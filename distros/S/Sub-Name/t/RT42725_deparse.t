@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Sub::Name;
 use B::Deparse;
 
@@ -12,3 +13,5 @@ my $source = eval {
 ok !$@;
 
 like $source, qr/\@\_/;
+
+done_testing;

@@ -89,8 +89,7 @@ for my $fw (6..9) {
 {
   C =>
     {
-      a
-        =>
+      a =>
         1
     }
 }
@@ -99,29 +98,31 @@ EOF
 for my $fw (1..5) {
   is( Data::Dumper::Interp->new()->Foldwidth($fw)->vis({C => {a => 1}}), do{chomp($_=<<'EOF'); $_}, "fw=$fw" );
 {
-  C
-    =>
+  C =>
     {
-      a
-        =>
+      a =>
         1
     }
 }
 EOF
 }
 
-like( Data::Dumper::Interp->new()->Foldwidth(72)
+like( Data::Dumper::Interp->new()->Foldwidth(72) 
      ->vis({ "" => "Emp", A=>111,BBBBB=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi}),
     expstr2re(do{chomp($_=<<'EOF'); $_}) );
-{ "" => "Emp",A => 111,BBBBB => 222,C => {d => 888,e => 999},D => {},
+{
+  "" => "Emp",A => 111,BBBBB => 222,C => {d => 888,e => 999},D => {},
   EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,F => \\\43,G => qr/foo.*bar/six
 }
 EOF
 
+# $Foldwidth is 12
+
 is( vis [12345678,4], '[12345678,4]' );
 
 is( vis [123456789,4], do{chomp(local $_=<<'EOF'); $_} );
-[ 123456789,
+[
+  123456789,
   4
 ]
 EOF
@@ -168,7 +169,8 @@ EOF
 # Once hit an assertion
 is( vis [ \undef, \\undef ],
     do{chomp(local $_=<<'EOF'); $_} );
-[ \undef,
+[
+  \undef,
   \$VAR1->[0]
 ]
 EOF
@@ -215,8 +217,7 @@ is( dvis('\%{}'), '\%{}' );
 is( Data::Dumper::Interp->new()->Foldwidth(4)->vis( [ [ ], 12345 ] ),
     do{chomp(local $_=<<'EOF'); $_} );
 [
-  [
-  ],
+  [],
   12345
 ]
 EOF

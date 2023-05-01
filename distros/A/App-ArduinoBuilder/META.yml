@@ -27,13 +27,15 @@ no_index:
   directory:
     - t
     - inc
+  namespace:
+    - App::ArduinoBuilder
 optional_features:
   test_coverage:
     description: 'Run `make cover` to compute test coverage'
 requires:
-  perl: '5.022'
+  perl: '5.026'
 resources:
   bugtracker: https://github.com/mkende/arduino_builder/issues
   repository: https://github.com/mkende/arduino_builder
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

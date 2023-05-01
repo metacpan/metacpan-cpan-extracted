@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Report::Html;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use base "Devel::Cover::Report::Html_minimal";
 
@@ -24,7 +24,7 @@ Devel::Cover::Report::Html - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

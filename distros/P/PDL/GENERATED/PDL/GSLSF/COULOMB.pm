@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_coulomb.pd"
 
 use strict;
@@ -37,12 +38,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =head1 SYNOPSIS
 
 =cut
-#line 41 "COULOMB.pm"
-
-
-
-
-
+#line 42 "COULOMB.pm"
 
 =head1 FUNCTIONS
 
@@ -50,8 +46,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -70,20 +64,15 @@ Normalized Hydrogenic bound states. Radial dipendence.
 gsl_sf_hydrogenicR does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 76 "COULOMB.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hydrogenicR = \&PDL::gsl_sf_hydrogenicR;
-#line 83 "COULOMB.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -102,20 +91,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 gsl_sf_coulomb_wave_FGp_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 108 "COULOMB.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_coulomb_wave_FGp_array = \&PDL::gsl_sf_coulomb_wave_FGp_array;
-#line 115 "COULOMB.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -134,20 +118,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 gsl_sf_coulomb_wave_sphF_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 140 "COULOMB.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_coulomb_wave_sphF_array = \&PDL::gsl_sf_coulomb_wave_sphF_array;
-#line 147 "COULOMB.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -166,16 +145,14 @@ Coulomb wave function normalization constant. [Abramowitz+Stegun 14.1.8, 14.1.9]
 gsl_sf_coulomb_CL_e does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 172 "COULOMB.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_coulomb_CL_e = \&PDL::gsl_sf_coulomb_CL_e;
-#line 179 "COULOMB.pm"
+
+
 
 
 
@@ -195,10 +172,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 199 "COULOMB.pm"
-
-
-
+#line 176 "COULOMB.pm"
 
 # Exit with OK status
 

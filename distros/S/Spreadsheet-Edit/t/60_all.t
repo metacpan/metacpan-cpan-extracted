@@ -55,11 +55,11 @@ for my $st (@subtests) {
                              run_subtest($st,'--verbose', '--debug') };
   if ($dwstat != 0) {
     say $doutput;
-    die "Non-zero exit status";
+    die "Non-zero exit status ($dwstat) from $st";
   }
   if (! eval { verif_no_internals_mentioned($doutput) }) {
     say $@;
-    die "internals inappropriately mentioned in output";
+    die "internals inappropriately mentioned in output from $st";
   }
   note basename($st)." produced ".length($doutput)." characters\n";
   ok (1, basename($st)." --verbose --debug : no inappropriate output detected");

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -397,9 +397,8 @@ sub __copy_table {
                 $str =~ s/\e\[[\d;]*m/\x{feff}/g;
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-                #$str = $self->{binary_filter} == 2 ? sprintf("%v02X", $str) =~ tr/./ /r : $self->{binary_string};  # perl 5.14
                 if ( $self->{binary_filter} == 2 ) {
-                    ( $str = sprintf("%v02X", $str) ) =~ tr/./ /;
+                    ( $str = sprintf("%v02X", $_ // $self->{undef} ) ) =~ tr/./ /;
                 }
                 else {
                     $str = $self->{binary_string};
@@ -736,12 +735,14 @@ sub __print_single_row {
             $key =~ s/(\e\[[\d;]*m)/push( @key_color, $1 ) && "\x{feff}"/ge;
         }
         if ( $self->{binary_filter} && substr( $key, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-            #$key = $self->{binary_filter} == 2 ? sprintf("%v02X", $key) =~ tr/./ /r : $self->{binary_string};  # perl 5.14
             if ( $self->{binary_filter} == 2 ) {
-                ( $key = sprintf("%v02X", $key) ) =~ tr/./ /;
+                ( $key = sprintf("%v02X", $tbl_orig->[0][$col] // $self->{undef} ) ) =~ tr/./ /;
             }
             else {
                 $key = $self->{binary_string};
+            }
+            if ( @key_color ) {
+                @key_color = ();
             }
         }
         $key =~ s/\t/ /g;
@@ -756,7 +757,7 @@ sub __print_single_row {
         }
         if ( @key_color ) {
             $key =~ s/\x{feff}/shift @key_color/ge;
-            $key = $key . "\e[0m";
+            $key .= "\e[0m";
         }
         my $value = $tbl_orig->[$row][$col];
         # $value: color and invalid char handling in `line_fold`
@@ -767,11 +768,14 @@ sub __print_single_row {
             $value = _handle_reference( $value );
         }
         if ( $self->{color} ) {
-            # color is reset only at the end of a table row
+            # keep a color to the end of a table row if not reset or overwritten
             if ( $col && length $tbl_orig->[$row][$col-1] ) {
-                $last_color_prev_value = ( $tbl_orig->[$row][$col-1] =~ /(\e\[[\d;]*m)/g )[-1] // $last_color_prev_value;
+                my $tmp_last_color = ( $tbl_orig->[$row][$col-1] =~ /(\e\[[\d;]*m)/g )[-1];
+                if ( $tmp_last_color && $tmp_last_color !~ /^\e\[0?m/ ) {
+                    $last_color_prev_value = $tmp_last_color;
+                }
             }
-            if ( $last_color_prev_value ) {
+            if ( $last_color_prev_value && substr( $value, 0, 100 ) !~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/) {
                 $value = $last_color_prev_value . $value;
             }
         }
@@ -931,7 +935,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.159
+Version 0.160
 
 =cut
 

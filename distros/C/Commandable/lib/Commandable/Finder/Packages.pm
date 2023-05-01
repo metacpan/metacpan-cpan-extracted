@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.09;
+package Commandable::Finder::Packages 0.10;
 
 use v5.14;
 use warnings;
@@ -88,7 +88,8 @@ named C<name>, C<description>, and optionally C<optional>.
 
 Gives a list of command option specifications. Each specification is a HASH
 reference giving one named option, in no particular order, and should contain
-keys named C<name>, C<description> and optionally C<mode> and C<default>.
+keys named C<name>, C<description> and optionally C<mode>, C<multi> and
+C<default>.
 
 =cut
 

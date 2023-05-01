@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Commandable::Finder::Packages;
 use Commandable::Invocation;
@@ -16,7 +16,7 @@ package MyTest::Command::one {
    );
    use constant COMMAND_OPTS => (
       { name => "verbose|v", description => "verbose option" },
-      { name => "target|t:", description => "target option" },
+      { name => "target|t=", description => "target option" },
    );
    sub run {}
 }
@@ -88,7 +88,7 @@ EOF
   one [OPTIONS...] $ARG
 
 * OPTIONS: *
-    <<--target>>, <<-t>>
+    <<--target <value>>>, <<-t <value>>>
       target option
 
     <<--verbose>>, <<-v>>

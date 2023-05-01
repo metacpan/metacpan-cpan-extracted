@@ -6,10 +6,11 @@ select(STDERR); $|=1;
 select(STDOUT); $|=1;
 
 use Test::More;
-use t::MockCPANDist;
-use t::Helper;
-use t::Frontend;
-use IO::CaptureOutput qw/capture/;
+use lib 't/lib';
+use MockCPANDist;
+use Helper;
+use Frontend;
+use Capture::Tiny qw/capture/;
 
 my @test_distros = (
     # pass
@@ -39,7 +40,7 @@ plan tests => 1 + test_grade_test_plan() * @test_distros + 3;
 # Fixtures
 #--------------------------------------------------------------------------#
 
-my $mock_dist = t::MockCPANDist->new( 
+my $mock_dist = MockCPANDist->new( 
     pretty_id => "JOHNQP/Bogus-Module-1.23.tar.gz",
     prereq_pm       => {
         requires => { 'File::Spec' => 0 },
@@ -62,10 +63,9 @@ for my $case ( @test_distros ) {
 
 # Test warning messages
 
-my ($stdout, $stderr);
-capture sub {
+my ($stdout, $stderr) = capture {
     CPAN::Reporter::_dispatch_report( {} );
-}, \$stdout, \$stderr;
+};
 
 like( $stdout, "/couldn't read configuration file/",
     "config file not found warnings"

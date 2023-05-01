@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 18 "ops.pd"
 
+#line 18 "ops.pd"
 
 use strict;
 use warnings;
@@ -52,11 +52,6 @@ none
 =cut
 #line 54 "Ops.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -64,35 +59,33 @@ none
 
 
 
-#line 132 "ops.pd"
 
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'+'} = $overload_sub = sub(;@) {
-      return PDL::plus(@_) unless ref $_[1]
+      goto &PDL::plus unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '+'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'+='} = sub { PDL::plus($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'+='} = sub { PDL::plus($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 84 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 83 "Ops.pm"
 
 =head2 plus
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -110,55 +103,48 @@ This function is used to overload the binary C<+> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 plus processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 123 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *plus = \&PDL::plus;
-#line 130 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'*'} = $overload_sub = sub(;@) {
-      return PDL::mult(@_) unless ref $_[1]
+      goto &PDL::mult unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '*'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'*='} = sub { PDL::mult($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'*='} = sub { PDL::mult($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 150 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 142 "Ops.pm"
 
 =head2 mult
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -176,55 +162,48 @@ This function is used to overload the binary C<*> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 mult processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 189 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *mult = \&PDL::mult;
-#line 196 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'-'} = $overload_sub = sub(;@) {
-      return PDL::minus(@_) unless ref $_[1]
+      goto &PDL::minus unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '-'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'-='} = sub { PDL::minus($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'-='} = sub { PDL::minus($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 216 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 201 "Ops.pm"
 
 =head2 minus
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -242,55 +221,48 @@ This function is used to overload the binary C<-> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 minus processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 255 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *minus = \&PDL::minus;
-#line 262 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'/'} = $overload_sub = sub(;@) {
-      return PDL::divide(@_) unless ref $_[1]
+      goto &PDL::divide unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '/'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'/='} = sub { PDL::divide($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'/='} = sub { PDL::divide($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 282 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 260 "Ops.pm"
 
 =head2 divide
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -308,51 +280,42 @@ This function is used to overload the binary C</> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 divide processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 321 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *divide = \&PDL::divide;
-#line 328 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>'} = $overload_sub = sub(;@) {
-      return PDL::gt(@_) unless ref $_[1]
+      goto &PDL::gt unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '>'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 344 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 313 "Ops.pm"
 
 =head2 gt
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -370,51 +333,42 @@ This function is used to overload the binary C<E<gt>> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 gt processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 383 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *gt = \&PDL::gt;
-#line 390 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<'} = $overload_sub = sub(;@) {
-      return PDL::lt(@_) unless ref $_[1]
+      goto &PDL::lt unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 406 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 366 "Ops.pm"
 
 =head2 lt
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -432,51 +386,42 @@ This function is used to overload the binary C<E<lt>> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 lt processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 445 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *lt = \&PDL::lt;
-#line 452 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<='} = $overload_sub = sub(;@) {
-      return PDL::le(@_) unless ref $_[1]
+      goto &PDL::le unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<='))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 468 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 419 "Ops.pm"
 
 =head2 le
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -494,51 +439,42 @@ This function is used to overload the binary C<E<lt>=> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 le processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 507 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *le = \&PDL::le;
-#line 514 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>='} = $overload_sub = sub(;@) {
-      return PDL::ge(@_) unless ref $_[1]
+      goto &PDL::ge unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '>='))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 530 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 472 "Ops.pm"
 
 =head2 ge
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -556,51 +492,42 @@ This function is used to overload the binary C<E<gt>=> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 ge processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 569 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ge = \&PDL::ge;
-#line 576 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'=='} = $overload_sub = sub(;@) {
-      return PDL::eq(@_) unless ref $_[1]
+      goto &PDL::eq unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '=='))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 592 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 525 "Ops.pm"
 
 =head2 eq
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -618,51 +545,42 @@ This function is used to overload the binary C<==> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 eq processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 631 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *eq = \&PDL::eq;
-#line 638 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'!='} = $overload_sub = sub(;@) {
-      return PDL::ne(@_) unless ref $_[1]
+      goto &PDL::ne unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '!='))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 654 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 578 "Ops.pm"
 
 =head2 ne
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -680,55 +598,48 @@ This function is used to overload the binary C<!=> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 ne processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 693 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ne = \&PDL::ne;
-#line 700 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<<'} = $overload_sub = sub(;@) {
-      return PDL::shiftleft(@_) unless ref $_[1]
+      goto &PDL::shiftleft unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<<'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'<<='} = sub { PDL::shiftleft($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'<<='} = sub { PDL::shiftleft($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 720 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 637 "Ops.pm"
 
 =head2 shiftleft
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -746,55 +657,48 @@ This function is used to overload the binary C<E<lt>E<lt>> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 shiftleft processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 759 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *shiftleft = \&PDL::shiftleft;
-#line 766 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>>'} = $overload_sub = sub(;@) {
-      return PDL::shiftright(@_) unless ref $_[1]
+      goto &PDL::shiftright unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '>>'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'>>='} = sub { PDL::shiftright($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'>>='} = sub { PDL::shiftright($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 786 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 696 "Ops.pm"
 
 =head2 shiftright
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -812,55 +716,48 @@ This function is used to overload the binary C<E<gt>E<gt>> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 shiftright processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 825 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *shiftright = \&PDL::shiftright;
-#line 832 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'|'} = $overload_sub = sub(;@) {
-      return PDL::or2($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
+      goto &PDL::or2 unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '|'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'|='} = sub { PDL::or2($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'|='} = sub { PDL::or2($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 852 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 755 "Ops.pm"
 
 =head2 or2
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap; SV *$ign; int $ign2)
 
 =for ref
 
@@ -878,55 +775,48 @@ This function is used to overload the binary C<|> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 or2 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 891 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *or2 = \&PDL::or2;
-#line 898 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'&'} = $overload_sub = sub(;@) {
-      return PDL::and2($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
+      goto &PDL::and2 unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '&'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'&='} = sub { PDL::and2($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'&='} = sub { PDL::and2($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 918 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 814 "Ops.pm"
 
 =head2 and2
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap; SV *$ign; int $ign2)
 
 =for ref
 
@@ -944,55 +834,48 @@ This function is used to overload the binary C<&> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 and2 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 957 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *and2 = \&PDL::and2;
-#line 964 "Ops.pm"
 
 
 
-#line 132 "ops.pd"
 
+
+#line 130 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'^'} = $overload_sub = sub(;@) {
-      return PDL::xor($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
+      goto &PDL::xor unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '^'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'^='} = sub { PDL::xor($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'^='} = sub { PDL::xor($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 984 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 873 "Ops.pm"
 
 =head2 xor
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap; SV *$ign; int $ign2)
 
 =for ref
 
@@ -1010,36 +893,27 @@ This function is used to overload the binary C<^> operator.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see second example), or supply it (see third one).
 
-
-
 =for bad
 
 xor processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1023 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *xor = \&PDL::xor;
-#line 1030 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
-#line 1037 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 917 "Ops.pm"
 
 =head2 bitnot
 
@@ -1059,55 +933,48 @@ unary bit negation
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<~> operator/function.
 
-
-
 =for bad
 
 bitnot processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1072 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bitnot = \&PDL::bitnot;
-#line 1079 "Ops.pm"
 
 
 
-#line 241 "ops.pd"
 
+
+#line 239 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'**'} = $overload_sub = sub(;@) {
-      return PDL::power(@_) unless ref $_[1]
+      goto &PDL::power unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '**'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'**='} = sub { PDL::power($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'**='} = sub { PDL::power($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 1099 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 972 "Ops.pm"
 
 =head2 power
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -1125,51 +992,42 @@ This function is used to overload the binary C<**> function.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see first example), or supply it (see second one).
 
-
-
 =for bad
 
 power processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1138 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *power = \&PDL::power;
-#line 1145 "Ops.pm"
 
 
 
-#line 241 "ops.pd"
 
+
+#line 239 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'atan2'} = $overload_sub = sub(;@) {
-      return PDL::atan2(@_) unless ref $_[1]
+      goto &PDL::atan2 unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], 'atan2'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 1161 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1025 "Ops.pm"
 
 =head2 atan2
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -1187,55 +1045,48 @@ This function is used to overload the binary C<atan2> function.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see first example), or supply it (see second one).
 
-
-
 =for bad
 
 atan2 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1200 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *atan2 = \&PDL::atan2;
-#line 1207 "Ops.pm"
 
 
 
-#line 241 "ops.pd"
 
+
+#line 239 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'%'} = $overload_sub = sub(;@) {
-      return PDL::modulo(@_) unless ref $_[1]
+      goto &PDL::modulo unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '%'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
+
+#line 193 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
-$OVERLOADS{'%='} = sub { PDL::modulo($_[0], $_[1], $_[0], 0); $_[0] };
+$OVERLOADS{'%='} = sub { PDL::modulo($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 1227 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1084 "Ops.pm"
 
 =head2 modulo
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -1253,51 +1104,42 @@ This function is used to overload the binary C<%> function.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see first example), or supply it (see second one).
 
-
-
 =for bad
 
 modulo processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1266 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *modulo = \&PDL::modulo;
-#line 1273 "Ops.pm"
 
 
 
-#line 241 "ops.pd"
 
+
+#line 239 "ops.pd"
+
+#line 180 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<=>'} = $overload_sub = sub(;@) {
-      return PDL::spaceship(@_) unless ref $_[1]
+      goto &PDL::spaceship unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<=>'))
               && $foo != $overload_sub; # recursion guard
-      $foo->($_[1], $_[0], !$_[2]);
+      goto &$foo;
   }; }
 }
-#line 1289 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1137 "Ops.pm"
 
 =head2 spaceship
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int swap)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -1315,36 +1157,27 @@ This function is used to overload the binary C<E<lt>=E<gt>> function.
 As of 2.065, when calling this function explicitly you can omit
 the third argument (see first example), or supply it (see second one).
 
-
-
 =for bad
 
 spaceship processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1328 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *spaceship = \&PDL::spaceship;
-#line 1335 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
-#line 1342 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1181 "Ops.pm"
 
 =head2 sqrt
 
@@ -1364,36 +1197,27 @@ elementwise square root
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<sqrt> operator/function.
 
-
-
 =for bad
 
 sqrt processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1377 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sqrt = \&PDL::sqrt;
-#line 1384 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
-#line 1391 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1221 "Ops.pm"
 
 =head2 sin
 
@@ -1413,36 +1237,27 @@ the sin function
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<sin> operator/function.
 
-
-
 =for bad
 
 sin processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1426 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sin = \&PDL::sin;
-#line 1433 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
-#line 1440 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1261 "Ops.pm"
 
 =head2 cos
 
@@ -1462,36 +1277,27 @@ the cos function
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<cos> operator/function.
 
-
-
 =for bad
 
 cos processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1475 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cos = \&PDL::cos;
-#line 1482 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
-#line 1489 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1301 "Ops.pm"
 
 =head2 not
 
@@ -1511,36 +1317,27 @@ the elementwise I<not> operation
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<!> operator/function.
 
-
-
 =for bad
 
 not processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1524 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *not = \&PDL::not;
-#line 1531 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
-#line 1538 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1341 "Ops.pm"
 
 =head2 exp
 
@@ -1560,36 +1357,27 @@ the exponential function
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<exp> operator/function.
 
-
-
 =for bad
 
 exp processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1573 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *exp = \&PDL::exp;
-#line 1580 "Ops.pm"
 
 
 
-#line 308 "ops.pd"
 
+
+#line 307 "ops.pd"
+
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
-#line 1587 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1381 "Ops.pm"
 
 =head2 log
 
@@ -1609,27 +1397,20 @@ the natural logarithm
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<log> operator/function.
 
-
-
 =for bad
 
 log processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1622 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *log = \&PDL::log;
-#line 1629 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1648,20 +1429,15 @@ Returns the real part of a complex number. Flows data back & forth.
 re processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1654 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *re = \&PDL::re;
-#line 1661 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1680,20 +1456,15 @@ Returns the imaginary part of a complex number. Flows data back & forth.
 im processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1686 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *im = \&PDL::im;
-#line 1693 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1712,23 +1483,18 @@ Returns the absolute (length) of a complex number.
 _cabs processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1718 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
-#line 1723 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
-#line 1728 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+
+
 
 
 
@@ -1750,20 +1516,15 @@ the base 10 logarithm
 It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<log10> operator/function.
 
-
-
 =for bad
 
 log10 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1763 "Ops.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 
 sub PDL::log10 {
@@ -1782,18 +1543,13 @@ sub PDL::log10 {
     &PDL::_log10_int( $x, $y );
     return $y;
 };
-#line 1786 "Ops.pm"
 
 
-
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *log10 = \&PDL::log10;
-#line 1793 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1812,20 +1568,15 @@ Plain numerical assignment. This is used to implement the ".=" operator
 assgn processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1818 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *assgn = \&PDL::assgn;
-#line 1825 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1844,20 +1595,15 @@ Returns the polar angle of a complex number.
 carg processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1850 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *carg = \&PDL::carg;
-#line 1857 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1876,20 +1622,15 @@ complex conjugate.
 conj processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1882 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *conj = \&PDL::conj;
-#line 1889 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1903,26 +1644,20 @@ convert real, imaginary to native complex, (sort of) like LISP zip
 function. Will add the C<r> ndarray to "i" times the C<i> ndarray. Only
 takes real ndarrays as input.
 
-
 =for bad
 
 czip does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1915 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *czip = \&PDL::czip;
-#line 1922 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1931,7 +1666,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(); indx b(); [o] ans())
-
 
 =for ref
 
@@ -1947,28 +1681,23 @@ It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 
 Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squaring>
 
-
-
 =for bad
 
 ipow does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1960 "Ops.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ipow = \&PDL::ipow;
-#line 1967 "Ops.pm"
 
 
 
-#line 568 "ops.pd"
 
+
+#line 567 "ops.pd"
 
 =head2 abs
 
@@ -1979,19 +1708,10 @@ Returns the absolute value of a number.
 =cut
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
-#line 1983 "Ops.pm"
 
-
-
-#line 580 "ops.pd"
-
+#line 176 "ops.pd"
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
-#line 1990 "Ops.pm"
-
-
-
-#line 582 "ops.pd"
-
+#line 581 "ops.pd"
 
 =head2 abs2
 
@@ -2002,13 +1722,7 @@ Returns the square of the absolute value of a number.
 =cut
 
 sub PDL::abs2 ($) { my $r = &PDL::abs; $r * $r }
-#line 2006 "Ops.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1726 "Ops.pm"
 
 =head2 r2C
 
@@ -2025,13 +1739,10 @@ convert real to native complex, with an imaginary part of zero
 r2C does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2031 "Ops.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::r2C ($) {
   return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
@@ -2039,18 +1750,13 @@ sub PDL::r2C ($) {
   PDL::_r2C_int($_[0], $r);
   $r;
 }
-#line 2043 "Ops.pm"
 
 
-
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *r2C = \&PDL::r2C;
-#line 2050 "Ops.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2069,13 +1775,10 @@ convert imaginary to native complex, with a real part of zero
 i2C does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2075 "Ops.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::i2C ($) {
   return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
@@ -2083,18 +1786,16 @@ sub PDL::i2C ($) {
   PDL::_i2C_int($_[0], $r);
   $r;
 }
-#line 2087 "Ops.pm"
 
 
-
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *i2C = \&PDL::i2C;
-#line 2094 "Ops.pm"
 
 
 
-#line 625 "ops.pd"
+
+
+#line 624 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -2121,15 +1822,8 @@ sub warn_non_numeric_op_wrapper {
     '--' => sub { $_[0] -= 1 },
     ;
 }
-#line 2125 "Ops.pm"
-
-
-
-
 
 #line 49 "ops.pd"
-
-
 =head1 AUTHOR
 
 Tuomas J. Lukka (lukka@fas.harvard.edu),
@@ -2140,10 +1834,7 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 2144 "Ops.pm"
-
-
-
+#line 1838 "Ops.pm"
 
 # Exit with OK status
 

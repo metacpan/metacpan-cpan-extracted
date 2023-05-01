@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.208';
+our $VERSION = '1.209';
 
 =encoding utf8
 
@@ -133,6 +133,10 @@ L<Quiq::Css> - Generiere CSS Code
 =item *
 
 L<Quiq::Css::Snippets> - CSS-Code für die Seiten einer Web-Applikation
+
+=item *
+
+L<Quiq::DataStructure> - Operationen auf einer komplexen Datenstruktur
 
 =item *
 
@@ -624,6 +628,10 @@ L<Quiq::LockedCounter> - Persistenter Zähler mit Lock
 
 =item *
 
+L<Quiq::Logger> - Schreiben von Logmeldungen
+
+=item *
+
 L<Quiq::MailTo> - Erzeuge mailto-URL
 
 =item *
@@ -966,7 +974,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.208
+1.209
 
 =head1 AUTHOR
 

@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Regexp::Common" => 0,
     "Scalar::Util" => 0,
     "Term::ReadKey" => 0,
+    "constant" => 0,
     "feature" => 0,
     "overload" => 0,
     "strict" => 0,
@@ -59,7 +60,6 @@ my %WriteMakefileArgs = (
     "bigint" => 0,
     "bignum" => 0,
     "bigrat" => 0,
-    "constant" => 0,
     "indirect" => 0,
     "lib" => 0,
     "multidimensional" => 0,
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "vars" => 0
   },
-  "VERSION" => "5.015",
+  "VERSION" => "5.016",
   "test" => {
     "TESTS" => "t/*.t"
   }

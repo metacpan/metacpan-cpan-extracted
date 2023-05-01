@@ -29,6 +29,7 @@ my @exports_normal   = (@EXPORT,
   @convertfuncs,
   qw(nelem dims shape null
       empty dup dupN inflateN
+      badflag
       convert inplace zeroes zeros ones nan inf i list listindices unpdl
       set at flows broadcast_define over reshape dog cat barf type
       thread_define dummy mslice approx flat sclr squeeze
@@ -61,15 +62,6 @@ $PDL::toolongtoprint = 10000;  # maximum pdl size to stringify for printing
 *thread_define = *broadcast_define;
 *PDL::threadover_n = *PDL::broadcastover_n;
 
-*dup = \&PDL::dup; *dupN = \&PDL::dupN;
-*howbig       = \&PDL::howbig;	  *unpdl	= \&PDL::unpdl;
-*nelem        = \&PDL::nelem;	  *inplace	= \&PDL::inplace;
-*dims	      = \&PDL::dims;	  *list 	= \&PDL::list;
-*broadcastids = \&PDL::broadcastids; *listindices  = \&PDL::listindices;
-*null	      = \&PDL::null;	  *set  	= \&PDL::set;
-*at		= \&PDL::at;	  *flows	= \&PDL::flows;
-*sclr           = \&PDL::sclr;    *shape        = \&PDL::shape;
-
 for my $t (PDL::Types::types()) {
   my $conv = $t->convertfunc;
   no strict 'refs';
@@ -80,14 +72,14 @@ for my $t (PDL::Types::types()) {
 }
 
 BEGIN {
-    *broadcast_define = \&PDL::broadcast_define;
-    *convert      = \&PDL::convert;   *over 	 = \&PDL::over;
-    *dog          = \&PDL::dog;       *cat 	         = \&PDL::cat;
-    *type         = \&PDL::type;      *approx        = \&PDL::approx;
-    *dummy        = \&PDL::dummy;
-    *mslice       = \&PDL::mslice;
-    *isempty      = \&PDL::isempty;
-    *string       = \&PDL::string;
+for (qw(
+  inflateN badflag dup dupN howbig unpdl nelem inplace dims
+  list broadcastids listindices null set at flows sclr shape
+  broadcast_define convert over dog cat mslice
+  type approx dummy isempty string
+)) {
+  no strict 'refs'; *{$_} = \&{"PDL::$_"};
+}
 }
 
 =head1 NAME
@@ -409,7 +401,7 @@ The BAD values are automatically kept BAD and propagated correctly.
 C<pdl()> is a functional synonym for the 'new' constructor,
 e.g.:
 
- $x = new PDL [1..10];
+ $x = PDL->new([1..10]);
 
 In order to control how undefs are handled in converting from perl lists to
 PDLs, one can set the variable C<$PDL::undefval>.
@@ -764,10 +756,6 @@ sub topdl {PDL->topdl(@_)}
 
 ##################### Data type/conversion stuff ########################
 
-sub PDL::dims {  # Return dimensions as @list
-   PDL->topdl(shift)->dims_c;
-}
-
 sub PDL::shape {  # Return dimensions as a pdl
    indx([PDL->topdl(shift)->dims]);
 }
@@ -795,10 +783,6 @@ below for usage).
  @ids = broadcastids $ndarray;
 
 =cut
-
-sub PDL::broadcastids {
-   PDL->topdl(shift)->broadcastids_c;
-}
 
 ################# Creation/copying functions #######################
 
@@ -871,9 +855,7 @@ new ndarray constructor method
 =for example
 
  $x = PDL->new(42);             # new from a Perl scalar
- $x = new PDL 42;               # ditto
  $y = PDL->new(@list_of_vals);  # new from Perl list
- $y = new PDL @list_of_vals;    # ditto
  $z = PDL->new(\@list_of_vals); # new from Perl list reference
  $w = PDL->new("[1 2 3]");      # new from Perl string, using
                                 # Matlab constructor syntax
@@ -983,7 +965,7 @@ sub PDL::Core::new_pdl_from_string {
    }
 
    # Wrap the string in brackets [], so that the following works:
-   # $x = new PDL q[1 2 3];
+   # $x = PDL->new(q[1 2 3]);
    # We'll have to check for dimensions of size one after we've parsed
    # the string and built a PDL from the resulting array.
    $value = '[' . $value . ']';
@@ -3100,15 +3082,6 @@ C<sclr> is generally used when a Perl scalar is required instead
 of a one-element ndarray. As of 2.064, if the input is a multielement ndarray
 it will throw an exception.
 
-=cut
-
-sub PDL::sclr {
-  my $this = shift;
-  confess "multielement ndarray in 'sclr' call"
-    if $this->nelem > 1;
-  return sclr_c($this);
-}
-
 =head2 cat
 
 =for ref
@@ -3161,7 +3134,7 @@ sub PDL::cat {
 	$@ = '';
 	eval {
 		$res = $_[0]->initialize;
-		$res->set_datatype((sort {$b<=>$a} map{$_->get_datatype} @_)[0] );
+		$res->set_datatype(max(map $_->get_datatype, @_));
 
 		my @resdims = $_[0]->dims;
 		for my $i(0..$#_){
@@ -3178,11 +3151,7 @@ sub PDL::cat {
 		# propagate any bad flags
 		for (@_) { if ( $_->badflag() ) { $res->badflag(1); last; } }
 	};
-	if ($@ eq '') {
-		# Restore the old error and return
-		$@ = $old_err;
-		return $res;
-	}
+	$@ = $old_err, return $res if !$@; # Restore the old error and return
 
 	# If we've gotten here, then there's been an error, so check things
 	# and barf out a meaningful message.
@@ -3942,7 +3911,7 @@ sub PDL::fhdr {
 
     # Avoid bug in 1.15 and earlier Astro::FITS::Header
     my @hdr = ("SIMPLE  =                    T");
-    my $hdr = new Astro::FITS::Header(Cards=>\@hdr);
+    my $hdr = Astro::FITS::Header->new(Cards=>\@hdr);
     tie my %hdr, "Astro::FITS::Header", $hdr;
     $pdl->sethdr(\%hdr);
     return \%hdr;

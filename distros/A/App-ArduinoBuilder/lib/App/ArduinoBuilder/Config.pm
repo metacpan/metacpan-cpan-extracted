@@ -14,13 +14,13 @@ our @EXPORT_OK = qw(get_os_name);
 
 sub new {
   my ($class, %options) = @_;
-  my $me = bless {config => {}, files => 0, options => {}}, $class;
-  $me->read_file($options{file}, %options) if $options{file};
+  my $this = bless {config => {}, files => 0, options => {}}, $class;
+  $this->read_file($options{file}, %options) if $options{file};
   for my $f (@{$options{files}}) {
-    $me->read_file($f, %options);
+    $this->read_file($f, %options, no_resolve => 1);
   }
-  $me->resolve(%options) if $options{resolve};
-  return $me;
+  $this->resolve(%options) unless $options{no_resolve};
+  return $this;
 }
 
 sub read_file {
@@ -33,7 +33,8 @@ sub read_file {
     fatal "Unparsable line in ${file_name}: ${l}" unless $l =~ m/^\s*([-0-9a-z_.]+?)\s*=\s*(.*?)\s*$/i;
     $this->{config}{$1} = $2 if !(exists $this->{config}{$1}) || $options{allow_override};
   }
-  $this->{file}++;
+  $this->resolve(%options) unless $options{no_resolve};
+  $this->{nb_files}++;
   return 1;
 }
 
@@ -45,6 +46,11 @@ sub size {
 sub empty {
   my ($this) = @_;
   return $this->size() == 0;
+}
+
+sub nb_files {
+  my ($this) = @_;
+  return $this->{nb_files}
 }
 
 sub get {
@@ -81,15 +87,19 @@ sub set {
 
 sub append {
   my ($this, $key, $value) = @_;
-  $this->{config}{$key} .= ($this->{config}{$key} ? ' ' : '').$value;
+  if ($this->{config}{$key}) {
+    $this->{config}{$key} .= ' '.$value;
+  } else {
+    $this->{config}{$key} = $value;
+  }
   return;
 }
 
 sub _resolve_key {
   my ($key, $config, %options) = @_;
   return $options{with}{$key} if exists $options{with}{$key};
-  return $options{base}->get($key, %options{grep { $_ ne 'base'} CORE::keys %options}) if exists $options{base} && $options{base}->exists($key);
   if (not exists $config->{$key}) {
+    return $options{base}->get($key, %options{grep { $_ ne 'base'} CORE::keys %options}) if exists $options{base} && $options{base}->exists($key);
     fatal "Can’t resolve key '${key}' in the configuration." unless $options{allow_partial};
     return;
   }
@@ -117,10 +127,12 @@ sub get_os_name {
 
 # This only does the OS resolution, not each key/value interpretation as this
 # should always be done as late as possible in case some values changes later.
+#
+# Should be called manually only if you call set() with OS specific keys (mainly
+# in tests).
 sub resolve {
   my ($this, %options) = @_;
   %options = (%{$this->{options}}, %options);
-  $options{allow_partial} = 1 if $options{no_resolve};
   my $config = $this->{config};
   my $os_name = $options{force_os_name} // get_os_name();
   for my $k (CORE::keys %$config) {
@@ -129,11 +141,11 @@ sub resolve {
   return 1;
 }
 
-# Definition from this are kept and not replaced by those from others.
+# By default, definition from this are kept and not replaced by those from others.
 sub merge {
-  my ($this, $other) = @_;
+  my ($this, $other, %options) = @_;
   while (my ($k, $v) = each %{$other->{config}}) {
-    $this->{config}{$k} = $v unless exists $this->{config}{$k};
+    $this->{config}{$k} = $v if $options{allow_override} || !exists $this->{config}{$k};
   }
 }
 

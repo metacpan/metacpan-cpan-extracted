@@ -63,7 +63,7 @@ SCRIPT
     ok(!-f $clean_result, 'clean script was not run from a clean --dry-run');
 
     cmp_deeply(
-        [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
+        [ grep /^\[Run::[^]]+\]/, @{ $tzil->log_messages } ],
         [
             '[Run::Clean] dry run, would run: "%x" script%pclean.pl',
             '[Run::Clean] dry run, would evaluate: use Path::Tiny; path(\'CLEAN.txt\')->append_utf8("eval command\n");',
@@ -93,7 +93,7 @@ SCRIPT
     );
 
     cmp_deeply(
-        [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
+        [ grep /^\[Run::[^]]+\]/, @{ $tzil->log_messages } ],
         [
             re(qr/^\[Run::Clean\] executing: /),
             '[Run::Clean] command executed successfully',

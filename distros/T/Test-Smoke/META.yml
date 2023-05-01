@@ -3,17 +3,16 @@ abstract: 'The Perl core test smoke suite'
 author:
   - 'H.Merijn Brand <h.m.brand@xs4all.nl>, Nicholas Clark <nick@plum.flirble.org> and Abe Timmerman <abeltje@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 6.55_03
   HTTP::Daemon: '0'
   HTTP::Message: '0'
   Test::Fatal: '0'
   Test::More: '0.88'
   Test::NoWarnings: '0'
-  URI: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,17 +23,22 @@ no_index:
     - t
     - inc
 requires:
-  CGI::Util: '0'
   Capture::Tiny: '0'
   File::Spec: '0.82'
+  Getopt::Long: '2.39'
   HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
   JSON::XS: '0'
+  Net::SSLeay: '0'
   POSIX: '0'
   System::Info: '0.05'
+  URI: '1.53'
+  autodie: '0'
   perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#smoke
+  bugtracker: https://github.com/abeltje/Test-Smoke/issues
   homepage: http://perl5.test-smoke.org/
-  repository: https://github.com/abeltje/Test-Smoke
-version: '1.79'
+  repository: https://github.com/abeltje/Test-Smoke.git
+version: '1.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

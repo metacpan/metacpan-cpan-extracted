@@ -1,7 +1,7 @@
 use strict;
 package CPAN::Reporter;
 
-our $VERSION = '1.2018';
+our $VERSION = '1.2019';
 
 use Config;
 use Capture::Tiny qw/ capture tee_merged /;
@@ -1189,9 +1189,10 @@ sub _report_text {
     my $data = shift;
     my $test_log = join(q{},@{$data->{output}});
     if ( length $test_log > MAX_OUTPUT_LENGTH ) {
-        $test_log = substr( $test_log, 0, MAX_OUTPUT_LENGTH) . "\n";
         my $max_k = int(MAX_OUTPUT_LENGTH/1000) . "K";
-        $test_log .= "\n[Output truncated after $max_k]\n\n";
+        $test_log = substr( $test_log, 0, MAX_OUTPUT_LENGTH/2 ) . "\n\n"
+	    . "[Output truncated because it exceeded $max_k]\n\n"
+	    . substr( $test_log, -(MAX_OUTPUT_LENGTH/2) );
     }
 
     my $comment_body = _comment_text();
@@ -1435,6 +1436,7 @@ my @toolchain_mods= qw(
     Parse::CPAN::Meta
     Test::Harness
     Test::More
+    Test2
     YAML
     YAML::Syck
     version
@@ -1589,7 +1591,7 @@ CPAN::Reporter - Adds CPAN Testers reporting to CPAN.pm
 
 =head1 VERSION
 
-version 1.2018
+version 1.2019
 
 =head1 SYNOPSIS
 
@@ -1817,7 +1819,7 @@ L<CPAN::Reporter::FAQ> -- hints and tips
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -1842,7 +1844,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Breno G. de Oliveira Christian Walde Ed J Joel Maslak Kent Fredric Matthew Musgrove Patrice Clement Reini Urban Scott Wiersdorf Slaven Rezic
+=for stopwords Alexandr Ciornii Breno G. de Oliveira Christian Walde David Cantrell Ed J Graham Knop James E Keenan J. Maslak José Joaquín Atria Kent Fredric Matthew Musgrove Patrice Clement Reini Urban Scott Wiersdorf Slaven Rezic
 
 =over 4
 
@@ -1860,11 +1862,27 @@ Christian Walde <walde.christian@googlemail.com>
 
 =item *
 
+David Cantrell <david@cantrell.org.uk>
+
+=item *
+
 Ed J <mohawk2@users.noreply.github.com>
 
 =item *
 
-Joel Maslak <jmaslak@antelope.net>
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+James E Keenan <jkeenan@cpan.org>
+
+=item *
+
+J. Maslak <jmaslak@antelope.net>
+
+=item *
+
+José Joaquín Atria <jjatria@cpan.org>
 
 =item *
 
@@ -1894,7 +1912,7 @@ Slaven Rezic <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2006 by David Golden.
+This software is Copyright (c) 2023 by David Golden.
 
 This is free software, licensed under:
 

@@ -1,16 +1,21 @@
-use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::UnusedVars;
+package Dist::Zilla::Plugin::Test::UnusedVars; # git description: v2.000007-16-gf6a4de2
 # ABSTRACT: Release tests for unused variables
-our $VERSION = '2.000007'; # VERSION
+
+our $VERSION = '2.001000';
+
 use Path::Tiny;
 use Moose;
-use Data::Section -setup;
+use Sub::Exporter::ForMethods 'method_installer';
+use Data::Section 0.004 { installer => method_installer }, '-setup';
+use namespace::autoclean;
+
 with qw(
     Dist::Zilla::Role::FileGatherer
     Dist::Zilla::Role::TextTemplate
+    Dist::Zilla::Role::PrereqSource
 );
 
 has files => (
@@ -18,7 +23,6 @@ has files => (
     isa => 'Maybe[ArrayRef[Str]]',
     predicate => 'has_files',
 );
-
 
 sub mvp_multivalue_args { return qw/ files / }
 sub mvp_aliases { return { file => 'files' } }
@@ -36,7 +40,7 @@ sub gather_files {
                 {
                     has_files => $self->has_files,
                     files => ($self->has_files
-                        ? [ map { path($_)->relative('lib')->stringify } @{ $self->files } ]
+                        ? [ map path($_)->relative('lib')->stringify, @{ $self->files } ]
                         : []
                     ),
                 }
@@ -45,9 +49,45 @@ sub gather_files {
     );
 };
 
+sub register_prereqs {
+    my $self = shift;
+
+    $self->zilla->register_prereqs(
+        {
+            phase => 'develop',
+            type  => 'requires',
+        },
+        'Test::Vars' => 0,
+    );
+}
+
 __PACKAGE__->meta->make_immutable;
-no Moose;
 1;
+
+#pod =pod
+#pod
+#pod =for Pod::Coverage mvp_multivalue_args mvp_aliases gather_files register_prereqs
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In your F<dist.ini>:
+#pod
+#pod     [Test::UnusedVars]
+#pod
+#pod Or, give a list of files to test:
+#pod
+#pod     [Test::UnusedVars]
+#pod     file = lib/My/Module.pm
+#pod     file = bin/verify-this
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing the
+#pod following file:
+#pod
+#pod     xt/release/unused-vars.t - a standard Test::Vars test
+#pod
+#pod =cut
 
 =pod
 
@@ -59,11 +99,11 @@ Dist::Zilla::Plugin::Test::UnusedVars - Release tests for unused variables
 
 =head1 VERSION
 
-version 2.000007
+version 2.001000
 
 =head1 SYNOPSIS
 
-In C<dist.ini>:
+In your F<dist.ini>:
 
     [Test::UnusedVars]
 
@@ -80,28 +120,18 @@ following file:
 
     xt/release/unused-vars.t - a standard Test::Vars test
 
-=for Pod::Coverage *EVERYTHING*
+=for Pod::Coverage mvp_multivalue_args mvp_aliases gather_files register_prereqs
 
-=for test_synopsis 1;
-__END__
+=head1 SUPPORT
 
-=head1 AVAILABILITY
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-UnusedVars>
+(or L<bug-Dist-Zilla-Plugin-Test-UnusedVars@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-UnusedVars@rt.cpan.org>).
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-UnusedVars/>.
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::UnusedVars/>.
-
-=head1 SOURCE
-
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars/issues>.
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHORS
 
@@ -117,7 +147,35 @@ Mike Doherty <doherty@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Mike Doherty Marcel Gruenauer Kent Fredric
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Mike Doherty <doherty@cs.dal.ca>
+
+=item *
+
+Mike Doherty <mike@mikedoherty.ca>
+
+=item *
+
+Marcel Gruenauer <hanekomu@gmail.com>
+
+=item *
+
+Kent Fredric <kentfredric@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2010 by Mike Doherty.
 
@@ -128,24 +186,16 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 ___[ xt/release/unused-vars.t ]___
-#!perl
-
 use Test::More 0.96 tests => 1;
-eval { require Test::Vars };
+use Test::Vars;
 
-SKIP: {
-    skip 1 => 'Test::Vars required for testing for unused vars'
-        if $@;
-    Test::Vars->import;
-
-    subtest 'unused vars' => sub {
+subtest 'unused vars' => sub {
 {{
 $has_files
     ? 'my @files = (' . "\n"
-        . join(",\n", map { q{    '} . $_ . q{'} } map { s{'}{\\'}g; $_ } @files)
+        . join(",\n", map q{    '}.$_.q{'}, map { s{'}{\\'}g; $_ } @files)
         . "\n" . ');' . "\n"
         . 'vars_ok($_) for @files;'
     : 'all_vars_ok();'
 }}
-    };
 };

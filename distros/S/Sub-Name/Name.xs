@@ -11,7 +11,7 @@
 #define NEED_newSVpvn_flags
 #define NEED_gv_fetchpvn_flags
 #define NEED_sv_catpvn_flags
-#define NEED_croak_xs_usage
+#define NEED_croak_xs_usage     /* running `perl ppport.h Name.xs` suggests removing this, but don't! see RT#125158 */
 #include "ppport.h"
 
 static MGVTBL subname_vtbl;

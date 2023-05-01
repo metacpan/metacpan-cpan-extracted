@@ -50,23 +50,18 @@ use PDL::Doc;
 use Pod::Select;
 use Pod::PlainText;
 use Term::ReadKey; #for GetTerminalSize
+use Cwd; # to help Debian packaging
 
-$PDL::onlinedoc = undef;
 $PDL::onlinedoc = PDL::Doc->new(FindStdFile());
 
 # Find std file
 
 sub FindStdFile {
-  my ($d,$f);
-  for $d (@INC) {
-      $f = $d."/PDL/pdldoc.db";
-      if (-f $f) {
-         print "Found docs database $f\n" if $PDL::verbose;
-	 print "Type 'help' for online help\n" if $PDL::verbose;
-         return $f;
-      }
-  }
-  warn "Unable to find PDL/pdldoc.db in ".join(":",@INC)."\n";
+  my ($f) = PDL::Doc::_find_inc([qw(PDL pdldoc.db)], 0);
+  warn("Unable to find PDL/pdldoc.db in ".join(":",@INC)."\n"), return if !defined $f;
+  print "Found docs database $f\n" if $PDL::verbose;
+  print "Type 'help' for online help\n" if $PDL::verbose;
+  return $f;
 }
 
 # used to find out how wide the screen should be
@@ -91,7 +86,6 @@ sub printmatch {
     }
 } # sub: print_match()
 
-
 # given a long module name, return the (perhaps shortened) module name.
 
 sub shortmod {
@@ -104,8 +98,6 @@ sub shortmod {
   }
   return $module;
 }
-
-
 
 # return a string containing a formated version of the Ref string
 # for the given matches
@@ -121,7 +113,7 @@ sub format_ref {
 
 
   my $width = screen_width()-17-1-$max_mod_length;
-  my $parser = new Pod::PlainText( width => $width, indent => 0, sentence => 0 );
+  my $parser = Pod::PlainText->new( width => $width, indent => 0, sentence => 0 );
 
   for my $m (@match) {
     my $ref = $m->[2]{Ref} ||
@@ -295,7 +287,8 @@ sub finddoc  {
 	   my $relfile = $m->[2]{File};
 	   my $absfile = undef;
 	   my @scnd = @{$PDL::onlinedoc->{Scanned}};
-	   for my $dbf(@scnd){
+	   for my $dbf (@scnd) {
+	       $dbf = Cwd::abs_path($dbf); # help Debian packaging
 	       $dbf =~ s:\/[^\/]*$::; # Trim file name off the end of the database file to get just the directory
 	       $dbf .= "/$relfile";
 	       $absfile = $dbf if( -e $dbf );
@@ -623,16 +616,6 @@ and the remaining commands listed, along with the names of their modules.
 
 =cut
 
-sub help_url {
-    local $_;
-    foreach(@INC) {
-	my $x = "$_/PDL/HtmlDocs/PDL/Index.html";
-	if(-e $x) {
-	    return "file://$x";
-	}
-    }
-}
-
 sub help {
   if ($#_>-1) {
       require PDL::Dbg;
@@ -644,28 +627,6 @@ sub help {
 	  $topic = 'PDL::Doc::Perldl' if $topic =~ /^\s*help\s*$/i;
 	  if ($topic =~ /^\s*vars\s*$/i) {
 	      PDL->px((caller)[0]);
-	  } elsif($topic =~ /^\s*url\s*/i) {
-	      my $x = help_url();
-	      if($x) {
-		  print $x;
-	      } else {
-		  print "Hmmm. Curious: I couldn't find the HTML docs anywhere in \@INC...\n";
-	      }
-	  } elsif($topic =~ /^\s*www(:([^\s]+))?\s*/i) {
-	      my $browser;
-	      my $url = help_url();
-	      if($2) {
-		  $browser = $2;
-	      } elsif($ENV{PERLDL_WWW}) {
-		  $browser = $ENV{PERLDL_WWW};
-	      } else {
-		  $browser = 'mozilla';
-	      }
-	      chomp($browser = `which $browser`);
-	      if(-e $browser && -x $browser) {
-		  print "Spawning \"$browser $url\"...\n";
-		  `$browser $url`;
-	      }
 	  } else {
 	      finddoc($topic);
 	  }
@@ -677,8 +638,6 @@ The following commands support online help in the perldl shell:
 
  help 'thing'   -- print docs on 'thing' (func, module, manual, autoload-file)
  help vars      -- print information about all current ndarrays
- help url       -- locate the HTML version of the documentation
- help www       -- View docs with default web browser (set by env: PERLDL_WWW)
 
  whatis <expr>  -- Describe the type and structure of an expression or ndarray.
  apropos 'word' -- search for keywords/function names 

@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,18 +10,17 @@ package Devel::Cover::Statement;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
-sub val         { $_[0][0]               }
-sub uncoverable { $_[0][1]               }
-sub covered     { $_[0][0]               }
-sub total       { 1                      }
-sub percentage  { $_[0][0] ? 100 : 0     }
-sub error       { $_[0][0] xor !$_[0][1] }
-sub criterion   { "statement"            }
-
+sub val         { $_[0][0]            }
+sub uncoverable { $_[0][1]            }
+sub covered     { $_[0][0]            }
+sub total       { 1                   }
+sub percentage  { $_[0][0] ? 100 : 0  }
+sub error       { $_[0]->simple_error }
+sub criterion   { "statement"         }
 
 1
 
@@ -33,7 +32,7 @@ Devel::Cover::Statement - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -55,7 +54,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

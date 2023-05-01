@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -86,11 +86,13 @@ _
     add_args_rels => {
         req_one => ['with_code', 'with_schema'],
     },
-
     links => [
         {url=>'prog:csv-check-cell-values', summary=>'Check single-cell values'},
         {url=>'prog:csv-check-field-names', summary=>'Check the field names'},
     ],
+    tags => ['category:checking', 'accepts-schema', 'accepts-code',
+             #'accepts-regex',
+         ],
 
     writes_csv => 0,
 
@@ -151,7 +153,7 @@ App::CSVUtils::csv_check_field_values - Check the values of whole fields against
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_check_field_values (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_check_field_values (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

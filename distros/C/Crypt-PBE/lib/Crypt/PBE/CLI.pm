@@ -13,7 +13,7 @@ use Carp;
 use Crypt::PBE::PBES1;
 use Crypt::PBE::PBES2;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 my @cli_options = qw(
     help|h
@@ -32,6 +32,10 @@ my @cli_options = qw(
 
     scheme=s
     algorithm=s
+
+    base64
+    hex
+    format=s
 
     encrypt
     decrypt
@@ -137,14 +141,17 @@ sub parse_value {
 
     if ( $value =~ /^(file|env)\:(.*)/ ) {
 
-        if ( $1 eq 'file' ) {
-            return cli_error('File not found') if ( !-f $2 );
-            return file_read($2);
+        my $type = $1;
+        my $name = $2;
+
+        if ( $type eq 'file' ) {
+            return cli_error('File not found') if ( !-f $name );
+            return file_read($name);
         }
 
-        if ( $1 eq 'env' ) {
-            return cli_error('Environment not found') if ( !defined $ENV{$2} );
-            return $ENV{$2};
+        if ( $type eq 'env' ) {
+            return cli_error('Environment variable not found') if ( !defined $ENV{$name} );
+            return $ENV{$name};
         }
 
     }
@@ -161,7 +168,20 @@ sub run {
 
     GetOptionsFromArray( $arguments, $options, @cli_options ) or pod2usage( -verbose => 0 );
 
-    $options->{count} ||= 1_000;
+    $options->{count}  ||= 1_000;
+    $options->{format} ||= 'base64';
+
+    if ( $options->{base64} ) {
+        $options->{format} = 'base64';
+    }
+
+    if ( $options->{hex} ) {
+        $options->{format} = 'hex';
+    }
+
+    if ($options->{format} ne 'base64' && $options->{format} ne 'hex') {
+        return cli_error('Invalid format');
+    }
 
     # Detect input from STDIN
     if ( -p STDIN || -f STDIN ) {
@@ -185,6 +205,10 @@ sub run {
 
     if ( !$pbe_params ) {
         return cli_error 'Invalid algorithm';
+    }
+
+    if (! $options->{encrypt} && ! $options->{decrypt}) {
+        return cli_error 'Specify --encrypt or --decrypt';
     }
 
     # Read password and input data from file or env variable
@@ -212,10 +236,10 @@ sub run {
     if ( $pbe_params->{scheme} eq 'pbes1' ) {
 
         if ( $options->{verbose} ) {
-            printf STDERR "Scheme: %s\n",     $pbe_params->{scheme};
-            printf STDERR "Hash: %s\n",       $pbe_params->{hash};
-            printf STDERR "Encryption: %s\n", $pbe_params->{encryption};
-            printf STDERR "Count: %s\n",      $options->{count};
+            printf STDERR "[PBES1] Scheme: %s\n",     $pbe_params->{scheme};
+            printf STDERR "[PBES1] Hash: %s\n",       $pbe_params->{hash};
+            printf STDERR "[PBES1] Encryption: %s\n", $pbe_params->{encryption};
+            printf STDERR "[PBES1] Count: %s\n",      $options->{count};
         }
 
         $pbes = Crypt::PBE::PBES1->new(
@@ -230,11 +254,10 @@ sub run {
     if ( $pbe_params->{scheme} eq 'pbes2' ) {
 
         if ( $options->{verbose} ) {
-            printf STDERR "Scheme: %s\n",     $pbe_params->{scheme};
-            printf STDERR "HMAC: %s\n",       $pbe_params->{hmac};
-            printf STDERR "Encryption: %s\n", $pbe_params->{encryption};
-            printf STDERR "Count: %s\n",      $options->{count};
-            printf STDERR "Password: %s\n",   $options->{password} if ( $options->{password} =~ /^(file|env)\:/ );
+            printf STDERR "[PBES2] Scheme: %s\n",     $pbe_params->{scheme};
+            printf STDERR "[PBES2] HMAC: %s\n",       $pbe_params->{hmac};
+            printf STDERR "[PBES2] Encryption: %s\n", $pbe_params->{encryption};
+            printf STDERR "[PBES2] Count: %s\n",      $options->{count};
         }
 
         $pbes = Crypt::PBE::PBES2->new(
@@ -246,15 +269,33 @@ sub run {
 
     }
 
+    my $output = '';
+
     if ( $options->{encrypt} ) {
-        print encode_base64( $pbes->encrypt( $options->{input} ), '' );
+
+        if ( $options->{format} eq 'hex' ) {
+            $output = join '', unpack 'H*', $pbes->encrypt( $options->{input} );
+        }
+
+        if ( $options->{format} eq 'base64' ) {
+            $output = encode_base64( $pbes->encrypt( $options->{input} ), '' );
+        }
+
     }
 
     if ( $options->{decrypt} ) {
-        print $pbes->decrypt( decode_base64 $options->{input} );
+
+        if ( $options->{format} eq 'hex' ) {
+            $output = $pbes->decrypt( pack 'H*', $options->{input} );
+        }
+
+        if ( $options->{format} eq 'base64' ) {
+            $output = $pbes->decrypt( decode_base64 $options->{input} );
+        }
+
     }
 
-    print $options->{null} ? "\0" : "\n";
+    print $output . ( $options->{null} ? "\0" : "\n" );
 
     return 0;
 
@@ -284,7 +325,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018-2021 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2020-2023 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

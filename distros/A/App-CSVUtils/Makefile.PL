@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "script/csv-ltrim",
     "script/csv-map",
     "script/csv-munge-field",
-    "script/csv-munge-row",
+    "script/csv-munge-rows",
     "script/csv-pick",
     "script/csv-pick-fields",
     "script/csv-pick-rows",
@@ -70,6 +70,7 @@ my %WriteMakefileArgs = (
     "script/csv2td",
     "script/csv2tsv",
     "script/csv2vcf",
+    "script/list-csvutils",
     "script/paras2csv",
     "script/tsv2csv"
   ],
@@ -77,7 +78,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CSVUtils",
   "PREREQ_PM" => {
-    "Complete::Module" => "0.262",
+    "Complete::Module" => "0.263",
     "Complete::Util" => "0.616",
     "Cwd" => 0,
     "Data::Cmp" => "0.002",
@@ -99,9 +100,11 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.50",
     "List::Util" => "1.54",
     "Log::ger" => "0.038",
+    "Module::List::Tiny" => 0,
     "Number::Util::Range" => "0.003",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
+    "Perinci::Sub::Gen::AccessTable" => "0.592",
     "Perinci::Sub::Util" => "0.470",
     "Perinci::Sub::XCompletion::filename" => 0,
     "Perinci::Sub::XCompletion::sortsub_spec" => 0,
@@ -131,7 +134,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.022",
+  "VERSION" => "1.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -140,7 +143,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
-  "Complete::Module" => "0.262",
+  "Complete::Module" => "0.263",
   "Complete::Util" => "0.616",
   "Cwd" => 0,
   "Data::Cmp" => "0.002",
@@ -167,9 +170,11 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::Util" => "1.54",
   "Log::ger" => "0.038",
+  "Module::List::Tiny" => 0,
   "Number::Util::Range" => "0.003",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
+  "Perinci::Sub::Gen::AccessTable" => "0.592",
   "Perinci::Sub::Util" => "0.470",
   "Perinci::Sub::XCompletion::filename" => 0,
   "Perinci::Sub::XCompletion::sortsub_spec" => 0,

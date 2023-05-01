@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -26,13 +26,14 @@ will contain the value of the field, and the Perl code is expected to modify it.
 row number (2 means the first data row). `$main::csv` is the <pm:Text::CSV_XS>
 object. `$main::fields_idx` is also available for additional information.
 
-To munge multiple fields, use <prog:csv-munge-row>.
+To munge multiple fields, use <prog:csv-munge-rows>.
 
 _
     add_args => {
         %App::CSVUtils::argspec_field_1,
         %App::CSVUtils::argspec_eval_2,
     },
+    tags => ['category:munging', 'modifies-field'],
 
     examples => [
         {
@@ -83,7 +84,7 @@ App::CSVUtils::csv_munge_field - Munge a field in every row of CSV file with Per
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_munge_field (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_munge_field (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 
@@ -112,7 +113,7 @@ C<$main::row> will contain the current row array. C<$main::rownum> contains the
 row number (2 means the first data row). C<$main::csv> is the L<Text::CSV_XS>
 object. C<$main::fields_idx> is also available for additional information.
 
-To munge multiple fields, use L<csv-munge-row>.
+To munge multiple fields, use L<csv-munge-rows>.
 
 This function is not exported.
 

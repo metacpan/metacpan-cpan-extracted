@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gaussian.pd"
 
 =head1 NAME
@@ -28,7 +29,6 @@ use DynaLoader;
 PDL::Fit::Gaussian - routines for fitting gaussians
 
 =head1 DESCRIPTION
-
 
 This module contains some custom gaussian fitting routines.
 These were developed in collaboration with Alison Offer,
@@ -121,23 +121,14 @@ use strict;
 use warnings;
 #line 123 "Gaussian.pm"
 
-
-
-
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
 *fitgauss1d = \&PDL::fitgauss1d;
-#line 134 "Gaussian.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *fitgauss1dr = \&PDL::fitgauss1dr;
-#line 141 "Gaussian.pm"
+
+
 
 
 
@@ -158,12 +149,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 162 "Gaussian.pm"
-
-
-
-
-
+#line 153 "Gaussian.pm"
 
 # Exit with OK status
 

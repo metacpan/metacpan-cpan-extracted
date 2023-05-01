@@ -7,7 +7,9 @@ use Getopt::Long;
 use Pod::Usage;
 
 my %options = ();
-GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q
+
+GetOptions( \%options, qw(build_dir=s build_logfile=s max_age=i all|a
+                          verbose|v force quiet|q
                           setup version help exclude=s only=s dry-run
                           skip-history ignore-versions)
 ) or pod2usage();
@@ -50,9 +52,16 @@ Call cpanm as you normally would:
 
    > cpanm Moose Catalyst::Runtime Data::Printer ...
 
-then, just call cpanm-reporter:
+then, just call cpanm-reporter to report results:
 
    > cpanm-reporter
+
+Or, if you performed a few installs (called cpanm more than once)
+and wish to report them all:
+
+   > cpanm-reporter --all
+
+See also some more advanced options below.
 
 =head2 OPTIONAL ARGUMENTS
 
@@ -61,9 +70,20 @@ then, just call cpanm-reporter:
    --help                 Shows basic usage help and exits
 
    --build_dir=PATH       Where your build directory is, containing
-                          each dist's subdir. Default: $HOME/.cpanm/latest-build
+                          each dist's subdir. Default:
+                          $HOME/.cpanm/latest-build
 
-   --build_logfile=PATH   Where the build.log is. Default: $BUILD_DIR/build.log
+   --build_logfile=PATH   Report results based on this specific build.log.
+                          By default: $BUILD_DIR/build.log is checked.
+
+   --all (or -a)          Report all recent installations, not only the
+                          last one. Use if you called cpanm a few times
+                          before spawning cpanm-reporter.
+
+   --max_age=AGE          Max age (in minutes) of reports which may
+                          be processed. See remarks below. Default: 30.
+
+   --force                Process reports even if they are too old.
 
    --verbose (or -v)      Extra output
 
@@ -74,10 +94,12 @@ then, just call cpanm-reporter:
    --only=A::B,C::D,...   Only send reports for these modules
 
    --exclude=A::B,...     Don't send reports for these modules
-   
+
    --dry-run              Prepare, but do not actually send reports
 
    --skip-history         Do not read nor write to the history file
+
+   --ignore-versions      Do not check if build perl version differs from the runtime
 
 
 =head1 DESCRIPTION
@@ -125,9 +147,10 @@ As such, you must be cautious to only run this tool I<right after> you run
 cpanm, otherwise your whole environment may have changed, rendering the
 report useless - maybe even turning it into a disservice.
 
-B<< As such, we will *only* parse build.log files last modified up to 30
-minutes before. >> You can override this by passing the C<--force> flag
-to cpanm-reporter, but please take good care to avoid sending bogus reports.
+B<< As such, we will *only* parse build.log files last modified up to
+30 minutes before. >> You can override this by passing the
+C<--max_age=...> option or the C<--force> flag to cpanm-reporter, but
+please take good care to avoid sending bogus reports.
 
 
 =item * cpanm currently does B<not> record the output into your build.log file
@@ -157,7 +180,7 @@ Breno G. de Oliveira  C<< <garu@cpan.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2012-2015, Breno G. de Oliveira C<< <garu@cpan.org> >>. All rights reserved.
+Copyright (c) 2012-2023, Breno G. de Oliveira C<< <garu@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

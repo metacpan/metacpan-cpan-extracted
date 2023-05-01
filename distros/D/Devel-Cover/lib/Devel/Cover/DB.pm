@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -489,8 +489,8 @@ sub add_branch {
             return;
         }
         my $n = $line{$l}++;
+        no warnings "uninitialized";
         if (my $a = $cc->{$l}[$n]) {
-            no warnings "uninitialized";
             $a->[0][0] += $fc->[$i][0];
             $a->[0][1] += $fc->[$i][1];
             $a->[0][2] += $fc->[$i][2] if exists $fc->[$i][2];
@@ -535,8 +535,11 @@ sub add_subroutine {
     }
 }
 
-*add_condition = \&add_branch;
-*add_pod       = \&add_subroutine;
+{
+    no warnings "once";
+    *add_condition = \&add_branch;
+    *add_pod       = \&add_subroutine;
+}
 
 sub uncoverable_files {
     my $self = shift;
@@ -754,16 +757,19 @@ sub objectify_cover {
             keys %$self
         };
 
-        *Devel::Cover::DB::Base::values = sub {
-            my $self = shift;
-            values %$self
-        };
+        {
+            no warnings "once";
+            *Devel::Cover::DB::Base::values = sub {
+                my $self = shift;
+                values %$self
+            };
 
-        *Devel::Cover::DB::Base::get = sub {
-            my $self = shift;
-            my ($get) = @_;
-            $self->{$get}
-        };
+            *Devel::Cover::DB::Base::get = sub {
+                my $self = shift;
+                my ($get) = @_;
+                $self->{$get}
+            };
+        }
 
         my $classes = {
             Cover     => [ qw( files file ) ],
@@ -780,22 +786,25 @@ sub objectify_cover {
             *{"${c}::$functions->[1]"} = \&{"${base}::get"};
         }
 
-        *Devel::Cover::DB::File::DESTROY = sub {};
-        unless (exists &Devel::Cover::DB::File::AUTOLOAD) {
-            *Devel::Cover::DB::File::AUTOLOAD = sub {
-                # Work around a change in bleadperl from 12251 to 14899
-                my $func = $Devel::Cover::DB::AUTOLOAD || $::AUTOLOAD;
+        {
+            no warnings "once";
+            *Devel::Cover::DB::File::DESTROY = sub {};
+            unless (exists &Devel::Cover::DB::File::AUTOLOAD) {
+                *Devel::Cover::DB::File::AUTOLOAD = sub {
+                    # Work around a change in bleadperl from 12251 to 14899
+                    my $func = $Devel::Cover::DB::AUTOLOAD || $::AUTOLOAD;
 
-                # print STDERR "autoloading <$func>\n";
-                (my $f = $func) =~ s/.*:://;
-                carp "Undefined subroutine $f called"
-                    unless grep { $_ eq $f }
-                                @{$self->{all_criteria}},
-                                @{$self->{all_criteria_short}};
-                no strict "refs";
-                *$func = sub { shift->{$f} };
-                goto &$func
-            };
+                    # print STDERR "autoloading <$func>\n";
+                    (my $f = $func) =~ s/.*:://;
+                    carp "Undefined subroutine $f called"
+                        unless grep { $_ eq $f }
+                                    @{$self->{all_criteria}},
+                                    @{$self->{all_criteria_short}};
+                    no strict "refs";
+                    *$func = sub { shift->{$f} };
+                    goto &$func
+                };
+            }
         }
     }
 }
@@ -933,7 +942,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -1019,7 +1028,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

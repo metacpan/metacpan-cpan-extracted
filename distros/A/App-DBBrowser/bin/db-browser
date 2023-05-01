@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.322';
+our $VERSION = '2.323';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.322
+Version 2.323
 
 =head1 SYNOPSIS
 
@@ -1203,15 +1203,25 @@ Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and 
 If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source. If this
 option is set to C<plain> or C<file>, the respective setting is used directly without any menu.
 
-=head2 Export
+=head2 Export_
 
 =head3 Destination folder
 
 Set the folder where the data to be exported will be saved as a CSV file.
 
-=head3 File Extension
+=head3 File name
+
+=over
+
+=item File extension csv
 
 If this option is enabled, the file extension C<csv> is added automatically to the file-name.
+
+=item Default file name
+
+If enabled, the table name will be used as the default name for the exported file.
+
+=back
 
 =head3 CSV options out a
 

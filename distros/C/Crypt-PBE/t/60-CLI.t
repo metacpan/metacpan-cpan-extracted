@@ -49,6 +49,9 @@ my $env_dec_2 = cmd( '--algorithm', $algorithm, '--password', 'env:PASSWORD', '-
 my $env_enc_3 = cmd( '--algorithm', $algorithm, '--password', $password, '--input', 'env:INPUT', '--encrypt' );
 my $env_dec_3 = cmd( '--algorithm', $algorithm, '--password', $password, '--input', $env_enc_3,  '--decrypt' );
 
+my $env_enc_4 = cmd( '--algorithm', $algorithm, '--password', $password, '--input', 'env:INPUT', '--hex', '--encrypt' );
+my $env_dec_4 = cmd( '--algorithm', $algorithm, '--password', $password, '--input', $env_enc_4,  '--hex', '--decrypt' );
+
 ok( $env_enc_1, 'Encrypt (env password)' );
 ok( $env_dec_1, 'Decrypt (env password)' );
 
@@ -57,6 +60,9 @@ ok( $env_dec_2, 'Decrypt (env password + input)' );
 
 ok( $env_enc_3, 'Encrypt (env input)' );
 ok( $env_dec_3, 'Decrypt (env input)' );
+
+ok( $env_enc_4, 'Encrypt (env input) in HEX' );
+ok( $env_dec_4, 'Decrypt (env input) in HEX' );
 
 # ------------------------------------------------------------------------------
 

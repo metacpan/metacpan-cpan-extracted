@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.2.4");
+use version 0.77; our $VERSION = version->declare("v2.2.5");
 
 
 sub new {
@@ -427,10 +427,9 @@ __END__
 Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" from a text table.
 
 
-
 =head1 VERSION
 
-Version v2.2.4
+Version v2.2.5
 
 
 =head1 SYNOPSIS
@@ -955,10 +954,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Table-Read-RelationOn-Tiny>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Text-Table-Read-RelationOn-Tiny>
 
 =item * Search CPAN
 

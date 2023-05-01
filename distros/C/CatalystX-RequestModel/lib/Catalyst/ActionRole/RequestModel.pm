@@ -3,8 +3,14 @@ package Catalyst::ActionRole::RequestModel;
 use Moose::Role;
 use Catalyst::Utils;
 use CatalystX::RequestModel::Utils::InvalidContentType;
+use String::CamelCase;
 
 requires 'attributes', 'execute';
+
+our $DEFAULT_BODY_POSTFIX = 'Body';
+our $DEFAULT_BODY_PREFIX_NAMESPACE = '';
+our $DEFAULT_QUERY_POSTFIX = 'Query';
+our $DEFAULT_QUERY_PREFIX_NAMESPACE = '';
 
 around 'execute', sub {
   my ($orig, $self, $controller, $ctx, @args) = @_;
@@ -14,6 +20,104 @@ around 'execute', sub {
   return $self->$orig($controller, $ctx, @args);
 };
 
+sub _default_body_postfix {
+  my ($self, $controller, $ctx) = @_;
+  return $controller->config->{body_model_postfix} if exists $controller->config->{body_model_postfix};
+  return $controller->default_body_postfix($self, $ctx) if $controller->can('default_body_postfix');
+  return $DEFAULT_BODY_POSTFIX;
+}
+
+sub _default_body_prefix_namespace {
+  my ($self, $controller, $ctx) = @_;
+  return $controller->config->{body_model_prefix_namespace} if exists $controller->config->{body_model_prefix_namespace};
+  return $controller->default_body_prefix_namespace($self, $ctx) if $controller->can('default_body_prefix_namespace');
+  return $DEFAULT_BODY_PREFIX_NAMESPACE;
+}
+
+sub _default_body_model {
+  my ($self, $controller, $ctx) = @_;
+  return $controller->default_body_model($self, $ctx) if $controller->can('default_body_model');
+
+  my $prefix = $self->_default_body_prefix_namespace($controller, $ctx);
+  $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
+
+  my $action_namepart = String::CamelCase::camelize($self->reverse);
+  $action_namepart =~s/\//::/g;
+  
+  my $postfix = $self->_default_body_postfix($controller, $ctx);
+  my $model_component_name = "${prefix}${action_namepart}${postfix}";
+
+  $ctx->log->debug("Initializing RequestModel: $model_component_name") if $ctx->debug;
+  return $model_component_name;
+}
+
+sub _process_body_model {
+  my ($self, $controller, $ctx, $model) = @_;
+  return $model unless $model =~m/^~/;
+
+  $model =~s/^~//;
+
+  my $prefix = $self->_default_body_prefix_namespace($controller, $ctx);
+  $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
+
+  my $namepart = String::CamelCase::camelize($controller->action_namespace);
+  $namepart =~s/\//::/g;
+
+  my $model_component_name = length("${prefix}${namepart}") ? "${prefix}${namepart}::${model}" : $model;
+
+  $ctx->log->debug("Initializing Body Model: $model_component_name") if $ctx->debug;
+  return $model_component_name;
+}
+
+sub _default_query_postfix {
+  my ($self, $controller, $ctx) = @_;
+  return $controller->config->{query_model_postfix} if exists $controller->config->{query_model_postfix};
+  return $controller->default_query_postfix($self, $ctx) if $controller->can('default_query_postfix');
+  return $DEFAULT_QUERY_POSTFIX;
+}
+
+sub _default_query_prefix_namespace {
+  my ($self, $controller, $ctx) = @_;
+  return $controller->config->{query_model_prefix_namespace} if exists $controller->config->{query_model_prefix_namespace};
+  return $controller->default_query_prefix_namespace($self, $ctx) if $controller->can('default_query_prefix_namespace');
+  return $DEFAULT_QUERY_PREFIX_NAMESPACE;
+}
+
+sub _default_query_model {
+  my ($self, $controller, $ctx) = @_;
+  return $controller->default_query_model($self, $ctx) if $controller->can('default_query_model');
+
+  my $prefix = $self->_default_query_prefix_namespace($controller, $ctx);
+  $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
+
+  my $action_namepart = String::CamelCase::camelize($self->reverse);
+  $action_namepart =~s/\//::/g;
+  
+  my $postfix = $self->_default_query_postfix($controller, $ctx);
+  my $model_component_name = "${prefix}${action_namepart}${postfix}";
+
+  $ctx->log->debug("Initializing Query Model: $model_component_name") if $ctx->debug;
+  return $model_component_name;
+}
+
+sub _process_query_model {
+  my ($self, $controller, $ctx, $model) = @_;
+  return $model unless $model =~m/^~/;
+
+  $model =~s/^~//;
+
+  my $prefix = $self->_default_query_prefix_namespace($controller, $ctx);
+  $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
+
+  my $namepart = String::CamelCase::camelize($controller->action_namespace);
+  $namepart =~s/\//::/g;
+
+  my $model_component_name = length("${prefix}${namepart}") ? "${prefix}${namepart}::${model}" : $model;
+
+  $ctx->log->debug("Initializing Query Model: $model_component_name") if $ctx->debug;
+  return $model_component_name;
+}
+
 sub _get_request_model {
   my ($self, $controller, $ctx) = @_;
   return unless exists $self->attributes->{RequestModel} ||
@@ -21,11 +125,18 @@ sub _get_request_model {
     exists $self->attributes->{BodyModel};
 
   my @models = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
-     map {split ',', $_ }  # Allow RequestModel(Model1,Model2)
+     map {split ',', $_||'' }  # Allow RequestModel(Model1,Model2)
     @{$self->attributes->{RequestModel} || []},
     @{$self->attributes->{BodyModel} || []};
 
   my $request_content_type = $ctx->req->content_type;
+
+  if(exists($self->attributes->{RequestModel}) || exists($self->attributes->{BodyModel})) {
+    @models = $self->_default_body_model($controller, $ctx) unless @models;
+    @models = map {
+      $self->_process_body_model($controller, $ctx, $_);
+    } @models;
+  }
 
   # Allow GET to hijack form encoded
   $request_content_type = "application/x-www-form-urlencoded"
@@ -44,8 +155,15 @@ sub _get_request_model {
 
   ## Query
   my @qmodels = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
-    map {split ',', $_ }  # Allow RequestModel(Model1,Model2)
+    map {split ',', $_||'' }  # Allow RequestModel(Model1,Model2)
     @{$self->attributes->{QueryModel} || []};
+
+  if(exists($self->attributes->{QueryModel})) {
+    @qmodels = $self->_default_query_model($controller, $ctx) unless @qmodels;
+    @qmodels = map {
+      $self->_process_query_model($controller, $ctx, $_);
+    } @qmodels;
+  }
 
   # Loop over all the found models.  Create each one and then filter by request
   # content type if that is defined.  This allows you to have different query paremters
@@ -121,6 +239,88 @@ to handled the no match conditions.
 
 You might also just find the code neater and more clean reading.  Downside is for people unfamiliar with
 this system it might increase learning curve time.
+
+=head1 ATTRITBUTE VALUE DEFAULTS
+
+Although you may prefer to be explicit in defining the request model name, we infer default values for
+both B<BodyModeL> and B<QueryModel> based on the action name and the controller namespace.  For example,
+
+    package Example::Controller::Account;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/root) PathPart('account') CaptureArgs(0)  { }
+
+      sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel() {
+        my ($self, $c, $request_model) = @_;
+        ## Do something with the $request_model
+      }
+
+      sub list :GET Chained('root') PathPart('') Args(0) Does(RequestModel) QueryModel() {
+        my ($self, $c, $paging_model) = @_;
+      }
+
+For the body model associated with the C<update> action, we will look for a model named
+C<Example::Model::Account:UpdateBody> and for the query model associated with the C<list> action
+we will look for a model named C<Example::Model::Account:ListQuery>.  You can change the default
+'postfix' for both types of models by defining the following methods in your controller class:
+
+    sub default_body_postfix { return 'Body' }
+    sub default_query_postfix { return 'Query' }
+
+Or via the controller configuration:
+
+    __PACKAGE__->config(
+      default_body_postfix => 'Body',
+      default_query_postfix => 'Query',
+    );
+
+You can also prepend a namespace affix to either the body or query model name by defining the following
+methods in your controller class:
+
+    sub default_body_prefix_namespace { return 'MyApp::Model' }
+    sub default_query_prefix_namespace { return 'MyApp::Model' }
+
+Or via the controller configuration:
+
+    __PACKAGE__->config(
+      default_body_prefix_namespace => 'MyApp::Model',
+      default_query_prefix_namespace => 'MyApp::Model',
+    );
+
+By default both namespace prefixes are empty, while the postfixes are 'Body' and 'Query' respectively.
+This I think sets a reasonable pattern that you can reuse to help make your code more consistent while
+allowing overrides for special cases.
+
+Alternatively you can use the action namespace of the current controller as a namespace prefix for
+the model name.  For example, if you have the following controller:
+
+    package Example::Controller::Account;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/root) PathPart('account') CaptureArgs(0)  { }
+
+      sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(~RequestBody) {
+        my ($self, $c, $request_model) = @_;
+        ## Do something with the $request_model
+      }
+
+      sub list :GET Chained('root') PathPart('') Args(0) Does(RequestModel) QueryModel(~RequestQuery) {
+        my ($self, $c, $paging_model) = @_;
+      }
+
+    __PACKAGE__->meta->make_immutable;
+
+Then we will look for a model named C<Example::Model::Account::RequestBody>
+and C<Example::Model::Account:RequestQuery> in your application namespace.  This approach also can
+set a query and body namespace prefix but not the postfix.
 
 =head1 METHOD ATTRIBUTES
 

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_check_field_names/csv_check_field_names",
@@ -41,7 +41,7 @@ csv-check-field-names - Check field names
 
 =head1 VERSION
 
-This document describes version 1.022 of csv-check-field-names (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of csv-check-field-names (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 SYNOPSIS
 
@@ -286,7 +286,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 Check field names
+=head2 Check that all field names are valid
 
  % csv-check-field-names file.csv
 
@@ -297,6 +297,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUti
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 SEE ALSO
+
+L<csv-check-cell-values>. Check of the values of individual cells.
 
 =head1 AUTHOR
 

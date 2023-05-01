@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "compression.pd"
 
+#line 5 "compression.pd"
 
 =head1 NAME
 
@@ -51,11 +51,6 @@ use strict;
 use warnings;
 #line 53 "Compression.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -63,19 +58,13 @@ use warnings;
 
 
 
-#line 74 "compression.pd"
 
+#line 74 "compression.pd"
 
 =head1 METHODS
 
 =cut
-#line 73 "Compression.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 68 "Compression.pm"
 
 =head2 rice_compress
 
@@ -130,19 +119,15 @@ Working on astronomical or solar image data, typical compression ratios of
 
   $new = $out->rice_expand;
 
-
 =for bad
 
 rice_compress ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 142 "Compression.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::rice_compress {
     my $in = shift;
@@ -164,18 +149,13 @@ sub PDL::rice_compress {
     $out = $out->slice("0:".($l-1))->sever;
     return wantarray ? ($out, $in->dim(0), $blocksize, $len) : $out;
 }
-#line 168 "Compression.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rice_compress = \&PDL::rice_compress;
-#line 175 "Compression.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -194,19 +174,15 @@ Unsquishes a PDL that has been squished by rice_compress.
      ($out, $len, $blocksize, $dim0) = $pdl->rice_compress;
      $copy = $out->rice_expand($dim0, $blocksize);
 
-
 =for bad
 
 rice_expand ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 206 "Compression.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::rice_expand {
     my $squished = shift;
@@ -217,21 +193,18 @@ sub PDL::rice_expand {
     PDL::_rice_expand_int( $squished, $out, $blocksize );
     return $out;
 }
-#line 221 "Compression.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rice_expand = \&PDL::rice_expand;
-#line 228 "Compression.pm"
+
+
 
 
 
 
 
 #line 35 "compression.pd"
-
 
 =head1 AUTHORS
 
@@ -267,10 +240,7 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 =back
 
 =cut
-#line 271 "Compression.pm"
-
-
-
+#line 244 "Compression.pm"
 
 # Exit with OK status
 

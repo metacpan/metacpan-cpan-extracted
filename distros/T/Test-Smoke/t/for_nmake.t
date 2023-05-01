@@ -40,11 +40,8 @@ Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 7;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 7 if !defined($makefile);
 
     # This should be set
     like( $makefile, '/^INST_DRV\s*=\s*F:\n/m', '$(INST_DRV)' );
@@ -52,9 +49,9 @@ SKIP: {
     like( $makefile, '/^# INST_DRV\t= untuched\n/m', "Untuched 2" );
 
     #These should be unset
-    like( $makefile, '/^#USE_MULTI\s*= define\n/m', '#$(USE_MULTI)' );
-    like( $makefile, '/^#USE_ITHREADS\s*= define\n/m', '#$(USE_ITHREADS)' );
-    like( $makefile, '/^#USE_IMP_SYS\s*= define\n/m', '#$(USE_IMP_SYS)' );
+    like( $makefile, '/^USE_MULTI\s*= define\n/m', '#$(USE_MULTI)' );
+    like( $makefile, '/^USE_ITHREADS\s*= define\n/m', '#$(USE_ITHREADS)' );
+    like( $makefile, '/^USE_IMP_SYS\s*= define\n/m', '#$(USE_IMP_SYS)' );
     like( $makefile, '/^#USE_LARGE_FILES\s*= define\n/m',
           '#$(USE_LARGE_FILES)' );
 }
@@ -67,11 +64,8 @@ Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 5;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 4 if !defined($makefile);
 
     # This should now be set twice
     like( $makefile, '/^CCTYPE\s*= MSVC60\nCCTYPE\s*= MSVC60\n/m',
@@ -80,30 +74,27 @@ SKIP: {
           "Untuched CCTYPE" );
 
     #These should be unset
-    like( $makefile, '/^#USE_MULTI\s*= define\n/m', '#$(USE_MULTI)' );
-    like( $makefile, '/^#USE_ITHREADS\s*= define\n/m', '#$(USE_ITHREADS)' );
-    like( $makefile, '/^#USE_IMP_SYS\s*= define\n/m', '#$(USE_IMP_SYS)' );
+    like( $makefile, '/^USE_MULTI\s*= define\n/m', '#$(USE_MULTI)' );
+    like( $makefile, '/^USE_ITHREADS\s*= define\n/m', '#$(USE_ITHREADS)' );
+    like( $makefile, '/^USE_IMP_SYS\s*= define\n/m', '#$(USE_IMP_SYS)' );
     like( $makefile, '/^#BUILD_STATIC\s*= define\n/m', '#$(BUILD_STATIC)' );
 }
 
 # Check that all three are set for -Duseithreads
 ok( my_unlink( $smoke_mk ), "Remove makefile" );
 
-$config = '-Dusethreads';
+$config = '-Uusethreads';
 Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 3;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 3 if !defined($makefile);
 
     #These should be set
-    like( $makefile, '/^USE_MULTI\s*= define\n/m', '$(USE_MULTI) set' );
-    like( $makefile, '/^USE_ITHREADS\s*= define\n/m', '$(USE_ITHREADS) set' );
-    like( $makefile, '/^USE_IMP_SYS\s*= define\n/m', '$(USE_IMP_SYS) set' );
+    like( $makefile, '/^#USE_MULTI\s*= define\n/m', '$(USE_MULTI) unset' );
+    like( $makefile, '/^#USE_ITHREADS\s*= define\n/m', '$(USE_ITHREADS) unset' );
+    like( $makefile, '/^#USE_IMP_SYS\s*= define\n/m', '$(USE_IMP_SYS) unset' );
 }
 
 # This will be a full configuration:
@@ -114,11 +105,8 @@ Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     #These should be set
     like( $makefile, '/^USE_LARGE_FILES\s*= define\n/m',
@@ -134,11 +122,8 @@ Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 3;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 7 if !defined($makefile);
 
     #These should be set
     like( $makefile, '/^USE_MULTI\s*= define\n/m', '$(USE_MULTI) set' );
@@ -163,11 +148,8 @@ Configure_win32( './Configure ' . $config, 'nmake', @cfg_args );
 ok( -f $smoke_mk, "New makefile ($config/[@cfg_args])" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     like( $makefile, '/
           ^CFG_VARS \s* = \s* \\\\\n
@@ -186,11 +168,8 @@ Configure_win32( './Configure ' . $config, 'nmake', @cfg_args );
 ok( -f $smoke_mk, "New makefile ($config/[@cfg_args])" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     like( $makefile, '/
           ^CFG_VARS \s* = \s* \\\\\n
@@ -210,11 +189,8 @@ Configure_win32( './Configure ' . $config, 'nmake', @cfg_args );
 ok( -f $smoke_mk, "New makefile ($config/[@cfg_args])" );
 
 SKIP: {
-    local *MF;
-    ok open( MF, "< $smoke_mk" ), "Opening makefile"  or
-        skip "Can't read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     like( $makefile, '/
           ^CFG_VARS \s* = \s* \\\\\n
@@ -231,11 +207,8 @@ $config = $dft_args . " -Accflags='-DPERL_COPY_ON_WRITE'";
 Configure_win32( './Configure '. $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 SKIP: {
-    local *MF;
-    ok open(MF, "< $smoke_mk"), "Opening makefile" or
-        skip "Cannot read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     like( $makefile, '/^BUILDOPT\t=\s\$\(BUILDOPT\)\ -DPERL_COPY_ON_WRITE\n
                        #+\ CHANGE THESE ONLY IF YOU MUST\ #+
@@ -249,11 +222,8 @@ $config = $dft_args . " -Accflags='-DPERL_COPY_ON_WRITE'".
 Configure_win32( './Configure '. $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 SKIP: {
-    local *MF;
-    ok open(MF, "< $smoke_mk"), "Opening makefile" or
-        skip "Cannot read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     like( $makefile, '/^BUILDOPT\t=\s\$\(BUILDOPT\)\ -DPERL_COPY_ON_WRITE\n
                         BUILDOPT\t=\s\$\(BUILDOPT\)\ -DPERL_POLLUTE\n
@@ -266,11 +236,8 @@ $config = $dft_args . " -Uuseimpsys";
 Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 SKIP: {
-    local *MF;
-    ok open(MF, "< $smoke_mk"), "Opening makefile" or
-        skip "Cannot read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 3 if !defined($makefile);
 
     #These should be unset
     like( $makefile, '/^USE_MULTI\s*= define\n/m', '$(USE_MULTI)' );
@@ -283,11 +250,8 @@ $config = $dft_args . " -Uuseshrplib";
 Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 SKIP: {
-    local *MF;
-    ok open(MF, "< $smoke_mk"), "Opening makefile" or
-        skip "Cannot read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
     #These should be unset
     like( $makefile, '/^BUILD_STATIC\s*= define\n/m', '$(BUILD_STATIC)' );
@@ -297,19 +261,16 @@ ok( my_unlink( $smoke_mk ), "Remove makefile" );
 
 note("Testing -Duseithreads -UWIN64...");
 $config = $dft_args . " -UWIN64";
-Configure_win32( './Configure ' . $config, 'dmake' );
+Configure_win32( './Configure ' . $config, 'nmake' );
 ok( -f $smoke_mk, "New makefile ($config)" );
 SKIP: {
-    local *MF;
-    ok open(MF, "< $smoke_mk"), "Opening makefile" or
-        skip "Cannot read from '$smoke_mk': $!", 1;
-    my $makefile = do { local $/; <MF> };
-    close MF;
+    my $makefile = get_smoke_mk_ok($smoke_mk);
+    skip "Can't read from '$smoke_mk': $!", 4 if !defined($makefile);
 
-    like($makefile, '/^USE_MULTI\s*\*= define\n/m',       '$(USE_MULTI)');
-    like($makefile, '/^USE_ITHREADS\s*\*= define\n/m',    '$(USE_ITHREADS)');
-    like($makefile, '/^USE_LARGE_FILES\s*\*= define\n/m', '$(USE_LARGE_FILES)');
-    like($makefile, '/^WIN64\s*\*= undef\n/m',            '$(WIN64)');
+    like($makefile, '/^USE_MULTI\s*= define\n/m',       '$(USE_MULTI)');
+    like($makefile, '/^USE_ITHREADS\s*= define\n/m',    '$(USE_ITHREADS)');
+    like($makefile, '/^USE_LARGE_FILES\s*= define\n/m', '$(USE_LARGE_FILES)');
+    like($makefile, '/^WIN64\s*= undef\n/m',            '$(WIN64)');
 }
 
 ok( my_unlink( $smoke_mk ), "Remove makefile" );
@@ -318,4 +279,18 @@ sub my_unlink {
     my $file = shift;
     1 while unlink $file;
     return ! -e $file;
+}
+
+sub get_smoke_mk_ok {
+    my ($smoke_mk) = @_;
+    my $content;
+    if ( open(my $fh, "<:crlf", $smoke_mk) ) {
+        $content = do {local $/; <$fh>};
+        close($fh);
+    }
+    else {
+        diag("Cannot open '$smoke_mk': $!");
+    }
+    ok(defined($content), "Reading makefile");
+    return $content;
 }

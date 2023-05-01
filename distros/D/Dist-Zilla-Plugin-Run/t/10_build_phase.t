@@ -76,9 +76,10 @@ SCRIPT
         ok( (  -f $no_trial_file), 'non-trial - file present' );
         is $no_trial_file->slurp_raw, ':-P', 'non-trial content';
 
-        my $script = $build_dir->child('script','no_trial.pl')->canonpath;   # use OS-specific path separators
+        my $script = quotemeta $build_dir->child('script','no_trial.pl')->canonpath;   # use OS-specific path separators
+        $script =~ s/\\\\/[\\\\\/]/g if  $^O eq 'MSWin32';
         like $tzil->log_messages->[-2],
-            qr{\[Run::AfterBuild\] executing: .+ \Q$script\E .+},
+            qr{\[Run::AfterBuild\] executing: .+ $script .+},
             'logged execution';
 
         like $tzil->log_messages->[-1],

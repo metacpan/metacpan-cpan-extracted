@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 68 "gsl_mroot.pd"
 
 use strict;
@@ -38,7 +39,6 @@ GNU Scientific Library.
 At the moment there is a single function B<gslmroot_fsolver> which provides an interface
 to the algorithms in the GSL library that do not use derivatives.
 
-
 =head1 SYNOPSIS
 
    use PDL;
@@ -47,10 +47,8 @@ to the algorithms in the GSL library that do not use derivatives.
    my $init = pdl (-10.00, -5.0);
    my $epsabs = 1e-7;
 
-
   $res = gslmroot_fsolver($init, \&rosenbrock,
                           {Method => 0, EpsAbs => $epsabs});
-
 
   sub rosenbrock{
      my ($x) = @_;
@@ -66,12 +64,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
      return $y;
   }
-#line 70 "MROOT.pm"
-
-
-
-
-
+#line 68 "MROOT.pm"
 
 =head1 FUNCTIONS
 
@@ -79,8 +72,6 @@ to the algorithms in the GSL library that do not use derivatives.
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -90,24 +81,19 @@ to the algorithms in the GSL library that do not use derivatives.
 
   Signature: (double [io]xfree(n);   double epsabs(); int method(); SV* function1)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 gslmroot_fsolver does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 107 "MROOT.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub gslmroot_fsolver {
 	my ($x, $f_vect) = @_;
@@ -119,14 +105,12 @@ sub gslmroot_fsolver {
 	_gslmroot_fsolver_int($res, $$opt{'EpsAbs'}, $$opt{'Method'}, $f_vect);
 	return $res;
 }
-#line 123 "MROOT.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gslmroot_fsolver = \&PDL::GSL::MROOT::gslmroot_fsolver;
-#line 130 "MROOT.pm"
+
+
 
 
 
@@ -152,10 +136,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 156 "MROOT.pm"
-
-
-
+#line 140 "MROOT.pm"
 
 # Exit with OK status
 

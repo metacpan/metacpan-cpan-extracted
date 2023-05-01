@@ -1,8 +1,8 @@
-package Data::Visitor; # git description: Data-Visitor-0.27-23-g8b10b8a
+package Data::Visitor; # git description: v0.31-4-g7498abb
 use Moose;
 # ABSTRACT: Visitor style traversal of Perl data structures
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 use Scalar::Util qw/blessed refaddr reftype weaken isweak/;
 use overload ();
 use Symbol ();
@@ -463,7 +463,7 @@ Data::Visitor - Visitor style traversal of Perl data structures
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -697,7 +697,7 @@ Marcel Grünauer <marcel@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Jesse Luehrs Florian Ragwitz Karen Etheridge David Steinbrunner Robin Smidsrød
+=for stopwords Jesse Luehrs Karen Etheridge Florian Ragwitz David Steinbrunner Graham Knop Robin Smidsrød
 
 =over 4
 
@@ -707,15 +707,19 @@ Jesse Luehrs <doy@tozt.net>
 
 =item *
 
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
 Karen Etheridge <ether@cpan.org>
 
 =item *
 
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
 David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 
@@ -725,7 +729,7 @@ Robin Smidsrød <robin@smidsrod.no>
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Yuval Kogman.
+This software is copyright (c) 2023 by Yuval Kogman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

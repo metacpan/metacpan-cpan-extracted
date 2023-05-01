@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.056-4-gfae9b39
+package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.057-4-gc62d384
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Check at build/release time if modules are out of date
 # KEYWORDS: prerequisites upstream dependencies modules metadata update stale
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeBuild',
@@ -192,7 +192,7 @@ sub stale_modules
         next if $already_checked{$module};
 
         # these core modules should be indexed, but aren't
-        if (any { $module eq $_ } qw(Config DB Errno Pod::Functions))
+        if (any { $module eq $_ } qw(Config DB DynaLoader Errno Pod::Functions))
         {
             $self->log_debug([ 'skipping core module: %s', $module ]);
             $already_checked{$module}++;
@@ -499,7 +499,7 @@ Dist::Zilla::Plugin::PromptIfStale - Check at build/release time if modules are 
 
 =head1 VERSION
 
-version 0.057
+version 0.058
 
 =head1 SYNOPSIS
 
@@ -640,7 +640,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

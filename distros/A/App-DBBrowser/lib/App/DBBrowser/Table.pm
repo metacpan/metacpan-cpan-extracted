@@ -279,6 +279,9 @@ sub __get_filename_fs {
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $file_name;
+    if ( $sf->{o}{export}{default_filename} ) {
+        $file_name = $sf->{d}{table_key};
+    }
     my $count = 0;
 
     FILE_NAME: while ( 1 ) {

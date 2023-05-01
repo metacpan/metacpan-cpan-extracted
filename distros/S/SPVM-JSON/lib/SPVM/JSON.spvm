@@ -1,76 +1,298 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class JSON : precompile {
+  version "0.051";
+  
   use Hash;
   use List;
   use StringBuffer;
   use Fn;
   use Array;
   use Sort;
+  use Math;
   
-  has canonical : rw byte;
-
-  private static method _decode_error : void ($die_message : string, $json : string, $start : int) {
-    my $end = length $json;
-    my $max_dump_length = 10;
-    if ($max_dump_length > $end - $start) {
-      $max_dump_length = $end - $start;
+  # Enumerations
+  private enum {
+    DECODE_NUM_BEGIN,
+    DECODE_NUM_LEADING_DIGIT,
+    DECODE_NUM_DOT,
+    DECODE_NUM_FRAC,
+    DECODE_NUM_EXP,
+    DECODE_NUM_EXP_SIGN,
+    DECODE_NUM_EXP_DIGIT,
+    DECODE_NUM_END,
+  }
+  
+  # Class Methods
+  static method new : JSON () {
+    my $self = new JSON;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method encode : string ($spvm_data : object) {
+    my $depth = 0;
+    
+    my $json_data = $self->_encode_recursive($spvm_data, $depth);
+    
+    return $json_data;
+  }
+  
+  private method _encode_recursive : string ($spvm_data : object, $depth : int) {
+    
+    my $json_data : string;
+    
+    # undef
+    if ($spvm_data == undef) {
+      $json_data = "null";
     }
-    my $hint = "";
-    if ($max_dump_length > 0) {
-      $hint = "near '" . Fn->substr($json, $start, $end - $start) . "'";
+    # Hash
+    elsif ($spvm_data isa Hash) {
+      my $buffer = StringBuffer->new;
+      $buffer->push_char('{');
+      my $hash = (Hash)$spvm_data;
+      my $keys = $hash->keys;
+      
+      # Sort keys
+      Sort->sort_string_asc($keys, 0, scalar @$keys);
+      
+      for (my $keys_index = 0; $keys_index < @$keys; ++$keys_index) {
+        if ($keys_index > 0) {
+          $buffer->push_char(',');
+        }
+        $buffer->push_char('"');
+        $buffer->push($keys->[$keys_index]);
+        $buffer->push_char('"');
+        $buffer->push_char(':');
+        my $json_data_part = $self->_encode_recursive($hash->get($keys->[$keys_index]), $depth + 1);
+        $buffer->push($json_data_part);
+      }
+      $buffer->push_char('}');
+      
+      $json_data = $buffer->to_string;
+    }
+    # List
+    elsif ($spvm_data isa List) {
+      my $buffer = StringBuffer->new;
+      $buffer->push_char('[');
+      
+      my $list = (List)$spvm_data;
+      my $length = $list->length;
+      for (my $list_index = 0; $list_index < $length; ++$list_index) {
+        if ($list_index > 0) {
+          $buffer->push_char(',');
+        }
+        my $json_data_part = $self->_encode_recursive($list->get($list_index), $depth + 1);
+        $buffer->push($json_data_part);
+      }
+      $buffer->push_char(']');
+      
+      $json_data = $buffer->to_string;
+    }
+    # string
+    elsif ($spvm_data isa string) {
+      my $escaped = &_escape_string((string)$spvm_data);
+      $json_data = "\"" . $escaped . "\"";
+    }
+    # Byte
+    elsif ($spvm_data isa Byte) {
+      $json_data = (string)$spvm_data->(Byte)->value;
+    }
+    # Short
+    elsif ($spvm_data isa Short) {
+      $json_data = (string)$spvm_data->(Short)->value;
+    }
+    # Int
+    elsif ($spvm_data isa Int) {
+      $json_data = (string)$spvm_data->(Int)->value;
+    }
+    # Long
+    elsif ($spvm_data isa Long) {
+      $json_data = (string)$spvm_data->(Long)->value;
+    }
+    # Float
+    elsif ($spvm_data isa Float) {
+      my $value = $spvm_data->(Float)->value;
+      if (Math->isnanf($value)) {
+        die "The \$spvm_data cannot contain a NaN float value. The found depth is $depth.";
+      }
+      elsif (Math->isinff($value)) {
+        die "The \$spvm_data cannot contain an inifinity float value. The found depth is $depth.";
+      }
+      
+      $json_data = (string)$value;
+    }
+    # Double
+    elsif ($spvm_data isa Double) {
+      my $value = $spvm_data->(Double)->value;
+      if (Math->isnan($value)) {
+        die "The \$spvm_data cannot contain a NaN double value. The found depth is $depth.";
+      }
+      elsif (Math->isinf($value)) {
+        die "The \$spvm_data cannot contain an inifinity double value. The found depth is $depth.";
+      }
+      
+      $json_data = (string)$value;
+    }
+    # Bool
+    elsif ($spvm_data isa Bool) {
+      if ($spvm_data->(Bool)) {
+        $json_data = "true";
+      }
+      else {
+        $json_data = "false";
+      }
     }
     else {
-      $hint = "end of string";
+      my $type_name = ref $spvm_data;
+      
+      die "The \$spvm_data contains a value of an invalid type. The type is $type_name. The found depth is $depth.";
     }
-    die $die_message . " ... $hint";
+    
+    return $json_data;
   }
-
-  private method _skip_spaces : void ($json : string, $iter : int*) {
-    my $end = length $json;
-    for (; 1 ; ++$$iter) {
-      if ($$iter == $end) {
+  
+  method decode : object ($json_data : string) {
+    my $json_data_index = 0;
+    my $spvm_data = $self->_decode_recursive($json_data, \$json_data_index);
+    
+    # allow $json_data to have trailing spaces.
+    $self->_skip_spaces($json_data, \$json_data_index);
+    
+    # do not allow $json_data to have non-space string after a json object,
+    # something like `{"key":1} [1,2]`
+    my $length = length $json_data;
+    unless ($json_data_index == $length) {
+      &_decode_error("The \$json_data can't end with non-space characters", $json_data, $json_data_index);
+    }
+    
+    return $spvm_data;
+  }
+  
+  private method _decode_recursive : object ($json_data : string, $json_data_index : int*) {
+    my $json_data_length = length $json_data;
+    
+    $self->_skip_spaces($json_data, $json_data_index);
+    
+    if ($$json_data_index == $json_data_length) {
+      &_decode_error("Unexpected character \"\"", $json_data, $$json_data_index);
+    }
+    
+    my $char = (int)($json_data->[$$json_data_index]);
+    switch ($char) {
+      case '{': {
+        # objects
+        return $self->_decode_hash($json_data, $json_data_index);
+      }
+      case '[': {
+        return $self->_decode_list($json_data, $json_data_index);
+      }
+      case '"': {
+        return $self->_decode_string($json_data, $json_data_index);
+      }
+      case '-':
+      case '0': case '1': case '2': case '3': case '4':
+      case '5': case '6': case '7': case '8': case '9': {
+        return $self->_decode_num($json_data, $json_data_index);
+      }
+      case 't': {
+        return $self->_decode_true($json_data, $json_data_index);
+      }
+      case 'f': {
+        return $self->_decode_false($json_data, $json_data_index);
+      }
+      case 'n': {
+        &_expect_token($json_data, $json_data_index, "null");
+        return undef;
+      }
+      default: {
+        &_decode_error("Unexpected character \"" . Fn->chr($char) . "\"", $json_data, $$json_data_index);
+      }
+    }
+  }
+  
+  private static method _decode_error : void ($message : string, $json_data : string, $pos : int) {
+    
+    my $json_data_from_pos = Fn->substr($json_data, 0, $pos);
+    
+    my $lines = (string[])undef;
+    if ($json_data eq "") {
+      $lines = [$json_data];
+    }
+    else {
+      $lines = Fn->split("\n", $json_data);
+    }
+    my $lines_length = @$lines;
+    
+    my $last_line = (mutable string)copy $lines->[$lines_length - 1];
+    if (length $last_line > 0 && $last_line->[length $last_line - 1] == '\r') {
+      Fn->shorten($last_line, length $last_line - 1);
+    }
+    my $last_new_line_pos = Fn->rindex($json_data, "\n", 0, $pos);
+    
+    my $last_line_pos = 0;
+    if ($last_new_line_pos >= 0) {
+      $last_line_pos = $pos - $last_new_line_pos - 1;
+    }
+    else {
+      $last_line_pos = $pos;
+    }
+    my $last_line_pos_disp = $last_line_pos + 1;
+    
+    my $line = $lines_length;
+    
+    die "The decoding of the \$json_data failed. $message at line $line column $last_line_pos_disp.";
+  }
+  
+  private method _skip_spaces : void ($json_data : string, $json_data_index : int*) {
+    my $json_data_length = length $json_data;
+    for (; 1 ; ++$$json_data_index) {
+      if ($$json_data_index == $json_data_length) {
         return;
       }
-      unless ($json->[$$iter] == ' ' || $json->[$$iter] == '\n' || $json->[$$iter] == '\t' || $json->[$$iter] == '\r') {
+      unless ($json_data->[$$json_data_index] == ' ' || $json_data->[$$json_data_index] == '\n' || $json_data->[$$json_data_index] == '\t' || $json_data->[$$json_data_index] == '\r') {
         last;
       }
     }
   }
-
-  private static method _expect_char : void ($json : string, $iter : int*, $expected : byte) {
-    my $end = length $json;
-    unless ($$iter + 1 <= $end && $json->[$$iter] == $expected) {
-      &_decode_error("Expected char: $expected] doesn't exist", $json, $$iter);
+  
+  private static method _expect_char : void ($json_data : string, $json_data_index : int*, $expected : byte) {
+    my $json_data_length = length $json_data;
+    unless ($$json_data_index + 1 <= $json_data_length && $json_data->[$$json_data_index] == $expected) {
+      &_decode_error("Expected character: \"" . Fn->chr($expected) . "\"", $json_data, $$json_data_index);
     }
-    ++$$iter;
+    ++$$json_data_index;
   }
-
-  private static method _expect_token : void ($json : string, $iter : int*, $expected : string) {
-    my $end = length $json;
+  
+  private static method _expect_token : void ($json_data : string, $json_data_index : int*, $expected : string) {
+    my $json_data_length = length $json_data;
     my $length = length $expected;
-    unless ($$iter + $length <= $end) {
-      &_decode_error("Expected token: $expected doesn't exist", $json, $$iter);
+    unless ($$json_data_index + $length <= $json_data_length) {
+      &_decode_error("Expected token: \"$expected\"", $json_data, $$json_data_index);
     }
-    my $got = Fn->substr($json, $$iter, $length);
+    my $got = Fn->substr($json_data, $$json_data_index, $length);
     if ($got eq $expected) {
-      $$iter += $length;
+      $$json_data_index += $length;
     }
     else {
-      &_decode_error("Expected token: $expected doesn't exist", $json, $$iter);
+      &_decode_error("Expected token: \"$expected\"", $json_data, $$json_data_index);
     }
   }
-
-  private method _decode_string : string ($json : string, $iter : int*) {
-    my $end = length $json;
+  
+  private method _decode_string : string ($json_data : string, $json_data_index : int*) {
+    my $json_data_length = length $json_data;
     my $buffer = StringBuffer->new;
 
-    &_expect_char($json, $iter, '"');
+    &_expect_char($json_data, $json_data_index, '"');
 
     my $special_char_expected = 0;
     while (1) {
-      if ($$iter >= $end || (!$special_char_expected && $json->[$$iter] == '"')) {
+      if ($$json_data_index >= $json_data_length || (!$special_char_expected && $json_data->[$$json_data_index] == '"')) {
         last;
       }
-      my $char = $json->[$$iter];
+      my $char = $json_data->[$$json_data_index];
       if ($special_char_expected) {
         switch ((int)$char) {
           case '"':
@@ -100,7 +322,7 @@ class JSON : precompile {
             break;
           }
           default: {
-            &_decode_error("Undefined special char", $json, $$iter);
+            &_decode_error("Invalid string", $json_data, $$json_data_index);
           }
         }
         $special_char_expected = 0;
@@ -110,59 +332,48 @@ class JSON : precompile {
       }
       else {
         if ($char <= 31 || $char == 127) {
-          &_decode_error("Control ASCII characters are not allowed in string", $json, $$iter);
+          &_decode_error("Invalid string", $json_data, $$json_data_index);
         }
         $buffer->push_char($char);
       }
-      ++$$iter;
+      ++$$json_data_index;
     }
-    if ($$iter == $end) {
-      &_decode_error("Invalid string. end-quote doesn't exist", $json, $$iter);
+    if ($$json_data_index == $json_data_length) {
+      &_decode_error("Invalid string", $json_data, $$json_data_index);
     }
 
-    &_expect_char($json, $iter, '\"');
+    &_expect_char($json_data, $json_data_index, '\"');
 
     return (string)$buffer->to_string;
   }
 
-  private enum {
-    DECODE_NUM_BEGIN,
-    DECODE_NUM_LEADING_DIGIT,
-    DECODE_NUM_DOT,
-    DECODE_NUM_FRAC,
-    DECODE_NUM_EXP,
-    DECODE_NUM_EXP_SIGN,
-    DECODE_NUM_EXP_DIGIT,
-    DECODE_NUM_END,
-  }
+  private method _decode_num : object ($json_data : string, $json_data_index : int*) {
+    my $json_data_length = length $json_data;
 
-  private method _decode_num : object ($json : string, $iter : int*) {
-    my $json_length = length $json;
-
-    my $iter_decode_begin = $$iter;
+    my $json_data_index_decode_begin = $$json_data_index;
 
     # validate number
     my $state = &DECODE_NUM_BEGIN();
 
-    if ($json->[$$iter] == '-') {
-      unless ($$iter + 1 < $json_length && Fn->is_digit($json->[$$iter + 1])) {
-        &_decode_error("malformed number (no digit after '-')", $json, $$iter);
+    if ($json_data->[$$json_data_index] == '-') {
+      unless ($$json_data_index + 1 < $json_data_length && Fn->is_digit($json_data->[$$json_data_index + 1])) {
+        &_decode_error("Invalid number", $json_data, $$json_data_index);
       }
-      $$iter += 2;
+      $$json_data_index += 2;
     }
-    elsif (!Fn->is_digit($json->[$$iter])) {
-      die "[BUG] first character must be digit or '-'";
+    elsif (!Fn->is_digit($json_data->[$$json_data_index])) {
+      die "Invalid number";
     }
 
     $state = &DECODE_NUM_LEADING_DIGIT();
 
     while ($state != &DECODE_NUM_END()) {
-      my $ch = (int) $json->[$$iter];
+      my $ch = (int) $json_data->[$$json_data_index];
 
       switch($ch) {
         case '.': {
           unless ($state == &DECODE_NUM_LEADING_DIGIT()) {
-            &_decode_error("malformed number (improper position of '.')", $json, $$iter);
+            &_decode_error("Invalid number", $json_data, $$json_data_index);
           }
           $state = &DECODE_NUM_DOT();
           break;
@@ -173,7 +384,7 @@ class JSON : precompile {
             case &DECODE_NUM_EXP():
             case &DECODE_NUM_EXP_SIGN():
             case &DECODE_NUM_EXP_DIGIT(): {
-              &_decode_error("malformed number (improper position of 'e')", $json, $$iter);
+              &_decode_error("Invalid number", $json_data, $$json_data_index);
               break;
             }
             default: {
@@ -186,7 +397,7 @@ class JSON : precompile {
           switch ($state) {
             case &DECODE_NUM_DOT(): {
               unless (Fn->is_digit($ch)) {
-                &_decode_error("malformed number (no digit after '.')", $json, $$iter);
+                &_decode_error("Invalid number", $json_data, $$json_data_index);
               }
               $state = &DECODE_NUM_FRAC();
               break;
@@ -199,13 +410,13 @@ class JSON : precompile {
                 $state = &DECODE_NUM_EXP_DIGIT();
               }
               else {
-                &_decode_error("malformed number (no digit after 'e')", $json, $$iter);
+                &_decode_error("Invalid number", $json_data, $$json_data_index);
               }
               break;
             }
             case &DECODE_NUM_EXP_SIGN(): {
               unless (Fn->is_digit($ch)) {
-                &_decode_error("malformed number (no digit after exponential sign)", $json, $$iter);
+                &_decode_error("Invalid number", $json_data, $$json_data_index);
               }
               $state = &DECODE_NUM_EXP_DIGIT();
               break;
@@ -225,154 +436,113 @@ class JSON : precompile {
         last;
       }
 
-      ++$$iter;
+      ++$$json_data_index;
 
-      if ($json_length <= $$iter) {
+      if ($json_data_length <= $$json_data_index) {
         unless ($state == &DECODE_NUM_LEADING_DIGIT() ||
                 $state == &DECODE_NUM_FRAC() ||
                 $state == &DECODE_NUM_EXP_DIGIT()) {
-          &_decode_error("malformed number (end of string)", $json, $$iter);
+          &_decode_error("Invalid number", $json_data, $$json_data_index);
         }
         $state = &DECODE_NUM_END();
       }
     }
 
-    my $iter_decode_end = $$iter;
+    my $json_data_index_decode_end = $$json_data_index;
 
     # decode number by Fn->to_double
-    my $decode_length = $iter_decode_end - $iter_decode_begin;
-    my $decode_string = Fn->substr($json, $iter_decode_begin, $decode_length);
+    my $decode_length = $json_data_index_decode_end - $json_data_index_decode_begin;
+    my $decode_string = Fn->substr($json_data, $json_data_index_decode_begin, $decode_length);
     my $result_number = Fn->to_double($decode_string);
 
     return Double->new($result_number);
   }
 
-  private method _decode_true : Bool ($json : string, $iter : int*) {
-    &_expect_token($json, $iter, "true");
+  private method _decode_true : Bool ($json_data : string, $json_data_index : int*) {
+    &_expect_token($json_data, $json_data_index, "true");
     return true;
   }
 
-  private method _decode_false : Bool ($json : string, $iter : int*) {
-    &_expect_token($json, $iter, "false");
+  private method _decode_false : Bool ($json_data : string, $json_data_index : int*) {
+    &_expect_token($json_data, $json_data_index, "false");
     return false;
   }
 
-  private method _decode_hash : Hash ($json : string, $iter : int*) {
-    my $end = length $json;
+  private method _decode_hash : Hash ($json_data : string, $json_data_index : int*) {
+    my $json_data_length = length $json_data;
     my $hash = Hash->new({});
     my $has_element = 0;
 
-    &_expect_char($json, $iter, '{');
+    &_expect_char($json_data, $json_data_index, '{');
 
     while (1) {
-      $self->_skip_spaces($json, $iter);
-      if ($$iter == $end) {
-        &_decode_error("Incomplete object in JSON: end of string", $json, $$iter);
+      $self->_skip_spaces($json_data, $json_data_index);
+      if ($$json_data_index == $json_data_length) {
+        &_decode_error("Unexpected character \"\"", $json_data, $$json_data_index);
       }
 
       # end of hash
-      if ($json->[$$iter] == '}') {
+      if ($json_data->[$$json_data_index] == '}') {
         last;
       }
 
       # comma
       if ($has_element) {
-        &_expect_char($json, $iter, ',');
-        $self->_skip_spaces($json, $iter);
+        &_expect_char($json_data, $json_data_index, ',');
+        $self->_skip_spaces($json_data, $json_data_index);
       }
       else {
         $has_element = 1;
       }
 
       # key
-      my $key = $self->_decode_string($json, $iter);
+      my $key = $self->_decode_string($json_data, $json_data_index);
 
       # separator
-      $self->_skip_spaces($json, $iter);
-      &_expect_char($json, $iter, ':');
+      $self->_skip_spaces($json_data, $json_data_index);
+      &_expect_char($json_data, $json_data_index, ':');
 
       # value
-      my $value = $self->_decode_recursive($json, $iter);
+      my $value = $self->_decode_recursive($json_data, $json_data_index);
       $hash->set($key, $value);
     }
 
-    &_expect_char($json, $iter, '}');
+    &_expect_char($json_data, $json_data_index, '}');
 
     return $hash;
   }
 
-  private method _decode_list : List ($json : string, $iter : int*) {
-    my $end = length $json;
+  private method _decode_list : List ($json_data : string, $json_data_index : int*) {
+    my $json_data_length = length $json_data;
     my $list = List->new([]);
     my $has_element = 0;
 
-    &_expect_char($json, $iter, '[');
+    &_expect_char($json_data, $json_data_index, '[');
 
     while (1) {
-      $self->_skip_spaces($json, $iter);
-      if ($$iter == $end) {
-        &_decode_error("Incomplete array in JSON: end of string", $json, $$iter);
+      $self->_skip_spaces($json_data, $json_data_index);
+      if ($$json_data_index == $json_data_length) {
+        &_decode_error("Unexpected character \"\"", $json_data, $$json_data_index);
       }
 
       # end of list
-      if ($json->[$$iter] == ']') {
+      if ($json_data->[$$json_data_index] == ']') {
         last;
       }
 
       # comma
       if ($has_element) {
-        &_expect_char($json, $iter, ',');
+        &_expect_char($json_data, $json_data_index, ',');
       }
       else {
         $has_element = 1;
       }
-      $list->push($self->_decode_recursive($json, $iter));
+      $list->push($self->_decode_recursive($json_data, $json_data_index));
     }
 
-    &_expect_char($json, $iter, ']');
+    &_expect_char($json_data, $json_data_index, ']');
 
     return $list;
-  }
-
-  private method _decode_recursive : object ($json : string, $iter : int*) {
-    my $end = length $json;
-
-    $self->_skip_spaces($json, $iter);
-    if ($$iter == $end) {
-      &_decode_error("Incomplete JSON", $json, $$iter);
-    }
-
-    my $c = (int)($json->[$$iter]);
-    switch ($c) {
-      case '{': {
-        # objects
-        return $self->_decode_hash($json, $iter);
-      }
-      case '[': {
-        return $self->_decode_list($json, $iter);
-      }
-      case '"': {
-        return $self->_decode_string($json, $iter);
-      }
-      case '-':
-      case '0': case '1': case '2': case '3': case '4':
-      case '5': case '6': case '7': case '8': case '9': {
-        return $self->_decode_num($json, $iter);
-      }
-      case 't': {
-        return $self->_decode_true($json, $iter);
-      }
-      case 'f': {
-        return $self->_decode_false($json, $iter);
-      }
-      case 'n': {
-        &_expect_token($json, $iter, "null");
-        return undef;
-      }
-      default: {
-        &_decode_error("Unexpected token.", $json, $$iter);
-      }
-    }
   }
 
   private static method _escape_string : string ($string : string) {
@@ -426,125 +596,11 @@ class JSON : precompile {
     }
     return $buffer->to_string;
   }
-
-  private method _encode_recursive : string ($spvm_data : object, $depth : int) {
-    
-    my $json : string;
-    
-    # undef
-    if ($spvm_data == undef) {
-      $json = "null";
-    }
-    # Hash
-    elsif ($spvm_data isa Hash) {
-      my $buffer = StringBuffer->new;
-      $buffer->push_char('{');
-      my $hash = (Hash)$spvm_data;
-      my $keys = $hash->keys;
-      if ($self->canonical) {
-        Sort->sort_string_asc($keys, 0, scalar @$keys);
-      }
-      for (my $keys_index = 0; $keys_index < @$keys; ++$keys_index) {
-        if ($keys_index > 0) {
-          $buffer->push_char(',');
-        }
-        $buffer->push_char('"');
-        $buffer->push($keys->[$keys_index]);
-        $buffer->push_char('"');
-        $buffer->push_char(':');
-        my $json_part = $self->_encode_recursive($hash->get($keys->[$keys_index]), $depth + 1);
-        $buffer->push($json_part);
-      }
-      $buffer->push_char('}');
-      
-      $json = $buffer->to_string;
-    }
-    # Array
-    elsif ($spvm_data isa List) {
-      my $buffer = StringBuffer->new;
-      $buffer->push_char('[');
-      
-      my $list = (List)$spvm_data;
-      my $length = $list->length;
-      for (my $list_index = 0; $list_index < $length; ++$list_index) {
-        if ($list_index > 0) {
-          $buffer->push_char(',');
-        }
-        my $json_part = $self->_encode_recursive($list->get($list_index), $depth + 1);
-        $buffer->push($json_part);
-      }
-      $buffer->push_char(']');
-      
-      $json = $buffer->to_string;
-    }
-    # string
-    elsif ($spvm_data isa string) {
-      my $escaped = &_escape_string((string)$spvm_data);
-      $json = "\"" . $escaped . "\"";
-    }
-    # byte
-    elsif ($spvm_data isa Byte) {
-      $json = (string)(double)(((Byte)$spvm_data)->value);
-    }
-    # short
-    elsif ($spvm_data isa Short) {
-      $json = (string)(double)(((Short)$spvm_data)->value);
-    }
-    # int
-    elsif ($spvm_data isa Int) {
-      $json = (string)(double)(((Int)$spvm_data)->value);
-    }
-    # long
-    elsif ($spvm_data isa Long) {
-      $json = (string)(double)(((Long)$spvm_data)->value);
-    }
-    # float
-    elsif ($spvm_data isa Float) {
-      $json = (string)(double)(((Float)$spvm_data)->value);
-    }
-    # double
-    elsif ($spvm_data isa Double) {
-      $json = (string)(((Double)$spvm_data)->value);
-    }
-    # bool
-    elsif ($spvm_data isa Bool) {
-      if (((Bool)$spvm_data)->value) {
-        $json = "true";
-      }
-      else {
-        $json = "false";
-      }
-    }
-    else {
-      die "Invalid data type";
-    }
-    
-    return $json;
-  }
-
-  static method new : JSON () {
-    my $json = new JSON;
-    return $json;
-  }
-
-  method encode : string ($object : object) {
-    return $self->_encode_recursive($object, 0);
-  }
-
-  method decode : object ($json : string) {
-    my $iter = 0;
-    my $spvm_data = $self->_decode_recursive($json, \$iter);
-
-    # allow $json to have trailing spaces.
-    $self->_skip_spaces($json, \$iter);
-
-    # do not allow $json to have non-space string after a json object,
-    # something like `{"key":1} [1,2]`
-    my $length = length $json;
-    unless ($iter == $length) {
-      &_decode_error("garbage after JSON object", $json, $iter);
-    }
-
-    return $spvm_data;
-  }
 }
+
+=pod TODO
+
+escape_slash => default false | field
+
+=cut
+

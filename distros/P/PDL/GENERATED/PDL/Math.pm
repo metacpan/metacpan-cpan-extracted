@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 13 "math.pd"
 
 use strict;
@@ -54,12 +55,7 @@ entirely in PDL.
 ### Kludge for backwards compatibility with older scripts
 ### This should be deleted at some point later than 21-Nov-2003.
 BEGIN {use PDL::MatrixOps;}
-#line 58 "Math.pm"
-
-
-
-
-
+#line 59 "Math.pm"
 
 =head1 FUNCTIONS
 
@@ -67,8 +63,6 @@ BEGIN {use PDL::MatrixOps;}
 
 
 
-
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -86,20 +80,15 @@ The usual trigonometric function.
 acos processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 92 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *acos = \&PDL::acos;
-#line 99 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -117,20 +106,15 @@ The usual trigonometric function.
 asin processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 123 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *asin = \&PDL::asin;
-#line 130 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -148,20 +132,15 @@ The usual trigonometric function.
 atan processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 154 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *atan = \&PDL::atan;
-#line 161 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -179,20 +158,15 @@ The standard hyperbolic function.
 cosh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 185 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cosh = \&PDL::cosh;
-#line 192 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -210,20 +184,15 @@ The standard hyperbolic function.
 sinh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 216 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sinh = \&PDL::sinh;
-#line 223 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -241,20 +210,15 @@ The usual trigonometric function.
 tan processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 247 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *tan = \&PDL::tan;
-#line 254 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -272,20 +236,15 @@ The standard hyperbolic function.
 tanh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 278 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *tanh = \&PDL::tanh;
-#line 285 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -304,20 +263,15 @@ Round to integer values in floating-point format. Works inplace.
 ceil processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 310 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ceil = \&PDL::ceil;
-#line 317 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -336,20 +290,15 @@ Round to integer values in floating-point format. Works inplace.
 floor processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 342 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *floor = \&PDL::floor;
-#line 349 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -379,20 +328,15 @@ try C<< ceil(abs($x)+0.5)*($x<=>0) >>. Works inplace.
 rint processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 385 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *rint = \&PDL::rint;
-#line 392 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -411,20 +355,15 @@ Synonym for `**'. Works inplace.
 pow processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 417 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *pow = \&PDL::pow;
-#line 424 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -442,20 +381,15 @@ The standard hyperbolic function.
 acosh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 448 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *acosh = \&PDL::acosh;
-#line 455 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -473,20 +407,15 @@ The standard hyperbolic function.
 asinh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 479 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *asinh = \&PDL::asinh;
-#line 486 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -504,20 +433,15 @@ The standard hyperbolic function.
 atanh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 510 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *atanh = \&PDL::atanh;
-#line 517 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -536,20 +460,15 @@ The error function. Works inplace.
 erf processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 542 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *erf = \&PDL::erf;
-#line 549 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -568,20 +487,15 @@ The complement of the error function. Works inplace.
 erfc processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 574 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *erfc = \&PDL::erfc;
-#line 581 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -600,20 +514,15 @@ The regular Bessel function of the first kind, J_n Works inplace.
 bessj0 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 606 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessj0 = \&PDL::bessj0;
-#line 613 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -632,20 +541,15 @@ The regular Bessel function of the first kind, J_n Works inplace.
 bessj1 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 638 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessj1 = \&PDL::bessj1;
-#line 645 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -664,20 +568,15 @@ The regular Bessel function of the second kind, Y_n. Works inplace.
 bessy0 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 670 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessy0 = \&PDL::bessy0;
-#line 677 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -696,20 +595,15 @@ The regular Bessel function of the second kind, Y_n. Works inplace.
 bessy1 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 702 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessy1 = \&PDL::bessy1;
-#line 709 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -732,20 +626,15 @@ of the function required.
 bessjn processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 738 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessjn = \&PDL::bessjn;
-#line 745 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -768,20 +657,15 @@ of the function required.
 bessyn processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 774 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessyn = \&PDL::bessyn;
-#line 781 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -800,27 +684,20 @@ while the second set, of integer values, gives the sign of the gamma
 function.  This is useful for determining factorials, amongst other
 things.
 
-
-
 =for bad
 
 lgamma processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 813 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *lgamma = \&PDL::lgamma;
-#line 820 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -839,18 +716,14 @@ Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negati
 Bad values are treated as C<NaN> or C<inf>.
 
 =cut
-#line 843 "Math.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*isfinite = \&PDL::isfinite;
-#line 850 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*isfinite = \&PDL::isfinite;
+
+
+
 
 
 
@@ -869,20 +742,15 @@ The inverse of the error function. Works inplace.
 erfi processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 875 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *erfi = \&PDL::erfi;
-#line 882 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -903,20 +771,15 @@ minus infinity) is equal to the argument (cf L</erfi>). Works inplace.
 ndtri processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 909 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ndtri = \&PDL::ndtri;
-#line 916 "Math.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -925,8 +788,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (cr(n); ci(n); [o]rr(m); [o]ri(m))
-
-
 
 =for ref
 
@@ -937,30 +798,25 @@ of decreasing powers.
 
  ($rr, $ri) = polyroots($cr, $ci);
 
-
-
 =for bad
 
 polyroots does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 950 "Math.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *polyroots = \&PDL::polyroots;
-#line 957 "Math.pm"
+
+
 
 
 
 
 
 #line 364 "math.pd"
-
 
 =head1 BUGS
 
@@ -980,10 +836,7 @@ distribution. If this file is separated from the PDL distribution,
 the PDL copyright notice should be included in the file.
 
 =cut
-#line 984 "Math.pm"
-
-
-
+#line 840 "Math.pm"
 
 # Exit with OK status
 

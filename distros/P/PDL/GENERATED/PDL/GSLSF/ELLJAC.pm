@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_elljac.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::ELLJAC - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "ELLJAC.pm"
-
-
-
-
-
+#line 40 "ELLJAC.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,16 +62,14 @@ Jacobian elliptic functions sn, dn, cn by descending Landen transformations
 gsl_sf_elljac does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "ELLJAC.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_elljac = \&PDL::gsl_sf_elljac;
-#line 81 "ELLJAC.pm"
+
+
 
 
 
@@ -97,10 +89,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 101 "ELLJAC.pm"
-
-
-
+#line 93 "ELLJAC.pm"
 
 # Exit with OK status
 

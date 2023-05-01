@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 19 "bad.pd"
 
+#line 19 "bad.pd"
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ PDL::Bad - PDL always processes bad values
 =head1 DESCRIPTION
 
 This module is loaded when you do C<use PDL>,
-C<Use PDL::Lite> or C<PDL::LiteF>.
+C<use PDL::Lite> or C<use PDL::LiteF>.
 
 Implementation details are given in
 L<PDL::BadValues>.
@@ -64,11 +64,6 @@ Set to 1 as of PDL 2.035 as always available.
 =cut
 #line 66 "Bad.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -76,8 +71,8 @@ Set to 1 as of PDL 2.035 as always available.
 
 
 
-#line 62 "bad.pd"
 
+#line 62 "bad.pd"
 
 # really should be constants
 $PDL::Bad::Status = 1;
@@ -91,12 +86,8 @@ use PDL::Primitive;
 
 ############################################################
 ############################################################
-#line 95 "Bad.pm"
 
-
-
-#line 98 "bad.pd"
-
+#line 79 "bad.pd"
 ############################################################
 ############################################################
 
@@ -230,13 +221,8 @@ sub PDL::check_badflag {
     $pdl->badflag(0) if $pdl->badflag and $pdl->nbad == 0;
     return $pdl->badflag;
 } # sub: check_badflag()
-#line 234 "Bad.pm"
 
-
-
-#line 309 "bad.pd"
-
-
+#line 288 "bad.pd"
 # note:
 #  if sent an ndarray, we have to change its bad values
 #  (but only if it contains bad values)
@@ -256,14 +242,14 @@ sub PDL::badvalue {
 	    $self->inplace->setbadtoval( $val );
 	    $self->badflag(1);
 	}
-	return PDL::_badvalue_per_pdl_int($self, $val, $num);
+	return PDL::Bad::_badvalue_per_pdl_int($self, $val, $num);
     } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
 	$num = $self->enum;
     } else {
         # assume it's a number
         $num = $self;
     }
-    PDL::_badvalue_int( $val, $num );
+    PDL::Bad::_badvalue_int( $val, $num );
 }
 
 sub PDL::orig_badvalue {
@@ -278,18 +264,12 @@ sub PDL::orig_badvalue {
         # assume it's a number
         $num = $self;
     }
-    PDL::_default_badvalue_int($num);
+    PDL::Bad::_default_badvalue_int($num);
 }
 
 ############################################################
 ############################################################
-#line 287 "Bad.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 273 "Bad.pm"
 
 =head2 isbad
 
@@ -320,21 +300,15 @@ This method works with input ndarrays that are bad. The output ndarray
 will never contain bad values, but its bad value flag will be the
 same as the input ndarray's flag.
 
-
-
 =cut
-#line 327 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *isbad = \&PDL::isbad;
-#line 334 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -366,21 +340,15 @@ This method works with input ndarrays that are bad. The output ndarray
 will never contain bad values, but its bad value flag will be the
 same as the input ndarray's flag.
 
-
-
 =cut
-#line 373 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *isgood = \&PDL::isgood;
-#line 380 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -414,21 +382,15 @@ nbadover processes input values that are bad. The output ndarray will not have
 any bad values, but the bad flag will be set if the input ndarray had its bad
 flag set.
 
-
-
 =cut
-#line 421 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *nbadover = \&PDL::nbadover;
-#line 428 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -463,22 +425,18 @@ ngoodover processes input values that are bad. The output ndarray will not have
 any bad values, but the bad flag will be set if the input ndarray had its bad
 flag set.
 
-
-
 =cut
-#line 470 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ngoodover = \&PDL::ngoodover;
-#line 477 "Bad.pm"
 
 
 
-#line 533 "bad.pd"
 
+
+#line 512 "bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -486,26 +444,16 @@ sub PDL::nbad {
 	$x->clump(-1)->nbadover($tmp=PDL->nullcreate($x) );
 	return $tmp;
 }
-#line 490 "Bad.pm"
 
-
-
-#line 533 "bad.pd"
-
-
+#line 512 "bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->ngoodover($tmp=PDL->nullcreate($x) );
 	return $tmp;
 }
-#line 503 "Bad.pm"
 
-
-
-#line 545 "bad.pd"
-
-
+#line 524 "bad.pd"
 =head2 nbad
 
 =for ref
@@ -580,13 +528,7 @@ sub PDL::setbadat {
     $self->badflag(1);
     return $self;
 }
-#line 584 "Bad.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 532 "Bad.pm"
 
 =head2 setbadif
 
@@ -629,21 +571,15 @@ are copied across to the output ndarray.
 
 Also see L</setvaltobad> and L</setnantobad>.
 
-
-
 =cut
-#line 636 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setbadif = \&PDL::setbadif;
-#line 643 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -675,21 +611,15 @@ any bad values (use L</check_badflag> to check
 whether there are any bad values in the output). 
 Any bad values in the input ndarrays are copied across to the output ndarray.
 
-
-
 =cut
-#line 682 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setvaltobad = \&PDL::setvaltobad;
-#line 689 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -719,21 +649,15 @@ is also set to bad in the output ndarray. If all values from the input
 ndarray are good, the output ndarray will B<not> have its
 bad flag set.
 
-
-
 =cut
-#line 726 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setnantobad = \&PDL::setnantobad;
-#line 733 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -762,21 +686,15 @@ is also set to bad in the output ndarray. If all values from the input
 ndarray are finite, the output ndarray will B<not> have its
 bad flag set.
 
-
-
 =cut
-#line 769 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setinftobad = \&PDL::setinftobad;
-#line 776 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -805,21 +723,15 @@ is also set to bad in the output ndarray. If all values from the input
 ndarray are finite, the output ndarray will B<not> have its
 bad flag set.
 
-
-
 =cut
-#line 812 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setnonfinitetobad = \&PDL::setnonfinitetobad;
-#line 819 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -848,21 +760,15 @@ not contain bad values (insofar as NaN is not Bad as far as PDL is concerned)
 and the output ndarray does not have its bad flag set. As an inplace
 operation, it clears the bad flag.
 
-
-
 =cut
-#line 855 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setbadtonan = \&PDL::setbadtonan;
-#line 862 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 setbadtoval
@@ -890,21 +796,15 @@ The output always has its bad flag cleared.
 If the input ndarray does not have its bad flag set, then
 values are copied with no replacement.
 
-
-
 =cut
-#line 897 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setbadtoval = \&PDL::setbadtoval;
-#line 904 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -923,24 +823,19 @@ badmask can be run with C<$x> inplace:
   badmask($x->inplace,0);
   $x->inplace->badmask(0);
 
-
 =for bad
 
 If bad values are present, these are also cleared.
 
 =cut
-#line 933 "Bad.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*badmask = \&PDL::badmask;
-#line 940 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*badmask = \&PDL::badmask;
+
+
+
 
 
 
@@ -978,21 +873,15 @@ or C<$mask> have bad values, those values will be marked
 as bad in the output ndarray and the output ndarray will have
 its bad value flag set to true.
 
-
-
 =cut
-#line 985 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *copybad = \&PDL::copybad;
-#line 992 "Bad.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1008,29 +897,25 @@ Last Observation Carried Forward - replace
 every BAD value with the most recent non-BAD value prior to it.
 Any leading BADs will be set to 0.
 
-
 =for bad
 
 locf processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1020 "Bad.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *locf = \&PDL::locf;
-#line 1027 "Bad.pm"
 
 
 
 
 
-#line 1091 "bad.pd"
 
+
+#line 1070 "bad.pd"
 
 =head1 AUTHOR
 
@@ -1047,10 +932,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 1051 "Bad.pm"
-
-
-
+#line 936 "Bad.pm"
 
 # Exit with OK status
 

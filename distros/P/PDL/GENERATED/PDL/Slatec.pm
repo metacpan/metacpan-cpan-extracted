@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 5 "slatec.pd"
 
 use strict;
@@ -94,16 +95,12 @@ data using L</chcm>.
 =back
  
 =cut
-#line 98 "Slatec.pm"
-
-
-
-
-
+#line 99 "Slatec.pm"
 
 =head1 FUNCTIONS
 
 =cut
+
 
 
 
@@ -282,13 +279,8 @@ of C<rfft> is a data vector, similar to what is input into
 L</PDL::Slatec::fft>.
 
 =cut
-#line 286 "Slatec.pm"
-
-
 
 #line 423 "slatec.pd"
-
-
 use PDL::Core;
 use PDL::Basic;
 use PDL::Primitive;
@@ -344,7 +336,6 @@ sub PDL::detslatec {
 	gedi($m,$ipvt,my $det=null,null,10);
 	return $det->slice('(0)')*10**$det->slice('(1)');
 }
-
 
 sub prepfft {
 	my($n) = @_;
@@ -412,7 +403,6 @@ sub PDL::polyfit {
   }
 }
 
-
 *polycoef = \&PDL::polycoef;
 sub PDL::polycoef {
   barf 'Usage: polycoef($l, $c, $x);'
@@ -457,13 +447,7 @@ sub PDL::polyvalue {
 
 }
                                                                               
-#line 461 "Slatec.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 451 "Slatec.pm"
 
 =head2 svdc
 
@@ -480,20 +464,15 @@ singular value decomposition of a matrix
 svdc does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 486 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *svdc = \&PDL::svdc;
-#line 493 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -511,20 +490,15 @@ and estimate the condition number of the matrix.
 poco does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 517 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *poco = \&PDL::poco;
-#line 524 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -542,20 +516,15 @@ the condition number of the matrix.
 geco does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 548 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *geco = \&PDL::geco;
-#line 555 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -574,20 +543,15 @@ Factor a matrix using Gaussian elimination.
 gefa does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 580 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gefa = \&PDL::gefa;
-#line 587 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -606,20 +570,15 @@ computed by L</poco>.
 podi does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 612 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *podi = \&PDL::podi;
-#line 619 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -637,20 +596,15 @@ factors computed by L</geco> or L</gefa>.
 gedi does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 643 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gedi = \&PDL::gedi;
-#line 650 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -668,20 +622,15 @@ factors computed by L</geco> or L</gefa>.
 gesl does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 674 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gesl = \&PDL::gesl;
-#line 681 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -701,20 +650,15 @@ of a REAL SYMMETRIC matrix.
 rs does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 707 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rs = \&PDL::rs;
-#line 714 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -736,20 +680,15 @@ are computed and stored in C<wsave()>.
 ezffti does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 742 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ezffti = \&PDL::ezffti;
-#line 749 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -761,27 +700,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 ezfftf does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 774 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ezfftf = \&PDL::ezfftf;
-#line 781 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -793,27 +725,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 ezfftb does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 806 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ezfftb = \&PDL::ezfftb;
-#line 813 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -831,20 +756,15 @@ C<c> and C<a()> must be of the same type.
 pcoef does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 837 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pcoef = \&PDL::pcoef;
-#line 844 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -864,20 +784,15 @@ same type.
 pvalue does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 870 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pvalue = \&PDL::pvalue;
-#line 877 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -886,7 +801,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);[o]d(n);longlong [o]ierr())
-
 
 =for ref
 
@@ -927,27 +841,20 @@ monotonicity (data still valid).
 
 =back
 
-
-
 =for bad
 
 chim does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 940 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chim = \&PDL::chim;
-#line 947 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -956,7 +863,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (longlong ic(two=2);vc(two=2);mflag();x(n);f(n);[o]d(n);wk(nwk);longlong [o]ierr())
-
 
 =for ref
 
@@ -1073,27 +979,20 @@ for monotonicity.
 
 =back
 
-
-
 =for bad
 
 chic does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1086 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chic = \&PDL::chic;
-#line 1093 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1102,7 +1001,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (longlong ic(two=2);vc(two=2);x(n);f(n);[o]d(n);wk(nwk);longlong [o]ierr())
-
 
 =for ref
 
@@ -1196,27 +1094,20 @@ for the interior derivative values.
 
 =back
 
-
-
 =for bad
 
 chsp does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1209 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chsp = \&PDL::chsp;
-#line 1216 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1225,7 +1116,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);d(n);longlong check();xe(ne);[o]fe(ne);[o]de(ne);longlong [o]ierr())
-
 
 =for ref
 
@@ -1269,27 +1159,20 @@ which should never happen.
 
 =back
 
-
-
 =for bad
 
 chfd does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1282 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chfd = \&PDL::chfd;
-#line 1289 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1298,7 +1181,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);d(n);longlong check();xe(ne);[o]fe(ne);longlong [o]ierr())
-
 
 =for ref
 
@@ -1337,27 +1219,20 @@ E<gt>0 if extrapolation was performed at C<ierr> points
 
 =back
 
-
-
 =for bad
 
 chfe does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1350 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chfe = \&PDL::chfe;
-#line 1357 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1366,7 +1241,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);d(n);longlong check();la();lb();[o]ans();longlong [o]ierr())
-
 
 =for ref
 
@@ -1418,27 +1292,20 @@ which should never happen.
 
 =back
 
-
-
 =for bad
 
 chia does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1431 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chia = \&PDL::chia;
-#line 1438 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1447,7 +1314,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);d(n);longlong check();longlong ia();longlong ib();[o]ans();longlong [o]ierr())
-
 
 =for ref
 
@@ -1487,27 +1353,20 @@ Error status returned by C<$ierr>:
 
 =back
 
-
-
 =for bad
 
 chid does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1500 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chid = \&PDL::chid;
-#line 1507 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1516,7 +1375,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);d(n);longlong check();longlong [o]ismon(n);longlong [o]ierr())
-
 
 =for ref
 
@@ -1584,27 +1442,20 @@ Error status returned by C<$ierr>:
 
 =back
 
-
-
 =for bad
 
 chcm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1597 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chcm = \&PDL::chcm;
-#line 1604 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1613,7 +1464,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (x(n);f(n);d(n);longlong knotyp();longlong nknots();t(tsize);[o]bcoef(bsize);longlong [o]ndim();longlong [o]kord();longlong [o]ierr())
-
 
 =for ref
 
@@ -1688,27 +1538,20 @@ Error status returned by C<$ierr>:
 
 =back
 
-
-
 =for bad
 
 chbs does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1701 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *chbs = \&PDL::chbs;
-#line 1708 "Slatec.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1727,16 +1570,14 @@ Fit discrete data in a least squares sense by polynomials
 polfit processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1733 "Slatec.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *polfit = \&PDL::polfit;
-#line 1740 "Slatec.pm"
+
+
 
 
 
@@ -1753,12 +1594,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1757 "Slatec.pm"
-
-
-
-
-
+#line 1598 "Slatec.pm"
 
 # Exit with OK status
 

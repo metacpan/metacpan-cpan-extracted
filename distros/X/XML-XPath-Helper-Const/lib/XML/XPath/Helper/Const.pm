@@ -8,7 +8,7 @@ use Exporter 'import';
 
 use XML::LibXML;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(XPATH_SIMPLE_LIST
                     XPATH_SIMPLE_TAGS
@@ -46,7 +46,7 @@ XML::XPath::Helper::Const - Exports some precompiled xpath constants for L<XML::
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 
 =head1 SYNOPSIS
@@ -148,13 +148,13 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-XPath-Helper-Const>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/XML-XPath-Helper-Const>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/XML-XPath-Helper-Const>
+
+=item * GitHub Repository
+
+L<https://github.com/AAHAZRED/perl-XML-XPath-Helper-Const>
 
 =back
 

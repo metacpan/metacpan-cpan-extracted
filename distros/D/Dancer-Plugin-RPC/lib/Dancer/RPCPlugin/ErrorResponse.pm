@@ -7,7 +7,8 @@ our @EXPORT = qw/register_error_responses error_response/;
 
 use Dancer::RPCPlugin::PluginNames;
 
-use Params::Validate ':all';
+use Params::ValidationCompiler 'validation_for';
+use Types::Standard qw/ StrMatch Maybe HashRef CodeRef Str Any /;
 
 my $_error_code_to_status_map = {
     xmlrpc  => {default => 200},
@@ -18,13 +19,14 @@ my $_error_code_to_status_map = {
 sub register_error_responses {
     shift if $_[0] eq __PACKAGE__;
     my $plugin_re = Dancer::RPCPlugin::PluginNames->new->regex;
-    my ($plugin, $status_map, $handler_name, $error_handler) = validate_pos(
-        @_,
-        {type => SCALAR,  optional => 0, regex => $plugin_re },
-        {type => HASHREF, optional => 0 },
-        {type => SCALAR,  optional => 1 },
-        {type => CODEREF, optional => 1 },
-    );
+    my ($plugin, $status_map, $handler_name, $error_handler) = validation_for(
+        params => [
+            { type => StrMatch [$plugin_re], optional => 0 },
+            { type => HashRef,               optional => 0 },
+            { type => Maybe [Str],           optional => 1 },
+            { type => Maybe [CodeRef],       optional => 1 },
+        ]
+    )->(@_);
 
     # maybe this is an update, so only touch the values mentioned
     for my $error_code (keys %$status_map) {
@@ -43,14 +45,13 @@ sub error_response {
 
 sub new {
     my $class = shift;
-    my %self = validate(
-        @_,
-        {
-            error_code    => {optional => 0},
-            error_message => {optional => 0},
-            error_data    => {optional => 1},
-        },
-    );
+    my %self = validation_for(
+        params => {
+            error_code    => { type => Str,         optional => 0 },
+            error_message => { type => Str,         optional => 0 },
+            error_data    => { type => Maybe [Any], optional => 1 },
+        }
+    )->(@_);
 
     return bless(\%self, $class);
 }
@@ -62,9 +63,11 @@ sub error_data    { exists $_[0]->{error_data} ? $_[0]->{error_data} : undef  }
 sub return_status {
     my $self = shift;
     my $check_plugins = Dancer::RPCPlugin::PluginNames->new->regex;
-    my ($plugin) = validate_pos(
-        @_, { regex => $check_plugins, optional => 0 }
-    );
+    my ($plugin) = validation_for(
+        params => [
+            { type => StrMatch [$check_plugins], optional => 0 },
+        ]
+    )->(@_);
 
     my $default = $_error_code_to_status_map->{$plugin}{default} // 200;
     my $http_status = $_error_code_to_status_map->{$plugin}

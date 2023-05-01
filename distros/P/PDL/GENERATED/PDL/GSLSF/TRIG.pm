@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_trig.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::TRIG - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "TRIG.pm"
-
-
-
-
-
+#line 40 "TRIG.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ Sin(x) with GSL semantics.
 gsl_sf_sin does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_sin = \&PDL::gsl_sf_sin;
-#line 81 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ Cos(x) with GSL semantics.
 gsl_sf_cos does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_cos = \&PDL::gsl_sf_cos;
-#line 113 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ Hypot(x,xx) with GSL semantics.
 gsl_sf_hypot does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hypot = \&PDL::gsl_sf_hypot;
-#line 145 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,20 +143,15 @@ Sin(z) for complex z
 gsl_sf_complex_sin does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_sin = \&PDL::gsl_sf_complex_sin;
-#line 177 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -196,20 +170,15 @@ Cos(z) for complex z
 gsl_sf_complex_cos does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 202 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_cos = \&PDL::gsl_sf_complex_cos;
-#line 209 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -228,20 +197,15 @@ Log(Sin(z)) for complex z
 gsl_sf_complex_logsin does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 234 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_logsin = \&PDL::gsl_sf_complex_logsin;
-#line 241 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -260,20 +224,15 @@ Log(Sinh(x)) with GSL semantics.
 gsl_sf_lnsinh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 266 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lnsinh = \&PDL::gsl_sf_lnsinh;
-#line 273 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -292,20 +251,15 @@ Log(Cos(x)) with GSL semantics.
 gsl_sf_lncosh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 298 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lncosh = \&PDL::gsl_sf_lncosh;
-#line 305 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -324,20 +278,15 @@ Convert polar to rectlinear coordinates.
 gsl_sf_polar_to_rect does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 330 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_polar_to_rect = \&PDL::gsl_sf_polar_to_rect;
-#line 337 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -356,20 +305,15 @@ Convert rectlinear to polar coordinates. return argument in range [-pi, pi].
 gsl_sf_rect_to_polar does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 362 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_rect_to_polar = \&PDL::gsl_sf_rect_to_polar;
-#line 369 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -388,20 +332,15 @@ Force an angle to lie in the range (-pi,pi].
 gsl_sf_angle_restrict_symm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 394 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_angle_restrict_symm = \&PDL::gsl_sf_angle_restrict_symm;
-#line 401 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -420,20 +359,15 @@ Force an angle to lie in the range [0,2 pi).
 gsl_sf_angle_restrict_pos does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 426 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_angle_restrict_pos = \&PDL::gsl_sf_angle_restrict_pos;
-#line 433 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -452,20 +386,15 @@ Sin(x) for quantity with an associated error.
 gsl_sf_sin_err does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 458 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_sin_err = \&PDL::gsl_sf_sin_err;
-#line 465 "TRIG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -484,16 +413,14 @@ Cos(x) for quantity with an associated error.
 gsl_sf_cos_err does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 490 "TRIG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_cos_err = \&PDL::gsl_sf_cos_err;
-#line 497 "TRIG.pm"
+
+
 
 
 
@@ -513,10 +440,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 517 "TRIG.pm"
-
-
-
+#line 444 "TRIG.pm"
 
 # Exit with OK status
 

@@ -167,7 +167,7 @@ cmp_deeply(
 ) or diag 'got distmeta: ', explain $tzil->distmeta;
 
 cmp_deeply(
-    [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
+    [ grep /^\[Run::[^]]+\]/, @{ $tzil->log_messages } ],
     [
         '[Run::BeforeBuild] attempting to use %d in before_build',
         '[Run::BeforeBuild] attempting to use %a in a non-Release plugin',

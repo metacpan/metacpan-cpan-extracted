@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.016
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.019
 
 use Test::More tests => 2;
 
 SKIP: {
-    eval 'require Moose::Conflicts; Moose::Conflicts->check_conflicts';
+    eval { +require Moose::Conflicts; Moose::Conflicts->check_conflicts };
     skip('no Moose::Conflicts module found', 1) if not $INC{'Moose/Conflicts.pm'};
 
     diag $@ if $@;

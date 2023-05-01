@@ -1,8 +1,7 @@
 package Test::Smoke::BuildCFG;
 use strict;
 
-use vars qw( $VERSION );
-$VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Cwd;
 use File::Spec;
@@ -391,6 +390,30 @@ sub as_string {
     return join "=\n", map join( "\n", @$_, "" ) => @sections;
 }
 
+=head2 source
+
+returns the text-source of this instance.
+
+=cut
+
+sub source {
+    my $self = shift;
+
+    return $self->{_buildcfg};
+}
+
+=head2 sections
+
+returns an ARRAYREF of the sections in this instance.
+
+=cut
+
+sub sections {
+    my $self = shift;
+
+    return $self->{_sections};
+}
+
 =head2 __get_smoked_configs( $logfile )
 
 Parse the logfile and return a hash(ref) of already processed
@@ -427,17 +450,15 @@ configuration.
 sub default_buildcfg() {
 
     return <<__EOCONFIG__;
-
-= Build all configurations with and without ithreads
+# Test::Smoke::BuildCFG->default_buildcfg
+# Check the documentation for more information
+== Build all configurations with and without ithreads
 
 -Duseithreads
-= Build perl with these options
--Uuseperlio
+== Build with and without 64bitall
 
--Duse64bitint
--Duselongdouble
--Dusemorebits
-= All configurations with and without -DDEBUGGING
+-Duse64bitall
+== All configurations with and without -DDEBUGGING
 /-DDEBUGGING/
 
 -DDEBUGGING

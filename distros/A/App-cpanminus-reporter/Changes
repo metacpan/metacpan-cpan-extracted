@@ -1,5 +1,16 @@
 Revision history for App-cpanminus-reporter
 
+0.19  2023-04-30
+    NEW FEATURES:
+      - analyze multiple reports at once via the new "--all"
+        flag (Marcin Kasperski)
+      - change the default build.log last modification time
+        check to other thresholds with the new "--max_age"
+        flag (Marcin Kasperski)
+      - allow reports coming from the filesystem (jkeenan)
+    OTHER:
+      - updated bugtracking meta link
+
 0.18  2023-01-23
     OTHER:
       - reduced prereq tree by switching from File::HomeDir to

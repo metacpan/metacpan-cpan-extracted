@@ -1,3 +1,31 @@
+0.051 2023-04-28
+  [New Features]
+    * The new method in the JSON class receive options
+    * Added the canonical option of the new method in the JSON class.
+    
+  [Incompatible Changes]
+    * the definition of the canonical field is changed.
+      [Before]
+      has canonical : rw byte;
+      
+      [After]
+      has canonical : ro byte;
+    * The encode_json method output 64bit integer value for a Long object.
+    * The encode_json method output 32bit integer value for a Int object.
+    * Removed the canonical field.
+  [Prerequirement Changes]
+    * SPVM 0.971009+ is required.
+    * SPVM::Math 1.001+ is required.
+  [Meta Information Fix]
+    * Fixed the repository URL.
+  [Test Improvement]
+    * Added CIs
+  [License Change]
+    * The license is changed to MIT License.
+  [Incompatible Changes]
+    * The encode_json method throw an exception if a float value or a double value is NaN or Inifinity.
+  [Exception Messages Improvement]
+    * Exception messages are improved.
 0.04  2023-03-19
   [Internal Compatible Changes]
     * Use SPVM::ExchangeAPI method instead of SPVM functions.

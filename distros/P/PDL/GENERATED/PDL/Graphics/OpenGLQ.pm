@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 7 "openglq.pd"
 
 =head1 NAME
@@ -45,116 +46,80 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 49 "OpenGLQ.pm"
-
-
-
-
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 50 "OpenGLQ.pm"
 
 *gl_spheres = \&PDL::gl_spheres;
-#line 60 "OpenGLQ.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-*gl_line_strip_col = \&PDL::gl_line_strip_col;
-#line 67 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_line_strip_col = \&PDL::gl_line_strip_col;
 
-*gl_line_strip_nc = \&PDL::gl_line_strip_nc;
-#line 74 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_line_strip_nc = \&PDL::gl_line_strip_nc;
 
-*gl_lines_col = \&PDL::gl_lines_col;
-#line 81 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_lines_col = \&PDL::gl_lines_col;
 
-*gl_lines_nc = \&PDL::gl_lines_nc;
-#line 88 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_lines_nc = \&PDL::gl_lines_nc;
 
-*gl_points_col = \&PDL::gl_points_col;
-#line 95 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_points_col = \&PDL::gl_points_col;
 
-*gl_points_nc = \&PDL::gl_points_nc;
-#line 102 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_points_nc = \&PDL::gl_points_nc;
 
-*gl_texts = \&PDL::gl_texts;
-#line 109 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_texts = \&PDL::gl_texts;
 
-*gl_triangles_mat = \&PDL::gl_triangles_mat;
-#line 116 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_triangles_mat = \&PDL::gl_triangles_mat;
 
-*gl_triangles_n_mat = \&PDL::gl_triangles_n_mat;
-#line 123 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_triangles_n_mat = \&PDL::gl_triangles_n_mat;
 
-*gl_triangles_wn_mat = \&PDL::gl_triangles_wn_mat;
-#line 130 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_triangles_wn_mat = \&PDL::gl_triangles_wn_mat;
 
-*gl_triangles = \&PDL::gl_triangles;
-#line 137 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_triangles = \&PDL::gl_triangles;
 
-*gl_triangles_n = \&PDL::gl_triangles_n;
-#line 144 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_triangles_n = \&PDL::gl_triangles_n;
 
-*gl_triangles_wn = \&PDL::gl_triangles_wn;
-#line 151 "OpenGLQ.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*gl_triangles_wn = \&PDL::gl_triangles_wn;
+
+
+
 
 *gl_arrows = \&PDL::gl_arrows;
-#line 158 "OpenGLQ.pm"
+
 
 
 

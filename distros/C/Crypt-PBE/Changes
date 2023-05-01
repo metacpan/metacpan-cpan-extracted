@@ -1,3 +1,10 @@
+0.103 2023/04/28
+    - pkcs5-tool(1): Added "--format=FORMAT", "--hex" and "--base64" input/output format
+    - pkcs5-tool(1): Improved verbose output
+    - Improved HEX output
+    - New tests
+    - Fixed critiques and code beautification
+
 0.102 2021/02/16
     - pkcs5-tool(1): Added support for "env:<name>" and "file:<path>" for --input and --password params
     - pkcs5-tool(1): Read password from user input (readline)

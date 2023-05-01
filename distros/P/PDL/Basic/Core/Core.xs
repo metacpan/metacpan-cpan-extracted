@@ -272,22 +272,10 @@ set_debugging(i)
 	RETVAL
 
 
-PDL_Anyval
-sclr_c(it)
-   pdl* it
-   CODE:
-        /* get the first element of an ndarray and return as
-         * Perl scalar (autodetect suitable type IV or NV)
-         */
-        RETVAL = pdl_at0(it);
-        if (RETVAL.type < 0) croak("Position out of range");
-    OUTPUT:
-        RETVAL
-
-
 SV *
 at_bad_c(x,pos)
    pdl*	x
+   PDL_Indx pos_count=0;
    PDL_Indx *pos
    PREINIT:
     PDL_Indx ipos;
@@ -295,10 +283,8 @@ at_bad_c(x,pos)
     volatile PDL_Anyval result = { PDL_INVALID, {0} };
    CODE:
     pdl_barf_if_error(pdl_make_physvaffine( x ));
-
     if (pos == NULL || pos_count < x->ndims)
        barf("Invalid position with pos=%p, count=%"IND_FLAG" for ndarray with %"IND_FLAG" dims", pos, pos_count, x->ndims);
-
     /*  allow additional trailing indices
      *  which must be all zero, i.e. a
      *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
@@ -307,7 +293,6 @@ at_bad_c(x,pos)
     for (ipos=x->ndims; ipos<pos_count; ipos++)
       if (pos[ipos] != 0)
          barf("Invalid position %"IND_FLAG" at dimension %"IND_FLAG, pos[ipos], ipos);
-
     result=pdl_at(PDL_REPRP(x), x->datatype, pos, x->dims,
         PDL_REPRINCS(x), PDL_REPROFFS(x),
 	x->ndims);
@@ -320,11 +305,14 @@ at_bad_c(x,pos)
      if (isbad == -1) barf("ANYVAL_ISBAD error on types %d, %d", result.type, badval.type);
      if (isbad)
        RETVAL = newSVpvn( "BAD", 3 );
-     else
+     else {
+       RETVAL = newSV(0);
        ANYVAL_TO_SV(RETVAL, result);
-   } else
+     }
+   } else {
+     RETVAL = newSV(0);
      ANYVAL_TO_SV(RETVAL, result);
-
+   }
     OUTPUT:
      RETVAL
 
@@ -377,9 +365,12 @@ listref_c(x)
 	 if (isbad == -1) croak("ANYVAL_ISBAD error on types %d, %d", pdl_val.type, pdl_badval.type);
 	 if (isbad)
 	    sv = newSVpvn( "BAD", 3 );
-	 else
+	 else {
+	    sv = newSV(0);
 	    ANYVAL_TO_SV(sv, pdl_val);
+	 }
       } else {
+	 sv = newSV(0);
 	 ANYVAL_TO_SV(sv, pdl_val);
       }
       av_store( av, lind, sv );
@@ -401,6 +392,7 @@ listref_c(x)
 void
 set_c(x,pos,value)
     pdl*	x
+    PDL_Indx pos_count=0;
     PDL_Indx *pos
     PDL_Anyval	value
    PREINIT:
@@ -481,6 +473,7 @@ pdl_avref(array_ref, class, type)
 	at this stage start making an ndarray and populate it with
 	values from the array (which has already been checked in av_check)
      */
+     ENTER; SAVETMPS;
      if (strcmp(class,"PDL") == 0) {
         p = pdl_from_array(av,dims,type,NULL); /* populate with data */
         RETVAL = newSV(0);
@@ -499,6 +492,7 @@ pdl_avref(array_ref, class, type)
        SvREFCNT_inc(psv);
        pdl_from_array(av,dims,type,p); /* populate ;) */
      }
+     FREETMPS; LEAVE;
      OUTPUT:
      RETVAL
 
@@ -598,10 +592,23 @@ pdl_remove_threading_magic(it)
 
 MODULE = PDL::Core	PACKAGE = PDL
 
+PDL_Anyval
+sclr(it)
+   pdl* it
+   CODE:
+        /* get the first element of an ndarray and return as
+         * Perl scalar (autodetect suitable type IV or NV)
+         */
+        pdl_barf_if_error(pdl_make_physdims(it));
+        if (it->nvals > 1) barf("multielement ndarray in 'sclr' call");
+        RETVAL = pdl_at0(it);
+        if (RETVAL.type < 0) croak("Position out of range");
+    OUTPUT:
+        RETVAL
+
 SV *
 initialize(class)
-	SV *class
-        PREINIT:
+        SV *class
         CODE:
         HV *bless_stash = SvROK(class)
           ? SvSTASH(SvRV(class)) /* a reference to a class */
@@ -665,6 +672,17 @@ set_dataflow_f(self,value)
 		self->state &= ~PDL_DATAFLOW_F;
 
 int
+badflag(x,newval=0)
+    pdl *x
+    int newval
+  CODE:
+    if (items>1)
+	pdl_propagate_badflag( x, newval );
+    RETVAL = ((x->state & PDL_BADVAL) > 0);
+  OUTPUT:
+    RETVAL
+
+int
 getndims(x)
 	pdl *x
 	ALIAS:
@@ -677,7 +695,7 @@ getndims(x)
 		RETVAL
 
 void
-dims_c(x)
+dims(x)
 	pdl *x
 	PREINIT:
 		PDL_Indx i;
@@ -717,7 +735,7 @@ getnbroadcastids(x)
 		RETVAL
 
 void
-broadcastids_c(x)
+broadcastids(x)
 	pdl *x
 	PREINIT:
 		PDL_Indx i;
@@ -744,6 +762,7 @@ getbroadcastid(x,y)
 void
 setdims(x,dims)
 	pdl *x
+	PDL_Indx dims_count=0;
 	PDL_Indx *dims
 	CODE:
 		pdl_barf_if_error(pdl_setdims(x,dims,dims_count));
@@ -848,6 +867,7 @@ broadcastover_n(...)
     if (pdl_startbroadcastloop(&pdl_brc,NULL,NULL,&error_ret) < 0) croak("Error starting broadcastloop");
     pdl_barf_if_error(error_ret);
     sd = pdl_brc.ndims;
+    ENTER; SAVETMPS;
     do {
 	dSP;
 	PUSHMARK(sp);
@@ -856,14 +876,16 @@ broadcastover_n(...)
 	for(i=0; i<npdls; i++) {
 		PDL_Anyval pdl_val = { PDL_INVALID, {0} };
 		pdl_val = pdl_get_offs(pdls[i],pdl_brc.offs[i]);
+		sv = sv_newmortal();
 		ANYVAL_TO_SV(sv, pdl_val);
-		PUSHs(sv_2mortal(sv));
+		PUSHs(sv);
 	}
 	PUTBACK;
 	perl_call_sv(code,G_DISCARD);
 	sd = pdl_iterbroadcastloop(&pdl_brc,0);
 	if ( sd < 0 ) die("Error in iterbroadcastloop");
     } while( sd );
+    FREETMPS; LEAVE;
     pdl_freebroadcaststruct(&pdl_brc);
 
 void
@@ -941,6 +963,7 @@ broadcastover(...)
 	pdl_SetSV_PDL(csv[i], child[i]); /* pdl* into SV* */
     }
     int brcloopval;
+    ENTER; SAVETMPS;
     do {  /* the actual broadcastloop */
 	pdl_trans *traff;
 	dSP;
@@ -962,4 +985,5 @@ broadcastover(...)
 	brcloopval = pdl_iterbroadcastloop(&pdl_brc,0);
 	if ( brcloopval < 0 ) die("Error in iterbroadcastloop");
     } while( brcloopval );
+    FREETMPS; LEAVE;
     pdl_freebroadcaststruct(&pdl_brc);

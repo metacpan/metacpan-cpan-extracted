@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 6 "fft.pd"
 
 =head1 NAME
@@ -90,7 +91,6 @@ which can easily be obtained using
 
 C<< $kx = $real->xlinvals(-($N/2-0.5)/$N/$D,($N/2-0.5)/$N/$D)->rotate(-($N-1)/2); >>
 
-
 =head1 ALTERNATIVE FFT PACKAGES
 
 Various other modules - such as L<PDL::FFTW3> and L<PDL::Slatec> -
@@ -101,19 +101,12 @@ and so may not be installed.
 =cut
 #line 103 "FFT.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -133,19 +126,15 @@ cfloat/cdouble input ndarray can also be used.
   fft($real,$imag);
   fft($complex);
 
-
 =for bad
 
 fft does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 145 "FFT.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::fft {
 	# Convert the first argument to decimal and check for trouble.
@@ -175,18 +164,13 @@ sub PDL::fft {
 		$_[0]=$re,$_[1]=$im;
 	}
 }
-#line 179 "FFT.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *fft = \&PDL::fft;
-#line 186 "FFT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -206,19 +190,15 @@ cfloat/cdouble input ndarray can also be used.
   ifft($real,$imag);
   ifft($complex);
 
-
 =for bad
 
 ifft does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 218 "FFT.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::ifft {
 	# Convert the first argument to decimal and check for trouble.
@@ -248,14 +228,12 @@ sub PDL::ifft {
 		$_[0]=$re,$_[1]=$im;
 	}
 }
-#line 252 "FFT.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ifft = \&PDL::ifft;
-#line 259 "FFT.pm"
+
+
 
 
 
@@ -461,14 +439,8 @@ sub PDL::fftconvolve {
     $_[1] = $c->im->sever;
     @_;
 }
-#line 465 "FFT.pm"
-
-
-
-
 
 #line 388 "fft.pd"
-
 =head1 BUGS
 
 Where the source is marked `FIX', could re-implement using phase-shift
@@ -486,10 +458,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 490 "FFT.pm"
-
-
-
+#line 462 "FFT.pm"
 
 # Exit with OK status
 

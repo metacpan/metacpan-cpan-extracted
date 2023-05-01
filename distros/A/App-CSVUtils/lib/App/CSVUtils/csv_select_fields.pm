@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -15,11 +15,13 @@ use App::CSVUtils qw(
 
 gen_csv_util(
     name => 'csv_select_fields',
-    summary => 'Only output selected field(s)',
+    summary => 'Select (only output) field(s) using a combination of excludes/includes, including by regex',
     add_args => {
         %App::CSVUtils::argspecsopt_field_selection,
         %App::CSVUtils::argspecsopt_show_selected_fields,
     },
+    tags => ['category:filtering'],
+
     examples => [
         {
             summary => 'Select a single field from CSV',
@@ -89,7 +91,7 @@ gen_csv_util(
 );
 
 1;
-# ABSTRACT: Only output selected field(s)
+# ABSTRACT: Select (only output) field(s) using a combination of excludes/includes, including by regex
 
 __END__
 
@@ -99,11 +101,11 @@ __END__
 
 =head1 NAME
 
-App::CSVUtils::csv_select_fields - Only output selected field(s)
+App::CSVUtils::csv_select_fields - Select (only output) field(s) using a combination of excludes/includes, including by regex
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_select_fields (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_select_fields (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 
@@ -114,7 +116,7 @@ Usage:
 
  csv_select_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Only output selected field(s).
+Select (only output) field(s) using a combination of excludesE<sol>includes, including by regex.
 
 Examples:
 

@@ -1,4 +1,4 @@
-# Copyright 2004-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2004-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Annotation::Random;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use Getopt::Long;
 
@@ -78,7 +78,7 @@ Devel::Cover::Annotation::Random - Example annotation for formatters
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2004-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2004-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

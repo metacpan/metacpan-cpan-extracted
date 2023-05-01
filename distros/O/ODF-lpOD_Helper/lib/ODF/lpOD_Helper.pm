@@ -37,7 +37,7 @@ ODF::lpOD_Helper - fix and enhance ODF::lpOD
   # Replace "{famous author}" with "Stephen King" in large, red, bold text.
   # regardless of segmentation
   $body->Hreplace("{famous author}", 
-                  [["bold",[size => "120%"],[color => "red]], "Stephen King"] 
+                  ["bold", size => "24pt", color => "red"], "Stephen King"] 
                  );
 
 The following funcions are exported by default:
@@ -90,11 +90,10 @@ warnings (L<https://rt.cpan.org/Public/Bug/Display.html?id=97977>)
 
 package ODF::lpOD_Helper;
 
-our $VERSION = '3.009'; # VERSION
-our $DATE = '2023-04-12'; # DATE
+our $VERSION = '3.010'; # VERSION
+our $DATE = '2023-04-28'; # DATE
 
 our @EXPORT = qw(
-  __disconnected_style
   Hautomatic_style Hcommon_style
   self_or_parent
   fmt_match fmt_node fmt_tree
@@ -113,6 +112,9 @@ use constant {
 };
 
 use ODF::lpOD;
+
+#$ODF::lpOD::Common::DEBUG = TRUE;
+
 BEGIN {
   # https://rt.cpan.org/Public/Bug/Display.html?id=97977
   no warnings 'once';
@@ -132,7 +134,7 @@ sub import {
   __PACKAGE__->export_to_level(1, $class, @exporter_args);
 }
 
-use constant lpod_helper => 'ODF::lpOD_Helper';
+#use constant lpod_helper => 'ODF::lpOD_Helper';
 
 use Carp;
 sub oops(@) { unshift @_, "oops! "; goto &Carp::confess; }
@@ -148,7 +150,6 @@ use List::Util qw/min max first any all none reduce max sum0/;
 # state if the same memory address has been reused for a new Document object.
 #
 our %perdoc_state;  # "address" => [ { statehash }, $doc_weakened ]
-my $auto_pfx = "auto";
 sub _get_per_doc_hash($) {
   my $doc = shift;
   confess "not a Document" unless ref($doc) eq "ODF::lpOD::Document";
@@ -164,6 +165,7 @@ sub _get_per_doc_hash($) {
   oops unless isweak($aref->[1]);
   return $aref->[0];
 }
+our $auto_pfx = "lpODH";
 
 sub fmt_node(_;$); # forward
 sub fmt_tree(_;@);
@@ -171,30 +173,46 @@ sub fmt_match(_);
 sub self_or_parent($$);
 sub hashtostring($);
 
-my $textonly_prop_re = qr/^(?:font|size|weight|style|variant|color
-                              |underline[-\ _](?:color|width|mode|style)
-                              |underline|display|language|country
-                              |style:font-name|fo-.*
-                           )$/x;
-my $paraonly_prop_re = qr/^(?:align|align-last|indent|widows|orphans|together
+sub __is_textonly_prop(_) {
+  local $_ = shift;
+  state $TextStyleATTRValues 
+    = {map{$_ => undef} values %ODF::lpOD::TextStyle::ATTR};
+  exists($ODF::lpOD::TextStyle::ATTR{$_})
+  || exists($TextStyleATTRValues->{$_})
+  || /^fo:(?!keep-together)/  # What are all possible fo:... ?
+}
+
+sub __is_paraonly_prop(_) {
+  local $_ = shift;
+  state $ParagraphStyleATTRValues 
+    = {map{$_ => undef} values %ODF::lpOD::ParagraphStyle::ATTR};
+  exists($ODF::lpOD::ParagraphStyle::ATTR{$_})
+  || exists($ParagraphStyleATTRValues->{$_})
+  || /^(?:style[- ])?(?:tab|register)/
+  # I wish I recorded how I came up with all these
+  || /^(?:text[- ])?
+       (?:align|align-last|indent|widows|orphans|together
                               |margin|margin[-\ _](?:left|right|top|bottom)
                               |border|border[-\ _](?:left|right|top|bottom)
                               |padding|padding[-\ _](?:left|right|top|bottom)
                               |shadow|keep[-\ _]with[-\ _]next
                               |break[-\ _](?:before|after)
                            )$/x;
-my $textorpara_prop_re = qr/^(?:name|parent|clone)$/;
+}
 
-my $text_prop_re = qr/${textorpara_prop_re}|${textonly_prop_re}/;
-my $para_prop_re = qr/${textorpara_prop_re}|${paraonly_prop_re}/;
+my $textorpara_prop_re = qr/(?:name|parent|clone)$/;
 
-my $table_prop_re = qr/^(?:width|together|keep.with.next|display
+# Again, I wish I recorded where I found all these..
+sub __is_table_prop(_) {
+  local $_ = shift;
+  /^(?:width|together|keep.with.next|display
                            |margin|margin[-\ _](?:left|right|top|bottom)
                            |break|break[-\ _](?:before|after)
                            |fo:.*     # assume it's ok if retrieved
                            |style:.*  # assume it's ok if retrieved
                            |table.*   # assume it's ok if retrieved
                         )$/x;
+}
 
 # Translate some single-item abbreviated properties
 sub __unabbrev_props($) {
@@ -210,73 +228,23 @@ sub __unabbrev_props($) {
     "roman"       =>  [style => "normal"],
     "small-caps"  =>  [variant => "small-caps"],
     "normal-caps" =>  [variant => "normal"], #???
+    "underlined"  =>  ["underline style" => "solid", 
+                       "underline width" => "normal",
+                       "underline mode" => "continuous"],
+    "hidden"      =>  [display => "none"],
   };
   my $input = shift;
   my $output = [];
   for(my $i=0; $i <= $#$input; ++$i) {
     local $_ = $input->[$i];
     if (my $pair=$abbr_props->{$_}) { push @$output, @$pair; }
+    # N.B. percentage only allowed in common styles, relative to parent style!
     elsif (/^(\d[\.\d]*)(pt|%)$/)   { push @$output, "size" => $_; }
     elsif (/^\d[\.\d]*$/)           { push @$output, "size" => "${_}pt"; }
     elsif ($i < $#$input)           { push @$output, $_, $input->[++$i]; }
     else                            { oops(ivis 'Unrecognized abbrev prop $_ (input=$input ix=$i)') }
   }
   return $output;
-}
-
-# Create a style with attributes specified via high-level properties.
-# Paragraph properties may include recognized text
-# style properties, which are internally segregated and put into the
-# required 'area' property and text style.  Fonts are registered as needed.
-sub __disconnected_style($$@) {
-  my ($context, $family, @input_props) = @_;
-  my %props = @{ __unabbrev_props(\@input_props) };
-
-  # Work around ODF::lpOD::odf_create_style bug which deletes {parent} in
-  # a cloned style
-  if (my $clonee = $props{clone}) {
-    if (my $clonee_parent = $clonee->get_parent_style) {
-      oops if $props{parent};
-      $props{parent} = $clonee_parent;
-    }
-  }
-
-  my $doc = $context->get_document;
-  my $object;
-  if ($family eq 'paragraph') {
-    my (@pprops, @tprops);
-    while(my ($key, $val) = each %props) {
-      if    ($key =~ /${textonly_prop_re}/) { push @tprops, $key, $val; }
-      elsif ($key =~ /${para_prop_re}/)     { push @pprops, $key, $val; }
-      else { croak "Unrecognized paragraph pseudo-property '$key'" }
-    }
-    $object = odf_create_style('paragraph', @pprops);
-    if (@tprops) {
-      my $ts = Hautomatic_style($context, 'text', @tprops);
-      $object->set_properties(area => 'text', clone => $ts);
-    }
-  }
-  elsif ($family eq 'text') {
-    while(my ($key, $val) = each %props) {
-      confess "Unk text prop '$key'\n"
-        unless $key =~ /${text_prop_re}/ || $key eq "name";
-      if ($key eq "font") {
-        unless ($context->get_document_part()->get_font_declaration($val)) {
-          $doc->set_font_declaration($val);
-        }
-      }
-    }
-    $object = odf_create_style('text', %props);
-  }
-  elsif ($family eq 'table') {
-    while(my ($key, $val) = each %props) {
-      croak "Unk table prop '$key'\n"
-        unless $key =~ /${table_prop_re}/ || $key eq "name";
-    }
-    $object = odf_create_style('table', %props);
-  }
-  else { die "style family '$family' not (yet) supported" }
-  return $object;
 }
 
 # Like ODF::lpOD get_text methods except:
@@ -519,39 +487,39 @@ each of which is either
 
 =item * A text string which may include spaces, tabs and newlines, or
 
-=item * A reference to [list of format PROPs]
+=item * A reference to [list of format properties]
 
 =back
 
-Each [list of format PROPs] describes an I<automatic character style>
+Each [list of format properties] describes an I<automatic character style>
 which will be applied only to the immediately-following text string.
 
-Each PROP is itself either a [key => value] sublist,
-or a shorcut string:
+Format properties may be any of the S<< key => value pairs >> accepted 
+by C<odf_create_style>, as well as these single-item abbreviations:
 
-  "center"      means  [align => "center"]
-  "left"        means  [align => "left"]
-  "right"       means  [align => "right"]
-  "bold"        means  [weight => "bold"]
-  "italic"      means  [style => "italic"]
-  "oblique"     means  [style => "oblique"]
-  "normal"      means  [style => "normal", weight => "normal"]
-  "roman"       means  [style => "normal"]
-  "small-caps"  means  [variant => "small-caps"]
-  "normal-caps" means  [variant => "normal"], #??
+  "center"      means  align => "center"
+  "left"        means  align => "left"
+  "right"       means  align => "right"
+  "bold"        means  weight => "bold"
+  "italic"      means  style => "italic"
+  "oblique"     means  style => "oblique"
+  "normal"      means  style => "normal", weight => "normal"
+  "roman"       means  style => "normal"
+  "small-caps"  means  variant => "small-caps"
+  "normal-caps" means  variant => "normal", #??
 
-  <NUM>         means  [size => "<NUM>pt],   # bare number means point size
-  "<NUM>pt"     means  [size => "<NUM>pt],
-  "<NUM>%"      means  [size => "<NUM>%],
+  <NUM>         means  size => "<NUM>pt,   # bare number means point size
+  "<NUM>pt"     means  size => "<NUM>pt,
+  "<NUM>%"      means  size => "<NUM>%,    # only in 'common' styles!
 
 Internally, an ODF "automatic" Style is created for
-each unique combination of PROPs, re-using styles when possible.
+each unique combination of properties, re-using styles when possible.
 Fonts are automatically registered.
 
-An ODF Style which already exists (or will be created) may be indicated
-by a list containing a single PROP like this:
+An ODF Style which already exists (or will be created) may be used by
+passing a single special property list 
 
-  [ [style-name => "name of style"] ]
+  [style-name => "name of style"]
 
 =cut
 
@@ -846,7 +814,7 @@ The new content is inserted at the indicated position relative to
 C<$context>.
 
 If multiple segments are inserted, the first one
-is will be at the indicated position and the others will be
+will be at the indicated position and the others will be
 immediately-following siblings of the first.
 
 Returns nothing.
@@ -1046,7 +1014,7 @@ sub ODF::lpOD::Element::self_or_parent($$) {
 =head2 $context->descendants_pruned($cond, $prune_cond)
 
 Similar to XML::Twig's C<descendants> method but omits
-all descendants of items which match C<prune_cond>.
+I<descendants> of items which match C<prune_cond>.
 An C<undef> condition matches all items.
 
 For example
@@ -1090,56 +1058,172 @@ sub ODF::lpOD::Element::descendants_pruned {
 
 ###################################################
 
-=head2 $context->gen_table_name()
+=head2 $context->gen_style_name($family, SUFFIX)
 
-Generate a table name not currently used of the form "Table<NUM>".
+=head2 $context->gen_table_name(SUFFIX)
 
-C<$context> may be the document object or a descendant.
+Generate a style or table name not currently in use.
+
+In the case of a I<style>, the C<$family> must be specified
+("text", "table", etc.).
+
+SUFFIX is an optional string which will be appended to a generated 
+unique name (to make it easier for humans to recognize).
+
+C<$context> may be the document itself or any Element.
 
 =cut
 
-sub ODF::lpOD::Element::gen_table_name($) {
-  my $context = shift;
+sub ODF::lpOD::Element::gen_style_name {
+  my ($context, $family, $name_suffix) = @_;
   my $doc = $context->get_document;
   my $sh = _get_per_doc_hash($doc);
-  my $table_names = ($sh->{table_names} //= {
-    map{ ($_->get_name() => 1) } $doc->get_body->get_tables
-  });
-
-  state $seq = 1;
+  my $counters = ($sh->{sn_counters} //= {});
+  $counters->{$family} //= 0;
   my $name;
-   do { $name=$auto_pfx."Table".($sh->{table_name_seq}++) } 
-   while exists $table_names->{$name};
-  $table_names->{$name} = 1;
-  return $name;
+  do {
+    $name = $auto_pfx
+                 .$family
+                 .(++$counters->{$family})
+                 .($name_suffix ? "_$name_suffix" : "");
+    $name =~ s/ /-/g;
+    # Avoid possible unknown unknowns with arbitrary chars
+    $name =~ s/:/./g;
+    $name =~ s/[^-._A-Za-z0-9]/./g; # allowed by OASIS for naming resources
+  } while(defined($doc->get_style($family, $name)));
+  $name
+}
+sub ODF::lpOD::Element::gen_table_name {
+  my ($context, $name_suffix) = @_;
+  my $doc = $context->get_document;
+  my $sh = _get_per_doc_hash($doc);
+  my $name;
+  do {
+    $name = $auto_pfx
+                 ."Table"
+                 .(++$sh->{tn_counter})
+                 .($name_suffix ? "_$name_suffix" : "");
+    $name =~ s/ /-/g;
+    # Avoid possible unknown unknowns with arbitrary chars
+    $name =~ s/:/./g;
+    $name =~ s/[^-._A-Za-z0-9]/./g; # allowed by OASIS for naming resources
+  } while(defined($context->get_table_by_name($name)));
+  $name
 }
 
-###################################################
+sub ODF::lpOD::Document::gen_style_name {
+  my ($doc, $family, $name_suffix) = @_;
+  &ODF::lpOD::Element::gen_style_name($doc->get_body(), $family, $name_suffix);
+}
 
 =head1 FUNCTIONS (not methods)
 
 
-=head2 Hautomatic_style($context, $family, PROP...)
+=head2 Hautomatic_style($context, $family, properties...)
 
 Find or create an 'automatic' (i.e. functionally anonymous) style
-with attributes specified via high-level properties.
+with the specified properties.
 
 Styles are re-used when possible, so the returned style object
 should not be modified because it might be shared.
 
-C<$family> is "text" or another style family name (TODO: specify)
+C<$family> must be "text" or another supported style family name (TODO: specify)
 
-PROPs are as described for C<Hreplace>.
+Property list items are as described for C<Hreplace>.
 
-=head2 Hcommon_style($context, $family, PROP...)
+=head2 Hcommon_style($context, $family, properties...)
 
 Create a 'common' (i.e. named by the user) style from high-level props.
 
-The name must be given by [name => "STYLENAME"] somewhere in PROPs.
+The name, which must not name an existing style,
+is given by C<< name => "STYLENAME" >> somewhere in PROPs.
 
 =cut
 
-sub Hautomatic_style($$@);
+# Create a style with specified properties, including high-level properties.
+# Paragraph properties may include recognized text
+# style properties, which are internally segregated and put into the
+# required 'text area' sub-style. Fonts are registered.
+# 
+# The caller must specify 'name' (except with default => TRUE).
+#
+# The caller should specify 'automatic'.  
+#
+# 'part' defaults appropriately (to CONTENT or STYLES), but
+# theoretically could be specified to, for example, force an automatic style 
+# into the STYLES part so it can later be referenced elsewhere in the STYLES 
+# part (The ODF::lpOD Style pod mentions this but I can't think of any
+# actual example of an automatic style being referenced by another style,
+# since inheriting from an automatic style is prohibited).
+#
+# Any fonts mentioned are globally registered (i.e. in both CONTENT and 
+# STYLES parts, via ODF::lpOD::Document::set_font_declaration()).
+sub __create_style($$@) {
+  my ($doc, $family, %opt) = @_;
+
+  confess "Style 'name' must be specified" unless $opt{name};
+
+  # FIXME: Is this correct?  Maybe it is desirable to "disinherit" from
+  # a superior style when cloning a subordinate style...
+  #
+  # Work around ODF::lpOD::odf_create_style bug which deletes {parent} in
+  # a cloned style
+  if (my $clonee = $opt{clone}) {
+    if (my $clonee_parent = $clonee->get_parent_style) {
+      oops if $opt{parent};
+      $opt{parent} = $clonee_parent;
+    }
+  }
+
+  my $object;
+  if ($family eq 'paragraph') {
+    my (@popt, @topt);
+    while(my ($key, $val) = each %opt) {
+      if (__is_textonly_prop($key)) {
+        push @topt, $key, $val; 
+      }
+      elsif (__is_paraonly_prop($key) || $key =~ /^(?:part|name|automatic)$/) {
+        push @popt, $key, $val; 
+      }
+      else { croak "Unrecognized paragraph property '$key'" }
+    }
+    $object = odf_create_style('paragraph', @popt);
+    if (@topt) {
+      push @topt, (part => $opt{part}) if $opt{part};
+      my $ts = Hautomatic_style($doc, 'text', @topt);
+      $object->set_properties(area => 'text', clone => $ts);
+    }
+  }
+  elsif ($family eq 'text') {
+    while(my ($key, $val) = each %opt) {
+      confess "Unk text prop '$key'\n"
+        unless __is_textonly_prop($key) || $key =~ /^(?:part|name|automatic)$/;
+      if ($key eq "font") {
+        unless ($doc->get_font_declaration($val)) {
+          $doc->set_font_declaration($val);
+        }
+      }
+    }
+    $object = odf_create_style('text', %opt);
+  }
+  elsif ($family eq 'table') {
+    while(my ($key, $val) = each %opt) {
+      croak "Unk table prop '$key'\n"
+        unless __is_table_prop($key) || $key =~ /^(?:part|name|automatic)$/;
+    }
+    $object = odf_create_style('table', %opt);
+  }
+  else {
+    #confess "style family '$family' not (yet) supported";
+    
+    # ROLL THE DICE!
+    oops if grep /font/, keys %opt;
+    $family =~ s/-/ /g;
+    $object = odf_create_style($family, %opt);
+  }
+  return $doc->insert_style($object, %opt);
+}
+
 sub Hautomatic_style($$@) {
   my ($context, $family, @input_props) = @_;
   my $doc = $context->get_document // oops;
@@ -1147,38 +1231,33 @@ sub Hautomatic_style($$@) {
 
   my $sh = _get_per_doc_hash($doc);
   my $style_caches = ($sh->{style_caches} //= {});
-  my $counters     = ($sh->{counters}     //= {});
 
   my $cache = ($style_caches->{$family} //= {});
-  my $cache_key = hashtostring(\%props);
+  my $cache_key = hashtostring(\%props); # unique only within family
   my $stylename = $$cache{$cache_key};
-  if (! defined $stylename) {
-    for (;;) {
-      $stylename = $auto_pfx.uc(substr($family,0,1)).(++$counters->{$family});
-      # Append something to remind us what style this is while debugging
-      # (the counter guarantees unique results)
-      foreach my $key (qw/align weight style variant size/) {
-        $stylename .= "_".$props{$key} if $props{$key}
-      }
-      last
-        unless defined (my $s=$doc->get_style($family, $stylename));
-      my $existing_key = hashtostring(scalar $s->get_properties);
-      $$cache{$existing_key} //= $stylename;
-    }
-    $$cache{$cache_key} = $stylename;
-    my $object = __disconnected_style($context,$family, %props, name=>$stylename);
-    return $doc->insert_style($object, automatic => TRUE);
-  } else {
+  if (defined $stylename) {
     return $doc->get_style($family, $stylename);
+  } else {
+    my $suffix =
+      $ODF::lpOD::Common::DEBUG
+        ? join("_", map{ "$_=".u($props{$_}) } keys %props)
+        : join("_", grep{defined} 
+                           map{$props{$_}} 
+                           qw/align weight style variant size/);
+    $stylename = $doc->gen_style_name($family, $suffix);
+    $$cache{$cache_key} = $stylename;
+
+    __create_style($doc, $family, 
+                   %props, automatic => TRUE, part => CONTENT, 
+                   name => $stylename);
   }
 }
 
 sub Hcommon_style($$@) {
   my ($context, $family, @input_props) = @_;
   my %props = @{ __unabbrev_props(\@input_props) };
-  croak "Hcommon_style must specify 'name'\n" unless $props{name};
-  my $object = __disconnected_style($context, $family, %props);
-  return $context->get_document->insert_style($object, automatic => FALSE);
+  __create_style($context->get_document, $family, 
+                 %props, automatic => FALSE, part => STYLES);
 }
 
 ###################################################
@@ -1212,6 +1291,14 @@ Format a match hashreffor debug messages (sans final newline).
 
 =cut
 
+sub _fmt_refaddr($) {  # like DDI::addrvis() but elides ODF::lpOD:: prefix
+  my $node = shift;
+  return "<undef>" unless defined($node);
+  ref($node) =~ /ODF::lpOD::(\w+)/;
+  my $class = $1 // ref($node) || confess("not a ref");
+  "$class<".addrvis(refaddr $node).">";
+}
+
 sub fmt_node(_;$) {  # sans final newline
   my ($node, $leaftextonly) = @_;
   return "undef" unless defined($node);
@@ -1221,7 +1308,7 @@ sub fmt_node(_;$) {  # sans final newline
   my $att  = eval{ $node->get_attributes };
   ref($node) =~ /ODF::lpOD::(\w+)/;
   my $class = $1 // ref($node) || confess("not a ref");
-  my $s = "$class<".addrvis(refaddr $node).">";
+  my $s = _fmt_refaddr($node);
   $s .=  " $tag" if defined $tag;
   $s .= " ".(%$att && $tag =~ /^(table-cell|sequence)/ ? "{...}" : vis($att))
     if keys %$att;
@@ -1240,6 +1327,8 @@ sub fmt_node(_;$) {  # sans final newline
 
   $s .= " ".vis($text)."[len=".length($text)."]"
     if defined($text);
+
+  $s .= " parent="._fmt_refaddr($node->{parent});
 
   if (0) {
     foreach my $k (sort keys %$node) { # any private members e.g. from XML::Twig?

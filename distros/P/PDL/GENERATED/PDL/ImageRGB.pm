@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 9 "imagergb.pd"
 
 use strict;
@@ -57,7 +58,6 @@ image rebinning
 
 =cut
 
-
 use vars qw( $typecheck $EPS );
 
 use PDL::Core;
@@ -67,7 +67,6 @@ use PDL::Types;
 
 use Carp;
 use strict 'vars';
-
 
 $PDL::ImageRGB::EPS = 1e-7;     # there is probably a more portable way
 
@@ -115,7 +114,6 @@ sub PDL::cquant {
     return ($out,$olut);
 }
 
-
 =head2 interlrgb
 
 =for ref
@@ -152,7 +150,6 @@ sub PDL::interlrgb {
     }
     return $res;
 }
-
 
 =head2 rgbtogr
 
@@ -258,20 +255,11 @@ conditions. For details, see the file COPYING in the PDL
 distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
-
 =cut
-#line 264 "ImageRGB.pm"
-
-
-
-
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 260 "ImageRGB.pm"
 
 *cquant_c = \&PDL::cquant_c;
-#line 275 "ImageRGB.pm"
+
 
 
 

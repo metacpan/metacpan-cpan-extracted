@@ -145,7 +145,7 @@ sub post {
     my $self = shift;
 
     my $response = eval { $self->_post_data() };
-    confess("[POST]: >$response< " . $@) if $@;
+    confess("[POST]: >$@<") if $@;
 
     my $response_body = eval {
         Test::Smoke::Util::LoadAJSON->new->utf8->allow_nonref->decode($response);

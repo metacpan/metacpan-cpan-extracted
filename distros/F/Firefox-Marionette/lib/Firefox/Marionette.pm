@@ -63,7 +63,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.35';
+our $VERSION = '1.37';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -7670,8 +7670,16 @@ sub capabilities {
     );
     my $response = $self->_get_response($message_id);
     if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
-        return $self->_create_capabilities(
-            $response->result()->{capabilities} );
+        if (   ( $response->result()->{value} )
+            && ( $response->result()->{value}->{capabilities} ) )
+        {
+            return $self->_create_capabilities(
+                $response->result()->{value}->{capabilities} );
+        }
+        else {
+            return $self->_create_capabilities(
+                $response->result()->{capabilities} );
+        }
     }
     else {
         return $self->_create_capabilities( $response->result()->{value} );
@@ -10305,7 +10313,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.35
+Version 1.37
 
 =head1 SYNOPSIS
 
@@ -12646,9 +12654,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 =item * L<Marionette Protocol|https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html>
 
-=item * L<Marionette Documentation|https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html>
-
-=item * L<Marionette driver.js|https://hg.mozilla.org/mozilla-central/file/tip/remote/marionette/driver.js>
+=item * L<Marionette driver.js|https://hg.mozilla.org/mozilla-central/file/tip/remote/marionette/driver.sys.mjs>
 
 =item * L<about:config|http://kb.mozillazine.org/About:config_entries>
 

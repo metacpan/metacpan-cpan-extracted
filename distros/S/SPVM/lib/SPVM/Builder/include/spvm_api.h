@@ -4,7 +4,7 @@
 #ifndef SPVM_API_H
 #define SPVM_API_H
 
-#define SPVM_VERSION "0.971008"
+#define SPVM_VERSION "0.971009"
 
 #include "spvm_typedecl.h"
 #include "spvm_native.h"
@@ -32,7 +32,7 @@ double SPVM_API_get_version_number(SPVM_ENV* env, SPVM_VALUE* stack, int32_t cla
   Environment APIs
 */
 
-SPVM_ENV* SPVM_API_new_env_raw();
+SPVM_ENV* SPVM_API_new_env_raw(void);
 void SPVM_API_free_env_raw(SPVM_ENV* env);
 SPVM_ENV* SPVM_API_new_env(SPVM_ENV* env);
 int32_t SPVM_API_init_env(SPVM_ENV* env);

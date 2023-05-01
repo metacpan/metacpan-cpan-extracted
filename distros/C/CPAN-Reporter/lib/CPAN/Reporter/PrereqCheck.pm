@@ -1,7 +1,7 @@
 use strict;
 package CPAN::Reporter::PrereqCheck;
 
-our $VERSION = '1.2018';
+our $VERSION = '1.2019';
 
 use ExtUtils::MakeMaker 6.36;
 use File::Spec;
@@ -131,22 +131,31 @@ sub _try_load {
        POE::Loop::Event SOAP::Constants
        Moose::Meta::TypeConstraint::Parameterizable Moose::Meta::TypeConstraint::Parameterized/,
     'Devel::Trepan', #"require Enbugger; require Devel::Trepan;" starts debugging session
+    'Test::BDD::Cucumber::Loader', #by doing something to Test::Builder breaks Test::SharedFork and any module that uses it
 
-    #removed modules
-    qw/Pegex::Mo YAML::LibYAML/,
+    #removed modules, they still exist but die
+    qw/Pegex::Mo YAML::LibYAML Params::CheckCompiler/,
 
     #have additional prereqs
-    qw/Log::Dispatch::Email::MailSender RDF::NS::Trine Plack::Handler::FCGI Web::Scraper::LibXML/,
+    qw/Log::Dispatch::Email::MailSender RDF::NS::Trine Plack::Handler::FCGI Web::Scraper::LibXML
+    DBIx::Class::EncodedColumn::Crypt::Eksblowfish::Bcrypt/,
 
     #modify @INC. 'lib' appearing in @INC will prevent correct
     #checking of modules with XS part, for ex. List::Util
     qw/ExtUtils::ParseXS ExtUtils::ParseXS::Utilities/,
     
     #require special conditions to run
-    qw/mylib/,
+    qw/mylib Test::YAML Cache::Reddit Dist::Zilla::Plugin::TestMLIncluder/,
+
+    #print text to STDOUT which C::R::PC cannot intercept
+    qw/Test::Sys::Info Test::Subs/,
 
     #do not return true value
     qw/perlsecret Alt::Crypt::RSA::BigInt/,
+
+    #Try::Tiny::Tiny and modules that use it conflict with several modules
+    'Try::Tiny::Tiny',
+    'Date::Lectionary::Time',
   );
 
   my %loading_conflicts = (
@@ -155,12 +164,14 @@ sub _try_load {
     'Dancer::Plugin::FlashNote' => ['Dancer::Plugin::FlashMessage'],
     'Dancer::Plugin::Mongoose' => ['Dancer::Plugin::DBIC'],
     'Dancer::Plugin::DBIC' => ['Dancer::Plugin::Mongoose'],
-    'Test::BDD::Cucumber::Loader' => ['Test::Exception', 'Test::MockObject'], #works in different order
     'Test::Mock::LWP::UserAgent' => ['HTTP::Response'],
+    'Test::BDD::Cucumber::Loader' => ['Test::Exception', 'Test::MockObject', 'Test::SharedFork'], #works in different order
     'Test::SharedFork' => ['threads'], #dies if $INC{'threads.pm'}
     'Test::TCP' => ['threads'], #loads Test::SharedFork
     'Test::Fake::HTTPD' => ['threads'], #loads Test::SharedFork
+    'Plack::Test::Suite' => ['threads'], #loads Test::SharedFork
     #Note: Test::Perl::Critic and other modules load threads, so reordering will not help
+    'App::Sqitch' => ['Moose'], #has "no Moo::sification"
   ); #modules that conflict with each other
   
   my %load_before = (
@@ -174,10 +185,16 @@ sub _try_load {
     'Moose::Meta::TypeConstraint::Union' => 'Moose',
     'Moose::Meta::Attribute::Native' => 'Class::MOP',
     'Moose::Meta::Role::Attribute' => 'Class::MOP',
+    'Moose::Util::TypeConstraints' => 'Moose',
     'Test::More::Hooks' => 'Test::More',
     'Net::HTTP::Spore::Middleware::DefaultParams' => 'Net::HTTP::Spore::Meta::Method',
     'Log::Log4perl::Filter' => 'Log::Log4perl',
     'RDF::DOAP::Project' => 'RDF::Trine', #or other modules that use RDF::Trine will fail
+    'Win32::API::Type' => 'Win32::API',
+    'Dancer2::Plugin::DBIC' => 'Dancer2', #or later Strehler::API will fail
+    'Wx::AUI' => 'Wx',
+    'Dist::Zilla::Role::Tempdir' => 'Dist::Zilla', # or it would not be possible to check Dist::Zilla
+    'Pod::Perldoc::ToMan' => 'Pod::Perldoc',
   );
 
   # M::I < 0.95 dies in require, so we can't check if it loads
@@ -235,7 +252,7 @@ CPAN::Reporter::PrereqCheck - Modulino for prerequisite tests
 
 =head1 VERSION
 
-version 1.2018
+version 1.2019
 
 =head1 SYNOPSIS
 
@@ -286,7 +303,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2006 by David Golden.
+This software is Copyright (c) 2023 by David Golden.
 
 This is free software, licensed under:
 

@@ -3,8 +3,8 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Warnings;
+use Test2::V0;
+use Test::NoWarnings ();
 
 use Commandable::Invocation;
 
@@ -87,4 +87,5 @@ use Commandable::Invocation;
    is( $inv->pull_token, "three four", '->pull_token from new_from_tokens' );
 }
 
+Test::NoWarnings::had_no_warnings;
 done_testing;

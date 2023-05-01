@@ -139,6 +139,7 @@ Demos/earth.txt
 Demos/General.pm
 Demos/Makefile.PL
 Demos/t/demos.t
+Demos/Sound.pm
 Demos/Transform_demo.pm
 Demos/TriD/test4.p
 Demos/TriD/test5.p
@@ -155,11 +156,9 @@ Doc/Doc.pm
 Doc/Doc/Config.pm.PL
 Doc/Doc/Perldl.pm
 Doc/Makefile.PL
-Doc/mkhtmldoc.pl
 Doc/mkpdlfuncpod
 Doc/README
 Doc/scantree.pl
-Doc/TODO
 Example/address-pseudonymise
 Example/Benchmark/Bench.pm
 Example/Benchmark/Bench.xs

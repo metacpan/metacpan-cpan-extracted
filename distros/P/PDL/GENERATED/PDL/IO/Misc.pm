@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 7 "misc.pd"
 
 use strict;
@@ -39,12 +40,7 @@ Some basic I/O functionality: FITS, tables, byte-swapping
  use PDL::IO::Misc;
 
 =cut
-#line 43 "Misc.pm"
-
-
-
-
-
+#line 44 "Misc.pm"
 
 =head1 FUNCTIONS
 
@@ -53,8 +49,8 @@ Some basic I/O functionality: FITS, tables, byte-swapping
 
 
 
-#line 47 "misc.pd"
 
+#line 47 "misc.pd"
 
 use PDL::Primitive;
 use PDL::Types;
@@ -64,13 +60,7 @@ use Carp;
 use Symbol qw/ gensym /;
 use List::Util;
 use strict;
-#line 68 "Misc.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 64 "Misc.pm"
 
 =head2 bswap2
 
@@ -87,20 +77,15 @@ Swaps pairs of bytes in argument x()
 bswap2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 93 "Misc.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *bswap2 = \&PDL::bswap2;
-#line 100 "Misc.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -119,20 +104,15 @@ Swaps quads of bytes in argument x()
 bswap4 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 125 "Misc.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *bswap4 = \&PDL::bswap4;
-#line 132 "Misc.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -151,23 +131,18 @@ Swaps octets of bytes in argument x()
 bswap8 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 157 "Misc.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *bswap8 = \&PDL::bswap8;
-#line 164 "Misc.pm"
+
+
 
 
 
 #line 124 "misc.pd"
-
-
-
 
 # Internal routine to extend PDL array by size $n along last dimension
 # - Would be nice to have a proper extend function rather than hack
@@ -250,7 +225,6 @@ sub _handle_types ($$$) {
     return @cols;
 } # sub: _handle_types
 
-
 # Whether an object is an IO handle
 use Scalar::Util;
 sub _is_io_handle {
@@ -260,7 +234,6 @@ sub _is_io_handle {
     my $reftype = Scalar::Util::reftype($h);
     return defined(fileno($h)) || (defined($reftype) && $reftype eq 'GLOB');
 }
-
 
 =head2 rcols
 
@@ -381,7 +354,6 @@ For example:
   # the next two data columns in the file as a single Nx2 ndarray 
   ($name,$xy) = rcols 'file4', 0, [1, 2], { PERLCOLS => [ 0 ] };
 
-
   NOTES:
 
   1. Quotes are required on patterns or use the qr{} quote regexp syntax.
@@ -433,7 +405,7 @@ sub PDL::rcols {
    shift;
 
    # set up default options
-   my $opt = new PDL::Options( {
+   my $opt = PDL::Options->new( {
        CHUNKSIZE => undef,
        COLIDS => undef,
        COLSEP => undef,
@@ -820,7 +792,6 @@ foreach my $col (@ret) {
 wantarray ? return(@ret) : return $ret[0];
 }
 
-
 =head2 wcols
 
 =for ref
@@ -1082,7 +1053,6 @@ sub PDL::swcols{
   wantarray ? return @outlist: return \@outlist;
 }
 
-
 =head2 rgrep
 
 =for ref
@@ -1146,7 +1116,7 @@ of C<$1>, C<$2> etc.
 
 	
      # set up default options
-     my $opt = new PDL::Options( {
+     my $opt = PDL::Options->new( {
          DEFTYPE => $deftype,
          TYPES => [],
          UNDEFINED => $PDL::undefval,
@@ -1217,22 +1187,12 @@ of C<$1>, C<$2> etc.
   Determine endianness of machine - returns 0 or 1 accordingly
 
 =cut
-#line 1221 "Misc.pm"
-
-
 
 #line 1180 "misc.pd"
-
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
-#line 1229 "Misc.pm"
-
-
 
 #line 1202 "misc.pd"
-
-
-
 =head2 rasc
 
 =for ref
@@ -1336,21 +1296,17 @@ sub rcube {
 
       return $cube;
 }
-#line 1340 "Misc.pm"
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1300 "Misc.pm"
 
 *_rasc = \&PDL::_rasc;
-#line 1347 "Misc.pm"
+
+
 
 
 
 
 
 #line 27 "misc.pd"
-
 
 =head1 AUTHOR
 
@@ -1363,10 +1319,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1367 "Misc.pm"
-
-
-
+#line 1323 "Misc.pm"
 
 # Exit with OK status
 

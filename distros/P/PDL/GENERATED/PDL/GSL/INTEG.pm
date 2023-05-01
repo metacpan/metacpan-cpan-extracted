@@ -23,6 +23,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_integ.pd"
 
 use strict;
@@ -73,7 +74,6 @@ and relative error bounds (epsabs,epsrel) which specify
 the following accuracy requirement:
 
 |RESULT - I|  <= max(epsabs, epsrel |I|)
-
 
 The routines will fail to converge if the
 error bounds are too stringent, but always return the best
@@ -131,11 +131,6 @@ Please check the GSL documentation for more information.
    }
 #line 133 "INTEG.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -143,8 +138,8 @@ Please check the GSL documentation for more information.
 
 
 
-#line 553 "gsl_integ.pd"
 
+#line 553 "gsl_integ.pd"
 
 sub gslinteg_qng{
   my ($opt,$warn);
@@ -158,13 +153,7 @@ sub gslinteg_qng{
   my ($res,$abserr,$neval,$ierr) = qng_meat($la,$lb,$epsabs,$epsrel,$warn,$f);
   return ($res,$abserr,$ierr,$neval);
 }
-#line 162 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 157 "INTEG.pm"
 
 =head2 qng_meat
 
@@ -174,32 +163,27 @@ sub gslinteg_qng{
                    double epsrel(); double [o] result(); double [o] abserr();
                    int [o] neval(); int [o] ierr(); int gslwarn(); SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qng_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 191 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qng_meat = \&PDL::qng_meat;
-#line 198 "INTEG.pm"
+
+
 
 
 
 #line 585 "gsl_integ.pd"
-
 
 sub gslinteg_qag{
    my ($opt,$warn);
@@ -213,13 +197,7 @@ sub gslinteg_qag{
    my ($res,$abserr,$ierr) = qag_meat($la,$lb,$epsabs,$epsrel,$limit,$key,$limit,$warn,$f);
    return ($res,$abserr,$ierr);
 }
-#line 217 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 201 "INTEG.pm"
 
 =head2 qag_meat
 
@@ -228,32 +206,27 @@ sub gslinteg_qag{
   Signature: (double a(); double b(); double epsabs();double epsrel(); int limit();
 	           int key(); double [o] result(); double [o] abserr();int n();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qag_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 245 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qag_meat = \&PDL::qag_meat;
-#line 252 "INTEG.pm"
+
+
 
 
 
 #line 621 "gsl_integ.pd"
-
 
 sub gslinteg_qags{
   my ($opt,$warn);
@@ -267,13 +240,7 @@ sub gslinteg_qags{
   my ($res,$abserr,$ierr) = qags_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 271 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 244 "INTEG.pm"
 
 =head2 qags_meat
 
@@ -282,32 +249,27 @@ sub gslinteg_qags{
   Signature: (double a(); double b(); double epsabs();double epsrel(); int limit();
 	           double [o] result(); double [o] abserr();int n();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qags_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 299 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qags_meat = \&PDL::qags_meat;
-#line 306 "INTEG.pm"
+
+
 
 
 
 #line 656 "gsl_integ.pd"
-
 
 sub gslinteg_qagp{
   my ($opt,$warn);
@@ -321,13 +283,7 @@ sub gslinteg_qagp{
   my ($res,$abserr,$ierr) = qagp_meat($points,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 325 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 287 "INTEG.pm"
 
 =head2 qagp_meat
 
@@ -336,32 +292,27 @@ sub gslinteg_qagp{
   Signature: (double pts(l); double epsabs();double epsrel();int limit();
 		   double [o] result(); double [o] abserr();int n();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qagp_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 353 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagp_meat = \&PDL::qagp_meat;
-#line 360 "INTEG.pm"
+
+
 
 
 
 #line 690 "gsl_integ.pd"
-
 
 sub gslinteg_qagi{
   my ($opt,$warn);
@@ -375,13 +326,7 @@ sub gslinteg_qagi{
   my ($res,$abserr,$ierr) = qagi_meat($epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 379 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 330 "INTEG.pm"
 
 =head2 qagi_meat
 
@@ -390,32 +335,27 @@ sub gslinteg_qagi{
   Signature: (double epsabs();double epsrel(); int limit();
 		   double [o] result(); double [o] abserr(); int n(); int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qagi_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 407 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagi_meat = \&PDL::qagi_meat;
-#line 414 "INTEG.pm"
+
+
 
 
 
 #line 724 "gsl_integ.pd"
-
 
 sub gslinteg_qagiu{
   my ($opt,$warn);
@@ -429,13 +369,7 @@ sub gslinteg_qagiu{
   my ($res,$abserr,$ierr) = qagiu_meat($la,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 433 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 373 "INTEG.pm"
 
 =head2 qagiu_meat
 
@@ -444,32 +378,27 @@ sub gslinteg_qagiu{
   Signature: (double a(); double epsabs();double epsrel();int limit();
 		   double [o] result(); double [o] abserr();int n();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qagiu_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 461 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagiu_meat = \&PDL::qagiu_meat;
-#line 468 "INTEG.pm"
+
+
 
 
 
 #line 759 "gsl_integ.pd"
-
 
 sub gslinteg_qagil{
   my ($opt,$warn);
@@ -483,13 +412,7 @@ sub gslinteg_qagil{
   my ($res,$abserr,$ierr) = qagil_meat($lb,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 487 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 416 "INTEG.pm"
 
 =head2 qagil_meat
 
@@ -498,32 +421,27 @@ sub gslinteg_qagil{
   Signature: (double b(); double epsabs();double epsrel();int limit();
 		   double [o] result(); double [o] abserr();int n();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qagil_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 515 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagil_meat = \&PDL::qagil_meat;
-#line 522 "INTEG.pm"
+
+
 
 
 
 #line 794 "gsl_integ.pd"
-
 
 sub gslinteg_qawc{
   my ($opt,$warn);
@@ -537,13 +455,7 @@ sub gslinteg_qawc{
   my ($res,$abserr,$ierr) = qawc_meat($la,$lb,$c,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 541 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 459 "INTEG.pm"
 
 =head2 qawc_meat
 
@@ -552,32 +464,27 @@ sub gslinteg_qawc{
   Signature: (double a(); double b(); double c(); double epsabs();double epsrel();int limit();
 	           double [o] result(); double [o] abserr();int n();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qawc_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 569 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qawc_meat = \&PDL::qawc_meat;
-#line 576 "INTEG.pm"
+
+
 
 
 
 #line 828 "gsl_integ.pd"
-
 
 sub gslinteg_qaws{
   my ($opt,$warn);
@@ -591,13 +498,7 @@ sub gslinteg_qaws{
   my ($res,$abserr,$ierr) = qaws_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$alpha,$beta,$mu,$nu,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 595 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 502 "INTEG.pm"
 
 =head2 qaws_meat
 
@@ -607,32 +508,27 @@ sub gslinteg_qaws{
 	         double [o] result(); double [o] abserr();int n();
 		 double alpha(); double beta(); int mu(); int nu();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qaws_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 624 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qaws_meat = \&PDL::qaws_meat;
-#line 631 "INTEG.pm"
+
+
 
 
 
 #line 868 "gsl_integ.pd"
-
 
 sub gslinteg_qawo{
   my ($opt,$warn);
@@ -653,13 +549,7 @@ sub gslinteg_qawo{
   my ($res,$abserr,$ierr) = qawo_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$OPTION_SIN_COS,$omega,$L,$nlevels,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 657 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 553 "INTEG.pm"
 
 =head2 qawo_meat
 
@@ -669,32 +559,27 @@ sub gslinteg_qawo{
 	         double [o] result(); double [o] abserr();int n();
 		 int sincosopt(); double omega(); double L(); int nlevels();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qawo_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 686 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qawo_meat = \&PDL::qawo_meat;
-#line 693 "INTEG.pm"
+
+
 
 
 
 #line 919 "gsl_integ.pd"
-
 
 sub gslinteg_qawf{
   my ($opt,$warn);
@@ -713,13 +598,7 @@ sub gslinteg_qawf{
   my ($res,$abserr,$ierr) = qawf_meat($la,$epsabs,$limit,$limit,$OPTION_SIN_COS,$omega,$nlevels,$warn,$f);
   return ($res,$abserr,$ierr);
 }
-#line 717 "INTEG.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 602 "INTEG.pm"
 
 =head2 qawf_meat
 
@@ -729,27 +608,23 @@ sub gslinteg_qawf{
 		 double [o] result(); double [o] abserr();int n();
 		 int sincosopt(); double omega(); int nlevels();int [o] ierr();int gslwarn();; SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 qawf_meat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 746 "INTEG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qawf_meat = \&PDL::qawf_meat;
-#line 753 "INTEG.pm"
+
+
 
 
 
@@ -785,7 +660,6 @@ Example:
      my ($x) = @_;
      return ($x**2.6)*log(1.0/$x);
    }
-
 
 =head2 gslinteg_qag - Adaptive integration
 
@@ -933,7 +807,6 @@ Example:
     my ($x) = @_;
     return exp(-$x - $x*$x) ;
   }
-
 
 =head2 gslinteg_qagiu - Adaptive integration on infinite interval
 
@@ -1114,7 +987,6 @@ Example:
     else{ return log($x);}
   }
 
-
 =head2 gslinteg_qawf - Adaptive integration for Fourier integrals
 
 This function attempts to compute a Fourier integral of the function
@@ -1151,7 +1023,6 @@ Example:
     return 1.0/sqrt($x)
   }
 
-
 =head1 BUGS
 
 Feedback is welcome. Log bugs in the PDL bug database (the
@@ -1176,10 +1047,7 @@ The GSL integration routines were written by Brian Gough. QUADPACK
 was written by Piessens, Doncker-Kapenga, Uberhuber and Kahaner.
 
 =cut
-#line 1180 "INTEG.pm"
-
-
-
+#line 1051 "INTEG.pm"
 
 # Exit with OK status
 

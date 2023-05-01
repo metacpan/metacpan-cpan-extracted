@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.35
+Version 1.37
 
 # SYNOPSIS
 
@@ -2150,8 +2150,7 @@ Thanks to [Mike Kaply](https://mike.kaply.com/about/) for his [post](https://mik
 Thanks also to the authors of the documentation in the following sources;
 
 - [Marionette Protocol](https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html)
-- [Marionette Documentation](https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html)
-- [Marionette driver.js](https://hg.mozilla.org/mozilla-central/file/tip/remote/marionette/driver.js)
+- [Marionette driver.js](https://hg.mozilla.org/mozilla-central/file/tip/remote/marionette/driver.sys.mjs)
 - [about:config](http://kb.mozillazine.org/About:config_entries)
 - [nsIPrefService interface](https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefService)
 

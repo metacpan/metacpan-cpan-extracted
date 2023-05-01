@@ -2,7 +2,7 @@ package Data::Visitor::Callback;
 use Moose;
 # ABSTRACT: A Data::Visitor with callbacks.
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 use Data::Visitor ();
 
 use Carp qw(carp);
@@ -181,24 +181,15 @@ sub visit_scalar {
 	}
 }
 
-sub subname { $_[1] }
-
 BEGIN {
-	eval {
-		require Sub::Name;
-		no warnings 'redefine';
-		*subname = \&Sub::Name::subname;
-	};
-
 	foreach my $reftype ( qw/array hash glob code/ ) {
 		my $name = "visit_$reftype";
-		no strict 'refs';
-		*$name = subname(__PACKAGE__ . "::$name", eval '
-			sub {
+		eval '
+			sub '.$name.' {
 				my ( $self, $data ) = @_;
 				my $new_data = $self->callback_and_reg( '.$reftype.' => $data );
 				if ( "'.uc($reftype).'" eq (reftype($new_data)||"") ) {
-					my $visited = $self->SUPER::visit_'.$reftype.'( $new_data );
+					my $visited = $self->SUPER::'.$name.'( $new_data );
 
 					no warnings "uninitialized";
 					if ( refaddr($visited) != refaddr($data) ) {
@@ -210,7 +201,8 @@ BEGIN {
 					return $self->_register_mapping( $data, $self->visit( $new_data ) );
 				}
 			}
-		' || die $@);
+			1;
+		' or die $@;
 	}
 }
 
@@ -297,7 +289,7 @@ Data::Visitor::Callback - A Data::Visitor with callbacks.
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -491,7 +483,7 @@ Marcel Grünauer <marcel@cpan.org>
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Yuval Kogman.
+This software is copyright (c) 2023 by Yuval Kogman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

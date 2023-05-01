@@ -35,6 +35,10 @@ pkcs5-tool - PKCS#5 Password-Based Encryption Tools
           --encrypt             Encrypt some data
           --decrypt             Decrypt some data
 
+          --format=FORMAT       input/output format (base64 or hex)
+          --base64              Base64 input/output format
+          --hex                 HEX input/output format
+
     Examples:
 
         Encrypt:
@@ -50,6 +54,12 @@ pkcs5-tool - PKCS#5 Password-Based Encryption Tools
             echo -n "secret" | pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password mypassword --encrypt
             pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password mypassword --encrypt < /path/of/secret
 
+        env: or file: prefix for --password and --input params:
+
+            pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password env:APP_PASSWORD --input secret --encrypt > /path/data.enc
+            pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password env:APP_PASSWORD --input file:/path/data.enc --decrypt
+
+
 =head1 DESCRIPTION
 
 C<pkcs5-tool> PKCS#5 Password-Based Encryption Tools
@@ -60,7 +70,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018-2021 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2020-2021 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

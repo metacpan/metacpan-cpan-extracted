@@ -4,9 +4,67 @@ use strict;
 use warnings;
 use App::ModuleBuildTiny;
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
+
+print_help() if ($ARGV[0] // 'help') eq 'help';
 
 modulebuildtiny(@ARGV);
+
+sub print_help {
+	print "Usage: $0 <command> [arguments ...]\n\nAvailable commands:\n\n";
+	App::ModuleBuildTiny::Help->filter(__FILE__);
+	print "\n";
+	exit !@ARGV;
+}
+
+package App::ModuleBuildTiny::Help;
+
+use parent qw(Pod::Simple::Methody);
+
+sub start_head1 {
+	my ($self, $attrs) = @_;
+	$self->{_mbth_head1_content} = '';
+}
+
+sub end_head1   {
+	my ($self) = @_;
+
+	$self->{_mbth_in_subcommands} = delete($self->{_mbth_head1_content}) eq 'SUBCOMMANDS';
+}
+
+sub start_head2 {
+	my ($self, $attrs) = @_;
+
+	return unless $self->{_mbth_in_subcommands};
+	$self->{_mbth_subcommand_name} = '';
+}
+
+sub end_head2 {
+	my ($self) = @_;
+
+	if (my $cmd = delete $self->{_mbth_subcommand_name}) {
+		$self->output_fh->printf("    %-10s - ", $1) if $cmd =~ /(^\w+)/;
+		$self->{_mbth_print_desc} = 1;
+	}
+}
+
+sub handle_text {
+	my ($self, $text) = @_;
+
+	if (defined $self->{_mbth_head1_content}) {
+		$self->{_mbth_head1_content} .= $text;
+		return;
+	}
+
+	if (defined $self->{_mbth_subcommand_name}) {
+		$self->{_mbth_subcommand_name} .= $text;
+		return;
+	}
+
+	if (delete $self->{_mbth_print_desc}) {
+		$self->output_fh->say($1) if $text =~ /^([^.(]+)/;
+	}
+}
 
 __END__
 
@@ -29,7 +87,7 @@ C<mbtiny> is a tool to help assemble your CPAN distributions. It's a minimalist 
 
 =head2 regenerate [--bump] [--version=<version] [--verbose] [--dry-run] [--scan] <files>...
 
-This regenerates the given files. If no files are given, it defaults to all six files it can regenerate. You usually want to do this when bumping the version of a module. It has the following options:
+Regenerate the specified files. If no files are given, defaults to all six files it can regenerate. You usually want to do this when bumping the version of a module. Takes the following options:
 
 =over 4
 
@@ -63,41 +121,41 @@ This will cause it to not write anything to disk, this is only ever useful when 
 
 =back
 
-It generates the following files:
+The following files can be generated:
 
 =over 4
 
 =item * Build.PL
 
-This contain the code needed to build the dist using L<Module::Build::Tiny|Module::Build::Tiny>.
+The code needed to build the dist using L<Module::Build::Tiny|Module::Build::Tiny>.
 
 =item * MANIFEST
 
-This contains the list of files in this distribution, and optionally descriptions.
+The list of files in this distribution, and optionally descriptions.
 
 =item * META.json
 
-The file containing most meta information about this distributions. Useful for both presenting information to the user as for installing the distribution.
+Most meta information about this distributions. Useful for both presenting information to the user as for installing the distribution.
 
 =item * META.yml
 
-This is the legacy meta file. This is mainly useful for bootstrapping on CPAN clients too old to support META.json but recent enough to support configure_requires.
+The legacy meta file. This is mainly useful for bootstrapping on CPAN clients too old to support META.json but recent enough to support configure_requires.
 
 =item * README
 
-A file containing a description of the project, based on the documentation of the main module.
+A description of the project, based on the documentation of the main module.
 
 =item * LICENSE
 
-This contains the license of the distribution.
+The license of the distribution.
 
 =back
 
 =head2 upload [--silent] [--config=<config_file>] [--tag] [--push]
 
-This assembles a tarball and uploads it to CPAN.
+Assemble a tarball and upload it to CPAN.
 
-Using a L<Config::Identity|Config::Identity> compatible F<.pause> file in your home directory is recommended, but if it's absent or incomplete your credentials will be asked on the console.
+Using a L<Config::Identity|Config::Identity> compatible F<.pause> file in your home directory is recommended, but if it's absent or incomplete your credentials will be asked on the console. Takes the following options:
 
 =over 4
 
@@ -121,7 +179,7 @@ The location of your pause credentials
 
 =head2 test [--no-author] [--release]
 
-This runs all of the tests of a distribution. It takes two negatable options:
+Run all of the tests of a distribution. Takes two negatable options:
 
 =over 4
 
@@ -137,29 +195,29 @@ Run author tests. Defaults to true.
 
 =head2 scan [--omit-core=<version>] [--omit=<module>]
 
-This will scan the C<lib/>, C<script/> and C<t/> directories for dependencies and writes them to C<prereqs.json>. It accepts the following option:
+Scan the C<lib/>, C<script/> and C<t/> directories for dependencies and write them to C<prereqs.json>. Accepts the following option:
 
 =over 4
 
 =item * omit_core = version
 
-This allows you to set a minimum perl version (e.g. C<5.008001> or C<v5.8.1>) whose core-provided dependencies will not be explicitly included.
+Set a minimum perl version (e.g. C<5.008001> or C<v5.8.1>) whose core-provided dependencies will not be explicitly included.
 
 =item * omit = module
 
-This will omit a specific from the dependencies, it can be specified multiple times.
+Omit a specific module from the dependencies. Can be specified multiple times.
 
 =back
 
 =head2 mint [--<option>=<value>]...  <distribution>
 
-This creates a new distribution. It takes one mandatory positional argument, the name of the new distribution, and up to six optional named arguments
+Create a new distribution. Takes one mandatory positional argument, the name of the new distribution, and the following optional named arguments:
 
 =over 4
 
 =item * abstract
 
-The abstract of this new distribution. It defaults to an empty string.
+The abstract of this new distribution. Defaults to an empty string.
 
 =item * author
 
@@ -167,7 +225,7 @@ The name of the author of this distribution. The default value is set in the con
 
 =item * dirname
 
-The directory name for the new distribution. It defaults to the distribution name.
+The directory name for the new distribution. Defaults to the distribution name.
 
 =item * email
 
@@ -175,11 +233,11 @@ The email address of the author. The default value is set in the configuration f
 
 =item * license
 
-The license of the new distribution. It default is set in the configuration file, this is usually C<Perl_5>.
+The license of the new distribution. The default value is set in the configuration file, this is usually C<Perl_5>.
 
 =item * version
 
-The initial version of the new distribution. This defaults to C<0.001>.
+The initial version of the new distribution. Defaults to C<0.001>.
 
 =item * init-git
 
@@ -189,53 +247,53 @@ Initialize a git repository on minting.
 
 =head2 setup <type>
 
-This creates or update your configuration file (at F<~/.mbtiny/config>). It takes one optional position argument that can take any of the following values:
+Create or update your configuration file (at F<~/.mbtiny/config>). Takes one optional positional argument that can take any of the following values:
 
 =over 4
 
 =item * update
 
-This asks you about all configuration items that are currently empty. This is the default.
+Ask about all configuration items that are currently empty. This is the default.
 
 =item * all
 
-This asks you about all configuration items, even if they currently have a value.
+Ask about all configuration items, even if they currently have a value.
 
 =item * list
 
-This lists your current configuration.
+List your current configuration.
 
 =item * reset
 
-This removes the current configuration file.
+Remove the current configuration file.
 
 =back
 
 =head2 listdeps [--versions] [--json] [--missing] [--omit-core=<version>]
 
-List all dependencies of this distribution. By default it prints a list of modules. If the C<json> option option is given, it's printed as JSON instead.
+List all dependencies of this distribution. By default it prints just a list of module names.
 
 =over 4
 
 =item * versions
 
-This will cause it to print out the required versions along with the modules.
+Print the required versions along with the modules.
 
 =item * json
 
-This will cause it to output the dependencies in JSON format, instead of a list format
+Output the dependencies in JSON format
 
 =item * missing
 
-This will cause it to list only modules whose requirement isn't met.
+List only modules whose requirement isn't met.
 
 =item * author
 
-This will cause the list to include development-time dependencies, such as C<App::ModuleBuildTiny> itself.
+Include development-time dependencies, such as C<App::ModuleBuildTiny> itself.
 
 =item * omit-core=<perl-version>
 
-This will cause the list to exclude any prerequisites that are provided by that specific perl version.
+Exclude any prerequisites that are provided by that specific perl version.
 
 =back
 
@@ -247,29 +305,29 @@ Run the specified command in an assembled distribution. It takes one boolean arg
 
 =item * no-build
 
-This will cause mbtiny not to build the distribution (run C<Build.PL> and C<Build>) before running the command.
+Do not build the distribution (run C<Build.PL> and C<Build>) before running the command.
 
 =back
 
 =head2 shell [--build]
 
-Runs the C<$SHELL>, this is equivalent to C<mbtiny run --no-build $SHELL>. It takes one argument.
+Run a shell in the assembled distribution. This is equivalent to C<mbtiny run --no-build $SHELL>. It takes one argument.
 
 =over 4
 
 =item * build
 
-This will cause mbtiny to build the distribution before running the shell.
+Build the distribution before running the shell.
 
 =back
 
 =head2 dist
 
-This creates a distribution tarball.
+Create a distribution tarball.
 
 =head2 distdir
 
-This creates a directory containing all of the files of the distribution.
+Create a directory containing all of the files of the distribution.
 
 =head1 INPUTS
 

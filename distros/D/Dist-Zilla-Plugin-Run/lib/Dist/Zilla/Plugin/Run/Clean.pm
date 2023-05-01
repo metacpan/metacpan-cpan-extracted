@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package Dist::Zilla::Plugin::Run::Clean;
 # ABSTRACT: execute a command of the distribution on 'dzil clean'
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use Moose;
 with
@@ -22,7 +22,7 @@ use namespace::autoclean;
         [
             clean => sub {
                 my ($zilla, $dry_run) = @_;
-                foreach my $plugin (grep { $_->isa(__PACKAGE__) } @{ $zilla->plugins })
+                foreach my $plugin (grep $_->isa(__PACKAGE__), @{ $zilla->plugins })
                 {
                     # Dist::Zilla really ought to have a -CleanerProvider hook...
                     $plugin->clean($dry_run);
@@ -64,7 +64,7 @@ Dist::Zilla::Plugin::Run::Clean - execute a command of the distribution on 'dzil
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,7 @@ my $tzil = Builder->from_config(
                 [ GatherDir         => ],
                 [ MakeMaker         => ],
                 [ ExecDir           => ],
-                [ Prereqs           => { 'Foo' => '0' } ],
+                [ Prereqs           => { 'Foo'       => '0' } ],
                 [ 'Conflicts'       => { 'Module::X' => '0.02' } ],
                 [ SurgicalPodWeaver => ],
             ),
@@ -41,7 +41,7 @@ ok( -e $module_filename, 'conflicts module created' );
 
 my $module_content = $module_filename->slurp_utf8();
 unlike(
-    $module_content, qr/=(pod|head)/,
+    $module_content, qr/=head1 AUTHOR/,
     'no pod was added to conflicts module'
 );
 

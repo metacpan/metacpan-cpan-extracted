@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Run
 
+0.049     2023-04-29 15:32:05Z
+  - fix some test failures on MSWin32 due to path separators (Graham Ollis,
+    #17)
+
 0.048     2019-02-09 02:48:27Z
   - more fixes for MSWin path canonicalization
 

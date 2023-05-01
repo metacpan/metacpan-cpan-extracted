@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Branch;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
@@ -24,7 +24,6 @@ sub values      { @{$_[0][0]}                                            }
 sub text        { $_[0][1]{text}                                         }
 sub criterion   { "branch"                                               }
 
-
 sub percentage {
     my $t = $_[0]->total;
     sprintf "%3d", $t ? $_[0]->covered / $t * 100 : 0
@@ -34,11 +33,11 @@ sub error {
     my $self = shift;
     if (@_) {
         my $c = shift;
-        return !($self->covered($c) xor $self->uncoverable($c));
+        return $self->err_chk($self->covered($c), $self->uncoverable($c));
     }
     my $e = 0;
     for my $c (0 .. $#{$self->[0]}) {
-        $e++ if !($self->covered($c) xor $self->uncoverable($c));
+        $e++ if $self->err_chk($self->covered($c), $self->uncoverable($c));
     }
     $e
 }
@@ -66,7 +65,7 @@ Devel::Cover::Branch - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -88,7 +87,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

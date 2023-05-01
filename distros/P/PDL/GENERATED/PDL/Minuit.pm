@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 14 "minuit.pd"
 
 =head1 NAME
@@ -43,12 +44,7 @@ and migrad minimization algorithms (see Minuit manual for more details).
 See the test file minuit.t in the test (t/) directory for a basic example.
 
 =cut
-#line 47 "Minuit.pm"
-
-
-
-
-
+#line 48 "Minuit.pm"
 
 =head1 FUNCTIONS
 
@@ -57,8 +53,8 @@ See the test file minuit.t in the test (t/) directory for a basic example.
 
 
 
-#line 37 "minuit.pd"
 
+#line 37 "minuit.pd"
 
 use strict;
 use warnings;
@@ -103,13 +99,7 @@ sub mn_init{
   }
 
 }
-#line 107 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 103 "Minuit.pm"
 
 =head2 mninit
 
@@ -117,31 +107,24 @@ sub mn_init{
 
   Signature: (longlong a();longlong b(); longlong c())
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mninit does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 134 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mninit = \&PDL::Minuit::mninit;
-#line 141 "Minuit.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -151,31 +134,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (longlong l(); char* nombre; char* mode)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mn_abre does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 168 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mn_abre = \&PDL::Minuit::mn_abre;
-#line 175 "Minuit.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -185,32 +161,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (longlong l())
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mn_cierra does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 202 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mn_cierra = \&PDL::Minuit::mn_cierra;
-#line 209 "Minuit.pm"
+
+
 
 
 
 #line 108 "minuit.pd"
-
 
 sub mn_def_pars{
   my $pars  = shift;
@@ -257,13 +228,7 @@ sub mn_def_pars{
      PDL::Minuit::mn_cierra($mn_options->{Unit});
   }
 }
-#line 261 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 232 "Minuit.pm"
 
 =head2 mnparm
 
@@ -271,32 +236,27 @@ sub mn_def_pars{
 
   Signature: (longlong a(); double b(); double c(); double d(); double e(); longlong [o] ia(); char* str)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mnparm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 288 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mnparm = \&PDL::Minuit::mnparm;
-#line 295 "Minuit.pm"
+
+
 
 
 
 #line 164 "minuit.pd"
-
 
 sub mn_excm{
   my $command = shift;
@@ -315,7 +275,6 @@ sub mn_excm{
 
   my $iflag = pdl(0);
 
-
   $iflag = PDL::Minuit::mnexcm($arglis, $narg, $command, $fun_ref,$mn_options->{N});
   warn "Problem executing command '$command' " unless ($iflag == 0);
 
@@ -325,13 +284,7 @@ sub mn_excm{
 
   return $iflag;
 }
-#line 329 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 288 "Minuit.pm"
 
 =head2 mnexcm
 
@@ -339,32 +292,27 @@ sub mn_excm{
 
   Signature: (double a(n); longlong ia(); longlong [o] ib(); char* str; SV* function; IV numelem)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mnexcm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 356 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mnexcm = \&PDL::Minuit::mnexcm;
-#line 363 "Minuit.pm"
+
+
 
 
 
 #line 205 "minuit.pd"
-
 
   sub mn_pout{
     barf "Usage: mn_pout(par_number)" unless ($#_ == 0);
@@ -390,13 +338,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
     return ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name);    
   }
-#line 394 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 342 "Minuit.pm"
 
 =head2 mnpout
 
@@ -404,38 +346,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d();longlong [o] ib(); SV* str)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mnpout does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 421 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mnpout = \&PDL::Minuit::mnpout;
-#line 428 "Minuit.pm"
+
+
 
 
 
 #line 242 "minuit.pd"
 
-
   sub mn_stat{
      if (defined (my $logfile = $mn_options->{Log})){
        PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
      }
-
 
      my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = PDL::Minuit::mnstat();
 
@@ -445,13 +381,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
      return ($fmin,$fedm,$errdef,$npari,$nparx,$istat);
   }
-#line 449 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 385 "Minuit.pm"
 
 =head2 mnstat
 
@@ -459,32 +389,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (double [o] a(); double [o] b(); double [o] c(); longlong [o] ia(); longlong [o] ib(); longlong [o] ic())
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mnstat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 476 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mnstat = \&PDL::Minuit::mnstat;
-#line 483 "Minuit.pm"
+
+
 
 
 
 #line 264 "minuit.pd"
-
 
   sub mn_emat{
    
@@ -505,13 +430,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     return $mat;
 
   }
-#line 509 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 434 "Minuit.pm"
 
 =head2 mnemat
 
@@ -519,32 +438,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (double [o] mat(n,n))
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mnemat does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 536 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mnemat = \&PDL::Minuit::mnemat;
-#line 543 "Minuit.pm"
+
+
 
 
 
 #line 292 "minuit.pd"
-
 
   sub mn_err{
 
@@ -566,13 +480,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
     return ($eplus,$eminus,$eparab,$globcc);
   }
-#line 570 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 484 "Minuit.pm"
 
 =head2 mnerrs
 
@@ -580,32 +488,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d())
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mnerrs does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 597 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mnerrs = \&PDL::Minuit::mnerrs;
-#line 604 "Minuit.pm"
+
+
 
 
 
 #line 320 "minuit.pd"
-
 
   sub mn_contour{
     barf "Usage: mn_contour(par_number_1,par_number_2,npt)" unless ($#_ == 2);
@@ -632,13 +535,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
     return ($xpt,$ypt,$nfound);
   }
-#line 636 "Minuit.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 539 "Minuit.pm"
 
 =head2 mncont
 
@@ -646,32 +543,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (longlong ia(); longlong ib(); longlong ic(); double [o] a(n); double [o] b(n); longlong [o] id(); SV* function; IV numelem)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 mncont does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 663 "Minuit.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *mncont = \&PDL::Minuit::mncont;
-#line 670 "Minuit.pm"
+
+
 
 
 
 #line 358 "minuit.pd"
-
 
 =head2 mn_init()
 
@@ -717,12 +609,10 @@ Example:
  mn_init(\&my_function,
 	 {Log => 'log.out', Title => 'My fit'});
 
-
  sub my_function{
     # the five variables input to the function to be minimized
     # xval is an ndarray containing the current values of the parameters
     my ($npar,$grad,$fval,$xval,$iflag) = @_;
-
 
     # Here is code computing the value of the function
     # and potentially also its gradient
@@ -762,7 +652,6 @@ Usage:
 			Lower_bounds => $lbounds,
 			Upper_bounds => $ubounds})
 
-
 =for example
 
 Example:
@@ -795,8 +684,6 @@ Example:
  #same as above because $lbounds is by default zeroes(n)
  $iflag = mn_def_pars($pars,$steps,{Names => \@names, 
 			Upper_bounds => $ubounds}});
-
-
 
 =head2 mn_excm()
 
@@ -941,12 +828,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 945 "Minuit.pm"
-
-
-
-
-
+#line 832 "Minuit.pm"
 
 # Exit with OK status
 

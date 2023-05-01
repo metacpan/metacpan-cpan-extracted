@@ -41,18 +41,20 @@ my %CONFIG = (
 
     df_ua_timeout => undef,
 
+    df_curlargs => [ ],
+
     'LWP::UserAgent' => {
         allowed  => [qw/ua_timeout/],
         required => [],
         class    => 'Test::Smoke::Poster::LWP_UserAgent',
     },
     'HTTP::Tiny' => {
-        allowed => [],
+        allowed => [qw/ua_timeout/],
         required => [],
         class => 'Test::Smoke::Poster::HTTP_Tiny',
     },
     'curl' => {
-        allowed => [qw/curlbin/],
+        allowed => [qw/curlbin curlargs ua_timeout/],
         required => [qw/curlbin/],
         class => 'Test::Smoke::Poster::Curl',
     },

@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 }
 
 use DynaLoader ();
@@ -25,7 +25,6 @@ use Devel::Cover::Inc;
 BEGIN { $VERSION //= $Devel::Cover::Inc::VERSION }
 
 use B qw( ppname main_cv main_start main_root walksymtable OPf_KIDS );
-use B::Debug;
 use B::Deparse;
 
 use Carp;
@@ -91,7 +90,7 @@ my %Coverage_options;                    # Options for overage criteria
 my %Run;                                 # Data collected from the run
 
 my $Const_right = qr/^(?:const|s?refgen|gelem|die|undef|bless|anon(?:list|hash)|
-                       scalar|return|last|next|redo|goto)$/x;
+                       emptyavhv|scalar|return|last|next|redo|goto)$/x;
                                          # constant ops
 
 our $File;                               # Last filename we saw.  (localised)
@@ -103,6 +102,8 @@ our %Files;                              # Whether we are interested in files
                                          # Used in runops function
 our $Replace_ops;                        # Whether we are replacing ops
 our $Silent;                             # Output nothing. Can be used anywhere
+our $Ignore_covered_err;                 # Don't flag an error when uncoverable
+                                         # code is covered.
 our $Self_cover;                         # Coverage of Devel::Cover
 
 BEGIN {
@@ -316,13 +317,13 @@ sub import {
         /^-blib/        && do { $blib        = shift @o; next };
         /^-subs_only/   && do { $Subs_only   = shift @o; next };
         /^-replace_ops/ && do { $Replace_ops = shift @o; next };
-        /^-coverage/    &&
+        /^-coverage/  &&
             do { $Coverage{+shift @o} = 1 while @o && $o[0] !~ /^[-+]/; next };
-        /^[-+]ignore/   &&
+        /^[-+]ignore/ &&
             do { push @Ignore,   shift @o while @o && $o[0] !~ /^[-+]/; next };
-        /^[-+]inc/      &&
+        /^[-+]inc/    &&
             do { push @Inc,      shift @o while @o && $o[0] !~ /^[-+]/; next };
-        /^[-+]select/   &&
+        /^[-+]select/ &&
             do { push @Select,   shift @o while @o && $o[0] !~ /^[-+]/; next };
         warn __PACKAGE__ . ": Unknown option $_ ignored\n";
     }
@@ -398,9 +399,8 @@ sub populate_run {
     my $mymeta = "$Dir/MYMETA.json";
     if (-e $mymeta) {
         eval {
-            require Devel::Cover::DB::IO::JSON;
-            my $io   = Devel::Cover::DB::IO::JSON->new;
-            my $json = $io->read($mymeta);
+            require CPAN::Meta;
+            my $json = CPAN::Meta->load_file($mymeta)->as_struct;
             $Run{$_} = $json->{$_} for qw( name version abstract );
         }
     } elsif ($Dir =~ m|.*/([^/]+)$|) {
@@ -474,25 +474,25 @@ sub normalised_file {
         $file = File::Spec->rel2abs($file, $m->[1]);
         # print STDERR "as <$file> ";
     }
-    if ($] >= 5.008) {
-        my $inc;
-        $inc ||= $file =~ $_ for @Inc_re;
-        # warn "inc for [$file] is [$inc] @Inc_re";
-        if ($inc && ($^O eq "MSWin32" || $^O eq "cygwin")) {
-            # Windows' Cwd::_win32_cwd() calls eval which will recurse back
-            # here if we call abs_path, so we just assume it's normalised.
-            # warn "giving up on getting normalised filename from <$file>\n";
-        } else {
-            # print STDERR "getting abs_path <$file> ";
-            if (-e $file) {  # Windows likes the file to exist
-                my $abs;
-                $abs = abs_path($file) unless -l $file;  # leave symbolic links
-                # print STDERR "giving <$abs> ";
-                $file = $abs if defined $abs;
-            }
+
+    my $inc;
+    $inc ||= $file =~ $_ for @Inc_re;
+    # warn "inc for [$file] is [$inc] @Inc_re";
+    if ($inc && ($^O eq "MSWin32" || $^O eq "cygwin")) {
+        # Windows' Cwd::_win32_cwd() calls eval which will recurse back
+        # here if we call abs_path, so we just assume it's normalised.
+        # warn "giving up on getting normalised filename from <$file>\n";
+    } else {
+        # print STDERR "getting abs_path <$file> ";
+        if (-e $file) {  # Windows likes the file to exist
+            my $abs;
+            $abs = abs_path($file) unless -l $file;  # leave symbolic links
+            # print STDERR "giving <$abs> ";
+            $file = $abs if defined $abs;
         }
-        # print STDERR "finally <$file> <$Dir>\n";
     }
+    # print STDERR "finally <$file> <$Dir>\n";
+
     $file =~ s|\\|/|g if $^O eq "MSWin32";
     $file =~ s|^\Q$Dir\E/|| if defined $Dir;
 
@@ -965,18 +965,22 @@ sub add_condition_cover {
     }
 }
 
-*is_scope       = \&B::Deparse::is_scope;
-*is_state       = \&B::Deparse::is_state;
-*is_ifelse_cont = \&B::Deparse::is_ifelse_cont;
-
 {
+    no warnings "once";
+    *is_scope       = \&B::Deparse::is_scope;
+    *is_state       = \&B::Deparse::is_state;
+    *is_ifelse_cont = \&B::Deparse::is_ifelse_cont;
+}
 
 my %Original;
+{
+
 BEGIN {
     $Original{deparse}      = \&B::Deparse::deparse;
     $Original{logop}        = \&B::Deparse::logop;
     $Original{logassignop}  = \&B::Deparse::logassignop;
     $Original{const_dumper} = \&B::Deparse::const_dumper;
+    $Original{const}        = \&B::Deparse::const if defined &B::Deparse::const;
 }
 
 sub const_dumper {
@@ -985,8 +989,17 @@ sub const_dumper {
     local *B::Deparse::logop        = $Original{logop};
     local *B::Deparse::logassignop  = $Original{logassignop};
     local *B::Deparse::const_dumper = $Original{const_dumper};
-
+    local *B::Deparse::const        = $Original{const} if $Original{const};
     $Original{const_dumper}->(@_);
+}
+
+sub const {
+    no warnings "redefine";
+    local *B::Deparse::deparse      = $Original{deparse};
+    local *B::Deparse::logop        = $Original{logop};
+    local *B::Deparse::logassignop  = $Original{logassignop};
+    local *B::Deparse::const_dumper = $Original{const_dumper};
+    $Original{const}->(@_);
 }
 
 sub deparse {
@@ -1204,13 +1217,13 @@ sub get_cover {
             if (ref $Coverage_options{pod}) {
                 my $p;
                 for (@{$Coverage_options{pod}}) {
-                    if (/^package|(?:also_)?private|trust_me|pod_from|nocp$/) {
+                    if (/^package|(?:also_)?private|trustme|pod_from|nocp$/) {
                         $opts{$p = $_} = [];
                     } elsif ($p) {
                         push @{$opts{$p}}, $_;
                     }
                 }
-                for $p (qw( private also_private trust_me )) {
+                for $p (qw( private also_private trustme )) {
                     next unless exists $opts{$p};
                     $_ = qr/$_/ for @{$opts{$p}};
                 }
@@ -1254,6 +1267,7 @@ sub get_cover {
     local *B::Deparse::logop        = \&logop;
     local *B::Deparse::logassignop  = \&logassignop;
     local *B::Deparse::const_dumper = \&const_dumper;
+    local *B::Deparse::const        = \&const if $Original{const};
 
     my $de = @_ && ref $_[0]
                  ? $deparse->deparse($_[0], 0)
@@ -1276,11 +1290,15 @@ sub _report_progress {
     my ($old_pipe, $n, $start) = ($|, 0, time);
     $|++;
     print OUT __PACKAGE__, ": $msg\n";
+    my $is_interactive = -t *OUT;
     for (@items) {
-        $prog->($n++);
+        $prog->($n++)
+            if $is_interactive;
         $code->($_);
     }
     $prog->($n || 1);
+    print OUT __PACKAGE__ . ": Done "
+        if !$is_interactive;
     print OUT "- " . (time - $start) . "s taken\n";
     $| = $old_pipe;
 }
@@ -1303,7 +1321,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -1316,6 +1334,11 @@ or
  cover -delete
  HARNESS_PERL_SWITCHES=-MDevel::Cover make test
  cover
+
+or if you are using dzil (Dist::Zilla) and have installed
+L<Dist::Zilla::App::Command::cover>:
+
+ dzil cover
 
 To get coverage for an uninstalled module which uses L<Module::Build> (0.26 or
 later):
@@ -1389,8 +1412,9 @@ reported.
 
 =over
 
-=item * Perl 5.10.0 or greater.
+=item * Perl 5.12.0 or greater.
 
+The latest version of Devel::Cover on which Perl 5.10 was supported was 1.38.
 The latest version of Devel::Cover on which Perl 5.8 was supported was 1.23.
 Perl versions 5.6.1 and 5.6.2 were not supported after version 1.22.  Perl
 versions 5.6.0 and earlier were never supported.  Using Devel::Cover with Perl
@@ -1410,16 +1434,6 @@ that the appropriate tools are installed.
 =item * L<Storable> and L<Digest::MD5>
 
 Both are in the core in Perl 5.8.0 and above.
-
-=back
-
-=head2 REQUIRED MODULES
-
-=over
-
-=item * L<B::Debug>
-
-This was core before Perl 5.30.0.
 
 =back
 
@@ -1580,6 +1594,22 @@ The keyword "uncoverable" must be the first text in the comment.  It should be
 followed by the name of the coverage criterion which is uncoverable.  There
 may then be further information depending on the nature of the uncoverable
 construct.
+
+In all cases as L<class> attribute may be included in L<details>.  At present a
+single class attribute is recognised: L<ignore_covered_err>.  Normally, an
+error is flagged if code marked as L<uncoverable> is covered.  When the
+L<ignore_covered_err> attribute is specified then such errors will not be
+flagged.  This is a more precise method to flag such exceptions than the global
+L<-ignore_covered_err> flag to the L<cover> program.
+
+There is also a L<note> attribute which can also be included in L<details>.
+This should be the final attribute and will consude all the remaining text.
+Currently this attribute is not used, but it is intented as a form of
+documentation for the uncoverable data.
+
+Example:
+
+    # uncoverable branch true count:1..3 class:ignore_covered_err note:error chk
 
 =head3 Statements
 
@@ -1782,8 +1812,6 @@ Modules used by Devel::Cover while gathering coverage:
 
 =item * L<B>
 
-=item * L<B::Debug>
-
 =item * L<B::Deparse>
 
 =item * L<Carp>
@@ -1821,7 +1849,7 @@ Please report new bugs on Github.
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

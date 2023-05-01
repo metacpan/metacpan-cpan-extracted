@@ -25,8 +25,8 @@ use DynaLoader;
 
 
 
-#line 1 "storable.pd"
 
+#line 1 "storable.pd"
 
 =head1 NAME
 
@@ -54,14 +54,8 @@ be able to store and retrieve ndarrays via Storable.
 
 use strict;
 use warnings;
-#line 58 "Storable.pm"
-
-
 
 #line 73 "storable.pd"
-
-
-
 { package # hide from PAUSE
     PDL;
 use Carp;
@@ -233,8 +227,6 @@ sub pdlunpack {
       $do_swap = 1;
     }
 
-
-
     # mostly this acts like unpack('Q<'...), but works even if my unpack()
     # doesn't support 'Q'. This also makes sure that my PDL_Indx is large enough
     # to read this ndarray
@@ -339,12 +331,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 343 "Storable.pm"
-
-
-
-
-
+#line 335 "Storable.pm"
 
 # Exit with OK status
 

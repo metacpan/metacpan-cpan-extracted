@@ -3,7 +3,7 @@ use v5.10.1;
 use warnings;
 use strict;
 
-our $VERSION = '1.00';
+our $VERSION = '1.06';
 
 use parent 'Test::Builder::Module';
 
@@ -21,11 +21,13 @@ our @EXPORT = (
 );
 
 sub import_extra {
-    warnings->import();
+    # use Test::Warnings 'warnings' interferes
+    # with warnings->import()
+    warnings::import('warnings');
     strict->import();
 
     require feature;
-    feature->import( ':5.10' );
+    feature->import(':5.10');
 
     require lib;
     lib->import('t/lib');
@@ -41,7 +43,7 @@ sub import_extra {
 
 =head1 NAME
 
-t::Test::abeltje - Helper Test module that imports useful stuf.
+t::Test::abeltje - Helper Test module that imports useful stuff.
 
 =head1 SYNOPSIS
 
@@ -71,6 +73,6 @@ This module works by the use of L<Test::Builder::Module/import_extra()>.
 
 =head1 COPYRIGHT
 
-(c) MMXX - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXX - Abe Timmerman <abeltje@cpan.org>
 
 =cut

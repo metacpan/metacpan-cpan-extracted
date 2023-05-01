@@ -7,6 +7,68 @@ Configuration: -Dusedevel -Duseithreads
 ------------------------------------------------------------------------------
 
 Compiler info: gcc version 3.3 20030304 (Apple Computer, Inc. build 1666)
+CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+regcomp.c: In function `S_make_trie':
+regcomp.c:905: warning: `scan' might be used uninitialized in this function
+regcomp.c: In function `S_study_chunk':
+regcomp.c:1618: warning: comparison is always false due to limited range of data type
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+pp_sys.c:311: warning: `S_emulate_eaccess' defined but not used
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+make: [extra.pods] Error 1 (ignored)
+	  CCCMD =  cc -DPERL_CORE -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os  -Wall
+	  CCCMD =  cc -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os
+	  CCCMD =  cc -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os
+	  CCCMD =  cc -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os
+	  CCCMD =  cc -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os
+	  CCCMD =  cc -c -DDEBUGGING -fno-common -DPERL_DARWIN -no-cpp-precomp -fno-strict-aliasing -pipe -I/usr/local/include -Os
+byterun.c: In function `byterun':
+byterun.c:906: warning: comparison is always false due to limited range of data type
+Note (probably harmless): No library found for -ldb
+DProf.xs:140: warning: ‘unused’ attribute ignored
+Please specify prototyping behavior for FastCalc.xs (see perlxs manual)
+Note (probably harmless): No library found for -lndbm
+Note (probably harmless): No library found for -lucb
+Note (probably harmless): No library found for -lposix
+Note (probably harmless): No library found for -lcposix
+Making header files for XS...
+re_comp.c: In function `S_study_chunk':
+re_comp.c:1618: warning: comparison is always false due to limited range of data type
+
 TSTENV = stdio	u=9.15  s=4.99  cu=642.43  cs=151.16  scripts=931  tests=106662
 All tests successful.
 TSTENV = perlio	u=8.60  s=4.89  cu=571.17  cs=148.59  scripts=931  tests=106662

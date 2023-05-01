@@ -1,4 +1,10 @@
-Revision history for Perl extension Dist-Zilla-Plugin-Test-UnusedVars
+Revision history for Dist-Zilla-Plugin-Test-UnusedVars
+
+2.001000  2023-04-29 15:23:20Z
+  - use the 'deprecated' warning category to issue the warning in
+    [UnusedVarsTests]
+  - unconditionally use Test::Vars in the test, and inject a prereq into
+    develop-requires
 
 2.000007  2015-01-22
   - Remove requirement for Moose::Autobox in tests [kentnl, GH #6]

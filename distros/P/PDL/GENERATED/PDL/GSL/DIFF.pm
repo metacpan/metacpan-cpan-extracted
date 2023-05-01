@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 4 "gsl_diff.pd"
 
+#line 4 "gsl_diff.pd"
 
 use strict;
 use warnings;
@@ -59,11 +59,6 @@ GNU Scientific Library.
    }
 #line 61 "DIFF.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -71,8 +66,8 @@ GNU Scientific Library.
 
 
 
-#line 119 "gsl_diff.pd"
 
+#line 119 "gsl_diff.pd"
 
 sub gsldiff{
   my $opt;
@@ -96,13 +91,7 @@ sub gsldiff{
   }
   return ($res,$abserr);
 }
-#line 100 "DIFF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 95 "DIFF.pm"
 
 =head2 diff_central
 
@@ -110,31 +99,24 @@ sub gsldiff{
 
   Signature: (double x(); double [o] res(); double [o] abserr(); SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 diff_central does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 127 "DIFF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *diff_central = \&PDL::diff_central;
-#line 134 "DIFF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -144,31 +126,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (double x(); double [o] res(); double [o] abserr(); SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 diff_backward does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 161 "DIFF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *diff_backward = \&PDL::diff_backward;
-#line 168 "DIFF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -178,27 +153,23 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (double x(); double [o] res(); double [o] abserr(); SV* function)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 diff_forward does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 195 "DIFF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *diff_forward = \&PDL::diff_forward;
-#line 202 "DIFF.pm"
+
+
 
 
 
@@ -270,10 +241,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL differentiation routines were written by David Morrison.
 
 =cut
-#line 274 "DIFF.pm"
-
-
-
+#line 245 "DIFF.pm"
 
 # Exit with OK status
 

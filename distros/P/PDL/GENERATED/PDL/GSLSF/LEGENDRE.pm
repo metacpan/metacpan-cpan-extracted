@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 5 "gsl_sf_legendre.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::LEGENDRE - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "LEGENDRE.pm"
-
-
-
-
-
+#line 40 "LEGENDRE.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ P_l(x)
 gsl_sf_legendre_Pl does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_Pl = \&PDL::gsl_sf_legendre_Pl;
-#line 81 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ P_l(x) from 0 to n-1.
 gsl_sf_legendre_Pl_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_Pl_array = \&PDL::gsl_sf_legendre_Pl_array;
-#line 113 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ Q_l(x)
 gsl_sf_legendre_Ql does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_Ql = \&PDL::gsl_sf_legendre_Ql;
-#line 145 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,20 +143,15 @@ P_lm(x)
 gsl_sf_legendre_Plm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_Plm = \&PDL::gsl_sf_legendre_Plm;
-#line 177 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -216,26 +190,20 @@ csphase should be (-1) to INCLUDE the Condon-Shortley phase factor (-1)^m, or (+
 
 See L</gsl_sf_legendre_array_index> to get the value of C<l> and C<m> in the returned vector.
 
-
 =for bad
 
 gsl_sf_legendre_array processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 228 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_array = \&PDL::gsl_sf_legendre_array;
-#line 235 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -259,20 +227,15 @@ Note that this function is called differently than the corresponding GSL functio
 gsl_sf_legendre_array_index does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 265 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_array_index = \&PDL::gsl_sf_legendre_array_index;
-#line 272 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -291,20 +254,15 @@ P_lm(x), normalized properly for use in spherical harmonics
 gsl_sf_legendre_sphPlm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 297 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_sphPlm = \&PDL::gsl_sf_legendre_sphPlm;
-#line 304 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -323,20 +281,15 @@ Irregular Spherical Conical Function P^{1/2}_{-1/2 + I lambda}(x)
 gsl_sf_conicalP_half does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 329 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_half = \&PDL::gsl_sf_conicalP_half;
-#line 336 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -355,20 +308,15 @@ Regular Spherical Conical Function P^{-1/2}_{-1/2 + I lambda}(x)
 gsl_sf_conicalP_mhalf does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 361 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_mhalf = \&PDL::gsl_sf_conicalP_mhalf;
-#line 368 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -387,20 +335,15 @@ Conical Function P^{0}_{-1/2 + I lambda}(x)
 gsl_sf_conicalP_0 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 393 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_0 = \&PDL::gsl_sf_conicalP_0;
-#line 400 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -419,20 +362,15 @@ Conical Function P^{1}_{-1/2 + I lambda}(x)
 gsl_sf_conicalP_1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 425 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_1 = \&PDL::gsl_sf_conicalP_1;
-#line 432 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -451,20 +389,15 @@ Regular Spherical Conical Function P^{-1/2-l}_{-1/2 + I lambda}(x)
 gsl_sf_conicalP_sph_reg does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 457 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_sph_reg = \&PDL::gsl_sf_conicalP_sph_reg;
-#line 464 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -483,20 +416,15 @@ Regular Cylindrical Conical Function P^{-m}_{-1/2 + I lambda}(x)
 gsl_sf_conicalP_cyl_reg_e does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 489 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_cyl_reg_e = \&PDL::gsl_sf_conicalP_cyl_reg_e;
-#line 496 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -515,20 +443,15 @@ lth radial eigenfunction of the Laplacian on the 3-dimensional hyperbolic space.
 gsl_sf_legendre_H3d does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 521 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_H3d = \&PDL::gsl_sf_legendre_H3d;
-#line 528 "LEGENDRE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -547,23 +470,20 @@ Array of H3d(ell), for l from 0 to n-1.
 gsl_sf_legendre_H3d_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 553 "LEGENDRE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_H3d_array = \&PDL::gsl_sf_legendre_H3d_array;
-#line 560 "LEGENDRE.pm"
+
+
 
 
 
 
 
 #line 302 "gsl_sf_legendre.pd"
-
 
 =head1 AUTHOR
 
@@ -577,10 +497,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 581 "LEGENDRE.pm"
-
-
-
+#line 501 "LEGENDRE.pm"
 
 # Exit with OK status
 

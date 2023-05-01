@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_debye.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::DEBYE - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "DEBYE.pm"
-
-
-
-
-
+#line 40 "DEBYE.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 gsl_sf_debye_1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "DEBYE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_1 = \&PDL::gsl_sf_debye_1;
-#line 81 "DEBYE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 gsl_sf_debye_2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "DEBYE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_2 = \&PDL::gsl_sf_debye_2;
-#line 113 "DEBYE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 gsl_sf_debye_3 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "DEBYE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_3 = \&PDL::gsl_sf_debye_3;
-#line 145 "DEBYE.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,16 +143,14 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 gsl_sf_debye_4 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "DEBYE.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_4 = \&PDL::gsl_sf_debye_4;
-#line 177 "DEBYE.pm"
+
+
 
 
 
@@ -193,10 +170,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 197 "DEBYE.pm"
-
-
-
+#line 174 "DEBYE.pm"
 
 # Exit with OK status
 

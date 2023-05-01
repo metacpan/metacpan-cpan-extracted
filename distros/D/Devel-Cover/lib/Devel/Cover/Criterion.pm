@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Criterion;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use Devel::Cover::Statement;
 use Devel::Cover::Branch;
@@ -36,6 +36,20 @@ sub text        { "n/a"                                           }
 sub values      { [ $_[0]->covered ]                              }
 sub criterion   { require Carp;
                   Carp::confess("criterion() must be overridden") }
+
+sub err_chk {
+    my $self = shift;
+    my ($covered, $uncoverable) = @_;
+    no warnings qw( once uninitialized );
+    $Devel::Cover::Ignore_covered_err || $uncoverable eq "ignore_covered_err"
+        ? !($covered ||  $uncoverable)
+        : !($covered xor $uncoverable)
+}
+
+sub simple_error {
+    my $self = shift;
+    $self->err_chk($self->covered, $self->uncoverable)
+}
 
 sub calculate_percentage {
     my $class = shift;
@@ -66,7 +80,6 @@ sub calculate_summary {
     $self->aggregate($s, $file, "error",       1) if $self->error;
 }
 
-
 1
 
 __END__
@@ -77,7 +90,7 @@ Devel::Cover::Criterion - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -101,7 +114,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

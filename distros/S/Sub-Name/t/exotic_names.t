@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use B 'svref_2object';
 BEGIN { $^P |= 0x210 }
 
@@ -81,8 +82,6 @@ push @ordinal,
     0x1f4a9,  # PILE OF POO
     unless "$]" < 5.008;
 
-plan tests => @ordinal * 2 * 3;
-
 my $legal_ident_char = "A-Z_a-z0-9'";
 $legal_ident_char .= join '', map chr, 0x100, 0x498
     unless "$]" < 5.008;
@@ -100,6 +99,11 @@ for my $ord (@ordinal) {
 
     # test that we can *always* compile at least within the correct package
     my $expected;
+  SKIP: {
+    skip 'single quote as a package separator has been '.
+        ("$]" gt '5.041001' ? 'removed' : 'deprecated'), 3
+        if $ord == 39 and "$]" gt '5.037009';
+
     if ( chr($ord) =~ m/^[$legal_ident_char]$/o ) { # compile directly
         $expected = "native::$fullname";
         $sub = compile_named_sub $expected => '(caller(0))[3]';
@@ -119,4 +123,7 @@ for my $ord (@ordinal) {
         $sub = compile_named_sub 'palatable::sub' => '(caller(0))[3]';
     }
     caller3_ok $sub, $expected, 'natively compiled sub', $ord;
+  }
 }
+
+done_testing;

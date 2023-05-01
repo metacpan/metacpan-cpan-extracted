@@ -1,7 +1,7 @@
-#! /usr/bin/perl -w
+#! perl -w
 use strict;
 use v5.10;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.55_03;
 use Config;
 
 my $findbin;
@@ -10,6 +10,7 @@ BEGIN { $findbin = dirname $0 }
 use File::Spec::Functions qw( :DEFAULT rel2abs );
 use Cwd;
 use File::Path;
+use Text::ParseWords qw( quotewords shellwords );
 
 # Some strange stuff happens when WriteMakefile() is called
 # on a non-clean distribution, cleanup before
@@ -31,10 +32,15 @@ if (-f 'Makefile') {
 
 my $mmver = eval "ExtUtils::MakeMaker->VERSION";
 
-my $iscript = 'INSTALLSITESCRIPT';
-unless ( eval "$mmver" >= eval "6.30_01" ) {
-print "You are running MakeMaker v$mmver: fix INSTALLSCRIPT\n";
-$iscript = 'INSTALLSCRIPT';
+my $prefix_or_base = 'PREFIX';
+if (my $perl_mm_opt = $ENV{PERL_MM_OPT}) {
+    my @mm_opts = shellwords($perl_mm_opt);
+    my ($install_base) = grep { m<^ INSTALL_BASE= >x } @mm_opts;
+    if ($install_base) {
+        $prefix_or_base = 'INSTALL_BASE';
+        my (undef, $install_path) = quotewords('=', 0, $install_base);
+        $ENV{SMOKE_INSTDIR} //= $install_path if $install_path;
+    }
 }
 
 my %install = ( );
@@ -55,17 +61,19 @@ unless ( @ARGV ) {
     }
 
     %install = (
-        PREFIX   => $install_dir,
-        $iscript => $install_dir,
-        LIB      => "$install_dir/lib",
+        INSTALLSITESCRIPT => $install_dir,
+        $prefix_or_base   => $install_dir,
+        ($prefix_or_base eq 'PREFIX'
+            ? (LIB => "$install_dir/lib")
+            : ()
+        ),
     );
 }
 my @scripts = qw(
-    synctree.pl patchtree.pl mailrpt.pl W32Configure.pl
-    configsmoke.pl smokeperl.pl runsmoke.pl sendrpt.pl
-    archiverpt.pl smokestatus.pl chkbcfg.pl sysinfo.pl
+    configsmoke.pl smokestatus.pl chkbcfg.pl sysinfo.pl
     tssynctree.pl tsrunsmoke.pl tssendrpt.pl tsarchive.pl
-    tssmokeperl.pl tsreport.pl
+    tssmokeperl.pl tsreport.pl tsrepostjsn.pl
+    tsw32configure.pl tsconfigsmoke.pl
 );
 
 my %extra_deps;
@@ -113,94 +121,90 @@ if (keys %posters == 3) {
         print "Found $curlbin\n";
     }
 }
-else {
+else { # we have a perl module, so we need extra stuff
     exists $posters{$_} or $extra_deps{$_} = 0, last
         for @ua_clients;
+    $extra_deps{'Net::SSLeay'} = 0;
+    $extra_deps{'IO::Socket::SSL'} = 0;
+    $extra_deps{'LWP::Protocol::https'} = 6 if exists($posters{'LWP::UserAgent'});
 }
 
+my %BUILD_REQUIRES = (
+    'ExtUtils::MakeMaker' => '6.55_03',
+);
 my %TEST_REQUIRES = (
     'Test::More'       => 0.88,
     'Test::NoWarnings' => 0,
     'Test::Fatal'      => 0,
     'HTTP::Daemon'     => 0,
     'HTTP::Message'    => 0,
-    'URI'              => 0,
+    ($mmver > 6.64 ? (%BUILD_REQUIRES) : ()),
 );
 
 my $test_requires = (
-    $mmver >= 5.5503
-        ? $mmver >= 6.64
-            ? 'TEST_REQUIRES'
-            : "BUILD_REQUIRES"
-        : 'PREREQ_PM'
+    $mmver >= 6.64
+        ? 'TEST_REQUIRES'
+        : "BUILD_REQUIRES"
 );
 
 my %wm = (
-    NAME          => "Test::Smoke",
-    DISTNAME      => "Test-Smoke",
-    VERSION_FROM  => "lib/Test/Smoke.pm",
-    AUTHOR        => 'H.Merijn Brand <h.m.brand@xs4all.nl>, '.
-                     'Nicholas Clark <nick@plum.flirble.org> and ' .
-                     'Abe Timmerman <abeltje@cpan.org>',
-    ABSTRACT_FROM => 'lib/Test/Smoke.pm',
+    NAME         => "Test::Smoke",
+    DISTNAME     => "Test-Smoke",
+    VERSION_FROM => "lib/Test/Smoke.pm",
+    AUTHOR       => 'H.Merijn Brand <h.m.brand@xs4all.nl>, '
+                  . 'Nicholas Clark <nick@plum.flirble.org> and '
+                  . 'Abe Timmerman <abeltje@cpan.org>',
+    ABSTRACT_FROM    => 'lib/Test/Smoke.pm',
+    MIN_PERL_VERSION => '5.010',
+    LICENSE          => "perl_5",
 
     dist => {
         COMPRESS => "gzip -9f",
         SUFFIX   => ".gz",
     },
-    PREREQ_PM     => {
-        'CGI::Util'     => 0,
+    PREREQ_PM => {
+        'URI'           => '1.53',
         'Capture::Tiny' => 0,
         'File::Spec'    => 0.82,
         'POSIX'         => 0,
         'System::Info'  => 0.050,
+        'autodie'       => 0,
+        'Getopt::Long'  => '2.39',
         ($test_requires eq 'PREREQ_PM' ? %TEST_REQUIRES : ()),
         %extra_deps,
     },
-    PMLIBDIRS     => [qw/ lib /],
-    EXE_FILES     => [map "bin/$_", @scripts],
-    test          => {
+    PMLIBDIRS => [qw/ lib /],
+    EXE_FILES => [ map "bin/$_", @scripts ],
+    test      => {
         TESTS => 't/*.t t/app/*.t',
-    }
+    },
+    META_ADD => {
+        "meta-spec" => {
+            version => 2,
+        },
+        "resources" => {
+            homepage   => "http://perl5.test-smoke.org/",
+            repository => {
+                type => "git",
+                url  => "https://github.com/abeltje/Test-Smoke.git",
+                web  => "https://github.com/abeltje/Test-Smoke",
+            },
+            bugtracker => {
+                web => 'https://github.com/abeltje/Test-Smoke/issues',
+            },
+            x_IRC => "irc://irc.perl.org/#smoke",
+        },
+    },
 );
 
 if ($test_requires ne 'PREREQ_PM') {
     $wm{$test_requires} = \%TEST_REQUIRES;
 }
 
-$mmver > 6.31 and $wm{LICENSE}  = "perl_5";
-$mmver > 6.46 and $wm{META_ADD} = {
-    "meta-spec" => {
-        version    => 2,
-    },
-    "resources" => {
-        homepage   => "http://perl5.test-smoke.org/",
-        repository => {
-            type   => "git",
-            url    => "git\@github.com:abeltje/Test-Smoke.git",
-            web    => "https://github.com/abeltje/Test-Smoke",
-        },
-        x_IRC      => "irc://irc.perl.org/#smoke",
-    },
-};
-$mmver >= 6.48 and $wm{MIN_PERL_VERSION} = '5.010';
-
 WriteMakefile(
     %wm,
     %install
 );
-
-#sub MY::libscan {
-#    my( $self, $path ) = @_;
-#    my @nopaths = qw( .svn t private investigate );
-#    my $patt = join '|', map {
-#        /^\w/ and $_ = "\\b$_";
-#        /\w$/ and $_ = "$_\\b";
-#        $_;
-#    } @nopaths;
-#
-#    return $path =~ m:$patt: ? "" : $path;
-#}
 
 sub dir_prompt {
 
@@ -226,3 +230,25 @@ sub dir_prompt {
         return $dir;
     }
 }
+
+package MY;
+
+sub test {
+    my $self = shift;
+    my $orig = $self->SUPER::test(@_);
+
+    $orig .= <<"EOM";
+
+XTEST_FILES = xt/*.t
+xtest ::
+EOM
+
+    my $varpfx = $^O eq 'MSWin32' ? '$$' : '\$$';
+    $orig .= "\t"
+           . qq{\$(FULLPERLRUN) "-e" "my ${varpfx}sw=q[-wl]; }
+           . qq{${varpfx}sw .= q[v] if \$(TEST_VERBOSE); }
+           . qq{system qq[prove ${varpfx}sw \$(XTEST_FILES)]"};
+
+    return $orig;
+}
+1;

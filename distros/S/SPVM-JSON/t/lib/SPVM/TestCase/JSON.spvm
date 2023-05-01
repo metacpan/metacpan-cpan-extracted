@@ -4,13 +4,7 @@ class TestCase::JSON {
   use Hash;
   use Fn;
   use Sort;
-
-  our $DEFAULT_JSON : JSON;
-
-  INIT {
-    $DEFAULT_JSON = JSON->new;
-    $DEFAULT_JSON->set_canonical(1);
-  }
+  use Point;
 
   static method _equals : int ($lhs : object, $rhs : object) {
     if ($lhs == undef) {
@@ -123,10 +117,12 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method encode_flat_hash : int () {
+  static method encode_json_hash : int () {
+    my $json = JSON->new;
+    
     {
       my $input    = Hash->new({});
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{}";
       unless ($got eq $expected) {
         return 0;
@@ -134,7 +130,7 @@ class TestCase::JSON {
     }
     {
       my $input    = Hash->new({"int" => 42 });
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{\"int\":42}";
       unless ($got eq $expected) {
         return 0;
@@ -142,7 +138,7 @@ class TestCase::JSON {
     }
     {
       my $input    = Hash->new({"string" => "vstr"});
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{\"string\":\"vstr\"}";
       unless ($got eq $expected) {
         return 0;
@@ -150,7 +146,7 @@ class TestCase::JSON {
     }
     {
       my $input    = Hash->new({"double" => 0.123});
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{\"double\":0.123}";
       unless ($got eq $expected) {
         return 0;
@@ -158,7 +154,7 @@ class TestCase::JSON {
     }
     {
       my $input    = Hash->new({"bool_true" => true});
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{\"bool_true\":true}";
       unless ($got eq $expected) {
         return 0;
@@ -166,7 +162,7 @@ class TestCase::JSON {
     }
     {
       my $input    = Hash->new({"bool_false" => false});
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{\"bool_false\":false}";
       unless ($got eq $expected) {
         return 0;
@@ -179,19 +175,65 @@ class TestCase::JSON {
         "int"    => 1,
         "str"    => "hoge",
       });
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "{\"bool\":false,\"double\":0.1,\"int\":1,\"str\":\"hoge\"}";
       unless ($got eq $expected) {
         return 0;
       }
     }
+
+    {
+      my $input = Hash->new({
+        "A" => Hash->new({
+          "B" => 1,
+          "C" => Hash->new({
+            "D" => 0.1,
+            "E" => true,
+            "F" => "str",
+            "G" => List->new([(object)
+              "abc",
+              123,
+              Hash->new({
+                "H" => "val",
+            }),
+            ]),
+          })
+        }),
+        "I" => "EOF",
+      });
+      my $got = $json->encode($input);
+      my $expected = "{\"A\":{\"B\":1,\"C\":{\"D\":0.1,\"E\":true,\"F\":\"str\",\"G\":[\"abc\",123,{\"H\":\"val\"}]}},\"I\":\"EOF\"}";
+      unless ($got eq $expected) {
+        return 0;
+      }
+      return 1;
+    }
+    
     return 1;
   }
-
-  static method decode_flat_hash : int () {
+  
+  static method encode_json_object : int () {
+    my $json = JSON->new;
+    
+    {
+      my $input = Point->new(1, 2);
+      eval { $json->encode($input); };
+      unless (Fn->contains($@, "The \$spvm_data contains a value of an invalid type")) {
+        return 0;
+      }
+      
+      $@ = undef;
+    }
+    
+    return 1;
+  }
+  
+  static method decode_json_hash : int () {
+    my $json = JSON->new;
+    
     {
       my $input    = "{}";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({});
       unless (&_equals($got, $expected)) {
         return 0;
@@ -199,7 +241,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "{\"string\":\"vstr\"}";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({"string" => "vstr"});
       unless (&_equals($got, $expected)) {
         return 0;
@@ -207,7 +249,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "{\"double\":0.123}";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({"double" => 0.123});
       unless (&_equals($got, $expected)) {
         return 0;
@@ -215,7 +257,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "{\"bool_true\":true}";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({"bool_true" => true});
       unless (&_equals($got, $expected)) {
         return 0;
@@ -223,7 +265,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "{\"bool_false\":false}";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({"bool_false" => false});
       unless (&_equals($got, $expected)) {
         return 0;
@@ -231,7 +273,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "{\"double\":0.1,\"bool\":false,\"int\":1,\"str\":\"hoge\"}";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({
         "bool"   => false,
         "double" => 0.1,
@@ -243,7 +285,7 @@ class TestCase::JSON {
     }
     {
       my $input    = " { \"key\" \n\t: 123\t,\n\t\t\"list\" :\n[\t1\t,\r2\t,\t3\n]}\r\r";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = Hash->new({
         "key"  => 123.0,
         "list" => List->new([(object) 1.0, 2.0, 3.0])
@@ -252,13 +294,53 @@ class TestCase::JSON {
         return 0;
       }
     }
+    
+    # Duplicated keys - overwritten the first value
+    {
+      my $input    = "{\"foo\":\"a\", \"foo\":\"b\"}";
+      my $got      = $json->decode($input);
+      my $expected = Hash->new({"foo" => "b"});
+      unless (&_equals($got, $expected)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input = "{\"A\":{\"B\":1,\"C\":{\"D\":0.1,\"E\":true,\"F\":\"str\",\"G\":[\"abc\",123,{\"H\":\"val\"}]}},\"I\":\"EOF\"}";
+      my $got = $json->decode($input);
+      my $expected = Hash->new({
+        "A" => Hash->new({
+          "B" => 1.0,
+          "C" => Hash->new({
+            "D" => 0.1,
+            "E" => true,
+            "F" => "str",
+            "G" => List->new([(object)
+              "abc",
+              123.0,
+              Hash->new({
+                "H" => "val",
+              }),
+            ]),
+          })
+        }),
+        "I" => "EOF",
+      });
+      unless (&_equals($got, $expected)) {
+        return 0;
+      }
+      return 1;
+    }
+    
     return 1;
   }
 
-  static method encode_flat_list : int () {
+  static method encode_json_list : int () {
+    my $json = JSON->new;
+    
     {
       my $input    = List->new([]);
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "[]";
       unless ($got eq $expected) {
         return 0;
@@ -266,7 +348,7 @@ class TestCase::JSON {
     }
     {
       my $input    = List->new([(object) 1, 2, 3]);
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "[1,2,3]";
       unless ($got eq $expected) {
         return 0;
@@ -274,7 +356,7 @@ class TestCase::JSON {
     }
     {
       my $input    = List->new([(object) "abc", "def"]);
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "[\"abc\",\"def\"]";
       unless ($got eq $expected) {
         return 0;
@@ -282,7 +364,7 @@ class TestCase::JSON {
     }
     {
       my $input    = List->new([(object) 0, 3.14, "abc", true]);
-      my $got      = $DEFAULT_JSON->encode($input);
+      my $got      = $json->encode($input);
       my $expected = "[0,3.14,\"abc\",true]";
       unless ($got eq $expected) {
         return 0;
@@ -291,10 +373,12 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method decode_flat_list : int () {
+  static method decode_json_list : int () {
+    my $json = JSON->new;
+    
     {
       my $input    = "[]";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = List->new([]);
       unless (&_equals($got, $expected)) {
         return 0;
@@ -302,7 +386,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "[3,2,1]";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = List->new([(object) 3.0, 2.0, 1.0]);
       unless (&_equals($got, $expected)) {
         return 0;
@@ -310,7 +394,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "[\"def\",\"abc\"]";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = List->new([(object) "def", "abc"]);
       unless (&_equals($got, $expected)) {
         return 0;
@@ -318,7 +402,7 @@ class TestCase::JSON {
     }
     {
       my $input    = "[0,3.14,\"abc\",true]";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = List->new([(object) 0.0, 3.14, "abc", true]);
       unless (&_equals($got, $expected)) {
         return 0;
@@ -326,7 +410,7 @@ class TestCase::JSON {
     }
     {
       my $input    = " [ 3.14\n, true \t , \"a\" ] ";
-      my $got      = $DEFAULT_JSON->decode($input);
+      my $got      = $json->decode($input);
       my $expected = List->new([(object) 3.14, true, "a"]);
       unless (&_equals($got, $expected)) {
         return 0;
@@ -335,21 +419,9 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method encode_int : int () {
-    my $test_case_json = ["-1", "0", "1"];
-    my $test_case_int  = [-1, 0, 1];
-    for (my $i = 0; $i < @$test_case_json; ++$i) {
-      my $input    = Int->new($test_case_int->[$i]);
-      my $got      = $DEFAULT_JSON->encode($input);
-      my $expected = $test_case_json->[$i];
-      unless ($got eq $expected) {
-        return 0;
-      }
-    }
-    return 1;
-  }
-
-  static method encode_double : int () {
+  static method encode_json_number : int () {
+    my $json = JSON->new;
+    
     my $test_case  = [
       0.123, -0.123, 3.14, -3.14, 123.987, -123.987,
       1.23456e+1, 1.23456e-1, 1.23456e+08, 1.23456e-08, 1.23456e+008, 1.23456e-008,
@@ -357,16 +429,110 @@ class TestCase::JSON {
     ];
     for (my $i = 0; $i < @$test_case; ++$i) {
       my $input    = Double->new($test_case->[$i]);
-      my $got      = $DEFAULT_JSON->encode($input);
-      my $expected = "" . $test_case->[$i];
+      my $got      = $json->encode($input);
+      my $expected = (string)$test_case->[$i];
+      warn "[Test Output]Got:$got,Expected:$expected";
       unless ($got eq $expected) {
         return 0;
       }
     }
+
+    # Byte
+    {
+      my $input    = Fn->BYTE_MIN;
+      my $got      = $json->encode($input);
+      my $expected = "-128";
+      unless ($got eq $expected) {
+        return 0;
+      }
+    }
+    
+    # Short
+    {
+      my $input    = Fn->SHORT_MIN;
+      my $got      = $json->encode($input);
+      my $expected = "-32768";
+      unless ($got eq $expected) {
+        return 0;
+      }
+    }
+    
+    # Int
+    {
+      my $input    = Fn->INT_MIN;
+      my $got      = $json->encode($input);
+      my $expected = "-2147483648";
+      unless ($got eq $expected) {
+        return 0;
+      }
+    }
+    
+    # Long
+    {
+      my $input    = Fn->LONG_MIN;
+      my $got      = $json->encode($input);
+      my $expected = "-9223372036854775808";
+      unless ($got eq $expected) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      # Float - Infinity
+      {
+        my $input = Math->INFINITYF;
+        eval { $json->encode($input); }
+        unless (Fn->contains($@, "The \$spvm_data cannot contain an inifinity float value. The found depth is 0.")) {
+          return 0;
+        }
+      }
+      
+      # Float - NaN
+      {
+        my $input = Math->NANF;
+        eval { $json->encode($input); }
+        unless (Fn->contains($@, "The \$spvm_data cannot contain a NaN float value. The found depth is 0.")) {
+          return 0;
+        }
+      }
+      
+      # Double - Infinity
+      {
+        my $input = Math->INFINITY;
+        eval { $json->encode($input); }
+        unless (Fn->contains($@, "The \$spvm_data cannot contain an inifinity double value. The found depth is 0.")) {
+          return 0;
+        }
+      }
+      
+      # Double - NaN
+      {
+        my $input = Math->NAN;
+        eval { $json->encode($input); }
+        unless (Fn->contains($@, "The \$spvm_data cannot contain a NaN double value. The found depth is 0.")) {
+          return 0;
+        }
+      }
+
+      # Invalid Type
+      {
+        my $input = Point->new;
+        eval { $json->encode($input); }
+        unless (Fn->contains($@, "The \$spvm_data contains a value of an invalid type. The type is Point. The found depth is 0.")) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  static method decode_double : int () {
+  static method decode_json_number : int () {
+    my $json = JSON->new;
+    
     my $test_case  = [
       0.123, -0.123, 3.14, -3.14, 123.987, -123.987,
       1.23456e+1, 1.23456e-1, 1.23456e+08, 1.23456e-08, 1.23456e+008, 1.23456e-008,
@@ -374,7 +540,7 @@ class TestCase::JSON {
     ];
     for (my $i = 0; $i < @$test_case; ++$i) {
       my $input    = "" . $test_case->[$i];
-      my $got      = "" . ((Double)$DEFAULT_JSON->decode($input))->value;
+      my $got      = "" . ((Double)$json->decode($input))->value;
       my $expected = "" . $test_case->[$i];
       unless ($got eq $expected) {
         return 0;
@@ -382,9 +548,9 @@ class TestCase::JSON {
     }
     {
       eval {
-        $DEFAULT_JSON->decode("-");
+        $json->decode("-");
       };
-      unless ($@ && Fn->index($@, "malformed number (no digit after '-')", 0) >= 0) {
+      unless ($@ && Fn->index($@, "Invalid number", 0) >= 0) {
         $@ = undef;
         return 0;
       }
@@ -395,9 +561,9 @@ class TestCase::JSON {
       for (my $i = 0; $i < @$test_case; ++$i) {
         my $input = $test_case->[$i];
         eval {
-          $DEFAULT_JSON->decode($input);
+          $json->decode($input);
         };
-        unless ($@ && Fn->index($@, "malformed number (improper position of '.')", 0) >= 0) {
+        unless ($@ && Fn->index($@, "Invalid number", 0) >= 0) {
           $@ = undef;
           return 0;
         }
@@ -409,9 +575,9 @@ class TestCase::JSON {
       for (my $i = 0; $i < @$test_case; ++$i) {
         my $input = $test_case->[$i];
         eval {
-          $DEFAULT_JSON->decode($input);
+          $json->decode($input);
         };
-        unless ($@ && Fn->index($@, "malformed number (improper position of 'e')", 0) >= 0) {
+        unless ($@ && Fn->index($@, "Invalid number", 0) >= 0) {
           $@ = undef;
           return 0;
         }
@@ -423,9 +589,9 @@ class TestCase::JSON {
       for (my $i = 0; $i < @$test_case; ++$i) {
         my $input = $test_case->[$i];
         eval {
-          $DEFAULT_JSON->decode($input);
+          $json->decode($input);
         };
-        unless ($@ && Fn->index($@, "malformed number (no digit after '.')", 0) >= 0) {
+        unless ($@ && Fn->index($@, "Invalid number", 0) >= 0) {
           $@ = undef;
           return 0;
         }
@@ -437,9 +603,9 @@ class TestCase::JSON {
       for (my $i = 0; $i < @$test_case; ++$i) {
         my $input = $test_case->[$i];
         eval {
-          $DEFAULT_JSON->decode($input);
+          $json->decode($input);
         };
-        unless ($@ && Fn->index($@, "malformed number (no digit after 'e')", 0) >= 0) {
+        unless ($@ && Fn->index($@, "Invalid number", 0) >= 0) {
           $@ = undef;
           return 0;
         }
@@ -451,9 +617,9 @@ class TestCase::JSON {
       for (my $i = 0; $i < @$test_case; ++$i) {
         my $input = $test_case->[$i];
         eval {
-          $DEFAULT_JSON->decode($input);
+          $json->decode($input);
         };
-        unless ($@ && Fn->index($@, "malformed number (no digit after exponential sign)", 0) >= 0) {
+        unless ($@ && Fn->index($@, "Invalid number", 0) >= 0) {
           $@ = undef;
           return 0;
         }
@@ -463,10 +629,12 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method encode_bool : int () {
+  static method encode_json_bool : int () {
+    my $json = JSON->new;
+    
     {
       my $input = true;
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "true";
       unless ($got eq $expected) {
         return 0;
@@ -474,7 +642,7 @@ class TestCase::JSON {
     }
     {
       my $input = false;
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "false";
       unless ($got eq $expected) {
         return 0;
@@ -483,10 +651,12 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method decode_bool : int () {
+  static method decode_json_bool : int () {
+    my $json = JSON->new;
+    
     {
       my $input = "true";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = true;
       unless (&_equals($got, $expected)) {
         return 0;
@@ -494,7 +664,7 @@ class TestCase::JSON {
     }
     {
       my $input = "false";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = false;
       unless (&_equals($got, $expected)) {
         return 0;
@@ -503,10 +673,12 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method encode_string : int () {
+  static method encode_json_string : int () {
+    my $json = JSON->new;
+    
     {
       my $input = "str";
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "\"str\"";
       unless ($got eq $expected) {
         return 0;
@@ -516,16 +688,28 @@ class TestCase::JSON {
     # '"'
     {
       my $input = "\"";
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "\"\\\"\"";
       unless (&_equals($got, $expected)) {
         return 0;
       }
     }
+    
+    # '/'
+    {
+      my $input = "/";
+      my $got = $json->encode($input);
+      my $expected = "\"\\/\"";
+      
+      unless (&_equals($got, $expected)) {
+        return 0;
+      }
+    }
+    
     # '\'
     {
       my $input = "\\";
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "\"\\\\\"";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -534,7 +718,7 @@ class TestCase::JSON {
     # '\n'
     {
       my $input = "\n";
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "\"\\n\"";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -543,7 +727,7 @@ class TestCase::JSON {
     # '\r'
     {
       my $input = "\r";
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "\"\\r\"";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -552,19 +736,22 @@ class TestCase::JSON {
     # '\t'
     {
       my $input = "\t";
-      my $got = $DEFAULT_JSON->encode($input);
+      my $got = $json->encode($input);
       my $expected = "\"\\t\"";
       unless (&_equals($got, $expected)) {
         return 0;
       }
     }
+    
     return 1;
   }
 
-  static method decode_string : int () {
+  static method decode_json_string : int () {
+    my $json = JSON->new;
+    
     {
       my $input = "\"str\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "str";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -574,7 +761,7 @@ class TestCase::JSON {
     # '"'
     {
       my $input = "\"\\\"\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\"";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -583,16 +770,26 @@ class TestCase::JSON {
     # '\'
     {
       my $input = "\"\\\\\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\\";
       unless (&_equals($got, $expected)) {
         return 0;
       }
     }
-    # '/'
+    # '\/'
     {
       my $input = "\"\\/\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
+      my $expected = "/";
+      unless (&_equals($got, $expected)) {
+        return 0;
+      }
+    }
+
+    # '/'
+    {
+      my $input = "\"/\"";
+      my $got = $json->decode($input);
       my $expected = "/";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -603,7 +800,7 @@ class TestCase::JSON {
     # '\b'
     {
       my $input = "\"\b\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\x08";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -613,7 +810,7 @@ class TestCase::JSON {
     # '\f'
     {
       my $input = "\"\\f\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\f";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -622,7 +819,7 @@ class TestCase::JSON {
     # '\n'
     {
       my $input = "\"\\n\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\n";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -631,7 +828,7 @@ class TestCase::JSON {
     # '\r'
     {
       my $input = "\"\\r\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\r";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -640,7 +837,7 @@ class TestCase::JSON {
     # '\t'
     {
       my $input = "\"\\t\"";
-      my $got = $DEFAULT_JSON->decode($input);
+      my $got = $json->decode($input);
       my $expected = "\t";
       unless (&_equals($got, $expected)) {
         return 0;
@@ -652,18 +849,18 @@ class TestCase::JSON {
     {
       for (my $ch : byte = 0; $ch <= 31; ++$ch) {
         eval {
-          $DEFAULT_JSON->decode("\"" . (string)[(byte)$ch] . "\"");
+          $json->decode("\"" . (string)[(byte)$ch] . "\"");
         };
-        unless ($@ && Fn->index($@, "Control ASCII characters are not allowed in string", 0) >= 0) {
+        unless ($@ && Fn->index($@, "Invalid string", 0) >= 0) {
           $@ = undef;
           return 0;
         }
         $@ = undef;
       }
       eval {
-        $DEFAULT_JSON->decode("\"" . (string)[(byte)127 ] . "\"");
+        $json->decode("\"" . (string)[(byte)127 ] . "\"");
       };
-      unless ($@ && Fn->index($@, "Control ASCII characters are not allowed in string", 0) >= 0) {
+      unless ($@ && Fn->index($@, "Invalid string", 0) >= 0) {
         $@ = undef;
         return 0;
       }
@@ -673,71 +870,101 @@ class TestCase::JSON {
     return 1;
   }
 
-  static method encode_nested_hash : int () {
-    my $input = Hash->new({
-      "A" => Hash->new({
-        "B" => 1,
-        "C" => Hash->new({
-          "D" => 0.1,
-          "E" => true,
-          "F" => "str",
-          "G" => List->new([(object)
-            "abc",
-            123,
-            Hash->new({
-              "H" => "val",
-          }),
-          ]),
-        })
-      }),
-      "I" => "EOF",
-    });
-    my $got = $DEFAULT_JSON->encode($input);
-    my $expected = "{\"A\":{\"B\":1,\"C\":{\"D\":0.1,\"E\":true,\"F\":\"str\",\"G\":[\"abc\",123,{\"H\":\"val\"}]}},\"I\":\"EOF\"}";
-    unless ($got eq $expected) {
-      return 0;
-    }
-    return 1;
-  }
-
-  static method decode_nested_hash : int () {
-    my $input = "{\"A\":{\"B\":1,\"C\":{\"D\":0.1,\"E\":true,\"F\":\"str\",\"G\":[\"abc\",123,{\"H\":\"val\"}]}},\"I\":\"EOF\"}";
-    my $got = $DEFAULT_JSON->decode($input);
-    my $expected = Hash->new({
-      "A" => Hash->new({
-        "B" => 1.0,
-        "C" => Hash->new({
-          "D" => 0.1,
-          "E" => true,
-          "F" => "str",
-          "G" => List->new([(object)
-            "abc",
-            123.0,
-            Hash->new({
-              "H" => "val",
-            }),
-          ]),
-        })
-      }),
-      "I" => "EOF",
-    });
-    unless (&_equals($got, $expected)) {
-      return 0;
-    }
-    return 1;
-  }
-
-  static method encode_null : int () {
-    unless ($DEFAULT_JSON->encode(undef) eq "null") {
+  static method encode_json_null : int () {
+    my $json = JSON->new;
+    
+    unless ($json->encode(undef) eq "null") {
       return 0;
     }
     return 1;
   }
   
-  static method decode_null : int () {
-    unless ($DEFAULT_JSON->decode("null") == undef) {
+  static method decode_json_null : int () {
+    my $json = JSON->new;
+    
+    unless ($json->decode("null") == undef) {
       return 0;
     }
+    return 1;
+  }
+
+  static method decode_json_invalid_json_data : int () {
+    my $json = JSON->new;
+    
+    {
+      my $input    = "";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "The decoding of the \$json_data failed. Unexpected character \"\" at line 1 column 1.")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input    = "ppp";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "The decoding of the \$json_data failed. Unexpected character \"p\" at line 1 column 1.")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input    = " ppp";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "The decoding of the \$json_data failed. Unexpected character \"p\" at line 1 column 2.")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input    = "\n[ppp]";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "The decoding of the \$json_data failed. Unexpected character \"p\" at line 2 column 2.")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input    = "[";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "Unexpected character \"\" at line 1 column 2.")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input    = "{";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "Unexpected character \"\" at line 1 column 2.")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $input    = "to";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "Expected token: \"true\" at line 1 column 1.")) {
+        return 0;
+      }
+    }
+
+    {
+      my $input    = "fo";
+      eval { $json->decode($input); }
+      
+      unless (Fn->contains($@, "Expected token: \"false\" at line 1 column 1.")) {
+        return 0;
+      }
+    }
+
+    $@ = undef;
+    
     return 1;
   }
 }

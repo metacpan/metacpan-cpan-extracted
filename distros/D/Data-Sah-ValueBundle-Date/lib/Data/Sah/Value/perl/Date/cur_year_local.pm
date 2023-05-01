@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-03-30'; # DATE
 our $DIST = 'Data-Sah-ValueBundle-Date'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     +{
@@ -45,7 +45,7 @@ Data::Sah::Value::perl::Date::cur_year_local
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Value::perl::Date::cur_year_local (from Perl distribution Data-Sah-ValueBundle-Date), released on 2023-03-30.
+This document describes version 0.002 of Data::Sah::Value::perl::Date::cur_year_local (from Perl distribution Data-Sah-ValueBundle-Date), released on 2023-03-30.
 
 =head1 DESCRIPTION
 

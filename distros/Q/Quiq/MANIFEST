@@ -46,6 +46,7 @@ lib/Quiq/Database/Row/Object.pm
 lib/Quiq/Database/Row/Object/Join.pm
 lib/Quiq/Database/Row/Object/Table.pm
 lib/Quiq/Database/Tree.pm
+lib/Quiq/DataStructure.pm
 lib/Quiq/Dbms.pm
 lib/Quiq/Debug.pm
 lib/Quiq/DestinationTree.pm
@@ -151,6 +152,7 @@ lib/Quiq/LineProcessor/Line.pm
 lib/Quiq/List.pm
 lib/Quiq/LockedContent.pm
 lib/Quiq/LockedCounter.pm
+lib/Quiq/Logger.pm
 lib/Quiq/MailTo.pm
 lib/Quiq/Math.pm
 lib/Quiq/Mechanize.pm
@@ -284,6 +286,7 @@ t/bin/Quiq/Database/Row/Object.t
 t/bin/Quiq/Database/Row/Object/Join.t
 t/bin/Quiq/Database/Row/Object/Table.t
 t/bin/Quiq/Database/Tree.t
+t/bin/Quiq/DataStructure.t
 t/bin/Quiq/Dbms.t
 t/bin/Quiq/Debug.t
 t/bin/Quiq/DestinationTree.t
@@ -389,6 +392,7 @@ t/bin/Quiq/LineProcessor/Line.t
 t/bin/Quiq/List.t
 t/bin/Quiq/LockedContent.t
 t/bin/Quiq/LockedCounter.t
+t/bin/Quiq/Logger.t
 t/bin/Quiq/MailTo.t
 t/bin/Quiq/Math.t
 t/bin/Quiq/Mechanize.t

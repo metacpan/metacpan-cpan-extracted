@@ -157,13 +157,14 @@ __EOCFG__
 { # This is to test the default configuration
     my $dft_sect = [
         [ '', '-Duseithreads'],
-        [ '-Uuseperlio', '', qw(-Duse64bitint -Duselongdouble -Dusemorebits) ],
+        [ '', '-Duse64bitall'],
         { policy_target => '-DDEBUGGING', args => [ '', '-DDEBUGGING'] },
     ];
 
     my $bcfg = Test::Smoke::BuildCFG->new( undef,  { v => $verbose } );
 
-    is_deeply $bcfg->{_sections}, $dft_sect, "Default configuration";
+    is_deeply $bcfg->{_sections}, $dft_sect, "Default configuration"
+        or diag(explain($bcfg->{_sections}));
 }
 
 { # Check the new ->policy_targets() method

@@ -68,6 +68,7 @@ our @EXPORT_OK = qw/$debug $silent $verbose dprint dprintf/;
 use Import::Into;
 use Data::Dumper;
 use Cwd qw/getcwd abs_path/;
+use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
 
 sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
@@ -291,11 +292,15 @@ sub show_white(_) { # show whitespace which might not be noticed
   show_empty_string $_
 }
 
-our $showstr_maxlen = 300;
+#our $showstr_maxlen = 300;
+our $showstr_maxlen = INT_MAX;
 our @quotes = ("«", "»");
 #our @quotes = ("<<", ">>");
 sub rawstr(_) { # just the characters in French Quotes (truncated)
-  $quotes[0].(length($_[0])>$showstr_maxlen ? substr($_[0],0,$showstr_maxlen-3)."..." : $_[0]).$quotes[1]
+  # Show spaces visibly
+  my $text = $_[0];
+  $text =~ s/ /\N{MIDDLE DOT}/gs;
+  $quotes[0].(length($text)>$showstr_maxlen ? substr($text,0,$showstr_maxlen-3)."..." : $text).$quotes[1]
 }
 
 # Show controls as single-charcter indicators like DDI's "controlpics",
@@ -391,7 +396,6 @@ sub checkeq_literal($$$) {
         .(" " x ($hposn+length($quotes[0])))."^"
                           .($vposn > 0 ? "(line ".($vposn+1).")\n" : "\n")
         ." at line ", (caller(0))[2]."\n"
-        .visFoldwidth()."\n" 
        ) ;
   #goto &Carp::confess;
   Carp::confess(@_);
@@ -483,7 +487,7 @@ sub check($$@) {
               ."TESTb FAILED: ".$desc."\n"
               ."Expected (Regexp):\n".${expected}."<<end>>\n"
               ."Got:\n".displaystr($actual)."<<end>>\n"
-              .visFoldwidth()."\n" ) ;
+             ) ;
         Carp::confess(@_); #goto &Carp::confess;
       }
 #say "###ACT $actual";

@@ -131,10 +131,12 @@ ok(all( approx(sqrt($pa), pdl(1.4142, 1.7321))), 'sqrt makes decimal');
 }
 
 {
+my @w;
+local $SIG{__WARN__} = sub { push @w, @_ };
 # And and Or
-
 ok(all( approx(pdl(1,0,1) & pdl(1,1,0), pdl(1,0,0))), 'elementwise and');
 ok(all( approx(pdl(1,0,1) | pdl(1,1,0), pdl(1,1,1))), 'elementwise or');
+is_deeply \@w, [], 'no warnings' or diag explain \@w;
 }
 
 {
@@ -300,5 +302,7 @@ $startgood->slice('0:4') .= $hasbad;
 ok $startgood->badflag, 'startgood badflag now true';
 ok $startgood->nbad == 1, 'badflag propagation with .=';
 }
+
+is_deeply [(zeroes(1,1,0) & zeroes(1,1,0))->dims], [1,1,0]; # used to segfault
 
 done_testing;

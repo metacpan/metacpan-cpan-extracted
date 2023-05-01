@@ -182,6 +182,44 @@ PDL_Indx* pdl_packdims ( SV* sv, PDL_Indx *ndims ) {
    return dims;
 }
 
+/* Pack array of pdl* - returns pdls[] (pdl_smalloced) and npdls */
+pdl ** pdl_packpdls( SV* sv, PDL_Indx *npdls ) {
+  if (!SvOK(sv)) { /* undef is OK, treat as empty */
+    *npdls = 0;
+    return NULL;
+  }
+  if (!SvROK(sv)) pdl_pdl_barf("Gave a non-reference as array-ref of PDLs");
+  if (SvTYPE(SvRV(sv))!=SVt_PVAV)
+    pdl_pdl_barf("Gave a non-array-reference as array-ref of PDLs");
+  AV *array = (AV *) SvRV(sv);
+  if (!array) pdl_pdl_barf("Failed to get AV from reference");
+  *npdls = (PDL_Indx) av_len(array) + 1;
+  if (!*npdls) return NULL;
+  pdl **pdls = (pdl **) pdl_smalloc( (*npdls) * sizeof(*pdls) );
+  if (!pdls) pdl_pdl_barf("Failed to allocate memory for pointers to PDLs");
+  PDL_Indx i;
+  for(i=0; i<(*npdls); i++) {
+    SV **s = av_fetch( array, i, 0 );
+    if (!s) pdl_pdl_barf("Failed to fetch SV #%"IND_FLAG, i);
+    pdls[i] = pdl_SvPDLV(*s);
+  }
+  return pdls;
+}
+
+/* Unpack array of pdl* into SV* */
+SV* pdl_unpackpdls( pdl **pdls, PDL_Indx npdls ) {
+   AV *array = newAV();
+   if (!array) return NULL;
+   av_extend(array, npdls + 1);
+   PDL_Indx i;
+   for(i=0; i<npdls; i++) {
+      SV *sv = newSV(0);
+      pdl_SetSV_PDL(sv, pdls[i]);
+      av_push(array, sv);
+   }
+   return sv_2mortal(newRV_noinc((SV *)array));
+}
+
 PDL_Indx pdl_safe_indterm( PDL_Indx dsz, PDL_Indx at, char *file, int lineno)
 {
   if (!(at >= 0 && at < dsz))
@@ -1165,5 +1203,5 @@ uint64_t pdl_pdl_seed() {
 	(void)time(&seconds);
 	/* End of Perl-specific symbols */
 	s = (uint64_t)seconds;
-	return abs(((s*181)*((pid-83)*359))%104729);
+	return ((s*181)*((pid-83)*359))%104729;
 }

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_check_cell_values/csv_check_cell_values",
@@ -41,7 +41,7 @@ csv-check-cell-values - Check the value of single cells of CSV against code/sche
 
 =head1 VERSION
 
-This document describes version 1.022 of csv-check-cell-values (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of csv-check-cell-values (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,10 @@ B<csv-check-cell-values> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h,
 B<csv-check-cell-values> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
 B<csv-check-cell-values> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-field-pat|/"--exclude-field-pat=s">>=I<re>|B<L<-A|/"--exclude-field-pat=s">>|B<L<--exclude-all-fields|/"--exclude-field-pat=s">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>|(B<L<-F|/"--exclude-fields-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-unknown-fields|/"--ignore-unknown-fields">>|B<L<--no-ignore-unknown-fields|/"--ignore-unknown-fields">>|B<L<--noignore-unknown-fields|/"--ignore-unknown-fields">>] [B<L<--include-field-pat|/"--include-field-pat=s, --field-pat">>=I<re>|B<L<-a|/"--include-field-pat=s, --field-pat">>|B<L<--field-pat|/"--include-field-pat=s, --field-pat">>=I<re>|B<L<--include-all-fields|/"--include-field-pat=s, --field-pat">>] [(B<L<--include-field|/"--include-fields-json=s">>=I<str>)+|B<L<--include-fields-json|/"--include-fields-json=s">>=I<json>|(B<L<-f|/"--include-fields-json=s">>=I<str>)+|(B<L<--field|/"--include-fields-json=s">>=I<str>)+] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--print-validated|/"--print-validated">>|B<L<--no-print-validated|/"--print-validated">>|B<L<--noprint-validated|/"--print-validated">>] [B<L<--quiet-arg|/"--quiet-arg, -q">>|B<L<-q|/"--quiet-arg, -q">>|B<L<--no-quiet-arg|/"--quiet-arg, -q">>|B<L<--noquiet-arg|/"--quiet-arg, -q">>] [B<L<--show-selected-fields|/"--show-selected-fields">>] [B<L<--with-code|/"--with-code=s">>=I<any>|B<L<--with-code-json|/"--with-code=s">>=I<json>] [B<L<--with-regex|/"--with-regex=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--with-schema|/"--with-schema=s">>=I<any>|B<L<--with-schema-json|/"--with-schema=s">>=I<json>] -- [I<L<input_filename|/"--input-filename=s">>]
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -398,6 +402,12 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Check whether the `rank` field has monotonically increasing values
+
+ % csv-check-cell-values formula.csv -f rank --with-schema array/num//monotonically_increasing
 
 =head1 HOMEPAGE
 

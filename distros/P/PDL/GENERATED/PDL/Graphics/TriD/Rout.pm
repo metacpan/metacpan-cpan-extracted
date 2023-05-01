@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "rout.pd"
 
 use strict;
@@ -34,12 +35,7 @@ PDL::Graphics::TriD::Rout - Helper routines for Three-dimensional graphics
 
 This module is for miscellaneous PP-defined utility routines for
 the PDL::Graphics::TriD module. Currently, there are
-#line 38 "Rout.pm"
-
-
-
-
-
+#line 39 "Rout.pm"
 
 =head1 FUNCTIONS
 
@@ -47,8 +43,6 @@ the PDL::Graphics::TriD module. Currently, there are
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -66,26 +60,20 @@ Combine three coordinates into a single ndarray.
 Combine x, y and z to a single ndarray the first dimension
 of which is 3. This routine does dataflow automatically.
 
-
 =for bad
 
 combcoords does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 78 "Rout.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *combcoords = \&PDL::combcoords;
-#line 85 "Rout.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -104,7 +92,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		double d;
 	)
 
-
 =for ref
 
 Repulsive potential for molecule-like constructs.
@@ -114,26 +101,20 @@ a repulsive force that vanishes at infinity for many
 objects. For use by the module L<PDL::Graphics::TriD::MathGraph>.
 For definition of the potential, see the actual function.
 
-
 =for bad
 
 repulse does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 126 "Rout.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *repulse = \&PDL::repulse;
-#line 133 "Rout.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -150,7 +131,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		double ms;
 	)
 
-
 =for ref
 
 Attractive potential for molecule-like constructs.
@@ -162,26 +142,20 @@ like molecular bonds).
 For use by the module L<PDL::Graphics::TriD::MathGraph>.
 For definition of the potential, see the actual function.
 
-
 =for bad
 
 attract does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 174 "Rout.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *attract = \&PDL::attract;
-#line 181 "Rout.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -191,32 +165,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (vertices(n=3); char* space; PerlIO *fp)
 
-
 =for ref
 
 info not available
-
 
 =for bad
 
 vrmlcoordsvert does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 208 "Rout.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *vrmlcoordsvert = \&PDL::vrmlcoordsvert;
-#line 215 "Rout.pm"
+
+
 
 
 
 #line 214 "rout.pd"
-
 
 =head2 contour_segments
 
@@ -276,21 +245,17 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
 	$this->{Points} = $this->{Points}->transpose;
 	
 }
-#line 280 "Rout.pm"
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 249 "Rout.pm"
 
 *contour_segments_internal = \&PDL::contour_segments_internal;
-#line 287 "Rout.pm"
+
+
 
 
 
 
 
 #line 436 "rout.pd"
-
 
 =head1 AUTHOR
 
@@ -303,10 +268,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 307 "Rout.pm"
-
-
-
+#line 272 "Rout.pm"
 
 # Exit with OK status
 

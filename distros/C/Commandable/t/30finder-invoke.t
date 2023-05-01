@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Commandable::Finder::Packages;
 use Commandable::Invocation;
@@ -21,7 +21,7 @@ package MyTest::Command::cmd {
 
    use constant COMMAND_OPTS => (
       { name => "verbose|v", description => "verbose option" },
-      { name => "target|t:", description => "target option" },
+      { name => "target|t=", description => "target option" },
    );
 
    sub run {
@@ -55,7 +55,7 @@ my $finder = Commandable::Finder::Packages->new(
    $finder->find_and_invoke( Commandable::Invocation->new( "cmd" ) );
 
    ok( defined $cmd_args, 'cmd command invoked' );
-   is_deeply( $cmd_args, [], 'cmd command given no args' );
+   is( $cmd_args, [], 'cmd command given no args' );
 }
 
 # one arg
@@ -64,7 +64,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    $finder->find_and_invoke( Commandable::Invocation->new( "cmd argument" ) );
 
-   is_deeply( $cmd_args, [ "argument" ], 'cmd command given one arg' );
+   is( $cmd_args, [ "argument" ], 'cmd command given one arg' );
 }
 
 # one option
@@ -74,8 +74,8 @@ my $finder = Commandable::Finder::Packages->new(
 
    $finder->find_and_invoke( Commandable::Invocation->new( "cmd --verbose" ) );
 
-   is_deeply( $cmd_args, [], 'cmd command given one option' );
-   is_deeply( $cmd_opts, { verbose => 1 }, 'cmd command given one option' );
+   is( $cmd_args, [], 'cmd command given one option' );
+   is( $cmd_opts, { verbose => 1 }, 'cmd command given one option' );
 }
 
 # two options
@@ -85,8 +85,8 @@ my $finder = Commandable::Finder::Packages->new(
 
    $finder->find_and_invoke( Commandable::Invocation->new( "cmd --verbose --target=red" ) );
 
-   is_deeply( $cmd_args, [], 'cmd command given two options' );
-   is_deeply( $cmd_opts, { verbose => 1, target => "red" }, 'cmd command given two options' );
+   is( $cmd_args, [], 'cmd command given two options' );
+   is( $cmd_opts, { verbose => 1, target => "red" }, 'cmd command given two options' );
 }
 
 # multiple commands

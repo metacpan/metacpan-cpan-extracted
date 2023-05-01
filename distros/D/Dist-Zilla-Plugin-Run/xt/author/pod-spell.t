@@ -22,12 +22,14 @@ David
 Dist
 Etheridge
 Golden
+Graham
 Karen
 Mengué
 Miyagawa
 Newkirk
 Nickolay
 Olivier
+Ollis
 Platonov
 Plugin
 Randy
@@ -54,6 +56,7 @@ irc
 lib
 miyagawa
 nplatonov
+plicease
 rwstauner
 torsten
 tsibley

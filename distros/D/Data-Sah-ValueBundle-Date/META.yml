@@ -19,13 +19,25 @@ name: Data-Sah-ValueBundle-Date
 provides:
   Data::Sah::Value::perl::Date::cur_year_local:
     file: lib/Data/Sah/Value/perl/Date/cur_year_local.pm
-    version: '0.001'
+    version: '0.002'
   Data::Sah::Value::perl::Date::cur_year_utc:
     file: lib/Data/Sah/Value/perl/Date/cur_year_utc.pm
-    version: '0.001'
+    version: '0.002'
+  Data::Sah::Value::perl::Date::last_year_local:
+    file: lib/Data/Sah/Value/perl/Date/last_year_local.pm
+    version: '0.002'
+  Data::Sah::Value::perl::Date::last_year_utc:
+    file: lib/Data/Sah/Value/perl/Date/last_year_utc.pm
+    version: '0.002'
+  Data::Sah::Value::perl::Date::next_year_local:
+    file: lib/Data/Sah/Value/perl/Date/next_year_local.pm
+    version: '0.002'
+  Data::Sah::Value::perl::Date::next_year_utc:
+    file: lib/Data/Sah/Value/perl/Date/next_year_utc.pm
+    version: '0.002'
   Data::Sah::ValueBundle::Date:
     file: lib/Data/Sah/ValueBundle/Date.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -34,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-ValueBundle-Date
   homepage: https://metacpan.org/release/Data-Sah-ValueBundle-Date
   repository: git://github.com/perlancar/perl-Data-Sah-ValueBundle-Date.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

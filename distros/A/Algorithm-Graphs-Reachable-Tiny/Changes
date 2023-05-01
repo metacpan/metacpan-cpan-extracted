@@ -1,5 +1,11 @@
 Revision history for Algorithm-Graphs-Reachable-Tiny
 
+0.06    2023/05/01
+        POD: Added link to git repo
+
+0.05    2023/04/29
+        POD: Removed link to cpanratings.perl.org (Id: 147783)
+
 0.04    2023/04/28
         Rudimentary argument check added
         Graph can be specified as an array

@@ -6,7 +6,7 @@ package PDL::Complex;
 our @EXPORT_OK = qw(Ctan Catan re im i cplx real r2C i2C Cr2p Cp2r Cadd Csub Cmul Cprodover Cscale Cdiv Ceq Cconj Cabs Cabs2 Carg Csin Ccos Cexp Clog Cpow Csqrt Casin Cacos Csinh Ccosh Ctanh Casinh Cacosh Catanh Cproj Croots rCpolynomial );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
-use PDL::Core;
+use PDL::Core();
 use PDL::Exporter;
 use DynaLoader;
 
@@ -21,15 +21,13 @@ BEGIN {
 
 
 
-#line 17 "complex.pd"
+
+#line 18 "complex.pd"
 
 use strict;
 use warnings;
 use Carp;
 our $VERSION = '2.009';
-   use PDL::Slices;
-   use PDL::Types;
-   use PDL::Bad;
 
 =encoding iso-8859-1
 
@@ -191,7 +189,6 @@ An ASCII version of this plot looks like this:
  -15 ++-----+------+------+------+------+------+-----###-----+------+-----++
      0      5      10     15     20     25     30     35     40     45     50
 
-
 =head1 OPERATORS
 
 The following operators are overloaded:
@@ -233,7 +230,7 @@ Comparing complex numbers other than for equality is a fatal error.
 =cut
 
 my $i;
-BEGIN { $i = bless pdl 0,1 }
+BEGIN { $i = bless PDL->pdl(0,1) }
 {
 no warnings 'redefine';
 sub i { $i->copy + (@_ ? $_[0] : 0) };
@@ -257,12 +254,7 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 *asinh = \&Casinh;
 *acosh = \&Cacosh;
 *atanh = \&Catanh;
-#line 261 "Complex.pm"
-
-
-
-
-
+#line 258 "Complex.pm"
 
 =head1 FUNCTIONS
 
@@ -271,8 +263,8 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 
 
 
-#line 332 "complex.pd"
 
+#line 330 "complex.pd"
 
 =head2 from_native
 
@@ -374,13 +366,7 @@ sub real($) {
    return $_[0] unless UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP unless complex
    bless $_[0]->slice(''), 'PDL';
 }
-#line 378 "Complex.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 370 "Complex.pm"
 
 =head2 r2C
 
@@ -397,13 +383,10 @@ convert real to complex, assuming an imaginary part of zero
 r2C does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 403 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 undef &PDL::r2C;
@@ -413,19 +396,14 @@ sub PDL::Complex::r2C {
   my $r = __PACKAGE__->initialize;
   &PDL::Complex::_r2C_int($_[0], $r);
   $r }
-#line 417 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*r2C = \&PDL::Complex::r2C;
 }
-#line 425 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -444,28 +422,18 @@ convert imaginary to complex, assuming a real part of zero
 i2C does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 450 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 undef &PDL::i2C; *PDL::i2C = \&PDL::Complex::i2C; sub PDL::Complex::i2C { my $r = __PACKAGE__->initialize; &PDL::Complex::_i2C_int($_[0], $r); $r }
-#line 457 "Complex.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*i2C = \&PDL::Complex::i2C;
 }
-#line 465 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -484,21 +452,15 @@ convert complex numbers in rectangular form to polar (mod,arg) form. Works inpla
 Cr2p does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 490 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cr2p = \&PDL::Complex::Cr2p;
 }
-#line 498 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -517,37 +479,25 @@ convert complex numbers in polar (mod,arg) form to rectangular form. Works inpla
 Cp2r does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 523 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cp2r = \&PDL::Complex::Cp2r;
 }
-#line 531 "Complex.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cadd = \&PDL::Complex::Cadd;
 }
-#line 539 "Complex.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csub = \&PDL::Complex::Csub;
 }
-#line 547 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -566,21 +516,15 @@ complex multiplication
 Cmul does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 572 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cmul = \&PDL::Complex::Cmul;
 }
-#line 580 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -599,21 +543,15 @@ Project via product to N-1 dimension
 Cprodover does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 605 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cprodover = \&PDL::Complex::Cprodover;
 }
-#line 613 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -632,21 +570,15 @@ mixed complex/real multiplication
 Cscale does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 638 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cscale = \&PDL::Complex::Cscale;
 }
-#line 646 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -665,21 +597,15 @@ complex division
 Cdiv does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 671 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 }
-#line 679 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -698,13 +624,10 @@ Complex equality operator.
 Ceq does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 704 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Ceq {
     my @args = !$_[2] ? @_[1,0] : @_[0,1];
@@ -712,19 +635,13 @@ sub PDL::Complex::Ceq {
     PDL::Complex::_Ceq_int($args[0], $args[1], my $r = PDL->null);
     $r;
 }
-#line 716 "Complex.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ceq = \&PDL::Complex::Ceq;
 }
-#line 724 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -743,21 +660,15 @@ complex conjugation. Works inplace
 Cconj does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 749 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cconj = \&PDL::Complex::Cconj;
 }
-#line 757 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -776,13 +687,10 @@ complex C<abs()> (also known as I<modulus>)
 Cabs does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 782 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Cabs($) {
            my $pdl= shift;
@@ -790,19 +698,12 @@ sub PDL::Complex::Cabs($) {
            &PDL::Complex::_Cabs_int($pdl, $abs);
            $abs;
         }
-#line 794 "Complex.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cabs = \&PDL::Complex::Cabs;
 }
-#line 802 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -821,13 +722,10 @@ complex squared C<abs()> (also known I<squared modulus>)
 Cabs2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 827 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Cabs2($) {
            my $pdl= shift;
@@ -835,19 +733,12 @@ sub PDL::Complex::Cabs2($) {
            &PDL::Complex::_Cabs2_int($pdl, $abs2);
            $abs2;
         }
-#line 839 "Complex.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cabs2 = \&PDL::Complex::Cabs2;
 }
-#line 847 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -866,13 +757,10 @@ complex argument function ("angle")
 Carg does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 872 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Carg($) {
            my $pdl= shift;
@@ -880,19 +768,12 @@ sub PDL::Complex::Carg($) {
            &PDL::Complex::_Carg_int($pdl, $arg);
            $arg;
         }
-#line 884 "Complex.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Carg = \&PDL::Complex::Carg;
 }
-#line 892 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -911,21 +792,15 @@ BEGIN {*Carg = \&PDL::Complex::Carg;
 Csin does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 917 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csin = \&PDL::Complex::Csin;
 }
-#line 925 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -944,22 +819,18 @@ BEGIN {*Csin = \&PDL::Complex::Csin;
 Ccos does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 950 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ccos = \&PDL::Complex::Ccos;
 }
-#line 958 "Complex.pm"
 
 
 
-#line 687 "complex.pd"
 
+#line 685 "complex.pd"
 
 =head2 Ctan
 
@@ -974,13 +845,7 @@ Does not work inplace.
 =cut
 
 sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
-#line 978 "Complex.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 849 "Complex.pm"
 
 =head2 Cexp
 
@@ -997,21 +862,15 @@ sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
 Cexp does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1003 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cexp = \&PDL::Complex::Cexp;
 }
-#line 1011 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1030,21 +889,15 @@ BEGIN {*Cexp = \&PDL::Complex::Cexp;
 Clog does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1036 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Clog = \&PDL::Complex::Clog;
 }
-#line 1044 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1063,21 +916,15 @@ complex C<pow()> (C<**>-operator)
 Cpow does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1069 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cpow = \&PDL::Complex::Cpow;
 }
-#line 1077 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1096,21 +943,15 @@ Works inplace
 Csqrt does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1102 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csqrt = \&PDL::Complex::Csqrt;
 }
-#line 1110 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1129,21 +970,15 @@ Works inplace
 Casin does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1135 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Casin = \&PDL::Complex::Casin;
 }
-#line 1143 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1162,22 +997,18 @@ Works inplace
 Cacos does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1168 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cacos = \&PDL::Complex::Cacos;
 }
-#line 1176 "Complex.pm"
 
 
 
-#line 834 "complex.pd"
 
+#line 832 "complex.pd"
 
 =head2 Catan
 
@@ -1191,15 +1022,9 @@ Does not work inplace.
 
 sub Catan($) {
    my $z = shift;
-   Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), pdl(0, 0.5);
+   Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), PDL->pdl(0, 0.5);
 }
-#line 1197 "Complex.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1028 "Complex.pm"
 
 =head2 Csinh
 
@@ -1216,21 +1041,15 @@ sub Catan($) {
 Csinh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1222 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csinh = \&PDL::Complex::Csinh;
 }
-#line 1230 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1249,21 +1068,15 @@ BEGIN {*Csinh = \&PDL::Complex::Csinh;
 Ccosh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1255 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ccosh = \&PDL::Complex::Ccosh;
 }
-#line 1263 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1282,21 +1095,15 @@ Works inplace
 Ctanh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1288 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ctanh = \&PDL::Complex::Ctanh;
 }
-#line 1296 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1315,21 +1122,15 @@ Works inplace
 Casinh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1321 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Casinh = \&PDL::Complex::Casinh;
 }
-#line 1329 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1348,21 +1149,15 @@ Works inplace
 Cacosh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1354 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cacosh = \&PDL::Complex::Cacosh;
 }
-#line 1362 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1381,21 +1176,15 @@ Works inplace
 Catanh does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1387 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Catanh = \&PDL::Complex::Catanh;
 }
-#line 1395 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1414,21 +1203,15 @@ compute the projection of a complex number to the riemann sphere. Works inplace
 Cproj does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1420 "Complex.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cproj = \&PDL::Complex::Cproj;
 }
-#line 1428 "Complex.pm"
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1447,13 +1230,10 @@ Compute the C<n> roots of C<a>. C<n> must be a positive integer. The result will
 Croots does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1453 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Croots($$) {
            my ($pdl, $n) = @_;
@@ -1461,20 +1241,15 @@ sub PDL::Complex::Croots($$) {
            &PDL::Complex::_Croots_int($pdl, $r, $n);
            bless $r;
         }
-#line 1465 "Complex.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Croots = \&PDL::Complex::Croots;
 }
-#line 1473 "Complex.pm"
 
 
 
-#line 1002 "complex.pd"
 
+#line 1000 "complex.pd"
 
 =head2 re, im
 
@@ -1498,13 +1273,7 @@ sub slice :lvalue {
   $ret;
 }
 }
-#line 1502 "Complex.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1277 "Complex.pm"
 
 =head2 rCpolynomial
 
@@ -1521,13 +1290,10 @@ evaluate the polynomial with (real) coefficients C<coeffs> at the (complex) posi
 rCpolynomial does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1527 "Complex.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 sub rCpolynomial {
@@ -1537,29 +1303,22 @@ sub rCpolynomial {
     _rCpolynomial_int($coeffs,$x,$out);
     return PDL::complex($out);
     }
-#line 1541 "Complex.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 }
-#line 1549 "Complex.pm"
 
 
 
 
 
-#line 1067 "complex.pd"
 
-
-# overload must be here, so that all the functions can be seen
+#line 1065 "complex.pd"
 
 # undocumented compatibility functions (thanks to Luis Mochan!)
-sub Catan2($$) { Clog( $_[1] + i()*$_[0])/i }
-sub atan2($$) { Clog( $_[1] + i()*$_[0])/i }
-
+sub Catan2 { Clog( $_[1] + i()*$_[0])/i }
+sub atan2 { Clog( $_[1] + i()*$_[0])/i }
 
 =begin comment
 
@@ -1577,20 +1336,18 @@ my %NO_MUTATE; BEGIN { @NO_MUTATE{qw(atan2 .= ==)} = (); }
 sub _gen_biop {
    local $_ = shift;
    my $sub;
-   if (/(\S+)\+(\w+)/) { #commutes
-      $sub = eval 'sub { '.$2.' $_[0], ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1] }';
-   } elsif (/(\S+)\-(\w+)/) { #does not commute
-      $sub = eval 'sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                       $_[2] ? '.$2.' $y, $_[0] : '.$2.' $_[0], $y }'; #need to swap?
-   } else {
-      die;
-   }
-   return ($1, $sub) if exists $NO_MUTATE{$1};
-   ($1, $sub, "$1=", $sub);
+   die if !(my ($op, $commutes, $func) = /(\S+)([-+])(\w+)/);
+   $sub = eval 'sub {
+      my ($x, $y) = '.($commutes eq '+' ? '' : '$_[2] ? @_[1,0] : ').'@_[0,1];
+      $_ = r2C $_ for grep ref $_ ne __PACKAGE__, $x, $y;
+      '.$func.'($x, $y);
+   }'; #need to swap?
+   die if $@;
+   ($op, $sub, exists $NO_MUTATE{$op} ? () : ("$op=", $sub));
 }
 
 sub _gen_unop {
-   my ($op, $func) = ($_[0] =~ /(.+)@(\w+)/);
+   my ($op, $func) = split '@', $_[0];
    no strict 'refs';
    *$op = \&$func if $op =~ /\w+/; # create an alias
    ($op, eval 'sub { '.$func.' $_[0] }');
@@ -1653,10 +1410,7 @@ in the file COPYING in the PDL distribution.
 perl(1), L<PDL>.
 
 =cut
-#line 1657 "Complex.pm"
-
-
-
+#line 1414 "Complex.pm"
 
 # Exit with OK status
 

@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -46,6 +46,8 @@ See <prog:csv-sort-fields> for details on sorting options.
 _
 
     writes_csv => 0,
+
+    tags => ['category:checking'],
 
     add_args => {
         # KEEP SYNC WITH csv_sort_fields
@@ -89,7 +91,7 @@ App::CSVUtils::csv_sorted_fields - Check that CSV fields are sorted
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_sorted_fields (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_sorted_fields (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -19,6 +19,8 @@ gen_csv_util(
     add_args => {
         %App::CSVUtils::argspecsopt_field_selection,
     },
+    tags => ['category:munging','deletes-fields'],
+
     examples => [
         {
             summary => 'Delete a single field from CSV',
@@ -101,7 +103,7 @@ App::CSVUtils::csv_delete_fields - Delete one or more fields from CSV file
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_delete_fields (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_delete_fields (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

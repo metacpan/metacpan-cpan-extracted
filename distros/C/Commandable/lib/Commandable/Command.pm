@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Commandable::Command 0.09;
+package Commandable::Command 0.10;
 
 use v5.14;
 use warnings;
@@ -87,9 +87,18 @@ sub parse_invocation
          my $spec;
          my $value_in_token;
 
+         my $value = 1;
          if( $token =~ s/^--([^=]+)(=|$)// ) {
-            $spec = $optspec{$1} or die "Unrecognised option name --$1\n";
-            $value_in_token = length $2;
+            my ( $opt, $equal ) = ($1, $2);
+            if( !$optspec{$opt} and $opt =~ /no-(.+)/ ) {
+               $spec = $optspec{$1} and $spec->negatable
+                  or die "Unrecognised option name --$opt\n";
+               $value = undef;
+            }
+            else {
+               $spec = $optspec{$opt} or die "Unrecognised option name --$opt\n";
+               $value_in_token = length $equal;
+            }
          }
          elsif( $token =~ s/^-(.)// ) {
             $spec = $optspec{$1} or die "Unrecognised option name -$1\n";
@@ -100,19 +109,29 @@ sub parse_invocation
             next;
          }
 
-         my $value = 1;
-         if( $spec->mode eq "value" ) {
+         my $name = $spec->name;
+
+         if( $spec->mode =~ /value$/ ) {
             $value = $value_in_token ? $token
                                      : ( $cinv->pull_token // die "Expected value for option --".$spec->name."\n" );
          }
 
-         $opts->{ $spec->name } = $value;
+         if( $spec->mode eq "multi_value" ) {
+            push @{ $opts->{$name} }, $value;
+         }
+         elsif( $spec->mode eq "inc" ) {
+            $opts->{$name}++;
+         }
+         else {
+            $opts->{$name} = $value;
+         }
       }
 
       $cinv->putback_tokens( @remaining );
 
       foreach my $spec ( values %optspec ) {
-         $opts->{ $spec->name } //= $spec->default if defined $spec->default;
+         my $name = $spec->name;
+         $opts->{$name} = $spec->default if defined $spec->default and !exists $opts->{$name};
       }
    }
 
@@ -162,10 +181,14 @@ sub new
 {
    my $class = shift;
    my %args = @_;
-   $args{mode} = "value" if $args{name} =~ s/:$//;
+   warn "Use of $args{name} in a Commandable command option name; should be " . $args{name} =~ s/:$/=/r
+      if $args{name} =~ m/:$/;
+   $args{mode} = "value" if $args{name} =~ s/[=:]$//;
+   $args{mode} = "multi_value" if $args{multi};
    my @names = split m/\|/, delete $args{name};
    $args{mode} //= "set";
-   bless [ \@names, @args{qw( description mode default )} ], $class;
+   $args{negatable} //= 1 if $args{mode} eq "bool";
+   bless [ \@names, @args{qw( description mode default negatable )} ], $class;
 }
 
 sub name        { shift->[0]->[0] }
@@ -173,6 +196,7 @@ sub names       { @{ shift->[0] } }
 sub description { shift->[1] }
 sub mode        { shift->[2] }
 sub default     { shift->[3] }
+sub negatable   { shift->[4] }
 
 =head1 AUTHOR
 

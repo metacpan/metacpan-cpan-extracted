@@ -67,7 +67,6 @@ sub PDL_BOOT {
   $symname ||= 'PDL';
   $module ||= 'The code';
   return << "EOR";
-
    perl_require_pv ("PDL/Core.pm"); /* make sure PDL::Core is loaded */
 #ifndef aTHX_
 #define aTHX_
@@ -80,7 +79,6 @@ sub PDL_BOOT {
      Perl_croak(aTHX_ "Got NULL pointer for $symname");
    if ($symname->Version != PDL_CORE_VERSION)
      Perl_croak(aTHX_ "[$symname->Version: \%ld PDL_CORE_VERSION: \%ld XS_VERSION: \%s] $module needs to be recompiled against the newly installed PDL", (long int)$symname->Version, (long int)PDL_CORE_VERSION, XS_VERSION);
-
 EOR
 }
 
@@ -258,6 +256,7 @@ sub pdlpp_stdargs {
 #   so all the magic *.pm generation happens during "make dist"
 # - it is intended to be called as a one-liner:
 #     perl -MPDL::Core::Dev -e pdlpp_mkgen DirName
+# - it relies on finding "=head1 NAME" and the module name in *.pd, though can be in comment
 #
 sub pdlpp_mkgen {
   require File::Spec::Functions;
@@ -286,11 +285,12 @@ sub pdlpp_mkgen {
     my $old_cwd = Cwd::cwd();
     chdir dirname($pd);
     #there is no way to use PDL::PP from perl code, thus calling via system()
-    my $pp_call_arg = _pp_call_arg($mod, $mod, $basename, '', 1);
+    my $pp_call_arg = _pp_call_arg($mod, $mod, $basename, '', 0); # 0 so guarantee not create pp-*.c
     my $rv = system($^X, @in, $pp_call_arg, File::Spec::Functions::abs2rel(basename($pd)));
     die "pdlpp_mkgen: cannot convert '$pd'\n" unless $rv == 0 && -f $basefile;
     File::Copy::copy($basefile, $outfile) or die "$outfile: $!";
     unlink $basefile; # Transform::Proj4.pm is wrong without GIS::Proj built
+    unlink "$basename.xs"; # since may have been recreated wrong
     chdir $old_cwd or die "chdir $old_cwd: $!";
     $added{"GENERATED/$prefix.pm"} = "mod=$mod pd=$pd (added by pdlpp_mkgen)";
   }
@@ -426,7 +426,7 @@ sub trylink {
   if ($mmprocess) {
       require ExtUtils::MakeMaker;
       require ExtUtils::Liblist;
-      my $self = new ExtUtils::MakeMaker {DIR =>  [],'NAME' => 'NONE'};
+      my $self = ExtUtils::MakeMaker->new({DIR =>  [],'NAME' => 'NONE'});
 
       my @libs = $self->ext($libs, 0);
 

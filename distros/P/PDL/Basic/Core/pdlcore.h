@@ -2,7 +2,7 @@
 #define __PDLCORE_H
 
 /* version 20: memory-management changes */
-/* on 21, unify pdl_broadcast per_pdl_flags, par_flags; remove threadloop #defines; change creating to char; relocate struct pdl.value appropriately, remove pdl_null */
+/* on 21, unify pdl_broadcast per_pdl_flags, par_flags; remove threadloop #defines; change creating to char; relocate struct pdl.value appropriately, remove pdl_null, safe_indterm */
 #define PDL_CORE_VERSION 20
 #define startbroadcastloop startthreadloop
 #define pdl_startbroadcastloop pdl_startthreadloop
@@ -151,7 +151,9 @@ void pdl_dump_anyval(PDL_Anyval v);
   X(make_error, pdl_error, (pdl_error_type e, const char *fmt, ...)) \
   X(make_error_simple, pdl_error, (pdl_error_type e, const char *msg)) \
   X(barf_if_error, void, (pdl_error err)) \
-  X(error_accumulate, pdl_error, (pdl_error err_current, pdl_error err_new))
+  X(error_accumulate, pdl_error, (pdl_error err_current, pdl_error err_new)) \
+  X(packpdls, pdl **, ( SV* sv, PDL_Indx *npdls )) \
+  X(unpackpdls, SV*, ( pdl **, PDL_Indx npdls ))
 
 /*************** Function prototypes *********************/
 #define X(sym, rettype, args) \

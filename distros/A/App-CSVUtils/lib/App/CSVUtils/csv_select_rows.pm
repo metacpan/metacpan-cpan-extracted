@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -16,7 +16,7 @@ use App::CSVUtils qw(
 
 gen_csv_util(
     name => 'csv_select_rows',
-    summary => 'Only output of specified row numbers',
+    summary => 'Select (only output) rows based on a specification of row numbers (e.g. 2-5,7)',
     description => <<'_',
 
 To select rows by Perl code, see <prog:csv-grep>.
@@ -31,6 +31,8 @@ _
             pos => 1,
         },
     },
+    tags => ['category:filtering'],
+
     examples => [
         {
             summary => 'Only show rows 1-3 (first to third data rows)',
@@ -71,7 +73,7 @@ _
 );
 
 1;
-# ABSTRACT: Only output of specified row numbers
+# ABSTRACT: Select (only output) rows based on a specification of row numbers (e.g. 2-5,7)
 
 __END__
 
@@ -81,11 +83,11 @@ __END__
 
 =head1 NAME
 
-App::CSVUtils::csv_select_rows - Only output of specified row numbers
+App::CSVUtils::csv_select_rows - Select (only output) rows based on a specification of row numbers (e.g. 2-5,7)
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_select_rows (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_select_rows (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 
@@ -96,7 +98,7 @@ Usage:
 
  csv_select_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Only output of specified row numbers.
+Select (only output) rows based on a specification of row numbers (e.g. 2-5,7).
 
 Examples:
 

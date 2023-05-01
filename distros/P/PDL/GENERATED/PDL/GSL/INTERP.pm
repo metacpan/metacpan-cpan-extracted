@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 6 "gsl_interp.pd"
 
 use strict;
@@ -59,12 +60,7 @@ C<b>. Since good Perl coding practices discourage the use of Perl
 variables C<$a> and C<$b>, here we refer to Parameters C<a> and C<b>
 as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
-#line 63 "INTERP.pm"
-
-
-
-
-
+#line 64 "INTERP.pm"
 
 =head1 FUNCTIONS
 
@@ -72,8 +68,6 @@ integration) as C<$la> and C<$lb>.
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -131,19 +125,15 @@ Example:
     # no sorting done on x, user is certain that x is monotonically increasing
     $spl = PDL::GSL::INTERP->init('cspline',$x,$y,{Sort => 0});
 
-
 =for bad
 
 init does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 143 "INTERP.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub init {
   my $opt;
@@ -165,18 +155,13 @@ sub init {
   my @ret_a = ($obj1,$obj2);
   return bless(\@ret_a, $class);
 }
-#line 169 "INTERP.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *init = \&PDL::GSL::INTERP::init;
-#line 176 "INTERP.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -203,20 +188,15 @@ Example:
 
     my $res = $spl->eval($x)
 
-
-
 =for bad
 
 eval processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 216 "INTERP.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub eval {
   my $opt;
@@ -226,18 +206,13 @@ sub eval {
   _eval_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
-#line 230 "INTERP.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *eval = \&PDL::GSL::INTERP::eval;
-#line 237 "INTERP.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -265,20 +240,15 @@ Example:
 
     my $res = $spl->deriv($x)
 
-
-
 =for bad
 
 deriv does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 278 "INTERP.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub deriv {
   my ($obj,$x) = @_;
@@ -287,18 +257,13 @@ sub deriv {
   _deriv_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
-#line 291 "INTERP.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *deriv = \&PDL::GSL::INTERP::deriv;
-#line 298 "INTERP.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -326,20 +291,15 @@ Example:
 
     my $res = $spl->deriv2($x)
 
-
-
 =for bad
 
 deriv2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 339 "INTERP.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub deriv2 {
   my ($obj,$x) = @_;
@@ -348,18 +308,13 @@ sub deriv2 {
   _deriv2_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
-#line 352 "INTERP.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *deriv2 = \&PDL::GSL::INTERP::deriv2;
-#line 359 "INTERP.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -387,20 +342,15 @@ Example:
 
     my $res = $spl->integ($la,$lb)
 
-
-
 =for bad
 
 integ does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 400 "INTERP.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub integ {
   my ($obj,$la,$lb) = @_;
@@ -409,14 +359,12 @@ sub integ {
   _integ_int($la,$lb,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
-#line 413 "INTERP.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *integ = \&PDL::GSL::INTERP::integ;
-#line 420 "INTERP.pm"
+
+
 
 
 
@@ -446,10 +394,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL interpolation module was written by Gerard Jungman.
 
 =cut
-#line 450 "INTERP.pm"
-
-
-
+#line 398 "INTERP.pm"
 
 # Exit with OK status
 

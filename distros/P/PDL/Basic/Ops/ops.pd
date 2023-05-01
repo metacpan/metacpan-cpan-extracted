@@ -86,14 +86,25 @@ sub protect_chars {
 
 # simple binary operators
 
+pp_addhdr(pp_line_numbers(__LINE__, <<'EOF'));
+#define PDL_BADVAL_WARN(var) \
+  { \
+    PDL_Anyval bad_anyval = PDL->get_pdl_badvalue(var); \
+    if (bad_anyval.type < 0) \
+      barf("Error getting badvalue, type=%d", bad_anyval.type); \
+    complex double bad_c; \
+    ANYVAL_TO_CTYPE(bad_c, complex double, bad_anyval); \
+    if( bad_c == 0 || bad_c == 1 ) \
+      warn(#var " badvalue is set to 0 or 1. This will cause data loss when using badvalues for comparison operators."); \
+  }
+EOF
 sub biop {
     my ($name,$op,$mutator,$doc,%extra) = @_;
     my $optxt = protect_chars ref $op eq 'ARRAY' ? $op->[1] : $op;
     $op = $op->[0] if ref $op eq 'ARRAY';
     $extra{HdrCode} = << 'EOH';
-  pdl *tmp;
   if (swap) {
-    tmp = a;
+    pdl *tmp = a;
     a = b;
     b = tmp;
   }
@@ -109,42 +120,31 @@ EOH
     if ($extra{Comparison}) {
         my $first_complex = $Ctypes[0]->sym;
 	$extra{HdrCode} .= <<EOF if $extra{Comparison} > 1;
-           if ((a->datatype >= $first_complex) || (b->datatype >= $first_complex))
-             barf("Can't compare complex numbers");
+  if ((a->datatype >= $first_complex) || (b->datatype >= $first_complex))
+    barf("Can't compare complex numbers");
 EOF
-	$extra{HdrCode} .= <<'EOH';
-           {
-             complex double bad_a, bad_b;
-             PDL_Anyval a_badval = PDL->get_pdl_badvalue(a);
-             if (a_badval.type < 0) barf("Error getting badvalue, type=%d", a_badval.type);
-             ANYVAL_TO_CTYPE(bad_a, complex double, a_badval);
-             PDL_Anyval b_badval = PDL->get_pdl_badvalue(b);
-             if (b_badval.type < 0) barf("Error getting badvalue, type=%d", b_badval.type);
-             ANYVAL_TO_CTYPE(bad_b, complex double, b_badval);
-             if( bad_a == 0 || bad_a == 1 || bad_b == 0 || bad_b == 1 ) {
-               warn("Badvalue is set to 0 or 1. This will cause data loss when using badvalues for comparison operators.");
-             }
-           }
-EOH
+	$extra{HdrCode} .= "  PDL_BADVAL_WARN(a)\n  PDL_BADVAL_WARN(b)\n";
         delete $extra{Comparison};
     }
 
-    pp_addpm(make_overload($op, $name, $mutator, delete $extra{Bitwise}));
+    pp_addpm(make_overload($op, $name, $mutator));
+    my $bitwise = delete $extra{Bitwise};
     pp_def($name,
 	   Pars => 'a(); b(); [o]c();',
-	   OtherPars => 'int swap',
-	   OtherParsDefaults => { swap => 0 },
+	   OtherPars => 'int $swap'.($bitwise ? '; SV *$ign; int $ign2' : ''),
+	   OtherParsDefaults => { swap => 0, ($bitwise ? (ign=>'&PL_sv_undef', ign2=>0) : ()) },
+	   ArgOrder => 1,
 	   HandleBad => 1,
 	   NoBadifNaN => 1,
 	   Inplace => [ 'a' ], # quick and dirty solution to get ->inplace do its job
-	   Code => pp_line_numbers(__LINE__-1, qq{
+	   Code => pp_line_numbers(__LINE__-1, <<EOF),
 char anybad = 0;
 broadcastloop %{
-	        PDL_IF_BAD(if ( $badcode ) { \$SETBAD(c()); anybad = 1; } else,)
-	           \$c() = \$a() $op \$b();
+  PDL_IF_BAD(if ( $badcode ) { \$SETBAD(c()); anybad = 1; } else,)
+     \$c() = \$a() $op \$b();
 %}
 if (anybad) \$PDLSTATESETBAD(c);
-	   }),
+EOF
 	   %extra,
 	   Doc => << "EOD");
 =for ref
@@ -169,31 +169,30 @@ EOD
 } # sub: biop()
 
 sub make_overload {
-    my ($op, $name, $mutator, $bitwise, $one_arg) = @_;
+    my ($op, $name, $mutator, $one_arg) = @_;
     my $ret;
-    my $bitwise_passon = $bitwise ? '$_[2]?@_[1,0]:@_[0,1]' : '@_';
     if ($one_arg) {
-      $ret = <<EOF;
+      $ret = pp_line_numbers(__LINE__, <<EOF);
 BEGIN { \$OVERLOADS{'$op'} = sub { PDL::$name(\$_[0]) } }
 EOF
     } else {
-      $ret = <<EOF;
+      $ret = pp_line_numbers(__LINE__, <<EOF);
 {
   my (\$foo, \$overload_sub);
   BEGIN { \$OVERLOADS{'$op'} = \$overload_sub = sub(;\@) {
-      return PDL::$name($bitwise_passon) unless ref \$_[1]
+      goto &PDL::$name unless ref \$_[1]
               && (ref \$_[1] ne 'PDL')
               && defined(\$foo = overload::Method(\$_[1], '$op'))
               && \$foo != \$overload_sub; # recursion guard
-      \$foo->(\$_[1], \$_[0], !\$_[2]);
+      goto &\$foo;
   }; }
 }
 EOF
     }
-    $ret .= <<EOF if $mutator;
+    $ret .= pp_line_numbers(__LINE__, <<EOF) if $mutator;
 BEGIN {
 # in1, in2, out, swap if true
-\$OVERLOADS{'$op='} = sub { PDL::$name(\$_[0], \$_[1], \$_[0], 0); \$_[0] };
+\$OVERLOADS{'$op='} = sub { PDL::$name(\$_[0]->inplace, \$_[1]); \$_[0] };
 }
 EOF
     $ret;
@@ -210,9 +209,8 @@ sub bifunc {
     $extra{GenericTypes} = [ grep exists $is_real{$_}, @{$extra{GenericTypes}} ]
 	if !$got_complex and $extra{GenericTypes};
     $extra{HdrCode} .= << 'EOH';
-  pdl *tmp;
   if (swap) {
-    tmp = a;
+    pdl *tmp = a;
     a = b;
     b = tmp;
   }
@@ -243,18 +241,19 @@ ENDCODE
 	   HandleBad => 1,
 	   NoBadifNaN => 1,
 	   Pars => 'a(); b(); [o]c();',
-	   OtherPars => 'int swap',
+	   OtherPars => 'int $swap',
 	   OtherParsDefaults => { swap => 0 },
-	   Inplace => [ 'a' ], # quick and dirty solution to get ->inplace do its job
-	   Code => pp_line_numbers(__LINE__, qq{
+	   ArgOrder => 1,
+	   Inplace => [ 'a' ],
+	   Code => pp_line_numbers(__LINE__-1, <<EOF),
 char anybad = 0;
 broadcastloop %{
-  PDL_IF_BAD(if ( \$ISBAD(a()) || \$ISBAD(b()) ) { anybad = 1; \$SETBAD(c()); } else ,){
+  PDL_IF_BAD(if ( \$ISBAD(a()) || \$ISBAD(b()) ) { anybad = 1; \$SETBAD(c()); } else ,) {
      $codestr
   }
 %}
 if (anybad) \$PDLSTATESETBAD(c);
-	   }),
+EOF
 	   %extra,
 	   Doc => << "EOD");
 =for ref
@@ -305,7 +304,7 @@ sub ufunc {
             (map 'types('.$_->ppsym.') %{$b() = c'.$func.$_->floatsuffix.'($a());%}', @Ctypes),
             ;
     }
-    pp_addpm(make_overload($funcov, $name, 0, 0, 1)) if $overload;
+    pp_addpm(make_overload($funcov, $name, 0, 1)) if $overload;
     # do not have to worry about propagation of the badflag when
     # inplace since only input ndarray is a, hence its badflag
     # won't change
@@ -315,11 +314,11 @@ sub ufunc {
 	   HandleBad => 1,
 	   NoBadifNaN => 1,
 	   Inplace => 1,
-	   Code => pp_line_numbers(__LINE__, qq{
-	        PDL_IF_BAD(if ( $badcode ) \$SETBAD(b()); else {,)
-	           $codestr
-		PDL_IF_BAD(},)
-	   }),
+	   Code => pp_line_numbers(__LINE__-1, <<EOF),
+PDL_IF_BAD(if ( $badcode ) \$SETBAD(b()); else {,)
+  $codestr
+PDL_IF_BAD(},)
+EOF
 	   %extra,
 	   Doc => << "EOD");
 =for ref
@@ -411,7 +410,7 @@ cfunc('re', 'creal', 1, 'Returns the real part of a complex number.',
 cfunc('im', 'cimag', 1, 'Returns the imaginary part of a complex number.',
   '$complexv() = creal($complexv()) + I * $b();'
 );
-cfunc('_cabs', 'cabs', 1, 'Returns the absolute (length) of a complex number.', undef,
+cfunc('_cabs', 'fabs', 1, 'Returns the absolute (length) of a complex number.', undef,
     PMFunc=>'',
 );
 my $rabs_code = '
@@ -424,8 +423,8 @@ pp_def ( '_rabs',
 	NoBadifNaN => 1,
 	    Inplace => 1,
 	Code => pp_line_numbers(__LINE__, qq{
-	  PDL_IF_BAD(if ( \$ISBAD(a()) ) \$SETBAD(b()); else,)
-	     $rabs_code
+PDL_IF_BAD(if ( \$ISBAD(a()) ) \$SETBAD(b()); else,)
+  $rabs_code
 	}),
 	Doc=>undef,
 	PMFunc=>'',
@@ -465,12 +464,12 @@ pp_def(
        GenericTypes => $A,
        Pars => 'a(); [o]b();',
        Code => pp_line_numbers(__LINE__-1, q{
-	  char anybad = 0;
-	  broadcastloop %{
-	    PDL_IF_BAD(if ( $ISBAD(a()) ) { anybad = 1; $SETBAD(b()); } else,)
-	       $b() = $a();
-	  %}
-	  PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(b);,)
+char anybad = 0;
+broadcastloop %{
+  PDL_IF_BAD(if ( $ISBAD(a()) ) { anybad = 1; $SETBAD(b()); } else,)
+    $b() = $a();
+%}
+PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(b);,)
        }),
        Doc =>
 'Plain numerical assignment. This is used to implement the ".=" operator',
@@ -488,8 +487,8 @@ sub cfunc {
 	   NoBadifNaN => 1,
 	   Inplace => 1,
 	   Code => pp_line_numbers(__LINE__, qq{
-	      PDL_IF_BAD(if ( \$ISBAD(complexv()) ) \$SETBAD(b()); else,)
-		 $codestr
+PDL_IF_BAD(if ( \$ISBAD(complexv()) ) \$SETBAD(b()); else,)
+  $codestr
 	   }),
 	   !$backcode ? () : (
 	     DefaultFlow => 1,
@@ -540,29 +539,29 @@ Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squari
    Pars => 'a(); indx b(); [o] ans()',
    GenericTypes => $AF,
    Code => pp_line_numbers(__LINE__, q{
-      PDL_Indx n = $b();
-      $GENERIC() y = 1;
-      $GENERIC() x = $a();
-      if (n < 0) {
-         x = 1 / x;
-         n = -n;
-      }
-      if (n == 0) {
-         $ans() = 1;
-      } else {
-          while (n > 1) {
-             if (n % 2 == 0) {
-                x = x * x;
-                n = n / 2;
-             } else {
-                y = x * y;
-                x = x * x;
-                n = (n - 1) / 2;
-             }
-         }
-         $ans() = x * y;
-      }
-   })
+PDL_Indx n = $b();
+$GENERIC() y = 1;
+$GENERIC() x = $a();
+if (n < 0) {
+   x = 1 / x;
+   n = -n;
+}
+if (n == 0) {
+   $ans() = 1;
+} else {
+    while (n > 1) {
+       if (n % 2 == 0) {
+          x = x * x;
+          n = n / 2;
+       } else {
+          y = x * y;
+          x = x * x;
+          n = (n - 1) / 2;
+       }
+   }
+   $ans() = x * y;
+}
+})
 );
 
 pp_addpm(<<'EOPM');
@@ -577,7 +576,7 @@ Returns the absolute value of a number.
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 EOPM
-pp_addpm(make_overload(qw(abs abs), 0, 0, 1));
+pp_addpm(make_overload(qw(abs abs), 0, 1));
 
 pp_addpm(<<'EOPM');
 

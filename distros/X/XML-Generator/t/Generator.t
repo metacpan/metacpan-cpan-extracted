@@ -3,7 +3,7 @@
 use Test;
 use utf8;
 
-BEGIN { $| = 1; plan tests => 108; }
+BEGIN { $| = 1; plan tests => 109; }
 
 use XML::Generator ();
 ok(1);
@@ -82,7 +82,7 @@ ok($xml, '<foo xmlns="A" bar="42"><bar xmlns="B" bar="54" /></foo>');
 
 $x = new XML::Generator 'conformance' => 'strict';
 $xml = $x->xmldecl();
-ok($xml, qq(<?xml version="1.0" standalone="yes"?>\n));
+ok($xml, qq(<?xml version="1.0"?>\n));
 
 $xml = $x->xmlcmnt("test");
 ok($xml, '<!-- test -->');
@@ -92,13 +92,16 @@ $x = new XML::Generator 'conformance' => 'strict',
 			'encoding' => 'iso-8859-2';
 
 $xml = $x->xmldecl();
-ok($xml, qq(<?xml version="1.1" encoding="iso-8859-2" standalone="yes"?>\n));
+ok($xml, qq(<?xml version="1.1" encoding="iso-8859-2"?>\n));
 
 $xml = $x->xmldecl(version => undef, encoding => undef, standalone => undef);
 ok($xml, qq(<?xml?>\n));
 
 $xml = $x->xmldecl(version => '1.0', encoding => 'utf8', standalone => 'no');
 ok($xml, qq(<?xml version="1.0" encoding="utf8" standalone="no"?>\n));
+
+$xml = $x->xmldecl(version => '1.0', encoding => 'utf8', standalone => 'yes');
+ok($xml, qq(<?xml version="1.0" encoding="utf8" standalone="yes"?>\n));
 
 $xml = $x->xmlpi("target", "option" => "value");
 ok($xml, '<?target option="value"?>');
@@ -146,7 +149,7 @@ $x = XML::Generator->new(
 ok(
     $x->xml($x->foo),
     join("\n",
-        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+        '<?xml version="1.0" encoding="UTF-8"?>',
         '<foo />'),
     "Correct XML tag"
 );
@@ -210,7 +213,7 @@ $x = new XML::Generator 'conformance' => 'strict';
 $xml = $x->foo(42);
 $xml = $x->xml($xml);
 ok($xml,
-'<?xml version="1.0" standalone="yes"?>
+'<?xml version="1.0"?>
 <foo>42</foo>');
 
 eval {
@@ -260,7 +263,7 @@ $xml = $x->foo();
 $cmnt = $x->xmlcmnt("comment");
 $pi = $x->xmlpi("foo");
 $xml = $x->xml($cmnt, $xml, $pi);
-ok($xml, '<?xml version="1.0" standalone="yes"?>
+ok($xml, '<?xml version="1.0"?>
 <!-- comment --><foo /><?foo?>');
 
 $x = new XML::Generator 'empty' => 'compact';
@@ -610,7 +613,7 @@ $pt = $gen->xml(
                   $gen->mailbox(\@contact, {'rdf:resource' => "mailto:em\@w3.org"}),
                   $gen->personalTitle(\@contact, 'Dr.'))));
 
-::ok($pt, '<?xml version="1.0" standalone="yes"?>
+::ok($pt, '<?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:contact="http://www.w3.org/2000/10/swap/pim/contact#">
   <contact:Person rdf:about="http://www.w3.org/People/EM/contact#me">

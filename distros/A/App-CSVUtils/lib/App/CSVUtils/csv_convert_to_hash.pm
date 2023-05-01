@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -26,6 +26,8 @@ _
             pos => 1,
         },
     },
+    tags => ['category:converting', 'outputs-data-structure'],
+
     examples => [
         {
             summary => 'Create a table containing field name as keys and second row as values',
@@ -75,7 +77,7 @@ App::CSVUtils::csv_convert_to_hash - Return a hash of field names as keys and fi
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_convert_to_hash (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_convert_to_hash (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

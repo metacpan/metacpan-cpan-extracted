@@ -8,7 +8,6 @@ META.yml
 Makefile.PL
 README
 README.md
-TODO
 appveyor.yml
 cpanfile
 dist.ini

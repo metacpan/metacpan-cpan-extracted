@@ -503,20 +503,14 @@ sub verif_eval_err(;$) {  # MUST be called on same line as the 'eval'
   my $ln = $caller[2];
   my $fn = $caller[1];
   my $ex = $@;
-  confess "expected error did not occur at $fn line $ln\n",
-          fmtsheet(sheet({package => $caller[0]}))
+  confess "expected error did not occur at $fn line $ln\n"
     unless $ex;
 
   if ($ex !~ / at $fn line $ln\.?(?:$|\n)/s) {
-    die "tex";
-    confess "Got UN-expected err (not ' at $fn line $ln'):\n«$ex»\n",
-            fmtsheet(sheet({package => $caller[0]})),
-            "\n";
+    confess "Got UN-expected err (not ' at $fn line $ln'):\n«$ex»\n"
   }
   if ($msg_regex && $ex !~ qr/$msg_regex/) {
-    confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$ex»\n",
-            fmtsheet(sheet({package => $caller[0]})),
-            "\n";
+    confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$ex»\n"
   }
   verif_no_internals_mentioned($ex);
   dprint "Got expected err: $ex\n";

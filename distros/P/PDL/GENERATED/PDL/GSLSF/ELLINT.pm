@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 5 "gsl_sf_ellint.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::ELLINT - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library.
 
 =cut
-#line 39 "ELLINT.pm"
-
-
-
-
-
+#line 40 "ELLINT.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ Legendre form of complete elliptic integrals K(k) = Integral[1/Sqrt[1 - k^2 Sin[
 gsl_sf_ellint_Kcomp does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_Kcomp = \&PDL::gsl_sf_ellint_Kcomp;
-#line 81 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ Legendre form of complete elliptic integrals E(k) = Integral[  Sqrt[1 - k^2 Sin[
 gsl_sf_ellint_Ecomp does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_Ecomp = \&PDL::gsl_sf_ellint_Ecomp;
-#line 113 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ Legendre form of incomplete elliptic integrals F(phi,k)   = Integral[1/Sqrt[1 - 
 gsl_sf_ellint_F does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_F = \&PDL::gsl_sf_ellint_F;
-#line 145 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,20 +143,15 @@ Legendre form of incomplete elliptic integrals E(phi,k)   = Integral[  Sqrt[1 - 
 gsl_sf_ellint_E does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_E = \&PDL::gsl_sf_ellint_E;
-#line 177 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -197,20 +171,15 @@ Legendre form of incomplete elliptic integrals P(phi,k,n) = Integral[(1 + n Sin[
 gsl_sf_ellint_P does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 203 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_P = \&PDL::gsl_sf_ellint_P;
-#line 210 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -230,20 +199,15 @@ Legendre form of incomplete elliptic integrals D(phi,k)
 gsl_sf_ellint_D does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 236 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_D = \&PDL::gsl_sf_ellint_D;
-#line 243 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -262,20 +226,15 @@ Carlsons symmetric basis of functions RC(x,y)   = 1/2 Integral[(t+x)^(-1/2) (t+y
 gsl_sf_ellint_RC does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 268 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RC = \&PDL::gsl_sf_ellint_RC;
-#line 275 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -294,20 +253,15 @@ Carlsons symmetric basis of functions RD(x,y,z) = 3/2 Integral[(t+x)^(-1/2) (t+y
 gsl_sf_ellint_RD does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 300 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RD = \&PDL::gsl_sf_ellint_RD;
-#line 307 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -326,20 +280,15 @@ Carlsons symmetric basis of functions RF(x,y,z) = 1/2 Integral[(t+x)^(-1/2) (t+y
 gsl_sf_ellint_RF does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 332 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RF = \&PDL::gsl_sf_ellint_RF;
-#line 339 "ELLINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -358,16 +307,14 @@ Carlsons symmetric basis of functions RJ(x,y,z,p) = 3/2 Integral[(t+x)^(-1/2) (t
 gsl_sf_ellint_RJ does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 364 "ELLINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RJ = \&PDL::gsl_sf_ellint_RJ;
-#line 371 "ELLINT.pm"
+
+
 
 
 
@@ -388,10 +335,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 392 "ELLINT.pm"
-
-
-
+#line 339 "ELLINT.pm"
 
 # Exit with OK status
 

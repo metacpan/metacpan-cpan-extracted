@@ -1,4 +1,4 @@
-# Copyright 2002-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2002-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use Carp;
 
@@ -20,26 +20,6 @@ use Test::More;
 use Devel::Cover::Inc;
 
 my $LATEST_RELEASED_PERL = 36;
-my %TEST2VERSIONOVERRIDE = (
-    bigint => \&_default_version_override,
-);
-my %TEST2MODULE2VERSION2PERL = (
-    bigint => { 'Math::BigInt' => { '1.999806' => '5.026000' } },
-);
-sub _default_version_override {
-    my ($test, $v) = @_;
-    return $v unless my $override = $TEST2MODULE2VERSION2PERL{$test};
-    my @perl_versions = $v;
-    for my $module (sort keys %$override) {
-        my $version2perl = $override->{$module};
-        eval "require $module"; # string-eval saves faff with turning to file
-        die $@ if $@;
-        my $modversion = do { no strict 'refs'; ${$module . '::VERSION'} };
-        push @perl_versions, map $version2perl->{$_},
-            grep $_ < $modversion, keys %$version2perl;
-    }
-    return (sort @perl_versions)[-1]; # highest version found
-}
 
 sub new {
     my $class = shift;
@@ -108,9 +88,10 @@ sub get_params {
     unless (mkdir $self->{cover_db}) {
         die "Can't mkdir $self->{cover_db}: $!" unless -d $self->{cover_db};
     }
+    my $p = $self->{cover_parameters} || [];
     $self->{cover_parameters} = join(" ", map "-coverage $_",
                                               split " ", $self->{criteria})
-                              . " -report text "
+                              . " @$p -report text "
                               . shell_quote $self->{cover_db};
     $self->{cover_parameters} .= " -uncoverable_file "
                               .  "@{$self->{uncoverable_file}}"
@@ -181,8 +162,7 @@ sub _get_right_version {
         $v = $_;
     }
     # die "Can't find golden results for $test" if $v eq "5.0";
-    return $v unless my $override_sub = $TEST2VERSIONOVERRIDE{$test};
-    $override_sub->($test, $v);
+    $v
 }
 
 sub cover_gold {
@@ -341,8 +321,8 @@ sub create_gold {
     my $self = shift;
 
     # Pod::Coverage not available on all versions, but it must be there on
-    # 5.10.0
-    return if $self->{criteria} =~ /\bpod\b/ && $] != 5.010000;
+    # 5.12.0
+    return if $self->{criteria} =~ /\bpod\b/ && $] != 5.012000;
 
     my ($base, $v) = $self->cover_gold;
     my $gold       = "$base.$v";
@@ -415,7 +395,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 METHODS
 
@@ -524,7 +504,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

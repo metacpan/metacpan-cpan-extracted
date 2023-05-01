@@ -1,5 +1,39 @@
 Revision history for Perl extension XML::Generator.
 
+1.13 -- Sat Apr 29 21:45:32 ADT 2023
+
+    Production Release of 1.12 no changes.
+
+    [Significant Updates since 1.11]
+
+    Two fairly minor updates that should not impact anyone much.
+    Dropping support for 5.008 - if you really need it send a PR
+    to fix.  There has been a longstanding "bug" that inserted
+    standalone in the xml declaration whether it was needed or not.
+    This makes it optional if it is not required for
+    externally-defined DTD or directly specified.
+
+
+    - 1a4e7a0 Update version for Release 1.13
+    - abb366d v1.12
+
+1.12 -- Sat Apr 29 11:55:46 ADT 2023
+
+    [Significant Updates since 1.11]
+
+    Two fairly minor updates that should not impact anyone much.
+    Dropping support for 5.008 - if you really need it send a PR
+    to fix.  There has been a longstanding "bug" that inserted
+    standalone in the xml declaration whether it was needed or not.
+    This makes it optional if it is not required for
+    externally-defined DTD or directly specified.
+
+    - 1a7defd Forgot to increment the number of tests
+    - 7a05609 Fix standalone bug
+    - aa3c19d Add autoprereqs
+    - a458ec3 Drop support for perl 5.008
+    - 85847a1 v1.11
+
 1.11 -- Mon Apr 17 17:17:55 ADT 2023
 
     [Significant Updates since 1.09]

@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::Release;
 # ABSTRACT: execute a command of the distribution on release
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use Moose;
 with qw(
@@ -64,7 +64,7 @@ Dist::Zilla::Plugin::Run::Release - execute a command of the distribution on rel
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

@@ -6,10 +6,10 @@ use utf8;
 
 use Cwd;
 use Exporter 'import';
-use File::Spec::Functions;
+use File::Spec::Functions 'catdir', 'rel2abs', 'canonpath';
 use List::Util 'first';
 
-our @EXPORT_OK = qw(find_arduino_dir system_cwd);
+our @EXPORT_OK = qw(find_arduino_dir system_cwd system_canonpath);
 
 sub find_arduino_dir {
   my @tests;
@@ -37,4 +37,16 @@ sub system_cwd {
     chomp($cwd);
   }
   return $cwd;
+}
+
+# Canonicalize a file path to be used to compare file paths (can’t be fed to
+# external utilities).
+sub system_canonpath {
+  my ($path) = @_;
+  my $canon = canonpath(rel2abs($path));
+  if ($^O eq 'cygwin') {
+    $canon = `cygpath '$canon'`;
+    chomp($canon);
+  }
+  return $canon;
 }

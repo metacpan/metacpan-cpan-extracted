@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Value/perl/Date/cur_year_local.pm','lib/Data/Sah/Value/perl/Date/cur_year_utc.pm','lib/Data/Sah/ValueBundle/Date.pm'];
+my $filenames = ['lib/Data/Sah/Value/perl/Date/cur_year_local.pm','lib/Data/Sah/Value/perl/Date/cur_year_utc.pm','lib/Data/Sah/Value/perl/Date/last_year_local.pm','lib/Data/Sah/Value/perl/Date/last_year_utc.pm','lib/Data/Sah/Value/perl/Date/next_year_local.pm','lib/Data/Sah/Value/perl/Date/next_year_utc.pm','lib/Data/Sah/ValueBundle/Date.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

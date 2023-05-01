@@ -4,7 +4,7 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "json",
       "serializer",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/p5sagit/JSON-MaybeXS"
       }
    },
-   "version" : "1.004004",
+   "version" : "1.004005",
    "x_contributors" : [
       "Clinton Gormley <develop@traveljury.com>",
       "Graham Knop <haarg@haarg.org>",
@@ -74,5 +74,5 @@
       "Kieren Diment <diment@gmail.com>",
       "Matt S Trout <mst@shadowcat.co.uk>"
    ],
-   "x_serialization_backend" : "JSON::MaybeXS version 1.004003"
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004004"
 }

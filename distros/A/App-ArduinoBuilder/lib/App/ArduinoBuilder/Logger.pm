@@ -7,7 +7,7 @@ use utf8;
 use Carp qw(confess);
 use Exporter 'import';
 
-our @EXPORT = qw(fatal error warning info debug debug_large);
+our @EXPORT = qw(fatal error warning info debug full_debug);
 our @EXPORT_OK = (@EXPORT, qw(log_cmd set_log_level set_prefix print_stack_on_fatal_error));
 our %EXPORT_TAGS = (all => [@EXPORT_OK], all_logger => [@EXPORT, 'log_cmd']);
 
@@ -73,7 +73,7 @@ sub _string_to_level {
   return $LEVEL_INFO if $level =~ m/^INFO?$/i;
   return $LEVEL_DEBUG if $level =~ m/^(?:DBG|DEBUG)$/i;
   return $LEVEL_CMD if $level =~ m/^(?:CMD|COMMAND)S?$/i;
-  return $LEVEL_FULL_DEBUG if $level =~ m/^FULL_(?:DBG|DEBUG)$/i;
+  return $LEVEL_FULL_DEBUG if $level =~ m/^FULL(:?_?(?:DBG|DEBUG))?$/i;
   error "Unknown log level: ${level}";
   return $default_level;
 }

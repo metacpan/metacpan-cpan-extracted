@@ -1,5 +1,8 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v2.2.5     2023/04/30
+           Removed link to cpanratings.perl.org (Id: 148049)
+
 v2.2.4     2022/04/11
            Used croak() from Carp instead of die() and confess()
            Corrected typo in POD. Some minor improvements in POD section.

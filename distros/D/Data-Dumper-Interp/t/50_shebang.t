@@ -29,6 +29,13 @@ confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 
 use Data::Dumper::Interp;
 
+sub visFoldwidth() {
+  "Data::Dumper::Interp::Foldwidth=".u($Data::Dumper::Interp::Foldwidth)
+ ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
+ .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
+}
+
+
 confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 
 # Run a variety of tests on an item which is a string or strigified object
@@ -48,8 +55,8 @@ confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 #    [ 'avis($_[1])',             '(_Q_)' ],
 #    [ 'avisq($_[1])',            '(_q_)' ],
 #    #currently broken due to $VAR problem: [ 'avisq($_[1], $_[1])',     '(_q_, _q_)' ],
-#    [ 'alvis($_[1])',             '_Q_' ],
-#    [ 'alvisq($_[1])',            '_q_' ],
+#    [ 'avisl($_[1])',             '_Q_' ],
+#    [ 'avislq($_[1])',            '_q_' ],
 #    [ 'ivis(\'$_[1]\')',         '_Q_' ],
 #    [ 'ivis(\'foo$_[1]\')',      'foo_Q_' ],
 #    [ 'ivis(\'foo$\'."_[1]")',   'foo_Q_' ],
@@ -87,8 +94,8 @@ sub checklit(&$$) {
     [ 'avis($_[1])',             '(_Q_)' ],
     [ 'avisq($_[1])',            '(_q_)' ],
     #currently broken due to $VAR problem: [ 'avisq($_[1], $_[1])',     '(_q_, _q_)' ],
-    [ 'alvis($_[1])',             '_Q_' ],
-    [ 'alvisq($_[1])',            '_q_' ],
+    [ 'avisl($_[1])',             '_Q_' ],
+    [ 'avislq($_[1])',            '_q_' ],
     [ 'ivis(\'$_[1]\')',         '_Q_' ],
     [ 'ivis(\'foo$_[1]\')',      'foo_Q_' ],
     [ 'ivis(\'foo$\'."_[1]")',   'foo_Q_' ],
@@ -133,7 +140,7 @@ foreach (
 {
   my ($confname, @values) = @$_;
   foreach my $value (@values) {
-    foreach my $base (qw(vis avis hvis alvis hlvis dvis ivis)) {
+    foreach my $base (qw(vis avis hvis avisl hvisl dvis ivis)) {
       foreach my $q ("", "q") {
         my $codestr = $base . $q . "(42";
          $codestr .= ", 43" if $base =~ /^[ahl]/;
@@ -248,10 +255,10 @@ $_ = "GroupA.GroupB";
 { my $code = 'vis'; check $code, "\"${_}\"", eval $code; }
 { my $code = 'avis($_,1,2,3)'; check $code, "(\"${_}\",1,2,3)", eval $code; }
 { my $code = 'hvis("foo",$_)'; check $code, "(foo => \"${_}\")", eval $code; }
-{ my $code = 'hlvis("foo",$_)'; check $code, "foo => \"${_}\"", eval $code; }
+{ my $code = 'hvisl("foo",$_)'; check $code, "foo => \"${_}\"", eval $code; }
 { my $code = 'avis(@_)'; check $code, '()', eval $code; }
 { my $code = 'hvis(@_)'; check $code, '()', eval $code; }
-{ my $code = 'hlvis(@_)'; check $code, '', eval $code; }
+{ my $code = 'hvisl(@_)'; check $code, '', eval $code; }
 { my $code = 'avis(undef)'; check $code, "(undef)", eval $code; }
 { my $code = 'hvis("foo",undef)'; check $code, "(foo => undef)", eval $code; }
 { my $code = 'vis(undef)'; check $code, "undef", eval $code; }
@@ -437,10 +444,16 @@ EOF
 #longer representation, so forcing wrap to be the same on all platforms.
 check
   'global dvis %toplex_h',
-q(%toplex_h=( "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
-  D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
+q(%toplex_h=(
+  "" => "Emp",
+  A => 111,
+  "B B" => 222,
+  C => {d => 888,e => 999},
+  D => {},
+  EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
   F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-    => \\\\\\43,G => qr/foo.*bar/six
+    => \\\\\\43,
+  G => qr/foo.*bar/six
 )),
   dvis('%toplex_h');
 check 'global divs @ARGV', q(@ARGV=("fake","argv")), dvis('@ARGV');
@@ -646,13 +659,25 @@ sub get_closure(;$) {
     [__LINE__, q($ENV{EnvVar}\n), qq(\$ENV{EnvVar}=\"Test EnvVar Value\"\n) ],
     [__LINE__, q($ENV{$EnvVarName}\n), qq(\$ENV{\$EnvVarName}=\"Test EnvVar Value\"\n) ],
     [__LINE__, q(@_\n), <<'EOF' ],  # N.B. Foldwidth was set to 72
-@_=( 42,
-  [ 0,1,"C",
-    { "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
-      D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,
+@_=(
+  42,
+  [
+    0,
+    1,
+    "C",
+    {
+      "" => "Emp",
+      A => 111,
+      "B B" => 222,
+      C => {d => 888,e => 999},
+      D => {},
+      EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,
       F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        => \\\43,G => qr/foo.*bar/six
-    },[],[0,1,2,3,4,5,6,7,8,9]
+        => \\\43,
+      G => qr/foo.*bar/six
+    },
+    [],
+    [0,1,2,3,4,5,6,7,8,9]
   ]
 )
 EOF
@@ -683,20 +708,37 @@ EOF
           my $p = "";
 
           [__LINE__, qq(${pfx}%${dollar}${name}_h${r}\n), <<EOF ],
-${pfx}\%${dollar}${name}_h${r}=( "" => "Emp",A => 111,"B B" => 222,
-${p}  C => {d => 888,e => 999},D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
+${pfx}\%${dollar}${name}_h${r}=(
+${p}  "" => "Emp",
+${p}  A => 111,
+${p}  "B B" => 222,
+${p}  C => {d => 888,e => 999},
+${p}  D => {},
+${p}  EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
 ${p}  F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-${p}    => \\\\\\43,G => qr/foo.*bar/six
+${p}    => \\\\\\43,
+${p}  G => qr/foo.*bar/six
 ${p})
 EOF
 
           [__LINE__, qq(${pfx}\@${dollar}${name}_a${r}\n), <<EOF ],
-${pfx}\@${dollar}${name}_a${r}=( 0,1,"C",
-${p}  { "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},D => {},
+${pfx}\@${dollar}${name}_a${r}=(
+${p}  0,
+${p}  1,
+${p}  "C",
+${p}  {
+${p}    "" => "Emp",
+${p}    A => 111,
+${p}    "B B" => 222,
+${p}    C => {d => 888,e => 999},
+${p}    D => {},
 ${p}    EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
 ${p}    F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-${p}      => \\\\\\43,G => qr/foo.*bar/six
-${p}  },[],[0,1,2,3,4,5,6,7,8,9]
+${p}      => \\\\\\43,
+${p}    G => qr/foo.*bar/six
+${p}  },
+${p}  [],
+${p}  [0,1,2,3,4,5,6,7,8,9]
 ${p})
 EOF
 

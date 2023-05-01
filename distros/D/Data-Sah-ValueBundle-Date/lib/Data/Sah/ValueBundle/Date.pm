@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-03-30'; # DATE
 our $DIST = 'Data-Sah-ValueBundle-Date'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Default value rules related to dates (and times)
@@ -22,7 +22,7 @@ Data::Sah::ValueBundle::Date - Default value rules related to dates (and times)
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::ValueBundle::Date (from Perl distribution Data-Sah-ValueBundle-Date), released on 2023-03-30.
+This document describes version 0.002 of Data::Sah::ValueBundle::Date (from Perl distribution Data-Sah-ValueBundle-Date), released on 2023-03-30.
 
 =head1 HOMEPAGE
 

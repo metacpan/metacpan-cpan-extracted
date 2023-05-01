@@ -9,6 +9,7 @@ require_ok('Crypt::PBE::PBKDF1');
 require_ok('Crypt::PBE::PBKDF2');
 require_ok('Crypt::PBE::PBES1');
 require_ok('Crypt::PBE::PBES2');
+require_ok('Crypt::PBE::CLI');
 
 done_testing();
 

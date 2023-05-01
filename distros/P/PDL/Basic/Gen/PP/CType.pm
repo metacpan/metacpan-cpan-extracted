@@ -17,6 +17,7 @@ sub new {
 
 sub stripptrs {
 	my($this,$str) = @_;
+	$this->{WasDollar} = 1 if $str =~ s/^\$//;
 	if($str =~ s/^\s*(\w+)\s*$/$1/g) {
 		$this->{ProtoName} = $str;
 		return [];
@@ -33,8 +34,7 @@ sub parsefrom {
 	my($this,$str) = @_;
 # First, take the words in the beginning
 	$str =~ /^\s*((?:\w+\b\s*)+)([^[].*)$/;
-	$this->{Base} = $1;
-	$this->{Chain} = $this->stripptrs($2);
+	@$this{qw(Base Chain)} = ($1, $this->stripptrs($2));
 }
 
 sub get_decl {
@@ -59,13 +59,13 @@ sub protoname { return shift->{ProtoName} }
 
 sub get_copy {
 	my($this,$from,$to) = @_;
-	return "($to) = ($from);" if !@{$this->{Chain}};
+	return "($to) = ($from); /* CType.get_copy */" if !@{$this->{Chain}};
 	# strdup loses portability :(
-	return "($to) = malloc(strlen($from)+1); strcpy($to,$from);"
+	return "($to) = malloc(strlen($from)+1); strcpy($to,$from); /* CType.get_copy */"
 	 if $this->{Base} =~ /^\s*char\s*$/;
-	return "($to) = newSVsv($from);" if $this->{Base} =~ /^\s*SV\s*$/;
+	return "($to) = newSVsv($from); /* CType.get_copy */" if $this->{Base} =~ /^\s*SV\s*$/;
 	my $code = $this->get_malloc($to,$from);
-	return "($to) = ($from);" if !defined $code; # pointer
+	return "($to) = ($from); /* CType.get_copy */" if !defined $code; # pointer
 	my ($deref0,$deref1,$prev,$close) = ($from,$to);
         my $no = 0;
 	for(@{$this->{Chain}}) {
@@ -74,14 +74,14 @@ sub get_copy {
 		elsif($type eq "ARR") {
 			$no++;
 			$arg = "$this->{ProtoName}_count" if $this->is_array;
-			$prev .= PDL::PP::pp_line_numbers(__LINE__-1, "
-			  if(!$deref0) {$deref1=0;}
+			$prev .= "
+			  if(!$deref0) {$deref1=0;} /* CType.get_copy */
 			  else {int __malloc_ind_$no;
 				for(__malloc_ind_$no = 0;
 					__malloc_ind_$no < $arg;
-					__malloc_ind_$no ++) {");
-			$deref0 = $deref0."[__malloc_ind_$no]";
-			$deref1 = $deref1."[__malloc_ind_$no]";
+					__malloc_ind_$no ++) {";
+			$deref0 .= "[__malloc_ind_$no]";
+			$deref1 .= "[__malloc_ind_$no]";
 			$close .= "}}";
 		} else { confess("Invalid decl @$_") }
 	}
@@ -91,11 +91,12 @@ sub get_copy {
 
 sub get_free {
 	my($this,$from) = @_;
+	my $single_ptr = @{$this->{Chain}} == 1 && $this->{Chain}[0][0] eq 'PTR';
+	return "SvREFCNT_dec($from); /* CType.get_free */\n" if $this->{Base} =~ /^\s*SV\s*$/ and $single_ptr;
+	return "free($from); /* CType.get_free */\n" if $this->{Base} =~ /^\s*char\s*$/ and $single_ptr;
 	return "" if !@{$this->{Chain}} or $this->{Chain}[0][0] eq 'PTR';
-	return "free($from);" if $this->{Base} =~ /^\s*char\s*$/;
-	return "SvREFCNT_dec($from);" if $this->{Base} =~ /^\s*SV\s*$/;
 	croak("Can only free one layer!\n") if @{$this->{Chain}} > 1;
-	"free($from);";
+	"free($from); /* CType.get_free */\n";
 }
 
 sub need_malloc {
@@ -112,7 +113,7 @@ sub get_malloc {
     if($type eq "PTR") {return}
     elsif($type eq "ARR") {
       $arg = "$this->{ProtoName}_count" if $this->is_array;
-      $str .= PDL::PP::pp_line_numbers(__LINE__-1, "$assignto = malloc(sizeof(*$assignto) * $arg);\n");
+      $str .= "$assignto = malloc(sizeof(*$assignto) * $arg); /* CType.get_malloc */\n";
     } else { confess("Invalid decl (@$_)") }
   }
   return $str;
@@ -121,9 +122,9 @@ sub get_malloc {
 sub is_array {
   my ($self) = @_;
   @{$self->{Chain}} &&
-    @{$self->{Chain}[0]} &&
-    $self->{Chain}[0][0] eq 'ARR' &&
-    !$self->{Chain}[0][1];
+    @{$self->{Chain}[-1]} &&
+    $self->{Chain}[-1][0] eq 'ARR' &&
+    !$self->{Chain}[-1][1];
 }
 
 1;

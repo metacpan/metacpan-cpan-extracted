@@ -2,7 +2,7 @@ NAME
     CPAN::Reporter - Adds CPAN Testers reporting to CPAN.pm
 
 VERSION
-    version 1.2018
+    version 1.2019
 
 SYNOPSIS
     From the CPAN shell:
@@ -214,9 +214,17 @@ CONTRIBUTORS
 
     *   Christian Walde <walde.christian@googlemail.com>
 
+    *   David Cantrell <david@cantrell.org.uk>
+
     *   Ed J <mohawk2@users.noreply.github.com>
 
-    *   Joel Maslak <jmaslak@antelope.net>
+    *   Graham Knop <haarg@haarg.org>
+
+    *   James E Keenan <jkeenan@cpan.org>
+
+    *   J. Maslak <jmaslak@antelope.net>
+
+    *   José Joaquín Atria <jjatria@cpan.org>
 
     *   Kent Fredric <kentfredric@gmail.com>
 
@@ -231,7 +239,7 @@ CONTRIBUTORS
     *   Slaven Rezic <slaven@rezic.de>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2006 by David Golden.
+    This software is Copyright (c) 2023 by David Golden.
 
     This is free software, licensed under:
 

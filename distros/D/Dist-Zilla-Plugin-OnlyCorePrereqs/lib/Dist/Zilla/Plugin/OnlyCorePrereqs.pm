@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::OnlyCorePrereqs; # git description: v0.023-3-g573b029
+package Dist::Zilla::Plugin::OnlyCorePrereqs; # git description: v0.024-27-g2ca3b05
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Check that no prerequisites are declared that are not part of core
 # KEYWORDS: plugin distribution metadata prerequisites core
-# vim: set ts=8 sts=4 sw=4 tw=78 et :
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use Moose;
 with 'Dist::Zilla::Role::AfterBuild';
@@ -13,7 +13,7 @@ use Moose::Util::TypeConstraints;
 use Module::CoreList 5.20150214;
 use MooseX::Types::Perl 0.101340 'LaxVersionStr';
 use version;
-use Encode;
+use Encode ();
 use HTTP::Tiny;
 use YAML::Tiny;
 use CPAN::DistnameInfo;
@@ -42,7 +42,7 @@ has starting_version => (
         my $self = shift;
 
         my $prereqs = $self->zilla->distmeta->{prereqs};
-        my @perl_prereqs = grep { defined } map { $prereqs->{$_}{requires}{perl} } keys %$prereqs;
+        my @perl_prereqs = grep defined, map $prereqs->{$_}{requires}{perl}, keys %$prereqs;
 
         return '5.005' if not @perl_prereqs;
 
@@ -113,11 +113,12 @@ around dump_config => sub
     my $config = $self->$orig;
 
     $config->{+__PACKAGE__} = {
-        ( map { $_ => [ $self->$_ ] } qw(phases skips also_disallow)),
-        ( map { $_ => $self->$_ } qw(deprecated_ok check_dual_life_versions)),
+        ( map +($_ => [ sort $self->$_ ]), qw(phases skips also_disallow)),
+        ( map +($_ => ($self->$_ ? 1 : 0)), qw(deprecated_ok check_dual_life_versions)),
         ( starting_version => ($self->_has_starting_version
                 ? $self->starting_version->stringify
                 : 'to be determined from perl prereq')),
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -179,7 +180,7 @@ sub after_build
 
                 if ($has < $wanted)
                 {
-                    push @insufficient_version, [ map { "$_" } $phase, $prereq, $wanted, $self->starting_version->stringify, $has ];
+                    push @insufficient_version, [ map "$_", $phase, $prereq, $wanted, $self->starting_version->stringify, $has ];
                     next;
                 }
             }
@@ -231,6 +232,7 @@ sub _is_dual
     # 'no_index' entries in the last perl release were complete.
     # TODO: keep checking Module::CoreList for fixes.
     my $dist_name = $self->_indexed_dist($module);
+    return 1 if grep $module eq $_, qw(Config DynaLoader); # exists, but not in the index
     $self->log([ 'Warning: %s not indexed?!', $module ]), return undef if not defined $dist_name;
 
     $self->log_debug([ '%s is indexed in the %s dist', $module, $dist_name ]);
@@ -288,7 +290,7 @@ Dist::Zilla::Plugin::OnlyCorePrereqs - Check that no prerequisites are declared 
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -333,8 +335,13 @@ There are two special values supported (available since version 0.003):
 
 =over 4
 
-=item * C<current> - indicates the version of Perl that you are currently running with
-=item * C<latest> - indicates the most recent (stable or development) release of Perl
+=item *
+
+C<current> - indicates the version of Perl that you are currently running with
+
+=item *
+
+C<latest> - indicates the most recent (stable or development) release of Perl
 
 =back
 
@@ -347,7 +354,7 @@ determining the version of the latest Perl release.)
 =head2 C<deprecated_ok>
 
 A boolean flag indicating whether it is considered acceptable to depend on a
-deprecated module. Defaults to 0.
+deprecated module (that is, has been removed from core). Defaults to 0.
 
 =head2 C<check_dual_life_versions>
 
@@ -356,7 +363,7 @@ Available since version 0.007.
 =for stopwords lifed blead
 
 A boolean flag indicating whether the specific module version available in the
-C<starting_version> of perl be checked (even) if the module is dual-lifed.
+C<starting_version> of perl should be checked (even) if the module is dual-lifed.
 Defaults to 1.
 
 This is useful to B<unset> if you don't want to fail if you require a core module
@@ -392,27 +399,32 @@ dependencies.  Can be used more than once.
 
 =head1 SUPPORT
 
-=for stopwords irc
-
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-OnlyCorePrereqs>
 (or L<bug-Dist-Zilla-Plugin-OnlyCorePrereqs@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-OnlyCorePrereqs@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2013 by Karen Etheridge.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTOR
 
 =for stopwords David Golden
 
 David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Karen Etheridge.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

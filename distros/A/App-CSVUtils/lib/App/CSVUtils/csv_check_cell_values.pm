@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -90,6 +90,16 @@ _
     links => [
         {url=>'prog:csv-check-field-values', summary=>'Check of the values of whole fields'},
     ],
+    tags => ['accepts-schema', 'accepts-regex', 'category:checking'],
+
+    examples => [
+        {
+            summary => 'Check whether the `rank` field has monotonically increasing values',
+            argv => ['formula.csv', '-f', 'rank', '--with-schema', 'array/num//monotonically_increasing'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 
     writes_csv => 0,
 
@@ -165,7 +175,7 @@ App::CSVUtils::csv_check_cell_values - Check the value of single cells of CSV ag
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_check_cell_values (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_check_cell_values (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 
@@ -177,6 +187,20 @@ Usage:
  csv_check_cell_values(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check the value of single cells of CSV against codeE<sol>schemaE<sol>regex.
+
+Examples:
+
+=over
+
+=item * Check whether the `rank` field has monotonically increasing values:
+
+ csv_check_cell_values(
+     input_filename => "formula.csv",
+   include_fields => ["rank"],
+   with_schema    => "array/num//monotonically_increasing"
+ );
+
+=back
 
 Example C<input.csv>:
 

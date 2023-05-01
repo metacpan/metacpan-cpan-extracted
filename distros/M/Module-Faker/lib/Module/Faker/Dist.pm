@@ -1,4 +1,4 @@
-package Module::Faker::Dist 0.024;
+package Module::Faker::Dist 0.025;
 # ABSTRACT: a fake CPAN distribution
 
 use Moose;
@@ -803,7 +803,7 @@ Module::Faker::Dist - a fake CPAN distribution
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

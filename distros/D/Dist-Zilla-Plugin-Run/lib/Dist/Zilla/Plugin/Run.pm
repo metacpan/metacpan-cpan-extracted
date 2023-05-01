@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Run; # git description: 0.047-5-gcc22469
+package Dist::Zilla::Plugin::Run; # git description: 0.048-6-gb5ec5d0
 # ABSTRACT: Run external commands and code at specific phases of Dist::Zilla
 # KEYWORDS: plugin tool distribution build release run command shell execute
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 1;
 
@@ -21,7 +21,7 @@ Dist::Zilla::Plugin::Run - Run external commands and code at specific phases of 
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ Torsten Raudssus <torsten@raudss.us> L<https://raudss.us/>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Randy Stauner Nickolay Platonov Olivier Mengué Al Newkirk Tatsuhiko Miyagawa Thomas Sibley David Golden
+=for stopwords Karen Etheridge Randy Stauner Nickolay Platonov Olivier Mengué Al Newkirk David Golden Graham Ollis Tatsuhiko Miyagawa Thomas Sibley
 
 =over 4
 
@@ -247,15 +247,19 @@ Al Newkirk <github@alnewkirk.com>
 
 =item *
 
+David Golden <dagolden@cpan.org>
+
+=item *
+
+Graham Ollis <plicease@cpan.org>
+
+=item *
+
 Tatsuhiko Miyagawa <miyagawa@cpan.org>
 
 =item *
 
 Thomas Sibley <tsibley@cpan.org>
-
-=item *
-
-David Golden <dagolden@cpan.org>
 
 =back
 

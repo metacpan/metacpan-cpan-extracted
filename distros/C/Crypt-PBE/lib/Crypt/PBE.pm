@@ -9,7 +9,7 @@ use Carp;
 use Crypt::PBE::PBES1;
 use Crypt::PBE::PBES2;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Exporter qw(import);
 
@@ -70,10 +70,9 @@ my $pbes2_map = {
 
 # PBES1 + PBDKF1
 
-foreach ( keys %{$pbes1_map} ) {
+foreach my $sub_name ( keys %{$pbes1_map} ) {
 
-    my $params   = $pbes1_map->{$_};
-    my $sub_name = $_;
+    my $params = $pbes1_map->{$sub_name};
 
     no strict 'refs';    ## no critic
 
@@ -81,7 +80,7 @@ foreach ( keys %{$pbes1_map} ) {
         my ( $password, $count ) = @_;
         my $pbes1 = Crypt::PBE::PBES1->new(
             password   => $password,
-            count      => $count || 1_000,
+            count      => ( $count || 1_000 ),
             hash       => $params->{hash},
             encryption => $params->{encryption},
         );
@@ -92,10 +91,9 @@ foreach ( keys %{$pbes1_map} ) {
 
 # PBES2 + PBDKF2
 
-foreach ( keys %{$pbes2_map} ) {
+foreach my $sub_name ( keys %{$pbes2_map} ) {
 
-    my $params   = $pbes2_map->{$_};
-    my $sub_name = $_;
+    my $params = $pbes2_map->{$sub_name};
 
     no strict 'refs';    ## no critic
 
@@ -103,7 +101,7 @@ foreach ( keys %{$pbes2_map} ) {
         my ( $password, $count ) = @_;
         my $pbes2 = Crypt::PBE::PBES2->new(
             password   => $password,
-            count      => $count || 1_000,
+            count      => ( $count || 1_000 ),
             hmac       => $params->{hmac},
             encryption => $params->{encryption},
         );
@@ -241,7 +239,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

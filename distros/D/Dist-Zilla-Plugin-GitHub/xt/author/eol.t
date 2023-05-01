@@ -18,7 +18,6 @@ my @files = (
     't/01-update.t',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
-    'xt/author/changes_has_content.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',

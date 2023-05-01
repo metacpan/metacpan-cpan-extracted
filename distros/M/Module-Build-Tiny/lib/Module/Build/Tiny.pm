@@ -1,5 +1,5 @@
 package Module::Build::Tiny;
-$Module::Build::Tiny::VERSION = '0.044';
+$Module::Build::Tiny::VERSION = '0.045';
 use strict;
 use warnings;
 use Exporter 5.57 'import';
@@ -106,7 +106,7 @@ my %actions = (
 		pm_to_blib({ %modules, %docs, %scripts, %dist_shared, %module_shared }, catdir(qw/blib lib auto/));
 		make_executable($_) for values %scripts;
 		mkpath(catdir(qw/blib arch/), $opt{verbose});
-		my $main_xs = catfile('lib', split /-/, $opt{meta}->name) . '.xs';
+		my $main_xs = join('/', 'lib', split /-/, $opt{meta}->name) . '.xs';
 		for my $xs (find(qr/.xs$/, 'lib')) {
 			my @c_files = $xs eq $main_xs ? find(qr/\.c$/, 'src') : ();
 			process_xs($xs, \%opt, \@c_files);
@@ -202,7 +202,7 @@ Module::Build::Tiny - A tiny replacement for Module::Build
 
 =head1 VERSION
 
-version 0.044
+version 0.045
 
 =head1 SYNOPSIS
 

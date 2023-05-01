@@ -11,7 +11,7 @@ use Digest::MD5 qw(md5);
 use Digest::SHA qw(sha1);
 use Exporter qw(import);
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 our @EXPORT = qw(
     pbkdf1
@@ -112,10 +112,10 @@ sub pbkdf1 {
 
     my (%params) = @_;
 
-    my $hash = delete( $params{hash} )     || 'sha1';
-    my $P    = delete( $params{password} ) || croak('Specify password');
-    my $S    = delete( $params{salt} )     || croak('Specify salt');
-    my $c    = delete( $params{count} )    || 1_000;
+    my $hash  = delete( $params{hash} )     || 'sha1';
+    my $P     = delete( $params{password} ) || croak('Specify password');
+    my $S     = delete( $params{salt} )     || croak('Specify salt');
+    my $c     = delete( $params{count} )    || 1_000;
     my $dkLen = delete( $params{dk_len} );
 
     if ( $hash ne 'md2' && $hash ne 'md5' && $hash ne 'sha1' ) {
@@ -181,7 +181,7 @@ for my $digest (qw/md2 md5 sha1/) {
         my (%params) = @_;
         $params{hash}   = $digest;
         $params{dk_len} = $dk_len;
-        return join '', unpack '(H2)*', pbkdf1(%params);
+        return join '', unpack 'H*', pbkdf1(%params);
     };
 
 }
@@ -391,7 +391,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

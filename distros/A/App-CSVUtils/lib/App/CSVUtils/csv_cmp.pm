@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -78,6 +78,11 @@ _
             schema => 'bool*',
         },
     },
+    tags => [
+        'accepts-regex', # for selecting fields
+        'category:comparing',
+    ],
+
     examples => [
         {
             summary => 'Compare two identical files, will output nothing and exits 0',
@@ -231,7 +236,7 @@ App::CSVUtils::csv_cmp - Compare two CSV files value by value
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_cmp (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_cmp (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

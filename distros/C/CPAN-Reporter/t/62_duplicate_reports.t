@@ -6,9 +6,10 @@ select(STDERR); $|=1;
 select(STDOUT); $|=1;
 
 use Test::More;
-use t::MockCPANDist;
-use t::Helper;
-use t::Frontend;
+use lib 't/lib';
+use MockCPANDist;
+use Helper;
+use Frontend;
 use Probe::Perl;
 
 #--------------------------------------------------------------------------#
@@ -173,9 +174,10 @@ sub history_format {
     $grade = uc $grade;
     my $perl_ver = "perl-" . CPAN::Reporter::History::_perl_version(); 
     $perl_ver .= " patch $Config{perl_patchlevel}" if $Config{perl_patchlevel};
-    my $arch = "$Config{archname} $Config{osvers}";
+    my $arch = CPAN::Reporter::History::_format_archname();
+    my $os = $Config{osvers};
     my $dist_name = $dist->base_id;
-    return "$phase $grade $dist_name ($perl_ver) $arch\n";
+    return "$phase $grade $dist_name ($perl_ver) $arch $os\n";
 }
 
 #--------------------------------------------------------------------------#
@@ -193,7 +195,7 @@ for my $case ( @cases ) {
     # and set it once localized 
 
     test_fake_config( send_duplicates => $case->{send_dup} );
-    $case->{dist} = t::MockCPANDist->new( 
+    $case->{dist} = MockCPANDist->new( 
         %mock_dist_info,
         pretty_id => "JOHNQP/Bogus-Module-$case->{version}.tar.gz",
     );

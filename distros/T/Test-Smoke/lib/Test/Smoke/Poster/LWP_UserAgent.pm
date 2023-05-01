@@ -64,9 +64,10 @@ sub _post_data {
     if ( !$response->is_success ) {
         $self->log_warn("POST failed: %s", $response->status_line);
         die sprintf(
-            "POST to '%s' failed: %s\n",
+            "POST to '%s' failed: %s%s\n",
             $self->smokedb_url,
-            $response->status_line
+            $response->status_line,
+            ($response->content ? sprintf(" (%s)", $response->content) : ""),
         );
     }
 

@@ -10,7 +10,7 @@ use MIME::Base64;
 use Digest::SHA qw(hmac_sha1 hmac_sha224 hmac_sha256 hmac_sha384 hmac_sha512);
 use Exporter qw(import);
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 our @EXPORT = qw(
     pbkdf2
@@ -235,7 +235,7 @@ for my $variant (qw(1 224 256 384 512)) {
     *{"pbkdf2_hmac_sha${variant}_hex"} = sub {
         my (%params) = @_;
         $params{prf} = $prf;
-        return join '', unpack '(H2)*', pbkdf2(%params);
+        return join '', unpack 'H*', pbkdf2(%params);
     };
 
     if ( $variant != 224 && $variant != 384 ) {
@@ -249,7 +249,7 @@ for my $variant (qw(1 224 256 384 512)) {
 }
 
 sub pbkdf2_hex {
-    return join '', unpack '(H2)*', pbkdf2(@_);
+    return join '', unpack 'H*', pbkdf2(@_);
 }
 
 sub pbkdf2_base64 {
@@ -271,7 +271,7 @@ sub pbkdf2_ldap {
 
     my $scheme          = 'PBKDF2';
     my $b64_salt        = b64_to_ab64( encode_base64( $params{salt}, '' ) );
-    my $b64_derived_key = b64_to_ab64( encode_base64( $derived_key, '' ) );
+    my $b64_derived_key = b64_to_ab64( encode_base64( $derived_key,  '' ) );
 
     $scheme = 'PBKDF2-SHA256' if ( $params{prf} eq 'hmac-sha256' );
     $scheme = 'PBKDF2-SHA512' if ( $params{prf} eq 'hmac-sha512' );
@@ -553,7 +553,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

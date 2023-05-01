@@ -75,7 +75,7 @@ notes on how to "opt-in" for your own modules):
   my @pack = (["pnm.pd", qw(Pnm PDL::IO::Pnm)]);
   my %hash = pdlpp_stdargs_int(@pack);
   $hash{OBJECT} .= ' get$(OBJ_EXT)';
-  sub MY::postamble { pdlpp_postamble_int(@pack); };
+  sub MY::postamble { pdlpp_postamble_int(@pack); }
   WriteMakefile(%hash);
 
 =head2 pp_addpm
@@ -110,7 +110,8 @@ whitespace removed.
 
 =for ref
 
-Available from 2.082. Add an XS typemap for use as C<OtherPars>. Takes
+Available from 2.082. Add an XS typemap for use as C<OtherPars> or from
+manually-added XS. Takes
 one named argument, either C<typemap> (an L<ExtUtils::Typemaps> object),
 C<string>, or C<file>.
 
@@ -145,13 +146,6 @@ Add BEGIN-block wrapping to code for the generated .pm file
 =for ref
 
 Sets the package to which the XS code is added (default is PDL)
-
-
-=head2 pp_boundscheck
-
-=for ref
-
-Control state of PDL bounds checking activity
 
 
 =head2 pp_core_importList
@@ -1358,9 +1352,14 @@ defaults will happen first):
     # ...
   );
 
-The C<MakeComp> code is placed in the C<pdl_(funcname)_run>, so access
+The C<MakeComp> code is placed in the C<pdl_run_(funcname)>, so access
 to C<Pars> (which will just be C<pdl *>s)/C<OtherPars> values is just
-via their names, not a macro.
+via their names, not a macro. The default code (which also applies
+to C<OtherPars>) makes a copy of values where it knows how to do so,
+including C<SV*> and C<char*>.
+
+You can also provide a C<CompFreeCodeComp> key, in case your C<MakeComp>
+needs tidying up after it.
 
 As of 2.058, you can instead give a C99 "incomplete
 array" type parameter as an C<OtherPars> entry:
@@ -1376,13 +1375,26 @@ array" type parameter as an C<OtherPars> entry:
     # ...
   );
 
-There is an XS F<typemap> entry (only for C<PDL_Indx> array types for
-now) that adds a C<(varname)_count> variable having extracted the index
+There is an XS F<typemap> entry (for C<PDL_Indx> and C<pdl*> array types for
+now) that relies on a C<(varname)_count> variable being declared in the
+XS C<INPUT> section (PP does this for you), to extract the index
 numbers from an array-ref parameter, and sets the count variable to the
 right value. PP then makes a copy of the data available. The C function
-(here, C<pdl_diagonal_run>)'s caller (here, the generated XS function)
+(here, C<pdl_run_diagonal>)'s caller (here, the generated XS function)
 is responsible for freeing the array passed in (here, PDL's C<smalloc>
 function is used, so the user need do nothing different).
+
+=head4 XS-only OtherPars
+
+As of 2.083, you can prefix the names of C<OtherPars> with C<$>, e.g.
+
+  pp_def('minus',
+    OtherPars => 'int $swap',
+    # ...
+  );
+
+This will mean they are available in C<HdrCode> and C<FtrCode>, but not
+elsewhere in the generated code (e.g. C<MakeComp>, C<Code>).
 
 =head2 Other functions in the Code section
 
@@ -1540,11 +1552,11 @@ in the signature. Instead you write
 As of 2.075, you can use the dimensions of passed-in ndarrays as they
 are available when the C<RedoDimsCode> is run.
 Before the code in the Code section is executed PP
-will create the proper storage for C<work> if it does not
-exist. Note that you only took the first dimension of C<p>
+will create the proper storage for C<work> (one area per POSIX thread,
+in case of broadcasting that multi-threads - the user cannot supply this).
+Note that you only took the first dimension of C<p>
 and C<x> because the user may have sent ndarrays with extra
-broadcasting dimensions. Of course, the temporary ndarray C<work> (note the
-[t] flag) should not be given any broadcast dimensions anyway.
+broadcasting dimensions.
 
 You can also use C<RedoDimsCode> to set the dimension of a
 ndarray flagged with [o]. In this case you set the dimensions
@@ -1655,6 +1667,17 @@ and use it in the code:
 where I have removed a macro wrapper call, but that would obscure the
 discussion.
 
+You can also have C<OtherPars> entries that are "incomplete arrays"
+of C<pdl*>, both for input and output:
+
+  OtherPars => 'pdl *ins[]', # $COMP(ins_count) will be available
+  # OR
+  OtherPars => '[o] pdl *outs[]', # update $COMP(outs_count) in your code
+
+Note that the output F<typemap> entry does a C<free> on the array of
+C<pdl*> pointers, so ensure that you C<malloc> it in your code, without
+leaking.
+
 =head3 OtherPars as outputs
 
 As of 2.081, you can specify an C<OtherPar> as an output. This looks like:
@@ -1673,6 +1696,8 @@ The passed-in stack SV will be mutated in place, so this code will then work:
 
     output_op([5,7], my $v0, my $v1);
     is_deeply [$v0,$v1], [5,7], 'output OtherPars work';
+    ($v0, $v1) = output_op([5,7]); # you can omit them, then they get returned
+    is_deeply [$v0,$v1], [5,7], 'output OtherPars work 1a';
 
 An operation with output C<OtherPars> cannot broadcast, since that would
 cause undefined results. A runtime check is generated that throws an
@@ -1684,6 +1709,11 @@ to avoid ambiguity given C types can have C<[]> in them.
 
 This relies on the relevant C<OtherPar> having an C<OUTPUT> entry in an
 XS typemap.
+
+As of 2.083, it is also possible to specify C<OtherPars> as C<[io]>,
+which means they I<must> be supplied (rather than being optional, like
+an C<[o]> one), but will still be updated after the operation has
+finished.
 
 =head2 Other useful PP keys in data operation definitions
 
@@ -1762,6 +1792,67 @@ type being overridden to the C<OtherPars> "totype".
 Allows specifying default values for C<OtherPars>. It is an error to
 specify a default for one that is before another that does not have
 a default.
+
+=head3 ArgOrder
+
+  Pars => 'x(); y(); [o]z()'
+  OtherPars => 'int a; int b',
+  ArgOrder => [qw(x y a b z)],
+
+  # or, a non-reference true value to enable flexible arg-handling and
+  # move defaultable to the end, followed by output ndarrays then OtherPars
+  Pars => 'x(); y(); [o]z()'
+  OtherPars => 'int a; int b',
+  ArgOrder => 1,
+
+Allows specifying a different order for providing the operation's
+arguments. This affects only the generated XS (not C C<pdl_run_(name)>)
+parameter list; the internal ordering of C<pdl*> in various C arrays
+is unaffected.
+
+Providing a non-reference true value enables flexible argument-handling
+and moves defaultable to the end, followed by output ndarrays then
+output C<OtherPars>. Also, all outputs (ndarray and C<OtherPars>) will
+be returned on the stack, even if supplied as arguments.
+
+It is an error to specify arguments that are not provided, or to give
+a false value, or to have "optional" arguments after mandatory ones.
+
+=head4 XS argument-handling change
+
+This also changes PP's XS argument handling; normally you can specify:
+
+=over
+
+=item *
+
+just the input/io arguments
+
+=item *
+
+(if the operation has default values provided) those plus values for all arguments with defaults
+
+=item *
+
+all of those plus output arguments, in other words all non-C<[t]> arguments
+
+=back
+
+With C<ArgOrder> given, "optional" arguments (outputs and ones with
+defaults) will be filled in from the leftmost missing one.
+
+=head3 HdrCode
+
+This is C code that is inserted in the XS function before the call to
+the generated C<pdl_run_(funcname)>. It will have access to all the Pars
+and OtherPars as C values.
+
+=head3 FtrCode
+
+As of 2.083.
+This is C code that is inserted in the XS function after the call to
+the generated C<pdl_run_(funcname)>. It will have access to all the Pars
+and OtherPars as C values.
 
 =head2 Other PDL::PP functions to support concise package definition
 
@@ -1876,6 +1967,25 @@ C<pp_bless> to specify the package (i.e. class) to which
 your I<pp_def>ed methods will be added. For example,
 C<pp_bless('PDL::MyClass')>. The default is C<PDL> if this is
 omitted.
+
+The value given here (or the default, C<PDL>), anywhere in the F<.pd>
+file, will be the package into which all PP operations get added, even
+for operations whose C<pp_def> was called I<before> the C<pp_bless>.
+This is because that package is inserted at the start of the generated
+XS code by C<pp_done>. The only way this changes is if C<pp_addxs> is
+called, which will add the given code (or none if an empty string is
+given) to the C<$::PDLPACK> package,
+I<and then changes the package to the pp_bless value>. For historical
+reasons, this cannot be changed. So, to have several different packages
+in one F<.pd> file, do something like this:
+
+  # any pp_def up till now will get put in PDL::Pack2
+  pp_bless('PDL::Pack1');
+  pp_addxs('');
+  pp_def('func1', ...);
+  pp_bless('PDL::Pack2');
+  pp_addxs('');
+  pp_def('otherfunc', ...);
 
 =head3 pp_addxs
 
@@ -2360,9 +2470,10 @@ Intended for affine transformations with dataflow.
 
 =head3 DefaultFlow
 
-If true, sets in the C<pdl_transvtable> (see L<PDL::Internals>) the
+If I<set>, sets in the C<pdl_transvtable> (see L<PDL::Internals>) the
 C<iflags> such that the trans will start with dataflow both forwards
-and backwards.
+and backwards. Note that setting this to any value (including 0) will
+trigger the behaviour.
 
 =head3 HaveBroadcasting
 
@@ -2586,17 +2697,6 @@ section at L<perlxs>.
 Adds pure-C code to your XS file. XS files are structured such that pure C
 code must come before XS specifications. This allows you to specify such
 C code.
-
-=head3 pp_boundscheck
-
-PDL normally checks the bounds of your accesses before making them. You can
-turn that on or off at runtime by setting MyPackage::set_boundscheck. This
-function allows you to remove that runtime flexibility and B<never> do bounds
-checking. It also returns the current boundschecking status if called
-without any argumens.
-
-NOTE: I have not found anything about bounds checking in other documentation.
-That needs to be addressed.
 
 =head2 Generating Perl Code
 

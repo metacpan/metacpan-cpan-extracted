@@ -1,0 +1,47 @@
+NAME
+    wd-print - Script to manipulate with Wikidata.org.
+
+SYNOPSIS
+     wd-print [-h] [-l lang] [-m mediawiki_site] [--version] wd_id
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-l lang"
+
+            Language used defined by ISO 639‑1 Code.
+
+            Default value is en = English.
+
+    *       "-m mediawiki_site"
+
+            MediaWiki site.
+
+            Default value is 'www.wikidata.org'.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "wd_id"
+
+            Identifier in Wikidata (qid or pid or lid).
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Wikidata-Print>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

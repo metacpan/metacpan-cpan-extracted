@@ -20,14 +20,13 @@ our $pars_re = qr/^
 /x;
 my %flag2info = (
   io => [[qw(FlagW)]],
-  nc => [[qw(FlagNCreat)]],
   o => [[qw(FlagOut FlagCreat FlagW)]],
   oca => [[qw(FlagOut FlagCreat FlagW FlagCreateAlways)]],
   t => [[qw(FlagTemp FlagCreat FlagW)]],
   phys => [[qw(FlagPhys)]],
-  real => [[qw(FlagReal)]],
-  complex => [[qw(FlagComplex)]],
-  (map +($_->ppforcetype => [[qw(FlagTyped)], 'Type']), types),
+  real => [[qw(FlagTypeOverride FlagReal)]],
+  complex => [[qw(FlagTypeOverride FlagComplex)]],
+  (map +($_->ppforcetype => [[qw(FlagTypeOverride FlagTyped)], 'Type']), types),
 );
 my %flag2c = qw(
   FlagReal PDL_PARAM_ISREAL
@@ -68,10 +67,6 @@ sub new {
 	  $this->{FlagTplus} = 1;
 	}
 	$this->{Type} &&= PDL::Type->new($this->{Type});
-	if($this->{FlagNCreat}) {
-		delete $this->{FlagCreat};
-		delete $this->{FlagCreateAlways};
-	}
 	$this->{RawInds} = [map{
 		s/\s//g; 		# Remove spaces
 		$_;
@@ -167,12 +162,12 @@ sub get_incname {
 
 sub get_incregisters {
 	my($this) = @_;
-	if(scalar(@{$this->{IndObjs}}) == 0) {return "";}
-	(join '',map {
+	return '' if scalar(@{$this->{IndObjs}}) == 0;
+	join '', map {
 		my $x = $_;
 		my ($name, $for_local) = map $this->get_incname($x, $_), 0, 1;
-		"register PDL_Indx $for_local = __privtrans->$name; (void)$for_local;\n";
-	} (0..$#{$this->{IndObjs}}) )
+		"register PDL_Indx $for_local = __privtrans->$name; (void)$for_local;";
+	} 0..$#{$this->{IndObjs}};
 }
 
 # Print an access part.
@@ -197,7 +192,7 @@ sub do_access {
 
 sub do_pdlaccess {
 	my($this) = @_;
-	PDL::PP::pp_line_numbers(__LINE__-1, '$PRIV(pdls)['.$this->{Number}.']');
+	'$PRIV(pdls)['.$this->{Number}.']';
 }
 
 sub do_pointeraccess {
@@ -219,8 +214,7 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
   confess "Access Index not found: $pdl, $ind, @{[$this->{IndObjs}[$ind]->name]}
 	  On stack:".(join ' ',map {"($_->[0],$_->[1])"} @$context)."\n"
 	  if !defined $index;
-  return "(".($this->get_incname($ind,1))."*".
-	 "PP_INDTERM(".$this->{IndObjs}[$ind]->get_size().", $index))";
+  return "(".($this->get_incname($ind,1))."*($index))";
 }
 
 sub get_xsdatapdecl { 

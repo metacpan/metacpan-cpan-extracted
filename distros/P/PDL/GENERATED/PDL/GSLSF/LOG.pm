@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_log.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::LOG - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "LOG.pm"
-
-
-
-
-
+#line 40 "LOG.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ Provide a logarithm function with GSL semantics.
 gsl_sf_log does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "LOG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_log = \&PDL::gsl_sf_log;
-#line 81 "LOG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,16 +89,14 @@ Complex Logarithm exp(lnr + I theta) = zr + I zi Returns argument in [-pi,pi].
 gsl_sf_complex_log does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "LOG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_log = \&PDL::gsl_sf_complex_log;
-#line 113 "LOG.pm"
+
+
 
 
 
@@ -129,10 +116,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 133 "LOG.pm"
-
-
-
+#line 120 "LOG.pm"
 
 # Exit with OK status
 

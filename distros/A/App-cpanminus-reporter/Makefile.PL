@@ -15,7 +15,7 @@ WriteMakefile(
     ),
     PREREQ_PM => {
         'CPAN::Meta::Converter'         => 0,
-        'CPAN::Testers::Common::Client' => 0.13,
+        'CPAN::Testers::Common::Client' => 0.14,
         'Capture::Tiny'                 => 0,
         'Carp'                          => 0,
         'Config::Tiny'                  => 2.08,
@@ -38,7 +38,9 @@ WriteMakefile(
     },
     META_MERGE => {
         resources => {
-            repository => 'http://github.com/garu/App-cpanminus-reporter',
+            repository => 'https://github.com/garu/App-cpanminus-reporter',
+            bugtracker => 'https://github.com/garu/App-cpanminus-reporter/issues/',
+            license    => 'perl',
         },
     },
 

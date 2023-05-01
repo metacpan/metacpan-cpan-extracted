@@ -2,7 +2,7 @@ package App::ModuleBuildTiny::Dist;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 use CPAN::Meta;
 use Config;
@@ -326,7 +326,7 @@ sub write_dir {
 	mkpath($dir, $verbose, oct '755');
 	my $files = $self->{files};
 	for my $filename (keys %{$files}) {
-		my $target = catfile($dir, $filename);
+		my $target = "$dir/$filename";
 		mkpath(dirname($target)) if not -d dirname($target);
 		if ($files->{$filename}) {
 			write_text($target, $files->{$filename});
@@ -371,7 +371,7 @@ sub run {
 	if ($opts{build}) {
 		system $Config{perlpath}, 'Build.PL';
 		system $Config{perlpath}, 'Build';
-		my @extralib = map { rel2abs(catdir('blib', $_)) } 'arch', 'lib';
+		my @extralib = map { rel2abs("blib/$_") } 'arch', 'lib';
 		local @PERL5LIB = (@extralib, @PERL5LIB);
 		local @PATH = (rel2abs(catdir('blib', 'script')), @PATH);
 		for my $command (@{ $opts{commands} }) {

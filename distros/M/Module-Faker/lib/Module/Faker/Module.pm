@@ -1,4 +1,4 @@
-package Module::Faker::Module 0.024;
+package Module::Faker::Module 0.025;
 # ABSTRACT: a faked module
 
 use Moose;
@@ -53,7 +53,7 @@ Module::Faker::Module - a faked module
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 PERL VERSION
 

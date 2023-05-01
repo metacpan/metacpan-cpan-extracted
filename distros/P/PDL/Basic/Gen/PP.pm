@@ -36,11 +36,11 @@
 # The InsertName class exists to allow you to return something like
 #   "foo<routine name>bar"
 # e.g.
-#  PDL::PP::Rule::InsertName->new("Foo", '_pdl_${name}_bar')
-#  PDL::PP::Rule::InsertName->new("Foo", "Arg2", '_pdl_${name}_bar')
+#  PDL::PP::Rule::InsertName->new("Foo", '_pdl_%s_bar')
+#  PDL::PP::Rule::InsertName->new("Foo", "Arg2", '_pdl_%s_bar')
 # Note that the Name argument is automatically used as a condition, so
 # it does not need to be supplied, and the return value should be
-# given as a single-quoted string and use the $name variable
+# given as a string and use a %s where the name goes
 #
 # The Substitute rule replaces dollar-signed macros ($P(), $ISBAD(), etc)
 # with the low-level C code to perform the macro.
@@ -55,7 +55,7 @@ use warnings;
 
 use Carp;
 
-use overload ("\"\"" => \&PDL::PP::Rule::stringify);
+use overload ('""' => \&PDL::PP::Rule::stringify);
 sub stringify {
     my $self = shift;
 
@@ -66,8 +66,9 @@ sub stringify {
 	$str =~ s/PDL::PP::Rule:://;
     }
     $str = "($str) ";
-    $str .= exists $self->{doc} ?
-       $self->{doc} : join(",", @{$self->{targets}});
+    $str .= "[".join(",", @{$self->{targets}||[]})."]";
+    $str .= "<-[".join(",", @{$self->{conditions}||[]})."] ";
+    $str .= $self->{doc} if exists $self->{doc};
     return $str;
 }
 
@@ -123,7 +124,7 @@ sub any_targets_exist {
 sub all_conditions_exist {
     my $self = shift;
     my $pars = shift;
-    return 1 unless my @nonexist = grep !ref() && !exists $pars->{$_}, @{$self->{conditions}};
+    return 1 unless my @nonexist = grep !/\?$/ && !exists $pars->{$_}, @{$self->{conditions}};
     $self->report("--skipping since CONDITIONs (@nonexist) do not exist\n");
     0;
 }
@@ -145,7 +146,7 @@ sub should_apply {
 # my @args = $self->extract_args($pars);
 sub extract_args {
     my ($self, $pars) = @_;
-    @$pars{ map ref($_) eq "SCALAR" ? $$_ : $_, @{ $self->{conditions} } };
+    @$pars{ map {(my $r=$_)=~s/\?$//;$r} @{ $self->{conditions} } };
 }
 
 # Apply the rule using the supplied $pars hash reference.
@@ -212,6 +213,7 @@ sub new {
 
 sub apply {
     my ($self, $pars) = @_;
+    $self->report("Applying: $self\n");
     croak($self->{doc}) if $self->should_apply($pars);
 }
 
@@ -302,51 +304,32 @@ our @ISA = qw (PDL::PP::Rule);
 
 # This class does not treat return values of "DO NOT SET!!"
 # as special.
-#
 sub new {
     my $class = shift;
-
     my $value = pop;
-
     my @args  = @_;
     my $self  = $class->SUPER::new(@args);
     $self->{"insertname.value"} = $value;
-
-    # Generate a defaul doc string
-    unless (exists $self->{doc}) {
-        $self->{doc} = 'Sets ' . $self->{targets}->[0]
-            . ' to "' . $value . '"';
-    }
-
+    # Generate a default doc string
+    $self->{doc} ||= "Sets $self->{targets}->[0] to \"$value\"";
     my $targets = $self->{targets};
     croak "There can only be 1 target for a $self, not " . (1+$#$targets) . "!"
-      unless $#$targets == 0;
-
-    # we add "Name" as the first condition
-    #
-    my $conditions = $self->{conditions};
-    unshift @$conditions, "Name";
-
+      unless @$targets == 1;
+    unshift @{$self->{conditions}}, "Name"; # add "Name" as first condition
     return $self;
 }
 
 sub apply {
     my $self = shift;
     my $pars = shift;
-
     carp "Unable to apply rule $self as there is no return value!"
       unless exists $self->{"insertname.value"};
-
     $self->report("Applying: $self\n");
-
     return unless $self->should_apply($pars);
-
     # Set the value
-    #
-    my $target = $self->{targets}->[0];
-    my $name   = $pars->{Name};
-    $self->report ("--setting: $target (name=$name)\n");
-    $pars->{$target} = eval "return \"" . $self->{"insertname.value"} . "\";";
+    my $target = $self->{targets}[0];
+    $self->report ("--setting: $target (name=$pars->{Name})\n");
+    $pars->{$target} = sprintf $self->{"insertname.value"}, $pars->{Name};
 }
 
 #   PDL::PP::Rule->new("NewXSCoerceMustSubs", ["NewXSCoerceMustSub1","Name"],
@@ -360,9 +343,7 @@ use strict;
 use Carp;
 our @ISA = qw (PDL::PP::Rule);
 
-sub badflag_isset {
-  PDL::PP::pp_line_numbers(__LINE__-1, "($_[0]->state & PDL_BADVAL)")
-}
+sub badflag_isset { "($_[0]->state & PDL_BADVAL)" }
 
 # Probably want this directly in the apply routine but leave as is for now
 sub dosubst_private {
@@ -381,25 +362,25 @@ sub dosubst_private {
       @pairs,
       ((ref $src) ? %{$src->[1]} : ()),
       PRIV => sub {return "$sname->$_[0]"},
-      COMP => sub {my $r="$pname->$_[0]";$sig->other_is_out($_[0])?"(*($r))":$r},
-      CROAK => sub {PDL::PP::pp_line_numbers(__LINE__-1, "return PDL->make_error(PDL_EUSERERROR, \"Error in $name:\" @{[join ',', @_]})")},
+      COMP => sub {my $r="$pname->$_[0]";$sig->other_is_output($_[0])?"(*($r))":$r},
+      CROAK => sub {"return PDL->make_error(PDL_EUSERERROR, \"Error in $name:\" @{[join ',', @_]})"},
       NAME => sub {return $name},
       MODULE => sub {return $::PDLMOD},
-      SETPDLSTATEBAD  => sub { PDL::PP::pp_line_numbers(__LINE__-1, "$_[0]\->state |= PDL_BADVAL") },
-      SETPDLSTATEGOOD => sub { PDL::PP::pp_line_numbers(__LINE__-1, "$_[0]\->state &= ~PDL_BADVAL") },
+      SETPDLSTATEBAD  => sub { "$_[0]\->state |= PDL_BADVAL" },
+      SETPDLSTATEGOOD => sub { "$_[0]\->state &= ~PDL_BADVAL" },
       ISPDLSTATEBAD   => \&badflag_isset,
       ISPDLSTATEGOOD  => sub {"!".badflag_isset($_[0])},
-      BADFLAGCACHE    => sub { PDL::PP::pp_line_numbers(__LINE__-1, "badflag_cache") },
-      PDLSTATESETBAD => sub { PDL::PP::pp_line_numbers(__LINE__-1, ($sig->objs->{$_[0]}//confess "Can't get PDLSTATESETBAD for unknown ndarray '$_[0]'")->do_pdlaccess."->state |= PDL_BADVAL") },
-      PDLSTATESETGOOD => sub { PDL::PP::pp_line_numbers(__LINE__-1, ($sig->objs->{$_[0]}->do_pdlaccess//confess "Can't get PDLSTATESETGOOD for unknown ndarray '$_[0]'")."->state &= ~PDL_BADVAL") },
+      BADFLAGCACHE    => sub { "badflag_cache" },
+      PDLSTATESETBAD => sub { ($sig->objs->{$_[0]}//confess "Can't get PDLSTATESETBAD for unknown ndarray '$_[0]'")->do_pdlaccess."->state |= PDL_BADVAL" },
+      PDLSTATESETGOOD => sub { ($sig->objs->{$_[0]}->do_pdlaccess//confess "Can't get PDLSTATESETGOOD for unknown ndarray '$_[0]'")."->state &= ~PDL_BADVAL" },
       PDLSTATEISBAD => sub {badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISBAD for unknown ndarray '$_[0]'")->do_pdlaccess)},
       PDLSTATEISGOOD => sub {"!".badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISGOOD for unknown ndarray '$_[0]'")->do_pdlaccess)},
       PP => sub { ($sig->objs->{$_[0]}//confess "Can't get PP for unknown ndarray '$_[0]'")->do_physpointeraccess },
       P => sub { (my $o = ($sig->objs->{$_[0]}//confess "Can't get P for unknown ndarray '$_[0]'"))->{FlagPhys} = 1; $o->do_pointeraccess; },
       PDL => sub { ($sig->objs->{$_[0]}//confess "Can't get PDL for unknown ndarray '$_[0]'")->do_pdlaccess },
       SIZE => sub { ($sig->ind_obj($_[0])//confess "Can't get SIZE of unknown dim '$_[0]'")->get_size },
-      SETNDIMS => sub {PDL::PP::pp_line_numbers(__LINE__-1, "PDL_RETERROR(PDL_err, PDL->reallocdims(__it,$_[0]));")},
-      SETDIMS => sub {PDL::PP::pp_line_numbers(__LINE__-1, "PDL_RETERROR(PDL_err, PDL->setdims_careful(__it));")},
+      SETNDIMS => sub {"PDL_RETERROR(PDL_err, PDL->reallocdims(__it,$_[0]));"},
+      SETDIMS => sub {"PDL_RETERROR(PDL_err, PDL->setdims_careful(__it));"},
       SETDELTABROADCASTIDS => sub {PDL::PP::pp_line_numbers(__LINE__, <<EOF)},
 {int __ind; PDL_RETERROR(PDL_err, PDL->reallocbroadcastids(\$PDL(CHILD), \$PDL(PARENT)->nbroadcastids));
 for(__ind=0; __ind<\$PDL(PARENT)->nbroadcastids; __ind++)
@@ -465,46 +446,61 @@ use strict;
 our $VERSION = "2.3";
 $VERSION = eval $VERSION;
 
-our $macros_xs = <<'EOF';
+our $macros_xs = pp_line_numbers(__LINE__, <<'EOF');
 #include "pdlperl.h"
 
-#define PDL_XS_PREAMBLE \
+#define PDL_XS_PREAMBLE(nret) \
   char *objname = "PDL"; /* XXX maybe that class should actually depend on the value set \
                             by pp_bless ? (CS) */ \
   HV *bless_stash = 0; \
   SV *parent = 0; \
-  int   nreturn = 0; \
-  (void)nreturn;
-
-#define PDL_XS_PACKAGEGET \
+  int   nreturn = (nret); \
+  (void)nreturn; \
   PDL_COMMENT("Check if you can get a package name for this input value.  ") \
   PDL_COMMENT("It can be either a PDL (SVt_PVMG) or a hash which is a     ") \
   PDL_COMMENT("derived PDL subclass (SVt_PVHV)                            ") \
-  if (SvROK(ST(0)) && ((SvTYPE(SvRV(ST(0))) == SVt_PVMG) || (SvTYPE(SvRV(ST(0))) == SVt_PVHV))) { \
-    parent = ST(0); \
-    if (sv_isobject(parent)){ \
-	bless_stash = SvSTASH(SvRV(ST(0))); \
-	objname = HvNAME((bless_stash));  PDL_COMMENT("The package to bless output vars into is taken from the first input var") \
+  do { \
+    if (SvROK(ST(0)) && ((SvTYPE(SvRV(ST(0))) == SVt_PVMG) || (SvTYPE(SvRV(ST(0))) == SVt_PVHV))) { \
+      parent = ST(0); \
+      if (sv_isobject(parent)){ \
+          bless_stash = SvSTASH(SvRV(ST(0))); \
+          objname = HvNAME((bless_stash));  PDL_COMMENT("The package to bless output vars into is taken from the first input var") \
+      } \
     } \
-  }
+  } while (0)
 
-#define PDL_XS_PERLINIT(name, to_push, method) \
-  if (strcmp(objname,"PDL") == 0) { PDL_COMMENT("shortcut if just PDL") \
-     name ## _SV = sv_newmortal(); \
-     name = PDL->pdlnew(); \
-     if (!name) PDL->pdl_barf("Error making null pdl"); \
-     PDL->SetSV_PDL(name ## _SV, name); \
-     if (bless_stash) name ## _SV = sv_bless(name ## _SV, bless_stash); \
-  } else { \
-     PUSHMARK(SP); \
-     XPUSHs(to_push); \
-     PUTBACK; \
-     perl_call_method(#method, G_SCALAR); \
-     SPAGAIN; \
-     name ## _SV = POPs; \
-     PUTBACK; \
-     name = PDL->SvPDLV(name ## _SV); \
+static inline pdl *PDL_XS_pdlinit(pTHX_ char *objname, HV *bless_stash, SV *to_push, char *method, SV **svp) {
+  dSP;
+  pdl *ret;
+  if (strcmp(objname,"PDL") == 0) { PDL_COMMENT("shortcut if just PDL")
+     ret = PDL->pdlnew();
+     if (!ret) PDL->pdl_barf("Error making null pdl");
+     if (svp) {
+       *svp = sv_newmortal();
+       PDL->SetSV_PDL(*svp, ret);
+       if (bless_stash) *svp = sv_bless(*svp, bless_stash);
+     }
+  } else {
+     PUSHMARK(SP);
+     XPUSHs(to_push);
+     PUTBACK;
+     perl_call_method(method, G_SCALAR);
+     SPAGAIN;
+     SV *sv = POPs;
+     PUTBACK;
+     ret = PDL->SvPDLV(sv);
+     if (svp) *svp = sv;
   }
+  return ret;
+}
+#define PDL_XS_PERLINIT_init() \
+  PDL_XS_pdlinit(aTHX_ objname, bless_stash, sv_2mortal(newSVpv(objname, 0)), "initialize", NULL)
+#define PDL_XS_PERLINIT_initsv(sv) \
+  PDL_XS_pdlinit(aTHX_ objname, bless_stash, sv_2mortal(newSVpv(objname, 0)), "initialize", &sv)
+#define PDL_XS_PERLINIT_copy() \
+  PDL_XS_pdlinit(aTHX_ objname, bless_stash, parent, "copy", NULL)
+#define PDL_XS_PERLINIT_copysv(sv) \
+  PDL_XS_pdlinit(aTHX_ objname, bless_stash, parent, "copy", &sv)
 
 #define PDL_XS_RETURN(clause1) \
     if (nreturn) { \
@@ -515,16 +511,17 @@ our $macros_xs = <<'EOF';
       XSRETURN(0); \
     }
 
-#define PDL_XS_INPLACE(in, out, noutca) \
-    if (in->state & PDL_INPLACE) { \
-        if (nreturn == noutca && out != in) { \
-            barf("inplace input but different output given"); \
-        } else { \
-            in->state &= ~PDL_INPLACE; PDL_COMMENT("unset") \
-            out = in; \
-            PDL->SetSV_PDL(out ## _SV,out); \
-        } \
-    }
+#define PDL_IS_INPLACE(in) ((in)->state & PDL_INPLACE)
+#define PDL_XS_INPLACE(in, out, whichinit) \
+    if (PDL_IS_INPLACE(in)) { \
+        if (out ## _SV) barf("inplace input but different output given"); \
+        out ## _SV = sv_newmortal(); \
+        in->state &= ~PDL_INPLACE; PDL_COMMENT("unset") \
+        out = in; \
+        PDL->SetSV_PDL(out ## _SV,out); \
+    } else \
+        out = out ## _SV ? PDL_CORE_(SvPDLV)(out ## _SV) : \
+          PDL_XS_PERLINIT_ ## whichinit ## sv(out ## _SV);
 EOF
 
 our $header_c = pp_line_numbers(__LINE__, <<'EOF');
@@ -562,44 +559,20 @@ PDL_COMMENT("   /* Memory access */                                         ")
 #include "pdlcore.h"
 #define PDL %s
 extern Core* PDL; PDL_COMMENT("Structure hold core C functions")
-static int __pdl_boundscheck = 0;
-
-#if ! %s
-# define PP_INDTERM(max, at) at
-#else
-# define PP_INDTERM(max, at) (__pdl_boundscheck? PDL->safe_indterm(max,at, __FILE__, __LINE__) : at)
-#endif
 EOF
-our $header_xs = pp_line_numbers(__LINE__, <<'EOF');
+our $header_xs = <<'EOF';
 
 Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
 
-MODULE = %1$s PACKAGE = %1$s
+MODULE = %1$s PACKAGE = %2$s PREFIX=pdl_run_
 
 PROTOTYPES: DISABLE
 
-int
-set_boundscheck(i)
-       int i;
-       CODE:
-       if (! %6$s)
-         warn("Bounds checking is disabled for %1$s");
-       RETVAL = __pdl_boundscheck;
-       __pdl_boundscheck = i;
-       OUTPUT:
-       RETVAL
-
-
-MODULE = %1$s PACKAGE = %2$s
-
-%3$s
-
+EOF
+our $header_xsboot = pp_line_numbers(__LINE__, <<'EOF');
 BOOT:
-
    PDL_COMMENT("Get pointer to structure of core shared C routines")
    PDL_COMMENT("make sure PDL::Core is loaded")
-   %4$s
-   %5$s
 EOF
 
 use Config;
@@ -612,10 +585,9 @@ our @EXPORT = qw/pp_addhdr pp_addpm pp_bless pp_def pp_done pp_add_boot
                       pp_add_exported pp_addxs pp_add_isa pp_export_nothing
                       pp_add_typemaps
                       pp_core_importList pp_beginwrap pp_setversion
-                      pp_addbegin pp_boundscheck pp_line_numbers
+                      pp_addbegin pp_line_numbers
                       pp_deprecate_module pp_add_macros/;
 
-$PP::boundscheck = 1;
 $::PP_VERBOSE    = 0;
 
 our $done = 0;  # pp_done has not been called yet
@@ -671,19 +643,6 @@ sub pp_add_macros {
   %macros = (%macros, @_);
 }
 
-# query/set boundschecking
-# if on the generated XS code will have optional boundschecking
-# that can be turned on/off at runtime(!) using
-#   __PACKAGE__::set_boundscheck(arg); # arg should be 0/1
-# if off code is speed optimized and no runtime boundschecking
-# can be performed
-# ON by default
-sub pp_boundscheck {
-  my $ret = $PP::boundscheck;
-  $PP::boundscheck = $_[0] if $#_ > -1;
-  return $ret;
-}
-
 sub pp_beginwrap {
 	@::PDL_IFBEGINWRAP = ('BEGIN {','}');
 }
@@ -701,7 +660,7 @@ sub pp_addhdr {
 	$::PDLXSC_header .= $hdr if $::PDLMULTI_C;
 }
 
-sub pp_addpm {
+sub _pp_addpm_nolineno {
 	my $pm = shift;
 	my $pos;
 	if (ref $pm) {
@@ -713,8 +672,17 @@ sub pp_addpm {
 	} else {
 	  $pos = 'Middle';
 	}
-	my @c = caller;
-	$::PDLPM{$pos} .= _pp_line_number_file($c[1], $c[2]-1, "\n$pm")."\n\n";
+	$pm =~ s#\n{3,}#\n\n#g;
+	$::PDLPM{$pos} .= "\n$pm\n\n";
+}
+
+sub pp_addpm {
+  my @args = @_;
+  my $pmind = ref $_[0] ? 1 : 0;
+  my @c = caller;
+  $args[$pmind] = _pp_line_number_file($c[1], $c[2]-1, "\n$args[$pmind]");
+  $args[$pmind] =~ s#\n{3,}#\n\n#g;
+  _pp_addpm_nolineno(@args);
 }
 
 sub pp_add_exported {
@@ -765,7 +733,7 @@ sub printxs {
 sub pp_addxs {
 	PDL::PP->printxs("\nMODULE = $::PDLMOD PACKAGE = $::CALLPACK\n\n",
                          @_,
-                         "\nMODULE = $::PDLMOD PACKAGE = $::PDLOBJ\n\n");
+                         "\nMODULE = $::PDLMOD PACKAGE = $::PDLOBJ PREFIX=pdl_run_\n\n");
 }
 
 # inserts #line directives into source text. Use like this:
@@ -801,22 +769,38 @@ my $LINE_RE = qr/^(\s*)PDL_LINENO_(?:START (\S+) "(.*)"|(END))$/;
 sub _pp_linenumber_fill {
   local $_; # else get "Modification of a read-only value attempted"
   my ($file, $text) = @_;
-  my (@stack, @to_return) = [$file, 1];
+  my (@stack, @to_return) = [1, $file];
   my @lines = split /\n/, $text;
-  while (defined($_ = shift @lines)) {
-    $_->[1]++ for @stack;
+  REALLINE: while (defined($_ = shift @lines)) {
+    $_->[0]++ for @stack;
     push(@to_return, $_), next if !/$LINE_RE/;
     my ($ci, $new_line, $new_file, $is_end) = ($1, $2, $3, $4);
-    if ($is_end) {
-      @stack = [$file, $stack[0][1]]; # as soon as another block is entered, line numbers for outer blocks become meaningless
-      if (@lines > 1 and !length($lines[0]) and $lines[1] =~ /$LINE_RE/) {
-        $stack[-1][1]--;
-      } else {
-        push @to_return, qq{$ci#line $stack[-1][1] "$stack[-1][0]"} if @lines;
+    if (!$is_end) {
+      push @stack, [$new_line-1, $new_file];
+      push @to_return, qq{$ci#line @{[$stack[-1][0]+1]} "$stack[-1][1]"} if @lines;
+      next REALLINE;
+    }
+    @stack = [$stack[0][0], $file]; # as soon as any block is left, line numbers for outer blocks become meaningless
+    my ($seen_empty, $empty_first, $last_ci, @last_dir) = (0, undef, $ci); # list=(line, file)
+    LINE: while (1) {
+      last REALLINE if !@lines;
+      if (!length $lines[0]) {
+        $seen_empty = 1;
+        shift @lines;
+        next LINE;
       }
-    } else {
-      push @stack, [$new_file, $new_line-1];
-      push @to_return, qq{$ci#line @{[$stack[-1][1]+1]} "$stack[-1][0]"} if @lines;
+      if ($lines[0] =~ /$LINE_RE/) { # directive
+        ($last_ci, @last_dir) = ($1, !$4 ? ($2, $3) : ());
+        $empty_first //= $seen_empty;
+        shift @lines;
+        next LINE;
+      } else { # substantive
+        push @stack, \@last_dir if @last_dir;
+        push(@to_return, ''), $stack[0][0]++ if $seen_empty and $empty_first;
+        push @to_return, qq{$last_ci#line $stack[-1][0] "$stack[-1][1]"};
+        push(@to_return, ''), $stack[0][0]++ if $seen_empty and !$empty_first;
+        last LINE;
+      }
     }
   }
   join '', map "$_\n", @to_return;
@@ -843,7 +827,7 @@ sub printxsc {
   my $text = join '',@_;
   if (defined $file) {
     (my $mod_underscores = $::PDLMOD) =~ s#::#_#g;
-    $text = join '', sprintf($PDL::PP::header_c, $mod_underscores, $PP::boundscheck), $::PDLXSC_header//'', $text;
+    $text = join '', sprintf($PDL::PP::header_c, $mod_underscores), $::PDLXSC_header//'', $text;
     _write_file($file, $text);
   } else {
     $::PDLXSC .= $text;
@@ -857,14 +841,16 @@ sub pp_done {
 	print "Inline running PDL::PP version $PDL::PP::VERSION...\n" if nopm();
         require PDL::Core::Dev;
         my $pdl_boot = PDL::Core::Dev::PDL_BOOT('PDL', $::PDLMOD);
+        my $user_boot = $::PDLXSBOOT//'';
+        $user_boot =~ s/^\s*(.*?)\n*$/  $1\n/ if $user_boot;
         (my $mod_underscores = $::PDLMOD) =~ s#::#_#g;
         my $text = join '',
-          sprintf($PDL::PP::header_c, $mod_underscores, $PP::boundscheck),
+          sprintf($PDL::PP::header_c, $mod_underscores),
           $::PDLXSC//'',
-          $PDL::PP::macros_xs, sprintf($PDL::PP::header_xs,
-            $::PDLMOD, $::PDLOBJ, $::PDLXS,
-            $pdl_boot, $::PDLXSBOOT//'', $PP::boundscheck,
-          );
+          $PDL::PP::macros_xs,
+          sprintf($PDL::PP::header_xs, $::PDLMOD, $::PDLOBJ),
+          $::PDLXS, "\n",
+          $PDL::PP::header_xsboot, $pdl_boot, $user_boot;
         _write_file("$::PDLPREF.xs", $text);
         return if nopm;
 	$::PDLPMISA = "'".join("','",@::PDLPMISA)."'";
@@ -945,7 +931,6 @@ sub pp_def {
 		);
 	if ($::PDLMULTI_C) {
 	  PDL::PP->printxsc(undef, <<EOF);
-extern pdl_transvtable $obj{VTableName};
 $obj{RunFuncHdr};
 EOF
 	  PDL::PP->printxsc("pp-$obj{Name}.c", $ctext);
@@ -955,9 +940,9 @@ EOF
 	PDL::PP->printxs($obj{NewXSCode});
 	pp_add_boot($obj{BootSetNewXS}) if $obj{BootSetNewXS};
 	PDL::PP->pp_add_exported($name);
-	PDL::PP::pp_addpm("\n".$obj{PdlDoc}."\n") if $obj{PdlDoc};
-	PDL::PP::pp_addpm($obj{PMCode}) if defined $obj{PMCode};
-	PDL::PP::pp_addpm($obj{PMFunc}."\n") if defined $obj{PMFunc};
+	PDL::PP::_pp_addpm_nolineno("\n".$obj{PdlDoc}."\n") if $obj{PdlDoc};
+	PDL::PP::_pp_addpm_nolineno($obj{PMCode}) if defined $obj{PMCode};
+	PDL::PP::_pp_addpm_nolineno($obj{PMFunc}."\n") if defined $obj{PMFunc};
 
 	print "*** Leaving pp_def for $name\n" if $::PP_VERBOSE;
 }
@@ -1006,10 +991,10 @@ XXX=cut
 
 EOF
   $deprecation_notice =~ s/^XXX=/=/gms;
-  pp_addpm( {At => 'Top'}, $deprecation_notice );
+  _pp_addpm_nolineno( {At => 'Top'}, $deprecation_notice );
 
-  pp_addpm {At => 'Top'}, <<EOF;
-warn \"$warning_main\n$warning_suppression_runtime\" unless \$ENV{$envvar};
+  _pp_addpm_nolineno {At => 'Top'}, <<EOF;
+warn "$warning_main\n$warning_suppression_runtime" unless \$ENV{$envvar};
 EOF
 }
 
@@ -1068,29 +1053,48 @@ sub make_xs_code {
     @bits) = @_;
   my($boot,$prelude);
   if($xs_c_headers) {
-    $prelude = join '' => ($xs_c_headers->[0], @bits, $xs_c_headers->[1]);
+    $prelude = join '', $xs_c_headers->[0], @bits, $xs_c_headers->[1];
     $boot = $xs_c_headers->[2];
     $str .= "\n";
   } else {
-    my $xscode = join '' => @bits;
-    $str .= " $xscode_before\n $xscode$xscode_after\n\n";
+    my $xscode = join '', @bits;
+    $str .= "$xscode_before\n$xscode$xscode_after\n";
   }
   $str =~ s/(\s*\n)+/\n/g;
   ($str,$boot,$prelude)
 }
 
 sub indent($$) {
-    my ($text,$ind) = @_;
-    $text =~ s/^(.*)$/$ind$1/mg;
+    my ($ind, $text) = @_;
+    return $text if !length $text or !$ind;
+    $ind = ' ' x $ind;
+    $text =~ s/^(.+)$/$ind$1/mg;
     return $text;
 }
 
 # This subroutine generates the XS code needed to call the perl 'initialize'
 # routine in order to create new output PDLs
 sub callPerlInit {
-    my ($names, $callcopy) = @_;
-    my $args = $callcopy ? 'parent, copy' : 'sv_2mortal(newSVpv(objname, 0)), initialize';
-    join '', map PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_PERLINIT($_, $args)\n"), @$names;
+    my ($sv, $callcopy) = @_;
+    "PDL_XS_PERLINIT_".($callcopy ? "copy" : "init").($sv ? "sv($sv)" : "()");
+}
+
+sub callTypemap {
+  my ($x, $ptype) = @_;
+  my ($setter, $type) = typemap($ptype, 'get_inputmap');
+  my $ret = typemap_eval($setter, {var=>$x, type=>$type, arg=>("${x}_SV")});
+  $ret =~ s/^\s*(.*?)\s*$/$1/g;
+  $ret =~ s/\s*\n\s*/ /g;
+  $ret;
+}
+
+sub reorder_args {
+  my ($sig, $otherdefaults) = @_;
+  my %optionals = map +($_=>1), keys(%$otherdefaults);
+  my @other_mand = grep !$optionals{$_} && !$sig->other_is_out($_),
+    my @other = @{$sig->othernames(1, 1)};
+  my @other_opt = grep $optionals{$_}, @other;
+  ($sig->names_in, @other_mand, @other_opt, $sig->names_out, $sig->other_out);
 }
 
 ###########################################################
@@ -1167,7 +1171,7 @@ $PDL::PP::deftbl =
    # ie should we bother with bad values for this routine?
    # 1     - yes,
    # 0     - no, maybe issue a warning
-   PDL::PP::Rule->new("BadFlag", \"HandleBad",
+   PDL::PP::Rule->new("BadFlag", "HandleBad?",
 		      "Sets BadFlag based upon HandleBad key",
 		      sub { $_[0] }),
 
@@ -1264,7 +1268,7 @@ $PDL::PP::deftbl =
    # could be really clever and include the sig to see about
    # input/output params, for instance
    
-   PDL::PP::Rule->new("BadDoc", ["BadFlag","Name",\"CopyBadStatusCode"],
+   PDL::PP::Rule->new("BadDoc", [qw(BadFlag Name CopyBadStatusCode?)],
               'Sets the default documentation for handling of bad values',
       sub {
          my ( $bf, $name, $code ) = @_;
@@ -1300,7 +1304,7 @@ $PDL::PP::deftbl =
          return $fulldoc;
       }
    ),
-   PDL::PP::Rule->new("PdlDoc", ["Name",\"Pars","OtherPars","Doc",\"BadDoc"],
+   PDL::PP::Rule->new("PdlDoc", [qw(Name Pars? OtherPars Doc BadDoc?)],
       sub {
         my ($name,$pars,$otherpars,$doc,$baddoc) = @_;
         return '' if !defined $doc # Allow explicit non-doc using Doc=>undef
@@ -1363,8 +1367,8 @@ EOD
       sub {
         my (undef,$name,$sname) = @_;
         ("PARENT(); [oca]CHILD();",0,0,[PDL::Types::ppdefs_all()],1,
-          pp_line_numbers(__LINE__-1,"\tpdl *__it = $sname->pdls[1];\n\tpdl *__parent = $sname->pdls[0];\n"),
-          pp_line_numbers(__LINE__-1,"PDL->hdr_childcopy($sname);\n$sname->dims_redone = 1;\n"),
+          "pdl *__it = $sname->pdls[1];\n",
+          "PDL->hdr_childcopy($sname); $sname->dims_redone = 1;\n",
         );
       }),
 
@@ -1381,7 +1385,7 @@ EOD
    PDL::PP::Rule::Returns->new("ExtraGenericSwitches", [],
        'Sets ExtraGenericSwitches to an empty hash if it does not already exist', {}),
 
-   PDL::PP::Rule::InsertName->new("VTableName", 'pdl_${name}_vtable'),
+   PDL::PP::Rule::InsertName->new("VTableName", 'pdl_%s_vtable'),
 
    PDL::PP::Rule::Returns->new("Priv", "AffinePriv", 'PDL_Indx incs[$PDL(CHILD)->ndims];PDL_Indx offs; '),
    PDL::PP::Rule::Returns->new("IsAffineFlag", "AffinePriv", "PDL_ITRANS_ISAFFINE"),
@@ -1391,12 +1395,11 @@ EOD
    PDL::PP::Rule::Returns->new("DefaultFlowFlag", "DefaultFlow", "PDL_ITRANS_DO_DATAFLOW_ANY"),
    PDL::PP::Rule::Returns::Zero->new("DefaultFlowFlag"),
 
-   PDL::PP::Rule->new("RedoDims", ["EquivPDimExpr",\"EquivDimCheck"],
+   PDL::PP::Rule->new("RedoDims", [qw(EquivPDimExpr EquivDimCheck?)],
       sub {
         my($pdimexpr,$dimcheck) = @_;
         $pdimexpr =~ s/\$CDIM\b/i/g;
-        PDL::PP::pp_line_numbers(__LINE__-1, '
-          int i,cor;
+        ' int i,cor;
           '.$dimcheck.'
           $SETNDIMS($PDL(PARENT)->ndims);
           $DOPRIVALLOC();
@@ -1409,7 +1412,7 @@ EOD
           $SETDIMS();
           $SETDELTABROADCASTIDS(0);
           $PRIV(dims_redone) = 1;
-        ');
+        ';
       }),
 
    PDL::PP::Rule->new("Code", ["EquivCPOffsCode","BadFlag"],
@@ -1431,7 +1434,7 @@ EOD
         # parse 'bad' code
         $bad  =~ s/\$EQUIVCPOFFS\(([^()]+),([^()]+)\)/if( \$PPISBAD(PARENT,[$2]) ) { \$PPSETBAD(CHILD,[$1]); } else { \$PP(CHILD)[$1] = \$PP(PARENT)[$2]; }/g;
         $bad =~ s/\$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)/ if( ($3) || \$PPISBAD(PARENT,[$2]) ) { \$PPSETBAD(CHILD,[$1]); } else {\$PP(CHILD)[$1] = \$PP(PARENT)[$2]; }/g;
-        PDL::PP::pp_line_numbers(__LINE__-1, 'if ( $PRIV(bvalflag) ) { ' . $bad . ' } else { ' . $good . '}');
+        'if ( $PRIV(bvalflag) ) { ' . $bad . ' } else { ' . $good . '}';
       }),
 
    PDL::PP::Rule->new("BackCode", ["EquivCPOffsCode","BadFlag"],
@@ -1476,7 +1479,7 @@ EOD
         # parse 'bad' code
         $bad  =~ s/\$EQUIVCPOFFS\(([^()]+),([^()]+)\)/if( \$PPISBAD(CHILD,[$1]) ) { \$PPSETBAD(PARENT,[$2]); } else { \$PP(PARENT)[$2] = \$PP(CHILD)[$1]; }/g;
         $bad =~ s/\$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)/if(!($3)) { if( \$PPISBAD(CHILD,[$1]) ) { \$PPSETBAD(PARENT,[$2]); } else { \$PP(PARENT)[$2] = \$PP(CHILD)[$1]; } } /g;
-        PDL::PP::pp_line_numbers(__LINE__-1, 'if ( $PRIV(bvalflag) ) { ' . $bad . ' } else { ' . $good . '}');
+        'if ( $PRIV(bvalflag) ) { ' . $bad . ' } else { ' . $good . '}';
       }),
 
    PDL::PP::Rule::Returns::Zero->new("Affine_Ok", "EquivCPOffsCode"),
@@ -1485,7 +1488,7 @@ EOD
    PDL::PP::Rule::Returns::NULL->new("ReadDataFuncName", "AffinePriv"),
    PDL::PP::Rule::Returns::NULL->new("WriteBackDataFuncName", "AffinePriv"),
 
-   PDL::PP::Rule::InsertName->new("NewXSName", '_${name}_int'),
+   PDL::PP::Rule::InsertName->new("NewXSName", '_%s_int'),
 
    PDL::PP::Rule::Returns::One->new("HaveBroadcasting"),
 
@@ -1505,12 +1508,9 @@ EOD
 # by parsing the string in that function.
 # If the user wishes to specify their own MakeComp code and Comp content,
 # The next definitions allow this.
-   PDL::PP::Rule->new("CompObj", ["BadFlag","Comp"],
-      sub { PDL::PP::Signature->new('', @_) }),
-   PDL::PP::Rule->new("CompObj", "SignatureObj", sub { @_ }), # provide default
-   PDL::PP::Rule->new("CompStructOther", "SignatureObj", sub {$_[0]->getcomp}),
-   PDL::PP::Rule->new("CompStructComp", [qw(CompObj Comp)], sub {$_[0]->getcomp}),
-   PDL::PP::Rule->new("CompStruct", ["CompStructOther", \"CompStructComp"], sub { join "\n", grep $_, @_ }),
+   PDL::PP::Rule->new("CompObj", [qw(BadFlag OtherPars Comp?)],
+      sub { PDL::PP::Signature->new('', $_[0], join(';', grep defined() && /[^\s;]/, @_[1..$#_])) }),
+   PDL::PP::Rule->new("CompStruct", ["CompObj"], sub {$_[0]->getcomp}),
 
  # Set CallCopy flag for simple functions (2-arg with 0-dim signatures)
  #   This will copy the $object->copy method, instead of initialize
@@ -1524,15 +1524,11 @@ EOD
 	  # Check for 2-arg function with 0-dim signatures
 	  return 0 if !($noDimmedArgs == 0 and $noArgs == 2);
 	  # Check to see if output arg is _not_ explicitly typed:
-	  !$sig->objs->{$sig->names->[1]}{FlagTyped};
+	  !$sig->objs->{$sig->names->[1]}{FlagTypeOverride};
       }),
 
-   PDL::PP::Rule->new(["InplaceCode"], ["SignatureObj","Inplace"],
-		      'Insert code (just after HdrCode) to ensure the routine can be done inplace',
-      # insert code, after the autogenerated xs argument processing code
-      # produced by VarArgsXSHdr and AFTER any in HdrCode
-      # - this code flags the routine as working inplace,
-      #
+   PDL::PP::Rule->new("InplaceNormalised", ["SignatureObj","Inplace"],
+		      'interpret Inplace and Signature to get input/output',
       # Inplace can be supplied several values
       #   => 1
       #     assumes fn has an input and output ndarray (eg 'a(); [o] b();')
@@ -1541,145 +1537,186 @@ EOD
       #     one is to be marked inplace
       #   => [ 'a', 'b' ]
       #     input ndarray is a(), output ndarray is 'b'
+      # this will set InplaceNormalised to [input,output]
       sub {
-        my ( $sig, $arg ) = @_;
-        return '' if !$arg;
+        my ($sig, $arg) = @_;
+        confess 'Inplace given false value' if !$arg;
         confess "Inplace array-ref (@$arg) > 2 elements" if ref($arg) eq "ARRAY" and @$arg > 2;
         # find input and output ndarrays
-        my @out = $sig->names_out;
+        my %is_out = map +($_=>1), my @out = $sig->names_out;
         my @in = $sig->names_in;
         my $in = @in == 1 ? $in[0] : undef;
         my $out = @out == 1 ? $out[0] : undef;
-        my %outca = map +($_=>1), $sig->names_oca;
-        my $noutca = grep $_, values %outca;
-        if ( ref($arg) eq "ARRAY" and @$arg) {
+        my $noutca = $sig->names_oca;
+        if (ref($arg) eq "ARRAY" and @$arg) {
           $in = $$arg[0];
           $out = $$arg[1] if @$arg > 1;
         }
-        confess "ERROR: Inplace does not know name of input ndarray\n"
+        confess "ERROR: Inplace does not know name of input ndarray"
             unless defined $in;
-        confess "ERROR: Inplace does not know name of output ndarray\n"
+        confess "ERROR: Inplace input ndarray '$in' is actually output"
+            if $is_out{$in};
+        confess "ERROR: Inplace does not know name of output ndarray"
             unless defined $out;
-        PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_INPLACE($in, $out, $noutca)\n");
+        my ($in_obj, $out_obj) = map $sig->objs->{$_}, $in, $out;
+        confess "ERROR: Inplace output arg $out not [o]\n" if !$$out_obj{FlagW};
+        my ($in_inds, $out_inds) = map $_->{IndObjs}, $in_obj, $out_obj;
+        confess "ERROR: Inplace args $in and $out different number of dims"
+          if @$in_inds != @$out_inds;
+        for my $i (0..$#$in_inds) {
+          my ($in_ind, $out_ind) = map $_->[$i], $in_inds, $out_inds;
+          next if grep !defined $_->{Value}, $in_ind, $out_ind;
+          confess "ERROR: Inplace Pars $in and $out inds ".join('=',@$in_ind{qw(Name Value)})." and ".join('=',@$out_ind{qw(Name Value)})." not compatible"
+            if $in_ind->{Value} != $out_ind->{Value};
+        }
+        [$in, $out];
+      }),
+   PDL::PP::Rule->new(["InplaceCode"], [qw(InplaceNormalised CallCopy)],
+      'code to implement working inplace',
+      # insert code, after the autogenerated xs argument processing code
+      # produced by VarArgsXSHdr and AFTER any in HdrCode
+      # - this code flags the routine as working inplace,
+      sub {
+        my ($arg, $callcopy) = @_;
+        my ($in, $out) = @$arg;
+        "  PDL_XS_INPLACE($in, $out, @{[$callcopy ? 'copy' : 'init']})\n";
       }),
    PDL::PP::Rule::Returns::EmptyString->new("InplaceCode", []),
 
    PDL::PP::Rule::Returns::EmptyString->new("HdrCode", [],
-					    'Code that will be inserted at the end of the autogenerated xs argument processing code VargArgsXSHdr'),
+    'Code that will be inserted before the call to the RunFunc'),
+   PDL::PP::Rule::Returns::EmptyString->new("FtrCode", [],
+    'Code that will be inserted after the call to the RunFunc'),
 
+   PDL::PP::Rule->new([], [qw(Name SignatureObj ArgOrder OtherParsDefaults?)],
+      "Check for ArgOrder errors",
+      sub {
+        my ($name, $sig, $argorder, $otherdefaults) = @_;
+        return if $argorder and !ref $argorder;
+        confess "$name ArgOrder given false value" if !ref $argorder;
+        my @names = @{ $sig->allnames(1, 1) };
+        my %namehash = map +($_=>1), @names;
+        delete @namehash{@$argorder};
+        confess "$name ArgOrder missed params: ".join(' ', keys %namehash) if keys %namehash;
+        my %orderhash = map +($_=>1), @$argorder;
+        delete @orderhash{@names};
+        confess "$name ArgOrder too many params: ".join(' ', keys %orderhash) if keys %orderhash;
+        my %optionals = map +($_=>1), keys(%$otherdefaults), $sig->names_out, $sig->other_out;
+        my $optional = '';
+        for (@$argorder) {
+          $optional = $_, next if exists $optionals{$_};
+          confess "$name got mandatory argument '$_' after optional argument '$optional'"
+            if $optional and !exists $optionals{$_};
+        }
+        ();
+      }),
+
+   PDL::PP::Rule->new([], [qw(Name SignatureObj OtherParsDefaults)],
+      "Check the OtherPars defaults aren't for ones after ones without",
+      sub {
+        my ($name,$sig,$otherdefaults) = @_;
+        my @other_args = @{ $sig->othernames(1, 1) };
+        return if keys %$otherdefaults == @other_args;
+        my $default_seen = '';
+        for (@other_args) {
+          $default_seen = $_ if exists $otherdefaults->{$_};
+          confess "$name got default-less arg '$_' after default-ful arg '$default_seen'"
+            if $default_seen and !exists $otherdefaults->{$_};
+        }
+      }),
    PDL::PP::Rule->new("VarArgsXSHdr",
-      ["Name","SignatureObj",
-       "HdrCode","InplaceCode",\"CallCopy",\"OtherParsDefaults"],
+      [qw(Name SignatureObj
+       CallCopy? OtherParsDefaults? ArgOrder? InplaceNormalised?)],
       'XS code to process input arguments based on supplied Pars argument to pp_def; not done if GlobalNew or PMCode supplied',
       sub {
         my($name,$sig,
-           $hdrcode,$inplacecode,$callcopy,$defaults) = @_;
+           $callcopy,$otherdefaults,$argorder,$inplace) = @_;
+        $argorder = [reorder_args($sig, $otherdefaults)] if $argorder and !ref $argorder;
         my $optypes = $sig->otherobjs;
-        my @args = @{ $sig->allnames(1) };
-        my %other = map +($_ => exists($$optypes{$_})), @args;
-        if (keys %{ $defaults ||= {} } < keys %other) {
-          my $default_seen = '';
-          for (@args) {
-            $default_seen = $_ if exists $defaults->{$_};
-            confess "got default-less arg '$_' after default-ful arg '$default_seen'"
-              if $default_seen and !exists $defaults->{$_};
-          }
-        }
-        my $ci = '  ';  # current indenting
+        my @args = @{ $argorder || $sig->allnames(1, 1) };
+        my %other = map +($_=>1), @{$sig->othernames(1, 1)};
+        $otherdefaults ||= {};
+        my $ci = 2;  # current indenting
         my %ptypes = map +($_=>$$optypes{$_} ? $$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1}) : 'pdl *'), @args;
         my %out = map +($_=>1), $sig->names_out_nca;
         my %outca = map +($_=>1), $sig->names_oca;
+        my @inargs = grep !$outca{$_}, @args;
         my %other_out = map +($_=>1), $sig->other_out;
-        my %tmp = map +($_=>1), $sig->names_tmp;
-        # remember, otherpars *are* input vars
-        my $nout   = grep $_, values %out;
-        my $noutca = grep $_, values %outca;
-        my $nother = grep $_, values %other;
-        my $ntmp   = grep $_, values %tmp;
+        my $nout   = keys(%out) + keys(%other_out);
+        my $noutca = keys %outca;
         my $ntot   = @args;
-        my $nmaxonstack = $ntot - $noutca;
-        my $nin    = $ntot - ($nout + $noutca);
-        my $ninout = $nin + $nout;
         my $nallout = $nout + $noutca;
-        my $ndefault = keys %$defaults;
-        my $usageargs = join ",", map exists $defaults->{$_} ? "$_=$defaults->{$_}" : $_, grep !$tmp{$_}, @args;
-        # Generate declarations for SV * variables corresponding to pdl * output variables.
-        # These are used in creating output variables.  One variable (ex: SV * outvar1_SV;)
-        # is needed for each output and output create always argument
-        my $svdecls = join "\n", map indent("SV *${_}_SV = NULL;",$ci), $sig->names_out;
-        my ($xsargs, $xsdecls) = ('', ''); my %already_read; my $cnt = 0; my %outother2cnt;
-        foreach my $x (@args) {
-            next if $outca{$x};
-            last if $out{$x} || ($other{$x} && exists $defaults->{$x});
-            $already_read{$x} = 1;
-            $xsargs .= "$x, "; $xsdecls .= "\n\t$ptypes{$x}$x";
-            $outother2cnt{$x} = $cnt if $other{$x} && $other_out{$x};
-            $cnt++;
+        my $ndefault = keys %$otherdefaults;
+        my %valid_itemcounts = ((my $nmaxonstack = $ntot - $noutca)=>1);
+        $valid_itemcounts{my $nin = $nmaxonstack - $nout} = 1;
+        $valid_itemcounts{my $nin_minus_default = "($nin-$ndefault)"} = 1 if $ndefault;
+        my $only_one = keys(%valid_itemcounts) == 1;
+        my $nretval = $argorder ? $nout :
+          $only_one ? $noutca :
+          "(items == $nmaxonstack) ? $noutca : $nallout";
+        my ($cnt, @preinit, @xsargs, %already_read, %name2cnts) = -1;
+        my @inputdecls = map "PDL_Indx ${_}_count=0;", grep $other{$_} && $optypes->{$_}->is_array, @inargs;
+        foreach my $x (@inargs) {
+          if (!$argorder && ($out{$x} || $other_out{$x} || exists $otherdefaults->{$x})) {
+            last if @xsargs + keys(%out) + $noutca != $ntot;
+            $argorder = 1; # remaining all output ndarrays, engage
+          }
+          $cnt++;
+          $name2cnts{$x} = [$cnt, $cnt];
+          $already_read{$x} = 1;
+          push @xsargs, $x.(!$argorder ? '' :
+            exists $otherdefaults->{$x} ? "=$otherdefaults->{$x}" :
+            !$out{$x} ? '' :
+            $inplace && $x eq $inplace->[1] ? "=$x" :
+            "=".callPerlInit($x."_SV", $callcopy)
+            );
+          push @inputdecls, "$ptypes{$x}$x".($inplace && $x eq $inplace->[1] ? "=NO_INIT" : '');
         }
-        my $pars = join "\n",map indent("$_;",$ci), $sig->alldecls(0, 0, \%already_read);
-        $svdecls = join "\n", grep length, $svdecls, map indent(qq{SV *${_}_SV = @{[defined($outother2cnt{$_})?"ST($outother2cnt{$_})":'NULL']};},$ci), $sig->other_out;
-        my @create = ();  # The names of variables which need to be created by calling
-                          # the 'initialize' perl routine from the correct package.
-        $ci = '    ';  # Current indenting
-        # clause for reading in all variables
-        my $clause1 = ''; $cnt = 0;
-        foreach my $x (@args) {
-            if ($outca{$x}) {
-                push @create, $x;
-            } else {
-                my ($setter, $type) = typemap($ptypes{$x}, 'get_inputmap');
-                $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>($out{$x}||$other_out{$x} ? "${x}_SV = " : '')."ST($cnt)"});
-                $setter =~ s/.*?(?=$x\s*=\s*)//s; # zap any declarations like whichdims_count
-                $clause1 .= indent("$setter;\n",$ci) if !$already_read{$x};
-                $cnt++;
-            }
+        my $shortcnt = my $xs_arg_cnt = $cnt;
+        foreach my $x (@inargs[$cnt+1..$nmaxonstack-1]) {
+          $cnt++;
+          $name2cnts{$x} = [$cnt, undef];
+          $name2cnts{$x}[1] = ++$shortcnt if !($out{$x} || $other_out{$x});
+          push @xsargs, "$x=$x";
+          push @inputdecls, "$ptypes{$x}$x".($other{$x} && !exists $otherdefaults->{$x} ? "; { ".callTypemap($x, $ptypes{$x})."; }" : "=NO_INIT");
         }
-        # Add code for creating output variables via call to 'initialize' perl routine
-        $clause1 .= indent(callPerlInit(\@create, $callcopy),$ci);
-        @create = ();
-        # clause for reading in input and creating output vars
-        my $clause3 = '';
-        my $defaults_rawcond = $ndefault ? "items == ($nin-$ndefault)" : '';
-        $cnt = 0;
-        foreach my $x (@args) {
-            if ($out{$x} || $outca{$x}) {
-                push @create, $x;
-            } else {
-                my ($setter, $type) = typemap($ptypes{$x}, 'get_inputmap');
-                $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>($other_out{$x} ? "${x}_SV = " : '')."ST($cnt)"});
-                $setter =~ s/^(.*?)=\s*//s, $setter = "$x = ($defaults_rawcond) ? ($defaults->{$x}) : ($setter)" if exists $defaults->{$x};
-                $clause3 .= indent("$setter;\n",$ci) if !$already_read{$x};
-                $cnt++;
-            }
-        }
-        # Add code for creating output variables via call to 'initialize' perl routine
-        $clause3 .= indent(callPerlInit(\@create, $callcopy),$ci); @create = ();
-        my $defaults_cond = $ndefault ? " || $defaults_rawcond" : '';
-        $clause3 = <<EOF . $clause3;
-  else if (items == $nin$defaults_cond) { PDL_COMMENT("only input variables on stack, create outputs")
-    nreturn = $nallout;
-EOF
-        $clause3 = '' if $nmaxonstack == $nin;
-        my $clause3_coda = $clause3 ? '  }' : '';
-        PDL::PP::pp_line_numbers(__LINE__, <<END);
-\nvoid
-$name($xsargs...)$xsdecls
- PREINIT:
-  PDL_XS_PREAMBLE
-$svdecls
-$pars
+        push @inputdecls, map "$ptypes{$_}$_=".callPerlInit($_."_SV", $callcopy).";", grep $outca{$_}, @args;
+        my $defaults_rawcond = $ndefault ? "items == $nin_minus_default" : '';
+        my $svdecls = join '', map "\n  $_",
+          (map "SV *${_}_SV = ".(
+            !$name2cnts{$_} ? 'NULL' :
+            $argorder ? "items > $name2cnts{$_}[1] ? ST($name2cnts{$_}[1]) : ".($other_out{$_} ? "sv_newmortal()" : "NULL") :
+            $name2cnts{$_}[0] == ($name2cnts{$_}[1]//-1) ? "ST($name2cnts{$_}[0])" :
+            "(items == $nmaxonstack) ? ST($name2cnts{$_}[0]) : ".
+            (!defined $name2cnts{$_}[1] ? ($other_out{$_} ? "sv_newmortal()" : "NULL") :
+              defined $otherdefaults->{$_} ? "!($defaults_rawcond) ? ST($name2cnts{$_}[1]) : ".($other_out{$_} ? "sv_newmortal()" : "NULL") :
+              "ST($name2cnts{$_}[1])"
+            )
+          ).";", (grep !$already_read{$_}, $sig->names_in), $sig->names_out, @{$sig->othernames(1, 1, \%already_read)}),
+          ;
+        my $argcode =
+          indent(2, join '',
+            (map
+              "if (!${_}_SV) { $_ = ($otherdefaults->{$_}); } else ".
+              "{ ".callTypemap($_, $ptypes{$_})."; }\n",
+              grep !$argorder && exists $otherdefaults->{$_}, @{$sig->othernames(1, 1)}),
+            (map callTypemap($_, $ptypes{$_}).";\n", grep !$already_read{$_}, $sig->names_in),
+            (map +("if (${_}_SV) { ".($argorder ? '' : callTypemap($_, $ptypes{$_}))."; } else ")."$_ = ".callPerlInit($_."_SV", $callcopy).";\n", grep $out{$_} && !$already_read{$_} && !($inplace && $_ eq $inplace->[1]), @args)
+          );
+        push @preinit, qq[PDL_XS_PREAMBLE($nretval);] if $nallout;
+        push @preinit, qq{if (!(@{[join ' || ', map "(items == $_)", sort keys %valid_itemcounts]}))
+    croak("Usage: ${main::PDLOBJ}::$name(@{[
+        join ",", map exists $otherdefaults->{$_} ? "$_=$otherdefaults->{$_}" :
+             $out{$_} || $other_out{$_} ? "[$_]" : $_, @inargs
+    ]}) (you may leave [outputs] and values with =defaults out of list)");}
+          unless $only_one || $argorder || ($nmaxonstack - ($xs_arg_cnt+1) == keys(%valid_itemcounts)-1);
+        my $preamble = @preinit ? qq[\n PREINIT:@{[join "\n  ", "", @preinit]}\n INPUT:\n] : '';
+        join '', qq[
+\nNO_OUTPUT pdl_error
+pdl_run_$name(@{[join ', ', @xsargs]})$svdecls
+$preamble@{[join "\n  ", "", @inputdecls]}
  PPCODE:
-  if (items != $nmaxonstack && !(items == $nin$defaults_cond) && items != $ninout)
-    croak (\"Usage:  PDL::$name($usageargs) (you may leave output variables out of list)\");
-  PDL_XS_PACKAGEGET
-  if (items == $nmaxonstack) { PDL_COMMENT("all variables on stack, read in output vars")
-    nreturn = $noutca;
-$clause1
-  }
-$clause3$clause3_coda
-$hdrcode
-$inplacecode
-END
+], map "$_\n", $argcode;
       }),
 
    # globalnew implies internal usage, not XS
@@ -1690,79 +1727,84 @@ END
       sub {
         my ($sig) = @_;
         my $optypes = $sig->otherobjs;
-        my @args = @{ $sig->allnames(1) };
-        my %other = map +($_ => exists($$optypes{$_})), @args;
+        my @args = @{ $sig->allnames(1, 1) };
         my %outca = map +($_=>1), $sig->names_oca;
-        my %other_out = map +($_=>1), $sig->other_out;
-        my $ci = '  ';
+        my %other_output = map +($_=>1), my @other_output = ($sig->other_io, $sig->other_out);
+        my $ci = 2;
         my $cnt = 0; my %outother2cnt;
         foreach my $x (grep !$outca{$_}, @args) {
-            $outother2cnt{$x} = $cnt if $other{$x} && $other_out{$x};
+            $outother2cnt{$x} = $cnt if $other_output{$x};
             $cnt++;
         }
-        join "\n", map indent(qq{SV *${_}_SV = ST($outother2cnt{$_});},$ci), $sig->other_out;
+        join "\n", map indent($ci,qq{SV *${_}_SV = ST($outother2cnt{$_});}), @other_output;
       }),
    PDL::PP::Rule->new("XSOtherOutSet",
-      ["SignatureObj"],
+      [qw(Name SignatureObj)],
       "Generate XS to set SVs to output values for OtherPars",
       sub {
-        my ($sig) = @_;
+        my ($name, $sig) = @_;
         my $clause1 = '';
-        my @other_out = $sig->other_out;
+        my @other_output = ($sig->other_io, $sig->other_out);
         my $optypes = $sig->otherobjs;
-        my %ptypes = map +($_=>$$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1})), @other_out;
-        for my $x (@other_out) {
+        my %ptypes = map +($_=>$$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1})), @other_output;
+        for my $x (@other_output) {
           my ($setter, $type) = typemap($ptypes{$x}, 'get_outputmap');
           $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>"tsv"});
-          $clause1 = <<EOF . $clause1;
-{ SV *tsv = sv_2mortal(newSV(0));
+          $clause1 .= <<EOF;
+if (!${x}_SV)
+  PDL->pdl_barf("Internal error in $name: tried to output to NULL ${x}_SV");
+{\n  SV *tsv = sv_newmortal();
 $setter
-sv_setsv(${x}_SV, tsv); }
+  sv_setsv(${x}_SV, tsv);\n}
 EOF
         }
-        $clause1;
+        indent(2, $clause1);
       }),
    PDL::PP::Rule->new("VarArgsXSReturn",
-      ["SignatureObj","XSOtherOutSet"],
+      ["SignatureObj"],
       "Generate XS trailer to return output variables or leave them as modified input variables",
       sub {
-        my ($sig,$other_out_set) = @_;
-        my @outs = $sig->names_out; # names of output ndarrays in calling order
-        my $clause1 = join ';', map "ST($_) = $outs[$_]_SV", 0 .. $#outs;
-        $other_out_set.PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_RETURN($clause1)");
+        my ($sig) = @_;
+        my $oc = my @outs = $sig->names_out; # output ndarrays in calling order
+        my @other_outputs = ($sig->other_io, $sig->other_out); # output OtherPars
+        my $clause1 = join ';', (map "ST($_) = $outs[$_]_SV", 0 .. $#outs),
+          (map "ST(@{[$_+$oc]}) = $other_outputs[$_]_SV", 0 .. $#other_outputs);
+        $clause1 ? indent(2,"PDL_XS_RETURN($clause1)\n") : '';
       }),
 
    PDL::PP::Rule->new("NewXSHdr", ["NewXSName","SignatureObj"],
       sub {
         my($name,$sig) = @_;
-        my $shortpars = join ',', @{ $sig->allnames(1) };
-        my $longpars = join "\n", map "\t$_", $sig->alldecls(1, 0);
+        my $shortpars = join ',', @{ $sig->allnames(1, 1) };
+        my $optypes = $sig->otherobjs;
+        my @counts = map "PDL_Indx ${_}_count=0;", grep $optypes->{$_}->is_array, @{ $sig->othernames(1, 1) };
+        my $longpars = join "\n", map "  $_", @counts, $sig->alldecls(1, 0, 1);
         return<<END;
-\nvoid
+\nNO_OUTPUT pdl_error
 $name($shortpars)
 $longpars
 END
       }),
-   PDL::PP::Rule::InsertName->new("RunFuncName", 'pdl_${name}_run'),
+   PDL::PP::Rule::InsertName->new("RunFuncName", 'pdl_run_%s'),
    PDL::PP::Rule->new("NewXSCHdrs", ["RunFuncName","SignatureObj","GlobalNew"],
       sub {
         my($name,$sig,$gname) = @_;
         my $longpars = join ",", $sig->alldecls(0, 1);
-        my $opening = 'pdl_error PDL_err = {0, NULL, 0};';
-        my $closing = 'return PDL_err;';
+        my $opening = '  pdl_error PDL_err = {0, NULL, 0};';
+        my $closing = '  return PDL_err;';
         return ["pdl_error $name($longpars) {$opening","$closing}",
-                "PDL->$gname = $name;"];
+                "  PDL->$gname = $name;"];
       }),
    PDL::PP::Rule->new(["RunFuncCall","RunFuncHdr"],["RunFuncName","SignatureObj"], sub {
         my ($func_name,$sig) = @_;
-        my $shortpars = join ',', map $sig->other_is_out($_)?"&$_":$_, @{ $sig->allnames(0) };
+        my $shortpars = join ',', map $sig->other_is_output($_)?"&$_":$_, @{ $sig->allnames(0) };
         my $longpars = join ",", $sig->alldecls(0, 1);
-        (PDL::PP::pp_line_numbers(__LINE__-1, "PDL->barf_if_error($func_name($shortpars));"),
+        (indent(2,"RETVAL = $func_name($shortpars);\nPDL->barf_if_error(RETVAL);\n"),
           "pdl_error $func_name($longpars)");
       }),
 
    PDL::PP::Rule->new("NewXSMakeNow", ["SignatureObj"],
-      sub { join '', map PDL::PP::pp_line_numbers(__LINE__-1, "$_ = PDL->make_now($_);\n"), @{ $_[0]->names } }),
+      sub { join '', map "$_ = PDL->make_now($_);\n", @{ $_[0]->names } }),
    PDL::PP::Rule->new("IgnoreTypesOf", ["FTypes","SignatureObj"], sub {
       my ($ftypes, $sig) = @_;
       my ($pnames, $pobjs) = ($sig->names_sorted, $sig->objs);
@@ -1772,31 +1814,12 @@ END
    PDL::PP::Rule::Returns->new("IgnoreTypesOf", {}),
 
    PDL::PP::Rule->new("NewXSTypeCoerceNS", ["StructName"],
-      sub {
-        PDL::PP::pp_line_numbers(__LINE__, <<EOF);
-PDL_RETERROR(PDL_err, PDL->type_coerce($_[0]));
-EOF
-      }),
+      sub { "  PDL_RETERROR(PDL_err, PDL->type_coerce($_[0]));\n" }),
    PDL::PP::Rule::Substitute->new("NewXSTypeCoerceSubd", "NewXSTypeCoerceNS"),
-
-   PDL::PP::Rule->new("NewXSSetTransPDLs", ["SignatureObj","StructName"], sub {
-      my($sig,$trans) = @_;
-      join '',
-        map PDL::PP::pp_line_numbers(__LINE__-1, "$trans->pdls[$_->[0]] = $_->[2];\n"),
-        grep !$_->[1], $sig->names_sorted_tuples;
-   }),
-
-   PDL::PP::Rule->new("NewXSExtractTransPDLs", ["SignatureObj","StructName"], sub {
-      my($sig,$trans) = @_;
-      join '',
-        map PDL::PP::pp_line_numbers(__LINE__, "$_->[2] = $trans->pdls[$_->[0]];\n"),
-        grep !$_->[1], $sig->names_sorted_tuples;
-   }),
 
    PDL::PP::Rule->new("NewXSRunTrans", ["StructName"], sub {
       my($trans) = @_;
-      PDL::PP::pp_line_numbers(__LINE__,
-      "PDL_RETERROR(PDL_err, PDL->make_trans_mutual($trans));\n");
+      "  PDL_RETERROR(PDL_err, PDL->make_trans_mutual($trans));\n";
    }),
 
    PDL::PP::Rule->new(["StructDecl","ParamStructType"],
@@ -1805,7 +1828,7 @@ EOF
         my($comp,$name) = @_;
         return ('', '') if !$comp;
         my $ptype = "pdl_params_$name";
-        (PDL::PP::pp_line_numbers(__LINE__-1, qq{typedef struct $ptype {\n$comp} $ptype;}),
+        (PDL::PP::pp_line_numbers(__LINE__-1, qq[typedef struct $ptype {\n]).qq[$comp\n} $ptype;],
         $ptype);
       }),
 
@@ -1815,21 +1838,18 @@ sub wrap_vfn {
     $code,$rout,$func_header,
     $all_func_header,$sname,$pname,$ptype,$extra_args,
   ) = @_;
-  PDL::PP::pp_line_numbers(__LINE__, <<EOF);
-pdl_error $rout(pdl_trans *$sname$extra_args) {
-  @{[join "\n  ",
-  'pdl_error PDL_err = {0, NULL, 0};',
-  $ptype ? "$ptype *$pname = $sname->params;" : (),
-  (grep $_, $all_func_header, $func_header, $code), 'return PDL_err;'
-]}
-}
-EOF
+  join "", PDL::PP::pp_line_numbers(__LINE__,
+qq[pdl_error $rout(pdl_trans *$sname$extra_args) {
+  pdl_error PDL_err = {0, NULL, 0};]),
+    ($ptype ? "  $ptype *$pname = $sname->params;\n" : ''),
+    indent(2, join '', grep $_, $all_func_header, $func_header, $code),
+    "  return PDL_err;\n}";
 }
 sub make_vfn_args {
   my ($which, $extra_args) = @_;
   ("${which}Func",
-    ["${which}CodeSubd","${which}FuncName",\"${which}FuncHeader",
-      \"AllFuncHeader", qw(StructName ParamStructName ParamStructType),
+    ["${which}CodeSubd","${which}FuncName","${which}FuncHeader?",
+      qw(AllFuncHeader? StructName ParamStructName ParamStructType),
     ],
     sub {$_[1] eq 'NULL' ? '' : wrap_vfn(@_,$extra_args//'')}
   );
@@ -1837,21 +1857,34 @@ sub make_vfn_args {
 ()},
 
    PDL::PP::Rule->new("MakeCompOther", [qw(SignatureObj ParamStructName)], sub { $_[0]->getcopy("$_[1]->%s") }),
-   PDL::PP::Rule->new("MakeCompTotal", ["MakeCompOther", \"MakeComp"], sub { join "\n", grep $_, @_ }),
+   PDL::PP::Rule->new("MakeCompTotal", [qw(MakeCompOther MakeComp?)], sub { join "\n", grep $_, @_ }),
    PDL::PP::Rule::Substitute->new("MakeCompiledReprSubd", "MakeCompTotal"),
+
+   PDL::PP::Rule->new("NewXSSetTransPDLs", ["SignatureObj","StructName"], sub {
+      my($sig,$trans) = @_;
+      join '',
+        map "  $trans->pdls[$_->[0]] = $_->[2];\n",
+        grep !$_->[1], $sig->names_sorted_tuples;
+   }),
+   PDL::PP::Rule->new("NewXSExtractTransPDLs", [qw(SignatureObj StructName MakeComp?)], sub {
+      my($sig,$trans,$makecomp) = @_;
+      !$makecomp ? '' : join '',
+        map "  $_->[2] = $trans->pdls[$_->[0]];\n",
+        grep !$_->[1], $sig->names_sorted_tuples;
+   }),
 
    (map PDL::PP::Rule::Substitute->new("${_}ReadDataCodeUnparsed", "${_}Code"), '', 'Bad'),
    PDL::PP::Rule->new(PDL::PP::Code::make_args(qw(ReadData)),
 		      sub { PDL::PP::Code->new(@_, undef, undef, 1); }),
    PDL::PP::Rule::Substitute->new("ReadDataCodeSubd", "ReadDataCodeParsed"),
-   PDL::PP::Rule::InsertName->new("ReadDataFuncName", 'pdl_${name}_readdata'),
+   PDL::PP::Rule::InsertName->new("ReadDataFuncName", 'pdl_%s_readdata'),
    PDL::PP::Rule->new(make_vfn_args("ReadData")),
 
    (map PDL::PP::Rule::Substitute->new("${_}WriteBackDataCodeUnparsed", "${_}BackCode"), '', 'Bad'),
    PDL::PP::Rule->new(PDL::PP::Code::make_args(qw(WriteBackData)),
 		      sub { PDL::PP::Code->new(@_, undef, 1, 1); }),
    PDL::PP::Rule::Substitute->new("WriteBackDataCodeSubd", "WriteBackDataCodeParsed"),
-   PDL::PP::Rule::InsertName->new("WriteBackDataFuncName", "BackCode", 'pdl_${name}_writebackdata'),
+   PDL::PP::Rule::InsertName->new("WriteBackDataFuncName", "BackCode", 'pdl_%s_writebackdata'),
    PDL::PP::Rule::Returns::NULL->new("WriteBackDataFuncName", "Code"),
    PDL::PP::Rule->new(make_vfn_args("WriteBackData")),
 
@@ -1861,7 +1894,7 @@ sub make_vfn_args {
    PDL::PP::Rule->new("DimsSetters",
       ["SignatureObj"],
       sub { join "\n", sort map $_->get_initdim, $_[0]->dims_values }),
-   PDL::PP::Rule->new("RedoDimsFuncName", ["Name", \"RedoDims", \"RedoDimsCode", "DimsSetters"],
+   PDL::PP::Rule->new("RedoDimsFuncName", [qw(Name RedoDims? RedoDimsCode? DimsSetters)],
       sub { (scalar grep $_ && /\S/, @_[1..$#_]) ? "pdl_$_[0]_redodims" : 'NULL'}),
    PDL::PP::Rule::Returns->new("RedoDimsCode", [],
 			       'Code that can be inserted to set the size of output ndarrays dynamically based on input ndarrays; is parsed',
@@ -1878,14 +1911,15 @@ sub make_vfn_args {
    PDL::PP::Rule::Substitute->new("RedoDimsCodeSubd", "RedoDims"),
    PDL::PP::Rule->new(make_vfn_args("RedoDims")),
 
-   PDL::PP::Rule->new("CompFreeCodeOther", "SignatureObj", sub {$_[0]->getfree("COMP")}),
-   PDL::PP::Rule->new("CompFreeCodeComp", [qw(CompObj Comp)], sub {$_[0]->getfree("COMP")}),
-   PDL::PP::Rule->new("CompFreeCode", ["CompFreeCodeOther", \"CompFreeCodeComp"], sub { join "\n", grep $_, @_ }),
+   PDL::PP::Rule->new("CompFreeCode", [qw(CompObj CompFreeCodeComp?)],
+    "Free any OtherPars/Comp stuff, including user-supplied code (which is probably paired with own MakeComp)",
+    sub {join '', grep defined() && length, $_[0]->getfree("COMP"), @_[1..$#_]},
+   ),
    PDL::PP::Rule->new("NTPrivFreeCode", "PrivObj", sub {$_[0]->getfree("PRIV")}),
    PDL::PP::Rule->new("FreeCodeNS",
       ["StructName","CompFreeCode","NTPrivFreeCode"],
       sub {
-	  (grep $_, @_[1..$#_]) ? PDL::PP::pp_line_numbers(__LINE__-1, "PDL_FREE_CODE($_[0], destroy, $_[1], $_[2])"): ''}),
+	  (grep $_, @_[1..$#_]) ? "PDL_FREE_CODE($_[0], destroy, $_[1], $_[2])" : ''}),
    PDL::PP::Rule::Substitute->new("FreeCodeSubd", "FreeCodeNS"),
    PDL::PP::Rule->new("FreeFuncName",
 		      ["FreeCodeSubd","Name"],
@@ -1902,13 +1936,12 @@ sub make_vfn_args {
    PDL::PP::Rule::Returns::EmptyString->new("NewXSCoerceMustNS"),
    PDL::PP::Rule::Substitute->new("NewXSCoerceMustCompSubd", "NewXSCoerceMustNS"),
 
-   PDL::PP::Rule->new("NewXSFindBadStatusNS", ["StructName"],
+   PDL::PP::Rule->new("NewXSFindBadStatusNS", [qw(StructName SignatureObj)],
       "Rule to find the bad value status of the input ndarrays",
       sub {
-        PDL::PP::pp_line_numbers(__LINE__, <<EOF);
-PDL_RETERROR(PDL_err, PDL->trans_check_pdls($_[0]));
-char \$BADFLAGCACHE() = PDL->trans_badflag_from_inputs($_[0]);
-EOF
+        my $str = "PDL_RETERROR(PDL_err, PDL->trans_check_pdls($_[0]));\n";
+        $str .= "char \$BADFLAGCACHE() = PDL->trans_badflag_from_inputs($_[0]);\n" if $_[1]->names_out;
+        indent(2, $str);
       }),
 
    PDL::PP::Rule->new("NewXSCopyBadStatusNS",
@@ -1929,7 +1962,7 @@ EOF
       sub {
         my ( $sig ) = @_;
         return '' if @{$sig->names} == (my @outs = $sig->names_out); # no input pdls, no badflag copying needed
-        PDL::PP::pp_line_numbers(__LINE__, join '',
+        !@outs ? '' : PDL::PP::indent(2, join '', # no outs, ditto
           "if (\$BADFLAGCACHE()) {\n",
           (map "  \$SETPDLSTATEBAD($_);\n", @outs),
           "}\n");
@@ -1945,11 +1978,10 @@ EOF
 		      "Rule to create and initialise the private trans structure",
       sub {
         my( $sname, $vtable, $pname, $ptype ) = @_;
-        PDL::PP::pp_line_numbers(__LINE__, <<EOF);
+        indent(2, <<EOF . ($ptype ? "$ptype *$pname = $sname->params;\n" : ""));
 if (!PDL) return (pdl_error){PDL_EFATAL, "PDL core struct is NULL, can't continue",0};
 pdl_trans *$sname = PDL->create_trans(&$vtable);
 if (!$sname) return PDL->make_error_simple(PDL_EFATAL, "Couldn't create trans");
-@{[$ptype ? "$ptype *$pname = $sname->params;" : ""]}
 EOF
       }),
 
@@ -1969,23 +2001,23 @@ EOF
       "Generate C function with idiomatic arg list to maybe call from XS",
       sub {
         my ($xs_c_header, @bits) = @_;
-        my $opening = 'pdl_error PDL_err = {0, NULL, 0};';
-        my $closing = 'return PDL_err;';
-        PDL::PP::pp_line_numbers __LINE__-1, join '', "$xs_c_header {\n$opening\n", @bits, "$closing\n}\n";
+        my $opening = '  pdl_error PDL_err = {0, NULL, 0};';
+        my $closing = '  return PDL_err;';
+        join '', "$xs_c_header {\n$opening\n", @bits, "$closing\n}\n";
       }),
 
    # internal usage, not XS - NewXSCHdrs only set if GlobalNew
    PDL::PP::Rule->new(["NewXSCode","BootSetNewXS","NewXSInPrelude"],
       ["NewXSHdr", "NewXSCHdrs", "RunFuncCall"],
       "Non-varargs XS code when GlobalNew given",
-      sub {(undef,(make_xs_code('CODE:',' XSRETURN(0);',@_))[1..2])}),
+      sub {(undef,(make_xs_code(' CODE:','',@_))[1..2])}),
    # if PMCode supplied, no var-args stuff
    PDL::PP::Rule->new(["NewXSCode","BootSetNewXS","NewXSInPrelude"],
-      ["PMCode","NewXSHdr", \"NewXSCHdrs", qw(FixArgsXSOtherOutDeclSV RunFuncCall XSOtherOutSet)],
+      [qw(PMCode NewXSHdr NewXSCHdrs? FixArgsXSOtherOutDeclSV RunFuncCall XSOtherOutSet)],
       "Non-varargs XS code when PMCode given",
-      sub {make_xs_code('CODE:',' XSRETURN(0);',@_[1..$#_])}),
+      sub {make_xs_code(' CODE:','',@_[1..$#_])}),
    PDL::PP::Rule->new(["NewXSCode","BootSetNewXS","NewXSInPrelude"],
-      [qw(VarArgsXSHdr), \"NewXSCHdrs", qw(RunFuncCall VarArgsXSReturn)],
+      [qw(VarArgsXSHdr NewXSCHdrs? HdrCode InplaceCode RunFuncCall FtrCode XSOtherOutSet VarArgsXSReturn)],
       "Rule to print out XS code when variable argument list XS processing is enabled",
       sub {make_xs_code('','',@_)}),
 
@@ -2027,7 +2059,7 @@ EOF
         my @indnames = $sig->ind_names_sorted;
         my $indnames = join(",", map qq|"$_"|, @indnames) || '""';
         my $sizeof = $ptype ? "sizeof($ptype)" : '0';
-        PDL::PP::pp_line_numbers(__LINE__, <<EOF);
+        <<EOF;
 static pdl_datatypes ${vname}_gentypes[] = { $gentypes_txt };
 static char ${vname}_flags[] = {
   $join_flags

@@ -6,13 +6,14 @@ select(STDOUT); $|=1;
 
 use Test::More;
 use Config::Tiny;
-use IO::CaptureOutput qw/capture/;
-use File::Copy::Recursive qw/fcopy/;
+use Capture::Tiny qw/capture/;
+use File::Copy qw/copy/;
 use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catdir catfile rel2abs/;
 use File::Temp qw/tempdir/;
-use t::Frontend;
-use t::MockHomeDir;
+use lib 't/lib';
+use Frontend;
+use MockHomeDir;
 
 #plan 'no_plan';
 plan tests => 12;
@@ -22,7 +23,7 @@ plan tests => 12;
 #--------------------------------------------------------------------------#
 
 
-my $config_dir = catdir( t::MockHomeDir::home_dir, ".cpanreporter" );
+my $config_dir = catdir( MockHomeDir::home_dir, ".cpanreporter" );
 my $config_file = catfile( $config_dir, "config.ini" );
 
 my $old_history_file = catfile( $config_dir, "history.db" );
@@ -38,9 +39,9 @@ my ($rc, $stdout, $stderr);
 sub re_require {
     delete $INC{'CPAN/Reporter/History.pm'};
     eval {
-        capture sub {
+        ($stdout, $stderr) = capture {
             require_ok( "CPAN::Reporter::History" );
-        } => \$stdout, \$stderr;
+        };
     };
     die $@ if $@;
     return 1;
@@ -69,7 +70,7 @@ re_require();
 ok( ! -f $old_history_file && ! -f $new_history_file, "still no history files");
 
 # If old history exists, convert it
-fcopy( $sample_old_file, $old_history_file);
+copy( $sample_old_file, $old_history_file);
 ok( -f $old_history_file, "copied sample old history file to config directory");
 re_require();
 like( $stdout, "/Upgrading automatically/", "saw upgrading notice" );

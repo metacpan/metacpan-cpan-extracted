@@ -1,5 +1,10 @@
 Changes for Data::Turtle:
 
+0.0202 2023-04-29
+    - Improve documentation slightly.
+    - Improve the eg/* code.
+    - Add the eg/synopsis-svg program.
+
 0.0201 2019-01-26
     - Improve documentation.
 

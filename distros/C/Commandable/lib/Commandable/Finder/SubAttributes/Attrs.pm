@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.09;
+package Commandable::Finder::SubAttributes::Attrs 0.10;
 
 use v5.14;
 use warnings;
@@ -57,12 +57,18 @@ sub Command_opt :ATTR(CODE,MULTI)
    my ( $opts, $name, $description, $default ) = @_;
 
    my $mode = "set";
-   $mode = "value" if $name =~ s/:$//;
+   $mode = "value" if $name =~ s/=$//;
+   $mode = "inc"   if $name =~ s/\+$//;
+
+   my $negatable = $name =~ s/\!$//;
+   my $multi     = $name =~ s/\@$//;
 
    my %optspec = (
       name        => $name,
       description => $description,
       mode        => $mode,
+      multi       => $multi,
+      negatable   => $negatable,
       default     => $default,
    );
 

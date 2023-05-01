@@ -165,18 +165,17 @@ if ( length $SCRIPT_PATH ) {
 	print("export PATH=\$PATH::\$SeismicUnixGui_script\n");
 	print("export PERL5LIB=\$PERL5LIB::\$SeismicUnixGui\n");
 	print(
-		"\nHowever, for a quick BUT temporary fix, you have 2 options:\n");
-	print("    A. Cut-and-paste the 4 instructions above, one at a time \n");
+		"\nHowever, for a quick BUT temporary fix, you have another option:\n");
+	print("    Cut-and-paste the 4 instructions above, one at a time \n");
 	print("into your command line and execute them one at a time.\n"
 	);
 	print("\nIn case you are unsure, this last instruction also means: \n");
-	print("    copy and paste each line,\n");
-	print("    one at a time,\n");
-	print("    into the command line,\n");
+	print("    copy and paste each complete line,\n");
+	print("    only one single command line at a time,\n");
 	print("    with each line followed by \"Enter\"\n\n");
-	print("or, B. Run the following bash instruction on a single line (!):\n");
-	chomp $SCRIPT_PATH;
-	print("    source .temp\n");
+#	print("or, B. Run the following bash instruction on a single line (!):\n");
+#	chomp $SCRIPT_PATH;
+#	print("    source .temp\n");
 	print("\n... after which you should be able run the following instruction\n");
 	print(" on the command line:\n\n");
 	print("    SeismicUnixGui\n");	

@@ -244,6 +244,7 @@ t/modules/Workflow/Task/Action.t
 t/modules/Workflow/Task/Group.t
 t/regression/10-set_and_dne.t
 t/regression/132-bool.t
+t/regression/247_check_ref_bool.t
 t/regression/27-1-Test2-Bundle-More.t
 t/regression/27-2-Test2-Tools-Compare.t
 t/regression/27-3-Test2-Tools-ClassicCompare.t

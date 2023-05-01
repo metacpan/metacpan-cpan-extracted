@@ -10,7 +10,7 @@ WriteMakefile(
     'MIN_PERL_VERSION' => '5.008001',
     'PREREQ_PM' => {
         'LWP::UserAgent' => 5.5,
-        JSON => 2.27,
+        'JSON::MaybeXS' => 0,
         Carp => 0,
         Encode => 0,
         URI => 0,

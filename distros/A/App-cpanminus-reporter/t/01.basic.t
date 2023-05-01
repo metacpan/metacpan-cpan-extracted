@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use App::cpanminus::reporter;
+use Cwd;
+use File::Spec;
 
 can_ok 'App::cpanminus::reporter',
 	qw( new config verbose quiet only exclude build_dir build_logfile
@@ -49,5 +51,38 @@ is_deeply $ret, $reporter->only, 'only() was properly returned when set';
 
 ok my $config = $reporter->config, 'object has config()';
 isa_ok $config, 'CPAN::Testers::Common::Client::Config';
+
+{
+    note("Testing 'file' scheme");
+
+    my $reporter = App::cpanminus::reporter->new();
+    ok(defined $reporter, "created a new reporter object");
+    isa_ok($reporter, 'App::cpanminus::reporter');
+
+    my ($uri, $rf);
+    my $cwd = cwd();
+    my $tarball_for_testing = File::Spec->catfile(
+      $cwd,
+      't',
+      'data',
+      'pause_mocker',
+      'M',
+      'ME',
+      'METATEST',
+      'Phony-PASS-0.01.tgz'
+    );
+    ok(-f $tarball_for_testing, "Located tarball '$tarball_for_testing'");
+    $uri = qq|file://$tarball_for_testing|;
+    $rf = $reporter->parse_uri($uri);
+    ok($rf, "parse_uri() returned true value");
+    my %expect = (
+        distfile => 'METATEST/Phony-PASS-0.01.tgz',
+        author => 'METATEST',
+    );
+    is($reporter->distfile(), $expect{distfile},
+        "distfile() returned expected value: $expect{distfile}");
+    is($reporter->author(), $expect{author},
+        "author() returned the proper author");
+}
 
 done_testing;

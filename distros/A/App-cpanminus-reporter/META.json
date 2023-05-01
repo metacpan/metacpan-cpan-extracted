@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "CPAN::Meta::Converter" : "0",
-            "CPAN::Testers::Common::Client" : "0.13",
+            "CPAN::Testers::Common::Client" : "0.14",
             "Capture::Tiny" : "0",
             "Carp" : "0",
             "Config::Tiny" : "2.08",
@@ -56,10 +56,13 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/garu/App-cpanminus-reporter/issues/"
+      },
       "repository" : {
-         "url" : "http://github.com/garu/App-cpanminus-reporter"
+         "url" : "https://github.com/garu/App-cpanminus-reporter"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

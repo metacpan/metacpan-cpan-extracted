@@ -6,8 +6,6 @@ use strict;
 use warnings;
 use PDL::Core '';
 use Pod::Select;
-use File::Spec;
-use File::Basename;
 
 our @ISA = qw(Pod::Select);
 
@@ -16,7 +14,7 @@ our %Title = ('Example' => 'Example',
 	  'Sig'     => 'Signature',
 	  'Opt'     => 'Options',
 	  'Usage'   => 'Usage',
-          'Bad'     => 'Bad value support',  
+          'Bad'     => 'Bad value support',
 	 );
 
 sub new {
@@ -105,7 +103,7 @@ sub checkmode {
   }
   unless ($this->{Parmode} =~ /Body/ || $this->{INBLOCK}) {
     my $func = $this->{CURFUNC};
-    barf "no function defined" unless defined $func;
+    die "no function defined\n" unless defined $func;
     local $this->{INBLOCK} = 1; # can interpolate call textblock?
     my $itxt = $verbatim ? $txt : $this->interpolate($txt);
     $this->{SYMHASH}->{$func}->{$this->{Parmode}} .=
@@ -156,7 +154,7 @@ PDL::Doc - support for PDL online documentation
 =head1 SYNOPSIS
 
   use PDL::Doc;
-  $onlinedc = new PDL::Doc ($docfile);
+  $onlinedc = PDL::Doc->new($docfile);
   @match = $onlinedc->search('m/slice|clump/');
 
 =head1 DESCRIPTION
@@ -168,7 +166,7 @@ An implementation of online docs for PDL.
 PDL::Doc's main use is in the "help" (synonym "?") and "apropos"
 (synonym "??") commands in the perldl shell.  PDL::Doc provides the
 infrastrucure to index and access PDL's documentation through these
-commands.  There is also an API for direct access to the documentation 
+commands.  There is also an API for direct access to the documentation
 database (see below).
 
 The PDL doc system is built on Perl's pod (Plain Old Documentation),
@@ -177,7 +175,7 @@ automatically indexed when PDL is built and installed, and there is
 provision for indexing external modules as well.
 
 To include your module's pod into the Perl::Doc index, you should
-follow the documentation conventions below.  
+follow the documentation conventions below.
 
 =head1 PDL documentation conventions
 
@@ -285,7 +283,7 @@ might return ndarrays with bad values.
 The PDL podparser is implemented as a simple state machine. Any of
 the above C<=for> statements switches the podparser into a state
 where the following paragraph is accepted as information for the
-respective field (C<Ref>, C<Usage>, C<Opt>, C<Example> or C<Bad>). 
+respective field (C<Ref>, C<Usage>, C<Opt>, C<Example> or C<Bad>).
 Only the text up to
 the end of the current paragraph is accepted, for example:
 
@@ -386,7 +384,7 @@ are documented in this way (for examples of this usage see, for example,
 the PDL::Slices module, especially F<slices.pd> and the resulting
 F<Slices.pm>). Similarly, the 'BadDoc' field provides a means of
 specifying information on how the routine handles the presence of
-bad values: this will be autpmatically created if 
+bad values: this will be automatically created if
 C<BadDoc> is not supplied, or set to C<undef>.
 
 Furthermore, the documentation for each function should contain
@@ -415,12 +413,14 @@ use warnings;
 use PDL::Core '';
 use File::Basename;
 use PDL::Doc::Config;
+use File::Spec::Functions qw(file_name_is_absolute abs2rel rel2abs catdir catfile);
+use Cwd (); # to help Debian packaging
 
 =head1 INSTANCE METHODS
 
 =head2 new
 
-  $onlinedc = new PDL::Doc ('file.pdl',[more files]);
+  $onlinedc = PDL::Doc->new('file.pdl',[more files]);
 
 =cut
 
@@ -465,22 +465,16 @@ Make sure that the database is slurped in
 sub ensuredb {
   my ($this) = @_;
   while (my $fi = pop @{$this->{File}}) {
-    open IN, $fi or
-      barf "can't open database $fi, scan docs first";
-    binmode IN;
+    open my $fh, $fi or barf "can't open database $fi, scan docs first";
+    binmode $fh;
     my ($plen,$txt);
-    while (read IN, $plen,2) {
+    while (read $fh, $plen,2) {
       my ($len) = unpack "S", $plen;
-      read IN, $txt, $len;
-      my (@a) =  split chr(0), $txt;
-      my $module = splice @a,1,1;
-      push(@a, "") unless(@a % 2);  # Add null string at end if necessary -- solves bug with missing REF section.
-      my ($sym, %hash) = @a;
-     
-      $hash{Dbfile} = $fi; # keep the origin pdldoc.db path
-      $this->{SYMS}->{$sym}->{$module} = {%hash};
+      read $fh, $txt, $len;
+      my ($sym, $module, @a) = split chr(0), $txt;
+      push @a, "" if @a % 2; # Add null string at end if necessary -- solves bug with missing REF section.
+      $this->{SYMS}{$sym}{$module} = { @a, Dbfile => $fi }; # keep the origin pdldoc.db path
     }
-    close IN;
     push @{$this->{Scanned}}, $fi;
   }
   return $this->{SYMS};
@@ -492,20 +486,19 @@ save the database (i.e., the hash of PDL symbols) to the file associated
 with this object.
 
 =cut
- 
+
 sub savedb {
   my ($this) = @_;
-  my $hash = $this->ensuredb();
+  my $hash = $this->ensuredb;
   open my $fh, '>', $this->{Outfile} or barf "can't write to symdb $this->{Outfile}: $!";
   binmode $fh;
   while (my ($name,$mods_hash) = each %$hash) {
     next if 0 == scalar(%$mods_hash);
-    while (my ($module,$val) = each %$mods_hash){
+    while (my ($module,$val) = each %$mods_hash) {
       my $fi = $val->{File};
-      if (File::Spec->file_name_is_absolute($fi) && -f $fi) {
+      $val->{File} = abs2rel($fi, dirname($this->{Outfile}))
         #store paths to *.pm files relative to pdldoc.db
-        $val->{File} = File::Spec->abs2rel($fi, dirname($this->{Outfile})) ;
-      }
+        if file_name_is_absolute($fi) && -f $fi;
       delete $val->{Dbfile}; # no need to store Dbfile
       my $txt = join(chr(0),$name,$module,%$val);
       print $fh pack("S",length($txt)).$txt;
@@ -516,7 +509,12 @@ sub savedb {
 
 =head2 gethash
 
-Return the PDL symhash (e.g. for custom search operations)
+Return the PDL symhash (e.g. for custom search operations). To see what
+it has stored in it in JSON format:
+
+  perl -MPDL::Doc -MJSON::PP -e \
+    'print encode_json +PDL::Doc->new(PDL::Doc::_find_inc([qw(PDL pdldoc.db)]))->gethash' |
+    json_pp -json_opt pretty,canonical
 
 The symhash is a multiply nested hash ref with the following structure:
 
@@ -558,9 +556,7 @@ The possible keys for each function/module entry include:
 
 =cut
 
-sub gethash {
-  return $_[0]->ensuredb();
-}
+sub gethash { $_[0]->ensuredb }
 
 =head2 search
 
@@ -613,7 +609,7 @@ sub search {
   $pattern = $this->checkregex($pattern);
 
   while (my ($name,$mods_hash) = each %$hash) {
-      while (my ($module,$val) = each %$mods_hash){
+      while (my ($module,$val) = each %$mods_hash) {
 	FIELD: for (@$fields) {
 	    if ($_ eq 'Name' and $name =~ /$pattern/i
 		or defined $val->{$_} and $val->{$_} =~ /$pattern/i) {
@@ -658,21 +654,9 @@ for online documentation
 
 sub scan {
   my ($this,$file,$verbose) = @_;
-  $verbose = 0 unless defined $verbose;
   barf "can't find file '$file'" unless -f $file;
-
-  # First HTMLify file in the tree
-
-  # Does not work yet
-
-  #if  (system ("pod2html $file")!=0) {
-  #   warn "Failed to execute command: pod2html $file2\n";
-  #}
-  #else{ # Rename result (crummy pod2html)
-  #   rename ("$file.html","$1.html") if  $file =~ /^(.*)\.pm$/;
-  #}
-
-  # Now parse orig pm/pod
+  $file = Cwd::abs_path($file); # help Debian packaging
+  $verbose = 0 unless defined $verbose;
 
   open my $infile, '<', $file;
   # XXXX convert to absolute path
@@ -687,20 +671,15 @@ sub scan {
   my $parser = PDL::PodParser->new;
   $parser->{verbose} = $verbose;
   eval { $parser->parse_from_filehandle($infile,$outfile) };
-  warn "cannot parse '$file' ($@)" if $@;
+  warn "cannot parse '$file' ($@)" if $@ and $@ ne "no function defined\n";
 
-  $this->{SYMS} = {} unless defined $this->{SYMS};
-  my $hash = $this->{SYMS};
-  my @stats = stat $file;
-  $this->{FTIME}->{$file2} = $stats[9]; # store last mod time
-  # print "mtime of $file: $stats[9]\n";
+  my $hash = $this->{SYMS} ||= {};
   my $n = 0;
+  $_->{File} = $file2, $n++ for values %{ $parser->{SYMHASH} };
   while (my ($key,$val) = each %{ $parser->{SYMHASH} }) {
-    $n++;
-    $val->{File} = $file2;
     #set up the 3-layer hash/database structure: $hash->{funcname}->{PDL::SomeModule} = $val
-    if (defined($val->{Module})){
-	$hash->{$key}->{$val->{Module}} = $val;
+    if (defined($val->{Module})) {
+	$hash->{$key}{$val->{Module}} = $val;
     } else {
 	warn "no Module for $key in $file2\n";
     }
@@ -712,7 +691,7 @@ sub scan {
 
   open $infile, '<', $file;
   $outfile_text = '';
-  $parser = new PDL::PodParser;
+  $parser = PDL::PodParser->new;
   $parser->select('NAME');
   eval { $parser->parse_from_filehandle($infile,$outfile) };
   warn "cannot parse '$file'" if $@;
@@ -729,8 +708,8 @@ sub scan {
      }
    }
    $does = 'Hmmm ????' if $does and $does =~ /^\s*$/;
-   my $type = ($file =~ /\.pod$/ ? 
-	       ($does =~ /shell|script/i && $name =~ /^[a-z][a-z0-9]*$/) ? 'Script:' 
+   my $type = ($file =~ /\.pod$/ ?
+	       ($does =~ /shell|script/i && $name =~ /^[a-z][a-z0-9]*$/) ? 'Script:'
 	       : 'Manual:'
 	       : 'Module:');
    $hash->{$name}{$name} = {Ref=>"$type $does",File=>$file2} if $name and $name !~ /^\s*$/;
@@ -751,20 +730,17 @@ sub scantree {
   require File::Find;
   print "Scanning $dir ... \n\n";
   my $ntot = 0;
-  my $sub = sub { if (($File::Find::name =~ /[.]pm$/ &&
-		      $File::Find::name !~ /PP.pm/ &&
-		      $File::Find::name !~ m|Pod/Parser.pm| &&
-		      $File::Find::dir !~ m#/PP|/Gen#) or (
-		       $File::Find::name =~ /[.]pod$/ && 
-                       $File::Find::name !~ /Index[.]pod$/)){
-       printf "%-20s", $_.'...';
-       my $n = $this->scan($File::Find::name,$verbose); # bind $this lexically
-       print "\t$n functions\n";
-       $ntot += $n;
-		    }
+  my $sub = sub {
+    return if $File::Find::name !~ /\.(?:pm|pod)$/;
+    return if $File::Find::name =~ /(?:Index\.pod|PP\.pm)$/ or
+      $File::Find::dir =~ m#/PP#;
+    printf "%-20s", $_.'...';
+    $ntot += my $n = $this->scan($File::Find::name,$verbose);
+    print "\t$n functions\n";
   };
   File::Find::find($sub,$dir);
-  print "\n\nfound $ntot functions\n";
+  print "\nfound $ntot functions\n";
+  $ntot;
 }
 
 
@@ -780,11 +756,12 @@ sub funcdocs {
   my $hash = $this->ensuredb;
   barf "unknown function '$func'" unless defined($hash->{$func});
   barf "funcdocs now requires 3 arguments" if defined fileno $module;
-  my $file = $hash->{$func}->{$module}->{File};
-  my $dbf = $hash->{$func}->{$module}->{Dbfile};
-  if (!File::Spec->file_name_is_absolute($file) && $dbf) {
-    $file = File::Spec->rel2abs($file, dirname($dbf)); 
-  }
+  my $file = $hash->{$func}{$module}{File};
+  my $dbf = $hash->{$func}{$module}{Dbfile};
+  $file = Cwd::abs_path($file) if file_name_is_absolute($file);
+  $dbf = Cwd::abs_path($dbf); # help Debian packaging
+  $file = rel2abs($file, dirname($dbf))
+    if !file_name_is_absolute($file) && $dbf;
   funcdocs_fromfile($func,$file,$fout);
 }
 
@@ -827,60 +804,61 @@ sub getfuncdocs {
 
 =for usage
 
- use PDL::Doc; PDL::Doc::add_module("my::module");
+ use PDL::Doc;
+ PDL::Doc::add_module("PDL::Stats"); # add PDL::Stats, PDL::Stats::GLM, ...
 
 =for ref
 
 The C<add_module> function allows you to add POD from a particular Perl
-module that you've installed somewhere in @INC.  It searches for the
+module (and as of PDL 2.083, in fact all modules starting with that as
+a prefix) that you've installed somewhere in C<@INC>. It searches for the
 active PDL document database and the module's .pod and .pm files, and
-scans and indexes the module into the database.
+scans and indexes the module(s) into the database.
 
 C<add_module> is meant to be added to your module's Makefile as part of the
-installation script.
+installation script. This is done automatically by
+L<PDL::Core::Dev/pdlpp_postamble>, but if the top level of your
+distribution is Perl modules (like L<PDL::LinearAlgebra>), then add a
+C<postamble> manually in the F<Makefile.PL>:
+
+  use PDL::Core::Dev;
+  sub MY::postamble {
+    my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
+    qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
+  }
 
 =cut
 
+sub _find_inc {
+  my ($what, $want_dir) = @_;
+  my @ret;
+  for my $dir (@INC) {
+    my $ent = $want_dir ? catdir($dir, @$what) : catfile($dir, @$what);
+    push @ret, $ent if $want_dir ? -d $ent : -f $ent;
+  }
+  @ret;
+}
+
 sub add_module {
-    my($module) = shift;
-    use File::Copy qw{copy};
-    my($pdldoc);
-    local($_);
-  DIRECTORY:
-    for my $dir (@INC){
-	my $file = $dir."/PDL/pdldoc.db";
-	if( -f $file) {
-	    if(! -w "$dir/PDL") {
-		die "No write permission at $dir/PDL - not updating docs database.\n";
-	    }
-	    print "Found docs database $file\n";
-	    $pdldoc = PDL::Doc->new($file);
-	    last DIRECTORY;
-	}
-    }
-
-    die "Unable to find docs database - therefore not updating it.\n" unless($pdldoc);
-
-    my $mfile = $module;
-    $mfile =~ s/\:\:/\//g;
-    for(@INC){
-	my $postfix;
-	my $hit = 0;
-	for $postfix(".pm",".pod") {
-	    my $f = "$_/$mfile$postfix";
-	    if( -e $f ){
-		$pdldoc->ensuredb();
-		$pdldoc->scan($f);
-		eval { $pdldoc->savedb(); };
-		warn $@ if $@;
-		print "PDL docs database updated - added $f.\n";
-		$hit = 1;
-	    }
-	}
-	return if($hit);
-    }
-
-    die "Unable to find a .pm or .pod file in \@INC for module $module\n";
+  my ($module) = @_;
+  my ($file) = _find_inc([qw(PDL pdldoc.db)], 0);
+  die "Unable to find docs database - therefore not updating it.\n" if !defined $file;
+  die "No write permission for $file - not updating docs database.\n"
+    if !-w $file;
+  print "Found docs database $file\n";
+  my $pdldoc = PDL::Doc->new($file);
+  my @pkg = my @mfile = split /::/, $module;
+  my $mlast = pop @mfile;
+  my @found = map _find_inc([@mfile, $mlast.$_]), qw(.pm .pod);
+  die "Unable to find a .pm or .pod file in \@INC for module $module\n" if !@found;
+  $pdldoc->ensuredb;
+  my $n = 0;
+  $n += $pdldoc->scan($_) for @found;
+  print "Added @found, $n functions.\n";
+  $n += $pdldoc->scantree($_) for _find_inc(\@pkg, 1);
+  eval { $pdldoc->savedb; };
+  warn $@ if $@;
+  print "PDL docs database updated - total $n functions.\n";
 }
 
 =head1 PDL::DOC EXAMPLE
@@ -890,18 +868,10 @@ own code.
 
  use PDL::Doc;
  # Find the pdl documentation
- my ($dir,$file,$pdldoc);
- DIRECTORY: for $dir (@INC) {
-     $file = $dir."/PDL/pdldoc.db";
-     if (-f $file) {
-         print "Found docs database $file\n";
-         $pdldoc = new PDL::Doc ($file);
-         last DIRECTORY;
-     }
- }
-
- die ("Unable to find docs database!\n") unless $pdldoc;
-
+ my ($file) = _find_inc([qw(PDL pdldoc.db)], 0);
+ die "Unable to find docs database!\n" unless defined $file;
+ print "Found docs database $file\n";
+ my $pdldoc = PDL::Doc->new($file);
  # Print the reference line for zeroes:
  print map{$_->{Ref}} values %{$pdldoc->gethash->{zeroes}};
  # Or, if you remember that zeroes is in PDL::Core:
@@ -920,7 +890,7 @@ own code.
  print "\n";
 
  #Or, more concisely:
- print join("\n",map{$_->[0]}@entries);
+ print map "$_->[0]\n", @entries;
 
  # Let's look at the function 'mpdl'
  @entries = $pdldoc->search('mpdl', 'Name');

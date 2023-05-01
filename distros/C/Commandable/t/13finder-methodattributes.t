@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Commandable::Finder::MethodAttributes;
 
@@ -35,7 +35,7 @@ my $finder = Commandable::Finder::MethodAttributes->new(
 # find_commands
 {
 
-   is_deeply( [ sort map { $_->name } $finder->find_commands ],
+   is( [ sort map { $_->name } $finder->find_commands ],
       [qw( help one )],
       '$finder->find_commmands' );
 }
@@ -44,7 +44,7 @@ my $finder = Commandable::Finder::MethodAttributes->new(
 {
    my $one = $finder->find_command( "one" );
    # can't test 'code' directly
-   is_deeply( { map { $_, $one->$_ } qw( name description package ) },
+   is( { map { $_, $one->$_ } qw( name description package ) },
       {
          name        => "one",
          description => "the one command",
@@ -55,7 +55,7 @@ my $finder = Commandable::Finder::MethodAttributes->new(
    is( scalar $one->arguments, 1, '$one has an argument' );
 
    my ( $arg ) = $one->arguments;
-   is_deeply( { map { $_ => $arg->$_ } qw( name description ) },
+   is( { map { $_ => $arg->$_ } qw( name description ) },
       {
          name        => "arg",
          description => "the argument",
@@ -64,7 +64,7 @@ my $finder = Commandable::Finder::MethodAttributes->new(
    );
 
    $one->code->( "the argument" );
-   is_deeply( \@called, [ { self => $object, arg => "the argument" } ],
+   is( \@called, [ { self => $object, arg => "the argument" } ],
       'Invoked code sees invocant object' );
 }
 

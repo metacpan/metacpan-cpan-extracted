@@ -30,7 +30,8 @@
             "XML::DOM" : "1.46"
          },
          "requires" : {
-            "perl" : "5.008"
+            "Carp" : "0",
+            "perl" : "5.010"
          },
          "suggests" : {
             "Tie::IxHash" : "0"
@@ -41,50 +42,54 @@
             "XML::DOM" : "1.46"
          },
          "requires" : {
-            "Test" : "0"
+            "Test" : "0",
+            "Test::More" : "0"
+         },
+         "suggests" : {
+            "Tie::IxHash" : "0"
          }
       }
    },
    "provides" : {
       "XML::Generator" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::DOM" : {
          "file" : "lib/XML/Generator/DOM.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::DOM::util" : {
          "file" : "lib/XML/Generator/DOM.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::cdata" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::comment" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::final" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::overload" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::pi" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::pretty" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       },
       "XML::Generator::util" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.11"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
@@ -95,7 +100,7 @@
          "web" : "https://github.com/timlegge/perl-XML-Generator"
       }
    },
-   "version" : "1.11",
+   "version" : "1.13",
    "x_generated_by_perl" : "v5.34.0",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"

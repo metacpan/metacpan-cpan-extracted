@@ -17,7 +17,7 @@ name: Release-Checklist
 provides:
   Release::Checklist:
     file: Checklist.pm
-    version: 0.16
+    version: 0.17
 recommends:
   CPAN::Meta::Converter: 2.150010
   CPAN::Meta::Validator: 2.150010
@@ -60,4 +60,4 @@ resources:
   bugtracker: https://github.com/Tux/Release-Checklist/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Release-Checklist
-version: 0.16
+version: 0.17

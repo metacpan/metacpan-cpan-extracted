@@ -11,27 +11,26 @@ use SPVM 'TestCase::JSON';
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
-# encode
+# encode_json
 {
-  ok(SPVM::TestCase::JSON->encode_null);
-  ok(SPVM::TestCase::JSON->encode_flat_hash);
-  ok(SPVM::TestCase::JSON->encode_flat_list);
-  ok(SPVM::TestCase::JSON->encode_int);
-  ok(SPVM::TestCase::JSON->encode_double);
-  ok(SPVM::TestCase::JSON->encode_bool);
-  ok(SPVM::TestCase::JSON->encode_string);
-  ok(SPVM::TestCase::JSON->encode_nested_hash);
+  ok(SPVM::TestCase::JSON->encode_json_null);
+  ok(SPVM::TestCase::JSON->encode_json_bool);
+  ok(SPVM::TestCase::JSON->encode_json_number);
+  ok(SPVM::TestCase::JSON->encode_json_string);
+  ok(SPVM::TestCase::JSON->encode_json_list);
+  ok(SPVM::TestCase::JSON->encode_json_hash);
+  ok(SPVM::TestCase::JSON->encode_json_object);
 }
 
-# decode
+# decode_json
 {
-  ok(SPVM::TestCase::JSON->decode_null);
-  ok(SPVM::TestCase::JSON->decode_flat_hash);
-  ok(SPVM::TestCase::JSON->decode_flat_list);
-  ok(SPVM::TestCase::JSON->decode_double);
-  ok(SPVM::TestCase::JSON->decode_bool);
-  ok(SPVM::TestCase::JSON->decode_string);
-  ok(SPVM::TestCase::JSON->decode_nested_hash);
+  ok(SPVM::TestCase::JSON->decode_json_null);
+  ok(SPVM::TestCase::JSON->decode_json_bool);
+  ok(SPVM::TestCase::JSON->decode_json_number);
+  ok(SPVM::TestCase::JSON->decode_json_string);
+  ok(SPVM::TestCase::JSON->decode_json_list);
+  ok(SPVM::TestCase::JSON->decode_json_hash);
+  ok(SPVM::TestCase::JSON->decode_json_invalid_json_data);
 }
 
 # All object is freed

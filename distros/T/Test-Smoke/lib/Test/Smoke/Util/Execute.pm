@@ -82,10 +82,9 @@ sub run {
 
     my $command = join(
         " ",
-        $self->{command},
         map {
             / / ? qq/"$_"/ : $_
-        } $self->arguments(@_)
+        } $self->{command}, $self->arguments(@_)
     );
     $self->log_debug("In pwd(%s) running:", cwd());
     $self->log_info("qx[%s]\n", $command);

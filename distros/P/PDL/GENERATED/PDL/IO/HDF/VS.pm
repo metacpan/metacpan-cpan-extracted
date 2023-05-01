@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "VS.pd"
 
 use strict;
@@ -47,17 +48,8 @@ For more information on HDF4, see http://www.hdfgroup.org/products/hdf4/
 =head1 FUNCTIONS
 
 =cut
-#line 51 "VS.pm"
-
-
-
-
-
-
 
 #line 308 "VS.pd"
-
-
 use PDL::Primitive;
 use PDL::Basic;
 
@@ -252,7 +244,6 @@ sub Vgetchildren
         unless defined( $self->{VGROUP}->{$name}->{children} );
     
     return sort keys %{$self->{VGROUP}->{$name}->{children}};
-#line 256 "VS.pm"
 #line 504 "VS.pd"
 } # End of Vgetchildren()...
 # Now defunct:
@@ -269,7 +260,6 @@ sub Vgetattach
         unless defined( $self->{VGROUP}->{$name}->{attach} );
 
     return sort keys %{$self->{VGROUP}->{$name}->{children}};
-#line 273 "VS.pm"
 #line 519 "VS.pd"
 } # End of Vgetattach()...
 
@@ -280,7 +270,6 @@ sub Vgetparents
         unless defined( $self->{VGROUP}->{$name}->{parents} );
     
     return sort keys %{$self->{VGROUP}->{$name}->{parents}};
-#line 284 "VS.pm"
 #line 528 "VS.pd"
 } # End of Vgetparents()...     
 
@@ -289,7 +278,6 @@ sub Vgetmains
     my ($self) = @_;
     my @rlist;
     foreach( sort keys %{$self->{VGROUP}} )
-#line 293 "VS.pm"
 #line 535 "VS.pd"
     {
         push(@rlist, $_) 
@@ -373,7 +361,6 @@ sub VSgetnames
 {
     my $self = shift;
     return sort keys %{$self->{VDATA}};
-#line 377 "VS.pm"
 #line 617 "VS.pd"
 } # End of VSgetnames()...
 
@@ -387,7 +374,6 @@ sub VSgetfieldnames
         unless defined( $self->{VDATA}->{$name} );
 
     return sort keys %{$self->{VDATA}->{$name}->{FIELDS}};
-#line 391 "VS.pm"
 #line 629 "VS.pd"
 } # End of VSgetfieldnames()...
 # Now defunct:
@@ -396,7 +382,6 @@ sub VSgetfieldsnames
     my $self = shift;
     return $self->VSgetfieldnames( @_ );
 } # End of VSgetfieldsnames()...
-
 
 sub VSread 
 {
@@ -500,19 +485,13 @@ sub VSwrite
     return $res;
 } # End of VSwrite()...
 
-
 sub DESTROY 
 {
     my $self = shift;
     $self->close;
 } # End of DESTROY()...
-#line 510 "VS.pm"
-
-
 
 #line 752 "VS.pd"
-
-
 =head1 CURRENT AUTHOR & MAINTAINER
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -528,12 +507,7 @@ contribs of Patrick Leilde patrick.leilde@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 532 "VS.pm"
-
-
-
-
-
+#line 511 "VS.pm"
 
 # Exit with OK status
 

@@ -40,7 +40,7 @@ my @tests = (
             meta_home => 1,
         },
         log_messages => [
-            '[GitHub::Update] Using distmeta URL',
+            '[GitHub::Update] Updating GitHub repository info using distmeta URL',
         ],
         expected_request => [
             PATCH => 'https://api.github.com/repos/bob/My-Stuff' => {

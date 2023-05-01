@@ -11,6 +11,7 @@ use t_TestCommon  # Test::More etc.
             string_to_tempfile
             @quotes/;
 use t_SSUtils;
+use Capture::Tiny qw/capture_merged tee_merged/;
 
 use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
 
@@ -290,7 +291,10 @@ sub check_both($) {
   my $letters = shift;  # current column ordering
   croak "Expected $num_cols columns" unless length($letters) == $num_cols;
 
+  my %oldoptions = options();
   my $saved_options = options(verbose => 0);
+  die "Should be a boolean, not object" if ref($saved_options);
+  die "Wrong old value" unless !!$saved_options == !!$oldoptions{verbose};
   scope_guard { options(verbose => $saved_options) };
 
   check_titles $letters;
@@ -336,6 +340,58 @@ check_no_sheet;
 tie_column_vars ':all';
 
 options silent => $silent, verbose => $verbose, debug => $debug;
+
+# Verify options() actually works
+{ my @keys = qw/debug verbose silent/;
+  my $s = sheet();
+  my %orig = (map{$_ => $$s->{$_}} @keys);
+  for my $key (@keys) {
+    # Note: Setting debug or verbose affects silent...
+    #warn dvis '###START $key';
+    my $old = $$s->{$key};
+    bug(dvis '$key $old %orig') unless !!$orig{$key} eq !!$old;
+    for my $k (@keys) {
+      bug(dvis '$k (direct access!) disturbed by ???; $orig{$k} $$s->{$k}')
+        unless !!$orig{$k} == !!$$s->{$k};
+    }
+    my %opts = options();
+    for my $k (@keys) {
+      bug(dvis '$k (direct access!) DISTURBED by calling options(); $orig{$k} $$s->{$k}')
+        unless !!$orig{$k} == !!$$s->{$k};
+    }
+    for my $k (@keys) {
+      bug(dvis 'FETCHED unexpected value: $k $orig{$k} $opts{$k}')
+        unless !!$orig{$k} == !!$opts{$k};
+    }
+    bug unless !!$opts{$key} == !!$old;
+    my $new = !$old;
+    # Suppress log messages so this test does not break "silent is really silent" tests
+    # N.B. this is a *nested* Capture when run under t/60_all.t
+    my ($outerr, $result) = capture_merged {
+        options($key => $new);
+        { my %nopts = options(); bug unless !!$nopts{$key} == !!$new; }
+        options($key => $old);
+        { my %nopts = options(); bug unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
+        $s->options($key => $new);
+        { my %nopts = options(); bug unless $nopts{$key} eq $new; }
+        $s->options($key => $old);
+        { my %nopts = options(); bug unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
+    
+        # There was a bug where $sheet->options() used current sheet instead of $sheet
+        # (and died if there was no current sheet)
+        { package Baloney; my %nopts = $s->options; 
+          main::bug unless main::u($nopts{$key}) eq main::u($old) && main::u($nopts{$key}) ne $new; 
+        }
+        42
+    };
+    bug "Someting went wrong:\n$outerr" unless $result == 42;
+    for my $k (@keys) {
+      bug("{$k} disturbed by TESTING $key!")
+        unless !!$orig{$k} == !!$opts{$k};
+      #warn "### BOTTOM ($key): ",dvis("\$\$s->{$k}\n")
+    }
+  }
+}
 
 # Verify that no-titles mode works
 read_spreadsheet {title_rx => undef}, $inpath;

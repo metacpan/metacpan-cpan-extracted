@@ -6,7 +6,7 @@ our $VERSION = '0.001';
 
 use base 'Test::Smoke::Poster::Base';
 
-use CGI::Util;                   # escape() for HTML
+use URI::Escape qw(uri_escape);
 
 =head1 NAME
 
@@ -30,7 +30,8 @@ sub new {
 
     require HTTP::Tiny;
     $self->{_ua} = HTTP::Tiny->new(
-        agent => $self->agent_string()
+        agent => $self->agent_string(),
+        ( $self->ua_timeout ? (timeout => $self->ua_timeout) : () ),
     );
 
     return $self;
@@ -48,7 +49,7 @@ sub _post_data {
     $self->log_info("Posting to %s via %s.", $self->smokedb_url, $self->poster);
     $self->log_debug("Report data: %s", my $json = $self->get_json);
 
-    my $form_data = sprintf("json=%s", CGI::Util::escape($json));
+    my $form_data = sprintf("json=%s", uri_escape($json));
     my $response = $self->ua->request(
         POST => $self->smokedb_url,
         {
@@ -62,14 +63,16 @@ sub _post_data {
 
     if (!$response->{success}) {
         $self->log_warn(
-            "POST failed: %s %s",
+            "POST failed: %s %s%s",
             $response->{status},
-            $response->{reason}
+            $response->{reason},
+            ($response->{content} ? " ($response->{content})" : ""),
         );
         die sprintf(
-            "POST to '%s' failed: %s %s\n",
+            "POST to '%s' failed: %s %s%s\n",
             $self->smokedb_url,
-            $response->{status}, $response->{reason}
+            $response->{status}, $response->{reason},
+            ($response->{content} ? " ($response->{content})" : ""),
         );
     }
 

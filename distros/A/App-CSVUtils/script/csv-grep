@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_grep/csv_grep",
@@ -26,7 +26,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Only output row(s) where Perl expression returns true
+# ABSTRACT: Select (only output) row(s) where Perl expression returns true
 # PODNAME: csv-grep
 
 __END__
@@ -37,11 +37,11 @@ __END__
 
 =head1 NAME
 
-csv-grep - Only output row(s) where Perl expression returns true
+csv-grep - Select (only output) row(s) where Perl expression returns true
 
 =head1 VERSION
 
-This document describes version 1.022 of csv-grep (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of csv-grep (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 SYNOPSIS
 

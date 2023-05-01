@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_gegenbauer.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::GEGENBAUER - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "GEGENBAUER.pm"
-
-
-
-
-
+#line 40 "GEGENBAUER.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ Evaluate Gegenbauer polynomials.
 gsl_sf_gegenpoly_n does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "GEGENBAUER.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gegenpoly_n = \&PDL::gsl_sf_gegenpoly_n;
-#line 81 "GEGENBAUER.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,23 +89,20 @@ Calculate array of Gegenbauer polynomials from 0 to n-1.
 gsl_sf_gegenpoly_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "GEGENBAUER.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gegenpoly_array = \&PDL::gsl_sf_gegenpoly_array;
-#line 113 "GEGENBAUER.pm"
+
+
 
 
 
 
 
 #line 49 "gsl_sf_gegenbauer.pd"
-
 
 =head1 AUTHOR
 
@@ -130,10 +116,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 134 "GEGENBAUER.pm"
-
-
-
+#line 120 "GEGENBAUER.pm"
 
 # Exit with OK status
 

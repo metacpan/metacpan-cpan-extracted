@@ -201,16 +201,13 @@ sub _read {
         $vmsg = "from anonymous filehandle";
     } else {
         if ( $nameorref ) {
-            if ( open SMOKERSLT, "< $nameorref" ) {
-                $self->{_outfile} = do { local $/; <SMOKERSLT> };
-                close SMOKERSLT;
-                $vmsg = "from $nameorref";
-            } else {
+            $vmsg = "from $nameorref";
+            $self->{_outfile} = read_logfile($nameorref, $self->{v});
+            defined($self->{_outfile}) or do {
                 require Carp;
                 Carp::carp( "Cannot read smokeresults ($nameorref): $!" );
-                $self->{_outfile} = undef;
                 $vmsg = "did fail";
-            }
+            };
         } else { # Allow intentional default_buildcfg()
             $self->{_outfile} = undef;
             $vmsg = "did fail";
@@ -771,6 +768,21 @@ sub get_logfile {
     return $self->{log_file} = read_logfile($self->{lfile}, $self->{v});
 }
 
+=head2 $reporter->get_outfile()
+
+Return the contents of C<< $self->{outfile} >> either by reading the file or
+returning the cached version.
+
+=cut
+
+sub get_outfile {
+    my $self = shift;
+    return $self->{_outfile} if $self->{_outfile};
+
+    my $fq_outfile = catfile($self->{ddir}, $self->{outfile});
+    return $self->{_outfile} = read_logfile($fq_outfile, $self->{v});
+}
+
 =head2 $reporter->write_to_file( [$name] )
 
 Write the C<< $self->report >> to file. If name is omitted it will
@@ -821,7 +833,7 @@ sub smokedb_data {
         (my $ncpu      = $si->ncpu          || "?") =~ s/^\s*(\d+)\s*/$1/;
         (my $user_note = $self->{user_note} || "")  =~ s/(\S)[\s\r\n]*\z/$1\n/;
         {
-            architecture     => $si->cpu_type,
+            architecture     => lc $si->cpu_type,
             config_count     => $self->{_rpt}{count},
             cpu_count        => $ncpu,
             cpu_description  => $si->cpu,
@@ -867,12 +879,7 @@ sub smokedb_data {
         if (   ($send_out eq "always")
             or ($send_out eq "on_fail" && $rpt_fail))
         {
-            local *FH;
-            if (open FH, "<", $rpt{outfile}) {
-                local $/;
-                $rpt{out_file} = <FH>;
-                close FH;
-            }
+            $rpt{out_file} = $self->get_outfile();
         }
     }
     delete $rpt{$_} for qw/from send_log send_out user_note/, grep m/^_/ => keys %rpt;
@@ -1034,7 +1041,11 @@ sub user_skipped_tests {
     if ($self->{skip_tests} && -f $self->{skip_tests} and open my $fh,
         "<", $self->{skip_tests})
     {
-        @skipped = map { chomp; "    $_" } <$fh>;
+        while (my $raw = <$fh>) {
+            next, if $raw =~ m/^# One test name on a line/;
+            chomp($raw);
+            push @skipped,  "    $raw";
+        }
         close $fh;
     }
     wantarray and return @skipped;
@@ -1064,7 +1075,7 @@ sub ccmessages {
         $self->log_info("Looking for cc messages: '%s'", $cc);
         $self->{_ccmessages_} = grepccmsg(
             $cc,
-            $self->get_logfile(),
+            $self->get_outfile(),
             $self->{v}
         ) || [];
     }
@@ -1101,7 +1112,7 @@ sub nonfatalmessages {
         $self->log_info("Looking for non-fatal messages: '%s'", $cc);
         $self->{_nonfatal_} = grepnonfatal(
             $cc,
-            $self->get_logfile(),
+            $self->get_outfile(),
             $self->{v}
         ) || [];
     }
@@ -1130,14 +1141,14 @@ sub preamble {
         version libc gnulibc_version
     ));
     my $si = System::Info->new;
-    my $archname  = $si->cpu_type;
+    my $archname  = lc $si->cpu_type;
 
     (my $ncpu = $si->ncpu || "") =~ s/^(\d+)\s*/$1 cpu/;
     $archname .= "/$ncpu";
 
     my $cpu = $si->cpu;
 
-    my $this_host = $si->host;
+    my $this_host = $self->{hostname} || $si->host;
     my $time_msg  = time_in_hhmm( $self->{_rpt}{secs} );
     my $savg_msg  = time_in_hhmm( $self->{_rpt}{avg}  );
 

@@ -13,7 +13,7 @@ BEGIN {
 }
 chdir 't';
 
-use Test::More tests => 98;
+use Test::More tests => 101;
 use Cwd;
 
 use File::Spec;
@@ -349,7 +349,9 @@ SKIP: {
 my @funky_keys = qw(space space_quote space_backslash space_quote_backslash);
 # test including an external manifest.skip file in MANIFEST.SKIP
 {
-    maniadd({ foo => undef , albatross => undef,
+    local $ENV{HOME} = File::Spec->catdir($cwd, qw(mantest));
+
+    maniadd({ foo => undef, orange => undef, albatross => undef,
               'mymanifest.skip' => undef, 'mydefault.skip' => undef});
     for (@funky_keys) {
         maniadd( {$funky_files{$_} => $_} ) if defined $funky_files{$_};
@@ -360,8 +362,9 @@ my @funky_keys = qw(space space_quote space_backslash space_quote_backslash);
     local $ExtUtils::Manifest::DEFAULT_MSKIP =
          File::Spec->catfile($cwd, qw(mantest mydefault.skip));
     my $skip = File::Spec->catfile($cwd, qw(mantest mymanifest.skip));
+    add_file('global.skip' => "^orange\n");
     add_file('MANIFEST.SKIP' =>
-             "albatross\n#!include $skip\n#!include_default");
+             "albatross\n#!include $skip\n#!include_default\n#!include ~/global.skip");
     my ($res, $warn) = catch_warning( \&skipcheck );
     for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
         like( $warn, qr/Skipping \b$_\b/,
@@ -376,7 +379,7 @@ my @funky_keys = qw(space space_quote space_backslash space_quote_backslash);
         }
     }
     ($res, $warn) = catch_warning( \&mkmanifest );
-    for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
+    for (qw(albatross foo foobar mymanifest.skip mydefault.skip orange)) {
         like( $warn, qr/Removed from MANIFEST: \b$_\b/,
               "Removed $_ from MANIFEST" );
     }
@@ -394,6 +397,7 @@ my @funky_keys = qw(space space_quote space_backslash space_quote_backslash);
     ok( exists $files->{bar},         'bar included in MANIFEST' );
     ok( ! exists $files->{foobar},    'foobar excluded via mymanifest.skip' );
     ok( ! exists $files->{foo},       'foo excluded via mymanifest.skip' );
+    ok( ! exists $files->{orange},    'orange excluded via global.skip' );
     ok( ! exists $files->{'mymanifest.skip'},
         'mymanifest.skip excluded via mydefault.skip' );
     ok( ! exists $files->{'mydefault.skip'},
@@ -438,6 +442,13 @@ my @funky_keys = qw(space space_quote space_backslash space_quote_backslash);
 
     my $extsep = $Is_VMS_noefs ? '_' : '.';
     $Files{"$_.bak"}++ for ('MANIFEST', "MANIFEST${extsep}SKIP");
+
+    my $mskip_contents = do {
+        local $/;
+        open my $fh, '<', "MANIFEST${extsep}SKIP" or return;
+        <$fh>;
+    };
+    unlike $mskip_contents, qr{^\Q^my\E}m, 'include_default memory-only';
 }
 
 add_file('MANIFEST'   => 'Makefile.PL');

@@ -112,7 +112,7 @@ sub _options {
         ],
         group_export => [
             { name => 'export_dir',         text => "- Destination folder", section => 'export'  },
-            { name => '_exported_files',    text => "- File extension",     section => 'export'  },
+            { name => '_exported_files',    text => "- File name",          section => 'export'  },
             { name => '_csv_out_char',      text => "- CSV options out a",  section => 'csv_out' },
             { name => '_csv_out_options',   text => "- CSV options out b",  section => 'csv_out' },
             { name => '_file_encoding_out', text => "- File encoding out",  section => 'export'  },
@@ -549,7 +549,8 @@ sub set_options {
             elsif ( $opt eq '_exported_files' ) {
                 my $prompt = 'Exported files';
                 my $sub_menu = [
-                    [ 'add_extension', "- Add automatically '.csv'-extension", [ $no, $yes ] ]
+                    [ 'add_extension',      "- Add automatically '.csv'-extension", [ $no, $yes ] ],
+                    [ 'default_filename',   "- Table-name is default file-name", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

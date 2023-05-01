@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_expint.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::EXPINT - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "EXPINT.pm"
-
-
-
-
-
+#line 40 "EXPINT.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ E_1(x) := Re[ Integrate[ Exp[-xt]/t, {t,1,Infinity}] ]
 gsl_sf_expint_E1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_expint_E1 = \&PDL::gsl_sf_expint_E1;
-#line 81 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ E_2(x) := Re[ Integrate[ Exp[-xt]/t^2, {t,1,Infity}] ]
 gsl_sf_expint_E2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_expint_E2 = \&PDL::gsl_sf_expint_E2;
-#line 113 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ Ei(x) := PV Integrate[ Exp[-t]/t, {t,-x,Infinity}]
 gsl_sf_expint_Ei does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_expint_Ei = \&PDL::gsl_sf_expint_Ei;
-#line 145 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,20 +143,15 @@ Shi(x) := Integrate[ Sinh[t]/t, {t,0,x}]
 gsl_sf_Shi does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_Shi = \&PDL::gsl_sf_Shi;
-#line 177 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -196,20 +170,15 @@ Chi(x) := Re[ M_EULER + log(x) + Integrate[(Cosh[t]-1)/t, {t,0,x}] ]
 gsl_sf_Chi does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 202 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_Chi = \&PDL::gsl_sf_Chi;
-#line 209 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -228,20 +197,15 @@ Ei_3(x) := Integral[ Exp[-t^3], {t,0,x}]
 gsl_sf_expint_3 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 234 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_expint_3 = \&PDL::gsl_sf_expint_3;
-#line 241 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -260,20 +224,15 @@ Si(x) := Integrate[ Sin[t]/t, {t,0,x}]
 gsl_sf_Si does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 266 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_Si = \&PDL::gsl_sf_Si;
-#line 273 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -292,20 +251,15 @@ Ci(x) := -Integrate[ Cos[t]/t, {t,x,Infinity}]
 gsl_sf_Ci does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 298 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_Ci = \&PDL::gsl_sf_Ci;
-#line 305 "EXPINT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -324,16 +278,14 @@ AtanInt(x) := Integral[ Arctan[t]/t, {t,0,x}]
 gsl_sf_atanint does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 330 "EXPINT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_atanint = \&PDL::gsl_sf_atanint;
-#line 337 "EXPINT.pm"
+
+
 
 
 
@@ -353,10 +305,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 357 "EXPINT.pm"
-
-
-
+#line 309 "EXPINT.pm"
 
 # Exit with OK status
 

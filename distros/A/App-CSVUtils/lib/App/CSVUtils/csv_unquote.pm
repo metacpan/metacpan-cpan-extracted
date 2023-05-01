@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils::csv_csv;
 use Perinci::Sub::Util qw(gen_modified_sub);
@@ -27,6 +27,8 @@ which is the default anyway.
 _
 
     remove_args => [qw/output_always_quote output_quote_emty/],
+    tags => ['category:munging', 'modifies-values'],
+
     modify_meta => sub {
         my $meta = shift;
         delete $meta->{args_rels};
@@ -67,7 +69,7 @@ App::CSVUtils::csv_unquote - Make sure values of CSV are unquoted unless when ne
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_unquote (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_unquote (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

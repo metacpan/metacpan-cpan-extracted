@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 3 "SD.pd"
 
+#line 3 "SD.pd"
 
 =head1 NAME 
 
@@ -104,7 +104,6 @@ PDL::IO::HDF::SD - PDL interface to the HDF4 SD library.
   #Now you can do what you want with your data
   $hdf->close();
 
-
 =head1 DESCRIPTION
 
 This library provides functions to read, write, and manipulate
@@ -124,17 +123,8 @@ interchangeably.
 
 use strict;
 use warnings;
-#line 128 "SD.pm"
-
-
-
-
-
-
 
 #line 361 "SD.pd"
-
-
 use PDL::Primitive;
 use PDL::Basic;
 
@@ -180,7 +170,6 @@ sub Byte2Char
     my $hdf = PDL::IO::HDF::SD->new("file.hdf");
 
 =cut
-
 
 sub new
 {
@@ -405,7 +394,6 @@ sub new
 
 =cut
 
-
 # See the changelog for more docs on this feature:
 sub Chunking
 {
@@ -435,12 +423,10 @@ sub Chunking
 
 =cut
 
-
 sub SDgetvariablenames
 {
     my($self) = @_;
     return sort keys %{$self->{DATASET}};
-#line 444 "SD.pm"
 #line 668 "SD.pd"
 } # End of SDgetvariablenames()...
 sub SDgetvariablename
@@ -448,7 +434,6 @@ sub SDgetvariablename
     my $self = shift;
     return $self->SDgetvariablenames( @_ );
 } # End of SDgetvariablename()...
-
 
 =head2 SDgetattributenames
 
@@ -475,7 +460,6 @@ sub SDgetvariablename
 
 =cut 
 
-
 sub SDgetattributenames
 {
     my($self, $name) = @_;
@@ -484,13 +468,11 @@ sub SDgetattributenames
         return( undef )
             unless defined( $self->{DATASET}->{$name} );
         return sort keys %{ $self->{DATASET}->{$name}->{ATTRS} };
-#line 488 "SD.pm"
 #line 710 "SD.pd"
     }
     else 
     {
         return sort keys %{ $self->{GLOBATTR} };
-#line 494 "SD.pm"
 #line 714 "SD.pd"
     }
 } # End of SDgetattributenames()...
@@ -525,7 +507,6 @@ sub SDgetattributname
     my $attr = $hdf->SDgetattribute("attr_name", "dataset_name");
 
 =cut
-
 
 sub SDgetattribute
 {
@@ -569,7 +550,6 @@ sub SDgetattribut
 
 =cut
 
-
 sub SDgetfillvalue
 {
     my($self, $name) = @_;
@@ -597,7 +577,6 @@ sub SDgetfillvalue
 
 =cut
 
-
 sub SDgetrange
 {
     my($self, $name) = @_;
@@ -624,7 +603,6 @@ sub SDgetrange
     my $scale = $hdf->SDgetscalefactor("dataset_name");
 
 =cut
-
 
 sub SDgetscalefactor
 {
@@ -654,7 +632,6 @@ sub SDgetscalefactor
         
 =cut
 
-
 sub SDgetdimsize
 {
     my ($self, $name) = @_;
@@ -662,7 +639,6 @@ sub SDgetdimsize
         unless defined( $self->{DATASET}->{$name} );
     my @dims;
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
-#line 666 "SD.pm"
 #line 884 "SD.pd"
     { 
         push @dims, $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE};
@@ -690,7 +666,6 @@ sub SDgetdimsize
 
 =cut
 
-
 sub SDgetunlimiteddimsize
 {
     my ($self, $name) = @_;
@@ -700,7 +675,6 @@ sub SDgetunlimiteddimsize
     
     my @dim;
     foreach( sort keys %{$self->{DATASET}{$name}{DIMS}} )
-#line 704 "SD.pm"
 #line 920 "SD.pd"
     {
         if( $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE} == 0 )
@@ -742,7 +716,6 @@ sub SDgetdimsizeunlimit
 
 =cut
 
-
 sub SDgetdimnames
 {
     my ($self, $name) = @_;
@@ -752,7 +725,6 @@ sub SDgetdimnames
         
     my @dims=();
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
-#line 756 "SD.pm"
 #line 970 "SD.pd"
     {
 	push @dims,$self->{DATASET}->{$name}->{DIMS}->{$_}->{NAME};
@@ -783,7 +755,6 @@ sub SDgetdimname
     my ($cal, $cal_err, $off, $off_err, $d_type) = $hdf->SDgetcal("dataset_name");
 
 =cut 
-
 
 sub SDgetcal
 {
@@ -839,7 +810,6 @@ sub SDgetcal
     my $pdldata = $hdf->SDget( "dataset_name", $start, $edge, $stride );
 
 =cut
-
 
 sub SDget
 {
@@ -903,7 +873,6 @@ sub SDget
 
 =cut
 
-
 sub SDsetfillvalue
 {
     my ($self, $name, $value) = @_;
@@ -936,7 +905,6 @@ sub SDsetfillvalue
     my $res = $hdf->SDsetrange("dataset_name", [$min, $max]);
 
 =cut
-
 
 sub SDsetrange
 {
@@ -991,7 +959,6 @@ sub SDsetrange
 
 =cut
 
-
 sub SDsetcal
 {
     my $self = shift;
@@ -1043,7 +1010,6 @@ sub SDsetcal
 
 =cut
 
-
 sub SDsetcompress
 {
     my ($self, $name) = @_;
@@ -1085,7 +1051,6 @@ sub SDsetcompress
     $res = $hdf->SDsettextattr("my_text", "attribut_name", "dataset_name");
 
 =cut
-
 
 sub SDsettextattr
 {
@@ -1131,7 +1096,6 @@ sub SDsettextattr
     $res = $hdf->SDsetvalueattr($attribute, "attribute_name", "dataset_name");
 
 =cut
-
 
 sub SDsetvalueattr
 {
@@ -1179,7 +1143,6 @@ sub SDsetvalueattr
 
 =cut
 
-
 # FIXME: There are several problems with this:
 #    - The return code is an aggregate, and not necessarily accurate
 #    - It bails on the first error without trying the rest. If that is still
@@ -1194,7 +1157,6 @@ sub SDsetdimname
     
     my $res = 0;
     foreach( sort keys %{$self->{DATASET}->{$name}->{DIMS}} )
-#line 1198 "SD.pm"
 #line 1410 "SD.pd"
     {
         return( undef )
@@ -1242,7 +1204,6 @@ sub SDsetdimname
     $res = $hdf->SDput("dataset_name", $data->slice("..."), undef, $start);
 
 =cut
-
 
 sub SDput
 {
@@ -1367,7 +1328,6 @@ sub SDput
 
 =cut
 
-
 # NOTE: This may not be enough, since there may be opened datasets as well! SDendaccess()!
 sub close 
 {
@@ -1382,13 +1342,8 @@ sub DESTROY
     my $self = shift;
     $self->close;
 } # End of DESTROY()...
-#line 1386 "SD.pm"
-
-
 
 #line 1602 "SD.pd"
-
-
 =head1 CURRENT AUTHOR & MAINTAINER
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -1404,12 +1359,7 @@ contribs of Olivier Archer olivier.archer@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 1408 "SD.pm"
-
-
-
-
-
+#line 1363 "SD.pm"
 
 # Exit with OK status
 

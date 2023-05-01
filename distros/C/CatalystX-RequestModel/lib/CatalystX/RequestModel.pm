@@ -1,6 +1,6 @@
 package CatalystX::RequestModel;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Class::Method::Modifiers;
 use Scalar::Util;
@@ -228,7 +228,7 @@ Dealing with incoming POSTed (or PUTed/ PATCHed, etc) request content bodies is 
 code issues we have to deal with.  L<Catalyst> has generic capacities for handling common incoming
 content types such as form URL encoded (common with HTML forms) and JSON as well as the ability to
 add in parsing for other types of contents (see L<Catalyst#DATA-HANDLERS>).   However these parsers
-only checked that a given body content is well formed and not that its valid for your given problem
+only check that a given body content is well formed and not that it's valid for your given problem
 domain.  Additionally I find that we spend a lot of code lines in controllers that are doing nothing
 but munging and trying to wack incoming parameters into a form that can be actually used.
 

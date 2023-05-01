@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 use Encode;
-use JSON;
+use JSON::MaybeXS;
 use HTTP::Request;
 use LWP::UserAgent;
 use URI;
@@ -18,11 +18,11 @@ Geo::Coder::GooglePlaces::V3 - Google Places Geocoding API V3
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -61,25 +61,33 @@ variables GMAP_CLIENT and GMAP_KEY before running v3_live.t
 
   GMAP_CLIENT=your_id GMAP_KEY='your_key' make test
 
-You can get a key from https://console.developers.google.com/apis/credentials.
+You can get a key from L<https://console.developers.google.com/apis/credentials>.
 
 =cut
 
 sub new {
-    my($class, %param) = @_;
+    my($class, %args) = @_;
 
-    my $ua       = delete $param{ua}       || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-    my $host     = delete $param{host}     || 'maps.googleapis.com';
+	if(!defined($class)) {
+		# Geo::Coder::GooglePlaces::new() used rather than Geo::Coder::GooglePlaces::new()
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 
-    my $language = delete $param{language} || delete $param{hl};
-    my $region   = delete $param{region}   || delete $param{gl};
-    my $oe       = delete $param{oe}       || 'utf8';
-    my $sensor   = delete $param{sensor}   || 0;
-    my $client   = delete $param{client}   || '';
-    my $key      = delete $param{key}      || '';
-    my $components = delete $param{components};
+    my $ua       = delete $args{ua}       || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+    my $host     = delete $args{host}     || 'maps.googleapis.com';
 
-    bless {
+    my $language = delete $args{language} || delete $args{hl};
+    my $region   = delete $args{region}   || delete $args{gl};
+    my $oe       = delete $args{oe}       || 'utf8';
+    my $sensor   = delete $args{sensor}   || 0;
+    my $client   = delete $args{client}   || '';
+    my $key      = delete $args{key}      || '';
+    my $components = delete $args{components};
+
+    return bless {
         ua => $ua, host => $host, language => $language,
         region => $region, oe => $oe, sensor => $sensor,
         client => $client, key => $key,
@@ -142,8 +150,8 @@ sub geocode {
 
         my $signature = $self->_make_signature($uri);
         # signature must be last parameter in query string or you get 403's
-        $url = $uri->as_string;
-        $url .= '&signature='.$signature if $signature;
+        $url = $uri->as_string();
+        $url .= "&signature=$signature" if $signature;
     }
 
     my $res = $self->{ua}->get($url);
@@ -152,15 +160,15 @@ sub geocode {
         Carp::croak('Google Places API returned error: ', $res->status_line());
     }
 
-    my $json = JSON->new()->utf8();
+    my $json = JSON::MaybeXS->new()->utf8();
     my $data = $json->decode($res->decoded_content());
 
-    unless ($data->{status} eq 'OK' || $data->{status} eq 'ZERO_RESULTS') {
-        Carp::croak(sprintf "Google Places API returned status '%s'", $data->{status});
+    unless($data->{status} eq 'OK' || $data->{status} eq 'ZERO_RESULTS') {
+        Carp::croak("$url: Google Places API returned status '", $data->{status}, '"');
     }
 
     my @results = @{ $data->{results} || [] };
-    wantarray ? @results : $results[0];
+    return wantarray ? @results : $results[0];
 }
 
 =head2 reverse_geocode
@@ -226,18 +234,18 @@ sub _make_signature {
 # Google API wants the components formatted in the following way:
 # <filter1>:<value1>|<filter2>:<value2>|....|<filterN>:<valueN>
 sub _get_components_query_params {
-    my ($self, ) = @_;
+    my $self = shift;
     my $components = $self->{components};
 
     my @validated_components;
     foreach my $filter (sort keys %$components ) {
         next unless grep {$_ eq $filter} @ALLOWED_FILTERS;
-        my $value = $components->{$filter};
-        if (!defined $value) {
+        if(my $value = $components->{$filter}) {
+		# Google API expects the parameter to be passed as <filter_name>:<value>
+		push @validated_components, "$filter:$value";
+	} else {
             Carp::croak("Value not specified for filter $filter");
         }
-        # Google API expects the parameter to be passed as <filter_name>:<value>
-        push @validated_components, "$filter:$value";
     }
     return unless @validated_components;
     return join('|', @validated_components);
@@ -262,7 +270,7 @@ sub ua {
     if (@_) {
         $self->{ua} = shift;
     }
-    $self->{ua};
+    return $self->{ua};
 }
 
 =head2 key
@@ -278,7 +286,7 @@ sub key {
     if (@_) {
         $self->{key} = shift;
     }
-    $self->{key};
+    return $self->{key};
 }
 
 1;
@@ -319,17 +327,9 @@ L<https://metacpan.org/release/Geo-Coder-GooglePlaces>
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-GooglePlaces>
 
-=item * CPANTS
-
-L<http://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces>
-
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=Geo-Coder-GooglePlaces>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Geo-Coder-GooglePlaces>
 
 =item * CPAN Testers Dependencies
 

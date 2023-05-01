@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::DB::File;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use Devel::Cover::Criterion;
 
@@ -37,7 +37,6 @@ sub calculate_percentage {
     my ($db, $s) = @_;
 
     # print STDERR Dumper $s;
-
     for my $criterion ($self->items) {
         next unless exists $s->{$criterion};
         my $c = "Devel::Cover::\u$criterion";
@@ -45,7 +44,6 @@ sub calculate_percentage {
         $c->calculate_percentage($db, $s->{$criterion});
     }
     Devel::Cover::Criterion->calculate_percentage($db, $s->{total});
-
     # print STDERR Dumper $s;
 }
 
@@ -59,7 +57,7 @@ Devel::Cover::DB::File - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -79,7 +77,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

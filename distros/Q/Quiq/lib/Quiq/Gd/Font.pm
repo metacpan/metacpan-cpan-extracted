@@ -54,7 +54,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.208';
+our $VERSION = '1.209';
 
 use GD ();
 use Quiq::Math;
@@ -771,7 +771,7 @@ sub hCenterOffset {
 
 =head1 VERSION
 
-1.208
+1.209
 
 =head1 AUTHOR
 

@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq lastval);
 use Scalar::Util    qw(weaken);
 
-our $VERSION = '1.83';
+our $VERSION = '1.84';
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled arrival_hidden
@@ -117,6 +117,7 @@ my %translation = (
 	75 => 'Heute: 1. Klasse vorne',                         # r 76
 	76 => 'Heute: 1. Klasse hinten',                        # r 75
 	77 => '1. Klasse fehlt',
+	78 => 'Ersatzverkehr mit Bus ist eingerichtet',
 	79 => 'Mehrzweckabteil fehlt',
 	80 => 'Abweichende Wagenreihung',
 	81 => 'Fahrzeugtausch',
@@ -919,7 +920,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.83
+version 1.84
 
 =head1 DESCRIPTION
 
@@ -1377,6 +1378,8 @@ Source: Correlation between IRIS and DB RIS (bahn.de).
 
 =item d 28 : "GegenstE<auml>nde im Gleis"
 
+=item d 29 : "Ersatzverkehr mit Bus ist eingerichtet"
+
 =item d 31 : "Bauarbeiten"
 
 =item d 32 : "VerzE<ouml>gerung beim Ein-/Ausstieg"
@@ -1491,6 +1494,8 @@ Source: correlation between IRIS and DB RIS (bahn.de).
 =item q 77 : "Ohne 1. Klasse"
 
 Source: correlation between IRIS and DB RIS (bahn.de).
+
+=item q 78 : "Ersatzverkehr mit Bus ist eingerichtet"
 
 =item q 79 : "Ohne Mehrzweckabteil"
 

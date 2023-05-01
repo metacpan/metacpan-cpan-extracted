@@ -126,7 +126,7 @@
    "provides" : {
       "ExtUtils::Manifest" : {
          "file" : "lib/ExtUtils/Manifest.pm",
-         "version" : "1.74"
+         "version" : "1.75"
       }
    },
    "release_status" : "stable",
@@ -143,7 +143,7 @@
       "x_IRC" : "irc://irc.perl.org/#toolchain",
       "x_MailingList" : "http://lists.perl.org/list/cpan-workers.html"
    },
-   "version" : "1.74",
+   "version" : "1.75",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037011"
@@ -654,7 +654,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.74",
+                  "tag" : "1.75",
                   "tag_format" : "%v",
                   "tag_message" : "v%v%t"
                },
@@ -807,15 +807,15 @@
       "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>",
       "Florian Ragwitz <rafl@debian.org>",
       "brian d foy <brian.d.foy@gmail.com>",
-      "Craig A. Berry <craigberry@mac.com>",
       "Leon Timmermans <fawaka@gmail.com>",
+      "Craig A. Berry <craigberry@mac.com>",
       "Andreas Koenig <andk@cpan.org>",
+      "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
+      "Ed J <mohawk2@users.noreply.github.com>",
       "Graham Knop <haarg@haarg.org>",
       "James E Keenan <jkeenan@cpan.org>",
       "David E. Wheeler <david@justatheory.com>",
-      "Ed J <mohawk2@users.noreply.github.com>",
       "Jerome Eteve <jerome@eteve.net>",
-      "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
       "Petr P\u00edsa\u0159 <ppisar@redhat.com>",
       "Zefram <zefram@fysh.org>"
    ],

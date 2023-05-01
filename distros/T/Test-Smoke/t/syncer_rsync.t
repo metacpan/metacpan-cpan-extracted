@@ -77,24 +77,44 @@ SKIP: {
     my $gitbin = whereis('git');
     skip("No git found :(", 10) if ! $gitbin;
 
+    my $branchname = 'master'; # for compatibility with old and new git version
     my $cwd = abs_path();
     # Set up a basic git repository
     my $git = Test::Smoke::Util::Execute->new(command => $gitbin);
     my $repopath = 't/tsgit';
-    $git->run(init => $repopath);
-    is($git->exitcode, 0, "git init $repopath");
+    $git->run('-c' => "init.defaultBranch=$branchname", init => "-q", $repopath);
+    unless (is($git->exitcode, 0, "git init $repopath")) {
+        skip "git init failed! The tests require an empty/different repo";
+    }
+
 
     mkpath("$repopath/Porting");
-    chdir $repopath;
+    unless(chdir $repopath) {
+        diag("chdir to '$repopath' failed with error: $!");
+        ok(0, "chdir repopath");
+        die "chdir failed! Can't run the other tests (wrong cwd)";
+    }
+    $git->run('config', 'user.name' => "syncer_rsync.t");
+    is($git->exitcode, 0, "git config user.name");
+    $git->run('config', 'user.email' => "syncer_rsync.t\@test-smoke.org");
+    is($git->exitcode, 0, "git config user.email");
+
     (my $gitversion = $git->run('--version')) =~ s/git version (\S+).+/$1/si;
     put_file($gitversion => 'first.file');
     $git->run(add => 'first.file');
+    is($git->exitcode, 0, "git add first.file");
     put_file("#! $^X -w\nsystem q/cat first.file/" => qw/Porting make_dot_patch.pl/);
     $git->run(add => 'Porting/make_dot_patch.pl');
+    is($git->exitcode, 0, "git add Porting/make_dot_patch.pl");
     $git->run(commit => '-m', "'We need a first file committed'");
+    is($git->exitcode, 0, "git commit");
 
     my $rsync_bin = whereis('rsync', $verbose);
-    skip "No rsync binary found...", 3 if !$rsync_bin;
+    if (not $rsync_bin) {
+        chdir $cwd;
+        rmtree($repopath);
+        skip "No rsync binary found...", 3;
+    }
 
     my $source = catdir($cwd, 't', 'ftppub', 'perl-current');
     $source = UNCify_path($source) if $^O eq 'MSWin32';

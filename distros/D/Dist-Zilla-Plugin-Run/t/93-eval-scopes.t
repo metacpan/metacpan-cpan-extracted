@@ -37,7 +37,7 @@ is(
 );
 
 cmp_deeply(
-    [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
+    [ grep /^\[Run::[^]]+\]/, @{ $tzil->log_messages } ],
     [
         '[Run::BeforeBuild] evaluating: $self',
         re(qr/^\[Run::BeforeBuild\] evaluation died: Global symbol "\$self" requires explicit package name/),

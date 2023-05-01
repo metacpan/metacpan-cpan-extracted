@@ -1,7 +1,7 @@
 use strict; # make CPANTS happy
 package CPAN::Reporter::FAQ;
 
-our $VERSION = '1.2018';
+our $VERSION = '1.2019';
 
 1;
 
@@ -19,7 +19,7 @@ CPAN::Reporter::FAQ - Answers and tips for using CPAN::Reporter
 
 =head1 VERSION
 
-version 1.2018
+version 1.2019
 
 =head1 REPORT GRADES
 
@@ -128,7 +128,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2006 by David Golden.
+This software is Copyright (c) 2023 by David Golden.
 
 This is free software, licensed under:
 

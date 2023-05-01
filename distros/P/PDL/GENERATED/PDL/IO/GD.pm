@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 22 "GD.pd"
 
 use strict;
@@ -66,12 +67,7 @@ The general version just provides several image IO utility functions you can use
 ndarray variables. It's deceptively useful, however.
 
 =cut
-#line 70 "GD.pm"
-
-
-
-
-
+#line 71 "GD.pm"
 
 =head1 FUNCTIONS
 
@@ -79,8 +75,6 @@ ndarray variables. It's deceptively useful, however.
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -95,26 +89,20 @@ Writes a 2-d PDL variable out to a PNG file, using the supplied color look-up-ta
 
 The LUT contains a line for each value 0-255 with a corresponding R, G, and B value.
 
-
 =for bad
 
 write_png does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 107 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_png = \&PDL::write_png;
-#line 114 "GD.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -126,26 +114,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Same as write_png(), except you can specify the compression level (0-9) as the last argument.
 
-
 =for bad
 
 write_png_ex does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_png_ex = \&PDL::write_png_ex;
-#line 145 "GD.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -159,26 +141,20 @@ Writes an (x, y, z(3)) PDL variable out to a PNG file, using a true color format
 
 This means a larger file on disk, but can contain more than 256 colors.
 
-
 =for bad
 
 write_true_png does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 171 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_true_png = \&PDL::write_true_png;
-#line 178 "GD.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -190,27 +166,23 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Same as write_true_png(), except you can specify the compression level (0-9) as the last argument.
 
-
 =for bad
 
 write_true_png_ex does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 202 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_true_png_ex = \&PDL::write_true_png_ex;
-#line 209 "GD.pm"
+
+
 
 
 
 #line 315 "GD.pd"
-
 
 =head2 write_png_best
 
@@ -221,7 +193,6 @@ Like write_png(), but it assumes the best PNG compression (9).
   write_png_best( $img(ndarray), $lut(ndarray), $filename )
 
 =cut
-
 
 sub write_png_best
 {
@@ -241,31 +212,19 @@ Like write_true_png(), but it assumes the best PNG compression (9).
 
 =cut
 
-
 sub write_true_png_best
 {
     my $img = shift;
     my $filename = shift;
     return write_true_png_ex( $img, $filename, 9 );
 } # End of write_true_png_best()...
-#line 252 "GD.pm"
-
-
-
-#line 361 "GD.pd"
-#line 257 "GD.pm"
-
-
 
 #line 389 "GD.pd"
-
-
 =head2 load_lut( $filename )
 
 Loads a color look up table from an ASCII file. returns an ndarray
 
 =cut
-
 
 sub load_lut
 {
@@ -277,7 +236,6 @@ sub load_lut
 Reads a (palette) PNG image into a (new) PDL variable.
 
 =cut
-
 
 sub read_png
 {
@@ -299,7 +257,6 @@ Reads a true color PNG image into a (new) PDL variable.
 
 =cut
 
-
 sub read_true_png
 {
     my $filename = shift;
@@ -309,66 +266,50 @@ sub read_true_png
     my $y = _get_png_ys($filename);
     #print "\$x=$x\t\$y=$y\n";
 
-
     my $temp = zeroes(long, $x, $y, 3);
     _read_true_png($temp, $filename);
     return byte($temp);
 } # End of read_png()...
-#line 318 "GD.pm"
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 274 "GD.pm"
 
 *_read_true_png = \&PDL::_read_true_png;
-#line 325 "GD.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-*_read_png = \&PDL::_read_png;
-#line 332 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_read_png = \&PDL::_read_png;
 
-*_gd_image_to_pdl_true = \&PDL::_gd_image_to_pdl_true;
-#line 339 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gd_image_to_pdl_true = \&PDL::_gd_image_to_pdl_true;
 
-*_gd_image_to_pdl = \&PDL::_gd_image_to_pdl;
-#line 346 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gd_image_to_pdl = \&PDL::_gd_image_to_pdl;
 
-*_pdl_to_gd_image_true = \&PDL::_pdl_to_gd_image_true;
-#line 353 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_pdl_to_gd_image_true = \&PDL::_pdl_to_gd_image_true;
+
+
+
 
 *_pdl_to_gd_image_lut = \&PDL::_pdl_to_gd_image_lut;
-#line 360 "GD.pm"
+
+
 
 
 
 #line 717 "GD.pd"
-
 
 =head2 read_png_lut( $filename )
 
 Reads a color LUT from an already-existing palette PNG file.
 
 =cut
-
 
 sub read_png_lut
 {
@@ -377,91 +318,67 @@ sub read_png_lut
     _read_png_lut($lut, $filename);
     return $lut;
 } # End of read_png_lut()...
-#line 381 "GD.pm"
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 322 "GD.pm"
 
 *_read_png_lut = \&PDL::_read_png_lut;
-#line 388 "GD.pm"
 
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-*_gdImageColorAllocates = \&PDL::_gdImageColorAllocates;
-#line 395 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageColorAllocates = \&PDL::_gdImageColorAllocates;
 
-*_gdImageColorAllocateAlphas = \&PDL::_gdImageColorAllocateAlphas;
-#line 402 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageColorAllocateAlphas = \&PDL::_gdImageColorAllocateAlphas;
 
-*_gdImageSetPixels = \&PDL::_gdImageSetPixels;
-#line 409 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageSetPixels = \&PDL::_gdImageSetPixels;
 
-*_gdImageLines = \&PDL::_gdImageLines;
-#line 416 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageLines = \&PDL::_gdImageLines;
 
-*_gdImageDashedLines = \&PDL::_gdImageDashedLines;
-#line 423 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageDashedLines = \&PDL::_gdImageDashedLines;
 
-*_gdImageRectangles = \&PDL::_gdImageRectangles;
-#line 430 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageRectangles = \&PDL::_gdImageRectangles;
 
-*_gdImageFilledRectangles = \&PDL::_gdImageFilledRectangles;
-#line 437 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageFilledRectangles = \&PDL::_gdImageFilledRectangles;
 
-*_gdImageFilledArcs = \&PDL::_gdImageFilledArcs;
-#line 444 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageFilledArcs = \&PDL::_gdImageFilledArcs;
 
-*_gdImageArcs = \&PDL::_gdImageArcs;
-#line 451 "GD.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+*_gdImageArcs = \&PDL::_gdImageArcs;
+
+
+
 
 *_gdImageFilledEllipses = \&PDL::_gdImageFilledEllipses;
-#line 458 "GD.pm"
+
+
 
 
 
 
 
 #line 804 "GD.pd"
-
 
 =head1 OO INTERFACE
  
@@ -627,7 +544,6 @@ sub _id_image_data
     return undef;
 } # End of _id_image_data()...
 
-
 # Load a new data scalar up:
 sub _img_ptr_from_data
 {
@@ -654,7 +570,6 @@ sub _img_ptr_from_data
     
     return undef;
 } # End of _img_ptr_from_data()...
-
 
 =head2 new
 
@@ -751,7 +666,6 @@ PDL::IO::GD::new couldn't parse its arguments.
 Expected a hash-ref or an inline hash or just a filename
 EOF
     }
-
 
     
     if( defined( $options->{pdl} ) )
@@ -871,7 +785,6 @@ When you're done playing with your GDImage and want an ndarray back, use this fu
 
 =cut
 
-
 sub to_pdl
 {
     my $self = shift;
@@ -900,7 +813,6 @@ Does a $im->ColorAllocate() for and entire LUT ndarray at once.
 The LUT ndarray format is the same as for the general interface above.
 
 =cut
-
 
 sub apply_lut
 {
@@ -932,246 +844,177 @@ so read with a grain of salt, and B<always> check the main GD documentation abou
 that function works and what it does.
 
 =cut
-#line 936 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_Png
 
 $image->write_Png( $filename )
 
 =cut
 
-
 sub write_Png
 {
     my $self = shift;
     return _gdImagePng ( $self->{IMG_PTR}, @_ );
 } # End of write_Png()...
-#line 954 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_PngEx
 
 $image->write_PngEx( $filename, $level )
 
 =cut
 
-
 sub write_PngEx
 {
     my $self = shift;
     return _gdImagePngEx ( $self->{IMG_PTR}, @_ );
 } # End of write_PngEx()...
-#line 972 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_WBMP
 
 $image->write_WBMP( $fg, $filename )
 
 =cut
 
-
 sub write_WBMP
 {
     my $self = shift;
     return _gdImageWBMP ( $self->{IMG_PTR}, @_ );
 } # End of write_WBMP()...
-#line 990 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_Jpeg
 
 $image->write_Jpeg( $filename, $quality )
 
 =cut
 
-
 sub write_Jpeg
 {
     my $self = shift;
     return _gdImageJpeg ( $self->{IMG_PTR}, @_ );
 } # End of write_Jpeg()...
-#line 1008 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_Gd
 
 $image->write_Gd( $filename )
 
 =cut
 
-
 sub write_Gd
 {
     my $self = shift;
     return _gdImageGd ( $self->{IMG_PTR}, @_ );
 } # End of write_Gd()...
-#line 1026 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_Gd2
 
 $image->write_Gd2( $filename, $cs, $fmt )
 
 =cut
 
-
 sub write_Gd2
 {
     my $self = shift;
     return _gdImageGd2 ( $self->{IMG_PTR}, @_ );
 } # End of write_Gd2()...
-#line 1044 "GD.pm"
-
-
 
 #line 1747 "GD.pd"
-
 =head2 write_Gif
 
 $image->write_Gif( $filename )
 
 =cut
 
-
 sub write_Gif
 {
     my $self = shift;
     return _gdImageGif ( $self->{IMG_PTR}, @_ );
 } # End of write_Gif()...
-#line 1062 "GD.pm"
-
-
 
 #line 1859 "GD.pd"
-
 =head2 get_Png_data
 
 $image->get_Png_data(  )
 
 =cut
 
-
 sub get_Png_data
 {
     my $self = shift;
     return _gdImagePngPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_Png_data()...
-#line 1080 "GD.pm"
-
-
 
 #line 1859 "GD.pd"
-
 =head2 get_PngEx_data
 
 $image->get_PngEx_data( $level )
 
 =cut
 
-
 sub get_PngEx_data
 {
     my $self = shift;
     return _gdImagePngPtrEx ( $self->{IMG_PTR}, @_ );
 } # End of get_PngEx_data()...
-#line 1098 "GD.pm"
-
-
 
 #line 1859 "GD.pd"
-
 =head2 get_WBMP_data
 
 $image->get_WBMP_data( $fg )
 
 =cut
 
-
 sub get_WBMP_data
 {
     my $self = shift;
     return _gdImageWBMPPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_WBMP_data()...
-#line 1116 "GD.pm"
-
-
 
 #line 1859 "GD.pd"
-
 =head2 get_Jpeg_data
 
 $image->get_Jpeg_data( $quality )
 
 =cut
 
-
 sub get_Jpeg_data
 {
     my $self = shift;
     return _gdImageJpegPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_Jpeg_data()...
-#line 1134 "GD.pm"
-
-
 
 #line 1859 "GD.pd"
-
 =head2 get_Gd_data
 
 $image->get_Gd_data(  )
 
 =cut
 
-
 sub get_Gd_data
 {
     my $self = shift;
     return _gdImageGdPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_Gd_data()...
-#line 1152 "GD.pm"
-
-
 
 #line 1859 "GD.pd"
-
 =head2 get_Gd2_data
 
 $image->get_Gd2_data( $cs, $fmt )
 
 =cut
 
-
 sub get_Gd2_data
 {
     my $self = shift;
     return _gdImageGd2Ptr ( $self->{IMG_PTR}, @_ );
 } # End of get_Gd2_data()...
-#line 1170 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetPixel
 
 $image->SetPixel( $x, $y, $color )
@@ -1180,12 +1023,10 @@ Alias for gdImageSetPixel.
 
 =cut
 
-
 sub SetPixel
 {
     return gdImageSetPixel ( @_ );
 } # End of SetPixel()...
-
 
 =head2 gdImageSetPixel
 
@@ -1193,18 +1034,13 @@ $image->gdImageSetPixel( $x, $y, $color )
 
 =cut
 
-
 sub gdImageSetPixel
 {
     my $self = shift;
     return _gdImageSetPixel ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetPixel()...
-#line 1203 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 GetPixel
 
 $image->GetPixel( $x, $y )
@@ -1213,12 +1049,10 @@ Alias for gdImageGetPixel.
 
 =cut
 
-
 sub GetPixel
 {
     return gdImageGetPixel ( @_ );
 } # End of GetPixel()...
-
 
 =head2 gdImageGetPixel
 
@@ -1226,18 +1060,13 @@ $image->gdImageGetPixel( $x, $y )
 
 =cut
 
-
 sub gdImageGetPixel
 {
     my $self = shift;
     return _gdImageGetPixel ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetPixel()...
-#line 1236 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 AABlend
 
 $image->AABlend(  )
@@ -1246,12 +1075,10 @@ Alias for gdImageAABlend.
 
 =cut
 
-
 sub AABlend
 {
     return gdImageAABlend ( @_ );
 } # End of AABlend()...
-
 
 =head2 gdImageAABlend
 
@@ -1259,18 +1086,13 @@ $image->gdImageAABlend(  )
 
 =cut
 
-
 sub gdImageAABlend
 {
     my $self = shift;
     return _gdImageAABlend ( $self->{IMG_PTR}, @_ );
 } # End of gdImageAABlend()...
-#line 1269 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Line
 
 $image->Line( $x1, $y1, $x2, $y2, $color )
@@ -1279,12 +1101,10 @@ Alias for gdImageLine.
 
 =cut
 
-
 sub Line
 {
     return gdImageLine ( @_ );
 } # End of Line()...
-
 
 =head2 gdImageLine
 
@@ -1292,18 +1112,13 @@ $image->gdImageLine( $x1, $y1, $x2, $y2, $color )
 
 =cut
 
-
 sub gdImageLine
 {
     my $self = shift;
     return _gdImageLine ( $self->{IMG_PTR}, @_ );
 } # End of gdImageLine()...
-#line 1302 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 DashedLine
 
 $image->DashedLine( $x1, $y1, $x2, $y2, $color )
@@ -1312,12 +1127,10 @@ Alias for gdImageDashedLine.
 
 =cut
 
-
 sub DashedLine
 {
     return gdImageDashedLine ( @_ );
 } # End of DashedLine()...
-
 
 =head2 gdImageDashedLine
 
@@ -1325,18 +1138,13 @@ $image->gdImageDashedLine( $x1, $y1, $x2, $y2, $color )
 
 =cut
 
-
 sub gdImageDashedLine
 {
     my $self = shift;
     return _gdImageDashedLine ( $self->{IMG_PTR}, @_ );
 } # End of gdImageDashedLine()...
-#line 1335 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Rectangle
 
 $image->Rectangle( $x1, $y1, $x2, $y2, $color )
@@ -1345,12 +1153,10 @@ Alias for gdImageRectangle.
 
 =cut
 
-
 sub Rectangle
 {
     return gdImageRectangle ( @_ );
 } # End of Rectangle()...
-
 
 =head2 gdImageRectangle
 
@@ -1358,18 +1164,13 @@ $image->gdImageRectangle( $x1, $y1, $x2, $y2, $color )
 
 =cut
 
-
 sub gdImageRectangle
 {
     my $self = shift;
     return _gdImageRectangle ( $self->{IMG_PTR}, @_ );
 } # End of gdImageRectangle()...
-#line 1368 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 FilledRectangle
 
 $image->FilledRectangle( $x1, $y1, $x2, $y2, $color )
@@ -1378,12 +1179,10 @@ Alias for gdImageFilledRectangle.
 
 =cut
 
-
 sub FilledRectangle
 {
     return gdImageFilledRectangle ( @_ );
 } # End of FilledRectangle()...
-
 
 =head2 gdImageFilledRectangle
 
@@ -1391,18 +1190,13 @@ $image->gdImageFilledRectangle( $x1, $y1, $x2, $y2, $color )
 
 =cut
 
-
 sub gdImageFilledRectangle
 {
     my $self = shift;
     return _gdImageFilledRectangle ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledRectangle()...
-#line 1401 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetClip
 
 $image->SetClip( $x1, $y1, $x2, $y2 )
@@ -1411,12 +1205,10 @@ Alias for gdImageSetClip.
 
 =cut
 
-
 sub SetClip
 {
     return gdImageSetClip ( @_ );
 } # End of SetClip()...
-
 
 =head2 gdImageSetClip
 
@@ -1424,18 +1216,13 @@ $image->gdImageSetClip( $x1, $y1, $x2, $y2 )
 
 =cut
 
-
 sub gdImageSetClip
 {
     my $self = shift;
     return _gdImageSetClip ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetClip()...
-#line 1434 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 GetClip
 
 $image->GetClip( $x1P, $y1P, $x2P, $y2P )
@@ -1444,12 +1231,10 @@ Alias for gdImageGetClip.
 
 =cut
 
-
 sub GetClip
 {
     return gdImageGetClip ( @_ );
 } # End of GetClip()...
-
 
 =head2 gdImageGetClip
 
@@ -1457,18 +1242,13 @@ $image->gdImageGetClip( $x1P, $y1P, $x2P, $y2P )
 
 =cut
 
-
 sub gdImageGetClip
 {
     my $self = shift;
     return _gdImageGetClip ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetClip()...
-#line 1467 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 BoundsSafe
 
 $image->BoundsSafe( $x, $y )
@@ -1477,12 +1257,10 @@ Alias for gdImageBoundsSafe.
 
 =cut
 
-
 sub BoundsSafe
 {
     return gdImageBoundsSafe ( @_ );
 } # End of BoundsSafe()...
-
 
 =head2 gdImageBoundsSafe
 
@@ -1490,18 +1268,13 @@ $image->gdImageBoundsSafe( $x, $y )
 
 =cut
 
-
 sub gdImageBoundsSafe
 {
     my $self = shift;
     return _gdImageBoundsSafe ( $self->{IMG_PTR}, @_ );
 } # End of gdImageBoundsSafe()...
-#line 1500 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Char
 
 $image->Char( $f, $x, $y, $c, $color )
@@ -1510,12 +1283,10 @@ Alias for gdImageChar.
 
 =cut
 
-
 sub Char
 {
     return gdImageChar ( @_ );
 } # End of Char()...
-
 
 =head2 gdImageChar
 
@@ -1523,18 +1294,13 @@ $image->gdImageChar( $f, $x, $y, $c, $color )
 
 =cut
 
-
 sub gdImageChar
 {
     my $self = shift;
     return _gdImageChar ( $self->{IMG_PTR}, @_ );
 } # End of gdImageChar()...
-#line 1533 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 CharUp
 
 $image->CharUp( $f, $x, $y, $c, $color )
@@ -1543,12 +1309,10 @@ Alias for gdImageCharUp.
 
 =cut
 
-
 sub CharUp
 {
     return gdImageCharUp ( @_ );
 } # End of CharUp()...
-
 
 =head2 gdImageCharUp
 
@@ -1556,18 +1320,13 @@ $image->gdImageCharUp( $f, $x, $y, $c, $color )
 
 =cut
 
-
 sub gdImageCharUp
 {
     my $self = shift;
     return _gdImageCharUp ( $self->{IMG_PTR}, @_ );
 } # End of gdImageCharUp()...
-#line 1566 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 String
 
 $image->String( $f, $x, $y, $s, $color )
@@ -1576,12 +1335,10 @@ Alias for gdImageString.
 
 =cut
 
-
 sub String
 {
     return gdImageString ( @_ );
 } # End of String()...
-
 
 =head2 gdImageString
 
@@ -1589,18 +1346,13 @@ $image->gdImageString( $f, $x, $y, $s, $color )
 
 =cut
 
-
 sub gdImageString
 {
     my $self = shift;
     return _gdImageString ( $self->{IMG_PTR}, @_ );
 } # End of gdImageString()...
-#line 1599 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 StringUp
 
 $image->StringUp( $f, $x, $y, $s, $color )
@@ -1609,12 +1361,10 @@ Alias for gdImageStringUp.
 
 =cut
 
-
 sub StringUp
 {
     return gdImageStringUp ( @_ );
 } # End of StringUp()...
-
 
 =head2 gdImageStringUp
 
@@ -1622,18 +1372,13 @@ $image->gdImageStringUp( $f, $x, $y, $s, $color )
 
 =cut
 
-
 sub gdImageStringUp
 {
     my $self = shift;
     return _gdImageStringUp ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringUp()...
-#line 1632 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 String16
 
 $image->String16( $f, $x, $y, $s, $color )
@@ -1642,12 +1387,10 @@ Alias for gdImageString16.
 
 =cut
 
-
 sub String16
 {
     return gdImageString16 ( @_ );
 } # End of String16()...
-
 
 =head2 gdImageString16
 
@@ -1655,18 +1398,13 @@ $image->gdImageString16( $f, $x, $y, $s, $color )
 
 =cut
 
-
 sub gdImageString16
 {
     my $self = shift;
     return _gdImageString16 ( $self->{IMG_PTR}, @_ );
 } # End of gdImageString16()...
-#line 1665 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 StringUp16
 
 $image->StringUp16( $f, $x, $y, $s, $color )
@@ -1675,12 +1413,10 @@ Alias for gdImageStringUp16.
 
 =cut
 
-
 sub StringUp16
 {
     return gdImageStringUp16 ( @_ );
 } # End of StringUp16()...
-
 
 =head2 gdImageStringUp16
 
@@ -1688,18 +1424,13 @@ $image->gdImageStringUp16( $f, $x, $y, $s, $color )
 
 =cut
 
-
 sub gdImageStringUp16
 {
     my $self = shift;
     return _gdImageStringUp16 ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringUp16()...
-#line 1698 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Polygon
 
 $image->Polygon( $p, $n, $c )
@@ -1708,12 +1439,10 @@ Alias for gdImagePolygon.
 
 =cut
 
-
 sub Polygon
 {
     return gdImagePolygon ( @_ );
 } # End of Polygon()...
-
 
 =head2 gdImagePolygon
 
@@ -1721,18 +1450,13 @@ $image->gdImagePolygon( $p, $n, $c )
 
 =cut
 
-
 sub gdImagePolygon
 {
     my $self = shift;
     return _gdImagePolygon ( $self->{IMG_PTR}, @_ );
 } # End of gdImagePolygon()...
-#line 1731 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 FilledPolygon
 
 $image->FilledPolygon( $p, $n, $c )
@@ -1741,12 +1465,10 @@ Alias for gdImageFilledPolygon.
 
 =cut
 
-
 sub FilledPolygon
 {
     return gdImageFilledPolygon ( @_ );
 } # End of FilledPolygon()...
-
 
 =head2 gdImageFilledPolygon
 
@@ -1754,18 +1476,13 @@ $image->gdImageFilledPolygon( $p, $n, $c )
 
 =cut
 
-
 sub gdImageFilledPolygon
 {
     my $self = shift;
     return _gdImageFilledPolygon ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledPolygon()...
-#line 1764 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorAllocate
 
 $image->ColorAllocate( $r, $g, $b )
@@ -1774,12 +1491,10 @@ Alias for gdImageColorAllocate.
 
 =cut
 
-
 sub ColorAllocate
 {
     return gdImageColorAllocate ( @_ );
 } # End of ColorAllocate()...
-
 
 =head2 gdImageColorAllocate
 
@@ -1787,18 +1502,13 @@ $image->gdImageColorAllocate( $r, $g, $b )
 
 =cut
 
-
 sub gdImageColorAllocate
 {
     my $self = shift;
     return _gdImageColorAllocate ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorAllocate()...
-#line 1797 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorAllocateAlpha
 
 $image->ColorAllocateAlpha( $r, $g, $b, $a )
@@ -1807,12 +1517,10 @@ Alias for gdImageColorAllocateAlpha.
 
 =cut
 
-
 sub ColorAllocateAlpha
 {
     return gdImageColorAllocateAlpha ( @_ );
 } # End of ColorAllocateAlpha()...
-
 
 =head2 gdImageColorAllocateAlpha
 
@@ -1820,18 +1528,13 @@ $image->gdImageColorAllocateAlpha( $r, $g, $b, $a )
 
 =cut
 
-
 sub gdImageColorAllocateAlpha
 {
     my $self = shift;
     return _gdImageColorAllocateAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorAllocateAlpha()...
-#line 1830 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorClosest
 
 $image->ColorClosest( $r, $g, $b )
@@ -1840,12 +1543,10 @@ Alias for gdImageColorClosest.
 
 =cut
 
-
 sub ColorClosest
 {
     return gdImageColorClosest ( @_ );
 } # End of ColorClosest()...
-
 
 =head2 gdImageColorClosest
 
@@ -1853,18 +1554,13 @@ $image->gdImageColorClosest( $r, $g, $b )
 
 =cut
 
-
 sub gdImageColorClosest
 {
     my $self = shift;
     return _gdImageColorClosest ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorClosest()...
-#line 1863 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorClosestAlpha
 
 $image->ColorClosestAlpha( $r, $g, $b, $a )
@@ -1873,12 +1569,10 @@ Alias for gdImageColorClosestAlpha.
 
 =cut
 
-
 sub ColorClosestAlpha
 {
     return gdImageColorClosestAlpha ( @_ );
 } # End of ColorClosestAlpha()...
-
 
 =head2 gdImageColorClosestAlpha
 
@@ -1886,18 +1580,13 @@ $image->gdImageColorClosestAlpha( $r, $g, $b, $a )
 
 =cut
 
-
 sub gdImageColorClosestAlpha
 {
     my $self = shift;
     return _gdImageColorClosestAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorClosestAlpha()...
-#line 1896 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorClosestHWB
 
 $image->ColorClosestHWB( $r, $g, $b )
@@ -1906,12 +1595,10 @@ Alias for gdImageColorClosestHWB.
 
 =cut
 
-
 sub ColorClosestHWB
 {
     return gdImageColorClosestHWB ( @_ );
 } # End of ColorClosestHWB()...
-
 
 =head2 gdImageColorClosestHWB
 
@@ -1919,18 +1606,13 @@ $image->gdImageColorClosestHWB( $r, $g, $b )
 
 =cut
 
-
 sub gdImageColorClosestHWB
 {
     my $self = shift;
     return _gdImageColorClosestHWB ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorClosestHWB()...
-#line 1929 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorExact
 
 $image->ColorExact( $r, $g, $b )
@@ -1939,12 +1621,10 @@ Alias for gdImageColorExact.
 
 =cut
 
-
 sub ColorExact
 {
     return gdImageColorExact ( @_ );
 } # End of ColorExact()...
-
 
 =head2 gdImageColorExact
 
@@ -1952,18 +1632,13 @@ $image->gdImageColorExact( $r, $g, $b )
 
 =cut
 
-
 sub gdImageColorExact
 {
     my $self = shift;
     return _gdImageColorExact ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorExact()...
-#line 1962 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorExactAlpha
 
 $image->ColorExactAlpha( $r, $g, $b, $a )
@@ -1972,12 +1647,10 @@ Alias for gdImageColorExactAlpha.
 
 =cut
 
-
 sub ColorExactAlpha
 {
     return gdImageColorExactAlpha ( @_ );
 } # End of ColorExactAlpha()...
-
 
 =head2 gdImageColorExactAlpha
 
@@ -1985,18 +1658,13 @@ $image->gdImageColorExactAlpha( $r, $g, $b, $a )
 
 =cut
 
-
 sub gdImageColorExactAlpha
 {
     my $self = shift;
     return _gdImageColorExactAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorExactAlpha()...
-#line 1995 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorResolve
 
 $image->ColorResolve( $r, $g, $b )
@@ -2005,12 +1673,10 @@ Alias for gdImageColorResolve.
 
 =cut
 
-
 sub ColorResolve
 {
     return gdImageColorResolve ( @_ );
 } # End of ColorResolve()...
-
 
 =head2 gdImageColorResolve
 
@@ -2018,18 +1684,13 @@ $image->gdImageColorResolve( $r, $g, $b )
 
 =cut
 
-
 sub gdImageColorResolve
 {
     my $self = shift;
     return _gdImageColorResolve ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorResolve()...
-#line 2028 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorResolveAlpha
 
 $image->ColorResolveAlpha( $r, $g, $b, $a )
@@ -2038,12 +1699,10 @@ Alias for gdImageColorResolveAlpha.
 
 =cut
 
-
 sub ColorResolveAlpha
 {
     return gdImageColorResolveAlpha ( @_ );
 } # End of ColorResolveAlpha()...
-
 
 =head2 gdImageColorResolveAlpha
 
@@ -2051,18 +1710,13 @@ $image->gdImageColorResolveAlpha( $r, $g, $b, $a )
 
 =cut
 
-
 sub gdImageColorResolveAlpha
 {
     my $self = shift;
     return _gdImageColorResolveAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorResolveAlpha()...
-#line 2061 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorDeallocate
 
 $image->ColorDeallocate( $color )
@@ -2071,12 +1725,10 @@ Alias for gdImageColorDeallocate.
 
 =cut
 
-
 sub ColorDeallocate
 {
     return gdImageColorDeallocate ( @_ );
 } # End of ColorDeallocate()...
-
 
 =head2 gdImageColorDeallocate
 
@@ -2084,18 +1736,13 @@ $image->gdImageColorDeallocate( $color )
 
 =cut
 
-
 sub gdImageColorDeallocate
 {
     my $self = shift;
     return _gdImageColorDeallocate ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorDeallocate()...
-#line 2094 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 TrueColorToPalette
 
 $image->TrueColorToPalette( $ditherFlag, $colorsWanted )
@@ -2104,12 +1751,10 @@ Alias for gdImageTrueColorToPalette.
 
 =cut
 
-
 sub TrueColorToPalette
 {
     return gdImageTrueColorToPalette ( @_ );
 } # End of TrueColorToPalette()...
-
 
 =head2 gdImageTrueColorToPalette
 
@@ -2117,18 +1762,13 @@ $image->gdImageTrueColorToPalette( $ditherFlag, $colorsWanted )
 
 =cut
 
-
 sub gdImageTrueColorToPalette
 {
     my $self = shift;
     return _gdImageTrueColorToPalette ( $self->{IMG_PTR}, @_ );
 } # End of gdImageTrueColorToPalette()...
-#line 2127 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorTransparent
 
 $image->ColorTransparent( $color )
@@ -2137,12 +1777,10 @@ Alias for gdImageColorTransparent.
 
 =cut
 
-
 sub ColorTransparent
 {
     return gdImageColorTransparent ( @_ );
 } # End of ColorTransparent()...
-
 
 =head2 gdImageColorTransparent
 
@@ -2150,18 +1788,13 @@ $image->gdImageColorTransparent( $color )
 
 =cut
 
-
 sub gdImageColorTransparent
 {
     my $self = shift;
     return _gdImageColorTransparent ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorTransparent()...
-#line 2160 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 FilledArc
 
 $image->FilledArc( $cx, $cy, $w, $h, $s, $e, $color, $style )
@@ -2170,12 +1803,10 @@ Alias for gdImageFilledArc.
 
 =cut
 
-
 sub FilledArc
 {
     return gdImageFilledArc ( @_ );
 } # End of FilledArc()...
-
 
 =head2 gdImageFilledArc
 
@@ -2183,18 +1814,13 @@ $image->gdImageFilledArc( $cx, $cy, $w, $h, $s, $e, $color, $style )
 
 =cut
 
-
 sub gdImageFilledArc
 {
     my $self = shift;
     return _gdImageFilledArc ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledArc()...
-#line 2193 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Arc
 
 $image->Arc( $cx, $cy, $w, $h, $s, $e, $color )
@@ -2203,12 +1829,10 @@ Alias for gdImageArc.
 
 =cut
 
-
 sub Arc
 {
     return gdImageArc ( @_ );
 } # End of Arc()...
-
 
 =head2 gdImageArc
 
@@ -2216,18 +1840,13 @@ $image->gdImageArc( $cx, $cy, $w, $h, $s, $e, $color )
 
 =cut
 
-
 sub gdImageArc
 {
     my $self = shift;
     return _gdImageArc ( $self->{IMG_PTR}, @_ );
 } # End of gdImageArc()...
-#line 2226 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 FilledEllipse
 
 $image->FilledEllipse( $cx, $cy, $w, $h, $color )
@@ -2236,12 +1855,10 @@ Alias for gdImageFilledEllipse.
 
 =cut
 
-
 sub FilledEllipse
 {
     return gdImageFilledEllipse ( @_ );
 } # End of FilledEllipse()...
-
 
 =head2 gdImageFilledEllipse
 
@@ -2249,18 +1866,13 @@ $image->gdImageFilledEllipse( $cx, $cy, $w, $h, $color )
 
 =cut
 
-
 sub gdImageFilledEllipse
 {
     my $self = shift;
     return _gdImageFilledEllipse ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledEllipse()...
-#line 2259 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 FillToBorder
 
 $image->FillToBorder( $x, $y, $border, $color )
@@ -2269,12 +1881,10 @@ Alias for gdImageFillToBorder.
 
 =cut
 
-
 sub FillToBorder
 {
     return gdImageFillToBorder ( @_ );
 } # End of FillToBorder()...
-
 
 =head2 gdImageFillToBorder
 
@@ -2282,18 +1892,13 @@ $image->gdImageFillToBorder( $x, $y, $border, $color )
 
 =cut
 
-
 sub gdImageFillToBorder
 {
     my $self = shift;
     return _gdImageFillToBorder ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFillToBorder()...
-#line 2292 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Fill
 
 $image->Fill( $x, $y, $color )
@@ -2302,12 +1907,10 @@ Alias for gdImageFill.
 
 =cut
 
-
 sub Fill
 {
     return gdImageFill ( @_ );
 } # End of Fill()...
-
 
 =head2 gdImageFill
 
@@ -2315,18 +1918,13 @@ $image->gdImageFill( $x, $y, $color )
 
 =cut
 
-
 sub gdImageFill
 {
     my $self = shift;
     return _gdImageFill ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFill()...
-#line 2325 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 CopyRotated
 
 $image->CopyRotated( $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight, $angle )
@@ -2335,12 +1933,10 @@ Alias for gdImageCopyRotated.
 
 =cut
 
-
 sub CopyRotated
 {
     return gdImageCopyRotated ( @_ );
 } # End of CopyRotated()...
-
 
 =head2 gdImageCopyRotated
 
@@ -2348,18 +1944,13 @@ $image->gdImageCopyRotated( $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight, $
 
 =cut
 
-
 sub gdImageCopyRotated
 {
     my $self = shift;
     return _gdImageCopyRotated ( $self->{IMG_PTR}, @_ );
 } # End of gdImageCopyRotated()...
-#line 2358 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetBrush
 
 $image->SetBrush(  )
@@ -2368,12 +1959,10 @@ Alias for gdImageSetBrush.
 
 =cut
 
-
 sub SetBrush
 {
     return gdImageSetBrush ( @_ );
 } # End of SetBrush()...
-
 
 =head2 gdImageSetBrush
 
@@ -2381,18 +1970,13 @@ $image->gdImageSetBrush(  )
 
 =cut
 
-
 sub gdImageSetBrush
 {
     my $self = shift;
     return _gdImageSetBrush ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetBrush()...
-#line 2391 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetTile
 
 $image->SetTile(  )
@@ -2401,12 +1985,10 @@ Alias for gdImageSetTile.
 
 =cut
 
-
 sub SetTile
 {
     return gdImageSetTile ( @_ );
 } # End of SetTile()...
-
 
 =head2 gdImageSetTile
 
@@ -2414,18 +1996,13 @@ $image->gdImageSetTile(  )
 
 =cut
 
-
 sub gdImageSetTile
 {
     my $self = shift;
     return _gdImageSetTile ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetTile()...
-#line 2424 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetAntiAliased
 
 $image->SetAntiAliased( $c )
@@ -2434,12 +2011,10 @@ Alias for gdImageSetAntiAliased.
 
 =cut
 
-
 sub SetAntiAliased
 {
     return gdImageSetAntiAliased ( @_ );
 } # End of SetAntiAliased()...
-
 
 =head2 gdImageSetAntiAliased
 
@@ -2447,18 +2022,13 @@ $image->gdImageSetAntiAliased( $c )
 
 =cut
 
-
 sub gdImageSetAntiAliased
 {
     my $self = shift;
     return _gdImageSetAntiAliased ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetAntiAliased()...
-#line 2457 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetAntiAliasedDontBlend
 
 $image->SetAntiAliasedDontBlend( $c, $dont_blend )
@@ -2467,12 +2037,10 @@ Alias for gdImageSetAntiAliasedDontBlend.
 
 =cut
 
-
 sub SetAntiAliasedDontBlend
 {
     return gdImageSetAntiAliasedDontBlend ( @_ );
 } # End of SetAntiAliasedDontBlend()...
-
 
 =head2 gdImageSetAntiAliasedDontBlend
 
@@ -2480,18 +2048,13 @@ $image->gdImageSetAntiAliasedDontBlend( $c, $dont_blend )
 
 =cut
 
-
 sub gdImageSetAntiAliasedDontBlend
 {
     my $self = shift;
     return _gdImageSetAntiAliasedDontBlend ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetAntiAliasedDontBlend()...
-#line 2490 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetStyle
 
 $image->SetStyle( $style, $noOfPixels )
@@ -2500,12 +2063,10 @@ Alias for gdImageSetStyle.
 
 =cut
 
-
 sub SetStyle
 {
     return gdImageSetStyle ( @_ );
 } # End of SetStyle()...
-
 
 =head2 gdImageSetStyle
 
@@ -2513,18 +2074,13 @@ $image->gdImageSetStyle( $style, $noOfPixels )
 
 =cut
 
-
 sub gdImageSetStyle
 {
     my $self = shift;
     return _gdImageSetStyle ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetStyle()...
-#line 2523 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SetThickness
 
 $image->SetThickness( $thickness )
@@ -2533,12 +2089,10 @@ Alias for gdImageSetThickness.
 
 =cut
 
-
 sub SetThickness
 {
     return gdImageSetThickness ( @_ );
 } # End of SetThickness()...
-
 
 =head2 gdImageSetThickness
 
@@ -2546,18 +2100,13 @@ $image->gdImageSetThickness( $thickness )
 
 =cut
 
-
 sub gdImageSetThickness
 {
     my $self = shift;
     return _gdImageSetThickness ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetThickness()...
-#line 2556 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Interlace
 
 $image->Interlace( $interlaceArg )
@@ -2566,12 +2115,10 @@ Alias for gdImageInterlace.
 
 =cut
 
-
 sub Interlace
 {
     return gdImageInterlace ( @_ );
 } # End of Interlace()...
-
 
 =head2 gdImageInterlace
 
@@ -2579,18 +2126,13 @@ $image->gdImageInterlace( $interlaceArg )
 
 =cut
 
-
 sub gdImageInterlace
 {
     my $self = shift;
     return _gdImageInterlace ( $self->{IMG_PTR}, @_ );
 } # End of gdImageInterlace()...
-#line 2589 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 AlphaBlending
 
 $image->AlphaBlending( $alphaBlendingArg )
@@ -2599,12 +2141,10 @@ Alias for gdImageAlphaBlending.
 
 =cut
 
-
 sub AlphaBlending
 {
     return gdImageAlphaBlending ( @_ );
 } # End of AlphaBlending()...
-
 
 =head2 gdImageAlphaBlending
 
@@ -2612,18 +2152,13 @@ $image->gdImageAlphaBlending( $alphaBlendingArg )
 
 =cut
 
-
 sub gdImageAlphaBlending
 {
     my $self = shift;
     return _gdImageAlphaBlending ( $self->{IMG_PTR}, @_ );
 } # End of gdImageAlphaBlending()...
-#line 2622 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SaveAlpha
 
 $image->SaveAlpha( $saveAlphaArg )
@@ -2632,12 +2167,10 @@ Alias for gdImageSaveAlpha.
 
 =cut
 
-
 sub SaveAlpha
 {
     return gdImageSaveAlpha ( @_ );
 } # End of SaveAlpha()...
-
 
 =head2 gdImageSaveAlpha
 
@@ -2645,18 +2178,13 @@ $image->gdImageSaveAlpha( $saveAlphaArg )
 
 =cut
 
-
 sub gdImageSaveAlpha
 {
     my $self = shift;
     return _gdImageSaveAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSaveAlpha()...
-#line 2655 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 TrueColor
 
 $image->TrueColor(  )
@@ -2665,12 +2193,10 @@ Alias for gdImageTrueColor.
 
 =cut
 
-
 sub TrueColor
 {
     return gdImageTrueColor ( @_ );
 } # End of TrueColor()...
-
 
 =head2 gdImageTrueColor
 
@@ -2678,18 +2204,13 @@ $image->gdImageTrueColor(  )
 
 =cut
 
-
 sub gdImageTrueColor
 {
     my $self = shift;
     return _gdImageTrueColor ( $self->{IMG_PTR}, @_ );
 } # End of gdImageTrueColor()...
-#line 2688 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 ColorsTotal
 
 $image->ColorsTotal(  )
@@ -2698,12 +2219,10 @@ Alias for gdImageColorsTotal.
 
 =cut
 
-
 sub ColorsTotal
 {
     return gdImageColorsTotal ( @_ );
 } # End of ColorsTotal()...
-
 
 =head2 gdImageColorsTotal
 
@@ -2711,18 +2230,13 @@ $image->gdImageColorsTotal(  )
 
 =cut
 
-
 sub gdImageColorsTotal
 {
     my $self = shift;
     return _gdImageColorsTotal ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorsTotal()...
-#line 2721 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Red
 
 $image->Red( $c )
@@ -2731,12 +2245,10 @@ Alias for gdImageRed.
 
 =cut
 
-
 sub Red
 {
     return gdImageRed ( @_ );
 } # End of Red()...
-
 
 =head2 gdImageRed
 
@@ -2744,18 +2256,13 @@ $image->gdImageRed( $c )
 
 =cut
 
-
 sub gdImageRed
 {
     my $self = shift;
     return _gdImageRed ( $self->{IMG_PTR}, @_ );
 } # End of gdImageRed()...
-#line 2754 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Green
 
 $image->Green( $c )
@@ -2764,12 +2271,10 @@ Alias for gdImageGreen.
 
 =cut
 
-
 sub Green
 {
     return gdImageGreen ( @_ );
 } # End of Green()...
-
 
 =head2 gdImageGreen
 
@@ -2777,18 +2282,13 @@ $image->gdImageGreen( $c )
 
 =cut
 
-
 sub gdImageGreen
 {
     my $self = shift;
     return _gdImageGreen ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGreen()...
-#line 2787 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Blue
 
 $image->Blue( $c )
@@ -2797,12 +2297,10 @@ Alias for gdImageBlue.
 
 =cut
 
-
 sub Blue
 {
     return gdImageBlue ( @_ );
 } # End of Blue()...
-
 
 =head2 gdImageBlue
 
@@ -2810,18 +2308,13 @@ $image->gdImageBlue( $c )
 
 =cut
 
-
 sub gdImageBlue
 {
     my $self = shift;
     return _gdImageBlue ( $self->{IMG_PTR}, @_ );
 } # End of gdImageBlue()...
-#line 2820 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 Alpha
 
 $image->Alpha( $c )
@@ -2830,12 +2323,10 @@ Alias for gdImageAlpha.
 
 =cut
 
-
 sub Alpha
 {
     return gdImageAlpha ( @_ );
 } # End of Alpha()...
-
 
 =head2 gdImageAlpha
 
@@ -2843,18 +2334,13 @@ $image->gdImageAlpha( $c )
 
 =cut
 
-
 sub gdImageAlpha
 {
     my $self = shift;
     return _gdImageAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageAlpha()...
-#line 2853 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 GetTransparent
 
 $image->GetTransparent(  )
@@ -2863,12 +2349,10 @@ Alias for gdImageGetTransparent.
 
 =cut
 
-
 sub GetTransparent
 {
     return gdImageGetTransparent ( @_ );
 } # End of GetTransparent()...
-
 
 =head2 gdImageGetTransparent
 
@@ -2876,18 +2360,13 @@ $image->gdImageGetTransparent(  )
 
 =cut
 
-
 sub gdImageGetTransparent
 {
     my $self = shift;
     return _gdImageGetTransparent ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetTransparent()...
-#line 2886 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 GetInterlaced
 
 $image->GetInterlaced(  )
@@ -2896,12 +2375,10 @@ Alias for gdImageGetInterlaced.
 
 =cut
 
-
 sub GetInterlaced
 {
     return gdImageGetInterlaced ( @_ );
 } # End of GetInterlaced()...
-
 
 =head2 gdImageGetInterlaced
 
@@ -2909,18 +2386,13 @@ $image->gdImageGetInterlaced(  )
 
 =cut
 
-
 sub gdImageGetInterlaced
 {
     my $self = shift;
     return _gdImageGetInterlaced ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetInterlaced()...
-#line 2919 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SX
 
 $image->SX(  )
@@ -2929,12 +2401,10 @@ Alias for gdImageSX.
 
 =cut
 
-
 sub SX
 {
     return gdImageSX ( @_ );
 } # End of SX()...
-
 
 =head2 gdImageSX
 
@@ -2942,18 +2412,13 @@ $image->gdImageSX(  )
 
 =cut
 
-
 sub gdImageSX
 {
     my $self = shift;
     return _gdImageSX ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSX()...
-#line 2952 "GD.pm"
-
-
 
 #line 1959 "GD.pd"
-
 =head2 SY
 
 $image->SY(  )
@@ -2962,12 +2427,10 @@ Alias for gdImageSY.
 
 =cut
 
-
 sub SY
 {
     return gdImageSY ( @_ );
 } # End of SY()...
-
 
 =head2 gdImageSY
 
@@ -2975,18 +2438,13 @@ $image->gdImageSY(  )
 
 =cut
 
-
 sub gdImageSY
 {
     my $self = shift;
     return _gdImageSY ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSY()...
-#line 2985 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 ColorAllocates
 
 $image->ColorAllocates( $r(pdl), $g(pdl), $b(pdl) )
@@ -2995,12 +2453,10 @@ Alias for gdImageColorAllocates.
 
 =cut
 
-
 sub ColorAllocates
 {
     return gdImageColorAllocates ( @_ );
 } # End of ColorAllocates()...
-
 
 =head2 gdImageColorAllocates
 
@@ -3008,18 +2464,13 @@ $image->gdImageColorAllocates( $r(pdl), $g(pdl), $b(pdl) )
 
 =cut
 
-
 sub gdImageColorAllocates
 {
     my $self = shift;
     return _gdImageColorAllocates ( @_, $self->{IMG_PTR} );
 } # End of gdImageColorAllocates()...
-#line 3018 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 ColorAllocateAlphas
 
 $image->ColorAllocateAlphas( $r(pdl), $g(pdl), $b(pdl), $a(pdl) )
@@ -3028,12 +2479,10 @@ Alias for gdImageColorAllocateAlphas.
 
 =cut
 
-
 sub ColorAllocateAlphas
 {
     return gdImageColorAllocateAlphas ( @_ );
 } # End of ColorAllocateAlphas()...
-
 
 =head2 gdImageColorAllocateAlphas
 
@@ -3041,18 +2490,13 @@ $image->gdImageColorAllocateAlphas( $r(pdl), $g(pdl), $b(pdl), $a(pdl) )
 
 =cut
 
-
 sub gdImageColorAllocateAlphas
 {
     my $self = shift;
     return _gdImageColorAllocateAlphas ( @_, $self->{IMG_PTR} );
 } # End of gdImageColorAllocateAlphas()...
-#line 3051 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 SetPixels
 
 $image->SetPixels( $x(pdl), $y(pdl), $color(pdl) )
@@ -3061,12 +2505,10 @@ Alias for gdImageSetPixels.
 
 =cut
 
-
 sub SetPixels
 {
     return gdImageSetPixels ( @_ );
 } # End of SetPixels()...
-
 
 =head2 gdImageSetPixels
 
@@ -3074,18 +2516,13 @@ $image->gdImageSetPixels( $x(pdl), $y(pdl), $color(pdl) )
 
 =cut
 
-
 sub gdImageSetPixels
 {
     my $self = shift;
     return _gdImageSetPixels ( @_, $self->{IMG_PTR} );
 } # End of gdImageSetPixels()...
-#line 3084 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 Lines
 
 $image->Lines( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) )
@@ -3094,12 +2531,10 @@ Alias for gdImageLines.
 
 =cut
 
-
 sub Lines
 {
     return gdImageLines ( @_ );
 } # End of Lines()...
-
 
 =head2 gdImageLines
 
@@ -3107,18 +2542,13 @@ $image->gdImageLines( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) )
 
 =cut
 
-
 sub gdImageLines
 {
     my $self = shift;
     return _gdImageLines ( @_, $self->{IMG_PTR} );
 } # End of gdImageLines()...
-#line 3117 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 DashedLines
 
 $image->DashedLines( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) )
@@ -3127,12 +2557,10 @@ Alias for gdImageDashedLines.
 
 =cut
 
-
 sub DashedLines
 {
     return gdImageDashedLines ( @_ );
 } # End of DashedLines()...
-
 
 =head2 gdImageDashedLines
 
@@ -3140,18 +2568,13 @@ $image->gdImageDashedLines( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) 
 
 =cut
 
-
 sub gdImageDashedLines
 {
     my $self = shift;
     return _gdImageDashedLines ( @_, $self->{IMG_PTR} );
 } # End of gdImageDashedLines()...
-#line 3150 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 Rectangles
 
 $image->Rectangles( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) )
@@ -3160,12 +2583,10 @@ Alias for gdImageRectangles.
 
 =cut
 
-
 sub Rectangles
 {
     return gdImageRectangles ( @_ );
 } # End of Rectangles()...
-
 
 =head2 gdImageRectangles
 
@@ -3173,18 +2594,13 @@ $image->gdImageRectangles( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) )
 
 =cut
 
-
 sub gdImageRectangles
 {
     my $self = shift;
     return _gdImageRectangles ( @_, $self->{IMG_PTR} );
 } # End of gdImageRectangles()...
-#line 3183 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 FilledRectangles
 
 $image->FilledRectangles( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(pdl) )
@@ -3193,12 +2609,10 @@ Alias for gdImageFilledRectangles.
 
 =cut
 
-
 sub FilledRectangles
 {
     return gdImageFilledRectangles ( @_ );
 } # End of FilledRectangles()...
-
 
 =head2 gdImageFilledRectangles
 
@@ -3206,18 +2620,13 @@ $image->gdImageFilledRectangles( $x1(pdl), $y1(pdl), $x2(pdl), $y2(pdl), $color(
 
 =cut
 
-
 sub gdImageFilledRectangles
 {
     my $self = shift;
     return _gdImageFilledRectangles ( @_, $self->{IMG_PTR} );
 } # End of gdImageFilledRectangles()...
-#line 3216 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 FilledArcs
 
 $image->FilledArcs( $cx(pdl), $cy(pdl), $w(pdl), $h(pdl), $s(pdl), $e(pdl), $color(pdl), $style(pdl) )
@@ -3226,12 +2635,10 @@ Alias for gdImageFilledArcs.
 
 =cut
 
-
 sub FilledArcs
 {
     return gdImageFilledArcs ( @_ );
 } # End of FilledArcs()...
-
 
 =head2 gdImageFilledArcs
 
@@ -3239,18 +2646,13 @@ $image->gdImageFilledArcs( $cx(pdl), $cy(pdl), $w(pdl), $h(pdl), $s(pdl), $e(pdl
 
 =cut
 
-
 sub gdImageFilledArcs
 {
     my $self = shift;
     return _gdImageFilledArcs ( @_, $self->{IMG_PTR} );
 } # End of gdImageFilledArcs()...
-#line 3249 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 Arcs
 
 $image->Arcs( $cx(pdl), $cy(pdl), $w(pdl), $h(pdl), $s(pdl), $e(pdl), $color(pdl) )
@@ -3259,12 +2661,10 @@ Alias for gdImageArcs.
 
 =cut
 
-
 sub Arcs
 {
     return gdImageArcs ( @_ );
 } # End of Arcs()...
-
 
 =head2 gdImageArcs
 
@@ -3272,18 +2672,13 @@ $image->gdImageArcs( $cx(pdl), $cy(pdl), $w(pdl), $h(pdl), $s(pdl), $e(pdl), $co
 
 =cut
 
-
 sub gdImageArcs
 {
     my $self = shift;
     return _gdImageArcs ( @_, $self->{IMG_PTR} );
 } # End of gdImageArcs()...
-#line 3282 "GD.pm"
-
-
 
 #line 2060 "GD.pd"
-
 =head2 FilledEllipses
 
 $image->FilledEllipses( $cx(pdl), $cy(pdl), $w(pdl), $h(pdl), $color(pdl) )
@@ -3292,12 +2687,10 @@ Alias for gdImageFilledEllipses.
 
 =cut
 
-
 sub FilledEllipses
 {
     return gdImageFilledEllipses ( @_ );
 } # End of FilledEllipses()...
-
 
 =head2 gdImageFilledEllipses
 
@@ -3305,33 +2698,23 @@ $image->gdImageFilledEllipses( $cx(pdl), $cy(pdl), $w(pdl), $h(pdl), $color(pdl)
 
 =cut
 
-
 sub gdImageFilledEllipses
 {
     my $self = shift;
     return _gdImageFilledEllipses ( @_, $self->{IMG_PTR} );
 } # End of gdImageFilledEllipses()...
-#line 3315 "GD.pm"
-
-
 
 #line 2072 "GD.pd"
-
 =head1 CLASS FUNCTIONS
 
 =cut
-#line 3324 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImageCopy
 
 gdImageCopy ( $dst(PDL::IO::GD), $src(PDL::IO::GD), $dstX, $dstY, $srcX, $srcY, $w, $h )
 
 =cut
-
 
 sub gdImageCopy
 {
@@ -3346,18 +2729,13 @@ sub gdImageCopy
 
     return _gdImageCopy ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $w, $h );
 } # End of gdImageCopy()...
-#line 3350 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImageCopyMerge
 
 gdImageCopyMerge ( $dst(PDL::IO::GD), $src(PDL::IO::GD), $dstX, $dstY, $srcX, $srcY, $w, $h, $pct )
 
 =cut
-
 
 sub gdImageCopyMerge
 {
@@ -3373,18 +2751,13 @@ sub gdImageCopyMerge
 
     return _gdImageCopyMerge ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $w, $h, $pct );
 } # End of gdImageCopyMerge()...
-#line 3377 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImageCopyMergeGray
 
 gdImageCopyMergeGray ( $dst(PDL::IO::GD), $src(PDL::IO::GD), $dstX, $dstY, $srcX, $srcY, $w, $h, $pct )
 
 =cut
-
 
 sub gdImageCopyMergeGray
 {
@@ -3400,18 +2773,13 @@ sub gdImageCopyMergeGray
 
     return _gdImageCopyMergeGray ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $w, $h, $pct );
 } # End of gdImageCopyMergeGray()...
-#line 3404 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImageCopyResized
 
 gdImageCopyResized ( $dst(PDL::IO::GD), $src(PDL::IO::GD), $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH )
 
 =cut
-
 
 sub gdImageCopyResized
 {
@@ -3428,18 +2796,13 @@ sub gdImageCopyResized
 
     return _gdImageCopyResized ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH );
 } # End of gdImageCopyResized()...
-#line 3432 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImageCopyResampled
 
 gdImageCopyResampled ( $dst(PDL::IO::GD), $src(PDL::IO::GD), $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH )
 
 =cut
-
 
 sub gdImageCopyResampled
 {
@@ -3456,18 +2819,13 @@ sub gdImageCopyResampled
 
     return _gdImageCopyResampled ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH );
 } # End of gdImageCopyResampled()...
-#line 3460 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImageCompare
 
 gdImageCompare ( $im1(PDL::IO::GD), $im2(PDL::IO::GD) )
 
 =cut
-
 
 sub gdImageCompare
 {
@@ -3476,18 +2834,13 @@ sub gdImageCompare
 
     return _gdImageCompare ( $im1->{IMG_PTR}, $im2->{IMG_PTR} );
 } # End of gdImageCompare()...
-#line 3480 "GD.pm"
-
-
 
 #line 2142 "GD.pd"
-
 =head2 gdImagePaletteCopy
 
 gdImagePaletteCopy ( $dst(PDL::IO::GD), $src(PDL::IO::GD) )
 
 =cut
-
 
 sub gdImagePaletteCopy
 {
@@ -3496,12 +2849,8 @@ sub gdImagePaletteCopy
 
     return _gdImagePaletteCopy ( $dst->{IMG_PTR}, $src->{IMG_PTR} );
 } # End of gdImagePaletteCopy()...
-#line 3500 "GD.pm"
-
-
 
 #line 1468 "GD.pd"
-
 =head2 StringTTF
 
 $image->StringTTF( $brect, $fg, $fontlist, $ptsize, $angle, $x, $y, $string )
@@ -3510,12 +2859,10 @@ Alias for gdImageStringTTF.
 
 =cut
 
-
 sub StringTTF
 {
     return gdImageStringTTF ( @_ );
 } # End of StringTTF()...
-
 
 =head2 gdImageStringTTF
 
@@ -3523,18 +2870,13 @@ $image->gdImageStringTTF( $brect, $fg, $fontlist, $ptsize, $angle, $x, $y, $stri
 
 =cut
 
-
 sub gdImageStringTTF
 {
     my $self = shift;
     return _gdImageStringTTF ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringTTF()...
-#line 3533 "GD.pm"
-
-
 
 #line 1521 "GD.pd"
-
 =head2 StringFT
 
 $image->StringFT( $brect, $fg, $fontlist, $ptsize, $angle, $x, $y, $string )
@@ -3543,12 +2885,10 @@ Alias for gdImageStringFT.
 
 =cut
 
-
 sub StringFT
 {
     return gdImageStringFT ( @_ );
 } # End of StringFT()...
-
 
 =head2 gdImageStringFT
 
@@ -3556,29 +2896,20 @@ $image->gdImageStringFT( $brect, $fg, $fontlist, $ptsize, $angle, $x, $y, $strin
 
 =cut
 
-
 sub gdImageStringFT
 {
     my $self = shift;
     return _gdImageStringFT ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringFT()...
-#line 3566 "GD.pm"
-
-
 
 #line 1553 "GD.pd"
-
-
 =head1 AUTHOR
 
 Judd Taylor, Orbital Systems, Ltd.
 judd dot t at orbitalsystems dot com
 
 =cut
-#line 3579 "GD.pm"
-
-
-
+#line 2913 "GD.pm"
 
 # Exit with OK status
 

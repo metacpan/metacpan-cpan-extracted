@@ -3,7 +3,7 @@ package App::cpanminus::reporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp ();
 use File::Spec     3.19;
@@ -50,7 +50,9 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  foreach my $option ( qw(quiet verbose force exclude only dry-run skip-history ignore-versions) ) {
+  $self->max_age($params{max_age} || 30);
+
+  foreach my $option ( qw(quiet verbose force exclude only dry-run skip-history ignore-versions all) ) {
     my $method = $option;
     $method =~ s/\-/_/g;
     $self->$method( $params{$option} ) if exists $params{$option};
@@ -85,6 +87,18 @@ sub verbose {
   my ($self, $verbose) = @_;
   $self->{_verbose} = $verbose if $verbose;
   return $self->{_verbose};
+}
+
+sub all {
+  my ($self, $all) = @_;
+  $self->{_all} = $all if $all;
+  return $self->{_all};
+}
+
+sub max_age {
+  my ($self, $max_age) = @_;
+  $self->{_max_age} = $max_age if $max_age;
+  return $self->{_max_age};
 }
 
 sub force {
@@ -187,38 +201,85 @@ sub _check_cpantesters_config_data {
   return 1;
 }
 
+# Returns 1 if log is fresh enough, 0 if it is too old.
 sub _check_build_log {
-  my $self = shift;
+  my ($self, $build_logfile) = @_;
+
+  my $max_age = $self->max_age;
 
   # as a safety mechanism, we only let people parse build.log files
   # if they were generated up to 30 minutes (1800 seconds) ago,
   # unless the user asks us to --force it.
-  my $mtime = (stat $self->build_logfile)[9];
-  if ( !$self->force && $mtime && time - $mtime > 1800 ) {
-      print <<'EOMESSAGE';
-Fatal: build.log was created longer than 30 minutes ago.
+  my $mtime = (stat $build_logfile)[9];
+  my $age_in_minutes = int((time - $mtime) / 60);
+  if ( !$self->force && $mtime && $age_in_minutes > $max_age ) {
+    if($self->all) {
+      print "Skipping $build_logfile, too old (modified $age_in_minutes minutes ago > $max_age)."
+    } else {
+      print <<"EOMESSAGE";
+$build_logfile is too old (created $age_in_minutes minutes ago).
 
-As a standalone tool, it is important that you run cpanm-reporter
-as soon as you finish cpanm, otherwise your system data may have
-changed, from new libraries to a completely different perl binary.
+As a standalone tool, it is important that you run cpanm-reporter as
+soon as you finish cpanm, otherwise your system data may have changed,
+from new libraries to a completely different perl binary.
 
-Because of that, this app will *NOT* parse build.log files last modified
-longer than 30 minutes before the moment it runs.
+Because of that, this app will *NOT* parse build.log files which are
+too old (by default: which are last modified more than 30 minutes ago).
 
-You can override this behaviour by touching the file or passing
-a --force flag to cpanm-reporter, but please take good care to avoid
+You can override this behaviour by touching the file, passing
+--max-age option or --force flag, but please take good care to avoid
 sending bogus reports.
 EOMESSAGE
+    }
     return;
   }
   return 1;
 }
 
+sub _get_logfiles {
+  my ($self) = @_;
+  my @files;
+  if ($self->all) {
+    my $workdir = File::Spec->catdir($self->build_dir, 'work');
+    if (-e $workdir) {
+      opendir my $dh, $workdir or return ();
+      my @children = grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+      closedir $dh;
+      foreach my $child (@children) {
+        my $logfile = File::Spec->catfile($workdir, $child, 'build.log');
+        if (-e $logfile && !-d _) {
+          push @files, $logfile;
+        }
+      }
+    }
+    else {
+      print <<"EOMSG";
+Can not find cpanm work directory (tried $workdir).
+Please specify top cpanm dir as --build-dir, or do not
+specify --build-dir if it is in ~/.cpanm.
+EOMSG
+    }
+  }
+  else {
+    push @files, $self->build_logfile;
+  }
+  return @files;
+}
+
 sub run {
   my $self = shift;
-  return unless ($self->_check_cpantesters_config_data and $self->_check_build_log);
+  return unless $self->_check_cpantesters_config_data;
+  foreach my $logfile ($self->_get_logfiles) {
+    $self->process_logfile($logfile);
+  }
+  return;
+}
 
-  my $logfile = $self->build_logfile;
+sub process_logfile {
+  my ($self, $logfile) = @_;
+
+  return unless $self->_check_build_log($logfile);
+
   open my $fh, '<', $logfile
     or Carp::croak "error opening build log file '$logfile' for reading: $!";
 
@@ -351,7 +412,37 @@ sub run {
 }
 
 sub get_author {
-  my ($self, $path ) = @_;
+  my ($self, $path) = @_;
+  if ($path->scheme eq 'file') {
+    return $self->_get_author_from_file($path);
+  }
+  else {
+    return $self->_get_author_from_metabase($path->path);
+  }
+}
+
+sub _get_author_from_file {
+  my ($self, $path) = @_;
+
+  my $directories = (File::Spec->splitpath($path))[1];
+  my @path = File::Spec->splitdir($directories);
+  pop @path if $path[-1] eq '';
+
+  if ( @path >= 3                               # R/RJ/RJBS
+       && $path[-1] =~ /\A[A-Z\-]+\z/           # RJBS
+       && substr($path[-1], 0, 2) eq $path[-2]  # RJ
+       && substr($path[-1], 0, 1) eq $path[-3]  # R
+  ) {
+    return $path[-1];
+  }
+  else {
+    print "DEBUG: path '$path' doesn't look valid" if $self->verbose;
+    return;
+  }
+}
+
+sub _get_author_from_metabase {
+  my ($self, $path) = @_;
   my $metadata;
 
   try {
@@ -372,18 +463,16 @@ sub parse_uri {
 
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
-  if (    $scheme ne 'http'
-      and $scheme ne 'https'
-      and $scheme ne 'ftp'
-      and $scheme ne 'cpan'
-  ) {
+  my %eligible_schemes = map {$_ => 1} (qw| http https ftp cpan file |);
+  if (! $eligible_schemes{$scheme}) {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
       unless $self->quiet;
     return;
   }
 
-  my $author = $self->get_author( $uri->path );
-  unless ($author) {
+  my $author = $self->get_author( $uri );
+
+  unless (defined $author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
       unless $self->quiet;
     return;

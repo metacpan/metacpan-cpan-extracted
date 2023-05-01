@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -17,7 +17,7 @@ use App::CSVUtils qw(
 
 gen_csv_util(
     name => 'csv_grep',
-    summary => 'Only output row(s) where Perl expression returns true',
+    summary => 'Select (only output) row(s) where Perl expression returns true',
     description => <<'_',
 
 This is like Perl's `grep` performed over rows of CSV. In `$_`, your Perl code
@@ -35,6 +35,8 @@ _
         %App::CSVUtils::argspecopt_hash,
         %App::CSVUtils::argspec_eval,
     },
+    tags => ['category:filtering', 'accepts-code'],
+
     examples => [
         {
             summary => 'Only show rows where the amount field '.
@@ -72,7 +74,7 @@ _
 );
 
 1;
-# ABSTRACT: Only output row(s) where Perl expression returns true
+# ABSTRACT: Select (only output) row(s) where Perl expression returns true
 
 __END__
 
@@ -82,11 +84,11 @@ __END__
 
 =head1 NAME
 
-App::CSVUtils::csv_grep - Only output row(s) where Perl expression returns true
+App::CSVUtils::csv_grep - Select (only output) row(s) where Perl expression returns true
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_grep (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_grep (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 
@@ -97,7 +99,7 @@ Usage:
 
  csv_grep(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Only output row(s) where Perl expression returns true.
+Select (only output) row(s) where Perl expression returns true.
 
 Examples:
 

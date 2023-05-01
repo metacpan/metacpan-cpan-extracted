@@ -5,9 +5,10 @@ use warnings;
 use utf8;
 
 use App::ArduinoBuilder::Logger;
+use App::ArduinoBuilder::System 'system_canonpath';
 use Exporter 'import';
 use File::Find;
-use File::Spec::Functions 'catdir', 'rel2abs';
+use File::Spec::Functions 'catdir';
 use List::Util 'min', 'any';
 
 our @EXPORT_OK = qw(find_latest_revision_dir list_sub_directories find_all_files_with_extensions);
@@ -52,20 +53,22 @@ sub list_sub_directories {
 sub find_all_files_with_extensions {
   my ($dir, $exts, $excluded_dirs, $no_recurse) = @_;
   my $exts_re = join('|', @{$exts});
-  my @excluded_dirs = map { rel2abs($_) } @{$excluded_dirs // []};
+  my @excluded_dirs = map { system_canonpath($_) } @{$excluded_dirs // []};
   my @found;
   my @dirs = ref $dir ? @{$dir} : $dir;
   for my $d (@dirs) {
-    my $is_root = 1;
     find(sub { push @found, $File::Find::name if -f && m/\.(?:$exts_re)$/;
                if (-d) {
-                 if ($no_recurse && !$is_root) {
+                 # $_ eq '.' only on the first, root directly that we are crawling.
+                 if ($no_recurse && $_ ne '.') {
+                   $File::Find::prune = 1;
+                   return;
+                 } elsif (/^\..+/) {
                    $File::Find::prune = 1;
                    return;
                  }
-                 my $a = rel2abs($_);
-                 $File::Find::prune = any { $_ eq $a || /^\./ } @excluded_dirs;
-                 $is_root = 0;
+                 my $a = system_canonpath($_);
+                 $File::Find::prune = any { $_ eq $a } @excluded_dirs;
                }
              }, $d);
   }

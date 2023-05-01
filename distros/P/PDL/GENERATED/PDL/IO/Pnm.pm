@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 6 "pnm.pd"
 
+#line 6 "pnm.pd"
 
 use strict;
 use warnings;
@@ -60,19 +60,12 @@ sub dmax {
 }
 #line 62 "Pnm.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -83,7 +76,6 @@ sub dmax {
   Signature: (type(); byte+ [o] im(m,n); byte [t] buf(llen); int ms => m; int ns => n;
 			int isbin; PerlIO *fp)
 
-
 =for ref
 
 Read in a raw pnm file.
@@ -93,26 +85,20 @@ determine the type of the operation when creating C<im> or trigger
 the appropriate type conversion (maybe we want a byte+ here so that
 C<im> follows I<strictly> the type of C<type>).
 
-
 =for bad
 
 pnminraw does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 105 "Pnm.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pnminraw = \&PDL::pnminraw;
-#line 112 "Pnm.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -123,31 +109,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   Signature: (type(); byte+ [o] im(m,n); int ms => m; int ns => n;
 			int format; PerlIO *fp)
 
-
 =for ref
 
 Read in an ascii pnm file.
-
 
 =for bad
 
 pnminascii does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 140 "Pnm.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pnminascii = \&PDL::pnminascii;
-#line 147 "Pnm.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -157,7 +136,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(m); int israw; int isbin; PerlIO *fp)
 
-
 =for ref
 
 Write a line of pnm data.
@@ -165,22 +143,19 @@ Write a line of pnm data.
 This function is implemented this way so that broadcasting works
 naturally.
 
-
 =for bad
 
 pnmout does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 177 "Pnm.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pnmout = \&PDL::pnmout;
-#line 184 "Pnm.pm"
+
+
 
 
 
@@ -388,8 +363,6 @@ sub PDL::wpnm {
     barf "wpnm: pbmconverter error: $!" if !$already_open and !close $fh;
 }
 
-
-
 ;# Exit with OK status
 
 1;
@@ -411,15 +384,10 @@ conditions. For details, see the file COPYING in the PDL
 distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
-
 =cut
 
-
 ############################## END PM CODE ################################
-#line 420 "Pnm.pm"
-
-
-
+#line 391 "Pnm.pm"
 
 # Exit with OK status
 

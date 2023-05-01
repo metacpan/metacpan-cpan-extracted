@@ -4,7 +4,7 @@ package Dist::Zilla::App::Command::gh;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Dist::Zilla::App -command;
 
@@ -86,7 +86,7 @@ Dist::Zilla::App::Command::gh - Use the GitHub plugins from the command-line
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 

@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @month_names = (
 	'january',
@@ -77,8 +77,17 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	if(!defined($class)) {
+		# Using DateTime::Format->new(), not DateTime::Format()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
 
+		# FIXME: this only works when no arguments are given
+		return bless { }, __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { }, ref($class);
+	}
 	return bless { }, $class;
 }
 
@@ -90,7 +99,6 @@ Synonym for parse().
 
 sub parse_datetime {
 	my $self = shift;
-	my %params;
 
 	if(!ref($self)) {
 		if(scalar(@_)) {
@@ -105,13 +113,15 @@ sub parse_datetime {
 
 	return $self->parse(@_);
 }
- 
+
 =head2 parse
 
-Creates a DateTime::Format::Text object.
-Returns a L<DateTime> object constructed from a date/time string embedding in aribitrary text.
+Returns a L<DateTime> object constructed from a date/time string embedded in
+arbitrary text.
 
 Can be called as a class or object method.
+
+When called in an array context, returns an array containing all of the matches
 
 =cut
 
@@ -122,6 +132,9 @@ sub parse {
 	if(!ref($self)) {
 		if(scalar(@_)) {
 			return(__PACKAGE__->new()->parse(@_));
+		} elsif($self eq __PACKAGE__) {
+			# Date::Time::Format->parse()
+			Carp::croak('Usage: ', $self, '::parse(string => $string)');
 		}
 		return(__PACKAGE__->new()->parse($self));
 	} elsif(ref($self) eq 'HASH') {
@@ -137,11 +150,43 @@ sub parse {
 	}
 
 	if(my $string = $params{'string'}) {
+		# Allow the text to be an object
+		if(ref($string)) {
+			$string = $string->as_string();
+		}
+
+		if(wantarray) {
+			# Return an array with all of the dates which match
+			my @rc;
+		
+			while($string =~ /([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/g) {
+				# Match dates: 01/01/2012 or 30-12-11 or 1 2 1985
+				my $r = $self->parse("$1 $2 $3");
+				push @rc, $r;
+			}
+			while($string =~ /($d|$sd)[\s,\-_\/]*?(\d?\d)[,\-\/]*($o)?[\s,\-\/]*($m|$sm)[\s,\-\/]+(\d{4})/ig) {
+				#  Match dates: Sunday 1st March 2015; Sunday, 1 March 2015; Sun 1 Mar 2015; Sun-1-March-2015
+				my $r = $self->parse("$2 $4 $5");
+				push @rc, $r;
+			}
+			while($string =~ /($m|$sm)[\s,\-_\/]*?(\d?\d)[,\-\/]*($o)?[\s,\-\/]+(\d{4})/ig) {
+				my $r = $self->parse("$1 $2 $4");
+				push @rc, $r;
+			}
+			return @rc if(scalar(@rc));
+			while($string =~ /(\d{1,2})\s($m|$sm)\s(\d{4})/ig) {
+				my $r = $self->parse("$1 $2 $3");	# Force scalar context
+				push @rc, $r;
+			}
+			return @rc if(scalar(@rc));
+		}
+
+		# !wantarray
 		my $day;
 		my $month;
 		my $year;
 
-		if($string =~ /([0-9]?[0-9])[\.\-\/ ]+([0-1]?[0-9])[\.\-\/ ]+([0-9]{2,4})/) {
+		if($string =~ /([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/) {
 			# Match dates: 01/01/2012 or 30-12-11 or 1 2 1985
 			$day = $1;
 			$month = $2;
@@ -155,11 +200,16 @@ sub parse {
 			$month //= $1;
 			$day //= $2;
 			$year //= $4;
+		# } elsif($string =~ /[^\s,\(](\d{1,2})\s+($m|$sm)[\s,]+(\d{4})/i) {
+			# # 12 September 1856
+			# $day = $1;
+			# $month = $2;
+			# $year = $3;
 		}
 
 		if(!defined($month)) {
 			#  Match month name
-			if($string =~ /($m|$sm)/) {
+			if($string =~ /($m|$sm)/i) {
 				$month = $1;
 			}
 		}
@@ -171,10 +221,21 @@ sub parse {
 			}
 		}
 
+		# We've managed to dig out a month and year, is there anything that looks like a day?
 		if(defined($month) && defined($year) && !defined($day)) {
 			# Match "Sunday 1st"
-			if($string =~ /($d|$sd)[,\s\-\/]+(\d?\d)[,\-\/]*($o)/i) {
+			if($string =~ /($d|$sd)[,\s\-\/]+(\d?\d)[,\-\/]*($o)\s+$year/i) {
 				$day = $1;
+			} elsif($string =~ /[\s\(](\d{1,2})\s+($m|$sm)/i) {
+				$day = $1;
+			} elsif($string =~ /^(\d{1,2})\s+($m|$sm)\s/i) {
+				$day = $1;
+			} elsif($string =~ /\s(\d{1,2})th\s/) {
+				$day = $1;
+			} elsif($string =~ /\s1st\s/i) {
+				$day = 1;
+			} elsif($string =~ /\s2nd\s/i) {
+				$day = 2;
 			}
 		}
 
@@ -202,19 +263,21 @@ sub parse {
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
-Based on https://github.com/etiennetremel/PHP-Find-Date-in-String.
+Based on L<https://github.com/etiennetremel/PHP-Find-Date-in-String>.
 Here's the author information from that:
 
     author   Etienne Tremel
-    license  https://creativecommons.org/licenses/by/3.0/ CC by 3.0
-    link     http://www.etiennetremel.net
+    license  L<https://creativecommons.org/licenses/by/3.0/> CC by 3.0
+    link     L<http://www.etiennetremel.net>
     version  0.2.0
 
 =head1 BUGS
 
+In array mode, it would be good to find more than one date in the string
+
 =head1 SEE ALSO
 
-    L<DateTime::Format::Natural>
+L<DateTime::Format::Natural>
 
 =head1 SUPPORT
 
@@ -230,10 +293,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Text>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/DateTime-Format-Text>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/DateTime-Format-Text/>
@@ -242,7 +301,7 @@ L<http://search.cpan.org/dist/DateTime-Format-Text/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Nigel Horne.
+Copyright 2019-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

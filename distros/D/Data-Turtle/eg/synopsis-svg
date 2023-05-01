@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Turtle ();
+use SVG qw(title);
+
+my ($width, $height) = (500, 500);
+my $stroke = 'black';
+my $fill = 'white';
+
+my $svg = SVG->new(
+    width  => $width,
+    height => $height,
+);
+$svg->title()->cdata('Data::Turtle');
+
+my $style = $svg->group(
+    id    => 'style-group',
+    style => {
+        stroke => $stroke,
+        fill   => $fill,
+    },
+);
+
+$style->rectangle(
+    id     => 'rectangle-frame',
+    x      => 0,
+    y      => 0,
+    width  => $width,
+    height => $height,
+);
+
+my $turtle = Data::Turtle->new(
+    width  => $width,
+    height => $height,
+);
+$turtle->pen_up;
+$turtle->right(45);
+$turtle->forward(10);
+$turtle->goto(100, 100);
+$turtle->mirror;
+$turtle->backward(10);
+$turtle->pen_down;
+for my $i (1 .. 4) {
+    my @line = $turtle->forward(50);
+    if (@line) {
+        $style->line(
+            id => "line-$i",
+            x1 => $line[0],
+            y1 => $line[1],
+            x2 => $line[2],
+            y2 => $line[3],
+        );
+    }
+    $turtle->right(90);
+}
+
+print $svg->xmlify;

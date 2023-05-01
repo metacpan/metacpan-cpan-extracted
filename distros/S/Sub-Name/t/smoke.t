@@ -3,7 +3,8 @@ use warnings;
 
 BEGIN { $^P |= 0x210 }
 
-use Test::More tests => 10;
+use Test::More;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Sub::Name;
 
 my $x = subname foo => sub { (caller 0)[3] };
@@ -40,4 +41,5 @@ for ("Blork:: Bar!", "Foo::Bar::Baz") {
     ::is($DB::sub{$_}, $anon);
 }
 
+::done_testing();
 # vim: ft=perl

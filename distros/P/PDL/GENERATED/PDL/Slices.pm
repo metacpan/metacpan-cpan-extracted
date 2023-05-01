@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "slices.pd"
 
+#line 5 "slices.pd"
 
 =head1 NAME
 
@@ -34,7 +34,6 @@ PDL::Slices -- Indexing, slicing, and dicing
   $x = ones(3,3);
   $y = $x->slice('-1:0,(1)');
   $c = $x->dummy(2);
-
 
 =head1 DESCRIPTION
 
@@ -87,12 +86,7 @@ use strict;
 use warnings;
 use PDL::Core ':Internal';
 use Scalar::Util 'blessed';
-#line 91 "Slices.pm"
-
-
-
-
-
+#line 90 "Slices.pm"
 
 =head1 FUNCTIONS
 
@@ -100,8 +94,6 @@ use Scalar::Util 'blessed';
 
 
 
-
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -173,25 +165,19 @@ from each column of C<$x> into C<$c>.  If you want to extract multiple
 columns from an array in one operation, see L</dice> or
 L</indexND>.
 
-
-
 =for bad
 
 index barfs if any of the index values are bad.
 
 =cut
-#line 184 "Slices.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*index = \&PDL::index;
-#line 191 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*index = \&PDL::index;
+
+
+
 
 
 
@@ -263,25 +249,19 @@ from each column of C<$x> into C<$c>.  If you want to extract multiple
 columns from an array in one operation, see L</dice> or
 L</indexND>.
 
-
-
 =for bad
 
 index1d propagates BAD index elements to the output variable.
 
 =cut
-#line 274 "Slices.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*index1d = \&PDL::index1d;
-#line 281 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*index1d = \&PDL::index1d;
+
+
+
 
 
 
@@ -353,21 +333,18 @@ from each column of C<$x> into C<$c>.  If you want to extract multiple
 columns from an array in one operation, see L</dice> or
 L</indexND>.
 
-
-
 =for bad
 
 index2d barfs if either of the index values are bad.
 
 =cut
-#line 364 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *index2d = \&PDL::index2d;
-#line 371 "Slices.pm"
+
+
 
 
 
@@ -421,20 +398,14 @@ sub PDL::indexND {
 }
 
 *PDL::indexNDb = \&PDL::indexND;
-#line 425 "Slices.pm"
-
-
 
 #line 293 "slices.pd"
-
-
 sub PDL::range {
   my($source,$ind,$sz,$bound) = @_;
 
 # Convert to indx type up front (also handled in rangeb if necessary)
   my $index = (ref $ind && UNIVERSAL::isa($ind,'PDL') && $ind->type eq 'indx') ? $ind : indx($ind);
   my $size = defined($sz) ? PDL->pdl($sz) : undef;
-
 
   # Handle empty PDL case: return a properly constructed Empty.
   if($index->isempty) {
@@ -444,9 +415,7 @@ sub PDL::range {
       return PDL->new_from_specification(0 x ($index->ndims-1), @sdims);
   }
 
-
   $index = $index->dummy(0,1) unless $index->ndims;
-
 
   # Pack boundary string if necessary
   if(defined $bound) {
@@ -467,19 +436,13 @@ sub PDL::range {
   no warnings; # shut up about passing undef into rangeb
   $source->rangeb($index,$size,$bound);
 }
-#line 471 "Slices.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 440 "Slices.pm"
 
 =head2 rangeb
 
 =for sig
 
-  Signature: (P(); C(); pdl *ind_pdl; SV *size; SV *boundary_sv)
+  Signature: (P(); C(); pdl *ind_pdl; SV *size_sv; SV *boundary_sv)
 
 =for ref
 
@@ -684,7 +647,7 @@ guaranteed result in the original PDL -- the result is an arbitrary
 choice among the valid values.  For some things that's OK; but for
 others it's not. In particular, this doesn't work:
 
-    pdl> $photon_list = new PDL::RandVar->sample(500)->reshape(2,250)*10
+    pdl> $photon_list = PDL::RandVar->new->sample(500)->reshape(2,250)*10
     pdl> $histogram = zeroes(10,10)
     pdl> $histogram->range($photon_list,1)++;  #not what you wanted
 
@@ -739,27 +702,20 @@ DEVEL NOTES
 makes it easier to loop over the index array but a little more brain-bending
 to tease out the algorithm.
 
-
-
 =for bad
 
 rangeb processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 752 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *rangeb = \&PDL::rangeb;
-#line 759 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -780,21 +736,18 @@ decode to C<$c>.
 
  rld($x,$y,$c=null);
 
-
-
 =for bad
 
 rld does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 793 "Slices.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
+
+#line 1045 "slices.pd"
 sub PDL::rld {
   my ($x,$y) = @_;
   my ($c);
@@ -810,18 +763,12 @@ sub PDL::rld {
   &PDL::_rld_int($x,$y,$c);
   $c;
 }
-#line 814 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 767 "Slices.pm"
 
 *rld = \&PDL::rld;
-#line 821 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -868,21 +815,18 @@ first instance of C<0> in each row of C<$x> should be considered.
  $yprob1x = $y->slice('-1:0')->double / $y->slice('(-1)');
  $z = cat($x1, 1 / $yprob1x**$nrolls)->transpose;
 
-
-
 =for bad
 
 rle does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 881 "Slices.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
+
+#line 1096 "slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -891,18 +835,12 @@ sub PDL::rle {
                                 ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
-#line 895 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 839 "Slices.pm"
 
 *rle = \&PDL::rle;
-#line 902 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -930,27 +868,20 @@ over a 1d PDL.
 See also: L</rle>, L<PDL::Ufunc/qsortvec>, L<PDL::Primitive/uniqvec>
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
-
-
 =for bad
 
 rlevec does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 943 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *rlevec = \&PDL::rlevec;
-#line 950 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -972,20 +903,18 @@ Can be used together with clump() to run-length decode "values" of arbitrary dim
 See also: L</rld>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
-
 =for bad
 
 rldvec does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 984 "Slices.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
+
+#line 1221 "slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
@@ -999,18 +928,12 @@ sub PDL::rldvec {
   &PDL::_rldvec_int($a,$b,$c);
   return $c;
 }
-#line 1003 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 932 "Slices.pm"
 
 *rldvec = \&PDL::rldvec;
-#line 1010 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1032,26 +955,20 @@ As for rle(), only the elements up to the first instance of 0 in $a should be co
 See also L</rle>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
-
 =for bad
 
 rleseq does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1044 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *rleseq = \&PDL::rleseq;
-#line 1051 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1076,20 +993,18 @@ as for:
 See also: L</rld>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
-
 =for bad
 
 rldseq does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1088 "Slices.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
+
+#line 1300 "slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
@@ -1101,18 +1016,15 @@ sub PDL::rldseq {
   &PDL::_rldseq_int($a,$b,$c);
   return $c;
 }
-#line 1105 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 1020 "Slices.pm"
 
 *rldseq = \&PDL::rldseq;
-#line 1112 "Slices.pm"
 
 
 
-#line 1346 "slices.pd"
+
+
+#line 1340 "slices.pd"
 
 =head2 rleND
 
@@ -1191,18 +1103,12 @@ sub rldND {
 
   return $data;
 }
-#line 1195 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 1107 "Slices.pm"
 
 *_clump_int = \&PDL::_clump_int;
-#line 1202 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1229,28 +1135,23 @@ are exchanged with each other i.e.
 
  $y->at(5,3,2,8) == $x->at(5,3,8,2)
 
-
-
 =for bad
 
 xchg does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1242 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *xchg = \&PDL::xchg;
-#line 1249 "Slices.pm"
 
 
 
-#line 1502 "slices.pd"
 
+
+#line 1499 "slices.pd"
 
 =head2 reorder
 
@@ -1370,13 +1271,7 @@ sub PDL::reorder {
         # a quicker way to do the reorder
         return $pdl->broadcast(@newDimOrder)->unbroadcast(0);
 }
-#line 1374 "Slices.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1275 "Slices.pm"
 
 =head2 mv
 
@@ -1402,27 +1297,23 @@ place 1, so:
 The other dimensions are moved accordingly.
 Negative dimension indices count from the end.
 
-
 =for bad
 
 mv does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1414 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *mv = \&PDL::mv;
-#line 1421 "Slices.pm"
 
 
 
-#line 1675 "slices.pd"
 
+
+#line 1676 "slices.pd"
 
 =head2 using
 
@@ -1452,13 +1343,7 @@ sub PDL::using {
   }
   @ind;
 }
-#line 1456 "Slices.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1347 "Slices.pm"
 
 =head2 diagonal
 
@@ -1510,33 +1395,25 @@ NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
   ]
  ]
 
-
 =for bad
 
 diagonal does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1522 "Slices.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
+
+#line 1770 "slices.pd"
 sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 1529 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 1412 "Slices.pm"
 
 *diagonal = \&PDL::diagonal;
-#line 1536 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1578,26 +1455,20 @@ C<$step> and C<$nlags> must be positive. C<$nthdim> can be
 negative and will then be counted from the last dim backwards
 in the usual way (-1 = last dim).
 
-
 =for bad
 
 lags does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1590 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *lags = \&PDL::lags;
-#line 1597 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1625,26 +1496,20 @@ the expression
 
 is always true (C<m> has to be less than 3).
 
-
 =for bad
 
 splitdim does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1637 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *splitdim = \&PDL::splitdim;
-#line 1644 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1658,26 +1523,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Shift vector elements along with wrap. Flows data back&forth.
 
-
 =for bad
 
 rotate does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1670 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *rotate = \&PDL::rotate;
-#line 1677 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1697,27 +1556,20 @@ Put some dimensions to a broadcastid.
 
  $y = $x->broadcastI(0,1,5); # broadcast over dims 1,5 in id 1
 
-
-
 =for bad
 
 broadcastI does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1710 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *broadcastI = \&PDL::broadcastI;
-#line 1717 "Slices.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1733,27 +1585,23 @@ All broadcasted dimensions are made real again.
 
 See [TBD Doc] for details and examples.
 
-
 =for bad
 
 unbroadcast does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1745 "Slices.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *unbroadcast = \&PDL::unbroadcast;
-#line 1752 "Slices.pm"
 
 
 
-#line 2110 "slices.pd"
 
+
+#line 2111 "slices.pd"
 
 =head2 dice
 
@@ -1903,13 +1751,7 @@ sub PDL::dice_axis {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1907 "Slices.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1755 "Slices.pm"
 
 =head2 slice
 
@@ -1964,7 +1806,6 @@ ignored (though it is not ignored within numbers).
 
 The empty string, C<:>, or C<X> cause the entire corresponding
 dimension to be kept unchanged.
-
 
 =item C<< <n> >> -- selection
 
@@ -2073,20 +1914,18 @@ direct slicing even though the syntax is convenient.
  $x->slice([3,1]);
  $x->slice([-2,1]);
 
-
 =for bad
 
 slice does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2085 "Slices.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
+
+#line 2430 "slices.pd"
 sub PDL::slice {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -2123,21 +1962,17 @@ sub PDL::slice {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 2127 "Slices.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 1966 "Slices.pm"
 
 *slice = \&PDL::slice;
-#line 2134 "Slices.pm"
 
 
 
 
 
-#line 2599 "slices.pd"
 
+
+#line 2598 "slices.pd"
 
 =head1 BUGS
 
@@ -2162,10 +1997,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 2166 "Slices.pm"
-
-
-
+#line 2001 "Slices.pm"
 
 # Exit with OK status
 

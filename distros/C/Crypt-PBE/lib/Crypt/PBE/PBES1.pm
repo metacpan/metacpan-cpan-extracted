@@ -10,7 +10,7 @@ use Exporter qw(import);
 
 use Crypt::PBE::PBKDF1;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use constant ENCRYPTION => { 'des' => 'Crypt::DES', };
 
@@ -215,7 +215,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

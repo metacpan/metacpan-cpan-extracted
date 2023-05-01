@@ -20,7 +20,7 @@ App::CSVUtils::Manual::Tips - App::CSVUtils tips/tricks
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::Manual::Tips (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::Manual::Tips (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 DESCRIPTION
 
@@ -30,7 +30,7 @@ If you process data from/to GUI spreadsheet program, you can install L<clipget>
 and L<clipadd> from L<App::ClipboardUtils>. For example, after you copy a range
 of cells from LibreOffice, you can do:
 
- % clipget | csv-munge-row -He '$_->{foo} = some-calculation...' --input-tsv --output-tsv | clipadd
+ % clipget | csv-munge-rows -He '$_->{foo} = some-calculation...' --input-tsv --output-tsv | clipadd
 
 =head1 HOMEPAGE
 

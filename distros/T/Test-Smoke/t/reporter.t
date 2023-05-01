@@ -50,7 +50,7 @@ for my $p (@patchlevels) {
 
     my $reporter = Test::Smoke::Reporter->new(
         ddir       => $findbin,
-        v          => $verbose, 
+        v          => $verbose,
         outfile    => '',
         showcfg    => $showcfg,
         cfg        => \( my $bcfg = <<__EOCFG__ ),
@@ -1867,7 +1867,6 @@ __EOFAIL__
 #    diag $reporter->report;
 }
 
-
 { # Test the grepccmsg() feature
     my $testdir = catdir $findbin, 'perl-current';
     mkpath $testdir;
@@ -1877,7 +1876,6 @@ __EOFAIL__
         ddir       => $testdir,
         is56x      => 0,
         defaultenv => 0,
-        lfile      => catfile( $findbin, 'gccmsg.log' ),
         v          => $verbose,
         showcfg    => $showcfg,
         cfg        => \( my $bcfg = <<'__EOCFG__' )), "init for grepccmsg() ");

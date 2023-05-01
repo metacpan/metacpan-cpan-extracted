@@ -1,4 +1,4 @@
-Geo-Coder-GooglePlaces Version 0.05
+Geo-Coder-GooglePlaces Version 0.06
 
 INSTALLATION
 
@@ -24,12 +24,8 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Geo-Coder-GooglePlaces
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Geo-Coder-GooglePlaces
-
     Search CPAN
         http://search.cpan.org/dist/Geo-Coder-GooglePlaces/
-
 
 LICENSE AND COPYRIGHT
 

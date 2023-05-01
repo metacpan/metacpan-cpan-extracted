@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::Run::Role::Runner;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -55,14 +55,13 @@ around dump_config => sub
 
     $config->{+__PACKAGE__} = {
         version => $VERSION,
-        (map { $_ => $self->$_ ? 1 : 0 } qw(fatal_errors quiet)),
-        map {
+        (map +($_ => $self->$_ ? 1 : 0), qw(fatal_errors quiet)),
+        map
             @{ $self->$_ }
                 # look for user:password URIs
-                ? ( $_ => [ map { $self->censor_commands || /\b\w+:[^@]+@\b/ ? 'REDACTED' : $_ } @{ $self->$_ } ] )
-                : ()
-        }
-        qw(run run_if_trial run_no_trial run_if_release run_no_release eval),
+                ? ( $_ => [ map $self->censor_commands || /\b\w+:[^@]+@\b/ ? 'REDACTED' : $_, @{ $self->$_ } ] )
+                : (),
+            qw(run run_if_trial run_no_trial run_if_release run_no_release eval),
     };
 
     return $config;

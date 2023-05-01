@@ -1,4 +1,4 @@
-package Module::Faker 0.024;
+package Module::Faker 0.025;
 # ABSTRACT: build fake dists for testing CPAN tools
 
 use 5.008;
@@ -170,7 +170,7 @@ Module::Faker - build fake dists for testing CPAN tools
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

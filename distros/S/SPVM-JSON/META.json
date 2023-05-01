@@ -1,12 +1,12 @@
 {
-   "abstract" : "JSON serializing/deserializing",
+   "abstract" : "JSON",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,23 +27,27 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "SPVM" : "0.971009"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9609"
+            "SPVM" : "0.971009",
+            "SPVM::Math" : "1.001"
          }
+      },
+      "test" : {
+         "requires" : {}
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/yuki-kimoto/Perl-SPVM-JSON.git",
-         "web" : "https://github.com/yuki-kimoto/Perl-SPVM-JSON"
+         "url" : "https://github.com/yuki-kimoto/SPVM-JSON.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-JSON"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.051",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils::csv_sort_fields;
 use Perinci::Sub::Util qw(gen_modified_sub);
@@ -23,6 +23,8 @@ This is basically like Unix command `shuf` performed over the CSV fields instead
 _
 
     remove_args => [qw/by_examples by_code by_sortsub sortsub_args ci reverse hash/],
+    tags => ['category:munging', 'modifies-rows', 'random'],
+
     modify_meta => sub {
         my $meta = shift;
         delete $meta->{args_rels};
@@ -60,7 +62,7 @@ App::CSVUtils::csv_shuf_fields - Shuffle CSV fields
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_shuf_fields (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_shuf_fields (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

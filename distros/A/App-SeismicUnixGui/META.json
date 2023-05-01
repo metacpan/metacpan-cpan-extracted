@@ -42,6 +42,8 @@
             "Shell" : "v0.73.1",
             "Time::HiRes" : "1.9764",
             "Tk" : "804.036",
+            "Tk::JFileDialog" : "2.20",
+            "Tk::Pod" : "0.9943",
             "aliased" : "0.34",
             "namespace::autoclean" : "0.29"
          }
@@ -53,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.82.4",
+   "version" : "v0.82.5",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

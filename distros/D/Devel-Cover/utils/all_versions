@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2004-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2004-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -41,7 +41,6 @@ sub get_options {
          ));
 
     $Options->{version} = [ map { ($_, "$_-thr") } qw(
-        5.10.0 5.10.1
         5.12.0 5.12.1 5.12.2 5.12.3 5.12.4 5.12.5
         5.14.0 5.14.1 5.14.2 5.14.3 5.14.4
         5.16.0 5.16.1 5.16.2 5.16.3
@@ -54,8 +53,9 @@ sub get_options {
         5.30.0 5.30.1 5.30.2
         5.32.0 5.32.1
         5.34.0 5.34.1
-        5.36.0
-        5.37.0
+        5.36.0 5.36.1
+        5.37.0 5.37.1 5.37.2 5.37.3 5.37.4 5.37.5
+        5.37.6 5.37.7 5.37.8 5.37.9 5.37.10 5.37.11
     ) ] unless @{$Options->{version}};
     $Options->{version} =
         [ grep {
@@ -86,7 +86,6 @@ sub _mods {
     my $version = version->parse($n);
 
     my @mods = qw( Test::Harness Test::Warn HTML::Entities );
-    push @mods, "B::Debug" if $version > version->parse("5.27.2");
 
     return @mods if $v =~ /-thr/ && $s != 1;
 

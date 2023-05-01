@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "iis.pd"
 
 =head1 NAME
@@ -95,17 +96,8 @@ using the module this will guarantee correct file names!
 
 use strict;
 use warnings;
-#line 99 "IIS.pm"
-
-
-
-
-
-
 
 #line 84 "iis.pd"
-
-
 use PDL::Core '';
 use PDL::Basic '';
 use Carp;
@@ -114,7 +106,6 @@ $iisframe      = 1;                # Starting defaults
 $stdimage      = "imt1024";
 $last_stdimage = "";
 $HOME          = $ENV{'HOME'};     # Used a lot so shorten
-
 
 ################ Public routines #################
 
@@ -171,7 +162,7 @@ sub iis {
     elsif ( $#_ == 0 ) {
       barf $usage unless ref($_[0]) eq "HASH";
 
-      my $opt = new PDL::Options( { MIN => undef, MAX => undef, TITLE => $title, FRAME => $frame } );
+      my $opt = PDL::Options->new( { MIN => undef, MAX => undef, TITLE => $title, FRAME => $frame } );
       $opt->options( shift );
       my $options = $opt->current;
 
@@ -333,7 +324,6 @@ sub ximtool {  # Start Ximtool
    return $pid;
 }
 
-
 ################ Private routines #################
 
 # Change the frame buffer configuration
@@ -427,28 +417,22 @@ sub findfifo {
       }
    }
 1;}
-#line 431 "IIS.pm"
-
-
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 421 "IIS.pm"
 
 *_iis = \&PDL::Graphics::IIS::_iis;
-#line 438 "IIS.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_iiscirc = \&PDL::Graphics::IIS::_iiscirc;
-#line 445 "IIS.pm"
+
+
 
 
 
 
 
 #line 619 "iis.pd"
-
 
 =head1 BUGS
 
@@ -464,10 +448,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 468 "IIS.pm"
-
-
-
+#line 452 "IIS.pm"
 
 # Exit with OK status
 

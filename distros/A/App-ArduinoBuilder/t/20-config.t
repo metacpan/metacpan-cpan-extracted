@@ -58,6 +58,14 @@ is($config->filter('test')->dump(), <<~EOF);
   is ($c->get('c'), 'd');
 }
 
+{
+  my $c = new();
+  $c->set('a' => '1');
+  $c->set('prefix.a' => '2');
+  my $filtered = $c->filter('prefix');
+  is ($filtered->get('a'), '2');
+}
+
 is(App::ArduinoBuilder::Config->new(files=>[$simple_config_path], resolve => 1, allow_partial => 1)->dump(), $simple_config_resolved);
 
 # todo: merge, read_file override order, size, empty, nested variables in replacements or variable inside braces that are not variables

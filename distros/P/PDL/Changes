@@ -1,3 +1,30 @@
+2.083 2023-04-30
+- no changes from 2.082_01
+
+2.082_01 2023-04-27
+- fix some memory leaking - thanks Yury Pakhomov for report
+- fix random() failing (#422) - thanks @falsifian for report
+- PP Inplace now checks inputs and outputs are dimensionally compatible (#416)
+- no more HTML doc generation
+- PDL::Doc::add_module now adds all submodules of given namespace (#420)
+- [o] OtherPars can now be omitted from args like [o] ndarrays
+- OtherPars can now be incomplete arrays of pdl* (#421)
+- add [io] OtherPars
+- add ArgOrder PP key
+- [nc] removed as Pars type-specifier, use [io]
+- fix pdl2 bug with demos (#424) - thanks @HaraldJoerg for report
+- fix PP bug revealed by https://github.com/moocow-the-bovine/PDL-HMM/pull/4
+- operations with only output ndarrays can now not be Inplace
+- overloaded ops require proper overload-handling; PDL::Complex now does
+- for more idiomatic XS code, PDL C function interface now pdl_run_(name)
+- add FtrCode in XS, to match HdrCode
+- add sound demo - thanks @HaraldJoerg
+- OtherPars can now be $argname, for XS processing only and not in operation
+- fix broadcasting over empty ndarray (#429) - thanks @falsifian for tests
+- fix appending with empty ndarray (#430) - thanks @falsifian for tests
+- fix whereND with all-zero mask or empty input (#428) - thanks @falsifian for tests
+- inplace operations no longer copy input arg if inplace
+
 2.082 2023-03-22
 - no changes from 2.081_03
 

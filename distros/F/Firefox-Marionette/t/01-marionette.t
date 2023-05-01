@@ -1521,9 +1521,16 @@ SKIP: {
 		($llx, $lly, $urx, $ury) = $page->mediabox();
 		$urx = int $urx; # for darwin
 		$ury = int $ury; # for darwin
-		ok(((centimetres_to_points(12) == $urx) || (centimetres_to_points(12) == $urx - 1)) &&
-			 ((centimetres_to_points(7) == $ury) || (centimetres_to_points(7) == $ury - 1)),
-				"Correct page height of " . centimetres_to_points(7) . " (was actually $ury) and width " . centimetres_to_points(12) . " (was actually $urx)");
+		if ((centimetres_to_points(12) == $urx) || (centimetres_to_points(12) == $urx - 1)) {
+			ok(((centimetres_to_points(12) == $urx) || (centimetres_to_points(12) == $urx - 1)) &&
+				 ((centimetres_to_points(7) == $ury) || (centimetres_to_points(7) == $ury - 1)),
+					"Correct page height of " . centimetres_to_points(7) . " (was actually $ury) and width " . centimetres_to_points(12) . " (was actually $urx)");
+		} else {
+			# at least like this since firefox 112
+			ok(((centimetres_to_points(12) == $ury) || (centimetres_to_points(12) == $ury - 1)) &&
+				 ((centimetres_to_points(7) == $urx) || (centimetres_to_points(7) == $urx - 1)),
+					"Correct page width of " . centimetres_to_points(7) . " (was actually $urx) and height " . centimetres_to_points(12) . " (was actually $ury)");
+		}
 		foreach my $paper_size ($firefox->paper_sizes()) {
 			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size, page_ranges => [], print_background => 1, shrink_to_fit => 1);
 			$pdf = PDF::API2->open_scalar($raw_pdf);
@@ -4119,7 +4126,10 @@ SKIP: {
 				if ($major_version >= 59) {
 					ok($firefox->scroll($element, { block => 'center' }), "Scroll until the username field is in the center of the screen");
 					$percentage = $firefox->percentage_visible($element);
-					ok($percentage == 100, "Percentage visible is 100% for the username field:$percentage");
+					TODO: {
+						local $TODO = $firefox->capabilities()->platform_name() eq 'mac' ? "mac sometimes doesn't have the correct 100% value, more like 95%" : q[];
+						ok($percentage == 100, "Percentage visible is 100% for the username field:$percentage");
+					}
 				}
 			} else {
 				diag("Skipping checks that require resize to work");

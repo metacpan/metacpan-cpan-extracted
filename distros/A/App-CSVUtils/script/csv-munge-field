@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_munge_field/csv_munge_field",
@@ -41,7 +41,7 @@ csv-munge-field - Munge a field in every row of CSV file with Perl code
 
 =head1 VERSION
 
-This document describes version 1.022 of csv-munge-field (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of csv-munge-field (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ C<$main::row> will contain the current row array. C<$main::rownum> contains the
 row number (2 means the first data row). C<$main::csv> is the L<Text::CSV_XS>
 object. C<$main::fields_idx> is also available for additional information.
 
-To munge multiple fields, use L<csv-munge-row>.
+To munge multiple fields, use L<csv-munge-rows>.
 
 =head1 OPTIONS
 

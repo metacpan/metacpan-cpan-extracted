@@ -8,8 +8,8 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit::IO;
-our $VERSION = '3.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-17'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.008'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-30'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 

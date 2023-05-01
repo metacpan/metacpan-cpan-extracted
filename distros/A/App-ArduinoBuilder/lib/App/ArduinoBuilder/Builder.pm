@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use utf8;
 
+use App::ArduinoBuilder::CommandRunner;
 use App::ArduinoBuilder::Config 'get_os_name';
 use App::ArduinoBuilder::DepCheck 'check_dep';
 use App::ArduinoBuilder::FilePath 'find_all_files_with_extensions';
 use App::ArduinoBuilder::Logger ':all_logger';
-use File::Basename 'basename';
 use File::Path 'make_path';
 use File::Spec::Functions 'catfile';
 
@@ -57,6 +57,7 @@ sub _ino_to_cpp {
   open my $fi, '<', "${source}" or fatal "Can’t open the source file '${source}' for reading: $!";
   open my $fo, '>', "${target}.cpp-pre" or fatal "Can’t open intermediate file '${target}.cpp-pre' for writing: $!";
   print $fo "#include \"Arduino.h\"\n";
+  print $fo "#line 1 \"${source}\"\n";
   while (my $l = <$fi>) {
     print $fo $l;
   }
@@ -109,24 +110,55 @@ sub _add_to_archive {
   return;
 }
 
+# Object to avoid collision in generated object file names. Both because we
+# flatten the directory structure of the sources that we build and also because
+# archive files may only reference the file names.
+package ObjectNameBuilder {
+  use File::Basename 'fileparse';
+  use File::Spec::Functions 'catfile';
+
+  sub new {
+    my ($class, $target_dir) = @_;
+    return bless {target_dir => $target_dir, files => {}}, $class;
+  }
+
+  sub object_for {
+    my ($this, $source) = @_;
+    my $basename = fileparse($source);
+    my $count = $this->{files}{$basename}++;
+    $basename .= ".${count}" if $count;
+    return catfile($this->{target_dir}, "${basename}.o");
+  }
+}
+
 # target_dir has all the intermediate file, $archive is a file name that goes in build.path.
 sub build_archive {
   my ($this, $source_dirs, $target_dir, $archive, $force) = @_;
   make_path($target_dir);
   my $did_something = 0;
+  my $obj_name = ObjectNameBuilder->new($target_dir);
+  my @objects;
   for my $d (@{$source_dirs}) {
-    my @sources = find_all_files_with_extensions($d, [@supported_source_extensions]);
+    # BUG: There is still a bug here (and in build_object_files) which is that if a file is removed
+    # from the sources and there is another file with the same basename, we will do weird things
+    # with the object files that will be mixed. This is unavoidable for now, the project needs to be
+    # cleaned when files are deleted.
+    my @sources = sort (find_all_files_with_extensions($d, [@supported_source_extensions]));
     for my $s (@sources) {
-      # BUG: There is a bug if several files have the same name in the core, but this is improbable...
-      # Note: if a source file is removed, it won’t be removed from the archive. So this is not
-      # perfecte but probably acceptable.
-      my $object_file = catfile($target_dir, basename($s).'.o');
+      my $object_file = $obj_name->object_for($s);
       if ($force || check_dep($s, $object_file)) {
+        push @objects, $object_file;
         $did_something = 1;
-        $this->build_file($s, $object_file);
-        $this->_add_to_archive($object_file, $archive);
+        default_runner()->execute(
+          sub {
+            $this->build_file($s, $object_file);
+          });
       }
     }
+  }
+  default_runner->wait();
+  for my $o (@objects) {
+    $this->_add_to_archive($o, $archive);
   }
   return $did_something;
 }
@@ -137,16 +169,20 @@ sub build_archive {
 sub build_object_files {
   my ($this, $source_dir, $target_dir, $excluded_dirs, $force, $no_recurse) = @_;
   make_path($target_dir);
-  my @sources = find_all_files_with_extensions($source_dir, [@supported_source_extensions], $excluded_dirs, $no_recurse);
+  my @sources = sort (find_all_files_with_extensions($source_dir, [@supported_source_extensions], $excluded_dirs, $no_recurse));
   my $did_something = 0;
+  my $obj_name = ObjectNameBuilder->new($target_dir);
   for my $s (@sources) {
-    # Same BUG here as in build_archive
-    my $object_file = catfile($target_dir, basename($s).'.o');
+    my $object_file = $obj_name->object_for($s);
     if ($force || check_dep($s, $object_file)) {
       $did_something = 1;
-      $this->build_file($s, $object_file);
+      default_runner()->execute(
+        sub {
+          $this->build_file($s, $object_file);
+        });
     }
   }
+  default_runner->wait();
   return $did_something;
 }
 

@@ -11,7 +11,7 @@ use Dancer::RPCPlugin::CallbackResult;
     is("$cbr", "success", "stringify-overload");
 
     my $e = exception {$cbr->does_not_exist};
-    like($e, qr/^Unknown attribute does_not_exist/, "unknown attirbute");
+    like($e, qr/^Can't locate object method "does_not_exist"/, "unknown attirbute");
 }
 
 {

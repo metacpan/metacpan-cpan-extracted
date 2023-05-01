@@ -2,13 +2,14 @@ package Test::Smoke;
 use strict;
 
 use vars qw($VERSION $conf @EXPORT);
-$VERSION  = '1.79';
+$VERSION  = '1.80';
 
 use base 'Exporter';
 @EXPORT  = qw( $conf &read_config &run_smoke );
 
 my $ConfigError;
 
+use File::Spec;
 use Test::Smoke::Policy;
 use Test::Smoke::BuildCFG;
 use Test::Smoke::Smoker;
@@ -52,6 +53,7 @@ sub read_config {
         unless $config_name =~ /_config$/ || -f $config_name;
 
     # Enable reloading by hackery
+    local @INC = ( File::Spec->curdir, @INC );
     delete $INC{ $config_name } if exists $INC{ $config_name };
     eval { require $config_name };
     $ConfigError = $@ ? $@ : undef;

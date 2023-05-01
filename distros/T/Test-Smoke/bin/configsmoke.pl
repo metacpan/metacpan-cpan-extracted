@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use 5.008003;
+use v5.10;
 use Carp;
 
 use Config;
@@ -21,7 +21,11 @@ use Test::Smoke::Util qw(do_pod2usage whereis);
 use Test::Smoke::Util::FindHelpers ':all';
 
 use vars qw($conf);
-our $VERSION = '0.091';
+our $VERSION = '0.092';
+
+use constant REPO_HOST    => 'github.com';
+use constant GH_REPO_PATH => 'Perl/perl5';
+use constant SNAP_HOST    => 'dromedary.p5h.org:5872';
 
 use Getopt::Long;
 my %options = (
@@ -61,10 +65,10 @@ foreach my $opt (qw( config jcl log )) {
     unless ( $load_error ) {
         $options{oldcfg} = 1;
         print "Using '$options{config}' for defaults.\n";
-        $conf->{perl_version} eq '5.9.x'  and $conf->{perl_version} = 'blead';
-        $conf->{perl_version} eq '5.11.x' and $conf->{perl_version} = 'blead';
-        $conf->{perl_version} eq '5.13.x' and $conf->{perl_version} = 'blead';
-        $conf->{perl_version} eq '5.15.x' and $conf->{perl_version} = 'blead';
+        if ( $conf->{perl_version} =~ m{^ 5 \. (?<minorv>\d+) \. .+$}x) {
+            my $is_dev = ($+{minorv}||0) % 2 ? 1 : 0;
+            $conf->{perl_version} = 'blead' if $is_dev;
+        }
     }
 
     if ( $load_error || $options{default} ) {
@@ -146,96 +150,12 @@ my %vdirs = map {
 } qw( 5.18.x 5.20.x 5.22.x 5.24.x 5.26.x );
 
 my %versions = (
-    '5.18.x' => {
-        gbranch => 'maint-5.18',
-        source  => 'perl5.git.perl.org::perl-5.18.x',
-        server  => 'http://perl5.git.perl.org',
-        sdir    => '/perl.git/snapshot/refs/heads/',
-        sfile   => 'maint-5.18.tar.gz',
-        pdir    => '/pub/apc/perl-current-diffs',
-        ddir    => File::Spec->catdir(
-            cwd(),
-            File::Spec->updir,
-            'perl-current'
-        ),
-
-        text    => 'Perl 5.18 maint',
-        cfg     => (
-            is_win32
-                ? 'w32current.cfg'
-                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
-        ),
-        is56x   => 0,
-    },
-    '5.20.x' => {
-        gbranch => 'maint-5.20',
-        source  => 'perl5.git.perl.org::perl-5.20.x',
-        server  => 'http://perl5.git.perl.org',
-        sdir    => '/perl.git/snapshot/refs/heads/',
-        sfile   => 'maint-5.20.tar.gz',
-        pdir    => '/pub/apc/perl-current-diffs',
-        ddir    => File::Spec->catdir(
-            cwd(),
-            File::Spec->updir,
-            'perl-current'
-        ),
-
-        text    => 'Perl 5.20 maint',
-        cfg     => (
-            is_win32
-                ? 'w32current.cfg'
-                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
-        ),
-        is56x   => 0,
-    },
-    '5.22.x' => {
-        gbranch => 'maint-5.22',
-        source  => 'perl5.git.perl.org::perl-5.22.x',
-        server  => 'http://perl5.git.perl.org',
-        sdir    => '/perl.git/snapshot/refs/heads/',
-        sfile   => 'maint-5.22.tar.gz',
-        pdir    => '/pub/apc/perl-current-diffs',
-        ddir    => File::Spec->catdir(
-            cwd(),
-            File::Spec->updir,
-            'perl-current'
-        ),
-
-        text    => 'Perl 5.22 maint',
-        cfg     => (
-            is_win32
-                ? 'w32current.cfg'
-                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
-        ),
-        is56x   => 0,
-    },
-    '5.24.x' => {
-        gbranch => 'maint-5.24',
-        source  => 'perl5.git.perl.org::perl-5.24.x',
-        server  => 'http://perl5.git.perl.org',
-        sdir    => '/perl.git/snapshot/refs/heads/',
-        sfile   => 'maint-5.24.tar.gz',
-        pdir    => '/pub/apc/perl-current-diffs',
-        ddir    => File::Spec->catdir(
-            cwd(),
-            File::Spec->updir,
-            'perl-current'
-        ),
-
-        text    => 'Perl 5.24 maint',
-        cfg     => (
-            is_win32
-                ? 'w32current.cfg'
-                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
-        ),
-        is56x   => 0,
-    },
     '5.26.x' => {
         gbranch => 'maint-5.26',
-        source  => 'perl5.git.perl.org::perl-5.26.x',
-        server  => 'http://perl5.git.perl.org',
-        sdir    => '/perl.git/snapshot/refs/heads/',
-        sfile   => 'maint-5.26.tar.gz',
+        source  => sprintf("%s::perl-5.26.x", SNAP_HOST),
+        server  => sprintf('https://%s/%s/tree/maint-5.26', REPO_HOST, GH_REPO_PATH),
+        sdir    => '/archive/',
+        sfile   => 'maint-5.26.zip',
         pdir    => '/pub/apc/perl-current-diffs',
         ddir    => File::Spec->catdir(
             cwd(),
@@ -251,12 +171,54 @@ my %versions = (
         ),
         is56x   => 0,
     },
+    '5.28.x' => {
+        gbranch => 'maint-5.28',
+        source  => sprintf("%s::perl-5.28.x", SNAP_HOST),
+        server  => sprintf('https://%s/%s/tree/maint-5.28', REPO_HOST, GH_REPO_PATH),
+        sdir    => '/archive/',
+        sfile   => 'maint-5.28.zip',
+        pdir    => '/pub/apc/perl-current-diffs',
+        ddir    => File::Spec->catdir(
+            cwd(),
+            File::Spec->updir,
+            'perl-current'
+        ),
+
+        text    => 'Perl 5.28 maint',
+        cfg     => (
+            is_win32
+                ? 'w32current.cfg'
+                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
+        ),
+        is56x   => 0,
+    },
+    '5.30.x' => {
+        gbranch => 'maint-5.30',
+        source  => sprintf("%s::perl-5.30.x", SNAP_HOST),
+        server  => sprintf('https://%s/%s/tree/maint-5.30', REPO_HOST, GH_REPO_PATH),
+        sdir    => '/archive/',
+        sfile   => 'maint-5.30.zip',
+        pdir    => '/pub/apc/perl-current-diffs',
+        ddir    => File::Spec->catdir(
+            cwd(),
+            File::Spec->updir,
+            'perl-current'
+        ),
+
+        text    => 'Perl 5.30 maint',
+        cfg     => (
+            is_win32
+                ? 'w32current.cfg'
+                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
+        ),
+        is56x   => 0,
+    },
     'blead' => {
         gbranch => 'blead',
-        source  => 'perl5.git.perl.org::perl-current',
-        server  => 'http://perl5.git.perl.org',
-        sdir    => '/perl.git/snapshot/',
-        sfile   => '',
+        source  => sprintf("%s::perl-current", SNAP_HOST),
+        server  => sprintf('https://%s/%s.git', REPO_HOST, GH_REPO_PATH),
+        sdir    => '/archive/',
+        sfile   => 'blead.zip',
         pdir    => '/pub/apc/perl-current-diffs',
         ddir    => File::Spec->catdir(
             cwd(),
@@ -413,7 +375,7 @@ my %opt = (
     gitorigin => {
         msg => "Git main repository?",
         alt => [ ],
-        dft => 'https://github.com/Perl/perl5.git',
+        dft => sprintf('https://%s/%s.git', REPO_HOST, GH_REPO_PATH),
     },
     gitdir => {
         msg => "Directory for the local git repository?",
@@ -597,7 +559,7 @@ EOT
     mail => {
         msg => "Would you like to email your reports?",
         alt => [qw( N y )],
-        dft => 'n',
+        dft => 'N',
     },
     mail_type => {
         msg => 'Which send facility should be used?',
@@ -916,6 +878,64 @@ you will need to confirm your choice.
     }
 }
 
+=item w32args
+
+For MSWin32 we need some extra information that is passed to
+L<Test::Smoke::Smoker> in order to compensate for the lack of
+B<Configure>.
+
+See L<Test::Smoke::Util/"Configure_win32( )"> and L<tsw32configure.pl>
+
+=cut
+
+WIN32: {
+    last WIN32 unless is_win32;
+
+    my $osvers = get_Win_version();
+    my %compilers = get_avail_w32compilers();
+    my $compiler_info = join(
+        "\n",
+        map {
+            sprintf("  %-4s - %s", $_, $compilers{$_}->{ccbin})
+        } keys %compilers
+    );
+
+    my $dft_compiler = $conf->{w32cc} ? $conf->{w32cc} : "";
+    $dft_compiler ||= ( sort keys %compilers )[-1];
+    $opt{w32cc} = {
+        msg => 'What compiler should be used?',
+        alt => [ keys %compilers ],
+        dft => $dft_compiler,
+    };
+
+    print <<EO_MSG;
+
+You are on $^O ($osvers).
+We found compilers:
+$compiler_info
+EO_MSG
+
+    $config{w32cc} = uc prompt( 'w32cc' );
+    my $cc_info = $compilers{ $config{w32cc} };
+
+    $opt{w32make} = {
+        alt => $cc_info->{maker},
+        dft => ( sort @{ $cc_info->{maker} } )[-1],
+    };
+    $opt{w32make}->{msg} = @{ $compilers{ $config{w32cc} }->{maker} } > 1
+        ? "Which make should be used" : undef;
+
+    $config{w32make} = prompt( 'w32make' );
+    $config{testmake} = $config{testmake};
+
+    $config{w32args} = [
+        "--win32-cctype" => $config{w32cc},
+        "--win32-maker"  => $config{w32make},
+        "osvers=$osvers",
+        $cc_info->{ccversarg},
+    ];
+}
+
 =item cfg
 
 C<cfg> is the path to the file that holds the build-configurations.
@@ -1101,13 +1121,18 @@ SYNCER: {
         $opt{$arg}{dft} = "$options{prefix}.gitbranch";
         $config{$arg} = prompt_file($arg, 1);
 
-        if (open my $gb, '>', $config{gitbranchfile}) {
-            print {$gb} $config{gitdfbranch};
-            close $gb;
-            print "Wrote $config{gitbranchfile}...\n";
+        if ($config{$arg}) {
+            if (open my $gb, '>', $config{gitbranchfile}) {
+                print {$gb} $config{gitdfbranch};
+                close $gb;
+                print "Wrote $config{gitbranchfile}...\n";
+            }
+            else {
+                print "Error writing to $config{gitbranchfile}: $!\n";
+            }
         }
         else {
-            print "Error writing to $config{gitbranchfile}: $!\n";
+            print "Skip '$arg' (no filename)\n";
         }
 
         last SYNCER;
@@ -1410,7 +1435,7 @@ See L<Test::Smoke::Mailer> and L<mailrpt.pl>
 =cut
 
 $arg = 'mail';
-$opt{ $arg }{dft} = ! $options{usedft};
+$opt{ $arg }{dft} = $options{usedft};
 $config{ $arg } = prompt_yn( $arg );
 MAIL: {
     last MAIL unless $config{mail};
@@ -1475,56 +1500,6 @@ MAIL: {
         $arg = 'swcc';
         $config{ $arg } = prompt( $arg );
     }
-}
-
-=item w32args
-
-For MSWin32 we need some extra information that is passed to
-L<Test::Smoke::Smoker> in order to compensate for the lack of
-B<Configure>.
-
-See L<Test::Smoke::Util/"Configure_win32( )"> and L<W32Configure.pl>
-
-=cut
-
-WIN32: {
-    last WIN32 unless is_win32;
-
-    my $osvers = get_Win_version();
-    my %compilers = get_avail_w32compilers();
-
-    my $dft_compiler = $conf->{w32cc} ? $conf->{w32cc} : "";
-    $dft_compiler ||= ( sort keys %compilers )[-1];
-    $opt{w32cc} = {
-        msg => 'What compiler should be used?',
-        alt => [ keys %compilers ],
-        dft => $dft_compiler,
-    };
-
-    print <<EO_MSG;
-
-I see you are on $^O ($osvers).
-No problem, but we need extra information.
-EO_MSG
-
-    $config{w32cc} = uc prompt( 'w32cc' );
-
-    $opt{w32make} = {
-        alt => $compilers{ $config{w32cc} }->{maker},
-        dft => ( sort @{ $compilers{ $config{w32cc} }->{maker} } )[-1],
-    };
-    $opt{w32make}->{msg} = @{ $compilers{ $config{w32cc} }->{maker} } > 1
-        ? "Which make should be used" : undef;
-
-    $config{w32make} = prompt( 'w32make' );
-    $config{testmake} = $config{testmake};
-
-    $config{w32args} = [
-        "--win32-cctype" => $config{w32cc},
-        "--win32-maker"  => $config{w32make},
-        "osvers=$osvers",
-        $compilers{ $config{w32cc} }->{ccversarg},
-    ];
 }
 
 =item vmsmake
@@ -2411,6 +2386,7 @@ sub check_buildcfg {
 
     print "Checking '$file_name'\n     for $pversion on $uname_s\n";
 
+    my @must_option = ( );
     my @no_option = ($pversion eq 'blead') ||($pversion >= 5.009)
         ? ( '-Uuseperlio' )
         : ( );
@@ -2430,6 +2406,14 @@ sub check_buildcfg {
 
         $os =~ /mswin32/i && do {
             push @no_option, qw( -Duselargefiles ) if $config{is56x};
+
+            my %compilers = get_avail_w32compilers();
+            my $cc_info = $compilers{ $config{w32cc} };
+            # Add -DCCHOME=C:\Strawberry\c for strawberryperl-gcc
+            if ($cc_info->{ccversarg} =~ /strawberryperl/i) {
+                (my $cchome = $cc_info->{ccbin}) =~ s{.bin.gcc\.exe$}{}i;
+                push @must_option, "-DCCHOME=$cchome";
+            }
         };
 
         $os =~ /cygwin/i && do {
@@ -2439,6 +2423,10 @@ sub check_buildcfg {
 
     foreach my $option ( @no_option ) {
         !/^#/ && /\Q$option\E/ && s/^/#/ for @bcfg;
+    }
+    foreach my $option ( @must_option ) {
+        unshift @bcfg, ("==\n", "$option\n", "==\n")
+            unless grep { /^\Q$option\E/ } @bcfg;
     }
 
     my $newcfg = join "", grep !/^#/ => @bcfg;

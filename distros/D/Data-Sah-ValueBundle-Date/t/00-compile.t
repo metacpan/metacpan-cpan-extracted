@@ -6,11 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Value/perl/Date/cur_year_local.pm',
     'Data/Sah/Value/perl/Date/cur_year_utc.pm',
+    'Data/Sah/Value/perl/Date/last_year_local.pm',
+    'Data/Sah/Value/perl/Date/last_year_utc.pm',
+    'Data/Sah/Value/perl/Date/next_year_local.pm',
+    'Data/Sah/Value/perl/Date/next_year_utc.pm',
     'Data/Sah/ValueBundle/Date.pm'
 );
 

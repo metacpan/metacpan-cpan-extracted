@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 9 "ufunc.pd"
 
 use strict;
@@ -51,12 +52,7 @@ to many of the functions in this module.
 
 use PDL::Slices;
 use Carp;
-#line 55 "Ufunc.pm"
-
-
-
-
-
+#line 56 "Ufunc.pm"
 
 =head1 FUNCTIONS
 
@@ -65,8 +61,6 @@ use Carp;
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
-
 
 
 =head2 prodover
@@ -74,7 +68,6 @@ use Carp;
 =for sig
 
   Signature: (a(n); int+ [o]b())
-
 
 =for ref
 
@@ -94,29 +87,20 @@ I<any> dimension.
 
  $spectrum = prodover $image->transpose
 
-
-
-
-
 =for bad
 
 prodover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 109 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *prodover = \&PDL::prodover;
-#line 116 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -125,7 +109,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); cdouble [o]b())
-
 
 =for ref
 
@@ -148,27 +131,20 @@ I<any> dimension.
 Unlike L</prodover>, the calculations are performed in complex double
 precision.
 
-
-
 =for bad
 
 cprodover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 161 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cprodover = \&PDL::cprodover;
-#line 168 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -177,7 +153,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); double [o]b())
-
 
 =for ref
 
@@ -199,27 +174,20 @@ I<any> dimension.
 
 Unlike L</prodover>, the calculations are performed in double precision.
 
-
-
 =for bad
 
 dprodover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 212 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *dprodover = \&PDL::dprodover;
-#line 219 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -228,7 +196,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); int+ [o]b(n))
-
 
 =for ref
 
@@ -251,29 +218,20 @@ is the first element of the parameter.
 
  $spectrum = cumuprodover $image->transpose
 
-
-
-
-
 =for bad
 
 cumuprodover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 266 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cumuprodover = \&PDL::cumuprodover;
-#line 273 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -282,7 +240,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); double [o]b(n))
-
 
 =for ref
 
@@ -307,27 +264,20 @@ is the first element of the parameter.
 
 Unlike L</cumuprodover>, the calculations are performed in double precision.
 
-
-
 =for bad
 
 dcumuprodover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 320 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *dcumuprodover = \&PDL::dcumuprodover;
-#line 327 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -336,7 +286,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); int+ [o]b())
-
 
 =for ref
 
@@ -356,29 +305,20 @@ I<any> dimension.
 
  $spectrum = sumover $image->transpose
 
-
-
-
-
 =for bad
 
 sumover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 371 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sumover = \&PDL::sumover;
-#line 378 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -387,7 +327,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); cdouble [o]b())
-
 
 =for ref
 
@@ -410,27 +349,20 @@ I<any> dimension.
 Unlike L</sumover>, the calculations are performed in complex double
 precision.
 
-
-
 =for bad
 
 csumover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 423 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *csumover = \&PDL::csumover;
-#line 430 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -439,7 +371,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); double [o]b())
-
 
 =for ref
 
@@ -461,27 +392,20 @@ I<any> dimension.
 
 Unlike L</sumover>, the calculations are performed in double precision.
 
-
-
 =for bad
 
 dsumover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 474 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *dsumover = \&PDL::dsumover;
-#line 481 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -490,7 +414,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); int+ [o]b(n))
-
 
 =for ref
 
@@ -513,29 +436,20 @@ is the first element of the parameter.
 
  $spectrum = cumusumover $image->transpose
 
-
-
-
-
 =for bad
 
 cumusumover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 528 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cumusumover = \&PDL::cumusumover;
-#line 535 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -544,7 +458,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); double [o]b(n))
-
 
 =for ref
 
@@ -569,27 +482,20 @@ is the first element of the parameter.
 
 Unlike L</cumusumover>, the calculations are performed in double precision.
 
-
-
 =for bad
 
 dcumusumover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 582 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *dcumusumover = \&PDL::dcumusumover;
-#line 589 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -598,7 +504,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); int+ [o]b())
-
 
 =for ref
 
@@ -618,10 +523,6 @@ I<any> dimension.
 
  $spectrum = andover $image->transpose
 
-
-
-
-
 =for bad
 
 If C<a()> contains only bad data (and its bad flag is set), 
@@ -629,18 +530,14 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 633 "Ufunc.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*andover = \&PDL::andover;
-#line 640 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*andover = \&PDL::andover;
+
+
+
 
 
 
@@ -649,7 +546,6 @@ as it will not contain any bad values.
 =for sig
 
   Signature: (a(n);  [o]b())
-
 
 =for ref
 
@@ -669,10 +565,6 @@ I<any> dimension.
 
  $spectrum = bandover $image->transpose
 
-
-
-
-
 =for bad
 
 If C<a()> contains only bad data (and its bad flag is set), 
@@ -680,18 +572,14 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 684 "Ufunc.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*bandover = \&PDL::bandover;
-#line 691 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*bandover = \&PDL::bandover;
+
+
+
 
 
 
@@ -700,7 +588,6 @@ as it will not contain any bad values.
 =for sig
 
   Signature: (a(n);  [o]b())
-
 
 =for ref
 
@@ -720,10 +607,6 @@ I<any> dimension.
 
  $spectrum = borover $image->transpose
 
-
-
-
-
 =for bad
 
 If C<a()> contains only bad data (and its bad flag is set), 
@@ -731,18 +614,14 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 735 "Ufunc.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*borover = \&PDL::borover;
-#line 742 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*borover = \&PDL::borover;
+
+
+
 
 
 
@@ -751,7 +630,6 @@ as it will not contain any bad values.
 =for sig
 
   Signature: (a(n); int+ [o]b())
-
 
 =for ref
 
@@ -771,10 +649,6 @@ I<any> dimension.
 
  $spectrum = orover $image->transpose
 
-
-
-
-
 =for bad
 
 If C<a()> contains only bad data (and its bad flag is set), 
@@ -782,18 +656,14 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 786 "Ufunc.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*orover = \&PDL::orover;
-#line 793 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*orover = \&PDL::orover;
+
+
+
 
 
 
@@ -802,7 +672,6 @@ as it will not contain any bad values.
 =for sig
 
   Signature: (a(n); int+ [o]b())
-
 
 =for ref
 
@@ -822,10 +691,6 @@ I<any> dimension.
 
  $spectrum = zcover $image->transpose
 
-
-
-
-
 =for bad
 
 If C<a()> contains only bad data (and its bad flag is set), 
@@ -833,18 +698,14 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 837 "Ufunc.pm"
 
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
-
-*zcover = \&PDL::zcover;
-#line 844 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
+*zcover = \&PDL::zcover;
+
+
+
 
 
 
@@ -853,7 +714,6 @@ as it will not contain any bad values.
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
 
 =for ref
 
@@ -883,28 +743,20 @@ integrals between the end points assuming the pdl gives values just at
 these centres: for such `functions', sumover is correct to C<O(h)>, but
 is the natural (and correct) choice for binned data, of course.
 
-
-
-
 =for bad
 
 intover ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 897 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *intover = \&PDL::intover;
-#line 904 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -913,7 +765,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); int+ [o]b())
-
 
 =for ref
 
@@ -933,25 +784,19 @@ I<any> dimension.
 
  $spectrum = average $image->transpose
 
-
-
-
-
 =for bad
 
 average processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 948 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *average = \&PDL::average;
-#line 955 "Ufunc.pm"
+
+
 
 
 
@@ -966,20 +811,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =cut
 
 *PDL::avgover = *avgover = \&PDL::average;
-#line 970 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 815 "Ufunc.pm"
 
 =head2 caverage
 
 =for sig
 
   Signature: (a(n); cdouble [o]b())
-
 
 =for ref
 
@@ -1002,23 +840,19 @@ I<any> dimension.
 Unlike L<average|/average>, the calculation is performed in complex double
 precision.
 
-
-
 =for bad
 
 caverage processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1015 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *caverage = \&PDL::caverage;
-#line 1022 "Ufunc.pm"
+
+
 
 
 
@@ -1033,20 +867,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =cut
 
 *PDL::cavgover = *cavgover = \&PDL::caverage;
-#line 1037 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 871 "Ufunc.pm"
 
 =head2 daverage
 
 =for sig
 
   Signature: (a(n); double [o]b())
-
 
 =for ref
 
@@ -1069,23 +896,19 @@ I<any> dimension.
 Unlike L<average|/average>, the calculation is performed in double
 precision.
 
-
-
 =for bad
 
 daverage processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1082 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *daverage = \&PDL::daverage;
-#line 1089 "Ufunc.pm"
+
+
 
 
 
@@ -1100,20 +923,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =cut
 
 *PDL::davgover = *davgover = \&PDL::daverage;
-#line 1104 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 927 "Ufunc.pm"
 
 =head2 minimum
 
 =for sig
 
   Signature: (a(n); [o]c())
-
 
 =for ref
 
@@ -1133,10 +949,6 @@ I<any> dimension.
 
  $spectrum = minimum $image->transpose
 
-
-
-
-
 =for bad
 
 Output is set bad if no elements of the input are non-bad,
@@ -1146,16 +958,14 @@ Note that C<NaNs> are considered to be valid values and will "win" over non-C<Na
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
-
 =cut
-#line 1152 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *minimum = \&PDL::minimum;
-#line 1159 "Ufunc.pm"
+
+
 
 
 
@@ -1170,13 +980,7 @@ for ways of masking NaNs.
 =cut
 
 *PDL::minover = *minover = \&PDL::minimum;
-#line 1174 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 984 "Ufunc.pm"
 
 =head2 minimum_ind
 
@@ -1197,16 +1001,14 @@ Note that C<NaNs> are considered to be valid values and will "win" over non-C<Na
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
-
 =cut
-#line 1203 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *minimum_ind = \&PDL::minimum_ind;
-#line 1210 "Ufunc.pm"
+
+
 
 
 
@@ -1221,13 +1023,7 @@ for ways of masking NaNs.
 =cut
 
 *PDL::minover_ind = *minover_ind = \&PDL::minimum_ind;
-#line 1225 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1027 "Ufunc.pm"
 
 =head2 minimum_n_ind
 
@@ -1248,8 +1044,6 @@ be set to that), or just the size, or a null and the size.
   $out = minimum_n_ind($pdl, 5);
   minimum_n_ind($pdl, $out = null, 5);
 
-
-
 =for bad
 
 Output bad flag is cleared for the output ndarray if sufficient non-bad elements found,
@@ -1259,13 +1053,10 @@ Note that C<NaNs> are considered to be valid values and will "win" over non-C<Na
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
-
 =cut
-#line 1265 "Ufunc.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 
 #line 409 "ufunc.pd"
@@ -1278,15 +1069,11 @@ sub PDL::minimum_n_ind {
   PDL::_minimum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1282 "Ufunc.pm"
-#line 1283 "Ufunc.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 1073 "Ufunc.pm"
 
 *minimum_n_ind = \&PDL::minimum_n_ind;
-#line 1290 "Ufunc.pm"
+
+
 
 
 
@@ -1301,20 +1088,13 @@ sub PDL::minimum_n_ind {
 =cut
 
 *PDL::minover_n_ind = *minover_n_ind = \&PDL::minimum_n_ind;
-#line 1305 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1092 "Ufunc.pm"
 
 =head2 maximum
 
 =for sig
 
   Signature: (a(n); [o]c())
-
 
 =for ref
 
@@ -1334,10 +1114,6 @@ I<any> dimension.
 
  $spectrum = maximum $image->transpose
 
-
-
-
-
 =for bad
 
 Output is set bad if no elements of the input are non-bad,
@@ -1347,16 +1123,14 @@ Note that C<NaNs> are considered to be valid values and will "win" over non-C<Na
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
-
 =cut
-#line 1353 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *maximum = \&PDL::maximum;
-#line 1360 "Ufunc.pm"
+
+
 
 
 
@@ -1371,13 +1145,7 @@ for ways of masking NaNs.
 =cut
 
 *PDL::maxover = *maxover = \&PDL::maximum;
-#line 1375 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1149 "Ufunc.pm"
 
 =head2 maximum_ind
 
@@ -1398,16 +1166,14 @@ Note that C<NaNs> are considered to be valid values and will "win" over non-C<Na
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
-
 =cut
-#line 1404 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *maximum_ind = \&PDL::maximum_ind;
-#line 1411 "Ufunc.pm"
+
+
 
 
 
@@ -1422,13 +1188,7 @@ for ways of masking NaNs.
 =cut
 
 *PDL::maxover_ind = *maxover_ind = \&PDL::maximum_ind;
-#line 1426 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1192 "Ufunc.pm"
 
 =head2 maximum_n_ind
 
@@ -1449,8 +1209,6 @@ be set to that), or just the size, or a null and the size.
   $out = maximum_n_ind($pdl, 5);
   maximum_n_ind($pdl, $out = null, 5);
 
-
-
 =for bad
 
 Output bad flag is cleared for the output ndarray if sufficient non-bad elements found,
@@ -1460,13 +1218,10 @@ Note that C<NaNs> are considered to be valid values and will "win" over non-C<Na
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
-
 =cut
-#line 1466 "Ufunc.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 
 #line 409 "ufunc.pd"
@@ -1479,15 +1234,11 @@ sub PDL::maximum_n_ind {
   PDL::_maximum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1483 "Ufunc.pm"
-#line 1484 "Ufunc.pm"
-
-
-
-#line 960 "../../blib/lib/PDL/PP.pm"
+#line 1238 "Ufunc.pm"
 
 *maximum_n_ind = \&PDL::maximum_n_ind;
-#line 1491 "Ufunc.pm"
+
+
 
 
 
@@ -1502,20 +1253,13 @@ sub PDL::maximum_n_ind {
 =cut
 
 *PDL::maxover_n_ind = *maxover_n_ind = \&PDL::maximum_n_ind;
-#line 1506 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1257 "Ufunc.pm"
 
 =head2 minmaximum
 
 =for sig
 
   Signature: (a(n); [o]cmin(); [o] cmax(); indx [o]cmin_ind(); indx [o]cmax_ind())
-
 
 =for ref
 
@@ -1530,8 +1274,6 @@ Find minimum and maximum and their indices for a given ndarray;
 
 See also L</minmax>, which clumps the ndarray together.
 
-
-
 =for bad
 
 If C<a()> contains only bad data, then the output ndarrays will
@@ -1540,14 +1282,13 @@ Otherwise they will have their bad flags cleared,
 since they will not contain any bad values.
 
 =cut
-#line 1544 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *minmaximum = \&PDL::minmaximum;
-#line 1551 "Ufunc.pm"
+
+
 
 
 
@@ -1562,12 +1303,8 @@ since they will not contain any bad values.
 =cut
 
 *PDL::minmaxover = *minmaxover = \&PDL::minmaximum;
-#line 1566 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 avg
 
 =for ref
@@ -1592,12 +1329,8 @@ sub PDL::avg {
 	$x->clump(-1)->average( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1596 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 sum
 
 =for ref
@@ -1622,12 +1355,8 @@ sub PDL::sum {
 	$x->clump(-1)->sumover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1626 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 prod
 
 =for ref
@@ -1652,12 +1381,8 @@ sub PDL::prod {
 	$x->clump(-1)->prodover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1656 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 davg
 
 =for ref
@@ -1682,12 +1407,8 @@ sub PDL::davg {
 	$x->clump(-1)->daverage( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1686 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 dsum
 
 =for ref
@@ -1712,12 +1433,8 @@ sub PDL::dsum {
 	$x->clump(-1)->dsumover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1716 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 dprod
 
 =for ref
@@ -1742,12 +1459,8 @@ sub PDL::dprod {
 	$x->clump(-1)->dprodover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1746 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 zcheck
 
 =for ref
@@ -1772,12 +1485,8 @@ sub PDL::zcheck {
 	$x->clump(-1)->zcover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1776 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 and
 
 =for ref
@@ -1802,12 +1511,8 @@ sub PDL::and {
 	$x->clump(-1)->andover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1806 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 band
 
 =for ref
@@ -1832,12 +1537,8 @@ sub PDL::band {
 	$x->clump(-1)->bandover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1836 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 or
 
 =for ref
@@ -1862,12 +1563,8 @@ sub PDL::or {
 	$x->clump(-1)->orover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1866 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 bor
 
 =for ref
@@ -1892,12 +1589,8 @@ sub PDL::bor {
 	$x->clump(-1)->borover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1896 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 min
 
 =for ref
@@ -1922,12 +1615,8 @@ sub PDL::min {
 	$x->clump(-1)->minimum( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1926 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 max
 
 =for ref
@@ -1952,12 +1641,8 @@ sub PDL::max {
 	$x->clump(-1)->maximum( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1956 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 median
 
 =for ref
@@ -1982,12 +1667,8 @@ sub PDL::median {
 	$x->clump(-1)->medover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1986 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 mode
 
 =for ref
@@ -2012,12 +1693,8 @@ sub PDL::mode {
 	$x->clump(-1)->modeover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 2016 "Ufunc.pm"
-
-
 
 #line 543 "ufunc.pd"
-
 =head2 oddmedian
 
 =for ref
@@ -2042,13 +1719,8 @@ sub PDL::oddmedian {
 	$x->clump(-1)->oddmedover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 2046 "Ufunc.pm"
-
-
 
 #line 573 "ufunc.pd"
-
-
 =head2 any
 
 =for ref
@@ -2124,20 +1796,13 @@ sub PDL::minmax {
   my @arr = $x->clump(-1)->minmaximum;
   map $_->sclr, @arr[0,1]; # as scalars !
 }
-#line 2128 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1800 "Ufunc.pm"
 
 =head2 medover
 
 =for sig
 
   Signature: (a(n); [o]b(); [t]tmp(n))
-
 
 =for ref
 
@@ -2157,29 +1822,20 @@ I<any> dimension.
 
  $spectrum = medover $image->transpose
 
-
-
-
-
 =for bad
 
 medover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2172 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *medover = \&PDL::medover;
-#line 2179 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2188,7 +1844,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); [o]b(); [t]tmp(n))
-
 
 =for ref
 
@@ -2208,8 +1863,6 @@ I<any> dimension.
 
  $spectrum = oddmedover $image->transpose
 
-
-
 The median is sometimes not a good choice as if the array has
 an even number of elements it lies half-way between the two
 middle values - thus it does not always correspond to a data
@@ -2218,27 +1871,20 @@ and so it ALWAYS sits on an actual data value which is useful in
 some circumstances.
 	
 
-
-
 =for bad
 
 oddmedover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2231 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *oddmedover = \&PDL::oddmedover;
-#line 2238 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2247,7 +1893,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (data(n); [o]out(); [t]sorted(n))
-
 
 =for ref
 
@@ -2267,7 +1912,6 @@ I<any> dimension.
 
  $spectrum = modeover $image->transpose
 
-
 The mode is the single element most frequently found in a 
 discrete data set.
 
@@ -2278,28 +1922,20 @@ mode is calculated.
 C<modeover> treats BAD the same as any other value:  if
 BAD is the most common element, the returned value is also BAD.
 
-
-
-
 =for bad
 
 modeover does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2292 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *modeover = \&PDL::modeover;
-#line 2299 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2308,7 +1944,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); p(); [o]b(); [t]tmp(n))
-
 
 =for ref
 
@@ -2336,28 +1971,20 @@ implemented here is based on the interpolation variant described at
 L<http://en.wikipedia.org/wiki/Percentile> as used by Microsoft Excel
 and recommended by NIST.
 
-
-
-
 =for bad
 
 pctover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2350 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *pctover = \&PDL::pctover;
-#line 2357 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2366,7 +1993,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); p(); [o]b(); [t]tmp(n))
-
 
 =for ref
 
@@ -2392,24 +2018,19 @@ falls between two values, the nearest data value is the result.
 The algorithm implemented is from the textbook version described
 first at L<http://en.wikipedia.org/wiki/Percentile>.
 
-
-
-
 =for bad
 
 oddpctover processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2406 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *oddpctover = \&PDL::oddpctover;
-#line 2413 "Ufunc.pm"
+
+
 
 
 
@@ -2435,12 +2056,8 @@ sub PDL::pct {
 	$x->clump(-1)->pctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2439 "Ufunc.pm"
-
-
 
 #line 934 "ufunc.pd"
-
 =head2 oddpct
 
 =for ref
@@ -2461,20 +2078,13 @@ sub PDL::oddpct {
 	$x->clump(-1)->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2465 "Ufunc.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 2082 "Ufunc.pm"
 
 =head2 qsort
 
 =for sig
 
   Signature: (a(n); [o]b(n))
-
 
 =for ref
 
@@ -2483,8 +2093,6 @@ Quicksort a vector into ascending order.
 =for example
 
  print qsort random(10);
-
-
 
 =for bad
 
@@ -2495,20 +2103,15 @@ Bad values are moved to the end of the array:
  pdl> p qsort($y)
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
-
 =cut
-#line 2501 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *qsort = \&PDL::qsort;
-#line 2508 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2517,7 +2120,6 @@ Bad values are moved to the end of the array:
 =for sig
 
   Signature: (a(n); indx [o]indx(n))
-
 
 =for ref
 
@@ -2528,8 +2130,6 @@ Quicksort a vector and return index of elements in ascending order.
  $ix = qsorti $x;
  print $x->index($ix); # Sorted list
 
-
-
 =for bad
 
 Bad elements are moved to the end of the array:
@@ -2539,20 +2139,15 @@ Bad elements are moved to the end of the array:
  pdl> p $y->index( qsorti($y) )
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
-
 =cut
-#line 2545 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *qsorti = \&PDL::qsorti;
-#line 2552 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2561,7 +2156,6 @@ Bad elements are moved to the end of the array:
 =for sig
 
   Signature: (a(n,m); [o]b(n,m))
-
 
 =for ref
 
@@ -2583,7 +2177,6 @@ the 1st dimension is list order.  Higher dimensions are broadcasted over.
  ]
  
 
-
 =for bad
 
 Vectors with bad components are moved to the end of the array:
@@ -2597,20 +2190,15 @@ Vectors with bad components are moved to the end of the array:
    [ BAD    0]
   ]
 
-
 =cut
-#line 2603 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *qsortvec = \&PDL::qsortvec;
-#line 2610 "Ufunc.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2619,7 +2207,6 @@ Vectors with bad components are moved to the end of the array:
 =for sig
 
   Signature: (a(n,m); indx [o]indx(m))
-
 
 =for ref
 
@@ -2636,30 +2223,25 @@ sorted list.
 Additional dimensions are broadcasted over: each plane is sorted separately,
 so qsortveci may be thought of as a collapse operator of sorts (groan).
 
-
-
 =for bad
 
 Vectors with bad components are moved to the end of the array as
 for L</qsortvec>.
 
-
 =cut
-#line 2649 "Ufunc.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *qsortveci = \&PDL::qsortveci;
-#line 2656 "Ufunc.pm"
+
+
 
 
 
 
 
 #line 1182 "ufunc.pd"
-
 
 =head1 AUTHOR
 
@@ -2673,10 +2255,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2677 "Ufunc.pm"
-
-
-
+#line 2259 "Ufunc.pm"
 
 # Exit with OK status
 

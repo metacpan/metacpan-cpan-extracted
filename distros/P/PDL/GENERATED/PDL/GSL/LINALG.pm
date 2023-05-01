@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_linalg.pd"
 
 use strict;
@@ -55,12 +56,7 @@ initial C<gsl_linalg_> removed. They are provided in both real and
 complex double precision.
 
 Currently only LU decomposition interfaces here. Pull requests welcome!
-#line 59 "LINALG.pm"
-
-
-
-
-
+#line 60 "LINALG.pm"
 
 =head1 FUNCTIONS
 
@@ -68,8 +64,6 @@ Currently only LU decomposition interfaces here. Pull requests welcome!
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -83,27 +77,20 @@ Currently only LU decomposition interfaces here. Pull requests welcome!
 
 LU decomposition of the given (real or complex) matrix.
 
-
-
 =for bad
 
 LU_decomp ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 96 "LINALG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *LU_decomp = \&PDL::LU_decomp;
-#line 103 "LINALG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -118,27 +105,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Solve C<A x = B> using the LU and permutation from L</LU_decomp>, real
 or complex.
 
-
-
 =for bad
 
 LU_solve ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 131 "LINALG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *LU_solve = \&PDL::LU_solve;
-#line 138 "LINALG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -152,27 +132,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Find the determinant from the LU decomp.
 
-
-
 =for bad
 
 LU_det ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 165 "LINALG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *LU_det = \&PDL::LU_det;
-#line 172 "LINALG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -187,23 +160,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Solve C<A x = B> where A is a tridiagonal system. Real only, because
 GSL does not have a complex function.
 
-
-
 =for bad
 
 solve_tridiag ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 200 "LINALG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *solve_tridiag = \&PDL::solve_tridiag;
-#line 207 "LINALG.pm"
+
+
 
 
 
@@ -219,10 +188,7 @@ The GSL documentation for linear algebra is online at
 L<https://www.gnu.org/software/gsl/doc/html/linalg.html>
 
 =cut
-#line 223 "LINALG.pm"
-
-
-
+#line 192 "LINALG.pm"
 
 # Exit with OK status
 

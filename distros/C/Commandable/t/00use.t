@@ -3,14 +3,15 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Commandable" );
+require Commandable;
 
-use_ok( "Commandable::Command" );
+require Commandable::Command;
 
-use_ok( "Commandable::Finder::MethodAttributes" );
-use_ok( "Commandable::Finder::Packages" );
-use_ok( "Commandable::Finder::SubAttributes" );
+require Commandable::Finder::MethodAttributes;
+require Commandable::Finder::Packages;
+require Commandable::Finder::SubAttributes;
 
+pass( "Modules loaded" );
 done_testing;

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Fatal;
 use Test::Deep;
@@ -12,9 +12,17 @@ use Path::Tiny;
 $TODO = 'Module::CoreList does not have information about this perl version of ' . $]
     if not exists $Module::CoreList::version{$]};
 
+# diag uses todo_output if in_todo :/
+no warnings 'redefine';
+*::diag = sub {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $tb = Test::Builder->new;
+    $tb->_print_comment($tb->failure_output, @_);
+};
+
 {
     my $tzil = Builder->from_config(
-        { dist_root => 't/does_not_exist' },
+        { dist_root => 'does-not-exist' },
         {
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
@@ -58,7 +66,7 @@ $TODO = 'Module::CoreList does not have information about this perl version of '
                             },
                         },
                         name => 'OnlyCorePrereqs',
-                        version => ignore,
+                        version => Dist::Zilla::Plugin::OnlyCorePrereqs->VERSION,
                     },
                 ),
             })
@@ -72,7 +80,7 @@ $TODO = 'Module::CoreList does not have information about this perl version of '
 
 {
     my $tzil = Builder->from_config(
-        { dist_root => 't/does_not_exist' },
+        { dist_root => 'does-not-exist' },
         {
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
@@ -126,7 +134,7 @@ $TODO = 'Module::CoreList does not have information about this perl version of '
                             },
                         },
                         name => 'OnlyCorePrereqs',
-                        version => ignore,
+                        version => Dist::Zilla::Plugin::OnlyCorePrereqs->VERSION,
                     },
                 ),
             })
@@ -146,7 +154,7 @@ SKIP:
         unless Module::CoreList->VERSION ge '2.93';
 
     my $tzil = Builder->from_config(
-        { dist_root => 't/does_not_exist' },
+        { dist_root => 'does-not-exist' },
         {
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
@@ -167,7 +175,7 @@ SKIP:
     );
 
     ok(
-        (!grep { /\[OnlyCorePrereqs\]/ } grep { !/\[OnlyCorePrereqs\] checking / } @{$tzil->log_messages}),
+        (!grep /\[OnlyCorePrereqs\]/, grep !/\[OnlyCorePrereqs\] checking /, @{$tzil->log_messages}),
         'Carp is new enough in 5.019001 - check succeeds',
     )
     or diag 'saw log messages: ', explain $tzil->log_messages;
@@ -192,7 +200,7 @@ SKIP:
                             },
                         },
                         name => 'OnlyCorePrereqs',
-                        version => ignore,
+                        version => Dist::Zilla::Plugin::OnlyCorePrereqs->VERSION,
                     },
                 ),
             })
@@ -206,7 +214,7 @@ SKIP:
 
 {
     my $tzil = Builder->from_config(
-        { dist_root => 't/does_not_exist' },
+        { dist_root => 'does-not-exist' },
         {
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
@@ -244,7 +252,7 @@ SKIP:
                             },
                         },
                         name => 'OnlyCorePrereqs',
-                        version => ignore,
+                        version => Dist::Zilla::Plugin::OnlyCorePrereqs->VERSION,
                     },
                 ),
             })
@@ -253,7 +261,7 @@ SKIP:
     ) or diag 'got dist metadata: ', explain $tzil->distmeta;
 
     ok(
-        (!grep { /\[OnlyCorePrereqs\]/ } grep { !/\[OnlyCorePrereqs\] checking / } @{$tzil->log_messages}),
+        (!grep /\[OnlyCorePrereqs\]/, grep !/\[OnlyCorePrereqs\] checking /, @{$tzil->log_messages}),
         'File::stat is undef in 5.005, but good enough - check succeeds',
     )
     or diag 'saw log messages: ', explain $tzil->log_messages;

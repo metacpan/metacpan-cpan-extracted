@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Commandable::Invocation;
 use Commandable::Finder::Packages;
@@ -46,12 +45,12 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "value" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [qw( value )],
+   is( [ $cmd->parse_invocation( $inv ) ], [qw( value )],
       '$cmd->parse_invocation with mandatory argument' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 
    like(
-      exception { $cmd->parse_invocation( Commandable::Invocation->new( "" ) ) },
+      dies { $cmd->parse_invocation( Commandable::Invocation->new( "" ) ) },
       qr/^Expected a value for 'arg' argument/,
       '$cmd->parse_invocation fails with no argument' );
 }
@@ -62,11 +61,11 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "value" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [qw( value )],
+   is( [ $cmd->parse_invocation( $inv ) ], [qw( value )],
       '$cmd->parse_invocation with optional argument present' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 
-   is_deeply( [ $cmd->parse_invocation( Commandable::Invocation->new( "" ) ) ], [],
+   is( [ $cmd->parse_invocation( Commandable::Invocation->new( "" ) ) ], [],
       '$cmd->parse_invocation with optional argument absent' );
 }
 
@@ -76,7 +75,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "x y z" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ [qw( x y z )] ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ [qw( x y z )] ],
       '$cmd->parse_invocation with slurpy argument' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }

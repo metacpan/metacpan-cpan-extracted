@@ -129,7 +129,7 @@ PerlIOEOL_fill(pTHX_ PerlIO * f)
     if (buf == NULL) { return 0; }
 
     if (i > start) {
-        Copy(start, ptr, i - start, STDCHAR);
+        Move(start, ptr, i - start, STDCHAR);
         ptr += i - start;
     }
 

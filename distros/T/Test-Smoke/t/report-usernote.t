@@ -1,7 +1,7 @@
 #! perl -w
 use strict;
 
-use Test::More 'no_plan';
+use Test::More;
 
 use Test::Smoke::Reporter;
 
@@ -47,4 +47,4 @@ use Test::Smoke::Reporter;
     );
 }
 
-# done_testing();
+done_testing();

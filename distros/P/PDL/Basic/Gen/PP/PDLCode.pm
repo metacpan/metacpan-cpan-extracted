@@ -10,12 +10,12 @@ use strict;
 use warnings;
 use Carp;
 
-sub get_pdls {my($this) = @_; return ($this->{ParNames},$this->{ParObjs});}
+sub get_pdls { @{$_[0]}{qw(ParNames ParObjs)} }
 
 my @code_args_always = qw(BadFlag SignatureObj GenericTypes ExtraGenericSwitches HaveBroadcasting Name);
 sub make_args {
   my ($target) = @_;
-  ("${target}CodeParsed", ["${target}CodeUnparsed",\"Bad${target}CodeUnparsed",@code_args_always]);
+  ("${target}CodeParsed", ["${target}CodeUnparsed","Bad${target}CodeUnparsed?",@code_args_always]);
 }
 
 # Do the appropriate substitutions in the code.
@@ -62,7 +62,7 @@ sub new {
 	ParNames => $parnames,
 	ParObjs => $sig->objs,
 	Sig => $sig,
-	Gencurtype => [], # stack to hold GenType in generic loops
+	Gencurtype => [], # stack to hold GenType in generic switches
 	ftypes_vars => {},
 	ftypes_type => undef,
         Generictypes => $generictypes,   # so that MacroAccess can check it
@@ -70,89 +70,45 @@ sub new {
         NullDataCheck => $nulldatacheck,
     }, $class;
 
-    # First, separate the code into an array of C fragments (strings),
-    # variable references (strings starting with $) and
-    # loops (array references, 1. item = variable.
-    #
-    my ( $broadcastloops, $coderef, $sizeprivs ) =
-	$this->separate_code( "{\n$code\n}" );
-
-    # Now, if there is no explicit broadcastlooping in the code,
-    # enclose everything into it.
-    if(!$broadcastloops && !$dont_add_brcloop) {
-	print "Adding broadcastloop...\n" if $::PP_VERBOSE;
-	my $nc = $coderef;
-	$coderef = $backcode
-	  ? PDL::PP::BackCodeBroadcastLoop->new() : PDL::PP::BroadcastLoop->new();
-	push @{$coderef},$nc;
+    my @codes = $code;
+    push @codes, $badcode if $handlebad && ($code ne $badcode || $badcode =~ /PDL_BAD_CODE|PDL_IF_BAD/);
+    my (@coderefs, @sizeprivs);
+    for my $c (@codes) {
+      # First, separate the code into an array of C fragments (strings),
+      # variable references (strings starting with $) and
+      # loops (array references, 1. item = variable.
+      my ( $broadcastloops, $coderef, $sizeprivs ) =
+          $this->separate_code( "{$c}" );
+      # Now, if there is no explicit broadcastlooping in the code,
+      # enclose everything into it.
+      if(!$broadcastloops && !$dont_add_brcloop) {
+          print "Adding broadcastloop...\n" if $::PP_VERBOSE;
+          $coderef = $coderef->enter(('PDL::PP::'.($backcode ? 'BackCode' : '').'BroadcastLoop')->new);
+      }
+      # Enclose it all in a generic switch.
+      my $if_gentype = ($code.($badcode//'')) =~ /PDL_IF_GENTYPE_/;
+      $coderef = $coderef->enter(PDL::PP::GenericSwitch->new($generictypes, undef,
+        [grep {!$extrageneric->{$_}} @$parnames],'$PRIV(__datatype)',$if_gentype));
+      # Do we have extra generic switches?
+      # If we do, first reverse the hash:
+      my %glh;
+      push @{$glh{$extrageneric->{$_}}},$_ for sort keys %$extrageneric;
+      my $no = 0;
+      $coderef = $coderef->enter(PDL::PP::GenericSwitch->new($generictypes,$no++,
+        $glh{$_},$_,$if_gentype)) for sort keys %glh;
+      push @coderefs, $coderef;
+      push @sizeprivs, $sizeprivs;
     }
-
-    # repeat for the bad code, then stick good and bad into
-    # a BadSwitch object which creates the necessary
-    # 'if (bad) { badcode } else { goodcode }' code
-    #
-    # NOTE: amalgamate sizeprivs from good and bad code
-    #
-    if ( $handlebad && ($code ne $badcode || $badcode =~ /PDL_BAD_CODE|PDL_IF_BAD/) ) {
-	print "Processing 'bad' code...\n" if $::PP_VERBOSE;
-	my ( $bad_broadcastloops, $bad_coderef, $bad_sizeprivs ) =
-	    $this->separate_code( "{\n$badcode\n}" );
-
-	if(!$bad_broadcastloops && !$dont_add_brcloop) {
-	    print "Adding 'bad' broadcastloop...\n" if $::PP_VERBOSE;
-	    my $nc = $bad_coderef;
-	    if( !$backcode ){ # Normal readbackdata broadcastloop
-		    $bad_coderef = PDL::PP::BroadcastLoop->new();
-	    }
-	    else{  # writebackcode broadcastloop
-		    $bad_coderef = PDL::PP::BackCodeBroadcastLoop->new();
-	    }
-	    push @{$bad_coderef},$nc;
-	}
-
-	my $good_coderef = $coderef;
-	$coderef = PDL::PP::BadSwitch->new( $good_coderef, $bad_coderef );
-
-	# amalgamate sizeprivs from Code/BadCode segments
-	# (sizeprivs is a simple hash, with each element
-	# containing a string - see PDL::PP::Loop)
-	while ( my ( $bad_key, $bad_str ) = each %$bad_sizeprivs ) {
-	    my $str = $$sizeprivs{$bad_key};
-	    die "ERROR: sizeprivs problem in PP/PDLCode.pm (BadVal stuff)\n"
-		if defined $str and $str ne $bad_str;
-	    $$sizeprivs{$bad_key} = $bad_str;  # copy over
-	}
-
-    } # if: $handlebad
-
+    amalgamate_sizeprivs(@sizeprivs) if @sizeprivs > 1;
+    my $sizeprivs = $sizeprivs[0];
+    my $coderef = @coderefs > 1 ? PDL::PP::BadSwitch->new( @coderefs ) : $coderefs[0];
     print "SIZEPRIVSX: ",(join ',',%$sizeprivs),"\n" if $::PP_VERBOSE;
-
-    # Enclose it all in a genericloop.
-    my $nc = $coderef;
-    my $if_gentype = ($code.($badcode//'')) =~ /PDL_IF_GENTYPE_/;
-    $coderef = PDL::PP::GenericSwitch->new($generictypes, undef,
-	  [grep {!$extrageneric->{$_}} @$parnames],'$PRIV(__datatype)',$if_gentype);
-    push @{$coderef},$nc;
-
-    # Do we have extra generic loops?
-    # If we do, first reverse the hash:
-    my %glh;
-    for(sort keys %$extrageneric) {
-	push @{$glh{$extrageneric->{$_}}},$_;
-    }
-    my $no = 0;
-    for(sort keys %glh) {
-	my $nc = $coderef;
-	$coderef = PDL::PP::GenericSwitch->new($generictypes,$no++,
-					    $glh{$_},$_,$if_gentype);
-	push @$coderef,$nc;
-    }
 
     my $pobjs = $sig->objs;
     # Then, in this form, put it together what we want the code to actually do.
     print "SIZEPRIVS: ",(join ',',%$sizeprivs),"\n" if $::PP_VERBOSE;
     $this->{Code} = (join '',sort values %$sizeprivs).
-       ($dont_add_brcloop?'':PDL::PP::pp_line_numbers __LINE__, join "\n",
+       ($dont_add_brcloop?'':join '', map "$_\n",
         'PDL_COMMENT("broadcastloop declarations")',
         'int __brcloopval;',
         'register PDL_Indx __tind0,__tind1; PDL_COMMENT("counters along dim")',
@@ -163,35 +119,48 @@ sub new {
         eol_protect(
          "#define ".$this->broadcastloop_macroname($backcode, 'START') . " " .
            $this->broadcastloop_start($this->func_name($backcode))
-        )."\n",
+        ),
         eol_protect(
          "#define ".$this->broadcastloop_macroname($backcode, 'END') . " " .
            $this->broadcastloop_end
-        )."\n",
-        join('',map $_->get_incregisters, @$pobjs{sort keys %$pobjs}),
+        ),
+        (grep $_, map $_->get_incregisters, @$pobjs{sort keys %$pobjs}),
        ).
        $this->params_declare.
        $coderef->get_str($this,[])
        ;
     $this->{Code};
+} # new
 
-} # new()
+# amalgamate sizeprivs from Code/BadCode segments
+# (sizeprivs is a simple hash, with each element
+# containing a string - see PDL::PP::Loop)
+sub amalgamate_sizeprivs {
+  my ($sizeprivs, $bad_sizeprivs) = @_;
+  while ( my ( $bad_key, $bad_str ) = each %$bad_sizeprivs ) {
+    my $str = $$sizeprivs{$bad_key};
+    die "ERROR: sizeprivs problem in PP/PDLCode.pm (BadVal stuff)\n"
+        if defined $str and $str ne $bad_str;
+    $$sizeprivs{$bad_key} = $bad_str;  # copy over
+  }
+}
 
 sub eol_protect {
   my ($text) = @_;
-  join " \\\n", split /\n/, $text;
+  join " \\\n", grep /\S/, split /\n/, $text;
 }
 
 sub params_declare {
     my ($this) = @_;
     my ($ord,$pdls) = $this->get_pdls;
-    my @decls = map $_->get_xsdatapdecl("PDL_PARAMTYPE_".$_->name, $this->{NullDataCheck}),
+    my %istyped = map +($_=>1), grep $pdls->{$_}{FlagTypeOverride}, @$ord;
+    my @decls = map $_->get_xsdatapdecl($istyped{$_->name} ? "PDL_TYPE_PARAM_".$_->name : "PDL_TYPE_OP", $this->{NullDataCheck}),
       map $pdls->{$_}, @$ord;
-    my @param_names = map "PDL_PARAMTYPE_$_", @$ord;
-    PDL::PP::pp_line_numbers(__LINE__, <<EOF);
+    my @param_names = ("PDL_TYPE_OP", map "PDL_TYPE_PARAM_$_", grep $istyped{$_}, @$ord);
+    <<EOF;
 #ifndef PDL_DECLARE_PARAMS_$this->{Name}_$this->{NullDataCheck}
 #define PDL_DECLARE_PARAMS_$this->{Name}_$this->{NullDataCheck}(@{[join ',', @param_names]}) \\
-  @{[join " \\\n", @decls]}
+  @{[join " \\\n  ", @decls]}
 #endif
 EOF
 }
@@ -208,12 +177,12 @@ sub broadcastloop_start {
     my ($ord,$pdls) = $this->get_pdls;
     <<EOF;
 PDL_BROADCASTLOOP_START(
-$funcname,
-\$PRIV(broadcast),
-\$PRIV(vtable),
-@{[ join "", map "\t".$pdls->{$ord->[$_]}->do_pointeraccess." += __offsp[$_];\n", 0..$#$ord ]},
-(@{[ join "", map "\t,".$pdls->{$ord->[$_]}->do_pointeraccess." += __tinc1_$ord->[$_] - __tinc0_$ord->[$_] * __tdims0\n", 0..$#$ord ]}),
-(@{[ join "", map "\t,".$pdls->{$ord->[$_]}->do_pointeraccess." += __tinc0_$ord->[$_]\n", 0..$#{$ord} ]})
+  $funcname,
+  \$PRIV(broadcast),
+  \$PRIV(vtable),
+@{[ PDL::PP::indent 2, join "", map $pdls->{$ord->[$_]}->do_pointeraccess." += __offsp[$_];\n", 0..$#$ord ]}  ,
+  (@{[ PDL::PP::indent 2, join "", map ",".$pdls->{$ord->[$_]}->do_pointeraccess." += __tinc1_$ord->[$_] - __tinc0_$ord->[$_] * __tdims0\n", 0..$#$ord ]}  ),
+  (@{[ PDL::PP::indent 2, join "", map ",".$pdls->{$ord->[$_]}->do_pointeraccess." += __tinc0_$ord->[$_]\n", 0..$#{$ord} ]}  )
 )
 EOF
 }
@@ -223,8 +192,8 @@ sub broadcastloop_end {
     my ($ord,$pdls) = $this->get_pdls();
     <<EOF;
 PDL_BROADCASTLOOP_END(
-\$PRIV(broadcast),
-@{[ join "", map $pdls->{$ord->[$_]}->do_pointeraccess." -= __tinc1_$ord->[$_] * __tdims1 + __offsp[$_];\n", 0..$#$ord ]}
+  \$PRIV(broadcast),
+@{[ PDL::PP::indent 2, join "", map $pdls->{$ord->[$_]}->do_pointeraccess." -= __tinc1_$ord->[$_] * __tdims1 + __offsp[$_];\n", 0..$#$ord ]}
 )
 EOF
 }
@@ -383,13 +352,14 @@ package PDL::PP::Block;
 sub new { my($type) = @_; bless [],$type; }
 
 sub myoffs { 0 }
+sub myextraindent { 0 }
 sub myprelude {}
 sub mypostlude {}
 
 sub get_str {
     my ($this,$parent,$context) = @_;
     my $str = $this->myprelude($parent,$context);
-    $str .= $this->get_str_int($parent,$context)//'';
+    $str .= PDL::PP::indent 2, $this->get_str_int($parent,$context)//'';
     $str .= $this->mypostlude($parent,$context)//'';
     return $str;
 }
@@ -402,7 +372,7 @@ sub get_str_int {
     my $it = $this->can('myitemstart') && $this->myitemstart($parent,$nth);
     last MYLOOP if $nth and !$it;
     $str .= $it//'';
-    $str .= join '', $this->get_contained($parent,$context);
+    $str .= PDL::PP::indent $this->myextraindent, join '', $this->get_contained($parent,$context);
     $str .= $it if $it = $this->can('myitemend') && $this->myitemend($parent,$nth);
     $nth++;
   }
@@ -413,6 +383,12 @@ sub get_contained {
   my ($this, $parent, $context) = @_;
   map ref($_) ? $_->get_str($parent, $context) : $_,
     @$this[$this->myoffs..$#$this];
+}
+
+sub enter {
+  my ($this, $new) = @_;
+  push @$new, $this;
+  $new;
 }
 
 ###########################
@@ -433,17 +409,17 @@ sub get_str {
     my ($this,$parent,$context) = @_;
     my $good = $this->[0];
     my $bad  = $this->[1];
-    my $str = PDL::PP::pp_line_numbers(__LINE__, <<EOF);
+    my $str = <<EOF;
 if ( \$PRIV(bvalflag) ) { PDL_COMMENT("** do 'bad' Code **")
-#define PDL_BAD_CODE
-#define PDL_IF_BAD(t,f) t
-  @{[ $bad->get_str($parent,$context) ]}
-#undef PDL_BAD_CODE
-#undef PDL_IF_BAD
+  #define PDL_BAD_CODE
+  #define PDL_IF_BAD(t,f) t
+@{[ PDL::PP::indent 2, $bad->get_str($parent,$context)
+]}  #undef PDL_BAD_CODE
+  #undef PDL_IF_BAD
 } else { PDL_COMMENT("** else do 'good' Code **")
-#define PDL_IF_BAD(t,f) f
-  @{[ $good->get_str($parent,$context) ]}
-#undef PDL_IF_BAD
+  #define PDL_IF_BAD(t,f) f
+@{[ PDL::PP::indent 2, $good->get_str($parent,$context)
+]}  #undef PDL_IF_BAD
 }
 EOF
 }
@@ -470,27 +446,28 @@ sub myprelude { my($this,$parent,$context) = @_;
 	push @$context, map {
 		my $i = $parent->make_loopind($_);
 # Used to be $PRIV(.._size) but now we have it in a register.
-		$text .= PDL::PP::pp_line_numbers(__LINE__, <<EOF);
-{PDL_COMMENT(\"Open $_\") register PDL_Indx $_;
-for($_=0; $_<(__$i->[0]_size); $_++) {
-EOF
+		$text .= "{PDL_COMMENT(\"Open $_\") register PDL_Indx $_; for($_=0; $_<(__$i->[0]_size); $_++) {";
 		$i;
 	} @{$this->[0]};
 	$text;
 }
 sub mypostlude { my($this,$parent,$context) = @_;
 	splice @$context, - ($#{$this->[0]}+1);
-	return join '', map PDL::PP::pp_line_numbers(__LINE__-1, "}} PDL_COMMENT(\"Close $_\")"), @{$this->[0]};
+	return join '', map "}} PDL_COMMENT(\"Close $_\")", @{$this->[0]};
 }
 
 package PDL::PP::GenericSwitch;
+use Carp;
 our @ISA = "PDL::PP::Block";
 
 # make the typetable from info in PDL::Types
 use PDL::Types ':All';
+my %type2canonical = map +($_->ppsym=>$_,$_->identifier=>$_), types();
 my @typetable = map [$_->ppsym, $_], types();
 sub get_generictyperecs { my($types) = @_;
-    my %wanted; @wanted{@$types} = ();
+    my @bad = grep !$type2canonical{$_}, @$types;
+    confess "Invalid GenericType (@bad)!" if @bad;
+    my %wanted; @wanted{map $type2canonical{$_}->ppsym, @$types} = ();
     [ map $_->[1], grep exists $wanted{$_->[0]}, @typetable ];
 }
 
@@ -502,13 +479,14 @@ sub new {
 }
 
 sub myoffs {5}
+sub myextraindent { 2 }
 
 sub myprelude {
     my ($this,$parent,$context) = @_;
     push @{$parent->{Gencurtype}}, undef; # so that $GENERIC can get at it
     die "ERROR: need to rethink NaN support in GenericSwitch\n"
 	if defined $this->[1] and $parent->{ftypes_type};
-    qq[PDL_COMMENT("Start generic loop")\n\tswitch($this->[3]) {\n];
+    qq[switch ($this->[3]) { PDL_COMMENT("Start generic switch")\n];
 }
 
 my @GENTYPE_ATTRS = qw(integer real unsigned);
@@ -518,16 +496,17 @@ sub myitemstart {
     $parent->{Gencurtype}[-1] = $item;
     @$parent{qw(ftypes_type ftypes_vars)} = ($item, $this->[2]) if defined $this->[1];
     my ($ord,$pdls) = $parent->get_pdls;
-    my @param_ctypes = map $pdls->{$_}->adjusted_type($item)->ctype, @$ord;
+    my %istyped = map +($_=>1), grep $pdls->{$_}{FlagTypeOverride}, @$ord;
+    my @param_ctypes = ($item->ctype, map $pdls->{$_}->adjusted_type($item)->ctype, grep $istyped{$_}, @$ord);
     my $decls = keys %{$this->[2]} == @$ord
-      ? PDL::PP::pp_line_numbers(__LINE__-1, "\t\tPDL_DECLARE_PARAMS_$parent->{Name}_$parent->{NullDataCheck}(@{[join ',', @param_ctypes]})\n")
+      ? "PDL_DECLARE_PARAMS_$parent->{Name}_$parent->{NullDataCheck}(@{[join ',', @param_ctypes]})\n"
       : join '', map $_->get_xsdatapdecl($_->adjusted_type($item)->ctype, $parent->{NullDataCheck}),
           map $parent->{ParObjs}{$_}, sort keys %{$this->[2]};
     my @gentype_decls = !$this->[4] ? () : map "#define PDL_IF_GENTYPE_".uc($_)."(t,f) ".
 	($item->$_ ? 't' : 'f')."\n",
 	@GENTYPE_ATTRS;
-    join '',
-	PDL::PP::pp_line_numbers(__LINE__-1, "case @{[$item->sym]}: {\n"),
+    "case @{[$item->sym]}: {\n" .
+	PDL::PP::indent 2, join '',
 	@gentype_decls,
 	$decls;
 }
@@ -538,7 +517,7 @@ sub myitemend {
     join '',
 	"\n",
 	(!$this->[4] ? () : map "#undef PDL_IF_GENTYPE_".uc($_)."\n", @GENTYPE_ATTRS),
-	PDL::PP::pp_line_numbers(__LINE__-1, "} break;\n");
+	"} break;\n";
 }
 
 sub mypostlude {
@@ -546,7 +525,7 @@ sub mypostlude {
     pop @{$parent->{Gencurtype}};  # and clean up the Gentype stack
     $parent->{ftypes_type} = undef if defined $this->[1];
     my $supported = join '', map $_->ppsym, @{$this->[0]};
-    "\n\tdefault:return PDL->make_error(PDL_EUSERERROR, \"PP INTERNAL ERROR in $parent->{Name}: unhandled datatype(%d), only handles ($supported)! PLEASE MAKE A BUG REPORT\\n\", $this->[3]);}\n";
+    "  default: return PDL->make_error(PDL_EUSERERROR, \"PP INTERNAL ERROR in $parent->{Name}: unhandled datatype(%d), only handles ($supported)! PLEASE MAKE A BUG REPORT\\n\", $this->[3]);\n}\n";
 }
 
 ####
@@ -565,11 +544,11 @@ sub new {
 sub myoffs { return 0; }
 sub myprelude {
     my($this,$parent,$context,$backcode) = @_;
-    $parent->broadcastloop_macroname($backcode, 'START') . "\n";
+    $parent->broadcastloop_macroname($backcode, 'START');
 }
 
 sub mypostlude {my($this,$parent,$context,$backcode) = @_;
-    $parent->broadcastloop_macroname($backcode, 'END') . "\n";
+    $parent->broadcastloop_macroname($backcode, 'END');
 }
 
 # Simple subclass of BroadcastLoop to implement writeback code
@@ -612,7 +591,7 @@ sub myoffs { return 1; }
 
 sub get_str {
   my ($this,$parent,$context) = @_;
-  confess "types() outside a generic loop"
+  confess "types() outside a generic switch"
     unless defined(my $type = $parent->{Gencurtype}[-1]);
   return '' if !$this->[0]{$type->ppsym};
   join '', $this->get_contained($parent,$context);
@@ -660,7 +639,7 @@ my %getters = (
 sub get_str {
     my ($this,$parent,$context) = @_;
     my ($opcode, $get, $name, $inds) = @$this;
-    confess "generic type access outside a generic loop in $name"
+    confess "generic type access outside a generic switch in $name"
       unless defined $parent->{Gencurtype}[-1];
     print "PDL::PP::BadAccess sent [$opcode] [$name] [$inds]\n" if $::PP_VERBOSE;
     die "ERROR: unknown check <$opcode> sent to PDL::PP::BadAccess\n"
@@ -701,7 +680,7 @@ sub new {
 sub get_str {
     my ($this, $parent, $context) = @_;
     my ($type2value, $name) = @{$this};
-    confess "generic type access outside a generic loop in $name"
+    confess "generic type access outside a generic switch in $name"
       unless defined $parent->{Gencurtype}[-1];
     $type2value->{$parent->{Gencurtype}[-1]->ppsym};
 }
@@ -712,7 +691,7 @@ use Carp;
 sub new { my($type,$pdl,$inds) = @_; bless [$inds],$type; }
 
 sub get_str {my($this,$parent,$context) = @_;
-  confess "generic type access outside a generic loop"
+  confess "generic type access outside a generic switch"
     unless defined(my $type = $parent->{Gencurtype}[-1]);
   return $type->ctype if !$this->[0];
   my $pobj = $parent->{ParObjs}{$this->[0]} // confess "not a defined parname";
@@ -725,7 +704,7 @@ use Carp;
 sub new { my($type,$pdl,$inds) = @_; bless [$inds],$type; }
 
 sub get_str {my($this,$parent,$context) = @_;
-  confess "generic type access outside a generic loop"
+  confess "generic type access outside a generic switch"
     unless defined(my $type = $parent->{Gencurtype}[-1]);
   return $type->ppsym if !$this->[0];
   my $pobj = $parent->{ParObjs}{$this->[0]} // confess "not a defined parname";

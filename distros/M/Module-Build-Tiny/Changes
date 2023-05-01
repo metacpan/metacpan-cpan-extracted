@@ -1,5 +1,8 @@
 Revision history for Module::Build::Tiny
 
+0.045     2023-04-30 11:52:20+02:00 Europe/Brussels
+          - Fix compilation issue on Windows
+
 0.044     2023-04-28 09:19:30+02:00 Europe/Brussels
           - Add module sharedirs
           - Only add src/*.c files to primary XS file

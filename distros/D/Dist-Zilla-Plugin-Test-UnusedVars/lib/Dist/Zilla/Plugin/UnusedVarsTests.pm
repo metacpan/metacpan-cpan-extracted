@@ -1,20 +1,22 @@
-use 5.008;
 use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::UnusedVarsTests;
 # ABSTRACT: (DEPRECATED) Release tests for unused variables
-our $VERSION = '2.000007'; # VERSION
+
+our $VERSION = '2.001000';
+
 use Moose;
 use namespace::autoclean;
 extends 'Dist::Zilla::Plugin::Test::UnusedVars';
 
 before register_component => sub {
-    warn '!!! [UnusedVarsTests] is deprecated and will be removed in a future release; replace it with [Test::UnusedVars]';
+    warnings::warnif('deprecated',
+        "!!! [UnusedVarsTests] is deprecated and will be removed in a future release; please use [Test::UnusedVars].\n",
+    );
 };
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 1;
 
 __END__
@@ -29,36 +31,32 @@ Dist::Zilla::Plugin::UnusedVarsTests - (DEPRECATED) Release tests for unused var
 
 =head1 VERSION
 
-version 2.000007
+version 2.001000
 
 =head1 SYNOPSIS
 
 Please use L<Dist::Zilla::Plugin::Test::UnusedVars> instead.
 
-In C<dist.ini>:
+In your F<dist.ini>:
 
     [Test::UnusedVars]
 
-=for test_synopsis 1;
-__END__
+=head1 DESCRIPTION
 
-=head1 AVAILABILITY
+THIS MODULE IS DEPRECATED. Please use
+L<Dist::Zilla::Plugin::Test::UnusedVars> instead. It may be removed at a
+later time (but not before February 2017).
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-UnusedVars/>.
+=head1 SUPPORT
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::UnusedVars/>.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-UnusedVars>
+(or L<bug-Dist-Zilla-Plugin-Test-UnusedVars@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-UnusedVars@rt.cpan.org>).
 
-=head1 SOURCE
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars/issues>.
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHORS
 
@@ -74,7 +72,7 @@ Mike Doherty <doherty@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2010 by Mike Doherty.
 

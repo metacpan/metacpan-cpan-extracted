@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 8 "matrixops.pd"
+
+#line 9 "matrixops.pd"
 
 use strict;
 use warnings;
@@ -116,7 +117,6 @@ C<svd> uses an SVD subroutine written by Bryant Marks, and C<eigens>
 uses a subset of the Small Scientific Library by Kenneth Geisshirt.
 They are free software, distributable under same terms as PDL itself.
 
-
 =head1 NOTES
 
 This is intended as a general-purpose linear algebra package for
@@ -132,11 +132,6 @@ use Carp;
 use strict;
 #line 134 "MatrixOps.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -144,7 +139,8 @@ use strict;
 
 
 
-#line 123 "matrixops.pd"
+
+#line 124 "matrixops.pd"
 
 =head2 identity
 
@@ -174,13 +170,8 @@ sub identity {
   (my $tmp = $out->diagonal(0,1))++; # work around perl -d "feature"
   $was_pdl ? bless $out, ref($n) : $out;
 }
-#line 178 "MatrixOps.pm"
 
-
-
-#line 156 "matrixops.pd"
-
-
+#line 157 "matrixops.pd"
 =head2 stretcher
 
 =for sig
@@ -204,13 +195,8 @@ sub stretcher {
   ($tmp = $out->diagonal(0,1)) += $in;	
   $out;
 }
-#line 208 "MatrixOps.pm"
 
-
-
-#line 187 "matrixops.pd"
-
-
+#line 188 "matrixops.pd"
 =head2 inv
 
 =for sig
@@ -232,7 +218,6 @@ way.  You can cache the LU decomposition in an output option variable.
 
 C<inv> uses C<lu_decomp> by default; that is a numerically stable
 (pivoting) LU decomposition method.
-
 
 OPTIONS:
 
@@ -303,13 +288,8 @@ sub inv {
   $x .= $out;
   $x;
 }
-#line 307 "MatrixOps.pm"
 
-
-
-#line 287 "matrixops.pd"
-
-
+#line 288 "matrixops.pd"
 =head2 det
 
 =for sig
@@ -361,13 +341,8 @@ sub det {
   }
   defined $lu ? $lu->diagonal(0,1)->prodover * $par : PDL->zeroes(sbyte,1);
 }
-#line 365 "MatrixOps.pm"
 
-
-
-#line 346 "matrixops.pd"
-
-
+#line 347 "matrixops.pd"
 =head2 determinant
 
 =for sig
@@ -448,20 +423,13 @@ sub determinant {
   
   return $sum;
 }
-#line 452 "MatrixOps.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 427 "MatrixOps.pm"
 
 =head2 eigens_sym
 
 =for sig
 
   Signature: ([phys]a(m); [o,phys]ev(n,n); [o,phys]e(n))
-
 
 =for ref
 
@@ -493,20 +461,15 @@ runs across their components.
     ($ev, $e) = eigens_sym($x); # e-vects & e-values
     $e = eigens_sym($x);        # just eigenvalues
 
-
-
 =for bad
 
 eigens_sym ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 506 "MatrixOps.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 
    sub PDL::eigens_sym {
@@ -541,18 +504,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	if(wantarray);
       $e;                #just eigenvalues
    }
-#line 545 "MatrixOps.pm"
 
 
-
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *eigens_sym = \&PDL::eigens_sym;
-#line 552 "MatrixOps.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -561,7 +519,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]a(m); [o,phys]ev(l,n,n); [o,phys]e(l,n))
-
 
 =for ref
 
@@ -619,19 +576,15 @@ numbers.  It might be useful to be able to return complex eigenvalues.
     ($ev, $e) = eigens($x); # e'vects & e'vals
     $e = eigens($x);        # just eigenvalues
 
-
 =for bad
 
 eigens ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 631 "MatrixOps.pm"
 
 
 
-#line 959 "../../blib/lib/PDL/PP.pm"
 
 
    sub PDL::eigens {
@@ -679,18 +632,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return $e->index(0)->sever;  #just eigenvalues
       }
    }
-#line 683 "MatrixOps.pm"
 
 
-
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *eigens = \&PDL::eigens;
-#line 690 "MatrixOps.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -699,7 +647,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n,m); [t]w(wsize); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
-
 
 =for usage
 
@@ -749,27 +696,23 @@ orientation of the ellipsoid of transformation:
       $x .= $r2 x $r1;  # a gets r2 x ess x r1
     }
 
-
 =for bad
 
 svd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 761 "MatrixOps.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *svd = \&PDL::svd;
-#line 768 "MatrixOps.pm"
 
 
 
-#line 800 "matrixops.pd"
 
+
+#line 801 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -943,13 +886,8 @@ sub lu_decomp {
 
    wantarray ? ($out,$permute,$parity) : $out;
 }
-#line 947 "MatrixOps.pm"
 
-
-
-#line 979 "matrixops.pd"
-
-
+#line 980 "matrixops.pd"
 =head2 lu_decomp2
 
 =for sig
@@ -1018,7 +956,6 @@ sub lu_decomp2 {
   my($inplace) = $in->is_inplace;
   my($out) = ($inplace) ? $in : $in->copy;
 
-
   if(defined $perm) {
     barf('lu_decomp2: permutation vector must match the matrix')
       if(!UNIVERSAL::isa($perm,'PDL') || 
@@ -1065,13 +1002,8 @@ sub lu_decomp2 {
 
   wantarray ? ($out,$perm,$par) : $out;
 }
-#line 1069 "MatrixOps.pm"
 
-
-
-#line 1101 "matrixops.pd"
-
-
+#line 1102 "matrixops.pd"
 =head2 lu_backsub
 
 =for sig
@@ -1283,20 +1215,13 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1287 "MatrixOps.pm"
-
-
-
-#line 958 "../../blib/lib/PDL/PP.pm"
-
-
+#line 1219 "MatrixOps.pm"
 
 =head2 simq
 
 =for sig
 
   Signature: ([phys]a(n,n); [phys]b(n); [o,phys]x(n); int [o,phys]ips(n); int flag)
-
 
 =for ref
 
@@ -1320,27 +1245,20 @@ required).
 See also L</lu_backsub>, which does the same thing with a slightly
 less opaque interface.
 
-
-
 =for bad
 
 simq ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1333 "MatrixOps.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *simq = \&PDL::simq;
-#line 1340 "MatrixOps.pm"
 
 
 
-#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1348,37 +1266,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n); b(m))
-
+  Signature: (a(n,n); [o]b(m))
 
 =for ref
 
-Convert a symmetric square matrix to triangular vector storage.
-
-
+Convert a lower-triangular square matrix to triangular vector storage.
+Ignores upper half of input.
 
 =for bad
 
 squaretotri does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1368 "MatrixOps.pm"
 
 
 
-#line 960 "../../blib/lib/PDL/PP.pm"
 
 *squaretotri = \&PDL::squaretotri;
-#line 1375 "MatrixOps.pm"
 
 
 
 
 
-#line 1396 "matrixops.pd"
 
+
+#line 1390 "matrixops.pd"
 
 =head1 AUTHOR
 
@@ -1390,10 +1303,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1394 "MatrixOps.pm"
-
-
-
+#line 1307 "MatrixOps.pm"
 
 # Exit with OK status
 

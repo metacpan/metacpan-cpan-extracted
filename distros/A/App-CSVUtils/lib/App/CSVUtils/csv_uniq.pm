@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -44,6 +44,8 @@ gen_csv_util(
     ],
 
     writes_csv => 0,
+
+    tags => ['category:filtering'],
 
     on_input_header_row => sub {
         my $r = shift;
@@ -99,7 +101,7 @@ App::CSVUtils::csv_uniq - Report or omit duplicated values in CSV
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_uniq (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_uniq (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 

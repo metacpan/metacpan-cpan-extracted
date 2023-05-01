@@ -1,9 +1,9 @@
-package Dist::Zilla::Plugin::GitHub; # git description: v0.47-12-g6b55af0
+package Dist::Zilla::Plugin::GitHub; # git description: v0.48-3-g3b5901f
 # ABSTRACT: Plugins to integrate Dist::Zilla with GitHub
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use JSON::MaybeXS;
 use Moose;
@@ -209,6 +209,11 @@ sub _check_response {
             return 'redo' if (($response->{status} eq '401') and
                               (($response->{headers}{'x-github-otp'} // '') =~ /^required/));
 
+            if ($response->{status} eq '404') {
+                $self->log($response->{reason}.' (insufficient permissions to edit this resource?)');
+                return;
+            }
+
             require Data::Dumper;
             $self->log("Err: ", Data::Dumper->new([ $response ])->Indent(2)->Terse(1)->Sortkeys(1)->Dump);
             return;
@@ -245,7 +250,7 @@ Dist::Zilla::Plugin::GitHub - Plugins to integrate Dist::Zilla with GitHub
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 

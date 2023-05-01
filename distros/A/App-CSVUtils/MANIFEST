@@ -39,7 +39,7 @@ lib/App/CSVUtils/csv_lookup_fields.pm
 lib/App/CSVUtils/csv_ltrim.pm
 lib/App/CSVUtils/csv_map.pm
 lib/App/CSVUtils/csv_munge_field.pm
-lib/App/CSVUtils/csv_munge_row.pm
+lib/App/CSVUtils/csv_munge_rows.pm
 lib/App/CSVUtils/csv_pick_fields.pm
 lib/App/CSVUtils/csv_pick_rows.pm
 lib/App/CSVUtils/csv_quote.pm
@@ -87,7 +87,7 @@ script/csv-lookup-fields
 script/csv-ltrim
 script/csv-map
 script/csv-munge-field
-script/csv-munge-row
+script/csv-munge-rows
 script/csv-pick
 script/csv-pick-fields
 script/csv-pick-rows
@@ -117,6 +117,7 @@ script/csv2paras
 script/csv2td
 script/csv2tsv
 script/csv2vcf
+script/list-csvutils
 script/paras2csv
 script/tsv2csv
 t/00-compile.t

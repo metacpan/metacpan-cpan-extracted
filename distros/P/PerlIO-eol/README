@@ -3,12 +3,20 @@ normalizing line endings.  It requires Perl version 5.7.3 or later.
 
 * Installation
 
+** If you downloaded the tarball from CPAN:
+
 PerlIO::eol uses the standard perl module install process:
 
 perl Makefile.PL
 make			# or 'nmake' on Win32; see notes below
 make test
 make install
+
+** From git:
+
+Use:
+
+    dzil install
 
 * Copyright
 

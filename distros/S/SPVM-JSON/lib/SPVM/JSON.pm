@@ -1,90 +1,108 @@
 package SPVM::JSON;
 
-our $VERSION = '0.04';
+our $VERSION = "0.051";
 
 1;
 
 =head1 NAME
 
-SPVM::JSON - JSON serializing/deserializing
+SPVM::JSON - JSON
 
-=head1 SYNOPSYS
+=head1 Description
 
-B<SPVM:>
+The JSON class of L<SPVM> has methods to manipulate L<JSON|https://en.wikipedia.org/wiki/JSON>.
+
+=head1 Usage
 
   use JSON;
-
+  
   # new
   my $json = JSON->new;
-
+  
   # decode
-  $json->decode($json_text);
-
-  # set the canonical flag on
-  $json->set_canonical(1);
-
+  my $spvm_data = $json->decode($json_data);
+  
   # encode
-  my $encoded_json = $json->encode($spvm_data);
+  my $json_data = $json->encode($spvm_data);
 
-B<Perl:>
-
-  use SPVM 'JSON';
-
-  # new
-  my $json = SPVM::JSON->new;
-
-  # decode
-  $json->decode($json_text);
-
-  # set the canonical flag on
-  $json->set_canonical(1);
-
-  # encode
-  my $encoded_json = $json->encode($spvm_data);
-
-=head1 DESCRIPTION
-
-B<SPVM::JSON> converts SPVM data structures to JSON and vice versa.
-
-B<SPVM::JSON> is a L<SPVM> module.
-
-B<SPVM is yet before 1.0 released. SPVM is changed without warnings. There will be quite a lot of changes.>
-
-=head1 CLASS METHODS
+=head1 Class Methods
 
 =head2 new
 
-  static method new : SPVM::JSON ()
+  static method new : JSON ();
 
-Create new L<SPVM::JSON> object that can be used to de/encode JSON strings.
+Creates a new L<JSON|SPVM::JSON> object.
 
-=head1 INSTANCE METHODS
+=head1 Instance Methods
 
 =head2 encode
 
-  method encode : string ($object : object)
+  method encode : string ($spvm_data : object);
 
-Converts the given SPVM data structure (undef or a object of numeric,
-L<string>, L<SPVM::JSON::Bool>, L<SPVM::Hash> or L<SPVM::ObjectList>)
-to its JSON representation.
+Converts the SPVM data $spvm_data to a JSON data.
+
+A SPVM C<undef> is converted to a JSON C<null>.
+
+A L<Bool|SPVM::Bool> object with the C<value> field of 1 is converted to JSON C<true>.
+
+A L<Bool|SPVM::Bool> object with the C<value> field of 0 is converted to a JSON C<false>.
+
+A SPVM string is converted to a JSON string. C</> in a SPVM string is escaped to C<\/> in a JSON string.
+
+A L<Byte|SPVM::Byte> object is converted to a JSON number.
+
+A L<Short|SPVM::Short> object is converted to a JSON number.
+
+A L<Int|SPVM::Int> object is converted to a JSON number.
+
+A L<Long|SPVM::Long> object is converted to a JSON number.
+
+A L<Float|SPVM::Float> object is converted to a JSON number.
+
+A L<Double|SPVM::Double> object is converted to a JSON number.
+
+A L<List|SPVM::List> object is converted to a JSON array.
+
+A L<Hash|SPVM::Hash> object is converted to a JSON object. The keys are sorted by dictionaly order asc.
+
+Exceptions:
+
+The $spvm_data cannot contain a NaN float value. If cannot, an exception is thrown.
+
+The $spvm_data cannot contain an inifinity float value. If cannot, an exception is thrown.
+
+The $spvm_data cannot contain a NaN double value. If cannot, an exception is thrown.
+
+The $spvm_data cannot contain an inifinity double value. If cannot, an exception is thrown.
+
+If the $spvm_data contains a value of an invalid type, an exception is thrown.
 
 =head2 decode
 
-  method decode : object ($json : string)
+  method decode : object ($json_data : string);
 
-The opposite of encode: expects a JSON text and tries to parse it, returning
-the resulting object. Dies on error. Numbers in a JSON text are converted
-to L<SPVM::Double>.
+Converts the JSON data $json_data to a SPVM data.
 
-=head2 set_canonical
+A JSON C<null> is converted to a SPVM C<undef>.
 
-  method set_canonical : void ($enable : byte)
+A JSON C<true> is converted to a L<Bool|SPVM::Bool> object with the C<value> field of 1.
 
-If C<$enable> is true, then the encode method will output JSON objects by
-sorting their keys. This is adding a comparatively high overhead.
+A JSON C<false> is converted to a L<Bool|SPVM::Bool> object with the C<value> field of 0.
 
-=head2 canonical
+A JSON string is converted to a SPVM string.
 
-  method canonical : byte ()
+A JSON number is converted to a L<Double|SPVM::Double> object. Accuracy may be reduced.
 
-Get the canonical flag.
+A JSON array is converted to a L<List|SPVM::List> object.
+
+A JSON object is converted to a L<Hash|SPVM::Hash> object.
+
+=head1 Repository
+
+L<SPVM::JSON - Github|https://github.com/yuki-kimoto/SPVM-JSON>
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

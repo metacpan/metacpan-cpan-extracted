@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
 plan skip_all => 'B::C required for testing perlcc -O3'
     unless eval { +require B::C; };
@@ -14,8 +15,6 @@ plan skip_all => 'Devel::CheckBin required for looking for a perlcc executable'
 
 plan skip_all => 'perlcc required' unless Devel::CheckBin::can_run('perlcc');
 
-plan tests => 1;
-
 my $f = "t/rt96893x.pl";
 open my $fh, ">", $f; END { unlink $f if $f }
 print $fh 'use Sub::Name; subname("main::bar", sub{42}); print "# successfully ran subname() with perlcc\n";';
@@ -27,4 +26,6 @@ local $TODO = 'experimental, for informational purposes only';
 is($? >> 8, 0, 'executable completed successfully');
 
 unlink "t/rt96893x", "t/rt96893x.exe";
+
+done_testing;
 # vim: ft=perl

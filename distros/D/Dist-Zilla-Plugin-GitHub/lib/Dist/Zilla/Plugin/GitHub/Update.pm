@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Update;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use JSON::MaybeXS;
 use Moose;
@@ -105,25 +105,26 @@ sub after_release {
         return;
     }
 
-    $self->log("Updating GitHub repository info");
-
     my $params = {
         name => ($repo_name =~ /\/(.*)$/)[0],
         description => $self->zilla->abstract,
     };
 
+    my $with;
     if ($self->meta_home && (my $meta_home = $self->zilla->distmeta->{resources}{homepage})) {
-        $self->log("Using distmeta URL");
+        $with = ' using distmeta URL';
         $params->{homepage} = $meta_home;
     } elsif ($self->metacpan) {
-        $self->log("Using MetaCPAN URL");
+        $with = ' using MetaCPAN URL';
         $params->{homepage} = "https://metacpan.org/release/$dist_name/";
     } elsif ($self->p3rl) {
-        $self->log("Using P3rl URL");
+        $with = ' using P3rl URL';
         my $guess_name = $dist_name;
         $guess_name =~ s/\-/\:\:/g;
         $params->{homepage} = "https://p3rl.org/$guess_name";
     }
+
+    $self->log('Updating GitHub repository info'.($with // ''));
 
     my $url = $self->api."/repos/$repo_name";
 
@@ -182,7 +183,7 @@ Dist::Zilla::Plugin::GitHub::Update - Update a GitHub repo's info on release
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 

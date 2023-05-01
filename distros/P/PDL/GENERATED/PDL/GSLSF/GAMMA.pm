@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_gamma.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::GAMMA - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "GAMMA.pm"
-
-
-
-
-
+#line 40 "GAMMA.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ Log[Gamma(x)], x not a negative integer Uses real Lanczos method. Determines the
 gsl_sf_lngamma does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lngamma = \&PDL::gsl_sf_lngamma;
-#line 81 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ Gamma(x), x not a negative integer
 gsl_sf_gamma does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gamma = \&PDL::gsl_sf_gamma;
-#line 113 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ Regulated Gamma Function, x > 0 Gamma^*(x) = Gamma(x)/(Sqrt[2Pi] x^(x-1/2) exp(-
 gsl_sf_gammastar does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gammastar = \&PDL::gsl_sf_gammastar;
-#line 145 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,20 +143,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 gsl_sf_gammainv does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gammainv = \&PDL::gsl_sf_gammainv;
-#line 177 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -196,20 +170,15 @@ Log[Gamma(z)] for z complex, z not a negative integer. Calculates: lnr = log|Gam
 gsl_sf_lngamma_complex does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 202 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lngamma_complex = \&PDL::gsl_sf_lngamma_complex;
-#line 209 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -228,20 +197,15 @@ x^n / n!
 gsl_sf_taylorcoeff does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 234 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_taylorcoeff = \&PDL::gsl_sf_taylorcoeff;
-#line 241 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -260,20 +224,15 @@ n!
 gsl_sf_fact does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 266 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_fact = \&PDL::gsl_sf_fact;
-#line 273 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -292,20 +251,15 @@ n!! = n(n-2)(n-4)
 gsl_sf_doublefact does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 298 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_doublefact = \&PDL::gsl_sf_doublefact;
-#line 305 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -324,20 +278,15 @@ ln n!
 gsl_sf_lnfact does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 330 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lnfact = \&PDL::gsl_sf_lnfact;
-#line 337 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -356,20 +305,15 @@ ln n!!
 gsl_sf_lndoublefact does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 362 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lndoublefact = \&PDL::gsl_sf_lndoublefact;
-#line 369 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -388,20 +332,15 @@ log(n choose m)
 gsl_sf_lnchoose does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 394 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lnchoose = \&PDL::gsl_sf_lnchoose;
-#line 401 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -420,20 +359,15 @@ n choose m
 gsl_sf_choose does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 426 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_choose = \&PDL::gsl_sf_choose;
-#line 433 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -452,20 +386,15 @@ Logarithm of Pochammer (Apell) symbol, with sign information. result = log( |(a)
 gsl_sf_lnpoch does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 458 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lnpoch = \&PDL::gsl_sf_lnpoch;
-#line 465 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -484,20 +413,15 @@ Pochammer (Apell) symbol (a)_x := Gamma[a + x]/Gamma[x]
 gsl_sf_poch does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 490 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_poch = \&PDL::gsl_sf_poch;
-#line 497 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -516,20 +440,15 @@ Relative Pochammer (Apell) symbol ((a,x) - 1)/x where (a,x) = (a)_x := Gamma[a +
 gsl_sf_pochrel does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 522 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_pochrel = \&PDL::gsl_sf_pochrel;
-#line 529 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -548,20 +467,15 @@ Normalized Incomplete Gamma Function Q(a,x) = 1/Gamma(a) Integral[ t^(a-1) e^(-t
 gsl_sf_gamma_inc_Q does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 554 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gamma_inc_Q = \&PDL::gsl_sf_gamma_inc_Q;
-#line 561 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -580,20 +494,15 @@ Complementary Normalized Incomplete Gamma Function P(a,x) = 1/Gamma(a) Integral[
 gsl_sf_gamma_inc_P does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 586 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_gamma_inc_P = \&PDL::gsl_sf_gamma_inc_P;
-#line 593 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -612,20 +521,15 @@ Logarithm of Beta Function Log[B(a,b)]
 gsl_sf_lnbeta does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 618 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lnbeta = \&PDL::gsl_sf_lnbeta;
-#line 625 "GAMMA.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -644,16 +548,14 @@ Beta Function B(a,b)
 gsl_sf_beta does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 650 "GAMMA.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_beta = \&PDL::gsl_sf_beta;
-#line 657 "GAMMA.pm"
+
+
 
 
 
@@ -673,10 +575,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 677 "GAMMA.pm"
-
-
-
+#line 579 "GAMMA.pm"
 
 # Exit with OK status
 

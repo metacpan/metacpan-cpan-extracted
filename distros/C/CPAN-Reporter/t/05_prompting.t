@@ -6,9 +6,10 @@ select(STDERR); $|=1;
 select(STDOUT); $|=1;
 
 use Test::More;
-use t::Helper;
-use t::Frontend;
-use IO::CaptureOutput qw/capture/;
+use lib 't/lib';
+use Helper;
+use Frontend;
+use Capture::Tiny qw/capture/;
 
 my @cases = (
     "default:yes",

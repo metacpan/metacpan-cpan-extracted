@@ -1,7 +1,7 @@
 package Test::Smoke::App::Base;
 use warnings;
 use strict;
-use Carp;
+use Carp qw/ confess /;
 
 our $VERSION = '0.002';
 
@@ -246,9 +246,9 @@ sub option {
             return $opts->{$option} if $is_special;
         }
 
-        croak("Option '$option' is not valid.");
+        confess("Option '$option' is not valid.");
     }
-    croak("Invalid option '$option'");
+    confess("Invalid option '$option'");
 }
 
 sub _find_option {
@@ -352,9 +352,12 @@ sub _get_options {
     my $self = shift;
 
     %{$self->{_cli_options}} = %{$self->opt_collection->options_for_cli};
-    @{$self->{_ARGV}} = @ARGV;
-    Getopt::Long::Configure('no_ignore_case');
-    GetOptions(
+
+    @{$self->{_ARGV}} = @{$self->{_ARGV_EXTRA}} = @ARGV;
+
+    my $parser = Getopt::Long::Parser->new(config => [qw/no_ignore_case passthrough/]);
+    $parser->getoptionsfromarray(
+        $self->{_ARGV_EXTRA},
         $self->cli_options,
         @{ $self->opt_collection->options_list },
     );
@@ -383,7 +386,10 @@ sub _post_process_options {
         $value = '<undef>' if !defined $value;
         push(
             @errors,
-            sprintf("Invalid value '%s' for option '%s'", $value, $opt)
+            sprintf(
+                "Invalid value '%s' for option '%s'",
+                $self->_show_option_value($opt), $opt
+            )
         ) if !$oo->allowed($self->final_options->{$opt});
     }
     if (@errors) {
@@ -420,6 +426,7 @@ sub _show_option_value {
 sub _obtain_config_file {
     my $self = shift;
     $self->{_from_configfile} = {};
+    $self->{_configfile_error} = undef;
 
     my $cf_name = $self->cli_options->{'configfile'};
     return if !$cf_name;

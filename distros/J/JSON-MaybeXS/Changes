@@ -1,5 +1,8 @@
 Revision history for JSON-MaybeXS
 
+1.004005 - 2023-04-30
+ - to_json and from_json are now documented (Dan Book, PR #2)
+
 1.004004 - 2022-09-17
  - slight speed optimization for is_bool()
 

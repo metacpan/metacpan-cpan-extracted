@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_psi.pd"
 
 use strict;
@@ -39,12 +40,7 @@ Poly-Gamma Functions
   psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
 
 =cut
-#line 43 "PSI.pm"
-
-
-
-
-
+#line 44 "PSI.pm"
 
 =head1 FUNCTIONS
 
@@ -52,8 +48,6 @@ Poly-Gamma Functions
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -72,20 +66,15 @@ Di-Gamma Function psi(x).
 gsl_sf_psi does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 78 "PSI.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_psi = \&PDL::gsl_sf_psi;
-#line 85 "PSI.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -104,20 +93,15 @@ Di-Gamma Function Re[psi(1 + I y)]
 gsl_sf_psi_1piy does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 110 "PSI.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_psi_1piy = \&PDL::gsl_sf_psi_1piy;
-#line 117 "PSI.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -136,16 +120,14 @@ Poly-Gamma Function psi^(n)(x)
 gsl_sf_psi_n does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 142 "PSI.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_psi_n = \&PDL::gsl_sf_psi_n;
-#line 149 "PSI.pm"
+
+
 
 
 
@@ -165,10 +147,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 169 "PSI.pm"
-
-
-
+#line 151 "PSI.pm"
 
 # Exit with OK status
 

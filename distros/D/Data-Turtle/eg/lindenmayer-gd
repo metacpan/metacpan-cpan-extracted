@@ -4,9 +4,9 @@ use warnings;
 
 # https://en.wikipedia.org/wiki/Lindenmayer_System
 
-use Data::Turtle;
-use GD;
-use Getopt::Long;
+use Data::Turtle ();
+use GD ();
+use Getopt::Long qw(GetOptions);
 
 my %opts = (
     rule     => 3,
@@ -131,7 +131,7 @@ print $img->png;
 
 sub forward {
     my @line = $turtle->forward( $opts{distance} );
-    if ( $turtle->pen_status == 1 && @line ) {
+    if ( @line ) {
         $img->setThickness( $line[5] );
         $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
     }

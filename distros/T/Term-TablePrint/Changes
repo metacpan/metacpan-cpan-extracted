@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.160   2023-04-30
+        - binary_filter: use unmodified string.
+
 0.159   2023-04-06
         - Bugfix in print_single_row.
         - Term::Choose minimum version 1.760.

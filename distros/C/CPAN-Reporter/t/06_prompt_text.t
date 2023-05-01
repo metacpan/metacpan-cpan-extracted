@@ -5,14 +5,14 @@ select(STDERR); $|=1;
 select(STDOUT); $|=1;
 
 use Test::More;
-use t::MockCPANDist;
-use t::Helper;
-use t::Frontend;
-use IO::CaptureOutput;
+use lib 't/lib';
+use MockCPANDist;
+use Helper;
+use Frontend;
 use Config;
 
 # For these tests, hide perl_patchlevel so all prompts are tested
-use t::MockPatchlevel;
+use MockPatchlevel;
 
 #--------------------------------------------------------------------------#
 # Fixtures
@@ -22,7 +22,7 @@ my $perl = Probe::Perl->find_perl_interpreter();
 $perl = qq{"$perl"};
 my $make = $Config{make};
 
-my $mock_dist = t::MockCPANDist->new( 
+my $mock_dist = MockCPANDist->new( 
     pretty_id => "JOHNQP/Bogus-Module-1.23.tar.gz",
     prereq_pm       => {
         requires => { 'File::Spec' => 0 },

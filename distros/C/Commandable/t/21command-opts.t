@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Commandable::Invocation;
 use Commandable::Finder::Packages;
@@ -13,8 +12,9 @@ package MyTest::Command::one {
    use constant COMMAND_NAME => "one";
    use constant COMMAND_DESC => "the one command";
    use constant COMMAND_OPTS => (
-      { name => "verbose|v", description => "verbose option" },
-      { name => "target|t:", description => "target option" },
+      { name => "verbose|v", description => "verbose option", mode => "inc" },
+      { name => "target|t=", description => "target option" },
+      { name => "multi",     description => "multi option", multi => 1 },
    );
    sub run {}
 }
@@ -24,6 +24,15 @@ package MyTest::Command::two {
    use constant COMMAND_DESC => "the two command";
    use constant COMMAND_OPTS => (
       { name => "default", description => "default option", default => "value" },
+   );
+   sub run {}
+}
+
+package MyTest::Command::three {
+   use constant COMMAND_NAME => "three";
+   use constant COMMAND_DESC => "the three command";
+   use constant COMMAND_OPTS => (
+      { name => "silent", description => "silent option", mode => "bool", default => 1 },
    );
    sub run {}
 }
@@ -38,7 +47,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ {} ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ {} ],
       '$cmd->parse_invocation with no options' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -49,7 +58,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--verbose" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
       '$cmd->parse_invocation with longname' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -60,7 +69,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "-v" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
       '$cmd->parse_invocation with shortname' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -71,7 +80,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--target TARG" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ { target => "TARG" } ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ { target => "TARG" } ],
       '$cmd->parse_invocation with space-separated value' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -82,8 +91,19 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--target=TARG" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ { target => "TARG" } ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ { target => "TARG" } ],
       '$cmd->parse_invocation with equals-separated value' );
+   ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
+}
+
+# multi value
+{
+   my $cmd = $finder->find_command( "one" );
+
+   my $inv = Commandable::Invocation->new( "--multi=one --multi two" );
+
+   is( [ $cmd->parse_invocation( $inv ) ], [ { multi => [ qw(one two) ] } ],
+      '$cmd->parse_invocation with repeated value' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
 
@@ -93,8 +113,41 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "" );
 
-   is_deeply( [ $cmd->parse_invocation( $inv ) ], [ { default => "value" } ],
+   is( [ $cmd->parse_invocation( $inv ) ], [ { default => "value" } ],
       '$cmd->parse_invocation with default option' );
+   ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
+}
+
+# negatable opt with default value
+{
+   my $cmd = $finder->find_command( "three" );
+
+   my $inv = Commandable::Invocation->new( "" );
+
+   is( [ $cmd->parse_invocation( $inv ) ], [ { silent => 1 } ],
+      '$cmd->parse_invocation with negatable option' );
+   ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
+}
+
+# negated opt with default value
+{
+   my $cmd = $finder->find_command( "three" );
+
+   my $inv = Commandable::Invocation->new( "--no-silent" );
+
+   is( [ $cmd->parse_invocation( $inv ) ], [ { silent => undef } ],
+      '$cmd->parse_invocation with negated option' );
+   ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
+}
+
+# incrementable opt
+{
+   my $cmd = $finder->find_command( "one" );
+
+   my $inv = Commandable::Invocation->new( "-v -v -v" );
+
+   is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 3 } ],
+      '$cmd->parse_invocation with repeated incrementable option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
 

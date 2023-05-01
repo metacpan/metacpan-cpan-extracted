@@ -1,7 +1,7 @@
 package Test::Smoke::ObjectBase;
 use warnings;
 use strict;
-use Carp;
+use Carp qw/ confess /;
 
 our $VERSION = '0.001';
 
@@ -28,7 +28,7 @@ sub AUTOLOAD {
         $self->{"_$attrib"} = shift if @_;
         return $self->{"_$attrib"};
     }
-    croak(
+    confess(
         sprintf(
             "Invalid attribute '%s' for class '%s'",
             $attrib,

@@ -1,4 +1,4 @@
-# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Report::Text;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.40'; # VERSION
 
 use Devel::Cover::DB;
 
@@ -75,6 +75,7 @@ sub print_statement {
             }
         }
 
+        # use Devel::Cover::Dumper; print STDERR Dumper(\%criteria);
         my $more = 1;
         while ($more) {
             my @args  = ($n, "");
@@ -99,6 +100,7 @@ sub print_statement {
                         : $o->percentage
                     : "";
                 $value = "-" . $value if $o && $o->uncoverable;
+                $value = "*" . $value if $o && $o->error;
                 push @args, $value;
                 $error ||= $o->error if $o;
             }
@@ -268,7 +270,7 @@ Devel::Cover::Report::Text - Text backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.38
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -289,7 +291,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2023, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

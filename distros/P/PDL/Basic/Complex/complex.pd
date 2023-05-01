@@ -5,6 +5,7 @@ my $R = [ppdefs()];
 my $F = [map $_->ppsym, grep $_->real && !$_->integer, types()];
 my $C = [ppdefs_complex()];
 
+pp_core_importList('()');
 pp_beginwrap; # required for overload to work
 
 # pp_def functions go into the PDL::Complex namespace
@@ -19,9 +20,6 @@ use strict;
 use warnings;
 use Carp;
 our $VERSION = '2.009';
-   use PDL::Slices;
-   use PDL::Types;
-   use PDL::Bad;
 
 =encoding iso-8859-1
 
@@ -225,7 +223,7 @@ Comparing complex numbers other than for equality is a fatal error.
 =cut
 
 my $i;
-BEGIN { $i = bless pdl 0,1 }
+BEGIN { $i = bless PDL->pdl(0,1) }
 {
 no warnings 'redefine';
 sub i { $i->copy + (@_ ? $_[0] : 0) };
@@ -564,7 +562,7 @@ pp_def 'Cdiv',
            $GENERIC() ar = $a(m=>0), ai = $a(m=>1);
            $GENERIC() br = $b(m=>0), bi = $b(m=>1);
 
-           if (fabs (br) > fabs (bi))
+           if (fabsl (br) > fabsl (bi))
              {
                $GENERIC() tt = bi / br;
                $GENERIC() dn = br + tt * bi;
@@ -845,7 +843,7 @@ Does not work inplace.
 
 sub Catan($) {
    my $z = shift;
-   Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), pdl(0, 0.5);
+   Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), PDL->pdl(0, 0.5);
 }
 
 EOD
@@ -1066,12 +1064,9 @@ pp_add_isa 'PDL';
 
 pp_addpm {At => 'Bot'}, <<'EOD';
 
-# overload must be here, so that all the functions can be seen
-
 # undocumented compatibility functions (thanks to Luis Mochan!)
-sub Catan2($$) { Clog( $_[1] + i()*$_[0])/i }
-sub atan2($$) { Clog( $_[1] + i()*$_[0])/i }
-
+sub Catan2 { Clog( $_[1] + i()*$_[0])/i }
+sub atan2 { Clog( $_[1] + i()*$_[0])/i }
 
 =begin comment
 
@@ -1089,20 +1084,18 @@ my %NO_MUTATE; BEGIN { @NO_MUTATE{qw(atan2 .= ==)} = (); }
 sub _gen_biop {
    local $_ = shift;
    my $sub;
-   if (/(\S+)\+(\w+)/) { #commutes
-      $sub = eval 'sub { '.$2.' $_[0], ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1] }';
-   } elsif (/(\S+)\-(\w+)/) { #does not commute
-      $sub = eval 'sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                       $_[2] ? '.$2.' $y, $_[0] : '.$2.' $_[0], $y }'; #need to swap?
-   } else {
-      die;
-   }
-   return ($1, $sub) if exists $NO_MUTATE{$1};
-   ($1, $sub, "$1=", $sub);
+   die if !(my ($op, $commutes, $func) = /(\S+)([-+])(\w+)/);
+   $sub = eval 'sub {
+      my ($x, $y) = '.($commutes eq '+' ? '' : '$_[2] ? @_[1,0] : ').'@_[0,1];
+      $_ = r2C $_ for grep ref $_ ne __PACKAGE__, $x, $y;
+      '.$func.'($x, $y);
+   }'; #need to swap?
+   die if $@;
+   ($op, $sub, exists $NO_MUTATE{$op} ? () : ("$op=", $sub));
 }
 
 sub _gen_unop {
-   my ($op, $func) = ($_[0] =~ /(.+)@(\w+)/);
+   my ($op, $func) = split '@', $_[0];
    no strict 'refs';
    *$op = \&$func if $op =~ /\w+/; # create an alias
    ($op, eval 'sub { '.$func.' $_[0] }');

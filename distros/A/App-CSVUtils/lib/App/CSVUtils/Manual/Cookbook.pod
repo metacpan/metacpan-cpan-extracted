@@ -21,7 +21,7 @@ App::CSVUtils::Manual::Cookbook - App::CSVUtils cookbook
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 DESCRIPTION
 
@@ -241,7 +241,7 @@ Keywords: munging rows
 
 =head1 Adding line number to CSV rows
 
- % csv-munge-row 1.csv -e '$_->[0] = ++$i . "|$_->[0]"'
+ % csv-munge-rows 1.csv -e '$_->[0] = ++$i . "|$_->[0]"'
  name,age,rank
  1|andi,25,120
  2|budi,28,115
@@ -250,13 +250,13 @@ Keywords: munging rows
 
 Other ways:
 
- % csv-munge-row 1.csv -e '$_->[0] = $data_rownum . "|$_->[0]"'
+ % csv-munge-rows 1.csv -e '$_->[0] = $data_rownum . "|$_->[0]"'
 
 See also: L</Adding a field containing line number>.
 
 =head1 Shuffling every row
 
- % csv-munge-row 1.csv -e 'use List::Util "shuffle"; $_=[shuffle @$_]'
+ % csv-munge-rows 1.csv -e 'use List::Util "shuffle"; $_=[shuffle @$_]'
 
 =head1 MODIFYING VALUES
 

@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 
-our $VERSION = '1.004004';
+our $VERSION = '1.004005';
 $VERSION =~ tr/_//d;
 
 sub _choose_json_module {
@@ -175,10 +175,29 @@ module, and takes a string of JSON text to deserialise to a perl data structure.
 
   my $data_structure = decode_json($json_text);
 
-=head2 to_json, from_json
+=head2 to_json
 
-See L<JSON> for details.  These are included to support legacy code
-B<only>.
+This function is equivalent to calling C<< JSON()->new->encode($data_structure) >>.
+It takes a perl data structure which is serialised to JSON text without encoding
+it to UTF-8. You should only use this function if you expect another layer to
+handle the UTF-8 encoding of the resulting JSON text.
+
+  my $json_text = to_json($data_structure);
+
+Additional arguments can be passed and will be handled as in L<JSON/to_json>,
+this is included to support legacy code B<only>.
+
+=head2 from_json
+
+This function is equivalent to calling C<< JSON()->new->decode($json_text) >>. It
+takes a string of unencoded JSON text to deserialise to a perl data structure. You
+should only use this function if another layer is already handling the UTF-8
+decoding of the input JSON text.
+
+  my $data_structure = from_json($json_text);
+
+Additional arguments can be passed and will be handled as in L<JSON/from_json>,
+this is included to support legacy code B<only>.
 
 =head2 JSON
 

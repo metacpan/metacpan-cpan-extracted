@@ -199,7 +199,7 @@ pp_def('matmult',
 	HandleBad=>0,
 	Pars => 'a(t,h); b(w,t); [o]c(w,h);',
 	GenericTypes => [ppdefs_all],
-	PMCode => <<'EOPM',
+	PMCode => pp_line_numbers(__LINE__, <<'EOPM'),
 sub PDL::matmult {
     my ($x,$y,$c) = @_;
     $y = PDL->topdl($y);
@@ -619,11 +619,10 @@ EOD
         GenericTypes => [ppdefs_all],
         OtherPars => 'int reflect;',
         HandleBad => 0,
-        PMCode => '
-
+        PMCode => pp_line_numbers(__LINE__, <<'EOPM'),
 sub PDL::conv1d {
-   my $opt = pop @_ if ref($_[-1]) eq \'HASH\';
-   die \'Usage: conv1d( a(m), kern(p), [o]b(m), {Options} )\'
+   my $opt = pop @_ if ref($_[-1]) eq 'HASH';
+   die 'Usage: conv1d( a(m), kern(p), [o]b(m), {Options} )'
       if @_<2 || @_>3;
    my($x,$kern) = @_;
    my $c = @_ == 3 ? $_[2] : PDL->null;
@@ -632,8 +631,7 @@ sub PDL::conv1d {
 		     lc $$opt{Boundary} eq "reflect");
    return $c;
 }
-
-',
+EOPM
         Code => '
            int i,i1,i2,poff,pflip;
            double tmp;
@@ -914,7 +912,7 @@ for my $opt (
             } else,) { '.$code.' }',
 	   Doc =>  'clip (threshold) C<$a> by C<$b> (C<$b> is '.
 	   ($name eq 'hclip' ? 'upper' : 'lower').' bound)',
-          PMCode=><<"EOD",
+          PMCode=>pp_line_numbers(__LINE__, <<"EOD"),
 sub PDL::$name {
    my (\$x,\$y) = \@_;
    my \$c;
@@ -963,7 +961,7 @@ pp_def(
            $c() = PDLMIN($h(), PDLMAX($l(), $a()));
          }
 EOBC
-       PMCode => <<'EOPM',
+       PMCode=>pp_line_numbers(__LINE__, <<'EOPM'),
 *clip = \&PDL::clip;
 sub PDL::clip {
   my($x, $l, $h) = @_;
@@ -1087,7 +1085,7 @@ pp_def('statsover',
               if ($ISGOOD(a())) {
                  diff = $a()-$avg();
                  tmp += diff * diff * $w();
-                 tmp1 += fabs(diff) * $w();
+                 tmp1 += fabsl(diff) * $w();
               }
            %}
            $rms() = sqrt( tmp/norm );
@@ -1097,9 +1095,9 @@ pp_def('statsover',
                    PDL_IF_BAD($SETBAD(prms()),$prms() = 0);
            $adev() = tmp1 / norm ;
          }',
-      PMCode => '
+      PMCode=>pp_line_numbers(__LINE__, <<'EOPM'),
 sub PDL::statsover {
-   barf(\'Usage: ($mean,[$prms, $median, $min, $max, $adev, $rms]) = statsover($data,[$weights])\') if @_>2;
+   barf('Usage: ($mean,[$prms, $median, $min, $max, $adev, $rms]) = statsover($data,[$weights])') if @_>2;
    my ($data, $weights) = @_;
    $weights //= $data->ones();
    my $median = $data->medover;
@@ -1112,7 +1110,7 @@ sub PDL::statsover {
    PDL::_statsover_int($data, $weights, $mean, $prms, $median, $min, $max, $adev, $rms);
    wantarray ? ($mean, $prms, $median, $min, $max, $adev, $rms) : $mean;
 }
-',
+EOPM
       Doc => '
 =for ref
 
@@ -1466,7 +1464,7 @@ pp_def('fibonacci',
         GenericTypes => [ppdefs_all],
 	Doc=>'Constructor - a vector with Fibonacci\'s sequence',
 	PMFunc=>'',
-	PMCode=><<'EOD',
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
 sub fibonacci { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->fibonacci : PDL->fibonacci(@_) }
 sub PDL::fibonacci{
    my $x = &PDL::Core::_construct;
@@ -1496,7 +1494,13 @@ pp_def('append',
         PMCode => pp_line_numbers(__LINE__-1, '
 sub PDL::append {
   my ($i1, $i2, $o) = map PDL->topdl($_), @_;
-  if (grep $_->isempty, $i1, $i2) {
+  my $nempty = grep $_->isempty, $i1, $i2;
+  if ($nempty == 2) {
+    my @dims = $i1->dims;
+    $dims[0] += $i2->dim(0);
+    return PDL->zeroes($i1->type, @dims);
+  }
+  if ($nempty == 1) {
     if (!defined $o) {
       return $i2->isnull ? PDL->zeroes(0) : $i2->copy if $i1->isempty;
       return $i1->isnull ? PDL->zeroes(0) : $i1->copy;
@@ -1813,7 +1817,7 @@ EOD
 pp_def('unionvec',
    Pars => 'a(M,NA); b(M,NB); [o]c(M,NC); indx [o]nc()',
    RedoDimsCode => '$SIZE(NC) = $SIZE(NA) + $SIZE(NB);',
-   PMCode=> q(
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
  sub PDL::unionvec {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($nc));
@@ -1822,7 +1826,7 @@ pp_def('unionvec',
    return ($c,$nc) if (wantarray);
    return $c->slice(",0:".($nc->max-1));
  }
-),
+EOD
    Code => q(
  PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
  int cmpval;
@@ -1875,7 +1879,7 @@ EOD
 pp_def('intersectvec',
    Pars => 'a(M,NA); b(M,NB); [o]c(M,NC); indx [o]nc()',
    RedoDimsCode => '$SIZE(NC) = PDLMIN($SIZE(NA),$SIZE(NB));',
-   PMCode=> q(
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
  sub PDL::intersectvec {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -1887,7 +1891,7 @@ pp_def('intersectvec',
 	   ? $c->slice(",0:".($nc_max-1))
 	   : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
  }
-),
+EOD
    Code => q(
  PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
  int cmpval;
@@ -1933,7 +1937,7 @@ EOD
 pp_def('setdiffvec',
    Pars => 'a(M,NA); b(M,NB); [o]c(M,NC); indx [o]nc()',
    RedoDimsCode => '$SIZE(NC) = $SIZE(NA);',
-   PMCode=> q(
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
  sub PDL::setdiffvec {
   my ($a,$b,$c,$nc) = @_;
   $c = PDL->null if (!defined($c));
@@ -1945,7 +1949,7 @@ pp_def('setdiffvec',
 	  ? $c->slice(",0:".($nc_max-1))
 	  : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
  }
-),
+EOD
    Code => q(
  PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
  int cmpval;
@@ -2002,7 +2006,7 @@ pp_add_macros(
 pp_def('union_sorted',
    Pars => 'a(NA); b(NB); [o]c(NC); indx [o]nc()',
    RedoDimsCode => '$SIZE(NC) = $SIZE(NA) + $SIZE(NB);',
-   PMCode=> q(
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
  sub PDL::union_sorted {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -2011,7 +2015,7 @@ pp_def('union_sorted',
    return ($c,$nc) if (wantarray);
    return $c->slice("0:".($nc->max-1));
  }
-),
+EOD
    Code => q(
  PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
  int cmpval;
@@ -2062,7 +2066,7 @@ EOD
 pp_def('intersect_sorted',
    Pars => 'a(NA); b(NB); [o]c(NC); indx [o]nc()',
    RedoDimsCode => '$SIZE(NC) = PDLMIN($SIZE(NA),$SIZE(NB));',
-   PMCode=> q(
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
  sub PDL::intersect_sorted {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -2074,7 +2078,7 @@ pp_def('intersect_sorted',
 	   ? $c->slice("0:".($nc_max-1))
 	   : $c->reshape(0, ($c->dims)[1..($c->ndims-1)]));
  }
-),
+EOD
    Code => q(
  PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
  int cmpval;
@@ -2119,7 +2123,7 @@ EOD
 pp_def('setdiff_sorted',
    Pars => 'a(NA); b(NB); [o]c(NC); indx [o]nc()',
    RedoDimsCode => '$SIZE(NC) = $SIZE(NA);',
-   PMCode=> q(
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
  sub PDL::setdiff_sorted {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -2131,7 +2135,7 @@ pp_def('setdiff_sorted',
 	   ? $c->slice("0:".($nc_max-1))
 	   : $c->reshape(0, ($c->dims)[1..($c->ndims-1)]));
  }
-),
+EOD
    Code => q(
  PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
  int cmpval;
@@ -2219,7 +2223,7 @@ L<PDL::Core/online_cpus>.
  srand(5); # fixed number e.g. for testing
 
 EOF
-	PMCode=><<'EOD',
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
 *srand = \&PDL::srand;
 sub PDL::srand { PDL::_srand_int($_[0] // PDL::Core::seed()) }
 EOD
@@ -2227,7 +2231,7 @@ EOD
 
 pp_def(
 	'random',
-	Pars=>'a();',
+	Pars=>'[o] a();',
         GenericTypes => [ppdefs_all],
 	PMFunc => '',
 	Code => <<'EOF',
@@ -2258,10 +2262,11 @@ a template.
 You can use the PDL function L</srand> to seed the random generator.
 If it has not been called yet, it will be with the current time.
 EOF
-	PMCode=><<'EOD',
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
 sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
 sub PDL::random {
    my $class = shift;
+   unshift @_, double() if !ref($class) and !@_;
    my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
    PDL::_random_int($x);
    return $x;
@@ -2271,7 +2276,7 @@ EOD
 
 pp_def(
 	'randsym',
-	Pars=>'a();',
+	Pars=>'[o] a();',
         GenericTypes => [ppdefs_all],
 	PMFunc => '',
 	Code => <<'EOF',
@@ -2303,10 +2308,11 @@ i.e. one can specify dimensions, types or give a template.
 You can use the PDL function L</srand> to seed the random generator.
 If it has not been called yet, it will be with the current time.
 EOF
-	PMCode=><<'EOD',
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
 sub randsym { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->randsym : PDL->randsym(@_) }
 sub PDL::randsym {
    my $class = shift;
+   unshift @_, double() if !ref($class) and !@_;
    my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
    PDL::_randsym_int($x);
    return $x;
@@ -2964,7 +2970,8 @@ pp_def('interpolate',
        BadDoc => 'needs major (?) work to handles bad values',
 	Pars => 'real xi(); real x(n); y(n); [o] yi(); int [o] err()',
 	GenericTypes => $AF,
-	PMCode => 'sub PDL::interpolate {
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+		sub PDL::interpolate {
 			my ($xi, $x, $y, $yi, $err) = @_;
 			croak "x must be real" if (ref($x) && ! $x->type->real);
 			croak "xi must be real" if (ref($xi) && ! $xi->type->real);
@@ -2972,7 +2979,8 @@ pp_def('interpolate',
 			$err //= PDL->null;
 			PDL::_interpolate_int($xi, $x, $y, $yi, $err);
 			($yi, $err);
-		}',
+		}
+EOD
 	Code => '
 		 $GENERIC() d;
 		 PDL_Indx n  = $SIZE(n);
@@ -3108,7 +3116,6 @@ All the interpolation methods treat the pixels as value-centered, so
 the C<sample> method will return C<< $a->(0) >> for coordinate values on
 the set [-0.5,0.5), and all methods will return C<< $a->(1) >> for
 a coordinate value of exactly 1.
-
 
 Recognized options:
 
@@ -3461,7 +3468,7 @@ EOD
 	  Elseclause => "",
 	  Outclause => '$lastout() = dm; while (dm < $SIZE(n)) $inds(n=>dm++) = -1;',
 	  Doc => $doc_which,
-	  PMCode=><<'EOD',
+	  PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
    sub which { my ($this,$out) = @_;
 		$this = $this->flat;
 		$out //= $this->nullcreate;
@@ -3478,7 +3485,7 @@ EOD
 	  Elseclause => "else { \n          \$notinds(n => dm2)=n; \n           dm2++;\n     }",
 	  Outclause => '$lastout() = dm; $lastoutn() = dm2; while (dm < $SIZE(n)) $inds(n=>dm++) = -1; while (dm2 < $SIZE(n)) $notinds(n=>dm2++) = -1;',
 	  Doc => $doc_which_both,
-	  PMCode=><<'EOD',
+	  PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
    sub which_both { my ($this,$outi,$outni) = @_;
 		$this = $this->flat;
 		$outi //= $this->nullcreate;
@@ -3678,14 +3685,18 @@ sub PDL::whereND :lvalue {
    my $mask = pop @_;  # $mask has 0==false, 1==true
    my @to_return;
    my $n = PDL::sum($mask);
+   my $maskndims = $mask->ndims;
    foreach my $arr (@_) {
-      my $sub_i = $mask * ones($arr);
-      my $where_sub_i = PDL::where($arr, $sub_i);
       # count the number of dims in $mask and $arr
       # $mask = a b c d e f.....
       my @idims = dims($arr);
-      # ...and pop off the number of dims in $mask
-      foreach ( dims($mask) ) { shift(@idims) };
+      splice @idims, 0, $maskndims; # pop off the number of dims in $mask
+      if (!$n or $arr->isempty) {
+        push @to_return, PDL->zeroes($arr->type, $n, @idims);
+        next;
+      }
+      my $sub_i = $mask * ones($arr);
+      my $where_sub_i = PDL::where($arr, $sub_i);
       my $ndim = 0;
       foreach my $id ($n, @idims[0..($#idims-1)]) {
          $where_sub_i = $where_sub_i->splitdim($ndim++,$id) if $n>0;

@@ -40,12 +40,15 @@ File::Copy::copy($master_copy_path, $input_path) or die "File::Copy $!";
 my $doc = odf_get_document($input_path, read_only => 1);
 my $body = $doc->get_body;
  
+$ODF::lpOD::Common::DEBUG = TRUE if $debug;
+
 {
   my $count = 0;
   my $initial_vtext = $body->Hsearch("Front Stuff")->{paragraph}->get_text;
   my $prev_item = "Front Stuff";
   foreach (
-           [["bold"], "NEW"],
+           [["bold", 13], "NEW"],
+           [["bold", color => "red", size => "140%", "italic"], "NEW"],
            ["NEW"], ["NEW"], 
            ["\t"], ["NEW\t"], ["\tNEW"], ["NEW\t006"],
            ["\n"], ["NEW\n"], ["\nNEW"], ["NEW\n009"],

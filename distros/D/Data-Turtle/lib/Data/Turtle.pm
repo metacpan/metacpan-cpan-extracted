@@ -4,11 +4,12 @@ our $AUTHORITY = 'cpan:GENE';
 # ABSTRACT: Turtle Movement and State Operations
 
 use Moo;
-use POSIX qw( ceil );
+use Math::Trig qw(:pi);
+use POSIX qw(ceil);
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0202';
 
-use constant K => 3.14159265358979323846 / 180;
+use constant K => pi / 180;
 
 
 sub _init_x {
@@ -95,14 +96,14 @@ sub pen_down {
 sub right {
     my $self = shift;
     my $degrees = shift // 0;
-    $self->heading( ( $self->heading + $degrees ) % 360 );
+    $self->heading(($self->heading + $degrees) % 360);
 }
 
 
 sub left {
     my $self = shift;
     my $degrees = shift // 0;
-    $self->heading( ( $self->heading - $degrees ) % 360 );
+    $self->heading(($self->heading - $degrees) % 360);
 }
 
 
@@ -126,7 +127,7 @@ sub get_state {
 
 sub set_state {
     my $self = shift;
-    my ( $x, $y, $heading, $pen_status, $pen_color, $pen_size ) = @_;
+    my ($x, $y, $heading, $pen_status, $pen_color, $pen_size) = @_;
     $self->x($x);
     $self->y($y);
     $self->heading($heading);
@@ -140,14 +141,14 @@ sub forward {
     my $self = shift;
     my $step = shift // 1;
 
-    my $x = $step * cos( $self->heading * K );
-    my $y = $step * sin( $self->heading * K );
+    my $x = $step * cos($self->heading * K);
+    my $y = $step * sin($self->heading * K);
 
     my $xo = $self->x;
     my $yo = $self->y;
 
-    $self->x( $x + $xo );
-    $self->y( $y + $yo );
+    $self->x($x + $xo);
+    $self->y($y + $yo);
 
     return $self->pen_status == 1
         ? ( ceil($xo), ceil($yo), ceil($self->x), ceil($self->y), $self->pen_color, $self->pen_size )
@@ -158,19 +159,19 @@ sub forward {
 sub backward {
     my $self = shift;
     my $step = shift;
-    $self->forward( - $step )
+    $self->forward(-$step)
 }
 
 
 sub mirror {
     my $self = shift;
-    $self->heading( $self->heading * -1 );
+    $self->heading($self->heading * -1);
 }
 
 
 sub goto {
     my $self = shift;
-    my ( $x, $y ) = @_;
+    my ($x, $y) = @_;
 
     my $xo = $self->x;
     my $yo = $self->y;
@@ -197,7 +198,7 @@ Data::Turtle - Turtle Movement and State Operations
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 SYNOPSIS
 
@@ -233,7 +234,7 @@ distribution directory.
 
 =head2 new
 
-  $turtle = Data::Turtle->new();
+  $turtle = Data::Turtle->new;
   $turtle = Data::Turtle->new(
     width      => $width,
     height     => $height,
@@ -358,7 +359,7 @@ Reflect the heading (by multiplying by -1).
 
 =head2 goto
 
-  @line = $turtle->goto( $x, $y );
+  @line = $turtle->goto($x, $y);
 
 Move the pen to the given coordinate.  If the pen is down, a list defining a
 line is returned with these values:
@@ -369,7 +370,11 @@ line is returned with these values:
 
 L<Moo>
 
+L<Math::Trig>
+
 L<POSIX>
+
+L<GD::Simple> has built-in turtle graphics
 
 L<https://metacpan.org/source/YVESP/llg-1.07/Turtle.pm>
 
@@ -381,7 +386,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2015-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

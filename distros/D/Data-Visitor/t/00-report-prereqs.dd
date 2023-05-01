@@ -10,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.158',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -38,7 +38,6 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Moose' => '0.89',
                                       'Scalar::Util' => '0',
-                                      'Sub::Name' => '0',
                                       'Symbol' => '0',
                                       'Tie::ToObject' => '0.01',
                                       'constant' => '0',

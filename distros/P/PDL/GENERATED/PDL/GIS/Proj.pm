@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 19 "Proj.pd"
 
 use strict;
@@ -33,16 +34,12 @@ PDL::GIS::Proj - PDL interface to the PROJ projection library.
 =head1 DESCRIPTION
 
 For more information on the PROJ library, see: L<http://www.proj.org/>
-#line 37 "Proj.pm"
-
-
-
-
-
+#line 38 "Proj.pm"
 
 =head1 FUNCTIONS
 
 =cut
+
 
 
 
@@ -65,13 +62,7 @@ sub get_proj_info
     pop(@a);
     return join("\n", @a);
 } # End of get_proj_info()...
-#line 69 "Proj.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 66 "Proj.pm"
 
 =head2 fwd_transform
 
@@ -92,26 +83,20 @@ on PROJ behavior. They will be PDL->null if an error has occurred.
 Ignores bad elements of $lat and $lon, and sets the corresponding elements
 of $x and $y to BAD
 
-
 =for bad
 
 fwd_transform processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 104 "Proj.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *fwd_transform = \&PDL::fwd_transform;
-#line 111 "Proj.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -135,27 +120,23 @@ occurred.
 Ignores bad elements of $lat and $lon, and sets the corresponding elements
 of $x and $y to BAD
 
-
 =for bad
 
 inv_transform processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 147 "Proj.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *inv_transform = \&PDL::inv_transform;
-#line 154 "Proj.pm"
+
+
 
 
 
 #line 213 "Proj.pd"
-
 
 =head2 proj_version
 
@@ -212,14 +193,8 @@ sub load_projection_information
     $info->{nzmg}{CATEGORIES} = [ 'fixed Earth' ];
     return $info;
 } # End of load_projection_information()...
-#line 216 "Proj.pm"
-
-
-
-
 
 #line 32 "Proj.pd"
-
 =head1 AUTHOR
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -236,10 +211,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
-#line 240 "Proj.pm"
-
-
-
+#line 215 "Proj.pm"
 
 # Exit with OK status
 

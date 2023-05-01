@@ -42,9 +42,6 @@ my %trustme = (
              'URI::WithBase' => [
                                   qr/^(?:can|clone|eq|new_abs)$/
                                 ],
-             'URI::_punycode' => [
-                                   qr/^(?:adapt|code_point|digit_value|min)$/
-                                 ],
              'URI::_query' => [
                                 qr/^(?:equery|query|query_form|query_form_hash|query_keywords|query_param|query_param_append|query_param_delete)$/
                               ],

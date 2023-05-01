@@ -32,13 +32,13 @@ foreach my $quiet (0, 1)
                     path(qw(source dist.ini)) => simple_ini(
                         [ GatherDir => ],
                         [ MetaConfig => ],
-                        map {
+                        map
                             [ 'Run::BeforeBuild' => 'plugin ' . $plugin_count++ => {
                                     quiet => $quiet,
                                     fatal_errors => 0,
                                     %$_,
-                                } ]
-                        } @configs,
+                                } ],
+                            @configs,
                     ),
                     path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
                 },
@@ -58,9 +58,9 @@ foreach my $quiet (0, 1)
                 my $num = $_;
                 map {
                     my $key = $_;
-                    map {
-                        "[plugin $num] " . ( $key eq 'run' ? 'executing: ' : 'evaluating: ') . $_
-                    } @{$configs[$num]->{$_}}
+                    map
+                        "[plugin $num] " . ( $key eq 'run' ? 'executing: ' : 'evaluating: ') . $_,
+                        @{$configs[$num]->{$_}}
                 } keys %{ $configs[$num] }
             } 0 .. $#configs
         );
@@ -68,13 +68,13 @@ foreach my $quiet (0, 1)
         if ($quiet and not $verbose)
         {
             foreach my $message (@run_messages) {
-                ok(!( grep { $_ eq $message } @{$tzil->log_messages} ), 'did not see log message when running command');
+                ok(!( grep $_ eq $message, @{$tzil->log_messages} ), 'did not see log message when running command');
             }
         }
         else
         {
             cmp_deeply(
-                [ grep { /^\[plugin [01]\]/ } @{ $tzil->log_messages } ],
+                [ grep /^\[plugin [01]\]/, @{ $tzil->log_messages } ],
                 bag(
                     @run_messages,
                     $quiet && !$verbose ? () : ( '[plugin 0] # hello this is a run command' ),
@@ -91,8 +91,8 @@ foreach my $quiet (0, 1)
             superhashof({
                 x_Dist_Zilla => superhashof({
                     plugins => supersetof(
-                        map {
-                            {
+                        map
+                            +{
                                 class => 'Dist::Zilla::Plugin::Run::BeforeBuild',
                                 config => {
                                     'Dist::Zilla::Plugin::Run::Role::Runner' => {
@@ -104,8 +104,8 @@ foreach my $quiet (0, 1)
                                 },
                                 name => "plugin $_",
                                 version => Dist::Zilla::Plugin::Run::BeforeBuild->VERSION,
-                            }
-                        } (0 .. $#configs)
+                            },
+                            (0 .. $#configs)
                     ),
                 }),
             }),
@@ -148,7 +148,7 @@ foreach my $quiet (0, 1)
         );
 
         cmp_deeply(
-            [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
+            [ grep /^\[Run::[^]]+\]/, @{ $tzil->log_messages } ],
             [
                 !$quiet || $verbose ? (
                     "[Run::BeforeBuild] executing: $command",
@@ -211,7 +211,7 @@ foreach my $quiet (0, 1)
     );
 
     cmp_deeply(
-        [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
+        [ grep /^\[Run::[^]]+\]/, @{ $tzil->log_messages } ],
         [
             '[Run::BeforeBuild] evaluated: die "oh noes"',
             re(qr/^\[Run::BeforeBuild\] evaluation died: oh noes/),

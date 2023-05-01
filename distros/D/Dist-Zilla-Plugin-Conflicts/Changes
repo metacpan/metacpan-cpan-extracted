@@ -1,3 +1,10 @@
+0.20    2023-04-30
+
+- Add some minimal pod to the generated conflicts module. This includes a
+  comment to disable Pod coverage testing if you're using
+  Pod::Coverage::TrustPod. Based on suggestion from greencoloured in GH #9.
+
+
 0.19    2016-08-20
 
 - Don't rely on '.' being in the current @INC in the code added to a distro's

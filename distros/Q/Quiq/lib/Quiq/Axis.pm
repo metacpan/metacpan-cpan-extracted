@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.208';
+our $VERSION = '1.209';
 
 use Quiq::AxisTick;
 
@@ -171,7 +171,7 @@ sub height {
 
 =head1 VERSION
 
-1.208
+1.209
 
 =head1 AUTHOR
 

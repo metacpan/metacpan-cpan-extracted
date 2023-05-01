@@ -222,7 +222,7 @@ sub check_MANIFEST {
     my %ignore = map {
         my $entry = $NOCASE ? uc $_ : $_;
         $entry => undef
-    } ( ".patch", "MANIFEST.SKIP", '.git', '.gitignore', @_ ),
+    } ( ".patch", "MANIFEST.SKIP", '.git', '.gitignore', '.mailmap', @_ ),
       keys %{ $self->_read_mani_file( 'MANIFEST.SKIP', 1 ) };
     $self->log_debug("Found %d entries in MANIFEST.SKIP", scalar(keys %ignore));
 

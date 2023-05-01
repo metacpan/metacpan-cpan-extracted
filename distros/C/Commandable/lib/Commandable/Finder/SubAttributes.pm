@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.09;
+package Commandable::Finder::SubAttributes 0.10;
 
 use v5.14;
 use warnings;
@@ -77,22 +77,34 @@ will be removed from the name).
 
    :Command_opt("optname", "description")
 
+   :Command_opt("optname", "description", "default")
+
 Gives a named option for the command and its description.
 
 If the name contains C<|> characters it provides multiple name aliases for the
 same option.
 
-If the name field ends in a C<:> character, a value is expected for the
+If the name field ends in a C<=> character, a value is expected for the
 option. It can either be parsed from the next input token, or after an C<=>
 sign of the same token:
 
    --optname VALUE
    --optname=VALUE
 
-An optional third argument may be present to specify a default value, if not
-provided by the invocation:
+If the name field ends in a C<@> character, a value is expected for the option
+and can be specified multiple times. All the values will be collected into an
+ARRAY reference.
 
-   :Command_opt("optname", "description", "default")
+If the name field ends in a C<+> character, the option can be specified
+multiple times and the total count will be used as the value.
+
+If the name field ends in a C<!> character, the option is negatable. An option
+name of C<--no-OPTNAME> is recognised and will reset the value to C<undef>. By
+setting a default of some true value (e.g. C<1>) you can detect if this has
+happened.
+
+An optional third argument may be present to specify a default value, if not
+provided by the invocation.
 
 =cut
 

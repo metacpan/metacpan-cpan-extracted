@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use vars qw/$VERSION $AUTOLOAD/;
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
 =head1 NAME
 
@@ -810,7 +810,7 @@ sub _xmldecl {
   # use it to create a <!DOCTYPE ...> and to indicate that this
   # document can't stand alone.
   my $doctype = $this->xmldtd($this->{xml}{dtd} // $this->{dtd});
-  my $standalone = $doctype ? "no" : "yes";
+  my $standalone;
 
   for (my $i = 0; $i < $#args; $i += 2) {
          if ($args[$i] eq 'version'   ) {
@@ -824,6 +824,7 @@ sub _xmldecl {
     }
   }
 
+  $standalone = "no" if $doctype;;
   $version    =    qq{ version="$version"}    if defined    $version;
   $encoding   =   qq{ encoding="$encoding"}   if defined   $encoding;
   $standalone = qq{ standalone="$standalone"} if defined $standalone;

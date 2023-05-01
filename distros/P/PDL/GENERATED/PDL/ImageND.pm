@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 4 "imagend.pd"
 
+#line 4 "imagend.pd"
 
 =head1 NAME
 
@@ -51,11 +51,6 @@ use strict;
 use warnings;
 #line 53 "ImageND.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -63,17 +58,11 @@ use warnings;
 
 
 
+
 #line 95 "imagend.pd"
 
-
 use Carp;
-#line 71 "ImageND.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 66 "ImageND.pm"
 
 =head2 convolve
 
@@ -98,20 +87,15 @@ This routine is kept for backwards compatibility with earlier scripts;
 for most purposes you want L<convolveND|PDL::ImageND/convolveND> instead:
 it runs faster and handles a variety of boundary conditions.
 
-
-
 =for bad
 
 convolve does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 111 "ImageND.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -134,19 +118,17 @@ sub PDL::convolve{
     }
     return $c;
 }
-#line 138 "ImageND.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *convolve = \&PDL::convolve;
-#line 145 "ImageND.pm"
+
+
 
 
 
 #line 225 "imagend.pd"
-
 
 =head2 ninterpol()
 
@@ -174,7 +156,6 @@ which runs somewhat slower.
 
 =cut
 
-
 *ninterpol = \&PDL::ninterpol;
 
 sub PDL::ninterpol {
@@ -188,13 +169,7 @@ sub PDL::ninterpol {
     for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
     $y;
 }
-#line 192 "ImageND.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 173 "ImageND.pm"
 
 =head2 rebin
 
@@ -226,20 +201,15 @@ Expansion is performed by sampling; reduction is performed by averaging.
 If you want different behavior, use L<PDL::Transform::map|PDL::Transform/map>
 instead.  PDL::Transform::map runs slower but is more flexible.
 
-
-
 =for bad
 
 rebin does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 239 "ImageND.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -292,19 +262,16 @@ sub PDL::rebin {
       return $x -> copy;
     }
 }
-#line 296 "ImageND.pm"
 
 
-
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rebin = \&PDL::rebin;
-#line 303 "ImageND.pm"
+
+
 
 
 
 #line 378 "imagend.pd"
-
 
 =head2 circ_mean_p
 
@@ -319,7 +286,6 @@ the projection. Optionally takes the center to be used.
    $cmean=circ_mean_p($im,{Center => [10,10]});
 
 =cut
-
 
 sub circ_mean_p {
  my ($x,$opt) = @_;
@@ -353,7 +319,6 @@ Optionally takes the center to be used.
 
 =cut
 
-
 sub circ_mean {
  my ($x,$opt) = @_;
  my ($rad,$sum,$norm,$a1);
@@ -374,13 +339,8 @@ sub circ_mean {
 
  return $x;
 }
-#line 378 "ImageND.pm"
-
-
 
 #line 454 "imagend.pd"
-
-
 =head2 kernctr
 
 =for ref
@@ -396,7 +356,6 @@ kernctr centres a small kernel to emulate the behaviour of the direct
 convolution routines.
 
 =cut
-
 
 *kernctr = \&PDL::kernctr;
 
@@ -436,20 +395,13 @@ sub PDL::kernctr {
     }
     $newk;
 }
-#line 440 "ImageND.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 399 "ImageND.pm"
 
 =head2 convolveND
 
 =for sig
 
   Signature: (k0(); pdl *k; pdl *aa; pdl *a)
-
 
 =for ref
 
@@ -471,7 +423,6 @@ rounded up to the next higher pixel (e.g. (1,2) for a 3x4 kernel).
 This mimics the behavior of the earlier L</convolve> and
 L<fftconvolve|PDL::FFT/fftconvolve()> routines, so convolveND is a drop-in
 replacement for them.
-
 
 The kernel may be any size compared to the image, in any dimension.
 
@@ -533,20 +484,15 @@ than a dedicated broadcastloop.
 The direct copying code uses PP primarily for the generic typing: it includes
 its own broadcastloops.
 
-
-
 =for bad
 
 convolveND does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 546 "ImageND.pm"
 
 
 
-#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 use PDL::Options;
@@ -581,7 +527,7 @@ sub PDL::convolveND {
   ## Handle options -- $def is a static variable so it only gets set up once.
   our $def;
   unless(defined($def)) {
-    $def = new PDL::Options( {
+    $def = PDL::Options->new( {
                               Method=>'a',
                               Boundary=>'t'
                              }
@@ -650,24 +596,21 @@ sub PDL::convolveND {
 
   }
 
-
   $x;
 }
-#line 657 "ImageND.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *convolveND = \&PDL::convolveND;
-#line 664 "ImageND.pm"
+
+
 
 
 
 
 
 #line 34 "imagend.pd"
-
 
 =head1 AUTHORS
 
@@ -679,10 +622,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 683 "ImageND.pm"
-
-
-
+#line 626 "ImageND.pm"
 
 # Exit with OK status
 

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "Carp" : "0",
             "Encode" : "0",
             "HTTP::Request" : "0",
-            "JSON" : "2.27",
+            "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "5.5",
             "URI" : "0",
             "perl" : "5.008001"
@@ -60,6 +60,6 @@
          "x_mailto" : "bug-CGI-Info@rt.cpan.org"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

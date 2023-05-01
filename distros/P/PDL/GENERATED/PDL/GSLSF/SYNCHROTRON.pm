@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_synchrotron.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::SYNCHROTRON - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "SYNCHROTRON.pm"
-
-
-
-
-
+#line 40 "SYNCHROTRON.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ First synchrotron function: synchrotron_1(x) = x Integral[ K_{5/3}(t), {t, x, In
 gsl_sf_synchrotron_1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "SYNCHROTRON.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_synchrotron_1 = \&PDL::gsl_sf_synchrotron_1;
-#line 81 "SYNCHROTRON.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,16 +89,14 @@ Second synchroton function: synchrotron_2(x) = x * K_{2/3}(x)
 gsl_sf_synchrotron_2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "SYNCHROTRON.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_synchrotron_2 = \&PDL::gsl_sf_synchrotron_2;
-#line 113 "SYNCHROTRON.pm"
+
+
 
 
 
@@ -129,10 +116,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 133 "SYNCHROTRON.pm"
-
-
-
+#line 120 "SYNCHROTRON.pm"
 
 # Exit with OK status
 

@@ -20,7 +20,9 @@ Bonaccorso
 Branislav
 Brendan
 Byrd
+Ceccarelli
 Chase
+Costa
 David
 Dorian
 Dubois
@@ -30,6 +32,7 @@ FAT
 Fiegehenn
 Fredric
 Förtsch
+Gianni
 Gisle
 Graham
 Herzog
@@ -43,6 +46,7 @@ ISBNs
 Ishigaki
 James
 Jan
+Joenio
 John
 Julien
 Kaitlyn
@@ -85,6 +89,7 @@ Ryan
 Salvatore
 Schmidt
 Schwern
+Sebastian
 Shoichi
 Skyttä
 Slaven
@@ -102,6 +107,7 @@ URL
 Unix
 Ville
 Whitener
+Willing
 Win32
 WithBase
 Zahradník
@@ -130,6 +136,7 @@ file
 foy
 ftp
 gerard
+gianni
 gisle
 gopher
 haarg
@@ -141,6 +148,7 @@ https
 isbn
 ishigaki
 jand
+joenio
 john
 jraspass
 kapranoff
@@ -171,6 +179,7 @@ rtsp
 rtspu
 ryker
 schwern
+sewi
 sftp
 simbabque
 sip
@@ -183,6 +192,8 @@ symkat
 telnet
 tn3270
 torsten
+unicode
 uppercasing
 urn
 ville
+xn

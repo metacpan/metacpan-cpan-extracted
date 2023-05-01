@@ -333,9 +333,10 @@ pdl_error pdl_destroytransform(pdl_trans *trans,int ensure,int *wd, int recurse_
 	if (!trans->vtable)
 		return pdl_make_error(PDL_EFATAL, "ZERO VTABLE DESTTRAN 0x%p %d\n",trans,ensure);
 	if (!ismutual) for(j=0; j<trans->vtable->nparents; j++)
+	  if (!trans->pdls[j]) return pdl_make_error(PDL_EFATAL, "NULL pdls[%td] in %s", j, trans->vtable->name); else
 	  if (trans->pdls[j]->state & PDL_DATAFLOW_ANY) { ismutual=1; break; }
 	PDLDEBUG_f(printf("pdl_destroytransform %s=%p (ensure=%d ismutual=%d)\n",
-			  trans->vtable ? trans->vtable->name : "NULL",
+			  trans->vtable->name,
 			  (void*)trans,ensure,ismutual));
 	if(ensure)
 		PDL_ACCUMERROR(PDL_err, pdl__ensure_trans(trans,ismutual ? 0 : PDL_PARENTDIMSCHANGED,wd, recurse_count+1));
@@ -457,14 +458,14 @@ pdl_error pdl_destroy(pdl *it) {
 
 /* Straight copy, no dataflow */
 pdl *pdl_hard_copy(pdl *src) {
+	PDLDEBUG_f(printf("pdl_hard_copy (src=%p): ", src));
 	pdl_error PDL_err = pdl_make_physical(src); /* Wasteful XXX... should be lazier */
 	if (PDL_err.error) return NULL;
 	int i;
-	PDLDEBUG_f(printf("pdl_hard_copy\n"));
 	pdl *it = pdl_pdlnew();
 	if (!it) return it;
 	it->state = 0;
-	PDLDEBUG_f(printf("pdl_hard_copy (%p): ", src);pdl_dump(it));
+	PDLDEBUG_f(printf("pdl_hard_copy (src=%p): ", src);pdl_dump(it));
 	it->datatype = src->datatype;
 	PDL_err = pdl_setdims(it,src->dims,src->ndims);
 	if (PDL_err.error) { pdl_destroy(it); return NULL; }
@@ -606,6 +607,7 @@ pdl_error pdl__addchildtrans(pdl *it,pdl_trans *trans)
 
 pdl_error pdl_make_physdims(pdl *it) {
 	pdl_error PDL_err = {0, NULL, 0};
+	if (!it) return pdl_make_error_simple(PDL_EFATAL, "make_physdims called with NULL");
 	PDL_Indx i;
 	int c = (it->state & PDL_PARENTDIMSCHANGED);
 	PDLDEBUG_f(printf("make_physdims %p (%X)\n",(void*)it, c));

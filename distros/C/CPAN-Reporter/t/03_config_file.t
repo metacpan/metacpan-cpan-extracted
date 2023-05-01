@@ -7,14 +7,15 @@ select(STDOUT); $|=1;
 
 use Test::More;
 use Config::Tiny;
-use IO::CaptureOutput qw/capture/;
+use Capture::Tiny qw/capture/;
 use File::Basename qw/basename/;
 use File::Glob qw/bsd_glob/;
 use File::Spec;
-use File::Temp qw/tempdir/;
+use File::Temp;
 use File::Path qw/mkpath/;
-use t::Frontend;
-use t::MockHomeDir;
+use lib 't/lib';
+use Frontend;
+use MockHomeDir;
 
 plan tests => 62;
 #plan 'no_plan';
@@ -23,7 +24,7 @@ plan tests => 62;
 # Fixtures
 #--------------------------------------------------------------------------#
 
-my $config_dir = File::Spec->catdir( t::MockHomeDir::home_dir, ".cpanreporter" );
+my $config_dir = File::Spec->catdir( MockHomeDir::home_dir, ".cpanreporter" );
 my $config_file = File::Spec->catfile( $config_dir, "config.ini" );
 my $metabase_file = File::Spec->catfile( $config_dir, 'metabase_id.json' );
 my $default_options = {
@@ -82,10 +83,11 @@ ok( ! -f $config_file,
     "no config file yet"
 );
 
-is( capture(sub{CPAN::Reporter::Config::_open_config_file()}, \$stdout, \$stderr),
-    undef,
-    "opening non-existent file returns undef"
-);
+my $ret;
+($stdout, $stderr) = capture {
+    $ret = CPAN::Reporter::Config::_open_config_file();
+};
+is( $ret, undef, "opening non-existent file returns undef" );
 
 like( $stdout, "/couldn't read configuration file/ms",
     "opening non-existent file gives a warning"
@@ -94,9 +96,8 @@ like( $stdout, "/couldn't read configuration file/ms",
 {
     local $ENV{PERL_MM_USE_DEFAULT} = 1;  # use prompt defaults
     eval {
-        ok( $rc = capture(sub{CPAN::Reporter::configure()}, \$stdout, \$stderr),
-            "configure() returned true"
-        );
+        ( $stdout, $stderr ) = capture { $rc = CPAN::Reporter::configure() };
+        ok( $rc, "configure() returned true" );
     };
     diag "STDOUT:\n$stdout\nSTDERR:$stderr\n" if $@; 
 }
@@ -139,10 +140,11 @@ SKIP:
 
     {
         local $ENV{PERL_MM_USE_DEFAULT} = 1;  # use prompt defaults
-        is( capture(sub{CPAN::Reporter::configure()}, \$stdout, \$stderr),
-            undef,
-            "configure() is undef if file not readable"
-        );
+
+        my $ret;
+        ($stdout, $stderr) = capture { $ret = CPAN::Reporter::configure() };
+
+        is( $ret, undef, "configure() is undef if file not readable" );
     }
 
     like( $stdout, "/couldn't read configuration file/",
@@ -168,10 +170,11 @@ SKIP:
 
     {
         local $ENV{PERL_MM_USE_DEFAULT} = 1;  # use prompt defaults
-        is( capture(sub{CPAN::Reporter::configure()}, \$stdout, \$stderr),
-            undef,
-            "configure() is undef if file not writeable"
-        );
+
+        my $ret;
+        ($stdout, $stderr) = capture { $ret = CPAN::Reporter::configure() };
+
+        is( $ret, undef, "configure() is undef if file not writeable" );
     }
 
     like( $stdout, "/error writing config file/",
@@ -208,9 +211,11 @@ SKIP:
 
     {
         local $ENV{PERL_MM_USE_DEFAULT} = 1;  # use prompt defaults
-        ok( capture(sub{CPAN::Reporter::configure()}, \$stdout, \$stderr),
-            "configure() ran again successfully"
-        );
+
+        my $ret;
+        ($stdout, $stderr) = capture { $ret = CPAN::Reporter::configure() };
+
+        ok( $ret, "configure() ran again successfully" );
     }
 
     like( $stdout, "/$bogus_email/",
@@ -261,9 +266,9 @@ SKIP:
 
     $tiny = Config::Tiny->read( $config_file );
     my $parsed_config;
-    capture sub{         
+    ($stdout, $stderr) = capture {
         $parsed_config = CPAN::Reporter::Config::_get_config_options( $tiny );
-    }, \$stdout, \$stderr;
+    };
 
     like( $stdout, "/invalid option 'invalid:invalid' in 'edit_report'. Using default instead./",
         "bad option warning seen"
@@ -300,9 +305,9 @@ SKIP:
 
         $tiny = Config::Tiny->read( $config_file );
         my $parsed_config;
-        capture sub{         
+        ($stdout, $stderr) = capture {
             $parsed_config = CPAN::Reporter::Config::_get_config_options( $tiny );
-        }, \$stdout, \$stderr;
+        };
 
         like( $stdout, "/invalid option 'bogus.skipfile' in '$skip_type'. Using default instead./",
             "bad $skip_type option warning seen"
@@ -328,9 +333,9 @@ SKIP:
         );
 
         $tiny = Config::Tiny->read( $config_file );
-        capture sub{         
+        ($stdout, $stderr) = capture {
             $parsed_config = CPAN::Reporter::Config::_get_config_options( $tiny );
-        }, \$stdout, \$stderr;
+        };
 
         is( $stdout, q{},
             "absolute $skip_type ok"
@@ -352,9 +357,9 @@ SKIP:
         );
 
         $tiny = Config::Tiny->read( $config_file );
-        capture sub{         
+        ($stdout, $stderr) = capture {
             $parsed_config = CPAN::Reporter::Config::_get_config_options( $tiny );
-        }, \$stdout, \$stderr;
+        };
 
         is( $stdout, q{},
             "relative $skip_type ok"

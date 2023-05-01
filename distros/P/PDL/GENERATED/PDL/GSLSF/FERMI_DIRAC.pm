@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_fermi_dirac.pd"
 
 use strict;
@@ -39,7 +40,6 @@ Complete Fermi-Dirac Integrals:
 
  F_j(x)   := 1/Gamma[j+1] Integral[ t^j /(Exp[t-x] + 1), {t,0,Infinity}]
 
-
 Incomplete Fermi-Dirac Integrals:
 
  F_j(x,b) := 1/Gamma[j+1] Integral[ t^j /(Exp[t-x] + 1), {t,b,Infinity}]
@@ -47,19 +47,12 @@ Incomplete Fermi-Dirac Integrals:
 =cut
 #line 49 "FERMI_DIRAC.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -78,20 +71,15 @@ Complete integral F_j(x) for integer j
 gsl_sf_fermi_dirac_int does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 84 "FERMI_DIRAC.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_int = \&PDL::gsl_sf_fermi_dirac_int;
-#line 91 "FERMI_DIRAC.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -110,20 +98,15 @@ Complete integral F_{-1/2}(x)
 gsl_sf_fermi_dirac_mhalf does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 116 "FERMI_DIRAC.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_mhalf = \&PDL::gsl_sf_fermi_dirac_mhalf;
-#line 123 "FERMI_DIRAC.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -142,20 +125,15 @@ Complete integral F_{1/2}(x)
 gsl_sf_fermi_dirac_half does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 148 "FERMI_DIRAC.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_half = \&PDL::gsl_sf_fermi_dirac_half;
-#line 155 "FERMI_DIRAC.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -174,20 +152,15 @@ Complete integral F_{3/2}(x)
 gsl_sf_fermi_dirac_3half does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 180 "FERMI_DIRAC.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_3half = \&PDL::gsl_sf_fermi_dirac_3half;
-#line 187 "FERMI_DIRAC.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -206,16 +179,14 @@ Incomplete integral F_0(x,b) = ln(1 + e^(b-x)) - (b-x)
 gsl_sf_fermi_dirac_inc_0 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 212 "FERMI_DIRAC.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_inc_0 = \&PDL::gsl_sf_fermi_dirac_inc_0;
-#line 219 "FERMI_DIRAC.pm"
+
+
 
 
 
@@ -235,10 +206,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 239 "FERMI_DIRAC.pm"
-
-
-
+#line 210 "FERMI_DIRAC.pm"
 
 # Exit with OK status
 

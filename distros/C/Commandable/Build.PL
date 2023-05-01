@@ -15,9 +15,8 @@ my $build = Module::Build->new(
       'Module::Pluggable::Object' => 0,
    },
    test_requires => {
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
-      'Test::Warnings' => 0,
+      'Test::NoWarnings' => 0,
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

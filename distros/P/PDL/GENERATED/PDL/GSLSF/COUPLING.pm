@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_coupling.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::COUPLING - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "COUPLING.pm"
-
-
-
-
-
+#line 40 "COUPLING.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ This is an interface to the Special Function package present in the GNU Scientif
 gsl_sf_coupling_3j does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "COUPLING.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_coupling_3j = \&PDL::gsl_sf_coupling_3j;
-#line 81 "COUPLING.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 gsl_sf_coupling_6j does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "COUPLING.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_coupling_6j = \&PDL::gsl_sf_coupling_6j;
-#line 113 "COUPLING.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,16 +116,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 gsl_sf_coupling_9j does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "COUPLING.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_coupling_9j = \&PDL::gsl_sf_coupling_9j;
-#line 145 "COUPLING.pm"
+
+
 
 
 
@@ -161,10 +143,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 165 "COUPLING.pm"
-
-
-
+#line 147 "COUPLING.pm"
 
 # Exit with OK status
 

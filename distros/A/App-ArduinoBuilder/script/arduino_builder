@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.026;
 use strict;
 use warnings;
 use utf8;
@@ -29,7 +29,7 @@ arduino_builder - Build system for Arduino programs
 
 =head1 SYNOPSIS
 
-  arduino_builder ...
+  arduino_builder [options] command
 
 =head1 DESCRIPTION
 
@@ -62,24 +62,57 @@ is allowed to be missing):
 
 =over 4
 
+=item - I<Command line options>. These are not actually configuration files but
+options passed with the C<--config> or C<--menu> command line switches will take
+precedance over any other configuration files that will be read afterward.
+
 =item - F<arduino_builder.local> file in the project directory.
 
 =item - F<arduino_builder.config> file in the project directory.
 
-=item - F<boards.local.txt> file in the platform package directory, like all
-other files below.
+=item - F<boards.local.txt> file in the platform package directory.
 
-=item - F<boards.txt>
+=item - F<boards.txt> file in the platform package directory.
 
-=item - F<platform.local.txt>
+=item - F<platform.local.txt> file in the platform package directory.
 
-=item - F<platform.txt>
+=item - F<platform.txt> file in the platform package directory.
 
-=item - F<programmers.local.txt>
+=item - F<programmers.local.txt> file in the platform package directory.
 
-=item - F<programmers.txt.txt>
+=item - F<programmers.txt.txt> file in the platform package directory.
 
 =back
+
+=head1 CONFIGURATION VALUES
+
+=over 4
+
+=item C<builder.project_name>
+
+=item C<builder.package.name>
+
+=item C<builder.package.path>
+
+=item C<builder.package.arch>
+
+=item C<builder.package.board>
+
+=item C<builder.default_build_dir>
+
+=item C<builder.source.path>
+
+=item C<builder.source.is_recursive>
+
+=item C<builder.menu.XXX>
+
+=item C<builder.parallelize>
+
+=back
+
+Other standard properties of the Arduino build system,
+L<documented here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#global-predefined-properties>,
+are also implemented and can be used when defining the config of your project.
 
 =head1 CAVEATS
 

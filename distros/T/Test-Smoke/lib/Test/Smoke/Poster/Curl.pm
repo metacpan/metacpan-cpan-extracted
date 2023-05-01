@@ -6,7 +6,9 @@ our $VERSION = '0.001';
 
 use base 'Test::Smoke::Poster::Base';
 
-use CGI::Util ();                # escape() for HTML
+use File::Temp qw(tempfile);
+use URI::Escape qw(uri_escape);
+
 use Test::Smoke::Util::Execute;
 
 =head1 NAME
@@ -53,16 +55,23 @@ sub _post_data {
     $self->log_info("Posting to %s via %s.", $self->smokedb_url, $self->poster);
     $self->log_debug("Report data: %s", my $json = $self->get_json);
 
-    my $form_data = sprintf("json=%s", CGI::Util::escape($json));
+    my $form_data = sprintf("json=%s", uri_escape($json));
+    my ($fh, $filename) = tempfile('curl-tsrepostXXXXXX', TMPDIR => 1);
+    print $fh $form_data;
+    close($fh);
+
     my $response = $self->curl->run(
-        ($self->v ? () : '--silent'),
         '-A' => $self->agent_string(),
-        '-d' => $form_data,
+        '-d' => "\@$filename",
+        ($self->ua_timeout    ? ('--max-time' => $self->ua_timeout) : ()),
+        ($self->curl->verbose ? () : '--silent'),
+        @{ $self->curlargs },
         $self->smokedb_url,
     );
+    1 while unlink($filename);
 
     if ($self->curl->exitcode) {
-        $self->log_warn("[POST] curl exitcode: %d", $self->curl->exitcode);
+        $self->log_warn("[POST] curl exitcode: %d %s", $self->curl->exitcode, $response || '');
         die sprintf(
             "POST to '%s' curl failed: %d\n",
             $self->smokedb_url,

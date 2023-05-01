@@ -10,8 +10,8 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit;
-our $VERSION = '3.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-17'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.008'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-30'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # TODO FIXME: Integrate with Spreadsheet::Read and provide a formatting API
 #
@@ -1828,11 +1828,19 @@ sub alias(@) {
   my ($colx, $colx_desc, $num_cols, $useraliases, $rows, $silent, $debug)
     = @$$self{qw/colx colx_desc num_cols useraliases rows silent debug/};
 
+  my ($file, $lno) = __fn_ln_methname();
+
   my @cxlist;
   while (@_) {
     my $ident = _validate_ident( shift @_ );
     my $spec  = shift @_;
 
+    if (my $wheredefined = $useraliases->{$ident}) {
+      croak "'$ident' is already a user-defined alias",
+            " for cx ", scalar($self->_spec2cx($ident)), 
+            " defined at ", $wheredefined, "\n"
+            #" (for cx ", scalar($self->_spec2cx($ident)), ")"
+    }
     croak "'$ident' is already a user-defined alias (for cx ",
           scalar($self->_spec2cx($ident)), ")"
       if $useraliases->{$ident};
@@ -1849,7 +1857,7 @@ sub alias(@) {
 
     $colx->{$ident} = $cx;
     $colx_desc->{$ident} = "alias for ".__fmt_cx($cx)." (".quotekey($spec).")";
-    $useraliases->{$ident} = 1;
+    $useraliases->{$ident} = "${file}:$lno";
     push @cxlist, $cx;
   }
   $self->_rebuild_colx();
@@ -2009,7 +2017,7 @@ sub _autodetect_title_rx {
         my @shortlist = grep{ $_->[0] >= $first_cx && $_->[0] <= $last_cx }
                         @list;
         if (@shortlist == 0) {
-          push @nd_reasons, ivis 'rx $rx: Matched \'$spec\' but in unacceptable cx '.alvis(map{$_->[0]} @list);
+          push @nd_reasons, ivis 'rx $rx: Matched \'$spec\' but in unacceptable cx '.avisl(map{$_->[0]} @list);
           next RX
         }
         if (! grep{ $_->[1] =~ /title/i } @shortlist) {
@@ -2206,26 +2214,38 @@ sub delete_col($) { goto &delete_cols; }
 # Used by new() and options()
 sub _set_verbose_debug_silent(@) {
   my $self = shift;
+  my $oldval;
   foreach (pairs @_) {
     my ($key, $val) = @$_;
+    $oldval = $$self->{$key};
+    next 
+      unless !!$oldval != !!$val;
     if ($key eq "silent") {
       $$self->{$key} = $val;
     }
     elsif ($key eq "verbose") {
-      $$self->{$key} = $val;
-      $$self->{silent} = 0 if $val; #?? might still want to suppress warnings
+      if ($val) {
+        $$self->{saved_silent}  = $$self->{silent};
+        $$self->{silent} = 0; #?? might still want to suppress warnings
+      } else {
+        $$self->{silent} = delete $$self->{saved_silent};
+      }
     }
     elsif ($key eq "debug") {
-      $$self->{$key} = $val;
       if ($val) {
+        $$self->{saved_verbose} = $$self->{verbose};
+        $$self->{saved_silent}  = $$self->{silent};
         $$self->{silent} = 0;
         $$self->{verbose} = "forced by {debug}";
       } else {
-        $$self->{verbose} = 0 if u($$self->{verbose}) eq "forced by {debug}";
+        $$self->{verbose} = delete $$self->{saved_verbose};
+        $$self->{silent}  = delete $$self->{saved_silent};
       }
     }
     else { croak "options: Unknown option key '$key'\n"; }
+    $$self->{$key} = $val;
   }
+  $oldval 
 }
 
 # Get or set option(s).
@@ -2234,19 +2254,20 @@ sub _set_verbose_debug_silent(@) {
 sub options(@) {
   my $self = &__self_ifexists;
   if (@_ == 0) {
-    my $self = &__selfmust; # 'retrieve' is valid only if object exists
+    $self //= &__selfmust; # 'retrieve' is valid only if object exists
     my @result;
     foreach my $key (qw/verbose debug silent/) {
       push(@result, $key, $$self->{$key}) if exists $$self->{$key};
     }
-    croak "(list) returned but called in scalar/void context"
+    croak "(list) returned but called in scalar or void context"
       unless wantarray;
     return @result;
   }
   my $opthash = &__opthash; # shift off 1st arg iff it is a hashref
   my @eff_args = (%$opthash, &__validate_pairs);
-  $self->_set_verbose_debug_silent(@eff_args);
-  $self->_logmethifv(\__fmt_pairlist(@eff_args)); # returns $self
+  my $oldval = $self->_set_verbose_debug_silent(@eff_args);
+  $self->_logmethretifv([\__fmt_pairlist(@eff_args)], $oldval);
+  $oldval
 }
 
 sub _colspecs_to_cxs_ckunique {
@@ -2744,7 +2765,7 @@ sub write_csv(*;@) {
       #removed above... Text::CSV::known_attributes(),
       qw/verbose silent debug/,
     );
-    croak "Unrecognized OPTION(s): ",alvisq(keys %notok) if %notok;
+    croak "Unrecognized OPTION(s): ",avislq(keys %notok) if %notok;
   }
 
   $opts->{iolayers} //= $$self->{iolayers} // "";
@@ -3370,8 +3391,9 @@ The I<Functions> and helper variables implicitly operate on a
 package-global "current sheet" object, which can be switched at will.
 OO I<Methods> operate on the C<sheet> object they are called on.
 
-Every function which operates on the "current sheet" has a
-corresponding OO method with the same name and the same arguments.
+Functions which operates on the "current sheet" have
+corresponding OO methods with the same names and arguments
+(note that method args must be enclosed by parenthesis).
 
 =head1 TIED COLUMN VARIABLES
 
@@ -3438,9 +3460,8 @@ Auto-detection options:
 =back
 
 The first row is used which includes the C<required> title(s), if any,
-and has non-empty titles in all columns.
-If C<first_cx> and/or C<last_cx> are specified then columns outside that
-range are ignored and may by empty.
+and has non-empty titles in all columns, or columns 
+C<first_cx> through C<last_cx>.
 
 =over 2
 
@@ -3472,6 +3493,8 @@ workbook was saved will be retrieved.
 
 =item debug => bool
 
+Probably what you expect.
+
 =item Other C<< key => value >> pairs override details of CSV parsing.
 
 See L<Text::CSV>.  UTF-8 encoding is assumed by default.
@@ -3497,17 +3520,19 @@ C<$row{IDENT}> and a tied variable C<$IDENT> will refer to the specified column.
 
 Aliases automatically track the column if it's position changes.
 
-Regular Expressions are matched against titles only, and must match
-exactly one column or else an exception is thrown.
-Other kinds of COLSPECs may be titles, existing alias names, column letters, etc.
+Regular Expressions are matched against titles only, and an exception is
+thrown if more than one title matches.
+
+Otherwise, COLSPECs may be titles, existing alias names, column letters, etc.
 (see "COLUMN SPECIFIERS" for details).
 
 The COLSPEC is evaluated before the alias is created, so
 
    alias B => "B";
 
-would make "B" henceforth refer to the current second column (or a different
-column which has title "B" if such exists) even if that column later moves.
+would make "B" henceforth refer to the column with title "B", if one exists,
+or the second column (treating COLSPEC as a letter-code), even if the column
+is later moved.
 
 RETURNS: The 0-based column indices of the aliased column(s).
 
@@ -3545,7 +3570,7 @@ with underscrores (see "AUTOMATIC ALIASES"),
 
 =back
 
-See "CONFLICT RESOLUTION" about name clashes.
+See "CONFLICT RESOLUTION" for how ambiguity is resolved.
 
 Multiple calls accumulate, including with different sheets.
 
@@ -3615,7 +3640,7 @@ immediately (re-)examined and the corresponding COLSPECs become valid,
 e.g. you can reference a column by it's title or a derived identifier.
 
 Note: Setting C<title_rx> this way is rarely needed because
-C<read_spreadsheet> automatically sets the title row.
+by default C<read_spreadsheet> sets the title row.
 
 =head2 title_rx undef ;
 
@@ -3668,12 +3693,12 @@ Rows may be safely inserted or deleted during 'apply';
 rows inserted after the currently-being-visited row will be visited
 at the proper time.
 
-An 'apply' sub may change the 'current sheet', after which
-tied column variables will refer to the other sheet and
-any C<apply> active for that sheet.  It should take care to restore
-the original sheet before returning
-(perhaps using C<Guard::scope_guard>).
 Nested and recursive C<apply>s are allowed.
+When an 'apply' changes the 'current sheet', 
+tied variables then refer to the other sheet and
+any C<apply> active for that sheet.  
+With nested 'apply's, take care restore the original sheet before returning
+(perhaps using C<Guard::scope_guard>).
 
 B<MAGIC VARIABLES USED DURING APPLY>
 
@@ -3681,14 +3706,14 @@ These variables refer to the row currently being visited:
 
 =over 2
 
-C<$rx> is the 0-based index of the current row.
+B<@crow> is an array aliased to the current row's cells.
 
-C<@crow> is an array aliased to the current row's cells.
-
-C<%crow> is a hash aliased to the same cells,
+B<%crow> is a hash aliased to the same cells,
 indexed by alias, title, letter code, etc. (any COLSPEC).
 
-C<$linenum> is the starting line number of the current row if the
+B<$rx> is the 0-based index of the current row.
+
+B<$linenum> is the starting line number of the current row if the
 data came from a .csv file.
 
 For example, the "Account Number" column in the SYNOPSIS may be accessed
@@ -3735,7 +3760,7 @@ immediately after the indicated column (">$" to place at the end),
 or POSITION may directly specify the destination column
 using an unadorned COLSPEC.
 
-A non-absolute COLSPEC indicates the initial position of the referenced column.
+A non-absolute COLSPEC indicates the I<initial> position of the referenced column.
 
 =head2 insert_col  POSITION, newtitle ;
 
@@ -3773,7 +3798,7 @@ If no range is specified, then the range is the
 same as for C<apply> (namely: All rows after the title row unless
 limited by B<first_data_rx> .. B<last_data_rx>).
 
-In the comparison function globals $a and $b will contain row objects, which
+In the comparison function, globals $a and $b will contain row objects, which
 are dual-typed to act as either an array or hash ref to the cells
 in their row.  The corresponding original row indicies are also passed
 as parameters in C<@_>.
@@ -3793,7 +3818,7 @@ RETURNS: A list of the previous row indicies of all rows in the sheet.
 Multiple pairs may be given.  Title cell(s) are updated as indicated.
 
 Existing user-defined aliases are I<not> affected, i.e.,
-they continue to refer to the same columns as before.
+they continue to refer to the same columns as before even if the titles changed.
 
 =head2 join_cols_sep STRING COLSPEC+ ;
 
@@ -4039,7 +4064,7 @@ C<$title_rx> contains the 0-based row index of the title row
 and C<$title_row> is an alias for C<$rows[ $title_rx ]>.
 
 The title row is auto-detected by default.
-See C<title_rx> for how to control this.
+See C<read_spreadsheet> and C<title_rx> for how to control this.
 
 If a column title is modified, set C<$title_rx = undef;> to force re-detection.
 
@@ -4068,7 +4093,7 @@ Arguments which specify columns may be:
 
 =item (2) an actual "column title" **
 
-=item (3) a title with any leading & trailing spaces removed *
+=item (3) an actual title with any leading & trailing spaces removed *
 
 =item (4) an AUTOMATIC ALIAS identifier *
 
@@ -4111,9 +4136,8 @@ CONFLICT RESOLUTION
 
 A conflict occurs when a column key potentially refers to multiple
 columns. For example, "A", "B" etc. are standard column
-names, but they might also be titles of other columns in which
-case those names refer to the other columns.
-Warnings are printed about conflicts unless the C<silent> option
+names, but they might also be the actual titles of other columns.
+Warnings are printed about conflicts unless the B<silent> option
 is true (see C<options>).
 
 =over
@@ -4156,7 +4180,7 @@ executed. This is relevant for commands which re-number or delete columns.
 All the Functions listed above (except for C<new_sheet>) have
 corresponding methods with the same arguments.
 
-However arguments to methods must be enclosed in parenthesis
+However method arguments must be enclosed in parenthesis
 and bare {code} blocks may not be used; a sub{...} ref
 should be passed to C<apply> etc.
 
@@ -4184,23 +4208,23 @@ instead of (or in addition to) an {OPTIONS} hashref.
 
 =head2 $sheet->last_data_rx() ;     # Analogous to $last_data_rx
 
+=head2 $sheet->title_rx() ;         # Analogous to to $title_rx
+
 =head2 $sheet->title_row() ;        # Analogous to $title_row
 
 =head2 $sheet->rx() ;               # Current rx in apply, analogous to to $rx
+
+=head2 $sheet->title_rx(rxvalue) ;  # Analogous to assigning to $title_rx (changes title row)
 
 =head2 $sheet->crow();              # Current row in apply (a dual-typed row object)
 
 =head2 $sheet->linenum() ;          # Analogous to to $linenum
 
-=head2 $sheet->title_rx() ;         # Analogous to to $title_rx
-
-=head2 $sheet->title_rx(rxvalue) ;  # (Re-)set the title row index
-
 =head2 $sheet->get(rx,ident) ;      # Analogous to to $rows[rx]{ident}
 
 =head2 $sheet->set(rx,ident,value); # Analogous to to $rows[rx]{ident} = value
 
-=head2 $sheet->data_source();       # "description of sheet" (e.g. path read)
+=head2 $sheet->data_source();       # Returns "description of sheet" (e.g. path read)
 
 =head2 $sheet->sheetname();         # valid if input was a spreadsheet, else undef
 
@@ -4226,10 +4250,6 @@ although it uses modules based on Twig which are quite slow.
 =head1 THREAD SAFETY
 
 Unknown, and probably not worth the trouble to find out.
-The author wonders whether tied variables are compatible with
-the implementation of threads::shared.
-Even the OO API uses tied variables (for the magical row objects
-which behave as either an array or hash reference).
 
 =head1 FUTURE IDEAS
 

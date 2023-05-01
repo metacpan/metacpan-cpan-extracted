@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Manifest
 
+1.75  2023-04-29
+  - #!include_default now memory-only, not changing MANIFEST.SKIP file.
+  - support removed for MacOS Classic
+
 1.74  2023-04-28
   - Add some MANIFEST.SKIP patterns for bzr/brz
 

@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 1 "browser.pd"
 
+#line 1 "browser.pd"
 
 =head1 NAME
 
@@ -42,19 +42,12 @@ use strict;
 use warnings;
 #line 44 "Browser.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -77,32 +70,25 @@ browse a 2D array using terminal cursor keys
 This uses the CURSES library to allow one to scroll
 around a PDL array using the cursor keys.
 
-
-
-
-
 =for bad
 
 browse does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 92 "Browser.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *browse = \&PDL::browse;
-#line 99 "Browser.pm"
+
+
 
 
 
 
 
 #line 56 "browser.pd"
-
 
 =head1 AUTHOR
 
@@ -113,12 +99,8 @@ conditions. For details, see the file COPYING in the PDL
 distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
-
 =cut
-#line 119 "Browser.pm"
-
-
-
+#line 104 "Browser.pm"
 
 # Exit with OK status
 

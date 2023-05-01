@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Commandable::Finder::Packages;
 
@@ -27,12 +27,12 @@ package MyTest::Command::nothing {
       named_by_package => 1,
    );
 
-   is_deeply( [ sort map { $_->name } $finder->find_commands ],
+   is( [ sort map { $_->name } $finder->find_commands ],
       [qw( help one two )],
       '$finder->find_commands' );
 
    my $one = $finder->find_command( "one" );
-   is_deeply( { map { $_, $one->$_ } qw( name description package ) },
+   is( { map { $_, $one->$_ } qw( name description package ) },
       { name => "one", description => "the one command",
         package => "MyTest::Command::one", },
       '$finder->find_command' );

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-PromptIfStale
 
+0.058     2023-04-30 10:00:42Z
+          - add special handling for DynaLoader, which is no longer indexed
+
 0.057     2020-05-03 17:55:48Z
           - fix tests on Dist::Zilla <6.0 (seen especially on perl 5.10, 5.12)
 

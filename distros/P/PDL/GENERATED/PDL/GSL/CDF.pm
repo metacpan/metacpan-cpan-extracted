@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 4 "gsl_cdf.pd"
 
+#line 4 "gsl_cdf.pd"
 
 use strict;
 use warnings;
@@ -72,11 +72,6 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 =cut
 #line 74 "CDF.pm"
 
-
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -84,21 +79,15 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 
 
 
-#line 144 "gsl_cdf.pd"
 
+#line 144 "gsl_cdf.pd"
 
 =head2 The Beta Distribution (gsl_cdf_beta_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the beta distribution with parameters I<a> and I<b>.
 
 =cut
-#line 96 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 91 "CDF.pm"
 
 =head2 gsl_cdf_beta_P
 
@@ -108,27 +97,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_beta_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 121 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_beta_P = \&PDL::gsl_cdf_beta_P;
-#line 128 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -140,27 +122,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_beta_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 153 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_beta_Pinv = \&PDL::gsl_cdf_beta_Pinv;
-#line 160 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -172,27 +147,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_beta_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 185 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_beta_Q = \&PDL::gsl_cdf_beta_Q;
-#line 192 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -204,41 +172,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_beta_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 217 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_beta_Qinv = \&PDL::gsl_cdf_beta_Qinv;
-#line 224 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Binomial Distribution (gsl_cdf_binomial_*)
 
 These functions compute the cumulative distribution functions P(k), Q(k) for the binomial distribution with parameters I<p> and I<n>.
 
 =cut
-#line 236 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 199 "CDF.pm"
 
 =head2 gsl_cdf_binomial_P
 
@@ -248,27 +205,20 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_binomial_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 261 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_binomial_P = \&PDL::gsl_cdf_binomial_P;
-#line 268 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -280,41 +230,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_binomial_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 293 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_binomial_Q = \&PDL::gsl_cdf_binomial_Q;
-#line 300 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Cauchy Distribution (gsl_cdf_cauchy_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Cauchy distribution with scale parameter I<a>.
 
 =cut
-#line 312 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 257 "CDF.pm"
 
 =head2 gsl_cdf_cauchy_P
 
@@ -324,27 +263,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_cauchy_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 337 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_cauchy_P = \&PDL::gsl_cdf_cauchy_P;
-#line 344 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -356,27 +288,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_cauchy_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 369 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_cauchy_Pinv = \&PDL::gsl_cdf_cauchy_Pinv;
-#line 376 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -388,27 +313,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_cauchy_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 401 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_cauchy_Q = \&PDL::gsl_cdf_cauchy_Q;
-#line 408 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -420,41 +338,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_cauchy_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 433 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_cauchy_Qinv = \&PDL::gsl_cdf_cauchy_Qinv;
-#line 440 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Chi-squared Distribution (gsl_cdf_chisq_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the chi-squared distribution with I<nu> degrees of freedom.
 
 =cut
-#line 452 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 365 "CDF.pm"
 
 =head2 gsl_cdf_chisq_P
 
@@ -464,27 +371,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_chisq_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 477 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_chisq_P = \&PDL::gsl_cdf_chisq_P;
-#line 484 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -496,27 +396,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_chisq_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 509 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_chisq_Pinv = \&PDL::gsl_cdf_chisq_Pinv;
-#line 516 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -528,27 +421,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_chisq_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 541 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_chisq_Q = \&PDL::gsl_cdf_chisq_Q;
-#line 548 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -560,41 +446,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_chisq_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 573 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_chisq_Qinv = \&PDL::gsl_cdf_chisq_Qinv;
-#line 580 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Exponential Distribution (gsl_cdf_exponential_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the exponential distribution with mean I<mu>.
 
 =cut
-#line 592 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 473 "CDF.pm"
 
 =head2 gsl_cdf_exponential_P
 
@@ -604,27 +479,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_exponential_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 617 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_exponential_P = \&PDL::gsl_cdf_exponential_P;
-#line 624 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -636,27 +504,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_exponential_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 649 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_exponential_Pinv = \&PDL::gsl_cdf_exponential_Pinv;
-#line 656 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -668,27 +529,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_exponential_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 681 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_exponential_Q = \&PDL::gsl_cdf_exponential_Q;
-#line 688 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -700,41 +554,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_exponential_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 713 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_exponential_Qinv = \&PDL::gsl_cdf_exponential_Qinv;
-#line 720 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Exponential Power Distribution (gsl_cdf_exppow_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) for the exponential power distribution with parameters I<a> and I<b>.
 
 =cut
-#line 732 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 581 "CDF.pm"
 
 =head2 gsl_cdf_exppow_P
 
@@ -744,27 +587,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) for the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_exppow_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 757 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_exppow_P = \&PDL::gsl_cdf_exppow_P;
-#line 764 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -776,41 +612,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_exppow_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 789 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_exppow_Q = \&PDL::gsl_cdf_exppow_Q;
-#line 796 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The F-distribution (gsl_cdf_fdist_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the F-distribution with I<nu1> and I<nu2> degrees of freedom.
 
 =cut
-#line 808 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 639 "CDF.pm"
 
 =head2 gsl_cdf_fdist_P
 
@@ -820,27 +645,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_fdist_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 833 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_fdist_P = \&PDL::gsl_cdf_fdist_P;
-#line 840 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -852,27 +670,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_fdist_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 865 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_fdist_Pinv = \&PDL::gsl_cdf_fdist_Pinv;
-#line 872 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -884,27 +695,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_fdist_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 897 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_fdist_Q = \&PDL::gsl_cdf_fdist_Q;
-#line 904 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -916,41 +720,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_fdist_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 929 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_fdist_Qinv = \&PDL::gsl_cdf_fdist_Qinv;
-#line 936 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Flat (Uniform) Distribution (gsl_cdf_flat_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for a uniform distribution from I<a> to I<b>.
 
 =cut
-#line 948 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 747 "CDF.pm"
 
 =head2 gsl_cdf_flat_P
 
@@ -960,27 +753,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_flat_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 973 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_flat_P = \&PDL::gsl_cdf_flat_P;
-#line 980 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -992,27 +778,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_flat_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1005 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_flat_Pinv = \&PDL::gsl_cdf_flat_Pinv;
-#line 1012 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1024,27 +803,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_flat_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1037 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_flat_Q = \&PDL::gsl_cdf_flat_Q;
-#line 1044 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1056,41 +828,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_flat_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1069 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_flat_Qinv = \&PDL::gsl_cdf_flat_Qinv;
-#line 1076 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Gamma Distribution (gsl_cdf_gamma_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the gamma distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1088 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 855 "CDF.pm"
 
 =head2 gsl_cdf_gamma_P
 
@@ -1100,27 +861,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gamma_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1113 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gamma_P = \&PDL::gsl_cdf_gamma_P;
-#line 1120 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1132,27 +886,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gamma_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1145 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gamma_Pinv = \&PDL::gsl_cdf_gamma_Pinv;
-#line 1152 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1164,27 +911,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gamma_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1177 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gamma_Q = \&PDL::gsl_cdf_gamma_Q;
-#line 1184 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1196,41 +936,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gamma_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1209 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gamma_Qinv = \&PDL::gsl_cdf_gamma_Qinv;
-#line 1216 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Gaussian Distribution (gsl_cdf_gaussian_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Gaussian distribution with standard deviation I<sigma>.
 
 =cut
-#line 1228 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 963 "CDF.pm"
 
 =head2 gsl_cdf_gaussian_P
 
@@ -1240,27 +969,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gaussian_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1253 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gaussian_P = \&PDL::gsl_cdf_gaussian_P;
-#line 1260 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1272,27 +994,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gaussian_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1285 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gaussian_Pinv = \&PDL::gsl_cdf_gaussian_Pinv;
-#line 1292 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1304,27 +1019,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gaussian_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1317 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gaussian_Q = \&PDL::gsl_cdf_gaussian_Q;
-#line 1324 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1336,41 +1044,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gaussian_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1349 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gaussian_Qinv = \&PDL::gsl_cdf_gaussian_Qinv;
-#line 1356 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Geometric Distribution (gsl_cdf_geometric_*)
 
 These functions compute the cumulative distribution functions P(k), Q(k) for the geometric distribution with parameter I<p>.
 
 =cut
-#line 1368 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1071 "CDF.pm"
 
 =head2 gsl_cdf_geometric_P
 
@@ -1380,27 +1077,20 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_geometric_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1393 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_geometric_P = \&PDL::gsl_cdf_geometric_P;
-#line 1400 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1412,41 +1102,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_geometric_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1425 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_geometric_Q = \&PDL::gsl_cdf_geometric_Q;
-#line 1432 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Type-1 Gumbel Distribution (gsl_cdf_gumbel1_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Type-1 Gumbel distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1444 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1129 "CDF.pm"
 
 =head2 gsl_cdf_gumbel1_P
 
@@ -1456,27 +1135,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel1_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1469 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel1_P = \&PDL::gsl_cdf_gumbel1_P;
-#line 1476 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1488,27 +1160,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel1_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1501 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel1_Pinv = \&PDL::gsl_cdf_gumbel1_Pinv;
-#line 1508 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1520,27 +1185,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel1_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1533 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel1_Q = \&PDL::gsl_cdf_gumbel1_Q;
-#line 1540 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1552,41 +1210,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel1_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1565 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel1_Qinv = \&PDL::gsl_cdf_gumbel1_Qinv;
-#line 1572 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Type-2 Gumbel Distribution (gsl_cdf_gumbel2_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Type-2 Gumbel distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1584 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1237 "CDF.pm"
 
 =head2 gsl_cdf_gumbel2_P
 
@@ -1596,27 +1243,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel2_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1609 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel2_P = \&PDL::gsl_cdf_gumbel2_P;
-#line 1616 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1628,27 +1268,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel2_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1641 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel2_Pinv = \&PDL::gsl_cdf_gumbel2_Pinv;
-#line 1648 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1660,27 +1293,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel2_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1673 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel2_Q = \&PDL::gsl_cdf_gumbel2_Q;
-#line 1680 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1692,41 +1318,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_gumbel2_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1705 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_gumbel2_Qinv = \&PDL::gsl_cdf_gumbel2_Qinv;
-#line 1712 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Hypergeometric Distribution (gsl_cdf_hypergeometric_*)
 
 These functions compute the cumulative distribution functions P(k), Q(k) for the hypergeometric distribution with parameters I<n1>, I<n2> and I<t>.
 
 =cut
-#line 1724 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1345 "CDF.pm"
 
 =head2 gsl_cdf_hypergeometric_P
 
@@ -1736,27 +1351,20 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_hypergeometric_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1749 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_hypergeometric_P = \&PDL::gsl_cdf_hypergeometric_P;
-#line 1756 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1768,41 +1376,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_hypergeometric_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1781 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_hypergeometric_Q = \&PDL::gsl_cdf_hypergeometric_Q;
-#line 1788 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Laplace Distribution (gsl_cdf_laplace_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Laplace distribution with width I<a>.
 
 =cut
-#line 1800 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1403 "CDF.pm"
 
 =head2 gsl_cdf_laplace_P
 
@@ -1812,27 +1409,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_laplace_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1825 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_laplace_P = \&PDL::gsl_cdf_laplace_P;
-#line 1832 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1844,27 +1434,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_laplace_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1857 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_laplace_Pinv = \&PDL::gsl_cdf_laplace_Pinv;
-#line 1864 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1876,27 +1459,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_laplace_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1889 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_laplace_Q = \&PDL::gsl_cdf_laplace_Q;
-#line 1896 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1908,41 +1484,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_laplace_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1921 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_laplace_Qinv = \&PDL::gsl_cdf_laplace_Qinv;
-#line 1928 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Logistic Distribution (gsl_cdf_logistic_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the logistic distribution with scale parameter I<a>.
 
 =cut
-#line 1940 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1511 "CDF.pm"
 
 =head2 gsl_cdf_logistic_P
 
@@ -1952,27 +1517,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_logistic_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1965 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_logistic_P = \&PDL::gsl_cdf_logistic_P;
-#line 1972 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1984,27 +1542,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_logistic_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1997 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_logistic_Pinv = \&PDL::gsl_cdf_logistic_Pinv;
-#line 2004 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2016,27 +1567,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_logistic_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2029 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_logistic_Q = \&PDL::gsl_cdf_logistic_Q;
-#line 2036 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2048,41 +1592,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_logistic_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2061 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_logistic_Qinv = \&PDL::gsl_cdf_logistic_Qinv;
-#line 2068 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Lognormal Distribution (gsl_cdf_lognormal_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the lognormal distribution with parameters I<zeta> and I<sigma>.
 
 =cut
-#line 2080 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1619 "CDF.pm"
 
 =head2 gsl_cdf_lognormal_P
 
@@ -2092,27 +1625,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_lognormal_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2105 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_lognormal_P = \&PDL::gsl_cdf_lognormal_P;
-#line 2112 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2124,27 +1650,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_lognormal_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2137 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_lognormal_Pinv = \&PDL::gsl_cdf_lognormal_Pinv;
-#line 2144 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2156,27 +1675,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_lognormal_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2169 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_lognormal_Q = \&PDL::gsl_cdf_lognormal_Q;
-#line 2176 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2188,27 +1700,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_lognormal_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2201 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_lognormal_Qinv = \&PDL::gsl_cdf_lognormal_Qinv;
-#line 2208 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2220,27 +1725,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_negative_binomial_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2233 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_negative_binomial_P = \&PDL::gsl_cdf_negative_binomial_P;
-#line 2240 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2252,41 +1750,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_negative_binomial_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2265 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_negative_binomial_Q = \&PDL::gsl_cdf_negative_binomial_Q;
-#line 2272 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Pareto Distribution (gsl_cdf_pareto_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Pareto distribution with exponent I<a> and scale I<b>.
 
 =cut
-#line 2284 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1777 "CDF.pm"
 
 =head2 gsl_cdf_pareto_P
 
@@ -2296,27 +1783,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_pareto_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2309 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_pareto_P = \&PDL::gsl_cdf_pareto_P;
-#line 2316 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2328,27 +1808,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_pareto_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2341 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_pareto_Pinv = \&PDL::gsl_cdf_pareto_Pinv;
-#line 2348 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2360,27 +1833,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_pareto_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2373 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_pareto_Q = \&PDL::gsl_cdf_pareto_Q;
-#line 2380 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2392,41 +1858,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_pareto_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2405 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_pareto_Qinv = \&PDL::gsl_cdf_pareto_Qinv;
-#line 2412 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Pascal Distribution (gsl_cdf_pascal_*)
 
 These functions compute the cumulative distribution functions P(k), Q(k) for the Pascal distribution with parameters I<p> and I<n>.
 
 =cut
-#line 2424 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1885 "CDF.pm"
 
 =head2 gsl_cdf_pascal_P
 
@@ -2436,27 +1891,20 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_pascal_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2449 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_pascal_P = \&PDL::gsl_cdf_pascal_P;
-#line 2456 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2468,41 +1916,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_pascal_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2481 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_pascal_Q = \&PDL::gsl_cdf_pascal_Q;
-#line 2488 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Poisson Distribution (gsl_cdf_poisson_*)
 
 These functions compute the cumulative distribution functions P(k), Q(k) for the Poisson distribution with parameter I<mu>.
 
 =cut
-#line 2500 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 1943 "CDF.pm"
 
 =head2 gsl_cdf_poisson_P
 
@@ -2512,27 +1949,20 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_poisson_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2525 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_poisson_P = \&PDL::gsl_cdf_poisson_P;
-#line 2532 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2544,41 +1974,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_poisson_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2557 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_poisson_Q = \&PDL::gsl_cdf_poisson_Q;
-#line 2564 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Rayleigh Distribution (gsl_cdf_rayleigh_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Rayleigh distribution with scale parameter I<sigma>.
 
 =cut
-#line 2576 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 2001 "CDF.pm"
 
 =head2 gsl_cdf_rayleigh_P
 
@@ -2588,27 +2007,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_rayleigh_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2601 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_rayleigh_P = \&PDL::gsl_cdf_rayleigh_P;
-#line 2608 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2620,27 +2032,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_rayleigh_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2633 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_rayleigh_Pinv = \&PDL::gsl_cdf_rayleigh_Pinv;
-#line 2640 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2652,27 +2057,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_rayleigh_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2665 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_rayleigh_Q = \&PDL::gsl_cdf_rayleigh_Q;
-#line 2672 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2684,41 +2082,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_rayleigh_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2697 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_rayleigh_Qinv = \&PDL::gsl_cdf_rayleigh_Qinv;
-#line 2704 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The t-distribution (gsl_cdf_tdist_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the t-distribution with I<nu> degrees of freedom.
 
 =cut
-#line 2716 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 2109 "CDF.pm"
 
 =head2 gsl_cdf_tdist_P
 
@@ -2728,27 +2115,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_tdist_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2741 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_tdist_P = \&PDL::gsl_cdf_tdist_P;
-#line 2748 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2760,27 +2140,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_tdist_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2773 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_tdist_Pinv = \&PDL::gsl_cdf_tdist_Pinv;
-#line 2780 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2792,27 +2165,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_tdist_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2805 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_tdist_Q = \&PDL::gsl_cdf_tdist_Q;
-#line 2812 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2824,41 +2190,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_tdist_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2837 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_tdist_Qinv = \&PDL::gsl_cdf_tdist_Qinv;
-#line 2844 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Unit Gaussian Distribution (gsl_cdf_ugaussian_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the unit Gaussian distribution.
 
 =cut
-#line 2856 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 2217 "CDF.pm"
 
 =head2 gsl_cdf_ugaussian_P
 
@@ -2868,27 +2223,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_ugaussian_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2881 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_ugaussian_P = \&PDL::gsl_cdf_ugaussian_P;
-#line 2888 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2900,27 +2248,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_ugaussian_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2913 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_ugaussian_Pinv = \&PDL::gsl_cdf_ugaussian_Pinv;
-#line 2920 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2932,27 +2273,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_ugaussian_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2945 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_ugaussian_Q = \&PDL::gsl_cdf_ugaussian_Q;
-#line 2952 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -2964,41 +2298,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_ugaussian_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2977 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_ugaussian_Qinv = \&PDL::gsl_cdf_ugaussian_Qinv;
-#line 2984 "CDF.pm"
+
+
 
 
 
 #line 144 "gsl_cdf.pd"
-
 
 =head2 The Weibull Distribution (gsl_cdf_weibull_*)
 
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Weibull distribution with scale I<a> and exponent I<b>.
 
 =cut
-#line 2996 "CDF.pm"
-
-
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
+#line 2325 "CDF.pm"
 
 =head2 gsl_cdf_weibull_P
 
@@ -3008,27 +2331,20 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_weibull_P processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3021 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_weibull_P = \&PDL::gsl_cdf_weibull_P;
-#line 3028 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -3040,27 +2356,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_weibull_Pinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3053 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_weibull_Pinv = \&PDL::gsl_cdf_weibull_Pinv;
-#line 3060 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -3072,27 +2381,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_weibull_Q processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3085 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_weibull_Q = \&PDL::gsl_cdf_weibull_Q;
-#line 3092 "CDF.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -3104,30 +2406,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-
-
 =for bad
 
 gsl_cdf_weibull_Qinv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3117 "CDF.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_cdf_weibull_Qinv = \&PDL::gsl_cdf_weibull_Qinv;
-#line 3124 "CDF.pm"
+
+
 
 
 
 
 
 #line 176 "gsl_cdf.pd"
-
 
 =head1 AUTHOR
 
@@ -3138,10 +2435,7 @@ The GSL CDF module was written by J. Stover.
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 3142 "CDF.pm"
-
-
-
+#line 2439 "CDF.pm"
 
 # Exit with OK status
 

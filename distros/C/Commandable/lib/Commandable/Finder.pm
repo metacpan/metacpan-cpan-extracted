@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.09;
+package Commandable::Finder 0.10;
 
 use v5.14;
 use warnings;
@@ -253,10 +253,11 @@ sub builtin_command_helpcmd
          Commandable::Output->printf( "\n" ) unless $first; undef $first;
 
          my $default = $optspec->default;
+         my $value   = $optspec->mode eq "value" ? " <value>" : "";
 
          Commandable::Output->printf( "    %s\n",
             _join( ", ", map {
-               Commandable::Output->format_note( length $_ > 1 ? "--$_" : "-$_", 1 )
+               Commandable::Output->format_note( length $_ > 1 ? "--$_$value" : "-$_$value", 1 )
             } $optspec->names )
          );
          Commandable::Output->printf( "      %s%s\n",

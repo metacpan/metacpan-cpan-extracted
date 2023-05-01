@@ -23,10 +23,10 @@ Internal module to handle signatures
 sub nospacesplit {grep /\S/, split $_[0],$_[1]}
 
 sub new {
-  my ($type,$str,$bvalflag,$otherpars) = @_;
+  my ($type,$pars,$bvalflag,$otherpars) = @_;
   $bvalflag ||= 0;
   my $this = bless {}, $type;
-  my @objects = map PDL::PP::PdlParObj->new($_,$bvalflag, $this), nospacesplit ';',$str;
+  my @objects = map PDL::PP::PdlParObj->new($_,$bvalflag, $this), nospacesplit ';',$pars;
   $this->{Names} = [ map $_->name, @objects ];
   $this->{Objects} = { map +($_->name => $_), @objects };
   my @objects_sorted = ((grep !$_->{FlagW}, @objects), (grep $_->{FlagW}, @objects));
@@ -59,8 +59,9 @@ sub _otherPars_nft {
 	my (%flags);
 	if (s/^\s*$PDL::PP::PdlParObj::sqbr_re\s*//) {
 	  %flags = my %lflags = map +($_=>1), split /\s*,\s*/, my $opts = $1;
-	  my $this_out = delete $lflags{o};
-	  die "Invalid options '$opts' in '$_'" if keys %lflags;
+	  confess "Can't have both [io] and [o]" if $lflags{o} && $lflags{io};
+	  my $this_out = delete($lflags{o}) || delete($lflags{io});
+	  confess "Invalid options '$opts' in '$_'" if keys %lflags;
 	  $any_out ||= $this_out;
 	}
 	if (/^\s*([^=]+?)\s*=>\s*(\S+)\s*$/) {
@@ -73,7 +74,7 @@ sub _otherPars_nft {
 	    $type = PDL::PP::CType->new($_);
 	}
 	my $name = $type->protoname;
-	croak "Invalid OtherPars name: $name"
+	confess "Invalid OtherPars name: $name"
 	  if $PDL::PP::PdlParObj::INVALID_PAR{$name};
 	push @names,$name;
 	$types{$name} = $type;
@@ -119,40 +120,52 @@ sub ind_names_sorted { @{$_[0]{IndNamesSorted}} }
 sub ind_index { $_[0]{Ind2Index}{$_[1]} }
 
 sub othernames {
-  my ($self, $omit_count, $except) = @_;
+  my ($self, $omit_count, $with_xs, $except) = @_;
   $except ||= {};
-  return $self->{OtherNames} if $omit_count && !keys %$except;
+  return $self->{OtherNames} if $omit_count && $omit_count > 0 && !keys %$except && $with_xs;
+  return [] if $omit_count && $omit_count < 0;
   my $objs = $self->otherobjs;
   my @raw_names = grep !$except->{$_}, @{$self->{OtherNames}};
   @raw_names = map $objs->{$_}->is_array ? ($_, "${_}_count") : $_, @raw_names if !$omit_count;
+  @raw_names = grep !$objs->{$_}{WasDollar}, @raw_names if !$with_xs;
   \@raw_names;
 }
 sub otherobjs { $_[0]{OtherObjs} }
 sub other_any_out { $_[0]{OtherAnyOut} }
-sub other_is_out { $_[0]{OtherFlags}{$_[1]} && $_[0]{OtherFlags}{$_[1]}{o} }
+sub other_is_flag {
+  my $flag = $_[2];
+  my $has_count = (my $without_count = $_[1]) =~ s/_count$//;
+  return $_[0]{OtherFlags}{$_[1]} && $_[0]{OtherFlags}{$_[1]}{$flag} if !$has_count;
+  $_[0]{OtherFlags}{$without_count} && $_[0]{OtherFlags}{$without_count}{$flag};
+}
+sub other_is_output { &other_is_out || &other_is_io }
+sub other_is_out { $_[0]->other_is_flag($_[1], 'o') }
 sub other_out { grep $_[0]->other_is_out($_), @{$_[0]{OtherNames}} }
+sub other_is_io { $_[0]->other_is_flag($_[1], 'io') }
+sub other_io { grep $_[0]->other_is_io($_), @{$_[0]{OtherNames}} }
 
-sub allnames { [
-  (grep +(!$_[2] || !$_[2]{$_}) && !$_[0]{Objects}{$_}{FlagTemp}, @{$_[0]{Names}}),
-  @{$_[0]->othernames(@_[1,2])},
+sub allnames { my ($self, $omit_count, $with_xs, $except) = @_; [
+  ($omit_count && $omit_count < 0) ? (grep $self->{Objects}{$_}{FlagCreateAlways}, @{$self->{Names}}) :
+  (grep +(!$except || !$except->{$_}) && !$self->{Objects}{$_}{FlagTemp}, @{$self->{Names}}),
+  @{$self->othernames(@_[1..3])},
 ] }
 sub allobjs {
   my $pdltype = PDL::PP::CType->new("pdl *__foo__");
   +{ ( map +($_,$pdltype), @{$_[0]{Names}} ), %{$_[0]->otherobjs} };
 }
 sub alldecls {
-  my ($self, $omit_count, $indirect, $except) = @_;
+  my ($self, $omit_count, $indirect, $with_xs, $except) = @_;
   my $objs = $self->allobjs;
-  my @names = @{$self->allnames($omit_count, $except)};
-  $indirect = $indirect ? { map +($_=>$self->other_is_out($_)), @names } : {};
+  my @names = @{$self->allnames($omit_count, $with_xs, $except)};
+  $indirect = $indirect ? { map +($_=>$self->other_is_output($_)), @names } : {};
   map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1,AddIndirect=>$indirect->{$_}}), @names;
 }
 sub getcomp {
   my ($self) = @_;
   my $objs = $self->otherobjs;
   my @names = @{$self->othernames(0)};
-  my $indirect = { map +($_=>$self->other_is_out($_)), @names };
-  join '', map "$_;", grep $_, map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1,AddIndirect=>$indirect->{$_}}), @names;
+  my $indirect = { map +($_=>$self->other_is_output($_)), @names };
+  join "\n", map "  $_;", grep $_, map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1,AddIndirect=>$indirect->{$_}}), @names;
 }
 sub getfree {
   my ($self,$symbol) = @_;
@@ -163,9 +176,7 @@ sub getfree {
 sub getcopy {
   my ($self, $to_pat) = @_;
   my $objs = $self->otherobjs;
-  PDL::PP::pp_line_numbers(__LINE__,
-    join '', map $objs->{$_}->get_copy($_,sprintf $to_pat,$_), @{$self->othernames(0)}
-  );
+  PDL::PP::indent(2, join '', map $objs->{$_}->get_copy($_,sprintf $to_pat,$_)."\n", @{$self->othernames(0)});
 }
 
 sub realdims {
@@ -175,7 +186,7 @@ sub realdims {
 
 sub creating {
   my $this = shift;
-  croak "you must perform a checkdims before calling creating"
+  confess "you must perform a checkdims before calling creating"
     unless defined $this->{Create};
   return $this->{Create};
 }
@@ -186,7 +197,7 @@ sub checkdims {
   $this->{Dims} = PDL::PP::PdlDimsObj->new;
   $this->{Objects}{$_}->add_inds($this->{Dims}) for @{$this->{Names}};
   my $n = @{$this->{Names}};
-  croak "not enough pdls to match signature" unless $#_ >= $n-1;
+  confess "not enough pdls to match signature" unless $#_ >= $n-1;
   my @pdls = @_[0..$n-1];
   if ($PDL::debug) { print "args: ".
 		     join(' ,',map { "[".join(',',$_->dims)."]," } @pdls)

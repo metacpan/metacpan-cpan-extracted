@@ -130,9 +130,10 @@ sub defaults {
             skip_empty_rows     => 0,
         },
         export => {
-            export_dir      => $sf->{i}{home_dir},
-            add_extension   => 0,
-            file_encoding   => 'UTF-8',
+            export_dir       => $sf->{i}{home_dir},
+            add_extension    => 0,
+            default_filename => 0,
+            file_encoding    => 'UTF-8',
         },
         csv_out => {
             auto_diag => 1,  # not an option, always 1

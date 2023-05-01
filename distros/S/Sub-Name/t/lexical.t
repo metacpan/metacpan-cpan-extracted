@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 BEGIN {
   if ("$]" < 5.018) {
     plan 'skip_all' => 'lexical subs not supported on this perl';

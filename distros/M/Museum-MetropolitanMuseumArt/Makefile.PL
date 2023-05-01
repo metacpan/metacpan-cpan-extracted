@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
         'JSON::MaybeXS' => '1.004003',
         'strictures'    => 2,
         'URI'           => '5.10',
+        'namespace::clean' => '0.27',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Museum-MetropolitanMuseumArt-*' },

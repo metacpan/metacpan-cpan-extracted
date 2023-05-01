@@ -58,7 +58,7 @@ I<< lpod->Huse_octet_strings() >> will will re-enable implicit decoding/encoding
 and I<< lpod->Huse_character_strings() >> will disable the old behavior
 and restore B<:chars> mode.
 
-Note: C<:chars> mode does not affect reading or writing ODF files, 
+Note: B<:chars> mode does not affect reading or writing ODF files, 
 which continue to be automatically decoded or encoded as expected.
 
 =head1 XML::Twig & XML::Parser
@@ -74,20 +74,19 @@ their results.  The encoding used is the same as was found when
 parsing the input file unless you change it,
 and the generated XML header specifies the encoding used.
 This makes sense when printing directly to a disk file (via a non-encoding
-file handle), but will corrupt non-ASCII/latin1 characters if 
-written to the tty console if (as is usually the case) STDOUT is 
-set to auto-encode.
+file handle), but will corrupt non-ASCII characters printed to STDOUT
+if STDOUT is set to auto-encode, as is usually the case.
 
 Going the other way, XML::Twig's B<parse()> method expects binary octets as 
-input because it will use the "encoding=..." specification in the XML
+input and uses the "encoding=..." specification in the XML
 header to know how to decode the remainder of the file.  
 
 =head2 Not always so tidy
 
 Perl's data model now has two kinds of strings: B<binary octets>,
 which might or might not represent Unicode characters in some fashion,
-and B<abstract characters> which are opaque atoms.  These two kinds
-of strings should usually not be combined, see C<man perlunifaq>.
+and B<abstract characters> which are opaque atoms.  
+In most cases these two kinds should never be combined, see C<man perlunifaq>.
 
 I<Decoding> means converting binary octets into abstract characters,
 and I<encoding> does the reverse.
@@ -97,7 +96,7 @@ using a variation of UTF-8, and so "decoding" or "encoding" between
 Perl characters and UTf-8 octet streams can be infinitely fast. 
 
 Non-Unicode-aware scripts usually "just work" as long as they never
-see characters outside the ASCII/latin1 range.  This is because,
+see characters outside the ASCII range.  This is because,
 without a I<decode> operation or literal strings with "wide" characters,
 Perl treats all strings as "binary"; the behaviour of such strings is
 usually correct when they hold single-byte characters.

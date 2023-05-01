@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-31'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.022'; # VERSION
+our $VERSION = '1.023'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -29,9 +29,14 @@ There will be options to add some additional checks in the future.
 _
     add_args => {
     },
+    links => [
+        {url=>'prog:csv-check-cell-values', summary=>'Check of the values of individual cells'},
+    ],
+    tags => ['category:checking'],
+
     examples => [
         {
-            summary => 'Check field names',
+            summary => 'Check that all field names are valid',
             argv => ['file.csv'],
             test => 0,
             'x.doc.show_result' => 0,
@@ -75,7 +80,7 @@ App::CSVUtils::csv_check_field_names - Check field names
 
 =head1 VERSION
 
-This document describes version 1.022 of App::CSVUtils::csv_check_field_names (from Perl distribution App-CSVUtils), released on 2023-03-10.
+This document describes version 1.023 of App::CSVUtils::csv_check_field_names (from Perl distribution App-CSVUtils), released on 2023-03-31.
 
 =head1 FUNCTIONS
 
@@ -92,7 +97,7 @@ Examples:
 
 =over
 
-=item * Check field names:
+=item * Check that all field names are valid:
 
  csv_check_field_names(input_filename => "file.csv");
 

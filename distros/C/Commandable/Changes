@@ -1,5 +1,13 @@
 Revision history for Commandable
 
+0.10    2023-04-29
+        [CHANGES]
+         * Add more types of option - negatable, incrementable, multi-value
+           (much thanks to ilmari)
+         * Use trailing `=` to indicate option names with values; to match
+           Getopt::Long
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+
 0.09    2022-12-04
         [CHANGES]
          * Added Commandable::Finder::MethodAttributes for handling commands

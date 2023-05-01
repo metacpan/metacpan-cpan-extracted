@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_transport.pd"
 
 use strict;
@@ -34,17 +35,11 @@ PDL::GSLSF::TRANSPORT - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
-
 Transport function:
   J(n,x) := Integral[ t^n e^t /(e^t - 1)^2, {t,0,x}]
 
 =cut
 #line 43 "TRANSPORT.pm"
-
-
-
-
-
 
 =head1 FUNCTIONS
 
@@ -52,8 +47,6 @@ Transport function:
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -72,20 +65,15 @@ J(2,x)
 gsl_sf_transport_2 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 78 "TRANSPORT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_transport_2 = \&PDL::gsl_sf_transport_2;
-#line 85 "TRANSPORT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -104,20 +92,15 @@ J(3,x)
 gsl_sf_transport_3 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 110 "TRANSPORT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_transport_3 = \&PDL::gsl_sf_transport_3;
-#line 117 "TRANSPORT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -136,20 +119,15 @@ J(4,x)
 gsl_sf_transport_4 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 142 "TRANSPORT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_transport_4 = \&PDL::gsl_sf_transport_4;
-#line 149 "TRANSPORT.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -168,16 +146,14 @@ J(5,x)
 gsl_sf_transport_5 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 174 "TRANSPORT.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_transport_5 = \&PDL::gsl_sf_transport_5;
-#line 181 "TRANSPORT.pm"
+
+
 
 
 
@@ -197,10 +173,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 201 "TRANSPORT.pm"
-
-
-
+#line 177 "TRANSPORT.pm"
 
 # Exit with OK status
 

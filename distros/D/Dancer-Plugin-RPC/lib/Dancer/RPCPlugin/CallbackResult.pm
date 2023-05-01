@@ -74,13 +74,14 @@ sub callback_fail {
     return Dancer::RPCPlugin::CallbackResult::Fail->new(%data);
 }
 
-sub AUTOLOAD {
-    my $self = shift;
-    (my $attribute = our $AUTOLOAD) =~ s/.*:://;
-    return $self->{$attribute} if exists $self->{$attribute};
-    die "Unknown attribute $attribute\n";
-}
-sub DESTROY { }
+=head2 $cr->success
+
+Returns the value of the C<success> attribute (getter only).
+
+=cut
+
+sub success { $_[0]->{success} }
+
 1;
 
 =head1 PACKAGE
@@ -138,8 +139,24 @@ sub new {
     return bless {success => 0, %data}, $class;
 }
 
+=head2 $cr->error_code
+
+Getter for the C<error_code> attribute.
+
+=cut
+
+sub error_code { return $_[0]->{error_code} }
+
+=head2 $cr->error_message
+
+Getter for the C<error_message> attribute.
+
+=cut
+
+sub error_message { return $_[0]->{error_message} }
+
 =head1 COPYRIGHT
 
-(c) MMXVI - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXVI - Abe Timmerman <abeltje@cpan.org>
 
 =cut

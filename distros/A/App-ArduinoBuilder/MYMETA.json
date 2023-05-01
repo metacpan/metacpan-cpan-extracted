@@ -27,6 +27,9 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "namespace" : [
+         "App::ArduinoBuilder"
       ]
    },
    "optional_features" : {
@@ -54,7 +57,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.022"
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -78,6 +81,6 @@
          "web" : "https://github.com/mkende/arduino_builder"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

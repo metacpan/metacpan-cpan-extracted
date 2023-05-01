@@ -69,8 +69,29 @@ EXPORTS
 
       my $data_structure = decode_json($json_text);
 
-  to_json, from_json
-    See JSON for details. These are included to support legacy code only.
+  to_json
+    This function is equivalent to calling
+    "JSON()->new->encode($data_structure)". It takes a perl data structure
+    which is serialised to JSON text without encoding it to UTF-8. You
+    should only use this function if you expect another layer to handle the
+    UTF-8 encoding of the resulting JSON text.
+
+      my $json_text = to_json($data_structure);
+
+    Additional arguments can be passed and will be handled as in "to_json"
+    in JSON, this is included to support legacy code only.
+
+  from_json
+    This function is equivalent to calling
+    "JSON()->new->decode($json_text)". It takes a string of unencoded JSON
+    text to deserialise to a perl data structure. You should only use this
+    function if another layer is already handling the UTF-8 decoding of the
+    input JSON text.
+
+      my $data_structure = from_json($json_text);
+
+    Additional arguments can be passed and will be handled as in "from_json"
+    in JSON, this is included to support legacy code only.
 
   JSON
     The "JSON" constant returns the selected implementation module's name
@@ -160,7 +181,7 @@ CONVERTING FROM JSON::Any
         my $json = decode_json($data);
 
 CAVEATS
-    The "new()" method in this module is technically a factory, not a
+    The new() method in this module is technically a factory, not a
     constructor, because the objects it returns will *NOT* be blessed into
     the "JSON::MaybeXS" class.
 

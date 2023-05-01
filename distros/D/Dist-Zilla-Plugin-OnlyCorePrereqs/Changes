@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-OnlyCorePrereqs
 
+0.025     2023-04-30 12:22:34Z
+          - do not complain about Config or DynaLoader being missing in the
+            index
+
 0.024     2015-03-19 07:04:15Z
           - fix test failures when Module::CoreList doesn't have information
             about the current version of perl

@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_elementary.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::ELEMENTARY - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "ELEMENTARY.pm"
-
-
-
-
-
+#line 40 "ELEMENTARY.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ Multiplication.
 gsl_sf_multiply does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "ELEMENTARY.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_multiply = \&PDL::gsl_sf_multiply;
-#line 81 "ELEMENTARY.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,16 +89,14 @@ Multiplication with associated errors.
 gsl_sf_multiply_err does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "ELEMENTARY.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_multiply_err = \&PDL::gsl_sf_multiply_err;
-#line 113 "ELEMENTARY.pm"
+
+
 
 
 
@@ -129,10 +116,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 133 "ELEMENTARY.pm"
-
-
-
+#line 120 "ELEMENTARY.pm"
 
 # Exit with OK status
 

@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gsl_sf_hyperg.pd"
 
 use strict;
@@ -35,12 +36,7 @@ PDL::GSLSF::HYPERG - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 39 "HYPERG.pm"
-
-
-
-
-
+#line 40 "HYPERG.pm"
 
 =head1 FUNCTIONS
 
@@ -48,8 +44,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -68,20 +62,15 @@ This is an interface to the Special Function package present in the GNU Scientif
 gsl_sf_hyperg_0F1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 74 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_0F1 = \&PDL::gsl_sf_hyperg_0F1;
-#line 81 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -100,20 +89,15 @@ Confluent hypergeometric function  for integer parameters. 1F1[a,b,x] = M(a,b,x)
 gsl_sf_hyperg_1F1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 106 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_1F1 = \&PDL::gsl_sf_hyperg_1F1;
-#line 113 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -132,20 +116,15 @@ Confluent hypergeometric function  for integer parameters. U(a,b,x)
 gsl_sf_hyperg_U does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 138 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_U = \&PDL::gsl_sf_hyperg_U;
-#line 145 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -164,20 +143,15 @@ Confluent hypergeometric function  for integer parameters. 2F1[a,b,c,x]
 gsl_sf_hyperg_2F1 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 170 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_2F1 = \&PDL::gsl_sf_hyperg_2F1;
-#line 177 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -196,20 +170,15 @@ Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x]
 gsl_sf_hyperg_2F1_conj does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 202 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_2F1_conj = \&PDL::gsl_sf_hyperg_2F1_conj;
-#line 209 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -228,20 +197,15 @@ Renormalized Gauss hypergeometric function 2F1[a,b,c,x] / Gamma[c]
 gsl_sf_hyperg_2F1_renorm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 234 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_2F1_renorm = \&PDL::gsl_sf_hyperg_2F1_renorm;
-#line 241 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -260,20 +224,15 @@ Renormalized Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x] / Gam
 gsl_sf_hyperg_2F1_conj_renorm does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 266 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_2F1_conj_renorm = \&PDL::gsl_sf_hyperg_2F1_conj_renorm;
-#line 273 "HYPERG.pm"
 
 
 
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -292,23 +251,20 @@ Mysterious hypergeometric function. The series representation is a divergent hyp
 gsl_sf_hyperg_2F0 does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 298 "HYPERG.pm"
 
 
 
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hyperg_2F0 = \&PDL::gsl_sf_hyperg_2F0;
-#line 305 "HYPERG.pm"
+
+
 
 
 
 
 
 #line 130 "gsl_sf_hyperg.pd"
-
 
 =head1 AUTHOR
 
@@ -322,10 +278,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 326 "HYPERG.pm"
-
-
-
+#line 282 "HYPERG.pm"
 
 # Exit with OK status
 

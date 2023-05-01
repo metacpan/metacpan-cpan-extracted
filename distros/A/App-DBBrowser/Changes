@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.323    2023-05-01
+        - New export option: table-name is default file-name.
+
 2.322    2023-03-23
         - Bugfix update/delete with unquoted table name.
 

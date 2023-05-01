@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.022 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-03-10.
+    This document describes version 1.023 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-03-31.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -34,7 +34,7 @@ DESCRIPTION
     24. csv-ltrim
     25. csv-map
     26. csv-munge-field
-    27. csv-munge-row
+    27. csv-munge-rows
     28. csv-pick
     29. csv-pick-fields
     30. csv-pick-rows
@@ -64,8 +64,9 @@ DESCRIPTION
     54. csv2td
     55. csv2tsv
     56. csv2vcf
-    57. paras2csv
-    58. tsv2csv
+    57. list-csvutils
+    58. paras2csv
+    59. tsv2csv
 
 FUNCTIONS
   gen_csv_util

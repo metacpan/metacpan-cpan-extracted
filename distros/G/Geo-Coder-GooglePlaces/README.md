@@ -12,7 +12,7 @@ Geo::Coder::GooglePlaces::V3 - Google Places Geocoding API V3
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -51,7 +51,7 @@ variables GMAP\_CLIENT and GMAP\_KEY before running v3\_live.t
 
     GMAP_CLIENT=your_id GMAP_KEY='your_key' make test
 
-You can get a key from https://console.developers.google.com/apis/credentials.
+You can get a key from [https://console.developers.google.com/apis/credentials](https://console.developers.google.com/apis/credentials).
 
 ## geocode
 
@@ -59,7 +59,8 @@ You can get a key from https://console.developers.google.com/apis/credentials.
     @location = $geocoder->geocode(location => $location);
 
 Queries _$location_ to Google Places geocoding API and returns hash
-reference returned back from API server. When you cann the method in
+reference returned back from API server.
+When you call the method in
 an array context, it returns all the candidates got back, while it
 returns the 1st one in a scalar context.
 
@@ -100,6 +101,10 @@ Based on [Geo::Coder::Google](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGoogl
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+# BUGS
+
+I believe that reverse may longer work.
+
 # SEE ALSO
 
 [Geo::Coder::Yahoo](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AYahoo)
@@ -120,17 +125,9 @@ You can also look for information at:
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-GooglePlaces](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-GooglePlaces)
 
-- CPANTS
-
-    [http://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces](http://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces)
-
 - CPAN Testers' Matrix
 
     [http://matrix.cpantesters.org/?dist=Geo-Coder-GooglePlaces](http://matrix.cpantesters.org/?dist=Geo-Coder-GooglePlaces)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Geo-Coder-GooglePlaces](http://cpanratings.perl.org/d/Geo-Coder-GooglePlaces)
 
 - CPAN Testers Dependencies
 

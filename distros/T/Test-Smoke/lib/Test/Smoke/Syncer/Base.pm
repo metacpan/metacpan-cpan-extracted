@@ -251,10 +251,10 @@ sub make_dot_patch {
     my $self = shift;
 
     my $mk_dot_patch = Test::Smoke::Util::Execute->new(
-        command => "$^X Porting/make_dot_patch.pl > .patch",
+        command => "$^X",
         verbose => $self->verbose,
     );
-    my $perlout = $mk_dot_patch->run();
+    my $perlout = $mk_dot_patch->run("Porting/make_dot_patch.pl", ">", ".patch");
     $self->log_debug($perlout);
 }
 

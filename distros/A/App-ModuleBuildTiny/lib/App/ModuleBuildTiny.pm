@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -11,11 +11,11 @@ use Config;
 use CPAN::Meta;
 use Data::Section::Simple 'get_data_section';
 use Encode qw/encode_utf8 decode_utf8/;
-use ExtUtils::Manifest qw/manifind maniskip maniread/;
+use ExtUtils::Manifest 1.75 qw/manifind maniskip maniread/;
 use File::Basename qw/dirname/;
 use File::Path qw/mkpath/;
 use File::Slurper qw/write_text write_binary read_binary/;
-use File::Spec::Functions qw/catfile catdir curdir rel2abs/;
+use File::Spec::Functions qw/catfile rel2abs/;
 use Getopt::Long 2.36 'GetOptionsFromArray';
 use JSON::PP qw/decode_json/;
 use Module::Runtime 'require_module';
@@ -82,8 +82,6 @@ sub write_changes {
 sub write_maniskip {
 	my $distname = shift;
 	write_text('MANIFEST.SKIP', "#!include_default\n$distname-.*\nREADME.pod\n");
-	maniskip(); # This expands the #!include_default as a side-effect
-	unlink 'MANIFEST.SKIP.bak' if -f 'MANIFEST.SKIP.bak';
 }
 
 sub write_readme {
@@ -227,11 +225,11 @@ sub get_config {
 sub extra_tests {
 	my @dirs;
 	if ($AUTHOR_TESTING) {
-		push @dirs, catdir('xt', 'author');
+		push @dirs, 'xt/author';
 		push @dirs, glob 'xt/*.t';
 	}
-	push @dirs, catdir('xt', 'release') if $RELEASE_TESTING;
-	push @dirs, catdir('xt', 'extended') if $EXTENDED_TESTING;
+	push @dirs, 'xt/release' if $RELEASE_TESTING;
+	push @dirs, 'xt/extended' if $EXTENDED_TESTING;
 	return grep -e, @dirs;
 }
 
@@ -279,7 +277,7 @@ my %actions = (
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		$dist->preflight_check(%opts);
 		local ($AUTHOR_TESTING, $RELEASE_TESTING) = (1, 1);
-		my @commands = ([ catfile(curdir, 'Build'), 'test' ]);
+		my @commands = ([ './Build', 'test' ]);
 		my @extra_tests = extra_tests;
 		push @commands, [ 'prove', '-br', @extra_tests ] if @extra_tests;
 		$dist->run(commands => \@commands, build => 1, verbose => !$opts{silent}) or return 1;

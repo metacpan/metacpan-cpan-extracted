@@ -1,5 +1,9 @@
 Revision history for App-ModuleBuildTiny
 
+0.041     2023-04-29 16:31:04+0200
+          - Depend on new ExtUtils::Manifest #include behavior
+          - Add help subcommand
+
 0.040     2023-04-13 23:40:33+0200
           - Create .gitignore when minting
           - Add -I option to test subcommand
