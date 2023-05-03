@@ -4852,6 +4852,7 @@ lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_L_SU
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.82.5.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile
@@ -5168,6 +5169,7 @@ lib/App/SeismicUnixGui/script/c55_file
 lib/App/SeismicUnixGui/script/cmguiTMEeyS
 lib/App/SeismicUnixGui/script/convert2V07
 lib/App/SeismicUnixGui/script/convert2V08
+lib/App/SeismicUnixGui/script/dev.null
 lib/App/SeismicUnixGui/script/gui_history.txt
 lib/App/SeismicUnixGui/script/iBottomMute
 lib/App/SeismicUnixGui/script/immodpg

@@ -1,5 +1,137 @@
 Revision history for Perl extension NOLookup
 
+1.37.19 2023-05-03
+     - Correct color option in POD for no_rdap.pl
+
+1.37.18 2023-05-03
+     - CPAN version
+
+1.37.17 2023-04-14
+     - Improve query validation and reject combinations which
+       potentially could lead to far to many entity or domain lookups.
+
+1.37.16 2023-04-14
+     - Rename and improve doc for page control default.
+
+1.37.15 2023-04-12
+     - Rename config parameter 'max_page_size' to 'page_size'.
+     - Pass nopages also for internal extra lookups.
+
+1.37.14 2023-03-28
+     - Various improvements in result formatting.
+     - Correct domain/nameserver validation, accept nameservers not
+       under .no.
+     - Support access_layers passed by user, which can override the
+       default ones in NOLookup.
+
+1.37.13 2023-03-21
+     - Better validation of nameserver and domain names
+
+1.37.12 2023-03-21
+     - Various fixes/changes.
+     - entity or expand need to be set to do additional lookups
+
+1.37.11 2023-03-14
+     - Various fixes/changes.
+     - Present ids in more cases, when present.
+     - expand paramater made bool again, sleep removed.
+
+1.37.10 2023-03-02
+     - more paging
+     - domain list fetched only if entity or expand performed only
+       when requested by caller.
+
+1.37.9 2023-03-01
+     - max_page_size fix
+     - minor RDAP lib paging refinements.
+
+1.37.8 2023-02-28
+     - RDAP lib paging refinements.
+
+1.37.7 2023-02-22
+     - use env to find perl in bin scripts
+
+1.37.6 2023-02-10
+     Merge from master:
+     - Handle errors that has content, like a json 'ResponseStatus'
+       body, and decode it before returning so the caller can differ
+       between error types.
+
+1.37.5 2023-01-25
+     - Added -c page count option, and debug to patent URL.
+
+1.37.4 2023-01-24
+     - Added debug option and debug output.
+
+1.37.3 2023-01-10
+     - More paging adjustments.
+
+1.37.2 2023-01-06
+     - Improve and correct page info.
+
+1.37.1 2023-01-03
+     - Handle HTTP unauthorized, added $RDAP_LOOKUP_NOT_AUTHORIZED
+
+1.37.0 2022-12-27
+     - Introduce Regexp::Common for ip-regexp,
+       domain regexp's did not work as wanted, so we keep old logic on
+       that
+
+1.36.1 2022-12-27
+     - Fix arguments, use '&' if '?' is already there.
+
+1.36.0 2022-12-22
+     - Handle check/head: Cannot build result strings since the result
+       is empty for a check. Insetad, just return and let the caller
+       worry about the check result presentation.
+
+1.35.0 2022-12-22
+     - Fixed the force_ipv arg. which did not work.
+
+1.34.0 2022-12-14
+     - Added more complete documentation.
+     - Handle raw argument cases more correctly.
+
+1.33.0 2022-12-14
+     - Detect rate limiting (quota) errors and return any collected
+       results instead of nothing in thiose cases. Also return a
+       warning telling that truncation may have occured.
+
+1.32.0 2022-12-13
+     - Added paging support: cursor, looping to fetch max no of pages,
+       default 10.
+
+1.31.0 2022-12-07
+     - type -> rawtype (-r) argument
+     - color now -l
+     - Some POD updates
+
+1.30.0 2022-12-03
+     - A lot of RDAP test cases in t/04test_rdap.t.
+     - Doc showing json structures in docs.
+
+1.29.0 2022-11-30
+     - More refinements in Norid RDAP lookup code.
+
+1.28.0 2022-11-28
+     - More refinements in Norid RDAP lookup code:
+       - support 'no' and better pattern guessing.
+       - support identity display also in non-whois.
+
+1.27.0 2022-11-25
+     - Added support for all Norid RDAP lookup options,
+       like the various new searches.
+
+1.26.0 2022-11-18
+     - Added support for Norid's RDAP basic authentication
+
+1.25.0 2022-11-14
+     - use env perl in bin scripts to find correct perl
+       when several version are installed
+
+1.24.1 2022-12-05
+     - Support new conformance values for new RDAP service.
+
 1.24 2020-12-14
      - Force RDAP date events to be displayed in timezone
        'Europe/Oslo'.

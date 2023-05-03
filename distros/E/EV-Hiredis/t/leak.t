@@ -27,7 +27,7 @@ $get_command = sub {
     });
 };
 $test = sub {
-    is refcount($result), 2, 'reference count of array is 2(no_leaks_ok and $test)';
+    is refcount($result), 1, 'reference count of array is 1(no_leaks_ok and $test)';
     is SvREFCNT($result->[0]), 1, 'reference count of first element is 1';
     is SvREFCNT($result->[1]), 1, 'reference count of second element is 1';
     $r->disconnect;

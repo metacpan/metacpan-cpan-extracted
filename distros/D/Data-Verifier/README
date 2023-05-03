@@ -1,9 +1,9 @@
 This archive contains the distribution Data-Verifier,
-version 0.63:
+version 0.65:
 
   Profile based data verification with Moose type constraints.
 
-This software is copyright (c) 2019 by Cold Hard Code, LLC.
+This software is copyright (c) 2023 by Cold Hard Code, LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

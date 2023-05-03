@@ -2,8 +2,8 @@ NAME
     Require::HookChain - Chainable require hook
 
 VERSION
-    This document describes version 0.008 of Require::HookChain (from Perl
-    distribution Require-HookChain), released on 2023-02-08.
+    This document describes version 0.009 of Require::HookChain (from Perl
+    distribution Require-HookChain), released on 2023-02-12.
 
 SYNOPSIS
     Say you want to create a require hook to prepend some code to the module
@@ -78,6 +78,34 @@ DESCRIPTION
     To create your own chainable require hook, see example in "SYNOPSIS".
     First you create a module under the "Require::HookChain::*" namespace,
     then create a constructor as well as "INC" handler.
+
+  Subnamespace organization
+    *   Require::HookChain::filter::
+
+        Hooks that filter module loading due to some criteria. These hooks
+        can fail a module being loaded even though the source is available,
+        if the additional criteria are not met.
+
+    *   Require::HookChain::log::
+
+        Hooks that add logging to module loading process.
+
+    *   Require::HookChain::munge::
+
+        Hooks that modify source code.
+
+    *   Require::HookChain::source::
+
+        Hooks that allow loading module source from alternative sources.
+
+    *   Require::HookChain::test::
+
+        Testing-related, particularly testing the Require::HookCHain hook
+        module itself.
+
+    *   Require::HookChain::timestamp::
+
+        Hooks that add timestamps during module loading process.
 
 Require::HookChain::r OBJECT
   Methods

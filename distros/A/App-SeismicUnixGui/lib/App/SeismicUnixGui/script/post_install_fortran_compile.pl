@@ -124,7 +124,8 @@ my @fortran_list   = `(find $starting_point -path $fortran_pathNfile2find -print
 my $lengthA= scalar @fortran_list;
 
 print("\n Found $lengthA versions of the script.\n");
-print(" Hint: use one with the \"perl\" in its path\)\n");
+print(" Hint: use one with the \"bin\" in the path name
+		or \"perl5/bin\"  for the case of a local installation\)\n");
 
 for ( my $i = 0 ; $i < $lengthA ; $i++ ) {
 

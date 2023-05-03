@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "JSON::Any" : "0",
+            "JSON::PP" : "0",
             "JSON::XS" : "0",
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
@@ -49,6 +50,7 @@
       },
       "test" : {
          "requires" : {
+            "JSON::PP" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006"
@@ -58,39 +60,39 @@
    "provides" : {
       "Data::Verifier" : {
          "file" : "lib/Data/Verifier.pm",
-         "version" : "0.63"
+         "version" : "0.65"
       },
       "Data::Verifier::Field" : {
          "file" : "lib/Data/Verifier/Field.pm",
-         "version" : "0.63"
+         "version" : "0.65"
       },
       "Data::Verifier::Filters" : {
          "file" : "lib/Data/Verifier/Filters.pm",
-         "version" : "0.63"
+         "version" : "0.65"
       },
       "Data::Verifier::Nested" : {
          "file" : "lib/Data/Verifier/Nested.pm",
-         "version" : "0.63"
+         "version" : "0.65"
       },
       "Data::Verifier::Results" : {
          "file" : "lib/Data/Verifier/Results.pm",
-         "version" : "0.63"
+         "version" : "0.65"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Manwar/data-verifier/issues"
+         "web" : "https://github.com/manwar/data-verifier/issues"
       },
-      "homepage" : "https://github.com/Manwar/data-verifier",
+      "homepage" : "https://github.com/manwar/data-verifier",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Manwar/data-verifier.git",
-         "web" : "https://github.com/Manwar/data-verifier"
+         "url" : "https://github.com/manwar/data-verifier.git",
+         "web" : "https://github.com/manwar/data-verifier"
       }
    },
-   "version" : "0.63",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "version" : "0.65",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

@@ -1,0 +1,25 @@
+#!/bin/sh
+# postinst script for libnolookup-perl-test
+
+set -e
+
+case "$1" in
+    configure)
+	chown draupne:draupne /usr/share/norid/test
+        chown -R draupne:draupne /usr/share/norid/test/NOLookup
+	chmod u+rwX,go+rX /usr/share/norid/test
+        chmod -R u+rwX,go+rX /usr/share/norid/test/NOLookup
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

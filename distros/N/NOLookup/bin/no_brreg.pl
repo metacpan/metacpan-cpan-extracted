@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -6,8 +6,8 @@ use NOLookup::Brreg::DataLookup;
 use Encode;
 
 use vars qw / 
-    $opt_o $opt_n $opt_f $opt_t $opt_p $opt_i $opt_u 
-    $opt_d $opt_x $opt_v $opt_h
+    $opt_o $opt_n $opt_f $opt_t $opt_p $opt_i $opt_c
+    $opt_u $opt_d $opt_X $opt_v $opt_h $opt_D
     /;
 use Getopt::Std;
 
@@ -20,13 +20,13 @@ $Data::Dumper::Indent=1;
 # ref. https://metacpan.org/pod/LWP::ConsoleLogger::Everywhere
 #use LWP::ConsoleLogger::Everywhere;
 
-&getopts('hvuo:n:f:p:t:i:d:x:');
+&getopts('hvud:o:n:f:p:c:t:i:D:X:');
 
 if ($opt_h) {
     pod2usage();
 }
 
-unless ($opt_o || $opt_n || $opt_f || $opt_t || $opt_d || $opt_x) {
+unless ($opt_o || $opt_n || $opt_f || $opt_t || $opt_D || $opt_X) {
     pod2usage("An organization number, name, from/to dates or update date or -id must be specified!\n");
 }
 
@@ -35,18 +35,20 @@ my $h2 = "OrgNumber\tupdateDateTime\t\t\tupdateId";
 
 my $bo = NOLookup::Brreg::DataLookup->new;
 
+$bo->{debug} = 1 if ($opt_d);
+
 if ($opt_o) {
     $bo->lookup_orgno($opt_o, $opt_u);
 
 } elsif ($opt_n) {
     my $nm = decode('UTF-8', $opt_n);
-    $bo->lookup_orgname($nm, $opt_p, $opt_i, $opt_u);
+    $bo->lookup_orgname($nm, $opt_p, $opt_i, $opt_u, $opt_c);
 
 } elsif ($opt_f || $opt_t) {
     $bo->lookup_reg_dates($opt_f, $opt_t, $opt_p, $opt_i, $opt_u);
 
-} elsif ($opt_d || $opt_x) {
-    $bo->lookup_update_dates($opt_d, $opt_x, $opt_p, $opt_i, $opt_u);
+} elsif ($opt_D || $opt_X) {
+    $bo->lookup_update_dates($opt_D, $opt_X, $opt_p, $opt_i, $opt_u);
 }
  
 if ($bo->error) {
@@ -88,7 +90,7 @@ if ($bo->size <1) {
             encode('UTF-8', $e->navn), "\n";
     }
     
-} elsif ($bo->size > 1 && ($opt_d || $opt_x)) {
+} elsif ($bo->size > 1 && ($opt_D || $opt_X)) {
     print "Found ", $bo->size, " matching updated $etype entries:\n";
     print "$h2\n";
     foreach my $e (@{$bo->data}) {
@@ -212,15 +214,17 @@ Arguments:
   -t: to registration date   (2017-04-11)
 
   To list entries updated/changed since update date/id:
-  -d: from update date       (2017-04-11)
-  -x: from update id         (1234)
+  -D: from update date       (2017-04-11)
+  -X: from update id         (1234)
 
   When -n, -f, -t, -d or -i is specifed, also:
   -u: search in underenheter, else enheter.
   -p: max number of pages (1..x, default 10). 100 hits per page.
+  -c: page count, number of entries per page (1..x, default 100).
   -i: page index (0..x), which page to start on
 
   Other:
+  -d: debug: 1 or higher for increased debug level
   -h: help
   -v: verbose dump of the complete JSON data structure
 

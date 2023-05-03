@@ -118,7 +118,7 @@ sub lookup_orgno {
 }
 
 sub lookup_orgname {
-    my ($self, $orgname, $max_no_pages, $page_ix, $sok_underenheter) = @_;
+    my ($self, $orgname, $max_no_pages, $page_ix, $sok_underenheter, $page_sz) = @_;
     
     unless ($orgname) {
         $self->status("mandatory parameter 'orgname' not specified");
@@ -131,7 +131,9 @@ sub lookup_orgname {
     # Use the orgname as filter in search to brreg
     my $onm_e = uri_encode($orgname, {encode_reserved => 1});
 
-    my $BR = "$BRREG/$ENHETER/?size=$MAX_SIZE&navn=$onm_e";
+    my $PAGE_SIZE = $page_sz || $MAX_SIZE;
+    
+    my $BR = "$BRREG/$ENHETER/?size=$PAGE_SIZE&navn=$onm_e";
 
     $self->_fetch_pages($BR, $max_no_pages, $page_ix, $AC_HEADER);
 }
@@ -250,7 +252,7 @@ sub _fetch_pages {
 sub _lookup_org_entries {
     my ($self, $URL, $accept_header) = @_;
 
-    #print STDERR "URL: $URL\n";
+    print STDERR "URL: $URL\n" if ($self->{debug});
     
     my $mech = WWW::Mechanize->new(
         timeout => $BRREG_TIMEOUT,
@@ -315,6 +317,8 @@ sub _lookup_org_entries {
 	    $self->cur_page($eo->cur_page);
 	    $self->next_page($eo->next_page);
 	    $self->prev_page($eo->prev_page);
+	} else {
+	    $self->total_size(0);  
 	}
     }
 
@@ -374,7 +378,8 @@ Returns 0 entries if none found.
 Returns an array of NOLookup::Brreg::Entry objects in the data 
 when matches are found.
 
-A maximum of $max_no_pages pages are fetched, each of 100 entries.
+A maximum of $max_no_pages pages are fetched, each of $page_sz
+entries, default $MAX_SIZE.
 
 =head3 lookup_reg_dates()
 

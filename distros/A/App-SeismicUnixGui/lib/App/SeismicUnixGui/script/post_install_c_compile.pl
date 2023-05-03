@@ -46,17 +46,18 @@ my $choice         = 1;
 my $repeat         = 1;
 
 # search for c libraries
-my $starting_point = '/';
+my $starting_points = '/home /';
 my $file           = 'run_me_only.sh';
 my $pathNfile2find = "*c/synseis/$file";
 
 print(" Looking for script on the system...\n");
 
-my @list   = `(find $starting_point -path $pathNfile2find -print 2>/dev/null)`;
+my @list   = `(find $starting_points -path $pathNfile2find -print 2>/dev/null)`;
 my $length = scalar @list;
 
 print(" Found $length versions of the script:\n");
-print \(" Hint: use one with the \"perl\" in the path name\)\n");
+print(" Hint: use one with the \"bin\" in the path name
+       or \"perl5/bin\"  for the case of a local installation\n");
 
 for ( my $i = 0 ; $i < $length ; $i++ ) {
 

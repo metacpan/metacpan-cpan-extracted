@@ -1,3 +1,6 @@
+0.041 2023-05-03
+  [New Features]
+    * The version string can be got.
 0.04 2023-04-05
   [Prerequirement Change]
     * SPVM 0.9701 is required.

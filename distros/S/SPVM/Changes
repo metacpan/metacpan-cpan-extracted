@@ -1,3 +1,73 @@
+0.971012 2023-05-03
+  [Incompatible Changes]
+    * The index method in the Fn is replaced with the index_v2 method.
+    * The rindex method in the Fn is replaced with the rindex_v2 method.
+  
+0.971011 2023-05-03
+  [Compiler Options Changes]
+    * Removed -D__USE_MINGW_ANSI_STDIO of the compiler option that is used by SPVM.xs and SPVM core sources
+      because MinGW maybe changes the beheivior of functions in stdio.h.
+      -std=c99 defines this definition automatically.
+
+  [Document Changes]
+    * The die operator becomes the die statemenet.
+    * void Returning Operator is merged into Operator.
+    * The doc of the warn operator is improved.
+  [Bug Fix]
+    * XS and SPVM source codes were compiled by C99 in 0.9702, but in face compiled by GNU C99 from now.
+      XS and SPVM source codes are compiled by C99 now.
+    * Fixed the bug that the module_name option of the link method in ExtUtils::CBuilder is not set correctly.
+  [Document Changes]
+    * "Undefined Type" is renamed to "undef Type".
+  [New Feature]
+    * Added operand less warn operator.
+      warn;
+    * The warn operator allow undef type.
+      warn undef;
+  [Changes]
+    * The die operator performet numeric to string convertion.
+    * The die operator can't receive undef.
+    * The binding INIT block to Perl is skipped.
+    * The die operator becomes the die statemenet.
+  [Compilation Error Message Changes]
+    * The format of compilation error messages is changed.
+      [Before]
+        MESSAGE at FILE_NAME line LINE
+      [After]
+        MESSAGE.
+          at FILE_NAME line LINE
+  [Exception Message Changes]
+    * The exception messages in Standard Modules ends with ".".      
+    * The exception messages in Standard Modules ends with ".".
+    * The exception messages in operations ends with ".".
+    * The default die message is changed to "Died.".
+    * Fixed exception messages of the warn operator, print operator, make_read_only operator.
+  [Message Changes]
+    * The default warn message is changed to "Warned.".
+  [Warning Fix]
+    * Fixed warning that the binding subroutines are redefined when it is used twice.
+  [Internal Improvement]
+    * Use more snprintf instead of sprintf.
+0.971010 2023-05-02
+  [Notice of Backward Compatibility Breaking]]
+    * The index_v2 method in the Fn class is added, and the definition and implementation of the index method in the Fn class will be replaced to the index_v2 method in the Fn class.
+      The index_v2 method in the Fn class will be removed.
+      
+      [Before]
+      static method index : int ($string : string, $substring : string, $string_offset = 0 : int, $string_length = -1 : int);
+      
+      [After]
+      static method index : int ($string : string, $substring : string, $begin = 0 : int, $end = -1 : int);
+
+    * The rindex_v2 method in the Fn class is added, and the definition and implementation of the rindex method in the Fn class will be replaced to the rindex_v2 method in the Fn class.
+      The rindex_v2 method in the Fn class will be removed.
+      
+      [Before]
+      static method rindex : int ($string : string, $substring : string, $offset = 0 : int, $length = -1 : int);
+      
+      [After]
+      static method rindex_v2 : int ($string : string, $substring : string, $end = -1 : int, $begin = 0 : int);
+      
 0.971009 2023-04-30
   [Changes]
     * Support semi colon less eval block.

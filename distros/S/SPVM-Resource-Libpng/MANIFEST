@@ -491,6 +491,7 @@ lib/SPVM/Resource/Libpng.native/src/tests/pngvalid-transform
 lib/SPVM/Resource/Libpng.native/src/TODO
 lib/SPVM/Resource/Libpng.native/src/TRADEMARK
 lib/SPVM/Resource/Libpng.pm
+lib/SPVM/Resource/Libpng.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

@@ -5814,6 +5814,7 @@ lib/App/SeismicUnixGui/sunix/well/sugassman.pm
 lib/App/SeismicUnixGui/sunix/well/sulprime.pm
 lib/App/SeismicUnixGui/sunix/well/suwellrf.pm
 Makefile
+Makefile.old
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.bak

@@ -14,9 +14,14 @@ $Data::Dumper::Indent=1;
 
 my $PATENT_TIMEOUT = 60; # secs (default is 180 secs but we want shorter time).
 
+####
+# API ref: https://ws.patentstyret.no/search/metadata
+#          https://ws.patentstyret.no/search/json/metadata?op=Search
+###
+
 # Free text search gives too many hits, so use the trademark-text-search
-my $PATENT_SEARCH = "http://ws.patentstyret.no/search/json/reply/search/trademark/?trademarktext";
-my $PATENT_ID     = "http://ws.patentstyret.no/search/json/reply/DetailedInfoRequest/trademark/detailedinfo/?ApplicationNumber";
+my $PATENT_SEARCH = "https://ws.patentstyret.no/search/json/reply/search/trademark/?trademarktext";
+my $PATENT_ID     = "https://ws.patentstyret.no/search/json/reply/DetailedInfoRequest/trademark/detailedinfo/?ApplicationNumber";
 
 my @module_methods = qw /
 
@@ -42,18 +47,14 @@ __PACKAGE__->mk_accessors(
 ######## L o o k u p
 
 sub lookup_tm_text {
-    my ($self, $tm_text, $max_no_pages, $page_ix) = @_;
+    my ($self, $tm_text, $max_no_pages, $page_ix, $page_sz) = @_;
 
     die "mandatory parameter 'tm_text' not specified" unless ($tm_text);
 
     my $max_pg_to_fetch = $max_no_pages   || 10;
     my $pg_ix           = $page_ix        || 1;
+    my $max_pg_elems    = $page_sz        || 100;
 
-    # Use a fixed 100 on number of elements on page, to be consistent
-    # with brreg_difi API, which does not support setting of this
-    # parameter.
-    my $max_pg_elems = 100;
-    
     my $tmt_e = uri_encode($tm_text, {encode_reserved => 1});
 
     # set size and total size so we get the first lookup
@@ -91,7 +92,7 @@ sub lookup_tm_applid {
 sub _lookup_tm_entries {
     my ($self, $URL) = @_;
 
-    #print STDERR "URL: $URL\n";
+    print STDERR "URL: $URL\n" if ($self->{debug});
     
     my $mech = WWW::Mechanize->new(
         timeout => $PATENT_TIMEOUT,
@@ -103,7 +104,8 @@ sub _lookup_tm_entries {
     unless ($mech->success) {
 	$self->status($resp->status_line);
 	$self->error(1);
-	return $self;
+	# If a content exists, try a decode of it before return is done
+	return $self unless ($mech->content);
     }
     
     my $json;
@@ -123,7 +125,11 @@ sub _lookup_tm_entries {
 
     if ($json) {
 	$self->raw_json_decoded($json);
-	
+
+	# From above: For errors we now have a decoded content, time to return.
+	#print STDERR "TM lookup error: ", Dumper $mech;
+	return $self if ($self->error);
+
 	# Map the json data structure to 
 	# internal entry objects
 	my $eo = NOLookup::Patent::Entry->new;
@@ -139,6 +145,8 @@ sub _lookup_tm_entries {
 	    push @{$self->{data}}, @$entries;
 	    $self->size($self->size + $eo->result_count);
 	    $self->total_size($eo->total_result_count);
+	} else {
+	    $self->total_size(0);
 	}
     }
     return $self;
@@ -176,6 +184,7 @@ Mandatory parameters are:
 Optional parameters are:
    $max_no_pages: max. number of pages to return, default 10.
    $page_ix     : index to the first page to fetch, default 1.
+   $page_sz     : number of entries per page, default 100.
 
 Returns 0 entries if none found.
 

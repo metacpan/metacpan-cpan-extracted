@@ -2,9 +2,9 @@
 package Require::HookChain;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-08'; # DATE
+our $DATE = '2023-02-12'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -127,7 +127,7 @@ Require::HookChain - Chainable require hook
 
 =head1 VERSION
 
-This document describes version 0.008 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-08.
+This document describes version 0.009 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-12.
 
 =head1 SYNOPSIS
 
@@ -202,6 +202,38 @@ This lets one chainable hook munge the result of the previous chainable hook.
 To create your own chainable require hook, see example in L</"SYNOPSIS">. First
 you create a module under the C<Require::HookChain::*> namespace, then create a
 constructor as well as C<INC> handler.
+
+=head2 Subnamespace organization
+
+=over
+
+=item * Require::HookChain::filter::
+
+Hooks that filter module loading due to some criteria. These hooks can fail a
+module being loaded even though the source is available, if the additional
+criteria are not met.
+
+=item * Require::HookChain::log::
+
+Hooks that add logging to module loading process.
+
+=item * Require::HookChain::munge::
+
+Hooks that modify source code.
+
+=item * Require::HookChain::source::
+
+Hooks that allow loading module source from alternative sources.
+
+=item * Require::HookChain::test::
+
+Testing-related, particularly testing the Require::HookCHain hook module itself.
+
+=item * Require::HookChain::timestamp::
+
+Hooks that add timestamps during module loading process.
+
+=back
 
 =for Pod::Coverage ^(blessed)$
 

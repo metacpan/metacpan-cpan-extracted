@@ -1,0 +1,69 @@
+#!/usr/local/bin/perl -w
+##
+## Print the SNMP-accessibe portion of a Sun's process table
+## in a manner similar to ps -ef.
+##
+## Uses the "sun-snmp" MIB according to /var/snmp/mibs/sun.mib in
+## Solstice Enterprise Agents.
+##
+use strict;
+
+use SNMP_Session;
+use BER;
+
+my $host = shift @ARGV || usage (1);
+my $community = shift @ARGV || 'public';
+
+my $psProcessID = [1,3,6,1,4,1,42,3,12,1,1,1];
+my $psParentProcessID = [1,3,6,1,4,1,42,3,12,1,1,2];
+my $psProcessSize = [1,3,6,1,4,1,42,3,12,1,1,3];
+my $psProcessCpuTime = [1,3,6,1,4,1,42,3,12,1,1,4];
+my $psProcessState = [1,3,6,1,4,1,42,3,12,1,1,5];
+my $psProcessWaitChannel = [1,3,6,1,4,1,42,3,12,1,1,6];
+my $psProcessTTY = [1,3,6,1,4,1,42,3,12,1,1,7];
+my $psProcessUserName = [1,3,6,1,4,1,42,3,12,1,1,8];
+my $psProcessUserID = [1,3,6,1,4,1,42,3,12,1,1,9];
+my $psProcessProcessName = [1,3,6,1,4,1,42,3,12,1,1,10];
+my $psProcessProcessStatus = [1,3,6,1,4,1,42,3,12,1,1,11];
+
+my $session = SNMP_Session->open ($host, $community, 161);
+$session->map_table ([$psProcessID, $psParentProcessID,
+		      $psProcessSize, $psProcessCpuTime,
+		      $psProcessState, $psProcessWaitChannel,
+		      $psProcessTTY, $psProcessUserName,
+		      $psProcessUserID, $psProcessProcessName,
+		      $psProcessProcessStatus],
+		     \&out_process)
+    || warn "Problem walking process table";
+$session->close ()
+    || warn "Problem closing SNMP_Session";
+1;
+
+sub out_process ($$$$$$$$$$$$) {
+    my ($index, $pid, $ppid, $size, $cpu_time,
+	$status, $wchan, $tty, $user_name, $user_id,
+	$name, $process_status);
+    $index = shift @_;
+    grep (defined $_ && ($_=pretty_print $_), @_);
+    ($pid, $ppid, $size, $cpu_time,
+     $status, $wchan, $tty, $user_name, $user_id,
+     $name, $process_status) = @_;
+    die "PID inconsistent"
+	unless $index == $pid;
+    printf STDOUT ("%8s %5d %5d %5s %-8s %-20.20s\n",
+		   $user_name,
+		   $pid, $ppid,
+		   pretty_cpu_time ($cpu_time),
+		   $tty,
+		   $name);
+}
+
+sub pretty_cpu_time ($) {
+    my ($time) = @_;
+    sprintf ("%2d:%02d", $time / 60, $time % 60);
+}
+
+sub usage ($) {
+    warn "usage: $0 host [community]\n";
+    exit $_[0] if $_[0];
+}

@@ -1,5 +1,5 @@
 package OPM::Maker::Utils::OTRS4;
-$OPM::Maker::Utils::OTRS4::VERSION = '1.1.0';
+$OPM::Maker::Utils::OTRS4::VERSION = '1.1.1';
 # ABSTRACT: helper functions for ((OTRS)) Community Edition >= 4 
 
 use strict;
@@ -51,7 +51,7 @@ OPM::Maker::Utils::OTRS4 - helper functions for ((OTRS)) Community Edition >= 4
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 METHODS
 

@@ -1,5 +1,11 @@
 Revision history for Data::Verifier
 
+0.65  May 02 2023
+      - Added Hernan Lopes to the contributors list.
+
+0.64  May 02 2023
+      - Added support for Bool types, thanks @hernan604.
+
 0.63  Jun 17 2019
       - Handle "meta_yml_has_provides" issue raised by CPANTS.
 

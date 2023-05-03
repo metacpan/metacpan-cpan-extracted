@@ -38,34 +38,34 @@ enum {
 };
 
 static const char* SPVM_IMPLEMENT_STRING_LITERALS[] = {
-  "The memory allocation for the call stack failed",
-  "The value cannnot be cast to the non-assignable type",
-  "The read-only string cannnot be cast to the mutable string type",
-  "Integral type values cannnot be divided by 0",
-  "The left operand of the \".\" operator must be defined",
-  "The right operand of the \".\" operator must be defined",
-  "The object creating failed",
-  "The array creating failed",
-  "The length of the array must be greater than or equal to 0",
-  "The string creating failed",
-  "The length of the string must be greater than or equal to 0",
-  "The array must be defined",
-  "The index of the array access must be greater than or equal to 0 and less than the length of the array",
-  "The element cannnot be assigned to the non-assignable type",
-  "The invocant of the field access must be defined",
-  "The unboxing conversion cannnot be performed on the undefined value",
-  "The source of the unboxing conversion must be the corresponding numeric object type",
-  "The memory allocation for the weaken back reference failed",
-  "The operand of the copy operator must be a string type, a numeric type, or a multi numeric type",
-  "The error code must be greater than or equal to 1",
-  " at %s%s%s line %d\n",
-  "Warning: something's wrong at %s%s%s line %d\n",
-  "The implementation of the \"%s\" instance method defined in \"%s\" is not found",
-  "The %s basic type is not found",
-  "The %s field is not found",
-  "The %s class variable in the %s class is not found",
-  "The %s class is not found",
-  "The %s method in the %s class is not found",
+  "The memory allocation for the call stack failed.",
+  "The value cannnot be cast to the non-assignable type.",
+  "The read-only string cannnot be cast to the mutable string type.",
+  "Integral type values cannnot be divided by 0.",
+  "The left operand of the \".\" operator must be defined.",
+  "The right operand of the \".\" operator must be defined.",
+  "The object creating failed.",
+  "The array creating failed.",
+  "The length of the array must be greater than or equal to 0.",
+  "The string creating failed.",
+  "The length of the string must be greater than or equal to 0.",
+  "The array must be defined.",
+  "The index of the array access must be greater than or equal to 0 and less than the length of the array.",
+  "The element cannnot be assigned to the non-assignable type.",
+  "The invocant of the field access must be defined.",
+  "The unboxing conversion cannnot be performed on the undefined value.",
+  "The source of the unboxing conversion must be the corresponding numeric object type.",
+  "The memory allocation for the weaken back reference failed.",
+  "The operand of the copy operator must be a string type, a numeric type, or a multi numeric type.",
+  "The error code must be greater than or equal to 1.",
+  "\n  at %s%s%s line %d\n",
+  "Warned.\n  at %s%s%s line %d\n",
+  "The implementation of the \"%s\" instance method defined in \"%s\" is not found.",
+  "The %s basic type is not found.",
+  "The %s field is not found.",
+  "The %s class variable in the %s class is not found.",
+  "The %s class is not found.",
+  "The %s method in the %s class is not found.",
 };
 
 enum {
@@ -2219,48 +2219,42 @@ static inline void SPVM_IMPLEMENT_REFCNT(SPVM_ENV* env, SPVM_VALUE* stack, int32
 #define SPVM_IMPLEMENT_TYPE_CONVERSION_DOUBLE_TO_FLOAT(out, in) (out = (float)in)
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_BYTE_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, int8_t value, char* tmp_buffer, int32_t tmp_buffer_length) {
-  memset(tmp_buffer, 0, tmp_buffer_length);
-  sprintf(tmp_buffer, "%" PRId8, value);
+  snprintf(tmp_buffer, tmp_buffer_length, "%" PRId8, value);
   int32_t string_length = strlen(tmp_buffer);
   void* string = env->new_string_raw(env, stack, tmp_buffer, string_length);
   SPVM_IMPLEMENT_OBJECT_ASSIGN(env, stack, out, string);
 }
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_SHORT_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, int16_t value, char* tmp_buffer, int32_t tmp_buffer_length) {
-  memset(tmp_buffer, 0, tmp_buffer_length);
-  sprintf(tmp_buffer, "%" PRId16, value);
+  snprintf(tmp_buffer, tmp_buffer_length, "%" PRId16, value);
   int32_t string_length = strlen(tmp_buffer);
   void* string = env->new_string_raw(env, stack, tmp_buffer, string_length);
   SPVM_IMPLEMENT_OBJECT_ASSIGN(env, stack, out, string);
 }
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_INT_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, int32_t value, char* tmp_buffer, int32_t tmp_buffer_length) {
-  memset(tmp_buffer, 0, tmp_buffer_length);
-  sprintf(tmp_buffer, "%" PRId32, value);
+  snprintf(tmp_buffer, tmp_buffer_length, "%" PRId32, value);
   int32_t string_length = strlen(tmp_buffer);
   void* string = env->new_string_raw(env, stack, tmp_buffer, string_length);
   SPVM_IMPLEMENT_OBJECT_ASSIGN(env, stack, out, string);
 }
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_LONG_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, int64_t value, char* tmp_buffer, int32_t tmp_buffer_length) {
-  memset(tmp_buffer, 0, tmp_buffer_length);
-  sprintf(tmp_buffer, "%" PRId64, value);
+  snprintf(tmp_buffer, tmp_buffer_length, "%" PRId64, value);
   int32_t string_length = strlen(tmp_buffer);
   void* string = env->new_string_raw(env, stack, tmp_buffer, string_length);
   SPVM_IMPLEMENT_OBJECT_ASSIGN(env, stack, out, string);
 }
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_FLOAT_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, float value, char* tmp_buffer, int32_t tmp_buffer_length) {
-  memset(tmp_buffer, 0, tmp_buffer_length);
-  sprintf(tmp_buffer, "%g", value);
+  snprintf(tmp_buffer, tmp_buffer_length, "%g", value);
   int32_t string_length = strlen(tmp_buffer);
   void* string = env->new_string_raw(env, stack, tmp_buffer, string_length);
   SPVM_IMPLEMENT_OBJECT_ASSIGN(env, stack, out, string);
 }
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_DOUBLE_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, double value, char* tmp_buffer, int32_t tmp_buffer_length) {
-  memset(tmp_buffer, 0, tmp_buffer_length);
-  sprintf(tmp_buffer, "%g", value);
+  snprintf(tmp_buffer, tmp_buffer_length, "%g", value);
   int32_t string_length = strlen(tmp_buffer);
   void* string = env->new_string_raw(env, stack, tmp_buffer, string_length);
   SPVM_IMPLEMENT_OBJECT_ASSIGN(env, stack, out, string);
@@ -2679,8 +2673,7 @@ static inline void SPVM_IMPLEMENT_RETURN_MULNUM_DOUBLE(SPVM_ENV* env, SPVM_VALUE
 static inline void SPVM_IMPLEMENT_CALL_INTERFACE_METHOD(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* interface_name, const char* method_name, int32_t args_stack_length, int32_t* error, char* tmp_buffer, int32_t tmp_buffer_length) {
   int32_t entity_method_id = env->get_instance_method_id(env, stack, object, method_name);
   if (entity_method_id < 0) {
-    memset(tmp_buffer, 0, tmp_buffer_length);
-    snprintf(tmp_buffer, 255, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_NOT_FOUND], method_name, interface_name);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_NOT_FOUND], method_name, interface_name);
     void* exception = env->new_string_nolen_raw(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error = 1;

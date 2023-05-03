@@ -13,31 +13,30 @@ subtest 'generate_completion_script - bash' => sub {
 
 subtest 'generate_completion_script - zsh' => sub {
   local $ENV{SHELL} = '/bin/zsh';
-  like generate_completion_script(), qr{^_complete_t\(\)}s,                     'complete function';
-  like generate_completion_script(), qr{COMP_LINE=.*COMP_POINT=.*COMP_SHELL=}s, 'environment';
+  like generate_completion_script(), qr{^_complete_t\(\)}s,                       'complete function';
+  like generate_completion_script(), qr{COMP_LINE=.*COMP_POINT=.*COMP_SHELL=}s,   'environment';
   like generate_completion_script(), qr{compctl -f -K _complete_t complete\.t;}s, 'complete';
 };
 
 subtest 'complete_reply' => sub {
   local $Getopt::App::OPTIONS = [qw(file=s h v|version)];
   my $app = do($script) or die $@;
-  test_complete_reply($app, '', 0, [qw(beans coffee help invalid unknown -h --completion-script)]);
-  test_complete_reply($app, 'coff',      4, [qw(coffee)],                 'coffee');
-  test_complete_reply($app, '--',        2, [qw(--completion-script)],    'double dash');
-  test_complete_reply($app, '--',        1, [qw(-h --completion-script)], 'single dash');
-  test_complete_reply($app, 'coffee ',   7, [qw(-h --version --dummy)],   'subcommand');
-  test_complete_reply($app, 'coffee --', 9, [qw(--version --dummy)],      'subcommand double dash');
-  test_complete_reply($app, 'coffee   -- --ve', 15, [qw(--version)],      'subcommand spaces');
+  test_complete_reply($app, '', 0, [qw(foo beans coffee help invalid unknown --foo -h --completion-script)], 'empty');
+  test_complete_reply($app, 'coff',             4,  [qw(coffee)],                       'coffee');
+  test_complete_reply($app, '--c',              3,  [qw(--completion-script)],          'double dash');
+  test_complete_reply($app, '-',                1,  [qw(--foo -h --completion-script)], 'single dash');
+  test_complete_reply($app, 'coffee ',          7,  [qw(-h --version --dummy)],         'subcommand');
+  test_complete_reply($app, 'coffee --',        9,  [qw(--version --dummy)],            'subcommand double dash');
+  test_complete_reply($app, 'coffee   -- --ve', 15, [qw(--version)],                    'subcommand spaces');
 };
 
 done_testing;
 
 sub test_complete_reply {
-  my $app = shift;
-  local $ENV{COMP_LINE}  = join ' ', $0, shift;
-  local $ENV{COMP_POINT} = length($0) + 1 + shift;
+  my ($app, $arg, $pos, $exp, $desc) = @_;
+  local $ENV{COMP_LINE}  = join ' ', $0, $arg;
+  local $ENV{COMP_POINT} = length($0) + 1 + $pos;
   note "COMP_LINE='$ENV{COMP_LINE}' ($ENV{COMP_POINT})";
-  my ($exp, $desc) = @_;
   my $res = capture($app);
   is [split /\n/, $res->[0]], $exp, $desc || 'complete_reply' or diag "ERR: $res->[1]";
 }

@@ -1,0 +1,42 @@
+SVN-Rami
+
+Automates merging to two or more branches.
+
+Rami is intended to be invoked from the command line
+with arguments: -c <revision-number>
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SVN::Rami
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Rami
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/SVN-Rami
+
+    Search CPAN
+        https://metacpan.org/release/SVN-Rami
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023 by Dan Richter.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

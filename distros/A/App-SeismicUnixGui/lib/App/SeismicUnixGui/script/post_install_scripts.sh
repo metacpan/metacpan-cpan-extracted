@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # starting variable definitions
-starting_point='/usr'
+starting_points='/home /'
 priority_level='-O3'
 file='f'
 case=1
@@ -12,7 +12,7 @@ default_answer="y"
 # see if a global variable is set
 # SeismicUnixGui_script is a global variable for locating the script folder
 
-echo -e "\n\tGLOBAL VARIABLES"
+echo -e "\n\tGLOBAL VARIABLES*********************"
  if [ -z "${SeismicUnixGui_script}" ]; then
 	
  	echo  " Global variable SeismicUnixGui_script should be set"
@@ -36,28 +36,31 @@ hint_ans=''
 Afile2find="post_install_fortran_compile.pl"
 # read the list of files and their paths
 
+echo -e " Please be patient."
 echo -e " Looking for scripts to compile fortran and C code  ...\n"
-echo -e " Hint: Use case with the \"bin\" in its path.\n"
-readarray -d '' -t list < <(find $starting_point -type $file -name $Afile2find -print0 )
-
+echo -e " Hint: Choose a path with $Afile2find in its path."
+echo -e " A local installation also has \"perl5/bin\" in the path."
+echo -e " Ignore the case with \"blib\" in its path.\n"
+readarray -d '' -t list < <(find $starting_points -type $file -name $Afile2find -print 2>/dev/null )
 length=${#list[@]}
-echo -e " Found $length post-installation script(s) to run:\n"
+echo -e "Found $length post-installation script(s) to run:\n"
 
 for each in ${list[@]}
 do
     echo "Case $case:   $each"
     ((case=case+1))
     
-    # quiet test of success
-    echo $each | grep -q bin
-    ((ans=$?))
+    # quiet: -q; ignorable cases
+     echo $each | grep -q blib
+     ((ans=$?))
     
-    if [ $ans == 0 ]; then
-    
-     hint_ans=$each
-     # echo "found $each"
-     
-    fi
+     if [[ $ans == 0 ]]; then  
+       echo "Ignore"   
+     elif [[ $ans == 1 ]]; then    
+       hint_ans=$each      
+     else 
+       echo "unexpected L 65"
+     fi
     
 done
 
@@ -84,16 +87,17 @@ while [ $choice == $repeat ]; do
 	elif [[ "$answer" == "y" ]]; then
 	    ((choice=$continue))
 	else
-	    echo "uenxpected L 73"
+	    echo "uenxpected L 92"
 	fi
 
  done
 echo -e "\n perl $script_name\n"
 perl $script_name
 
-# read the list of files and their paths
-c_script_name=$(echo $script_name | sed -e 's/fortran/c/')
+# finished with programs in Fortran
 
+c_script_name=$(echo $script_name | sed -e 's/fortran/c/')
+# Now, for C programs -- read the list of files and their paths
 echo -e "\nNow, looking for scripts to compile C code  ..."
 echo -e "\nNext script name=$c_script_name"
 echo "Looking for $c_script_name to compile  C code  ..."

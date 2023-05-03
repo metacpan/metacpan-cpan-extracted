@@ -3,7 +3,8 @@ package NOLookup::RDAP::RDAPLookup::Whois;
 use warnings;
 use strict;
 use POSIX qw(locale_h);
-use base qw(NOLookup::RDAP::RDAPLookup);
+use base qw(NOLookup::RDAP::RDAPLookup); 
+use NOLookup::RDAP::RDAPLookup qw / $RDAP_LOOKUP_ERR_NO_MATCH /;
 use NOLookup::Whois::WhoisLookup;
 
 use Data::Dumper;
@@ -20,11 +21,15 @@ Uses internal helper formatting functions.
 =cut
 
 sub result_as_norid_whois_string {
-    my ($self, $check, $nameservers, $entity, $expand) = @_;
+    my ($self, $check, $nameservers, $entity, $expand, $lookup_reg_ent) = @_;
 
     my (@errors, $errs);
 
     my $rs = "";
+
+    # A check has no data, let the caller handle it.
+    return if ($check);
+    
     my $response = $self->result;
 
     if ($response->isa('Net::RDAP::Error')) {
@@ -32,7 +37,7 @@ sub result_as_norid_whois_string {
 	return $rs, \@errors;
     }
 
-    ($rs, $errs) = rdap_notice_as_norid_whois_string($self, $response);
+    ($rs, $errs) = $self->rdap_notice_as_norid_whois_string($response);
 
     if ($response->isa('Net::RDAP::SearchResult')) {
 
@@ -43,10 +48,11 @@ sub result_as_norid_whois_string {
 	    push @errors, @$errs if ($errs && @$errs);
 	    ++$ix;
 	}
-	$ix = 0;
 
+	$ix = 0;
 	foreach my $do ( $response->domains) {
-	    my ($rst, $errs) = $self->rdap_domain_obj_as_norid_whois_string($do, $ix, $check, $nameservers, $entity, 1, $expand);
+	    my ($rst, $errs) =
+		$self->rdap_domain_obj_as_norid_whois_string($do, $ix, $check, $nameservers, $entity, 1, $expand);
 	    $rs .= $rst if ($rst);
 	    push @errors, @$errs if ($errs && @$errs);
 	    ++$ix;
@@ -54,7 +60,8 @@ sub result_as_norid_whois_string {
 
 	$ix = 0;
 	foreach my $o ($response->entities) {
-	    my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($o, $ix, $check, $nameservers, $entity, 1);
+	    my ($rst, $errs) =
+		$self->rdap_entity_obj_as_norid_whois_string($o, $ix, $check, $nameservers, $entity, 1, $expand);
 	    $rs .= $rst if ($rst);
 	    push @errors, @$errs if ($errs && @$errs);
 	    ++$ix;
@@ -67,7 +74,15 @@ sub result_as_norid_whois_string {
 	push @errors, @$errs if ($errs && @$errs);
 
     } elsif ($response->class eq 'entity') {
-	my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($response, 0, $check, $nameservers, $entity, 0);
+
+	#print STDERR "** AN ENTITY OBJ: ix: 0, ",
+	#    ", ns    : ", $nameservers || 0,
+	#    ", entity: ", $entity || 0,
+	#    ", search: ", 0,
+	#    ", expand: ", $expand || 0,
+	#    "\n";
+
+	my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($response, 0, $check, $nameservers, $entity, 0, $expand);
 	$rs .= $rst if ($rst);
 	push @errors, @$errs if ($errs && @$errs);
 
@@ -107,6 +122,7 @@ sub rdap_ns_obj_as_norid_whois_string {
 	if ($nameservers) {
 	    # Multiple nameserver objects
 	    push @wa, "Hosts matching the search parameter";
+	    rdap_page_info_as_norid_whois_string($self, \@wa);
 	} else {
 	    # single NS
 	    push @wa, "Host information";
@@ -114,59 +130,53 @@ sub rdap_ns_obj_as_norid_whois_string {
     }
     push @wa, "";
 
+    if ($self->is_a_search) {
+	my $cnt = $ix+1;
+	push @wa, "[$cnt]";
+    }
     push @wa, "NORID Handle...............: " . $nso->handle;
 
-    if ($nameservers) {
-	# Nameservers multiple after search
-	# Entities contains the registrar info
+    ##
+    # $nso is a single nameserver, present the name
+    #print "RDL: NSO single: ", Dumper $nso;
 	
-	my @ent = $nso->entities;
+    my ($name, $xname) = $self->rdap_get_obj_name($nso);
 
-	if (scalar(@ent) > 0) {
-	    foreach my $en (@ent) {
-		push @wa, "Registrar Handle...........: " . uc($en->handle);
-	    }
-	}
+    push @wa, "Name Server Hostname.......: " . $name;
 
-    } else {
-	# single nameserver, present the name
-	#print "RDL: NSO single: ", Dumper $nso;
-	
-	my ($name, $xname) = $self->rdap_get_obj_name($nso);
-
-	push @wa, "Name Server Hostname.......: " . $name;
-
-	if ($xname ne $name) {
-	    # Not likely to have this for an ns under .no,
-	    # since ace coded ns is not allowd.
-	    push @errors, "Unexpected nameserver ACE name";
-	    push @wa, "ACE Name Server Hostname ...: " . $xname;
-	}
+    if ($xname ne $name) {
+	# Not likely to have this for an ns under .no,
+	# since ace coded ns is not allowd.
+	push @errors, "Unexpected nameserver ACE name";
+	push @wa, "ACE Name Server Hostname...: " . $xname;
+    }
     
-	my @addrs = $nso->addresses;
-	if (scalar(@addrs) > 0) {
-	    foreach my $ip (@addrs) {
-		push @wa, "Name Server IP-address.....: " . $ip->ip;
-	    }
+    my @addrs = $nso->addresses;
+    if (scalar(@addrs) > 0) {
+	foreach my $ip (@addrs) {
+	    push @wa, "Name Server IP-address.....: " . $ip->ip;
 	}
-
-	my @ent = $nso->entities;
-	if (scalar(@ent) > 0) {
-	    foreach my $en (@ent) {
-		my @roles = $en->roles;
-		if (scalar(@roles)) {
-		    my $role = $roles[0];
-		    if ($role eq 'registrar') {
-			push @wa, "Registrar Handle...........: " . uc($en->handle);
-		    } elsif ($role eq 'technical') {
-			push @wa, "Tech-c Handle..............: " . $en->handle;
-		    }
+    }
+    
+    my @ent = $nso->entities;
+    if (scalar(@ent) > 0) {
+	foreach my $en (@ent) {
+	    my @roles = $en->roles;
+	    if (scalar(@roles)) {
+		my $role = $roles[0];
+		if ($role eq 'registrar') {
+		    push @wa, "Registrar Handle...........: " . uc($en->handle);
+		} elsif ($role eq 'technical') {
+		    push @wa, "Tech-c Handle..............: " . $en->handle;
 		}
 	    }
 	}
+    }
 
-	push @wa, "";
+    push @wa, "";
 
+    # Add Additional dates only if single ns
+    unless ($nameservers) {
 	my @events = $nso->events;
 	if (scalar(@events)) {
 	    push @wa, "Additional information:";
@@ -175,7 +185,7 @@ sub rdap_ns_obj_as_norid_whois_string {
 		# DateTime object is UTC, convert to localtime
 		my $to = $event->date;
 		$to->set_time_zone('Europe/Oslo');
-
+		
 		if ($event->action eq 'registration') {
 		    $create_date = substr(scalar($to->date), 0, 10);
 		    push @wa, "Created:         " . $create_date;
@@ -190,8 +200,8 @@ sub rdap_ns_obj_as_norid_whois_string {
 	    }
 	}
 	
+	push @wa, "";
     }
-    push @wa, "";
     
     return join("\n", @wa), \@errors;;
 
@@ -209,7 +219,7 @@ sub rdap_notice_as_norid_whois_string {
     my (@errors, @wa);
     
     my @notices = $response->notices;
-    
+
     if (scalar(@notices) > 0) {
 	foreach my $notice (@notices) {
 
@@ -229,19 +239,26 @@ sub rdap_notice_as_norid_whois_string {
 
 Return whois formatted string.
 
-  $search indicates if a search is done, in which case the entity is a
-  set of at least one. 
+$search indicates if a search is done, in which case the entity is a
+set of at least one.
 
-  The header if built differently dependent of $nameservers and $search.
+The header if built differently dependent of $nameservers and $search.
+
+$lookup_reg_ent triggers lookup of registrar entity, if missing.
 
 =cut
 
 sub rdap_entity_obj_as_norid_whois_string {
-    my ($self, $eo, $ix, $check, $nameservers, $entity, $search) = @_;
+    my ($self, $eo, $ix, $check, $nameservers, $entity, $search, $expand, $lookup_reg_ent) = @_;
 
     my (@errors, @wa, @doms);
 
-    #print STDERR "ENTITY OBJ map2whois: ix: $ix, ns: ", $nameservers || 0, ", entity: ", $entity || 0, ", search: ", $search || 0, "\n";
+    #print STDERR "ENTITY OBJ map2whois: ix: $ix, ns: ", $nameservers || 0,
+    #	", entity        : ", $entity || 0,
+    #	", search        : ", $search || 0,
+    #	", expand        : ", $expand || 0,
+    #	", lookup_reg_ent: ", $lookup_reg_ent || 0,
+    #	"\n";
     
     unless ($eo->isa('Net::RDAP::Object::Entity')) {
 	push @errors, "Not an entity isa object";
@@ -257,23 +274,30 @@ sub rdap_entity_obj_as_norid_whois_string {
     push @wa, "";
     push @wa, "";
 
+    #print STDERR "rdap_entity_obj_as_norid_whois_string(), eo: ", Dumper $eo, "\n";
+
     # If there are entities inside an entity, it carries the registrar info,
     # if not, it is a registrar entity directly
     my @ent = $eo->entities;
-
     my $handle = $eo->handle;
     my $htype = $self->norid_handle_type($handle);
 
     if ($ix == 0) {
 	if ($search) {
 	    push @wa, "Contacts matching the search parameter";
+	    rdap_page_info_as_norid_whois_string($self, \@wa);
 	} else {
 	    push @wa, ucfirst($htype) . " Information";
 	}
 	push @wa, "";
     }
+    if ($search) {
+	my $cnt = $ix+1;
+	push @wa, "[$cnt]";
+    }
 
     #print STDERR "ENTITY REG map2whois\n";
+    #print STDERR "  number ent found: ", scalar(@ent), "\n";
 
     if ($htype eq 'registrar') {
 	push @wa, "Registrar Handle...........: " . uc($handle);
@@ -281,100 +305,46 @@ sub rdap_entity_obj_as_norid_whois_string {
     } else {
 	push @wa, "NORID Handle...............: " . uc($handle);
 
-	if ($search && !@ent) {
-	    #print STDERR "ENTITY obj, search and no ent, look them up\n";
+	if (($lookup_reg_ent || $search) && !@ent && ($expand || $entity)) {
 
-	    # Entity search on identity, need to look up the registrar handle
-	    # since it is not included in an entity list
-	    my (%entities, $entity);
-
-	    my $ro = NOLookup::RDAP::RDAPLookup->new(
-		{
-		    service_url         => $self->{service_url},
-		    debug               => $self->{debug},
-		    use_cache  	        => $self->{use_cache},
-		    norid_header_secret => $self->{norid_header_secret},
-		    norid_header_proxy  => $self->{norid_header_proxy},
-		});
-	    
-	    my $new = $ro->lookup($handle, $check, $nameservers, 1);
-
-	    if ($new->isa('Net::RDAP::Error')) {
-		push @errors, "Unable to lookup $handle: $handle, errorcode:" .
-		    $new->errorCode . "desc: " . $new->title;
-	    } else {
-		$entity = $new->result;
-		
-		my @nent = $entity->entities;
-		push @ent, @nent if (@nent);
-	    }
+	    $self->rdap_get_entities_by_entity_handle($handle, $check,
+					       $nameservers, \@ent, \@errors);
 	}
-	#print STDERR "ENTITY ENT map2whois: $handle\n";
 
-	if (scalar(@ent) > 0) {
+        if (scalar(@ent) > 0 && ($expand || $entity) &&
+	    ($htype eq 'organization' || $htype eq 'person')) {
 
-	    die "Unexpected handle type here: $handle" if ($htype eq 'registrar');
-
-	    if ($htype eq 'organization' || $htype eq 'person') {
-		# Entity lookup on registrant handle, need to
-		# search on the registrar handle since it is not
-		# included in an entity list, plus the domain list
-
-		my (%entities, $entity);
-
-		#print "ENTITY ORG $handle lookup in ENT map2whois\n";
-		
-		my $ro = NOLookup::RDAP::RDAPLookup->new(
-		    {
-			service_url         => $self->{service_url},
-			debug               => $self->{debug},
-			use_cache  	    => $self->{use_cache},
-			norid_header_secret => $self->{norid_header_secret},
-			norid_header_proxy  => $self->{norid_header_proxy},
-		    });
-
-		#print STDERR " ro ", Dumper $ro;
-
-		my $new = $ro->lookup($handle, $check, $nameservers, 0);
-
-		if ($new->isa('Net::RDAP::Error')) {
-		    push @errors, "Unable to lookup $handle: $handle, errorcode:" .
-			$new->errorCode . "desc: " . $new->title;
-		} else {
-		    $entity = $new->result;
-		    #print "ENTITY ORG ENT DONE, new is: ", Dumper $new;
-		    #print "ENTITY ORG ENT new result: ", Dumper $entity;
-				
-		    if ($entity && $entity->isa('Net::RDAP::SearchResult')) {
-			@doms = $entity->domains;
-		    }
-		}
-	    }
-	    
-	    foreach my $en (@ent) {
-		
-		my $ehandle = $en->handle;
-		my $ehtype  = $self->norid_handle_type($ehandle);
-		die "Unexpected ehandle type here: '$ehtype' for $ehandle" if ($ehtype ne 'registrar');
-		
-		my @roles = $en->roles;
-		
-		if (scalar(@roles)) {
-		    my $role = $roles[0];
-
-		    if ($role eq 'registrar') {
-			push @wa, "Registrar Handle...........: " . uc($ehandle);
-		} elsif ($role eq 'technical') {
-		    push @wa, "Tech-c Handle..............: " . $ehandle;
-		    die "Unexpected combination for role $role - only registrar expected here";
-		    } else {
-			die "Unexpected combination for role $role - only registrar expected here";
-		    }
-		}
-	    }
-	    
+	    $self->rdap_get_domains_by_entity_handle($handle, $check,
+					      $nameservers, \@doms, \@errors);
 	}
     }
+
+    foreach my $en (@ent) {
+	#print STDERR "en: ", Dumper $en, "\n";
+		
+	my $ehandle = $en->handle;
+	my $ehtype  = $self->norid_handle_type($ehandle);
+	die "Unexpected ehandle type here: '$ehtype' for $ehandle" if ($ehtype ne 'registrar');
+		
+	my @roles = $en->roles;
+
+	#print STDERR "en role: ", Dumper \@roles, "\n";
+
+	if (scalar(@roles)) {
+	    my $role = $roles[0];
+	    if ($role eq 'registrar') {
+		push @wa, "Registrar Handle...........: " . uc($ehandle);
+	    } elsif ($role eq 'technical') {
+		push @wa, "Tech-c Handle..............: " . $ehandle;
+		die "Unexpected combination for role $role - only registrar expected here";
+	    } else {
+		die "Unexpected combination for role $role - only registrar expected here";
+	    }
+	}
+    }
+
+    #print STDERR "eo: ", Dumper $eo, "\n";
+
     my @ids = $eo->ids;
     if (scalar(@ids)) {
 	foreach my $id (@ids) {
@@ -402,7 +372,6 @@ sub rdap_entity_obj_as_norid_whois_string {
 	foreach my $card (@cards) {
 	    # @cards may contain a single undef entry if no cards were found 
 	    next unless $card;
-
 	    my ($vcs, $errs) = $self->rdap_vcard_as_norid_whois_string($card, $htype, $eo);
 	    push @wa, $vcs if $vcs;
 
@@ -410,7 +379,7 @@ sub rdap_entity_obj_as_norid_whois_string {
 	}
     }
 
-    push @wa, "" unless ($search);
+    #push @wa, "" unless ($search);
 
     # Dates not presented in whois for a reg handle.
     unless ($htype eq 'registrar') {
@@ -445,15 +414,16 @@ sub rdap_entity_obj_as_norid_whois_string {
 	    push @wa, "";
 	    push @wa, "Total Number of Domains....: " . scalar(@doms);
 	    push @wa, "Domains....................: " . join(" ", sort(@dns));
+	    push @wa, "";
 	}
     }
 
     #print "ENTITY OBJ DONE\n";
-
     
     return join("\n", @wa), \@errors;
 
 }
+
 
 =head2 rdap_domain_obj_as_norid_whois_string
 
@@ -470,7 +440,9 @@ Return whois formatted string.
 =cut
 
 sub rdap_domain_obj_as_norid_whois_string {
-    my ($self, $do, $ix, $check, $nameservers, $entity, $search, $expand) = @_;
+    my ($self, $do, $ix, $check, $nameservers, $entity, $search, $expand, $lookup_reg_ent) = @_;
+
+    #print STDERR "ix: $ix, rdap_domain_obj_as_norid_whois_string()\n";
 
     my (@errors, @wa);
 
@@ -497,73 +469,47 @@ sub rdap_domain_obj_as_norid_whois_string {
     if ($ix == 0) {
 	if ($search) {
 	    # This search did not exist in the old whois
-	    push @wa, "Domains matching the search parameter (** extended whois **)";
-
+	    push @wa, "Domains matching the search parameter";
+	    rdap_page_info_as_norid_whois_string($self, \@wa);
 	} else {
 	    push @wa, ucfirst($htype) . " Information";
 	}
 	push @wa, "";
+    }
+    if ($search) {
+	my $cnt = $ix+1;
+	push @wa, "[$cnt]";
     }
 
     push @wa, "NORID Handle...............: " . uc($do->handle);
 
     my ($name, $xname) = $self->rdap_get_obj_name($do);
 
-    # If name is .no, RDAP currently fails, so skip it
-    #print STDERR "NAME is $name\n";
+    #print STDERR "Doman name is '$name'\n";
+
+    push @wa, "Domain Name................: " . $xname;
 	
-    unless ($search) {
-	push @wa, "Domain Name................: " . $xname;
-	
-	if ($xname ne $name) {
-	    # Not likely to have this for an ns under .no,
-	    # since ace coded ns is not allowd.
+    if ($xname ne $name) {
+	# Not likely to have this for an ns under .no,
+	# since ace coded ns is not allowd.
 	    push @wa, "ACE Domain Name............: " . $name;
-	}
     }
-    
+
     my $hoe;
     
     my @ent = $do->entities;
-    
-    if ($search && !@ent && $expand) {
-	# Domain search on identity, need to look up entities
-	# since they are not included
-	my (%entities, $entity);
-   
-	my $ro = NOLookup::RDAP::RDAPLookup->new(
-	    {
-		service_url         => $self->{service_url},
-		debug               => $self->{debug},
-		use_cache           => $self->{use_cache},
-		norid_header_secret => $self->{norid_header_secret},
-		norid_header_proxy  => $self->{norid_header_proxy},
-	    });
 
-	#print STDERR "DOMAIN obj, no embedded entities, lookup entity on $name\n";
-	
-	my $new = $ro->lookup($name, $check, $nameservers, 1);
+    if ($search && !@ent && ($expand || $entity)) {
+	#print STDERR "DOMAIN obj, but no embedded entities, lookup entity on domain name: '$name'\n";
 
-	if ($new->isa('Net::RDAP::Error')) {
-	    push @errors, "Unable to lookup $handle: $handle, errorcode:" .
-		$new->errorCode . "desc: " . $new->title;
-
-	} elsif ($new->result) {
-	    $entity = $new->result;
-	    #print STDERR "DOMAIN obj, no embedded entities: ", Dumper $entity;
-
-	    my @nent = $entity->entities if ($entity->entities);
-	    push @ent, @nent if (@nent);
-
-	} elsif ($new->isa('NOLookup::RDAP::RDAPLookup')) {
-	    # No result, error set by lookup function
-	}
-
+	$self->rdap_get_entities_by_domain_name($name, $check,
+					 $nameservers, \@ent, \@errors);
     }
 
     if (scalar(@ent) > 0) {
 
 	#print STDERR "DOMAIN obj, embedded entities found\n";
+	#print STDERR "  ent's: ", Dumper \@ent, "n";
 	
 	my (@ha, @ta, @ra);
 	foreach my $en (@ent) {
@@ -572,16 +518,14 @@ sub rdap_domain_obj_as_norid_whois_string {
 		my $role = $roles[0];
 		if ($role eq 'registrar') {
 		    push @ra, "Registrar Handle...........: " . uc($en->handle);
-		} elsif (!$search) {
-		   if ($role eq 'technical') {
-		       push @ta, "Tech-c Handle..............: " . $en->handle;
-		   } elsif ($role eq 'registrant') {
-		       push @ha, "Domain Holder Handle.......: " . $en->handle;
-		       $hoe = $en;
+		} elsif ($role eq 'technical') {
+		    push @ta, "Tech-c Handle..............: " . $en->handle;
+		} elsif ($role eq 'registrant') {
+		    push @ha, "Domain Holder Handle.......: " . $en->handle;
+		    $hoe = $en;
 
-		   } else {
-		       die "unexpected role: $role";
-		   }
+		} else {
+		    die "unexpected role: $role";
 		}
 	    }
 	}
@@ -624,7 +568,7 @@ sub rdap_domain_obj_as_norid_whois_string {
 	    push @wa, "Key Key       $ix..........: " . $key->key;
 	}
     }
-    
+
     unless ($search) {
 	push @wa, "";
     
@@ -655,12 +599,16 @@ sub rdap_domain_obj_as_norid_whois_string {
     if ($hoe && !$search) {
 	# We have the domain info above, attach registrant/holder info
 	# to simulate the output from Norid whois on a domain lookup.
-	my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($hoe, 0, $check, $nameservers, 1, 0);
+
+	#print STDERR "hoe entity as norid string\n";
+	#print STDERR "hoe entity, self: ", Dumper $self;
+
+	my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($hoe, 0, $check, $nameservers, 1, 0, $expand, 0);
 
 	push @wa, $rst if ($rst);
 	push @errors, @$errs if ($errs && @$errs);
     }
-    
+
     return join("\n", @wa), \@errors;
 
 }
@@ -730,12 +678,9 @@ sub rdap_vcard_as_norid_whois_string {
 	push @wa, "Type.......................: " . $type;
 
 	if ($type eq 'organization') {
-	    # TODO/Note:
 	    # When full layer access is configured, two names should be present in the card:
-	    #   - the legal name should be found in fn (instead of org. name as it is now)
+	    #   - the legal name should be found in fn
 	    #   - the org. name should be in the 'organization' field.
-	    # Currently only the org. name is returned and put in full_name
-	    # Have requested for support of both names in RDAP, it is put on the TODO list
 	    push @wa, "Organization Name..........: " . $card->organization if ($card->organization);
 	}
 	push @wa, "Name.......................: " . $card->full_name if ($card->full_name);
@@ -787,10 +732,11 @@ sub rdap_vcard_as_norid_whois_string {
     }
 
     foreach my $number (@{$card->phones}) {
+
 	my @types = ('ARRAY' eq ref($number->{'type'}) ? @{$number->{'type'}} : ($number->{'type'}));
 
-	# Separate between fax, cell and mobile phone
-	my $type = 'phone';
+	# Separate between fax, voice and cell phone
+	my $type = 'voice';
 	foreach my $t (@types) {
 	    $t = lc($t);
 	    if ($t eq 'fax' || $t eq 'cell') {
@@ -799,12 +745,13 @@ sub rdap_vcard_as_norid_whois_string {
 	    }	    
 	}
 
+	# strip the 'tel:' prefix
 	my $no = $number->{'number'};
-	$no =~ s/^tel://g;
-	
+	$no =~ s/^tel://;
+
 	if ($type eq 'fax') {
 	    push @wa, "Fax Number.................: $no";
-	} elsif ($type eq 'phone') {
+	} elsif ($type eq 'voice') {
 	    push @wa, "Phone Number...............: $no";
 	} elsif ($type eq 'cell') {
 	    push @wa, "Mobile Phone Number........: $no";
@@ -853,6 +800,55 @@ sub rdap_vcard_as_norid_whois_string {
    
     return join("\n", @wa), \@errors;
 }
+
+=head2 rdap_page_info_as_norid_whois_string
+
+Format and insert page info, if requested.
+
+=cut
+
+sub rdap_page_info_as_norid_whois_string {
+    my ($self, $wa) = @_;
+
+    #print STDERR "rdap_page_info_as_norid_whois_string() called\n";
+
+    return unless ($self->{insert_page_info});
+
+    my $nopages_int = $self->total_no_pages || 1;
+
+    #print STDERR "rdap_page_info_as_norid_whois_string() inserting\n";
+    #print STDERR "page_size  : ", $self->page_size, "\n";
+    #print STDERR "total_size : ", $self->total_size, "\n";
+    #print STDERR "page_number: ", $self->page_number, "\n";
+    #print STDERR "nopages_int: $nopages_int\n";
+
+    push @$wa, "";
+    push @$wa, "Page Number................: " . ($self->page_number || 1) . "/$nopages_int";
+    push @$wa, "Number Of Hits Shown.......: " . $self->size;
+    push @$wa, "Number Of Total Hits.......: " . $self->total_size;
+
+    return if ($self->size == $self->total_size);
+
+    # cur_page not interesting as I see it?
+    if ($self->first_page) {
+	#print STDERR " first_page: ", $self->first_page, "\n";
+    	push @$wa, "First Page.................: " . $self->first_page;
+    }
+    if ($self->cur_page) {
+	#print STDERR " cur_page: ", $self->cur_page, "\n";
+    	push @$wa, "Current Page...............: " . $self->cur_page;
+    }
+    if ($self->prev_page) {
+	#print STDERR " prev_page: ", $self->prev_page, "\n";
+	push @$wa, "Previous Page..............: " . $self->prev_page;    
+    }
+    
+    if ($self->size < $self->total_size && $self->next_page) {
+	#print STDERR " next_page: ", $self->next_page, "\n";
+	push @$wa, "Next Page..................: " . $self->next_page;
+    }
+}
+
 
 =head2 norid_whois_parse
 
@@ -927,6 +923,8 @@ $result must point to a domain result.
 sub rdap_get_domain_object_as_whois {
     my ($self, $result) = @_;
 
+    #print STDERR "rdap_get_domain_object_as_whois()\n";
+
     my @errors;
     
     # We expect only a domain name result
@@ -971,7 +969,6 @@ sub rdap_get_entity_objects_as_whois {
     if (scalar(@ent) > 0) {
 	$ix = 0;
 	foreach my $en (@ent) {
-    
 	    my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($en, $ix);
 	    unless ($rst) {
 		push @errors, "No whois string, not able to build entity_objects_as_whois";
@@ -1048,7 +1045,7 @@ sub rdap_get_nameserver_objects_as_whois {
 		if ($ix > 1) {
 		    push @errors, "Unexpected number of tech-contacts ($ix) for name server: $nsh!";
 		}
-		
+
 		my ($rst, $errs) = $self->rdap_entity_obj_as_norid_whois_string($en, $ix);
 		unless ($rst) {
 		    push @errors, "No whois string, not able to build nameserver tech entity objects_as_whois";
@@ -1081,7 +1078,6 @@ sub rdap_get_nameserver_objects_as_whois {
     return (\@nss, \@zcs, \@errors);
     
 }
-
 
 
 =pod
@@ -1159,9 +1155,10 @@ E<lt>(nospam)info(at)norid.noE<gt>
 
 =head1 SEE ALSO
 
-L<http://www.norid.no/en>
-L<https://www.norid.no/en/registrar/system/tjenester/whois-das-service>
-L<https://teknisk.norid.no/en/registrar/system/tjenester/rdap>
+L<https://www.norid.no/en>
+L<https://teknisk.norid.no/en/integrere-mot-norid/rdap-tjenesten>
+L<https://teknisk.norid.no/en/integrere-mot-norid/whois>
+
 =head1 CAVEATS
 
 =head1 AUTHOR
@@ -1182,33 +1179,5 @@ the Free Software Foundation; either version 2 of the License, or
 
 This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=head1 About the Norid RDAP API
-
-From Norid doc:
-
-RDAP is based on a subset of the HTTP protocol. The server accepts
-requests of type GET and HEAD. GET lookup is answered with data about
-the object in question. HEAD responds if the object exists or
-not. Both request types are answered with return code 200 / OK if the object
-exists, and return code 404 / NOT FOUND if the object does not exist, and other
-return code for other error types.
-
-The server supports the following types of lookups:
-
-    GET/HEAD https://rdap.norid.no/domain/<domenenavn>
-    GET/HEAD https://rdap.norid.no/entity/<handle>
-    GET/HEAD https://rdap.norid.no/registrar/<reg_handle>     (Norid extension)
-      Note: Returns same result as /entity/<reg_handle>
-    GET/HEAD https://rdap.norid.no/nameserver_handle/<handle> (Norid extension)
-
-And the following searches:
-
-    GET https://rdap.norid.no/nameservers?name=<hostname>
-    GET https://rdap.norid.no/domains?identity=<identity>  (Norid extension for proxy)
-    GET https://rdap.norid.no/domains?registrant=<handle>  (Norid extension for proxy)
-    GET https://rdap.norid.no/entities?identity=<identity> (Norid extension for proxy)
-
-=cut
 
 1;

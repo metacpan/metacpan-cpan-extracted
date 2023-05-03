@@ -1,6 +1,6 @@
 package App::SeismicUnixGui;
 
-$VERSION = '0.82.5';
+$VERSION = '0.82.6';
 use strict;
 use warnings;
 
@@ -16,23 +16,7 @@ Seismic Unix (Stockwell, 1999) is a widely distributed
 free software package for processing seismic reflection 
 and signal processing. 
 Perl/Tk is a mature, well-documented and free, 
-object-oriented graphical user interface for Perl. 
-
-=head1 ENVIRONMENTAL VARIABLES
-
-It is advisable to already have you environment variables
-properly defined. That is you should already have active the
-following definitions in your ".bashrc" file. For example:
-
-#for using a SeismicUnixGui installed via cpan  
-
-export SeismicUnixGui=/usr/local/share/perl/5.34.0/App/SeismicUnixGui 
- 
-export SeismicUnixGui_script=$SeismicUnixGui/script  
-
-export PATH=$PATH::$SeismicUnixGui_script  
-
-export PERL5LIB=$PERL5LIB:$SeismicUnixGui  
+object-oriented graphical user interface for Perl.  
 
 =head1 EXTRA PACKAGES
 
@@ -50,4 +34,21 @@ A.
 B.
   locate post_install_scripts.sh
 
-=head2 SeismicUnixGui Project Examples
+=head1 ENVIRONMENTAL VARIABLES
+
+GLOBAL INSTALLATION:
+It is advisable to have you environment variables
+properly defined. That is you should already have active the
+following definitions in your ".bashrc" file. For example:
+
+#for using a SeismicUnixGui installed via cpan  
+
+export SeismicUnixGui=/usr/local/share/perl/5.34.0/App/SeismicUnixGui 
+ 
+export SeismicUnixGui_script=$SeismicUnixGui/script  
+
+export PATH=$PATH::$SeismicUnixGui_script  
+
+export PERL5LIB=$PERL5LIB:$SeismicUnixGui 
+
+=head1 SeismicUnixGui Project Examples

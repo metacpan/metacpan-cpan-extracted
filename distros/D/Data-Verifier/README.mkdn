@@ -4,7 +4,7 @@ Data::Verifier - Profile based data verification with Moose type constraints.
 
 # VERSION
 
-version 0.63
+version 0.65
 
 # DESCRIPTION
 
@@ -85,12 +85,12 @@ be checked against it's type constraint.
 
 ## Serialization
 
-Data::Verifier uses [MooseX::Storage](https://metacpan.org/pod/MooseX::Storage) to allow serialization of
-[Data::Verifier::Results](https://metacpan.org/pod/Data::Verifier::Results) objects.  You can use this to store results for
+Data::Verifier uses [MooseX::Storage](https://metacpan.org/pod/MooseX%3A%3AStorage) to allow serialization of
+[Data::Verifier::Results](https://metacpan.org/pod/Data%3A%3AVerifier%3A%3AResults) objects.  You can use this to store results for
 validation across redirects.  Note, however, that the `value`
 attribute is **not** serialized.  Since you can coerce a value into anything
 it is not reasonable to expect to be able to serialize it.  Have a look at
-the `original_value` or `post_filter_value` in [Data::Verifier::Results](https://metacpan.org/pod/Data::Verifier::Results)
+the `original_value` or `post_filter_value` in [Data::Verifier::Results](https://metacpan.org/pod/Data%3A%3AVerifier%3A%3AResults)
 if you want to know more.
 
 ## Verifying Objects
@@ -282,7 +282,7 @@ are:
 - **filters**
 
     An optional list of filters through which this specific value will be run.
-    See the documentation for [Data::Verifier::Filters](https://metacpan.org/pod/Data::Verifier::Filters) to learn more.  This
+    See the documentation for [Data::Verifier::Filters](https://metacpan.org/pod/Data%3A%3AVerifier%3A%3AFilters) to learn more.  This
     value my be either a scalar (string or coderef) or an arrayref of strings or
     coderefs.
 
@@ -357,7 +357,7 @@ are:
 
     The name of the Moose type constraint to use with verifying this field's
     value. Note, this will also accept an instance of
-    [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose::Meta::TypeConstraint), although it may not serialize properly as a
+    [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose%3A%3AMeta%3A%3ATypeConstraint), although it may not serialize properly as a
     result.
 
 # METHODS
@@ -383,7 +383,7 @@ specific entity.
 ## verify (\\%parameters)
 
 Call this method and provide the parameters you are checking.  The results
-will be provided to you as a [Data::Verifier::Results](https://metacpan.org/pod/Data::Verifier::Results) object.
+will be provided to you as a [Data::Verifier::Results](https://metacpan.org/pod/Data%3A%3AVerifier%3A%3AResults) object.
 
 # CONTRIBUTORS
 
@@ -405,13 +405,15 @@ Wallace Reis
 
 Mohammad S Anwar
 
+Hernan Lopes
+
 # AUTHOR
 
 Cory G Watson <gphat@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Cold Hard Code, LLC.
+This software is copyright (c) 2023 by Cold Hard Code, LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Wikibase::Datatype::Print;
 use strict;
 use warnings;
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 1;
 
@@ -31,7 +31,7 @@ Wikibase form pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Item>
 
-TODO
+Wikibase item pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Lexeme>
 
@@ -39,7 +39,7 @@ Wikibase lexeme pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Mediainfo>
 
-TODO
+Wikibase mediainfo pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::MediainfoSnak>
 
@@ -51,7 +51,7 @@ Wikibase mediainfo statement pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Property>
 
-TODO
+Wikibase property pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Reference>
 
@@ -147,6 +147,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

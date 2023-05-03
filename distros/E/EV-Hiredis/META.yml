@@ -12,7 +12,7 @@ configure_requires:
   EV::MakeMaker: '0'
   File::Which: '0'
   Module::Build: '0.4005'
-  Module::Build::XSUtil: '0.02'
+  Module::Build::XSUtil: '0.03'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -34,7 +34,7 @@ no_index:
 provides:
   EV::Hiredis:
     file: lib/EV/Hiredis.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   EV: '4.11'
   XSLoader: '0.02'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/typester/EV-Hiredis/issues
   homepage: https://github.com/typester/EV-Hiredis
   repository: https://github.com/typester/EV-Hiredis.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'ICHINOSE Shogo <shogo82148@gmail.com>'
   - 'taniwaki-makoto <taniwaki-makoto@kayac.com>'

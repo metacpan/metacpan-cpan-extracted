@@ -376,8 +376,8 @@ E<lt>(nospam)info(at)norid.noE<gt>
 
 =head1 SEE ALSO
 
-L<http://www.norid.no/en>
-L<https://www.norid.no/en/registrar/system/tjenester/whois-das-service>
+L<https://www.norid.no/en>
+L<https://teknisk.norid.no/en/integrere-mot-norid/whois>
 
 =head1 CAVEATS
 

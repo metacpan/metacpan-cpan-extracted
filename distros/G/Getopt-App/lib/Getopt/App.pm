@@ -8,7 +8,7 @@ use Carp         qw(croak);
 use Getopt::Long ();
 use List::Util   qw(first);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
@@ -168,7 +168,6 @@ sub run {
   my $cb   = pop @rules;
   my $argv = ref $rules[0] eq 'ARRAY' ? shift @rules : [@ARGV];
   local $OPTIONS = [@rules];
-  @rules = map {s!$OPT_COMMENT_RE.*$!!r} @rules;
 
   my $app = $class->new;
   return $app->$call_maybe('getopt_complete_reply') if defined $ENV{COMP_POINT} and defined $ENV{COMP_LINE};
@@ -178,14 +177,7 @@ sub run {
   local $SUBCOMMANDS = $app->$call_maybe('getopt_subcommands');
   my $exit_value = $SUBCOMMANDS ? _subcommand_run_maybe($app, $SUBCOMMANDS, $argv) : undef;
   return _exit($app, $exit_value) if defined $exit_value;
-
-  my @configure = $app->$call_maybe('getopt_configure');
-  my $prev      = Getopt::Long::Configure(@configure);
-  my $valid     = Getopt::Long::GetOptionsFromArray($argv, $app, @rules) ? 1 : 0;
-  Getopt::Long::Configure($prev);
-  $app->$call_maybe(getopt_post_process_argv => $argv, {valid => $valid});
-
-  return _exit($app, $valid ? $app->$cb(@$argv) : 1);
+  return _run($app, \@rules, $argv, $cb);
 }
 
 sub _getopt_complete_reply { Getopt::App::Complete::complete_reply(@_) }
@@ -224,9 +216,25 @@ sub _exit {
   return $exit_value;
 }
 
+sub _run {
+  my ($app, $rules, $argv, $cb) = @_;
+  s!$OPT_COMMENT_RE.*$!! for @$rules;
+
+  my @configure = $app->$call_maybe('getopt_configure');
+  my $prev      = Getopt::Long::Configure(@configure);
+  my $valid     = Getopt::Long::GetOptionsFromArray($argv, $app, @$rules) ? 1 : 0;
+  Getopt::Long::Configure($prev);
+  $app->$call_maybe(getopt_post_process_argv => $argv, {valid => $valid});
+  return _exit($app, $valid ? $app->$cb(@$argv) : 1);
+}
+
 sub _subcommand_run {
   my ($app, $subcommand, $argv) = @_;
   local $Getopt::App::SUBCOMMAND = $subcommand;
+
+  my $method = $app->can($subcommand->[1]);
+  return _run($app, [@$OPTIONS], [@$argv[1 .. $#$argv]], $method) if $method;
+
   unless ($APPS{$subcommand->[1]}) {
     $APPS{$subcommand->[1]} = $app->$call_maybe(getopt_load_subcommand => $subcommand, $argv);
     croak "$subcommand->[0] did not return a code ref" unless ref $APPS{$subcommand->[1]} eq 'CODE';
@@ -406,7 +414,9 @@ differently. The default return value is:
 
   qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)
 
-The default return value is currently EXPERIMENTAL.
+Note that the default "pass_through" item is to enable the default
+L</getopt_post_process_argv> to croak on invalid arguments, since
+L<Getopt::Long> will by default just warn to STDERR about unknown arguments.
 
 =head2 getopt_load_subcommand
 
@@ -478,6 +488,11 @@ also use L<Getopt::App> for this to work properly.
 
 The sub-command will have C<$Getopt::App::SUBCOMMAND> set to the item found in
 the list.
+
+Instead of specifying a path, it is also possible to specify a method name, in
+case you want to include the sub commands inside the current script. Example:
+
+  [["foo", "command_foo", "help text"], ...]
 
 See L<https://github.com/jhthorsen/getopt-app/tree/main/example> for a working
 example.

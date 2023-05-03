@@ -1,5 +1,5 @@
 package OPM::Maker::Command::sopm;
-$OPM::Maker::Command::sopm::VERSION = '1.1.0';
+$OPM::Maker::Command::sopm::VERSION = '1.1.1';
 use v5.10;
 
 use strict;
@@ -117,6 +117,7 @@ sub execute {
             '4' => 'OTRS4',
             '5' => 'OTRS4',
             '6' => 'OTRS4',
+            '7' => 'OTRS4',
         },
         KIX => {
             '5' => 'OTRS4',
@@ -133,7 +134,7 @@ sub execute {
         $max = 5;
     }
 
-    my $mod   = $utils_versions{$product}->{$max} || $utils_versions{OTRS}->{3};
+    my $mod   = $utils_versions{$product}->{$max} || $utils_versions{OTRS}->{4};
     my $utils = 'OPM::Maker::Utils::' . $mod;
 
     if ( $json->{requires} ) {
@@ -735,7 +736,7 @@ OPM::Maker::Command::sopm - Build .sopm file based on metadata
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 DESCRIPTION
 

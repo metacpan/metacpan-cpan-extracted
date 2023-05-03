@@ -1011,6 +1011,12 @@ sub help_menubutton {
 		my $message = $message_director->help_button($item);
 
 	}
+	elsif ( length $install_option_ref
+		and $$install_option_ref eq $help_menubutton_type->{_InstallationGuide} ){
+
+		my $item    = $alias_help_menubutton_label_h->{_InstallationGuide};
+		my $message = $message_director->help_button_pdf($item);		
+	}
 	else {
 		carp("L_SU, can not provide help\n");
 		print("Help button option = $$install_option_ref\n");

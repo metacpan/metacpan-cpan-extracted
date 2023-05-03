@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.971009');
+my %configure_and_runtime_requires = ('SPVM' => '0.971010');
 WriteMakefile(
   NAME              => 'SPVM::JSON',
   VERSION_FROM      => 'lib/SPVM/JSON.pm', # finds $VERSION

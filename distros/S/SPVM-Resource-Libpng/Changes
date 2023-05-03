@@ -1,3 +1,6 @@
+0.011 2023-05-03
+  [New Features]
+    * The version string can be got.
 0.01  2023-04-05
   [CHANGES]
   * First release

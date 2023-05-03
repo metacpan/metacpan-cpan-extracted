@@ -4,7 +4,7 @@
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

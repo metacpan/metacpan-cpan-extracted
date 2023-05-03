@@ -131,6 +131,17 @@ sub help_button {
     return ();
 }
 
+sub help_button_pdf {
+    my ($self, $item ) = @_;
+
+    my $message_item  = $item;
+    $help_button->set_pdf($message_item);
+    $help_button->get_pdf();  
+#    print("message_director,help_button,_pdf message=$message_item\n");
+    
+    return ();
+}
+
 sub immodpg {
     my ( $self, $number ) = @_;
 

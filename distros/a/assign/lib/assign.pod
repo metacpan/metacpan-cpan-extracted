@@ -1,0 +1,21 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+assign - Enable Destructuring Assignment Syntax in Perl
+
+=head1 SYNOPSIS
+
+    my {$foo, bar => [ $x1, $x2, @xs ]} = $self->data;
+
+=head1 STATUS
+
+PRE-ALPHA. Forget you've seen this!
+
+=head1 DESCRIPTION
+
+This module enables a destructuring assignment syntax for Perl. Various complex data structure definitions on the LHS of assignment result can be used to unpack a complex data structure using variables that match keys and positions on the RHS.
+
+=cut

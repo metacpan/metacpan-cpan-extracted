@@ -11,7 +11,7 @@ Readonly::Array our @EXPORT_OK => qw(print_aliases print_common print_descriptio
 	print_forms print_glosses print_labels print_references print_senses
 	print_sitelinks print_statements);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 sub print_aliases {
 	my ($obj, $opts_hr, $alias_cb) = @_;
@@ -293,6 +293,34 @@ Returns array with pretty print strings.
  # Output:
  # Description: domácí zvíře (cs)
 
+=head1 EXAMPLE3
+
+=for comment filename=utils_print_forms.pl
+
+ use strict;
+ use warnings;
+
+ use Unicode::UTF8 qw(encode_utf8);
+ use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
+ use Wikibase::Datatype::Print::Form;
+ use Wikibase::Datatype::Print::Utils qw(print_forms);
+
+ my $obj = Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun->new;
+ my @ret = print_forms($obj, {'lang' => 'cs'},
+         \&Wikibase::Datatype::Print::Form::print);
+
+ # Print.
+ print encode_utf8(join "\n", @ret);
+ print "\n";
+
+ # Output:
+ # Forms:
+ #   Id: L469-F1
+ #   Representation: pes (cs)
+ #   Grammatical features: Q110786, Q131105
+ #   Statements:
+ #     P898: pɛs (normal)
+
 =head1 DEPENDENCIES
 
 L<Error::Pure>,
@@ -317,6 +345,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

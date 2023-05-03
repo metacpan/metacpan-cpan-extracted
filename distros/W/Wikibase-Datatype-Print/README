@@ -10,13 +10,13 @@ SEE ALSO
         Wikibase form pretty print helpers.
 
     Wikibase::Datatype::Print::Item
-        TODO
+        Wikibase item pretty print helpers.
 
     Wikibase::Datatype::Print::Lexeme
         Wikibase lexeme pretty print helpers.
 
     Wikibase::Datatype::Print::Mediainfo
-        TODO
+        Wikibase mediainfo pretty print helpers.
 
     Wikibase::Datatype::Print::MediainfoSnak
         Wikibase mediainfo snak pretty print helpers.
@@ -25,7 +25,7 @@ SEE ALSO
         Wikibase mediainfo statement pretty print helpers.
 
     Wikibase::Datatype::Print::Property
-        TODO
+        Wikibase property pretty print helpers.
 
     Wikibase::Datatype::Print::Reference
         Wikibase reference pretty print helpers.
@@ -93,5 +93,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

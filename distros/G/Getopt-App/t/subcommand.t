@@ -8,7 +8,15 @@ plan skip_all => "$script" unless -x $script;
 local $0 = $script;
 my $app = do($script) or die $@;
 
-subtest 'dispatch' => sub {
+subtest 'dispatch to method' => sub {
+  my $res = capture($app, [qw(foo)]);
+  like $res->[0], qr{args= foo=}, 'plain stdout' or diag "ERROR: $res->[1]";
+
+  $res = capture($app, [qw(foo --foo cool a b c)]);
+  like $res->[0], qr{args=a,b,c foo=cool}, 'args stdout' or diag "ERROR: $res->[1]";
+};
+
+subtest 'dispatch to script' => sub {
   my $res = capture($app, []);
   is $res->[2], 10, 'main exit';
   like $res->[0], qr{\bcool$}, 'main stdout' or diag "ERROR: $res->[1]";
@@ -39,6 +47,7 @@ subtest 'help' => sub {
   my $res = capture($app, [qw(-h)]);
   is $res->[0], <<'HERE', 'help';
 Subcommands:
+  foo      internal method
   beans    Try beans.pl
   coffee   Try coffee.pl
   help     Try help.pl
@@ -46,6 +55,7 @@ Subcommands:
   unknown  Try unknown.pl
 
 Options:
+  --foo                Argument for foo
   -h                   Print help
   --completion-script  Print autocomplete script
 

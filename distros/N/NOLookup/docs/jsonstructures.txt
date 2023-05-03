@@ -1,0 +1,156 @@
+domain lookup, all data: https://rdap.test.norid.no/domain/norid.no:
+
+
+
+Search on domain, nameserver or identity:
+
+Net::RDAP::SearchResult: result is one of:
+ - domains[domain]
+ - nameservers[nameserver]
+ - entities[entity]
+
+
+- domain (Net::RDAP::Object::Domain):
+ - objectClassName = 'domain'
+ - handle
+ - ldhName
+ - unicodeName,
+ - nameservers[nameserver]
+ - ipAddresses{}
+ - entities[entity]
+ - events[]
+ - secureDNS{}
+ - notices[]
+ - links[]
+
+
+- nameserver:
+   - objectClassName = 'nameserver'
+   - rdapConformance[]
+   - handle
+   - ldhName
+   - ipAddresses{v4[], v6[]}
+   - events[{}]
+   - entities[{}]
+   - notices[{}]
+   - links[{}]
+
+
+- entity:
+  - objectClassName = 'entity'
+  - rdapConformance[]
+  - handle
+  - roles [techical, registrar, registrant]
+  - events
+  - vcardArray' => [vcard,]
+  - publicIds[{}]  
+  - notices[{}]
+  - links[{}]
+
+
+- ipAddresses" : {
+        "v4" : [
+            "1.2.3.2"
+         ],
+         "v6" : [
+            "2001:700:0:5561::1001"
+         ]
+      },
+
+
+- secureDNS" : {
+      "delegationSigned" : true,
+      "dsData" : [
+         {
+            "digestType" : 2,
+            "keyTag" : 1630,
+            "algorithm" : 10,
+            "digest" : "a7016b9c6f2f35efe7f1cd1fc046e863363c1c3cb8706d57491ad19e5932cf83"
+         },
+         {
+            "digest" : "25ac53dda1a3b5128c0e203fe626849c19e443a37e3fa609d8636c62b60db93f",
+            "digestType" : 2,
+            "keyTag" : 11542,
+            "algorithm" : 8
+         }
+      ]
+   },
+
+
+- vcard []:
+  0: version ['version', {}, 'text','4.0'],
+  1: fn      ['fn', {}, 'text', 'Tech Role for Haugen' ],
+  2: kind    ['kind', {}, 'text', 'group' ],
+  3: adr     [ 'adr', {}, 'text', [
+              '',
+              '',
+              [
+                "Abelsgate 5 \x{e6}\x{f8}\x{e5} \x{e6}\x{f8}\x{e5}"
+              ],
+              'SAKSVIK',
+              '',
+              'NO-7562',
+              'NORWAY'
+             ]    
+            ],
+
+  4: url    ["url", {}, "uri", "http://tronds-registrartjeneste.no" ],
+
+  5: tel    [ 'tel', {
+              'type' => [
+                'voice',
+                'cell'
+              ]
+            },
+            'uri',
+            'tel:+47.982364422'
+            ],
+	    
+  6: email [
+            'email',
+            {
+              'pref' => '1'
+            },
+            'text',
+            'info@norid.no'
+          ],
+          [
+            'email',
+            {},
+            'text',
+            'trond-admin@thaugen.no'
+          ]
+        ]
+      ],
+
+
+- links:
+        {
+          'href' => 'https://rdap.test.norid.no/entity/TRH2R-NORID',
+          'type' => 'application/rdap+json',
+          'value' => 'https://rdap.test.norid.no/entity/TRH2R-NORID',
+          'rel' => 'self'
+        }
+      ],
+    },
+
+
+- events_
+      {
+         "eventDate" : "2010-02-08T14:40:51Z",
+         "eventAction" : "registration"
+      },
+      {
+         "eventDate" : "2022-11-18T15:01:58Z",
+         "eventAction" : "last changed"
+      }
+   ],
+
+----
+
+  'rdapConformance' => [
+    'rdap_level_0',
+    'rdap_objectTag_level_0',
+    'norid_level_0'
+  ],
+

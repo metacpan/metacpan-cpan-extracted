@@ -2,7 +2,7 @@
 # MIT License
 
 class JSON : precompile {
-  version "0.051";
+  version "1.001";
   
   use Hash;
   use List;
@@ -230,7 +230,7 @@ class JSON : precompile {
     if (length $last_line > 0 && $last_line->[length $last_line - 1] == '\r') {
       Fn->shorten($last_line, length $last_line - 1);
     }
-    my $last_new_line_pos = Fn->rindex($json_data, "\n", 0, $pos);
+    my $last_new_line_pos = Fn->rindex($json_data, "\n", $pos);
     
     my $last_line_pos = 0;
     if ($last_new_line_pos >= 0) {
@@ -362,7 +362,7 @@ class JSON : precompile {
       $$json_data_index += 2;
     }
     elsif (!Fn->is_digit($json_data->[$$json_data_index])) {
-      die "Invalid number";
+      &_decode_error("Invalid number", $json_data, $$json_data_index);
     }
 
     $state = &DECODE_NUM_LEADING_DIGIT();
@@ -597,10 +597,3 @@ class JSON : precompile {
     return $buffer->to_string;
   }
 }
-
-=pod TODO
-
-escape_slash => default false | field
-
-=cut
-

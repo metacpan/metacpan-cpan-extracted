@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+ <HEAD>
+  <TITLE>SNMP support for Perl 5</TITLE>
+ </HEAD>
+ <BODY bgcolor="#ffffff">
+<DIV ALIGN=CENTER>
+  <H1>SNMP support for Perl 5</H1>
+
+  <p> Copyright (c) 1995-2009, Simon Leinen<br>
+  All rights reserved </p>
+
+  <em> This program is free software; you can redistribute it under
+  the <a href="dist/Artistic">"Artistic License 2.0"</a> included in
+  this distribution. </em>
+
+  <p>Author: <A HREF="http://www.switch.ch/misc/leinen/">Simon
+Leinen</A> &lt;<A
+HREF="mailto:simon.leinen@switch.ch">simon.leinen@switch.ch</A>&gt;</p>
+
+</DIV>
+
+<p> This package contains Perl 5 modules <tt>SNMP_Session.pm</tt>,
+<tt>BER.pm</tt>, and <tt>SNMP_util.pm</tt> which, when used together,
+provide rudimentary access to remote SNMP (v1/v2)
+agents. </p>
+
+<p> <b> Download it from <a href="http://code.google.com/p/snmp-session/downloads/"><tt>http://code.google.com/p/snmp-session/downloads/</tt></a></b> </p>
+
+<!--            <iframe marginwidth="0" marginheight="0" width="120" height="240" scrolling="no" frameborder="0" src="http://rcm.amazon.com/e/cm?o=1&l=as1&f=ifr&t=simonleinensbook&p=8&asins=0596000200&IS2=1&amp;lt1=_blank"><MAP NAME="boxmap-p8"><AREA SHAPE="RECT" COORDS="14, 200, 103, 207" HREF="http://rcm.amazon.com/e/cm/privacy-policy.html?o=1" ><AREA COORDS="0,0,10000,10000" HREF="http://www.amazon.com/exec/obidos/redirect-home/simonleinensbook" ></map><img src="http://rcm-images.amazon.com/images/G/01/rcm/120x240.gif" width="120" height="240" border="0" usemap="#boxmap-p8" alt="Shop at Amazon.com"></iframe>    -->         
+
+<p> The library is featured in the book <em><a
+href="http://www.oreilly.com/catalog/esnmp/">Essential SNMP</a></em>
+by Douglas R. Mauro and Kevin J. Schmidt, July 2001, O'Reilly &amp;
+Associates, ISBN: 0-59600020-0.  You can buy it on-line at <a
+href="http://www.amazon.com/exec/obidos/ASIN/0596000200/simonleinensbook/ref=nosim/"><img
+border=0 width=90 height=29 align="middle"
+src="http://www.switch.ch/misc/leinen/images/amazon/90X29-w-logo.gif"
+alt="Amazon.com"></a> <a
+href="http://www.amazon.de/exec/obidos/ASIN/0596000200/simonleinensbo0d/ref=nosim/"><img
+align="middle"
+src="http://www.switch.ch/misc/leinen/images/amazon/w_90x31.gif"
+width=90 height=31 border="0" alt="In Partnerschaft mit
+Amazon.de"></a>. </p>
+
+<H2>Features</H2>
+
+<P> This module differs from existing SNMP packages in that it is
+ completely stand-alone, i.e. you don't need to have another SNMP
+ package such as Net-SNMP.  It is also written entirely in Perl, so
+ you don't have to compile any C modules.  It uses the Perl 5
+ <SAMP>Socket.pm</SAMP> module and should therefore be very portable,
+ even to non-Unix systems. </P>
+
+<p> Note: For the development of new scripts, I strongly recommend to
+use the higher-level programming interface provided by
+<tt>SNMP_util.pm</tt>.  Its use is described in <a
+href="dist/README.SNMP_util"><tt>README.SNMP_util</tt></a>.  The
+remainder of this page desribes the low-level API in
+<tt>SNMP_Session.pm</tt>, which you normally shouldn't use. </p>
+
+<p> The SNMP operations currently supported are "get", "get-next",
+ "get-bulk" and "set", as well as trap generation and reception. </p>
+
+<p> For an excellent example of the type of application this is useful
+ for, see Tobias
+ Oetiker's <a href="URL:http://oss.oetiker.ch/mrtg/">``mrtg'' (Multi
+ Router Traffic Grapher)</a> tool.  Another application that uses this
+ library is <a href="http://www.dynw.com/iog/">IOG</a> (Input/Output
+ Grapher). </p>
+
+<h2> Recent Changes: </h2>
+
+<p> For a list of changes, see the <samp><a
+href="changes.html">changes.html</a></samp> file packaged with this
+system. </p>
+
+<h2> Usage </h2>
+
+See the <b>EXAMPLES</b> section in the POD documentation
+of <tt>SNMP_Session.pm</tt>.
+
+<H2>Future Plans</H2>
+
+<H3>SNMPv3 Support</H3>
+
+<P> The code could first be restructured to follow the modularization
+ proposed in <a
+ href="ftp://sunsite.cnlab-switch.ch/doc/standard/rfc/22xx/2271">RFC
+ 2271</a> (An Architecture for Describing SNMP Management Frameworks).
+ The existing SNMPv1 and SNMPv2c support must somehow be retrofitted
+ to this framework.  Later, one could add support for SNMPv3 PDU
+ formats and for user-based security. </p>
+
+<H3>Higher-Level APIs</H3>
+
+<P> The current programming interface is very close to the level of
+ SNMP operations and PDUs.  For actual management applications, there
+ are probably more convenient interfaces that could be defined. </P>
+
+<HR>
+<ADDRESS>
+<!-- hhmts start -->20091228
+<!-- hhmts end -->
+<A HREF="http://www.switch.ch/misc/leinen/">
+ Simon Leinen &lt;simon.leinen@switch.ch&gt;</A>
+
+<A HREF="http://validator.w3.org/"><IMG ALIGN=RIGHT BORDER=0
+     SRC="http://www.switch.ch/misc/leinen/images/vh40.gif"
+     ALT="Valid HTML 4.0!" HEIGHT=31 WIDTH=88></A>
+
+</ADDRESS>
+
+</BODY>
+</HTML>

@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -49,17 +49,20 @@ Wikibase::Datatype::Print::Value::Item - Wikibase item value pretty print helper
  use Wikibase::Datatype::Print::Value::Item qw(print);
 
  my $pretty_print_string = print($obj, $opts_hr);
+ my @pretty_print_lines = print($obj, $opts_hr);
 
 =head1 SUBROUTINES
 
 =head2 C<print>
 
  my $pretty_print_string = print($obj, $opts_hr);
+ my @pretty_print_lines = print($obj, $opts_hr);
 
 Construct pretty print output for L<Wikibase::Datatype::Value::Item>
 object.
 
-Returns string.
+Returns string in scalar context.
+Returns list of lines in array context.
 
 =head1 ERRORS
 
@@ -122,6 +125,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

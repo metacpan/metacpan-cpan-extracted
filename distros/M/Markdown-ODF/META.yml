@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/Amtivo-Group/Markdown-ODF/issues
   homepage: https://github.com/Amtivo-Group/Markdown-ODF/
   repository: https://github.com/Amtivo-Group/Markdown-ODF
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

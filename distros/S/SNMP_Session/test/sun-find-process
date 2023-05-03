@@ -1,0 +1,41 @@
+#!/usr/local/bin/perl -w
+##
+## Usage: find-process name host [community]
+##
+## List the PID(s) of processes of a given NAME running on a given
+## HOST, using SNMP community COMMUNITY.
+##
+## Uses the "sun-snmp" MIB according to /var/snmp/mibs/sun.mib in
+## Solstice Enterprise Agents.
+##
+use strict;
+
+use SNMP_Session;
+use BER;
+
+my $proc_name = shift @ARGV || usage (1);
+my $host = shift @ARGV || usage (1);
+my $community = shift @ARGV || 'public';
+
+my $psProcessID = [1,3,6,1,4,1,42,3,12,1,1,1];
+my $psProcessProcessName = [1,3,6,1,4,1,42,3,12,1,1,10];
+
+my $session = SNMP_Session->open ($host, $community, 161);
+$session->map_table ([$psProcessProcessName],
+		     sub
+		     {
+			 my ($index, $name);
+			 $index = shift @_;
+			 grep (defined $_ && ($_=pretty_print $_), @_);
+			 ($name) = @_;
+			 print STDOUT $index,"\n" if $name eq $proc_name;
+		     })
+    || warn "Problem walking process table";
+$session->close ()
+    || warn "Problem closing SNMP_Session";
+1;
+
+sub usage ($) {
+    warn "usage: $0 host [community]\n";
+    exit $_[0] if $_[0];
+}

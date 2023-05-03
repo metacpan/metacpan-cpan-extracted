@@ -41,7 +41,7 @@
             "EV::MakeMaker" : "0",
             "File::Which" : "0",
             "Module::Build" : "0.4005",
-            "Module::Build::XSUtil" : "0.02"
+            "Module::Build::XSUtil" : "0.03"
          }
       },
       "develop" : {
@@ -65,7 +65,7 @@
    "provides" : {
       "EV::Hiredis" : {
          "file" : "lib/EV/Hiredis.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/typester/EV-Hiredis"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "ICHINOSE Shogo <shogo82148@gmail.com>",
       "taniwaki-makoto <taniwaki-makoto@kayac.com>",

@@ -1,5 +1,8 @@
 Revision history for perl distribution Getopt-App
 
+0.13 2023-05-03T13:38:06
+ - Made it much easier to call methods as sub commands
+
 0.12 2023-01-12T17:45:46
  - Made capture() more robust
 

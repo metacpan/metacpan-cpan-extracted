@@ -4,8 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "1.24";
-
+our $VERSION = "1.37.19";
 
 =pod 
 
@@ -21,7 +20,7 @@ See the POD for the respective lookup modules.
 
 =head1 DESCRIPTION
 
-Search and lookup information about Noriwegian domains, organizations and trademarks.
+Search and lookup information about Norwegian domains, organizations and trademarks.
 
 See POD for each lookup module for further details.
 

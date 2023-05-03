@@ -1,0 +1,69 @@
+#!/usr/local/bin/perl -w
+### discover
+### Author:	  Simon Leinen <simon@switch.ch>
+### Date Created: 1998-Oct-16
+###
+### discover ADDRESS [COMMUNITY]
+###
+### Send a specific SNMP request to a IP address and wait for replies.
+### Can be used with a broadcast or multicast address to discover SNMP
+### agents ("Command Responder Applications") responding to a given
+### community.  Warning: This code uses internal subroutines of the
+### SNMP_Session.pm module which are subject to change :-(
+###
+use strict;
+use vars qw($MULTILINE_MATCHING);
+
+require 5;
+
+use SNMP_Session "0.61";
+use BER;
+use Socket;
+
+my $host = shift @ARGV || die;
+my $community = shift @ARGV || 'public';
+
+my $sysDescr = encode_oid (1,3,6,1,2,1,1,1,0);
+
+my $session = SNMP_Session->open ($host, $community, 161)
+    || die "Cannot open SNMP session";
+my @oids = ($sysDescr);
+$session->send_query ($session->encode_get_request (@oids));
+while ($session->wait_for_response ($session->timeout)) {
+    my($response_length);
+
+    $response_length
+	= $session->receive_response_3 (SNMP_Session::get_response, \@oids, 0);
+    if ($response_length) {
+	my $response = $session->pdu_buffer;
+	my ($binding, $bindings, $oid, $value);
+	eval {
+	    ($bindings) = $session->decode_get_response ($response);
+	};
+	while ($bindings ne '') {
+	    ($binding,$bindings) = decode_sequence ($bindings);
+	    ($oid,$value) = decode_by_template ($binding, "%O%@");
+	    ##print $pretty_oids{$oid}," => ",
+	    {
+		my $string = pretty_print ($value);
+		my $sender = $session->{'last_sender_addr'};
+		local $MULTILINE_MATCHING = 1;
+		$string =~ s/\n/\\n/g;
+		$string =~ s/\r/\\r/g;
+		print STDOUT pretty_address ($sender), "\n  ";
+		print STDOUT $string, "\n";
+	    }
+	}
+    }
+}
+
+$session->close ();
+1;
+
+sub pretty_address
+{
+    my($addr) = shift;
+    my($port,$ipaddr) = unpack_sockaddr_in($addr);
+    my $hostname = gethostbyaddr ($ipaddr, AF_INET);
+    return $hostname ? $hostname : ('['.inet_ntoa($ipaddr).']');
+}

@@ -1,0 +1,19 @@
+Source: libnolookup-perl
+Section: perl
+Priority: optional
+Maintainer: Trond Haugen <trond.haugen@norid.no>
+Build-Depends: debhelper (>= 9), dh-dist-zilla
+Build-Depends-Indep: perl
+Standards-Version: 4.5.0
+
+Package: libnolookup-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, libclass-accessor-chained-perl, libdata-validate-ip-perl, libencode-perl, libio-socket-inet6-perl, libio-socket-ssl-perl, libjson-perl, liblist-moreutils-perl, libnet-dns-perl, libnet-ip-perl, libnet-rdap-perl, libsys-hostip-perl, liburi-encode-perl, liburi-perl, libregexp-common-perl
+Description: NOLookup lookup module
+ A set of lookup modules for various Norwegian data services.
+
+Package: libnolookup-perl-test
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, libnolookup-perl, libwww-mechanize-perl
+Description: NOLookup test suite
+ Test suite for the NOLookup

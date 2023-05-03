@@ -1,0 +1,397 @@
+
+		       README for SNMP_util.pm
+
+		       Copyright (c) 1998-2002, Mike Mitchell
+			  All rights reserved
+
+This program is free software; you can redistribute it under the
+"Artistic License" included in this distribution (file "Artistic").
+
+	Author: Mike Mitchell	<Mike.Mitchell@.sas.com>
+			Contributors:
+	    Tobias Oetiker	<tobi@oetiker.ch>
+	    Simon Leinen	<simon@switch.ch>
+	    Jeff Allen		<jeff.allen@acm.org>
+	    Johannes Demel	<demel@zid.tuwien.ac.at>
+	    Laurent Girod	<girod.laurent@pmintl.ch>
+	    Ian Duplisse	<i.duplisse@cablelabs.com>
+
+
+I was using Simon Leinen's SNMP tools in various perl scripts, and I
+found that I was using the same functions over and over.  I grouped
+the common routines into a separate perl module so that I would only
+have to make changes in one place, rather than track down all the
+different perl scripts that included the code.  The result is the
+'SNMP_utils.pm' module.
+
+Thanks goes to Tobias Oetiker (tobi@oetiker.ch) of MRTG fame for the
+basic layout of the functions.
+
+The SNMP_utils.pm module contains the functions
+
+  snmpmapOID(text, OID, [text, OID ...])
+  snmpMIB_to_OID(filename)
+  snmpLoad_OID_Cache(filename)
+  snmpQueue_MIB_File(filename, [filename])
+
+  snmpget(community@host:port:timeout:retries:backoff:version, OID, [OID...])
+  snmpgetnext(community@host:port:timeout:retries:backoff:version, OID,
+	    [OID...])
+  snmpwalk(community@host:port:timeout:retries:backoff:version, OID, [OID...])
+  snmpgetbulk(community@host:port:timeout:retries:backoff:version, non_repeat,
+	    max_repeat, OID, [OID...])
+  snmpset(community@host:port:timeout:retries:backoff:version, OID, type, value,
+	    [OID, type, value ...])
+  snmptrap(community@host:port:timeout:retries:backoff:version, enterpriseOID,
+	    agent, generalID, specificID, OID, type, value,
+	    [OID, type, value ...])
+  snmpmaptable(community@host:port:timeout:retries:backoff:version,
+		function, OID, [OID...])
+  snmpmaptable4(community@host:port:timeout:retries:backoff:version,
+		function, max_repetitions, OID, [OID...])
+  snmpwalkhash(community@host:port:timeout:retries:backoff:version,
+		function, OID, [OID...], [hash ref])
+
+
+The functions have a small mapping table for commonly used OIDs.  The
+OIDs from RFC1213 (MIB-II) and RFC1315 (Frame Relay) are preloaded.
+
+It is much easier to say "ifInOctets.4" instead of "1.3.6.1.2.1.2.2.1.10.4".
+The snmpmapOID() function will let you add your own entries to the mapping
+table.  It doesn't return anything.  Be sure to leave off any instance
+number from the OID passed to snmpmapOID()!  The example above would be
+    &snmpmapOID("ifInOctets", "1.3.6.1.2.1.2.2.1.10").
+Don't use
+    &snmpmapOID("ifInOctets.4", "1.3.6.1.2.1.2.2.1.10.4").
+The trailing ".4" is interpreted as an instance number, and not the entire
+OID.  The snmpmapOID function will ignore the attempt to add a mapping entry
+that includes an instance number.  The call
+    &snmpmapOID("ifInOctets.four", "1.3.6.1.2.1.2.2.1.10.4")
+would be accepted, because the text ".four" is interpreted differently
+than the number 4.
+
+The snmpMIB_to_OID() function will open the passed-in MIB file name
+and read it.  It will create text mappings for the appropriate OID
+number.  It returns the number of text mappings added, so a zero or
+negative return indicates an error.
+
+The snmpLoad_OID_Cache() function will open the passed-in file name
+and read the file.  It is expecting lines with a text string in
+the first column and an OID number in the second column, like
+
+    ifInOctets	1.3.6.1.2.1.2.2.1.10
+    ifOutOctets	1.3.6.1.2.1.2.2.1.16
+
+It will add the text to OID mappings in the file to the internal list by
+calling the "snmpmapOID()" function.  This way the extra overhead of
+parsing a MIB file can be avoided if you have a pre-parsed version of
+the MIB handy.
+
+The snmpQueue_MIB_File() function queues up file names for use by the
+"snmpMIB_to_OID()" function.  If there are filenames passed into
+"snmpQueue_MIB_File()", when an OID can't be found in the internal
+table, the queued MIB files are loaded one after another until the
+OID can be found (or the list is exhausted).  This delays the MIB
+parsing until the OID value is actually needed.
+
+A cache file with the looked up text-to-OID mappings is maintained.
+It's name is "OID_cache.txt", and can be changed by setting the
+variable $SNMP_util::CacheFile to the name of the file you desire.
+This cache file is automatically loaded before the queued MIB files
+are parsed.  If the OID is found in the cache file, the MIB file
+doesn't have to be parsed.
+
+
+
+The rest of the functions require a hostname/IP address as the first
+argument.  The community string, port number, timeout, retries, backoff,
+and version parameters are all optional.  If the community string isn't
+specified, "public" is used.  If the port number isn't specified, the
+default value from SNMP_Sesssion.pm (port 161) is used for everything but
+snmptrap().  snmptrap() uses port 162 as its default.
+
+The port parameter was recently augmented to allow the specification of
+the IP address (or hostname) and port of the machine doing the query in
+addition to the IP address (or hostname) and port of the machine being
+queried.  Some machines have additional security features that only allow
+SNMP queries to come from certain IP addresses.  If the host doing the
+query has multiple interface, it may be necessary to specify the interface
+the query should come from.  The port parameter is further broken down
+into "remote_port!local_address!local_port".  Here are some examples:
+
+    somehost
+    somehost:161
+    somehost:161!192.168.2.4!4000  use 192.168.2.4 and port 4000 as source
+    somehost:!192.168.2.4          use 192.168.2.4 as source
+    somehost:!!4000                use port 4000 as source
+
+Most people will only need to use the first form ("somehost").
+
+The timeout, retries, and backoff parameters default to whatever
+SNMP_Session.pm uses.  For SNMP_Session.pm version 0.83 they are 2 seconds,
+5 retries, and a 1.0 backoff factor.  The backoff factor is used as a
+multiplier to increase the timeout after every retry.  With a backoff factor
+of 1.0 the timeout stays the same for every retry.
+
+The version parameter defaults to SNMP version 1.  Some SNMP values such as
+64-bit counters have to be queried using SNMP version 2.  Specifying "2" or
+"2c" as the version parameter will accomplish this.  The snmpgetbulk routine
+is only supported in SNMP version 2 and higher.
+
+Several parameters internal to SNMP_Session can be set by passing a hash as
+the first OID.  The keys to the hash are the parameters to modify.  Here is
+a list of parameters and their default values in SNMP_Session version 0.91:
+   'community'   => "public"
+   'timeout'     => 2.0
+   'retries'     => 5
+   'backoff'     => 1.0
+   'debug'       => 0
+   'default_max_repetitions' => 12
+   'use_getbulk' => 1
+   'lenient_source_address_matching' => 1
+   'lenient_source_port_matching' => 1
+Consult the documentation and/or source code for SNMP_Session for further
+information of these parameters.
+
+
+The snmpget function returns an array with the results of the 'get'
+operation.  The value associated with each OID is returned as a
+separate value in the array.
+
+The snmpgetnext function returns an array with the results of the
+'getnext' operation.  The OID number is added to the result as a
+prefix with a colon separator, like '1.3.6.1.2.1.2.2.1.2.1:ethernet'
+
+The snmpwalk function returns an array with all the OID numbers and values,
+like the 'snmpgetnext' function.  If only one OID is specified for the walk,
+only the instance part of the OID number is added as a prefix.  If multiple
+OID are specified for the walk, the entire OID number is added as a prefix.
+For instance, a walk of just '1.3.6.1.2.1.2.2.1.2' will return values
+like '1:ethernet', '2:ethernet', '3:fddi'.  A walk multiple OIDs will return
+values like '1.3.6.1.2.1.2.2.1.2.1:ethernet'.
+The snmpwalk function will use a 'getbulk' query for efficiency if the
+SNMP version is 2 or higher.
+
+The snmpgetbulk function, like the snmpgetnext function,  returns an array
+with the results of the 'getbulk' operation.  The OID number is added to the
+result as a prefix with a colon separator, like '1.3.6.1.2.1.2.2.1.2.1:ethernet'
+The 'non_repeat' argument is the number of OID arguments that should be
+retrieved no more than once.  The 'max_repeat' argument is the number of
+times that other variables beyond those specified by the 'non_repeat'
+argument should be retrieved.  The getbulk query is only supported at
+SNMP version 2 or higher.
+
+The snmpset function is passed OID, type, and value triplets.  It
+returns an array with the result of the set.
+
+The snmpmaptable function can be used for walking tables.  The OID arguments
+are the columns of the table sharing the same index, and the passed-in
+function is called once per row.  The passed-in function will be given
+the row index as a partial OID in dotted notation, e.g. "1.3", or
+"10.0.1.34", and values of the requested table columns in that row.
+
+The snmpmaptable4 function is just like snmpmaptable, only the third argument
+is the number of table rows to request in a single SNMP query.  The
+snmpmaptable function uses the default of 12 rows.
+
+The snmpwalkhash acts like snmpwalk, but will call the passed-in function
+once per returned value.  The function is passed a reference to a hash,
+the hostname, the textual OID, the dotted-numeric OID, the instance, the
+value, and the textual OID you requested.  That function can customize the
+result you want, in a hash of hashes, so you can extract the value later by
+hosts, by oid_names, by oid_numbers, by instances... like these:
+
+   $hash{$host}{$name}{$inst} = $value;
+   $hash{$host}{$oid}{$inst} = $value;
+   $hash{$name}{$inst} = $value;
+   $hash{$oid}{$inst} = $value;
+   $hash{$oid . '.' . $ints} = $value;
+   $hash{$inst} = $value;
+   ...
+If the last argument to snmpwalkhash is a reference to a hash, that hash
+reference is passed to the passed-in function instead of a local hash
+reference.  That way your function can look up other objects unrelated
+to the current invocation of snmpwalkhash.
+
+Here is a simple example of using the functions:
+
+#! /usr/local/bin/perl5
+BEGIN {
+
+###
+# Finally, SNMPGet fully written in PERL5. 
+# Thanks to Simon Leinen <simon@switch.ch>
+# More on: http://www.switch.ch/misc/leinen/snmp/perl/
+####
+
+# There older perls tend to behave peculiar with
+# large integers ... 
+require 5.004;
+
+use SNMP_util "0.89";
+}
+
+use strict;
+sub printfun {
+    my($ind, $desc, $phy) = @_;
+    my($a, $b, $c, $d, $e, $f, $mac);
+
+    ($a, $b, $c, $d, $e, $f) = unpack("C6", $phy);
+    $mac = sprintf("%02x-%02x-%02x-%02x-%02x-%02x", $a, $b, $c, $d, $e, $f);
+    print "interface $ind: MAC $mac   $desc\n";
+}
+
+sub my_hash_with_host {
+    my($h_ref, $host, $name, $oid, $inst, $value, $tree) = @_;
+    $inst =~ s/^\.+//;
+    if ($name =~ /ifPhysAddress/) {
+	my $mac = '';
+	map { $mac .= sprintf("%02X", $_) } unpack "CCCCCC", $value;
+	$value = $mac;
+    }
+    $h_ref->{$host}->{$name}->{$inst} = $value;
+}
+
+sub main {
+  
+  my($oid, $host, $response, $cont);
+  my($desc, @ret, $nrows);
+
+  $host = "127.0.0.1";
+  $cont = "Your Name";
+
+  # This snmpmapOID() isn't necessary, as it is already in
+  # the internal map table.  It is just an example...
+  &snmpmapOID("ifDescr", "1.3.6.1.2.1.2.2.1.2");
+
+  print "Trying 'getnext' on $host\n";
+  @ret = &snmpgetnext($host, "ifDescr");
+  foreach $desc (@ret) {
+    ($oid, $desc) = split(':', $desc, 2);
+    print "$oid = $desc\n";
+  }
+
+  print "Trying 'getnext' on $host with different timeout and retries\n";
+  @ret = &snmpgetnext($host, { 'timeout' => 4, 'retries' => 2 }, "ifDescr");
+  foreach $desc (@ret) {
+    ($oid, $desc) = split(':', $desc, 2);
+    print "$oid = $desc\n";
+  }
+
+  print "Trying 'walk' on $host\n";
+  @ret = &snmpwalk($host, "ifDescr");
+  foreach $desc (@ret) {
+    ($oid, $desc) = split(':', $desc, 2);
+    print "$oid = $desc\n";
+  }
+
+  print "Trying 'walkhash' on $host\n";
+  my %ret_hash = &snmpwalkhash($host, \&my_hash_with_host, "ifEntry");
+  foreach $oid (sort keys %{$ret_hash{$host}}) {
+    foreach my $inst (sort { $a <=> $b } keys %{$ret_hash{$host}{$oid}}) {
+      printf("%20s\t: %-15s %3s = %s\n", $host, $oid, $inst,
+		$ret_hash{$host}{$oid}{$inst});
+    }
+  }
+
+  print "Trying 'walkhash' on $host, using own hash\n";
+  my(%myhash);
+  %ret_hash = &snmpwalkhash($host, \&my_hash_with_host, "ifEntry", \%myhash);
+  foreach $oid (sort keys %{$myhash{$host}}) {
+    foreach my $inst (sort { $a <=> $b } keys %{$myhash{$host}{$oid}}) {
+      printf("%20s\t: %-15s %3s = %s\n", $host, $oid, $inst,
+		$myhash{$host}{$oid}{$inst});
+    }
+  }
+
+  print "Before set:\n";
+  $oid = "sysContact";
+  ($response) = &snmpget($host, $oid);
+  if ($response) {
+    print "GET $oid : $response\n";
+  } else {
+    warn "$host did not respond to SNMP query\n";
+  }
+
+  my $oldContact = $response;
+
+  print "setting contact to $cont\n";
+  ($response) = &snmpset("security\@$host", $oid, 'string', $cont);
+
+  if ($response) {
+    print "SET: $oid : $response\n";
+  } else {
+    die "$host did not respond to SNMP set\n";
+  }
+
+  print "After set:\n";
+  ($response) = &snmpget($host, $oid);
+  if ($response) {
+    print "GET $oid : $response\n";
+  } else {
+    die "$host did not respond to SNMP query\n";
+  }
+
+  print "Setting contact back to $oldContact\n";
+  ($response) = &snmpset("security\@$host", $oid, 'string', $oldContact);
+
+  if ($response) {
+    print "SET: $oid : $response\n";
+  } else {
+    die "$host did not respond to SNMP set\n";
+  }
+
+  print "After 2nd set:\n";
+  ($response) = &snmpget($host, $oid);
+  if ($response) {
+    print "GET $oid : $response\n";
+  } else {
+    die "$host did not respond to SNMP query\n";
+  }
+
+  print "Walking table of interface description and physical address\n";
+  $nrows = &snmpmaptable($host, \&printfun, "ifDescr", "ifPhysAddress");
+  print "walked $nrows rows in the table\n";
+}
+main;
+exit(0);
+-----------------------------------------------------
+Here is an example using the MIB parsing functions.
+First create a file with a simple MIB:
+cat > dummy.mib <<EOF
+abc OBJECT IDENTIFIER ::=  { system 1  }
+EOF
+
+#! /usr/local/bin/perl5
+BEGIN {
+
+# The older perls tend to behave peculiar with
+# large integers ... 
+require 5.003;
+
+use SNMP_util "0.71";
+}
+
+use strict;
+
+sub main {
+    my ($ret, $arg);
+
+    # queue up reading the "dummy.mib" file
+    &snmpQueue_MIB_File("dummy.mib");
+
+    # Override the default cache file ("OID_cache.txt") with "cache_test.txt"
+    $SNMP_util::CacheFile = "cache_test.txt";
+
+    ($ret) = &snmpget("127.0.0.1", "abc.0");
+    print "$ret\n";
+}
+
+main;
+exit(0);
+-----------------------------------------------------
+The first time you run the above script, the "dummy.mib" file will be read
+and parsed.  You should see the "cache_test.txt" file get created with
+a single line in it, namely "abc 1.3.6.1.2.1.1.1". The second time you
+run the script the "cache_test.txt" file will be loaded instead of the
+"dummy.mib" file.

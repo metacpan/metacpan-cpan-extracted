@@ -1,0 +1,87 @@
+		       SNMP support for Perl 5
+		       -----------------------
+
+		Copyright (c) 1995-2007, Simon Leinen
+			 All rights reserved
+
+This program is free software; you can redistribute it under the
+"Artistic License" included in this distribution (file "Artistic").
+
+	       Author: Simon Leinen  <simon.leinen@switch.ch>
+			    Contributors:
+		 Tobias Oetiker	 <tobi@oetiker.ch>
+	       Matthew Trunnell	 <matter@media.mit.edu>
+		 Andrzej Tobola	 <san@iem.pw.edu.pl>
+		      Dave Rand	 <dlr@Bungi.com>
+		   Heine Peters	 <peters@dkrz.de>
+		      Yufang HU	 <yhu@casc.com>
+	       Philippe Simonet	 <Philippe.Simonet@swisscom.com>
+	      Daniel L. Needles	 <dan_needles@INS.COM>
+			Dan Cox	 <dcox@lexmark.com>
+	       Iouri Pakhomenko	 <pakhomenko@gmd.de>
+		   Niels Bakker	 <niels@euro.net>
+		  Mike Mitchell  <mcm@unx.sas.com>
+                   Alan Nichols  <Alan.Nichols@Ebay.Sun.COM>
+                  Mike McCauley  <mikem@open.com.au>
+		Andrew W. Elble  <elble@icculus.nsg.nwu.edu>
+		Paul E. Erkkila  <pee@gblx.net>
+		 Johannes Demel  <demel@zid.tuwien.ac.at>
+		 Rik Hoorelbeke  <rik.hoorelbeke@pandora.be>
+		 Brett T Warden  <wardenb@eluminant.com>
+		 Alistair Mills  <alistair@alizta.com>
+		  Bert Driehuis  <driehuis@playbeing.org>
+                 Michael Deegan  <michael@cnspc18.murdoch.edu.au>
+           Jakob Ilves (/IlvJa)  <jakob.ilves@oracle.com>
+		   Jan Kasprzak  <kas@informatics.muni.cz>
+	       Valerio Bontempi  <v.bontempi@inwind.it>
+		Lorenzo Colitti  <lorenzo@colitti.com>
+		   Joerg Kummer  <JOERG.KUMMER@Roche.COM>
+           Christopher J. Tengi  <tengi@CS.Princeton.EDU>
+                    Luc Pauwels  <Luc.Pauwels@xalasys.com>
+                   Milen Pavlov  <milen@batmbg.com>
+       Andrew Cornford-Matheson  <andrew.matheson@corenetworks.com>
+                   Gerry Dalton  <gerry.dalton@consolidated.com>
+		 Jan van Keulen  <cologne@email.com>
+	       Armin Wolfermann  <armin@wolfermann.org>
+	             Allan Jude  <allanjude@freebsd.org>
+
+	http://www.switch.ch/misc/leinen/snmp/perl/index.html
+
+This archive contains Perl 5 modules SNMP_Session.pm and BER.pm,
+which, when used together, provide rudimentary access to remote SNMP
+(v1/v2) agents.
+
+This module differs from existing SNMP packages in that it is
+completely stand-alone, i.e. you don't need to have another SNMP
+package such as Net-SNMP.  It is also written entirely in Perl, so you
+don't have to compile any C modules.  It uses the Perl 5 Socket.pm
+module and should therefore be very portable, even to non-Unix systems.
+
+The SNMP operations currently supported are "get", "get-next", and
+"set", as well as trap generation and reception.
+
+For an excellent example of the type of application this is useful
+for, see Tobias Oetiker's ``mrtg'' (Multi Router Traffic Grapher)
+tool: <URL:http://oss.oetiker.ch/mrtg/>
+
+				Usage
+				.....
+
+See the EXAMPLES section of the POD documentation in SNMP_Session.pm.
+
+			     Future Plans
+			     ............
+
+			    SNMPv3 Support
+
+The code could first be restructured to follow the modularization
+proposed in RFC 2271 (An Architecture for Describing SNMP Management
+Frameworks).  The existing SNMPv1 and SNMPv2c support must somehow be
+retrofitted to this framework.  Later, one could add support for
+SNMPv3 PDU formats and for user-based security.
+
+			  Higher-Level APIs
+
+The current programming interface is very close to the level of SNMP
+operations and PDUs.  For actual management applications, there are
+probably more convenient interfaces that could be defined.

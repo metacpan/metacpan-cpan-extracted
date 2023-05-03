@@ -63,7 +63,7 @@
          "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

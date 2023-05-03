@@ -1,0 +1,140 @@
+#!/usr/local/bin/perl -w
+## Name:	test/arp
+## Author:	Simon Leinen  <simon@switch.ch>
+## Description:	Dump ARP table using Perl SNMP library
+######################################################################
+## Usage: arp hostname [community]
+##
+## Extracts HOSTNAME's network to media address table using SNMP and
+## prints it to standard output.  Example output (errors probably due
+## to the agent):
+##
+## $ perl test/arp babar public
+## lo0                  130.59.4.11     dynamic    08:00:20:12:cc:3f
+## lo0                  130.59.4.22     dynamic    08:00:20:88:9a:5e
+## lo0                  130.59.4.30     dynamic    08:00:20:76:48:af
+## lo0                  130.59.4.33     dynamic    08:00:09:f7:f2:9b
+## lo0                  130.59.4.38     dynamic    08:00:20:86:95:57
+## lo0                  130.59.4.110    dynamic    00:05:02:9c:34:1e
+## lo0                  130.59.4.134    dynamic    00:05:02:ec:a3:1b
+## lo0                  130.59.4.202    dynamic    00:00:0c:5d:05:d0
+## lo0                  224.0.0.0       dynamic    01:00:5e:00:00:00
+## lo0                  224.1.127.255   dynamic    01:00:5e:01:7f:ff
+## lo0                  224.2.127.253   dynamic    01:00:5e:02:7f:fd
+## lo0                  224.2.127.254   dynamic    01:00:5e:02:7f:fe
+## lo0                  239.255.255.255 dynamic    01:00:5e:7f:ff:ff
+## hme0                 130.59.4.2      dynamic    08:00:20:83:00:69
+##
+## The interface name in the first column is the ifDescr value for the
+## interface to which the ipNetToMediaIfIndex refers.
+######################################################################
+
+require 5.002;
+use strict;
+use SNMP_Session "0.57";	# needs map_table
+use BER;
+
+sub out_arp_entry ($$$);
+sub ether_hex ($);
+sub ifDescr ($$);
+sub usage ();
+
+#
+#  OIDs we know by name.
+#
+my %OIDS = (
+            'ipNetToMediaPhysAddress' => [1,3,6,1,2,1,4,22,1,2],
+            'ipNetToMediaType' => [1,3,6,1,2,1,4,22,1,4],
+	    );
+
+my $hostname = $ARGV[0] || usage ();
+my $community = $ARGV[1] || "public";
+
+my $session;
+
+die "Couldn't open SNMP session to $hostname"
+    unless ($session = SNMP_Session->open ($hostname, $community, 161));
+$session->map_table ([$OIDS{'ipNetToMediaPhysAddress'},
+		      $OIDS{'ipNetToMediaType'}],
+		     \&out_arp_entry);
+$session->close ();
+
+1;
+
+## out_arp_entry (INDEX, PHYS_ADDRESS, TYPE)
+##
+## Writes a line of ARP output from a partial row of the
+## ipNetToMediaTable.  The does not use the ipNetToMediaIfIndex or
+## ipNetToMediaNetAddress, because those can be derived from the row
+## index.
+##
+sub out_arp_entry ($$$) {
+  my ($index, $physAddress, $type) = @_;
+
+  ## the index of this table has the form IFINDEX.IPADDRESS, where
+  ## IPADDRESS is a "dotted quad" of four integers.  We simply split
+  ## at the first dot to get the interface index and the IP address in
+  ## readable notation:
+  ##
+  my ($ifIndex, $netAddress) = split(/\./, $index, 2);
+
+  $type = pretty_print ($type);
+  if ($type eq 1) { $type = "other"; }
+  elsif ($type eq 2) { $type = "invalid"; }
+  elsif ($type eq 3) { $type = "dynamic"; }
+  elsif ($type eq 4) { $type = "static"; }
+
+  $physAddress = ether_hex (hex_string ($physAddress));
+
+  printf STDOUT ("%-20s %-15s %-10s %s\n",
+		 ifDescr ($ifIndex, $session),
+		 $netAddress,
+		 $type,
+		 $physAddress);
+}
+
+## ether_hex (HEX_STRING)
+##
+## Converts a raw hex representation into the common form used in
+## Ethernet addresses, e.g. "080020830069" becomes
+## "08:00:20:83:00:69".
+##
+sub ether_hex ($) {
+  my ($string) = @_;
+  $string =~ s/([0-9a-f][0-9a-f])/$1:/g;
+  $string =~ s/:$//;
+  $string;
+}
+
+my %ifDescrCache;
+
+## ifDescr (IFINDEX, SESSION)
+##
+## Return the interface description associated with the given
+## IFINDEX.  Uses SESSION as the destination for SNMP request.
+## Results are cached in %ifDescrCache to avoid sending the same SNMP
+## request more than once.
+##
+sub ifDescr ($$) {
+    my @ifDescr = split ('\.','1.3.6.1.2.1.2.2.1.2');
+    my ($ifIndex, $session) = @_;
+
+    return $ifDescrCache{$ifIndex,$session}
+    if defined ($ifDescrCache{$ifIndex,$session});
+    push @ifDescr,$ifIndex;
+    if ($session->get_request_response (encode_oid (@ifDescr))) {
+	my $response = $session->pdu_buffer;
+	my ($bindings, $binding, $oid, $value);
+
+	($bindings) = $session->decode_get_response ($response);
+	($binding,$bindings) = decode_sequence ($bindings);
+	($oid,$value) = decode_by_template ($binding, "%O%@");
+	return $ifDescrCache{$ifIndex,$session} = pretty_print ($value);
+    } else {
+	return "if#".$ifIndex;
+    }
+}
+
+sub usage () {
+  die "usage: $0 host [community]";
+}

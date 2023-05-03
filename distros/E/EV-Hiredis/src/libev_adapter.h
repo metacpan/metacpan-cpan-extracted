@@ -119,7 +119,7 @@ static void redisLibevSetTimeout(void *privdata, struct timeval tv) {
     if (!e->timing) {
         e->timing = 1;
         ev_init(&e->timer, redisLibevTimeout);
-        e->timer.data = e;
+        e->timer.data = (SV*)e;
     }
 
     e->timer.repeat = tv.tv_sec + tv.tv_usec / 1000000.00;

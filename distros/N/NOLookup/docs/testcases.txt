@@ -1,0 +1,74 @@
+Testcases
+
+===
+* Check operations. Check if an objekt is registered, like a DAS service.
+  Uses a HTTP HEAD operation:
+
+ * https://rdap.norid.no/domain/<domainname>
+ * https://rdap.norid.no/entity/<handle>
+ * https://rdap.norid.no/registrar/<reg_handle>
+ * https://rdap.norid.no/nameserver_handle/<handle>
+
+===
+
+* Get operations, use an HTTP GET operation:
+
+ * Lookup registered entity, like a whois service:
+
+   * https://rdap.norid.no/domain/<domainname>
+   * https://rdap.norid.no/entity/<handle>
+   * https://rdap.norid.no/registrar/<reg_handle>
+   * https://rdap.norid.no/nameserver_handle/<handle>
+
+ * Searches for domain names matching a search criteria:
+
+ GET https://rdap.norid.no/domains?name=<name>
+ GET https://rdap.norid.no/domains?registrant=<handle> 
+ GET https://rdap.norid.no/domains?identity=<identity>
+ GET https://rdap.norid.no/domains?nsIp=<ip4|ip6>
+ GET https://rdap.norid.no/domains?nsLdhName=<nsname>
+
+ * Searches for nameservers matching a search criteria:
+
+ GET https://rdap.norid.no/nameservers?name=<hostname>
+ GET https://rdap.norid.no/nameservers?ip=<ip4|ip6>
+
+ * Searches for entities matching a search criteria:
+
+ GET https://rdap.norid.no/entities?fn=<personname|orgname>
+ GET https://rdap.norid.no/entities?identity=<identity>
+
+----
+
+Examples on domain name searches:
+
+ * https://rdap.test.norid.no/domains?name=nord*.no
+ * https://rdap.test.norid.no/domains?registrant=NT1O
+ * https://rdap.test.norid.no/domains?identity=985821585
+ * https://rdap.test.norid.no/domains?nsIp=128.39.8.40
+ * https://rdap.test.norid.no/domains?nsLdhName=*.labnic.no
+
+==
+Examples on nameserver searches macthing a nameserver name or ip:
+
+ * https://rdap.test.norid.no/nameservers?name=*.labnic.no
+ * https://rdap.test.norid.no/nameservers?ip=128.39.8.40
+
+Examples on entity (contact object) searches:
+
+* Examples on contact object searches on full name:
+
+  * https://rdap.test.norid.no/entities?fn=norid*
+  * https://rdap.test.norid.no/entities?identity=985821585
+
+
+
+
+
+ * O/P: Potensial registrants:
+   - Org handle
+   - Person handle
+
+ * R: Roles, are technical contacts:
+
+ * REGxx: Registrar contacts

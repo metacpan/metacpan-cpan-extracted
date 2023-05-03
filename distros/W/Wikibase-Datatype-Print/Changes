@@ -1,3 +1,10 @@
+0.13 2023-05-02T09:29:21+02:00
+ - Add doc for Wikibase::Datatype::Print::Mediainfo.
+ - Add doc for Wikibase::Datatype::Print::Property.
+ - Add example for print_forms() to Util.
+ - Finish Print doc.
+ - Fix print() function in doc. More contexts.
+
 0.12 2023-04-24T18:40:57+02:00
  - Add doc for Wikibase::Datatype::Print::Item.
  - Fix dependency to Wikidata::Datatype::Value::Sense.

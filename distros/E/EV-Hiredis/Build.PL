@@ -58,6 +58,11 @@ my %args = (
     recursive_test_files => 1,
 
 
+    needs_compiler_c99 => 0,
+    needs_compiler_cpp => 0,
+    generate_ppport_h => '1',
+    generate_xshelper_h => '0',
+    cc_warnings => 0,
 );
 if (-d 'share') {
     $args{share_dir} = 'share';

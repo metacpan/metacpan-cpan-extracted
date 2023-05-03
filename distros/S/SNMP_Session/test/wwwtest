@@ -1,0 +1,190 @@
+#!/usr/bin/perl
+######################################################################
+### Sample CGI script using the Perl 5 SNMP Module
+###
+### This script can be used as a CGI script with an HTTP Daemon, to
+### allow asking SNMP queries from a World-Wide Web client.
+###
+######################################################################
+### When called with an empty QUERY_STRING environment variable, a
+### form is generated that lets the user fill in a host and community
+### name.  When the filled-in form is submitted, the script will be
+### called again, this time with parameters passed through
+### $QUERY_STRING.  It will make an SNMP query to the selected
+### host/community and return the results as an HTML document
+### containing an HTML 3 table which shows the names and values of
+### some MIB variable instances.
+######################################################################
+
+require 5;
+
+use lib qw(/home/leinen/perl/SNMP_Session-0.96/lib /home/leinen/perl/SNMP_Session-0.96/blib/lib);
+
+use SNMP_Session;
+use BER;
+use CGI qw(:standard start_table end_table :debug);
+use strict;
+
+sub init_oids ();
+sub query_to_html_response ($$);
+sub snmp_get ($@);
+sub write_query_form ();
+sub html_error_message ($$);
+sub html_quote ($ );
+
+my @allowed_hosts=qw(localhost ::1 127.0.0.1);
+my %allowed_hosts;
+
+my $community_file_name = "/home/leinen/snmp/.zxc";
+
+my $ipv4_only_p = 0;
+
+my $home_url = "http://www.switch.ch/misc/leinen/snmp/perl/";
+
+my (%ugly_oids, %pretty_oids);
+
+foreach (@allowed_hosts) { $allowed_hosts{$_} = 1; }
+
+my $q = new CGI;
+
+if (!defined ($q) || !defined $q->param ('hostname')) {
+    write_query_form ();
+} else {
+    init_oids ();
+    if (! exists ($allowed_hosts{$q->param ('hostname')})) {
+	print (header ());
+	       html_error_message ("parsing the query",
+			    "Illegal hostname ".$q->param ('hostname'));
+    } else {
+	query_to_html_response ($q->param ('hostname'),
+				$q->param ('community'));
+    }
+}
+1;
+
+sub init_oids ()
+{
+    %ugly_oids = qw(sysDescr.0		1.3.6.1.2.1.1.1.0
+		    sysLocation.0	1.3.6.1.2.1.1.6.0
+		    );
+    foreach (keys %ugly_oids) {
+	$ugly_oids{$_} = encode_oid (split (/\./, $ugly_oids{$_}));
+	$pretty_oids{$ugly_oids{$_}} = $_;
+    }
+}
+
+sub query_to_html_response ($$)
+{
+    my ($hostname, $community) = @_;
+    my $session;
+
+    if ($community eq 'public'
+	&& -r $community_file_name) {
+	open (COMM, $community_file_name);
+	$community = <COMM>;
+	chomp $community;
+	close COMM;
+    }
+    print (header (),
+	   start_html ("Perl SNMP Module Test"),
+	   h1 ("SNMP query to "
+	       .html_quote ($community)
+	       .'@'
+	       .html_quote ($hostname)),
+	   hr ());
+
+    srand();
+    eval { $session = SNMPv2c_Session->open ($hostname, $community, 161,
+					     undef, undef, undef, undef,
+					     $ipv4_only_p) };
+    html_error_message ("opening SNMP session", $SNMP_Session::errmsg), return 0
+	unless defined $session;
+    html_error_message ("opening SNMP session", $@), return 0 if $@;
+    eval { snmp_get ($session, qw(sysDescr.0 sysLocation.0)) };
+    html_error_message ("executing SNMP query", $@), return 0 if $@;
+    $session->close ();
+
+    print (end_html ());
+    1;
+}
+
+sub snmp_get ($@)
+{
+    my($session, @oids) = @_;
+    my($response, $bindings, $binding, $value, $oid);
+    grep ($_ = $ugly_oids{$_}, @oids);
+    if ($session->get_request_response (@oids)) {
+	$response = $session->pdu_buffer;
+	($bindings) = $session->decode_get_response ($response);
+
+	print (start_table({border=>'1'}));
+	while ($bindings ne '') {
+	    ($binding,$bindings) = decode_sequence ($bindings);
+	    ($oid,$value) = decode_by_template ($binding, "%O%@");
+	    print Tr(th ({align=>'right'},
+			 $pretty_oids{$oid}),
+		     td ({align=>'left'},
+			 html_quote (pretty_print ($value))));
+	}
+	print (end_table ());
+	1;
+    } else {
+	die "No response received.\n";
+    }
+}
+
+sub write_query_form ()
+{
+    my $first_p = 1;
+    my $options = join
+	("\n",
+	 map ({my $res = $q->option ({-selected=>$first_p, -value=>$_}, $_);
+	       $first_p = 0;
+	       $res;}
+	      @allowed_hosts));
+    print (header (),
+	   start_html ("Perl SNMP Module Test"),
+	   h1 ("Perl SNMP Module Test"),
+	   p ("This is a sample application of an ",
+	      a ({href => $home_url}, "SNMP Module"),
+	      "(version ${SNMP_Session::VERSION}) for Perl 5."),
+	   hr (),
+	   $q->start_form (-method=>'GET'),
+	   "Host name:\n",
+	   Select ({name => 'hostname'},
+		   $options), "\n",
+	   "Community name:\n",
+	   Select ({name => 'community'},
+		   option ({value => 'public'},
+			   "public")),
+	   br (), "\n",
+	   input ({type => 'submit',
+		   value => "Send request"}), "\n",
+	   input ({type => 'reset',
+		   value => "Clear"}), "\n",
+	   $q->end_form (),
+	   hr (), "\n",
+	   address (a ({href=>"http://www.switch.ch/misc/leinen/"},
+		       "Simon Leinen &lt;simon\@switch.ch&gt;")), "\n",
+	   end_html (), "\n");
+}
+
+sub html_error_message ($$)
+{
+    my($context, $errmsg) = @_;
+
+    print ($q->h2 ("SNMP Error"), hr (),
+	   p ("While ",$context,", the following error occurred:"),
+	   pre (html_quote($errmsg)),
+	   end_html ());
+}
+
+sub html_quote ($ ) {
+    local ($_) = @_;
+
+    return $_ unless /[<>&]/;
+    s/&/&amp;/g;
+    s/</&lt;/g;
+    s/>/&gt;/g;
+    $_;
+}

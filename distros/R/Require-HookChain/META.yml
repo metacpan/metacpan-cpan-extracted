@@ -19,28 +19,31 @@ name: Require-HookChain
 provides:
   RHC:
     file: lib/RHC.pm
-    version: '0.008'
+    version: '0.009'
   Require::HookChain:
     file: lib/Require/HookChain.pm
-    version: '0.008'
+    version: '0.009'
   Require::HookChain::log::logger:
     file: lib/Require/HookChain/log/logger.pm
-    version: '0.008'
+    version: '0.009'
   Require::HookChain::log::stderr:
     file: lib/Require/HookChain/log/stderr.pm
-    version: '0.008'
+    version: '0.009'
   Require::HookChain::munge::prepend:
     file: lib/Require/HookChain/munge/prepend.pm
-    version: '0.008'
+    version: '0.009'
   Require::HookChain::r:
     file: lib/Require/HookChain.pm
-    version: '0.008'
+    version: '0.009'
+  Require::HookChain::test::fail:
+    file: lib/Require/HookChain/test/fail.pm
+    version: '0.009'
   Require::HookChain::timestamp::hires:
     file: lib/Require/HookChain/timestamp/hires.pm
-    version: '0.008'
+    version: '0.009'
   Require::HookChain::timestamp::std:
     file: lib/Require/HookChain/timestamp/std.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Log::ger: '0.038'
   Scalar::Util: '0'
@@ -52,7 +55,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Require-HookChain
   homepage: https://metacpan.org/release/Require-HookChain
   repository: git://github.com/perlancar/perl-Require-HookChain.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

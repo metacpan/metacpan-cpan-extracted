@@ -1,5 +1,5 @@
 package Data::Verifier::Field;
-$Data::Verifier::Field::VERSION = '0.63';
+$Data::Verifier::Field::VERSION = '0.65';
 use Moose;
 use MooseX::Storage;
 
@@ -10,14 +10,14 @@ with 'MooseX::Storage::Deferred';
 
 has original_value => (
     is => 'rw',
-    isa => 'Maybe[Str|ArrayRef|HashRef]',
+    isa => 'Maybe[Str|ArrayRef|HashRef|Bool]',
     predicate => 'has_original_value'
 );
 
 
 has post_filter_value => (
     is => 'rw',
-    isa => 'Maybe[Str|ArrayRef|HashRef]',
+    isa => 'Maybe[Str|ArrayRef|HashRef|Bool]',
     predicate => 'has_post_filter_value'
 );
 
@@ -57,7 +57,7 @@ Data::Verifier::Field - Field from a Data::Verifier profile
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Cory G Watson <gphat@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Cold Hard Code, LLC.
+This software is copyright (c) 2023 by Cold Hard Code, LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

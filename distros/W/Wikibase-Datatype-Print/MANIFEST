@@ -2,10 +2,13 @@ Changes
 examples/create_and_print_form.pl
 examples/create_and_print_item.pl
 examples/create_and_print_lexeme.pl
+examples/create_and_print_mediainfo.pl
 examples/create_and_print_mediainfo_snak.pl
 examples/create_and_print_mediainfo_snak_translated.pl
 examples/create_and_print_mediainfo_statement.pl
 examples/create_and_print_mediainfo_statement_translated.pl
+examples/create_and_print_mediainfo_translated.pl
+examples/create_and_print_property.pl
 examples/create_and_print_reference.pl
 examples/create_and_print_reference_translated.pl
 examples/create_and_print_sense.pl
@@ -27,6 +30,7 @@ examples/create_and_print_value_time.pl
 examples/create_and_print_value_time_translated.pl
 examples/utils_print_aliases.pl
 examples/utils_print_descriptions.pl
+examples/utils_print_forms.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -1,0 +1,35 @@
+libnolookup-perl (1.37.17-norid1) focal-norid; urgency=medium
+
+  * 1.37.17: RDAP support updates
+
+ -- Trond Haugen <trondh@server108.lab.norid.no>  Mon, 17 Apr 2023 10:57:41 +0200
+
+libnolookup-perl (1.24.3-norid1) focal-norid; urgency=medium
+
+  * Handle errors with content, decode it then and return result to user.
+
+ -- Trond Haugen <trondh@server108.lab.norid.no>  Fri, 10 Feb 2023 14:04:11 +0100
+
+libnolookup-perl (1.24.2~rc1-norid1) focal-norid; urgency=medium
+
+  * From rdap_dev branch: Added -c page count option. Added debug option.
+
+ -- Trond Haugen <trondh@server108.lab.norid.no>  Thu, 02 Feb 2023 10:36:19 +0100
+
+libnolookup-perl (1.24.1+2-norid1) focal-norid; urgency=medium
+
+  * Added missing dependencies in the debian control file
+
+ -- Richard Persson <richard@server108.lab.norid.no>  Wed, 07 Dec 2022 09:28:18 +0100
+
+libnolookup-perl (1.24.1-norid1) focal-norid; urgency=medium
+
+  * Version 1.24.1: Support new rdap conformance values.
+
+ -- Trond Haugen <trondh@server108.lab.norid.no>  Mon, 05 Dec 2022 13:16:23 +0100
+
+libnolookup-perl (1.24~rc1-norid1) focal-norid; urgency=medium
+
+  * Version 1.24
+
+ -- Richard Persson <richard.persson@server108.lab.norid.no>  Tue, 16 Aug 2022 07:03:19 +0100

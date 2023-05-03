@@ -1,0 +1,69 @@
+A collection of test scripts for the Perl SNMP code.
+
+arp	Sample application that lists the ipNetToMediaTable of a
+	host.  Similar to the simple form of the Unix "arp" command.
+
+asn1-test.pl
+ber-test.pl
+	A few regression tests for BER encoding.  If you get errors
+	running these, I'd be very interested to hear about it!
+
+cisco-cpus
+	Use CISCO-PROCESS-MIB to get CPU utilization statistics from
+	all processors in a Cisco router.  This is most useful for
+	routers with multiple CPUs, such as 7500 (RSP) routers with
+	VIP2s, or Cisco 12000 (GSR) routers.
+
+cisco-memory
+	Print global usage statistics (total/used/free bytes) for
+	different types of memory on the main processor of a Cisco
+	router.
+
+if-counters.pl (requires Curses.pm)
+	Displays a router's byte and packet counter development in
+	real-time.  Demonstrates map_table_4 and a heuristic for
+	maxRepetitions.
+
+iftop (requires Curses.pm)
+	Display top interface counters in real time.
+	Based on if-counters.pl.
+	Contributed by Dave Plonka <plonka@doit.wisc.edu>, see also
+	    http://net.doit.wisc.edu/~plonka/iftop/
+
+set-test.pl
+	Application that tries to change the sysContact.0 variable and
+	then changes it back to the original value.  Contributed by
+	Matthew Trunnell <matter@dune.media.mit.edu>
+
+SNMPAgent.pm
+	Simple SNMP agent returning nonsense replies.
+	Intended as an example of how to write agents.
+	Contributed by Mike McCauley <mikem@open.com.au>
+
+sun-find-process
+	Use SEA's "sun" MIB to find process ID(s) of processes with a
+	specific command name.
+
+sun-ps	List the process table of a remote system using the "sun" MIB
+	implemented in Sun's Solstice Enterprise Agents.
+
+test.pl	Trivial application that reads some fixed variables from an
+	agent.
+
+trap-send
+	Send an SNMPv1 trap to a remote management station
+
+trap-listener
+	Sit there and listen for SNMPv1 traps, which are decoded and
+	written out in a readable form
+
+walk-intf.pl
+	A variant of walk-test.pl that walks several columns of the
+	RFC 1213 interfaces table.
+
+walk-test.pl
+	Another trivial application that walks two columns in the
+	interface table of RFC 1213.
+
+wwwtest	Example for a CGI script that allows SNMP read access to a
+	specific set of devices over the Web.

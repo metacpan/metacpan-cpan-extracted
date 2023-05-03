@@ -233,6 +233,7 @@ lib/SPVM/Resource/Zlib.native/src/zlib.pc.in
 lib/SPVM/Resource/Zlib.native/src/zlib2ansi
 lib/SPVM/Resource/Zlib.native/src/zutil.c
 lib/SPVM/Resource/Zlib.pm
+lib/SPVM/Resource/Zlib.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

@@ -152,24 +152,24 @@ static SV* EV__hiredis_decode_reply(redisReply* reply) {
         case REDIS_REPLY_STRING:
         case REDIS_REPLY_ERROR:
         case REDIS_REPLY_STATUS:
-            res = sv_2mortal(newSVpvn(reply->str, reply->len));
+            res = newSVpvn(reply->str, reply->len);
             break;
 
         case REDIS_REPLY_INTEGER:
-            res = sv_2mortal(newSViv(reply->integer));
+            res = newSViv(reply->integer);
             break;
         case REDIS_REPLY_NIL:
-            res = sv_2mortal(newSV(0));
+            res = newSV(0);
             break;
 
         case REDIS_REPLY_ARRAY: {
-            AV* av = (AV*)sv_2mortal((SV*)newAV());
-            res = newRV_inc((SV*)av);
-
+            AV* av = newAV();
+            av_extend(av, (SSize_t)reply->elements);
             size_t i;
             for (i = 0; i < reply->elements; i++) {
-                av_push(av, SvREFCNT_inc(EV__hiredis_decode_reply(reply->element[i])));
+                av_push(av, EV__hiredis_decode_reply(reply->element[i]));
             }
+            res = newRV_noinc((SV*)av);
             break;
         }
     }
@@ -213,7 +213,7 @@ static void EV__hiredis_reply_cb(redisAsyncContext* c, void* reply, void* privda
         SAVETMPS;
 
         PUSHMARK(SP);
-        sv_reply = EV__hiredis_decode_reply((redisReply*)reply);
+        sv_reply = sv_2mortal(EV__hiredis_decode_reply((redisReply*)reply));
         if (((redisReply*)reply)->type == REDIS_REPLY_ERROR) {
             PUSHs(&PL_sv_undef);
             PUSHs(sv_reply);

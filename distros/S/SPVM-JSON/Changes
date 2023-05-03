@@ -1,3 +1,14 @@
+1.001 2023-05-03
+  [Document Changes]
+    * The doc is improved.
+  [Exception Messages Improvment]
+    * Exception messages are improved.
+0.053 2023-05-03
+  [Prerequirement Changes]
+    * SPVM 0.971012+ is required.
+0.052 2023-05-03
+  [Prerequirement Changes]
+    * SPVM 0.971010+ is required.
 0.051 2023-04-28
   [New Features]
     * The new method in the JSON class receive options

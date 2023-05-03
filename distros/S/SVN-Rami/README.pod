@@ -1,0 +1,84 @@
+=head1 NAME
+
+SVN::Rami - Automates merging to multiple branches
+
+=head1 VERSION
+
+Version 0.1
+
+
+=cut
+
+=head1 SYNOPSIS
+
+Should be invoked from the command line:
+
+  perl -e "use SVN::Rami;" -c <version-number>
+
+This is version 0.1, still mainly a proof-of-concept.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 No publicly available subroutines at this time
+
+
+=cut
+
+=head2 function2
+
+
+=cut
+
+=head1 AUTHOR
+
+Dan Richter, C<< <dan.richter at trdpnt.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-svn-rami at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Rami>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc SVN::Rami
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Rami>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/SVN-Rami>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/SVN-Rami>
+
+=back
+
+=head1 SEE ALSO
+
+SVK::Merge
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023 by Dan Richter.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+
+=cut
+

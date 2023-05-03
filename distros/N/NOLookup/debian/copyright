@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: NOLookup
+
+Files: *
+Copyright: 2018 Trond Haugen <trond.haugen@norid.no>
+License: Proprietary
+ Copyright (C) Norid AS - All Rights Reserved
+ Unauthorized copying of this software and its documentation, via any medium
+ is strictly prohibited.

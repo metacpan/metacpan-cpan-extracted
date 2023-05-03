@@ -230,9 +230,13 @@ my @file_dialog_type;
 
 # for the visible Help button in the GUI
 my @alias_help_menubutton_label;
-$alias_help_menubutton_label[0] = 'About',
+$alias_help_menubutton_label[0] = 'About';
+$alias_help_menubutton_label[1] = 'InstallationGuide';
 
-  my $alias_help_menubutton_label_h = { _About => 'About', };
+my $alias_help_menubutton_label_h = { 
+		_About => 'About', 
+        _InstallationGuide => 'InstallationGuide', 
+};
 
 # in spec files for when Data_PL_SEISMIC, may
 # not necessarily informed by DATA_DIR_IN and DATA_DIR_OUT
@@ -267,7 +271,9 @@ my $flow_type_h = {
 	_pre_built_superflow => 'pre_built_superflow',
 };
 
-my $help_menubutton_type_h = { _About => 'About', };
+my $help_menubutton_type_h = { _About => 'About', 
+							   _InstallationGuide => 'InstallationGuide',
+};
 
 my $purpose = { _geopsy => 'geopsy', };
 
@@ -363,7 +369,7 @@ my $var = {
 	_one_character                 => '1',
 	_one_pixel                     => '1',
 	_one_pixel_borderwidth         => '1',
-	_program_title                 => 'SeismicUnixGui V0.82.5',
+	_program_title                 => 'SeismicUnixGui V0.82.6',
 	_project_selector_title        => 'Project Selector',
 	_l_suplot_title                => 'L_suplot',
 	_project_selector_title        => 'Project Selector',
@@ -1009,9 +1015,12 @@ sub alias_FileDialog_button_label_aref {    # array ref
 	return ( \@alias_FileDialog_button_label );
 }
 
-sub alias_help_menubutton_label_aref {    # array ref
-										  #my 	$self = @_;
-	return ( \@alias_help_menubutton_label );
+sub alias_help_menubutton_label_aref {
+	
+#	my ($self,$variable) = @_; # array ref
+	my $result = \@alias_help_menubutton_label;
+	return ( $result );
+
 }
 
 sub alias_help_menubutton_label_h {    # hash ref
@@ -2146,7 +2155,8 @@ sub superflow_names_aref {
 }
 
 sub superflow_names_gui_aref {
-
+	
+	my (@self) = @_;
 	return ( \@superflow_names_gui );
 
 }

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.323';
+our $VERSION = '2.324';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.323
+Version 2.324
 
 =head1 SYNOPSIS
 
@@ -324,7 +324,7 @@ C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is
 
 =head3 Export
 
-Export the result of the chosen SQL statement to a C<CSV>-file.
+Export the result of the chosen SQL statement to a C<CSV>-file. See options L<Export data>.
 
 =head1 WRITE ACCESS
 
@@ -334,7 +334,7 @@ I<Create/Drop Table/View> can be reached by selecting the prompt-line in the L</
 activated.
 
 Selecting the prompt line of the I<Create/Drop Table/View> sub-menu allows one to set the parse settings described in
-L</Import>.
+L</Import data>.
 
 =head3 Create Table
 
@@ -396,7 +396,7 @@ respective option is activated.
 I<Delete>, I<Update> or I<Insert Into>  may not be available with C<JOIN> and C<UNION> statements.
 
 Selecting the prompt line of the I<Insert Into/Update/Delete> sub-menu allows one to set the parse settings described in
-L</Import>.
+L</Import data>.
 
 =head3 Insert Into
 
@@ -981,7 +981,7 @@ warnings - e.g. utf8 warnings - when printing a table.
 
 =back
 
-=head2 Import
+=head2 Import data
 
 =head3 Parse tool
 
@@ -1203,7 +1203,7 @@ Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and 
 If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source. If this
 option is set to C<plain> or C<file>, the respective setting is used directly without any menu.
 
-=head2 Export_
+=head2 Export data
 
 =head3 Destination folder
 
@@ -1215,11 +1215,11 @@ Set the folder where the data to be exported will be saved as a CSV file.
 
 =item File extension csv
 
-If this option is enabled, the file extension C<csv> is added automatically to the file-name.
+If this option is enabled, the file extension C<csv> is added automatically to the file name.
 
 =item Default file name
 
-If enabled, the table name will be used as the default name for the exported file.
+If enabled, the table name will be used as the default file name.
 
 =back
 
