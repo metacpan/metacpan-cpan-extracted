@@ -1,0 +1,9 @@
+Revision history for Dist-Zilla-Plugin-Typemap
+
+0.002     2023-05-09 12:38:13+02:00 Europe/Amsterdam
+          - Make plugin a FileMunger
+          - Add filename attribute
+          - Add version to typemap module dependencies
+
+0.001     2023-05-08 20:35:34+02:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

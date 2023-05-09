@@ -1,39 +1,63 @@
 Revision history for Perl module Term::Highlight and script hl.
 
 
-2006/01/16 - Version 1.0 - first functional version.
+2023/05/09 - Version 2.2.0 - a new hl option -gitignore to skip not tracked or
+                ignored files in git repositories, effective in recursive grep.
 
-2006/02/10 - Version 1.1 - generic approach to 16/256 color terminals.
+2020/01/20 - Version 2.1.2 - performance improvements.
 
-2006/02/13 - Version 1.2 - basic functionality moved to Highlight.pm,
-                supports grep option ('-g') with recursive search ('-r'),
-                reads from STDIN as well as from file list.
+2020/01/15 - Version 2.1.1 - corrected and faster line endings split.
 
-2006/02/15 - Version 1.3 - more sophisticated option reset functionality added.
-                Support for binary files added.
+2020/01/15 - Version 2.1.0 - no longer grep hidden files and descend into hidden
+                directories by default. A new option '-a' was added to do so.
 
-2008/12/16 - Version 1.4 - support for HL_INITSTRING environment variable
-                which can be used to set common options
-                (e.g. default hl color) for all cases.
+2018/11/13 - Version 2.0.4 - license update, explicitly licensed by the Perl 5
+                license.
 
-2008/12/19 - Version 1.5 - distributed as perl package (using Makefile.PL),
-                Highlight.pm now uses strict,
-                Highlight.pm cleanup from global variable @Patterns
-                    (moved to class implementation),
-                tagtypes with "xterm" uses "term",
-                perl pod sections fixed and significantly extended,
-                'hl -help' cleanup.
+2018/05/20 - Version 2.0.3 - added new global option '-f' to build the file list
+                from the trailing arguments automatically when option '-' is not
+                specified, fixed handling of option '0'.
 
-2010/08/17 - Version 1.6 - bugfix in hl script.
-                "Attempt to free unreferenced scalar value" message at exit is
-                now fixed.
+2018/04/01 - Version 2.0.2 - better treatment of the trailing highlight options
+                not followed by a pattern.
 
-2010/09/17 - Version 1.7 - in hl added possibility to store highlight snippets
-                in file .hlrc in HOME directory.
+2018/03/30 - Version 2.0.1 - do not pass newlines from hl to the module part.
 
-2011/09/09 - Version 1.7.1 - hl will not put color escape sequences if output
-                directed not to STDOUT: this will make it possible to use hl
-                safely in pipes.
+2018/03/29 - Version 2.0.0 - fixed color tags offsets at ends of lines
+                with support for "\r\n" line endings.
+
+2016/07/22 - Version 1.9.4 - optimization: always pre-check that line matches.
+                Highlight.pm version 1.8 - minor cleanup.
+
+2016/07/22 - Version 1.9.3 - expensive Process() calls optimized.
+
+2016/07/21 - Version 1.9.2 - version bump after Highlight.pm update.
+                Highlight.pm version 1.7 - fixes in default color mode.
+
+2016/07/21 - Version 1.9.1 - significant speed optimization in the grep mode.
+                Highlight.pm version 1.6 - added a new interface function.
+
+2016/07/14 - Version 1.9.0 - allow natural Unicode symbols in input patterns
+                when option '-u' is set. Support for granular snippet files to
+                help hl start faster.
+
+2016/06/28 - Version 1.8.9 - fixes in context lines processing
+
+2016/06/27 - Version 1.8.8 - added option '-c' to print context lines around
+                matches.
+
+2016/06/26 - Version 1.8.7 - added option '-n' to print line numbers,
+                file names and line numbers can now be colorized by setting of
+                    an environment variable HL_LOCATION.
+                Highlight.pm version 1.5 - ignore zero-length matches.
+
+2016/06/05 - Version 1.8.6 - minor bug fixes and docs updates.
+
+2016/06/01 - Version 1.8.5 - much faster start time when recursive grep is not
+                needed.
+
+2016/05/31 - Version 1.8.4 - various fixes related mostly to multiple files
+                processing.
 
 2015/10/25 - Version 1.8 - fixing multiple errors in hl, including:
                 option '-' did not work when global option '-b' was set,
@@ -43,58 +67,37 @@ Revision history for Perl module Term::Highlight and script hl.
                 Highlight.pm version 1.3 - resetting of bold typeface and
                     background colors could not work.
 
-2016/05/31 - Version 1.8.4 - various fixes related mostly to multiple files
-                processing.
+2011/09/09 - Version 1.7.1 - hl will not put color escape sequences if output
+                directed not to STDOUT: this will make it possible to use hl
+                safely in pipes.
 
-2016/06/01 - Version 1.8.5 - much faster start time when recursive grep is not
-                needed.
+2010/09/17 - Version 1.7 - in hl added possibility to store highlight snippets
+                in file .hlrc in HOME directory.
 
-2016/06/05 - Version 1.8.6 - minor bug fixes and docs updates.
+2010/08/17 - Version 1.6 - bugfix in hl script.
+                "Attempt to free unreferenced scalar value" message at exit is
+                now fixed.
 
-2016/06/26 - Version 1.8.7 - added option '-n' to print line numbers,
-                file names and line numbers can now be colorized by setting of
-                    an environment variable HL_LOCATION.
-                Highlight.pm version 1.5 - ignore zero-length matches.
+2008/12/19 - Version 1.5 - distributed as perl package (using Makefile.PL),
+                Highlight.pm now uses strict,
+                Highlight.pm cleanup from global variable @Patterns
+                    (moved to class implementation),
+                tagtypes with "xterm" uses "term",
+                perl pod sections fixed and significantly extended,
+                'hl -help' cleanup.
 
-2016/06/27 - Version 1.8.8 - added option '-c' to print context lines around
-                matches.
+2008/12/16 - Version 1.4 - support for HL_INITSTRING environment variable
+                which can be used to set common options
+                (e.g. default hl color) for all cases.
 
-2016/06/28 - Version 1.8.9 - fixes in context lines processing
+2006/02/15 - Version 1.3 - more sophisticated option reset functionality added.
+                Support for binary files added.
 
-2016/07/14 - Version 1.9.0 - allow natural Unicode symbols in input patterns
-                when option '-u' is set. Support for granular snippet files to
-                help hl start faster.
+2006/02/13 - Version 1.2 - basic functionality moved to Highlight.pm,
+                supports grep option ('-g') with recursive search ('-r'),
+                reads from STDIN as well as from file list.
 
-2016/07/21 - Version 1.9.1 - significant speed optimization in the grep mode.
-                Highlight.pm version 1.6 - added a new interface function.
+2006/02/10 - Version 1.1 - generic approach to 16/256 color terminals.
 
-2016/07/21 - Version 1.9.2 - version bump after Highlight.pm update.
-                Highlight.pm version 1.7 - fixes in default color mode.
-
-2016/07/22 - Version 1.9.3 - expensive Process() calls optimized.
-
-2016/07/22 - Version 1.9.4 - optimization: always pre-check that line matches.
-                Highlight.pm version 1.8 - minor cleanup.
-
-2018/03/29 - Version 2.0.0 - fixed color tags offsets at ends of lines
-                with support for "\r\n" line endings.
-
-2018/03/30 - Version 2.0.1 - do not pass newlines from hl to the module part.
-
-2018/04/01 - Version 2.0.2 - better treatment of the trailing highlight options
-                not followed by a pattern.
-
-2018/05/20 - Version 2.0.3 - added new global option '-f' to build the file list
-                from the trailing arguments automatically when option '-' is not
-                specified, fixed handling of option '0'.
-
-2018/11/13 - Version 2.0.4 - license update, explicitly licensed by the Perl 5
-                license.
-
-2020/01/15 - Version 2.1.0 - no longer grep hidden files and descend into hidden
-                directories by default. A new option '-a' was added to do so.
-
-2020/01/15 - Version 2.1.1 - corrected and faster line endings split.
-
-2020/01/20 - Version 2.1.2 - performance improvements.
+2006/01/16 - Version 1.0 - first functional version.
 

@@ -7,7 +7,7 @@ use MsOffice::Word::Surgeon::Run;
 use MsOffice::Word::Surgeon::Text;
 use XML::LibXML;
 use List::Util                     qw(max);
-use Carp                           qw(croak);
+use Carp                           qw(croak carp);
 
 # syntactic sugar for attributes
 sub has_inner ($@) {my $attr = shift; has($attr => @_, lazy => 1, builder => "_$attr", init_arg => undef)}
@@ -18,7 +18,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 
 #======================================================================
@@ -38,6 +38,7 @@ has_inner 'relationships'  => (is => 'ro', isa => 'ArrayRef');
 has_inner 'images'         => (is => 'ro', isa => 'HashRef');
 
 has 'contents_has_changed' => (is => 'bare', isa => 'Bool', default => 0);
+has 'was_cleaned_up'       => (is => 'bare', isa => 'Bool', default => 0);
 
 #======================================================================
 # GLOBAL VARIABLES
@@ -259,10 +260,17 @@ sub plain_text {
 sub cleanup_XML {
   my ($self, @merge_args) = @_;
 
+  # avoid doing it twice
+  return if $self->{was_cleaned_up};
+
+  # do the cleanup
   $self->reduce_all_noises;
   my $names_of_ASK_fields = $self->unlink_fields;
   $self->suppress_bookmarks(@$names_of_ASK_fields);
   $self->merge_runs(@merge_args);
+
+  # remember it was done
+  $self->{was_cleaned_up} = 1;
 }
 
 sub noise_reduction_regex {
@@ -326,8 +334,8 @@ sub merge_runs {
 
   # check validity of received args
   state $is_valid_arg = {no_caps => 1};
-  $is_valid_arg->{$_} or croak "merge_runs(): invalid arg: $_"
-    foreach keys %args;
+  my @invalid_args    = grep {!$is_valid_arg->{$_}} keys %args;
+  croak "merge_runs(): invalid arg(s): " . join ", ", @invalid_args if @invalid_args;
 
   my @new_runs;
   # loop over internal "run" objects
@@ -383,9 +391,27 @@ sub unlink_fields {
 sub replace {
   my ($self, $pattern, $replacement_callback, %replacement_args) = @_;
 
+  # shared initial string for error messages
+  my $error_msg = '->replace($pattern, $callback, %args)';
+
+  # default value for arg 'cleanup_XML', possibly from deprecated arg 'keep_xml_as_is'
+  if (delete $replacement_args{keep_xml_as_is}) {
+    not exists $replacement_args{cleanup_XML}
+      or croak "$error_msg: deprecated arg 'keep_xml_as_is' conflicts with arg 'cleanup_XML'";
+    carp "$error_msg: arg 'keep_xml_as_is' is deprecated, use 'cleanup_XML' instead";
+    $replacement_args{cleanup_XML} = 0;
+  }
+  else {
+    $replacement_args{cleanup_XML} //= 1; # default
+  }
+
   # cleanup the XML structure so that replacements work better
-  my $keep_xml_as_is = delete $replacement_args{keep_xml_as_is};
-  $self->cleanup_XML unless $keep_xml_as_is;
+  if (my $cleanup_args = $replacement_args{cleanup_XML}) {
+    $cleanup_args = {} if ! ref $cleanup_args;
+    ref $cleanup_args eq 'HASH'
+      or croak "$error_msg: arg 'cleanup_XML' should be a hashref";
+    $self->cleanup_XML(%$cleanup_args);
+  }
 
   # check for presences of a special option to avoid modying contents
   my $dont_overwrite_contents = delete $replacement_args{dont_overwrite_contents};
@@ -497,6 +523,14 @@ __END__
 =head1 NAME
 
 MsOffice::Word::Surgeon::PackagePart - Operations on a single part within the ZIP package of a docx document
+
+=head1 SYNOPSIS
+
+  my $part = $surgeon->document;
+  print $part->plain_text;
+  $part->replace(qr[$pattern], $replacement_callback);
+  $part->replace_image($image_alt_text, $image_PNG_content);
+
 
 =head1 DESCRIPTION
 
@@ -640,11 +674,24 @@ restores the complete document.
 
 =head3 cleanup_XML
 
-  $part->cleanup_XML;
+  $part->cleanup_XML(%args);
 
 Apply several other methods for removing unnecessary nodes within the internal
 XML. This method successively calls L</reduce_all_noises>, L</unlink_fields>,
 L</suppress_bookmarks> and L</merge_runs>.
+
+Currently there is only one legal arg :
+
+=over
+
+=item C<no_caps>
+
+If true, the method L<MsOffice::Word::Surgeon::Run/remove_caps_property> is automatically
+called for each run object. As a result, all texts within runs with the C<caps> property are automatically
+converted to uppercase.
+
+=back
+
 
 
 =head3 reduce_noise
@@ -781,6 +828,13 @@ if true, no call is made to the L</cleanup_XML> method before performing the rep
 if true, the internal XML contents is not modified in place; the new XML after performing
 replacements is merely returned to the caller.
 
+=item cleanup_args
+
+the argument should be an arrayref and will be passed to the L</cleanup_XML> method. This
+is typically used as 
+
+  $part->replace($pattern, $replacement, cleanup_args => [no_caps => 1]);
+
 =back
 
 
@@ -820,7 +874,7 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019-2022 by Laurent Dami.
+Copyright 2019-2023 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

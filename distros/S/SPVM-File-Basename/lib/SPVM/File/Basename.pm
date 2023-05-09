@@ -1,18 +1,16 @@
 package SPVM::File::Basename;
 
-our $VERSION = '0.04';
+our $VERSION = "0.041";
 
 1;
 
 =head1 Name
 
-SPVM::File::Basename - Parsing File Path into Directory and Base Name.
+SPVM::File::Basename - Parsing File Path into Directory and Base Name
 
 =head1 Description
 
-C<SPVM::File::Basename> is the C<File::Basename> class in L<SPVM> language.
-
-This class parses a file path into a directory and a base name.
+The File::Basename class of L<SPVM> has the methods to parse a file path into the directory part and the base name part.
 
 =head1 Usage
 
@@ -22,7 +20,7 @@ This class parses a file path into a directory and a base name.
   
   # fileparse
   {
-    my $ret =File::Basename->fileparse($path);
+    my $ret = File::Basename->fileparse($path);
     
     # a.txt
     my $base_name = $ret->[0];
@@ -34,13 +32,13 @@ This class parses a file path into a directory and a base name.
   # basename
   {
     # a.txt
-    my $base_name =File::Basename->basename($path);
+    my $base_name = File::Basename->basename($path);
   }
 
   # dirname
   {
     # dir
-    my $dir_name =File::Basename->dirname($path);
+    my $dir_name = File::Basename->dirname($path);
   }
 
 =head1 Interfaces
@@ -95,8 +93,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 

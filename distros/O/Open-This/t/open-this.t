@@ -168,7 +168,7 @@ local $ENV{EDITOR} = 'vim';
         parse_text($text),
         {
             file_name      => 't/lib/Foo/Bar.pm',
-            is_module_name => 1,
+            is_module_name => !!1,
             line_number    => 3,
             original_text  => $text,
             sub_name       => 'do_something',

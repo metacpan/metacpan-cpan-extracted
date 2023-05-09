@@ -21,7 +21,7 @@ name: Crypt-Passphrase-Scrypt
 provides:
   Crypt::Passphrase::Scrypt:
     file: lib/Crypt/Passphrase/Scrypt.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Crypt::Passphrase: '0.008'
@@ -35,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase-scrypt/issues
   repository: git://github.com/Leont/crypt-passphrase-scrypt.git
-version: '0.003'
+version: '0.004'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

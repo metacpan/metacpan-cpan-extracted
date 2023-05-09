@@ -35,7 +35,7 @@ sub render {
 		pad_end => $self->page->num + $attributes{page_offset},
 		%attributes
 	);
-	$self->SUPER::add($file);	
+	$self->SUPER::add($file, align => 'none');	
 	my %position = $self->get_points();
 	my $outline_position = $self->outline_position;
 	$attributes{y} = $position{y} + $self->font->size;

@@ -37,7 +37,7 @@ use Time::Piece;
 use Time::Seconds;
 use Try::Tiny;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 # URLs of where to obtain information.
 my $TIAA_MAIN_URL = 'https://www.tiaa.org/public/investment-performance';

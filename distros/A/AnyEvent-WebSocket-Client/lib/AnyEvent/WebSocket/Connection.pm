@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.54'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 has handle => (
@@ -298,7 +298,7 @@ sub close
 {
   my($self, $code, $reason) = @_;
 
-  my $body = pack('n', ($code) ? $code : '1005');
+  my $body = pack('n', ($code) ? $code : '1000');
 
   $body .= Encode::encode 'UTF-8', $reason if defined $reason;
 
@@ -340,7 +340,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.54
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -502,7 +502,7 @@ On a cleanly closed connection this will be `undef`.
 Close the connection.  You may optionally provide a code and a reason.
 See L<section 5.5.1|https://tools.ietf.org/html/rfc6455#section-5.5.1> and L<section 7.4.1|https://tools.ietf.org/html/rfc6455#section-7.4.1> of RFC6455.
 
-The code is a 16-bit unsigned integer value that indicates why you close the connection. By default the code is 1005.
+The code is a 16-bit unsigned integer value that indicates why you close the connection. By default the code is 1000.
 
 The reason is a character string (not an octet string) that further describes why you close the connection. By default the reason is an empty string.
 
@@ -562,7 +562,7 @@ Daniel Kamil Kozar (xavery)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2013-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

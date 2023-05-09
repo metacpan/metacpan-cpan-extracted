@@ -37,6 +37,8 @@ our $VERSION = '0.0.1';
 
 use Cwd;
 use Shell qw(echo find);
+use File::Basename;
+use File::Spec;
 
 my $C_pathNfile;
 my $SeismicUnixGui;
@@ -44,11 +46,13 @@ my $ans            = 'n'."\n";
 my $default_answer = 'y';
 my $choice         = 1;
 my $repeat         = 1;
+my $bin            = 'bin';
 
 # search for c libraries
 my $starting_points = '/home /';
 my $file           = 'run_me_only.sh';
 my $pathNfile2find = "*c/synseis/$file";
+my ( $filename, $C_path );
 
 print(" Looking for script on the system...\n");
 
@@ -56,8 +60,9 @@ my @list   = `(find $starting_points -path $pathNfile2find -print 2>/dev/null)`;
 my $length = scalar @list;
 
 print(" Found $length versions of the script:\n");
-print(" Hint: use one with the \"bin\" in the path name
-       or \"perl5/bin\"  for the case of a local installation\n");
+print(" Hint: use one with the \"perl\" in the path name
+  or \"perl5\", for the case of a local installation.
+  But ignore the case(s) with \"blib\" in their name.\n");
 
 for ( my $i = 0 ; $i < $length ; $i++ ) {
 
@@ -101,5 +106,26 @@ print "Proceeding to compile\n";
 chdir "$path";
 system("sudo bash $file");
 
+# Explain ENV settings to user
+print("\nMake sure you now set the environment variable properly.");
+
+( $filename, $C_path ) = fileparse($C_pathNfile);
+
+#print ("Directory:$Fortran_path...\n");
+my @dirs = File::Spec->splitdir($C_path);      # parse directories
+#print ("@dirs...\n");
+pop @dirs;                                           # remove top dir
+pop @dirs;                                            # remove top dir
+pop @dirs;                                            # remove top dir
+print ("@dirs...\n");
+my $SeismicUnixGui_path = File::Spec->catdir(@dirs);    # create new path
+print(
+"\nFor your system, the environment variable: \$SeismicUnixGui appears to be:\n $SeismicUnixGui_path\n\n"
+);
+print("Before running SeismicUnixGui, be sure to add the\n");
+print("following  line to the end of your \".bashrc\" file:\n\n");
+print("export PATH=\$PATH:\$SeismicUnixGui:$C_path$bin\n\n");
+
+print("   End of C-programs Installation\n");
 print("Hit Enter to leave\n");
 <STDIN>

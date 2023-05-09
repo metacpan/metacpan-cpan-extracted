@@ -1,3 +1,10 @@
+0.006   2023-02-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Add action 'stream_as_csv'
+
+        - Handle table with infinite rows by streaming as CSV as default action.
+
+
 0.005   2022-10-18  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

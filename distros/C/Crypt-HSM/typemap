@@ -1,5 +1,7 @@
 TYPEMAP
 	Crypt::HSM              T_PROVIDER
+	Crypt::HSM::Slot        T_PTROBJ
+	Crypt::HSM::Mechanism   T_PTROBJ
 	Crypt::HSM::Session     T_PTROBJ
 	Crypt::HSM::Stream      T_PTROBJ
 	Crypt::HSM::Encrypt     T_PTROBJ

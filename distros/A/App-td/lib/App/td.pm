@@ -7,9 +7,9 @@ use warnings;
 use PerlX::Maybe;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-10'; # DATE
+our $DATE = '2023-02-11'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.110'; # VERSION
+our $VERSION = '0.111'; # VERSION
 
 our %SPEC;
 
@@ -182,10 +182,10 @@ XLS/XLSX/ODS.
 
 **What scripts/modules accept table data?**
 
-This *td* script, for one, accept table data.
+This *td* script, for one, accepts table data.
 
-If a module/script expects CSV, you can feed table data and convert it to CSV
-using <prog:td2csv> utility.
+If a module/script expects CSV, you can feed it table data and convert the table
+data to CSV using <prog:td2csv> utility.
 
 Several other formats can also be converted to table data, e.g. JSON,
 YAML, XLS/XLSX/ODS.
@@ -347,7 +347,7 @@ _
     args => {
         action => {
             summary => 'Action to perform on input table',
-            schema => ['str*', in => [sort keys %actions]],
+            schema => ['str*', in => [sort keys %actions], 'x.in.summaries' => [map {$actions{$_}{summary}} sort keys %actions], ],
             req => 1,
             pos => 0,
             description => <<'_',
@@ -927,7 +927,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.110 of App::td (from Perl distribution App-td), released on 2023-02-10.
+This document describes version 0.111 of App::td (from Perl distribution App-td), released on 2023-02-11.
 
 =head1 FUNCTIONS
 
@@ -982,10 +982,10 @@ XLS/XLSX/ODS.
 
 B<What scripts/modules accept table data?>
 
-This I<td> script, for one, accept table data.
+This I<td> script, for one, accepts table data.
 
-If a module/script expects CSV, you can feed table data and convert it to CSV
-using L<td2csv> utility.
+If a module/script expects CSV, you can feed it table data and convert the table
+data to CSV using L<td2csv> utility.
 
 Several other formats can also be converted to table data, e.g. JSON,
 YAML, XLS/XLSX/ODS.

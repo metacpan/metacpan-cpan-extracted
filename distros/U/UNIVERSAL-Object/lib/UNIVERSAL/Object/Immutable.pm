@@ -11,7 +11,7 @@ use Scalar::Util ();
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.16';
+our $VERSION   = '0.17';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -41,6 +41,28 @@ sub new {
     return $self;
 }
 
+sub DESTROY {
+    my $self = $_[0];
+    my $repr = overload::StrVal($self);
+
+    # reverse the locks for all types ...
+    if ( $repr =~ /\=HASH\(0x/ ) {
+        Hash::Util::unlock_hash( %$self );
+    }
+    elsif ( $repr =~ /\=ARRAY\(0x/ ) {
+        Internals::SvREADONLY( @$self, 0 );
+    }
+    elsif ( $repr =~ /\=SCALAR\(0x/ or $repr =~ /\=REF\(0x/ or $repr =~ /\=REGEXP\(0x/ ) {
+        Internals::SvREADONLY( $$self, 0 );
+    }
+    else {
+        # nothing here ...
+    }
+
+    $self->can('DEMOLISH') && UNIVERSAL::Object::Util::DEMOLISHALL( $self );
+    return;
+}
+
 1;
 
 __END__
@@ -53,7 +75,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -74,6 +96,12 @@ immutable. This means that if you need to munge values, or build
 values based on the contents of other slots, you should do this
 inside a C<BUILD> method, during which the instance will still be
 mutable.
+
+The instance will remain immutable throughout it's lifetime up
+until the C<DESTROY> method is called. Before delgating to any
+C<DEMOLISH> methods the instance will be unlocked. This will
+allow you to handle any kind of object descostruction neccesary
+before the instance is freed.
 
 =head2 Supported REPR types
 
@@ -187,7 +215,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016, 2017, 2018 by Stevan Little.
+This software is copyright (c) 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

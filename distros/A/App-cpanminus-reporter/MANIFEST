@@ -25,7 +25,9 @@ t/15.parser.na.t
 t/16.missing.t
 t/17.parser.local.t
 t/18.parser.mixed_schema.t
+t/19.parser.compilation_error.t
 t/data/build.cloudweights.log
+t/data/build.compilation_error.log
 t/data/build.configure_failed.log
 t/data/build.dist_subdir.log
 t/data/build.fresh.log

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.040, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.041, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,14 +18,14 @@ name: Crypt-Passphrase-HSM
 provides:
   Crypt::Passphrase::HSM:
     file: lib/Crypt/Passphrase/HSM.pm
-    version: '0.003'
+    version: '0.005'
   Crypt::Passphrase::Pepper::HSM:
     file: lib/Crypt/Passphrase/Pepper/HSM.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   Carp: '0'
-  Crypt::HSM: '0'
-  Crypt::Passphrase: '0'
+  Crypt::HSM: '0.010'
+  Crypt::Passphrase: '0.016'
   Crypt::Passphrase::Pepper::Base: '0'
   MIME::Base64: '0'
   parent: '0'
@@ -34,6 +34,6 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase-hsm/issues
   repository: git://github.com/Leont/crypt-passphrase-hsm.git
-version: '0.003'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

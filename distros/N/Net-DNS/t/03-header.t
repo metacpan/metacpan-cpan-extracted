@@ -1,15 +1,14 @@
 #!/usr/bin/perl
-# $Id: 03-header.t 1899 2023-02-20 15:34:02Z willem $
+# $Id: 03-header.t 1910 2023-03-30 19:16:30Z willem $
 #
 
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 75;
+use TestToolkit;
 
 use Net::DNS::Packet;
 use Net::DNS::Parameters;
-
-plan tests => 77;
 
 
 my $packet = Net::DNS::Packet->new(qw(. NS IN));
@@ -17,7 +16,7 @@ my $header = $packet->header;
 ok( $header->isa('Net::DNS::Header'), 'packet->header object' );
 
 
-sub waggle {
+sub toggle {
 	my ( $object, $attribute, @sequence ) = @_;
 	for my $value (@sequence) {
 		my $change = $object->$attribute($value);
@@ -31,20 +30,20 @@ sub waggle {
 my $newid = Net::DNS::Packet->new()->header->id(0);
 ok( $newid, 'expected non-zero packet ID' );
 
-waggle( $header, 'opcode', qw(QUERY UPDATE DSO) );
-waggle( $header, 'id',	   $header->id, 0, $header->id );	# Zero ID => DSO unidirectional
-waggle( $header, 'opcode', qw(QUERY) );
-waggle( $header, 'id',	   $header->id, $newid, $header->id );
+toggle( $header, 'opcode', qw(QUERY UPDATE DSO) );
+toggle( $header, 'id',	   $header->id, 0, $header->id );	# Zero ID => DSO unidirectional
+toggle( $header, 'opcode', qw(QUERY) );
+toggle( $header, 'id',	   $header->id, $newid, $header->id );
 
-waggle( $header, 'rcode',  qw(REFUSED FORMERR NOERROR) );
+toggle( $header, 'rcode', qw(REFUSED FORMERR NOERROR) );
 
-waggle( $header, 'qr', 1, 0, 1, 0 );
-waggle( $header, 'aa', 1, 0, 1, 0 );
-waggle( $header, 'tc', 1, 0, 1, 0 );
-waggle( $header, 'rd', 0, 1, 0, 1 );
-waggle( $header, 'ra', 1, 0, 1, 0 );
-waggle( $header, 'ad', 1, 0, 1, 0 );
-waggle( $header, 'cd', 1, 0, 1, 0 );
+toggle( $header, 'qr', 1, 0, 1, 0 );
+toggle( $header, 'aa', 1, 0, 1, 0 );
+toggle( $header, 'tc', 1, 0, 1, 0 );
+toggle( $header, 'rd', 0, 1, 0, 1 );
+toggle( $header, 'ra', 1, 0, 1, 0 );
+toggle( $header, 'ad', 1, 0, 1, 0 );
+toggle( $header, 'cd', 1, 0, 1, 0 );
 
 
 #
@@ -63,6 +62,9 @@ like( $header->string, '/prcount = 0/',	    'string() has prcount correct' );
 like( $header->string, '/upcount = 0/',	    'string() has upcount correct' );
 like( $header->string, '/adcount = 0/',	    'string() has adcount correct' );
 
+$header->opcode('DSO');
+like( $header->string, '/opcode = DSO/', 'string() has DSO opcode' );
+
 
 #
 # Check that the aliases work
@@ -77,20 +79,6 @@ is( $header->zocount, $header->qdcount, 'zocount value matches qdcount' );
 is( $header->prcount, $header->ancount, 'prcount value matches ancount' );
 is( $header->upcount, $header->nscount, 'upcount value matches nscount' );
 is( $header->adcount, $header->arcount, 'adcount value matches arcount' );
-
-
-foreach my $method (qw(qdcount ancount nscount arcount)) {
-	local $Net::DNS::Header::warned;
-	local $SIG{__WARN__} = sub { die @_ };
-
-	eval { $header->$method(1) };
-	my ($warning) = split /\n/, "$@\n";
-	ok( $warning, "$method read-only:\t[$warning]" );
-
-	eval { $header->$method(1) };
-	my ($repeated) = split /\n/, "$@\n";
-	ok( !$repeated, "warning not repeated:\t[$repeated]" );
-}
 
 
 my $data = $packet->data;
@@ -109,15 +97,15 @@ SKIP: {
 
 	skip( 'EDNS header extensions not supported', 10 ) unless $edns->isa('Net::DNS::RR::OPT');
 
-	waggle( $header, 'do', 0, 1, 0, 1 );
-	waggle( $header, 'rcode', qw(BADVERS BADMODE BADNAME FORMERR NOERROR) );
+	toggle( $header, 'do', 0, 1, 0, 1 );
+	toggle( $header, 'rcode', qw(BADVERS BADMODE BADNAME FORMERR NOERROR) );
 
 	my $packet = Net::DNS::Packet->new();			# empty EDNS size solicitation
 	my $udplim = 1280;
-	$packet->edns->size($udplim);
+	$packet->edns->UDPsize($udplim);
 	my $encoded = $packet->data;
 	my $decoded = Net::DNS::Packet->new( \$encoded );
-	is( $decoded->edns->size, $udplim, 'EDNS size request assembled correctly' );
+	is( $decoded->edns->UDPsize, $udplim, 'EDNS size request assembled correctly' );
 }
 
 
@@ -130,6 +118,13 @@ eval {					## no critic		# exercise printing functions
 	unlink($file);
 };
 
+
+exception( 'qdcount read-only', sub { $header->qdcount(0) } );
+exception( 'ancount read-only', sub { $header->ancount(0) } );
+exception( 'nscount read-only', sub { $header->nscount(0) } );
+exception( 'adcount read-only', sub { $header->adcount(0) } );
+
+noexception( 'warnings not repeated', sub { $header->qdcount(0) } );
 
 exit;
 

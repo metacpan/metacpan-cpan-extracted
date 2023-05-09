@@ -8,7 +8,11 @@ use lib "$FindBin::Bin/lib";
 
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build" };
 
+use SPVM 'Fn';
+use SPVM::Regex;
+
 use SPVM 'TestCase::Regex';
+use SPVM 'Regex';
 
 my $api = SPVM::api();
 
@@ -70,6 +74,11 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is(SPVM::TestCase::Regex->extra_url_unescape('foo%E3%81%82bar%E3%81%84'), "fooあbarい");
     };
   }
+}
+
+# Version
+{
+  is($SPVM::Regex::VERSION, SPVM::Fn->get_version_string('Regex'));
 }
 
 # All object is freed

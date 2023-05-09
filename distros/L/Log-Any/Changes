@@ -2,6 +2,20 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.715     2023-05-04 13:09:22-05:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed Multiplex adapter losing context details. Normally, the
+    Log::Any::Proxy joins all of the arguments passed in to a logging
+    method if the adapter it's using does not support structured data.
+    Multiplex supports structured data, but one of the adapters inside
+    may not. So, the Multiplex adapter must also perform this
+    concatenation to avoid losing those additional arguments.
+
+    Thanks @jrubinator and @GrantStreetGroup for discovering this bug
+    and providing the fix! [Github #95]
+
 1.714     2023-03-20 11:48:30-05:00 America/Chicago
 
   [Fixed]

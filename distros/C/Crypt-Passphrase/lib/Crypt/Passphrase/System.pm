@@ -1,12 +1,11 @@
 package Crypt::Passphrase::System;
-$Crypt::Passphrase::System::VERSION = '0.015';
+$Crypt::Passphrase::System::VERSION = '0.016';
 use strict;
 use warnings;
 
 use Crypt::Passphrase -encoder;
 
 use Carp 'croak';
-use MIME::Base64 qw/encode_base64/;
 
 my @possibilities = (
 	[1   , '$1$'              ,  6, '$1$aaaaaa$FuYJ957Lgsw.eVsENqOok1'                                                                ],
@@ -17,8 +16,8 @@ my @possibilities = (
 	['2y', '$2y$12$'          , 16, '$2y$08$......................qrjEXaz4RUVmquy3IT5eLKXLB28ahI2'                                    ],
 	['2b', '$2b$12$'          , 16, '$2b$08$......................qrjEXaz4RUVmquy3IT5eLKXLB28ahI2'                                    ],
 	[7   , '$7$DU..../....'   , 16, '$7$AU..../....2Q9obwLhin8qvQl6sisAO/$E1HizYWxBmnIH4sdPkd1UOML9t62Gf.wvNTnt5XFzs8'                ],
-	['gy', '$gy$j8T$'         , 18, '$gy$j9T$......................$5.2XCu2DhNfGzpifM7X8goEG2Wkio9cWIMtyWnX4tp2'                      ],
-	['y' , '$y$j8T$'          , 18, '$y$j9T$F5Jx5fExrKuPp53xLKQ..1$tnSYvahCwPBHKZUspmcxMfb0.WiB9W.zEaKlOBL35rC'                       ],
+	['gy', '$gy$j8T$'         , 16, '$gy$j9T$......................$5.2XCu2DhNfGzpifM7X8goEG2Wkio9cWIMtyWnX4tp2'                      ],
+	['y' , '$y$j8T$'          , 16, '$y$j9T$F5Jx5fExrKuPp53xLKQ..1$tnSYvahCwPBHKZUspmcxMfb0.WiB9W.zEaKlOBL35rC'                       ],
 );
 
 my (%algorithm, %salt_for, $default);
@@ -60,10 +59,31 @@ sub new {
 	}, $class;
 }
 
+my $base64_digits = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+sub _encode_crypt64 {
+	my $bytes = shift;
+	my $nbytes = length $bytes;
+	my $npadbytes = 2 - ($nbytes + 2) % 3;
+	$bytes .= "\0" x $npadbytes;
+	my $digits = '';
+	for(my $i = 0; $i < $nbytes; $i += 3) {
+		my $v = ord(substr $bytes, $i, 1) |
+			(ord(substr $bytes, $i + 1, 1) << 8) |
+			(ord(substr $bytes, $i + 2, 1) << 16);
+		$digits .= substr($base64_digits, $v & 0x3f, 1) .
+			substr($base64_digits, ($v >> 6) & 0x3f, 1) .
+			substr($base64_digits, ($v >> 12) & 0x3f, 1) .
+			substr($base64_digits, ($v >> 18) & 0x3f, 1);
+	}
+	substr $digits, -$npadbytes, $npadbytes, '';
+	return $digits;
+}
+
+
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
-	my $encoded_salt = encode_base64($salt, "") =~ tr{A-Za-z0-9+/=}{./0-9A-Za-z}dr;
+	my $encoded_salt = _encode_crypt64($salt);
 	return crypt($password, "$self->{settings}$encoded_salt\$");
 }
 
@@ -105,7 +125,7 @@ Crypt::Passphrase::System - An system crypt() encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

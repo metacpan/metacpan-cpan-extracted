@@ -1,16 +1,28 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Basename {
+  version "0.041";
+  
   use File::Basename::Instance;
+  
+  our $SINGLETON : File::Basename::Instance;
+  
+  INIT {
+    File::Basename::Instance->INIT;
+    $SINGLETON = File::Basename::Instance->new;
+  }
   
   # Class Methods
   static method fileparse : string[] ($path : string) {
-    return File::Basename::Instance->new->fileparse($path);
+    return $SINGLETON->fileparse($path);
   }
   
   static method basename : string ($path : string) {
-    return File::Basename::Instance->new->basename($path);
+    return $SINGLETON->basename($path);
   }
   
   static method dirname : string ($path : string) {
-    return File::Basename::Instance->new->dirname($path);
+    return $SINGLETON->dirname($path);
   }
 }

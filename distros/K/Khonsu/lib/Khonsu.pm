@@ -1,7 +1,7 @@
 package Khonsu;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 use PDF::API2;
 
 use Khonsu::File;
@@ -13,7 +13,8 @@ sub new {
 		pages => [],
 		page_size => $args{page_size} || 'A4',
 		page_args => $args{page_args} || {},
-		pdf => PDF::API2->new( -file => sprintf("%s.pdf", $name) )
+		pdf => PDF::API2->new( -file => sprintf("%s.pdf", $name) ),
+		configure => $args{configure}
 	);
 	return $file;
 }
@@ -24,19 +25,15 @@ sub open { ... }
 
 =head1 NAME
 
-Khonsu - The great new Khonsu!
+Khonsu - PDF Generation!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.08
 
 =cut
 
 =head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
 	my @words = ('Aker', 'Anubis', 'Hapi', 'Khepri', 'Maahes', 'Thoth', 'Bastet', 'Hatmehit', 'Tefnut', 'Menhit', 'Imentet');
 
@@ -47,49 +44,212 @@ Perhaps a little code snippet.
 
 	use Khonsu;
 
+	my $padding = 20;
+	my $page_padding = $padding * 2;
 	my $khonsu = Khonsu->new(
 		'Ra',
 		page_size => 'A4',
 		page_args => {
-			background => '#36b636'
-		}
-	)->add_page;
-
-	my $padding = 20;
-	my $page_padding = $padding * 2;
-	$khonsu->add_h1(
-		text => $generate_text->(3),
-		x => 20,
-		y => $padding,
-		w => $khonsu->page->w - $page_padding,
-		font => {
-			colour => '#fff'
-		}
-	)->add_text(
-		text => $generate_text->(2000),
-		x => 20,
-		y => ($padding * 2) + $khonsu->h1->line_height,
-		w => $khonsu->page->w - 40,
-		h => $khonsu->page->h - ($khonsu->h1->line_height + $page_padding + $padding),
-		indent => 4,
-		font => {
-			colour => '#fff'
+			background => '#3ff'
 		},
-		overflow => 1,
+		configure => {
+			page_header => {
+				padding => $padding,
+				show_page_num => 'right',
+				page_num_text => 'page {num}',
+				h => $padding,
+				cb => sub {
+					my ($self, $file, %atts) = @_;
+					$self->add(
+						$file,
+						text => 'Ra',
+						align => 'center',
+						%attrs,
+					);
+				}
+			},
+			page_footer => {
+				padding => $padding,
+				show_page_num => 'left',
+				page_num_text => 'page {num}',
+				h => $padding,
+				cb => sub {
+					my ($self, $file, %atts) = @_;
+					$self->add(
+						$file,
+						text => 'Ra',
+						align => 'center',
+						%attrs,
+					);
+				}
+			},
+			toc => {
+				title => 'Table of contents',
+				title_font_args => {
+					size => 50,
+				},
+				title_padding => 10,
+				font_args => {
+					size => 20,
+				},
+				padding => 5,
+			},
+			h1 => {
+				font => { colour => '#0EE' }
+			}
+		}
 	);
 
-	$khonsu->add_page(
-		background => '#fff'
-	)->add_image(
+	$khonsu->add_image(
 		image => 't/test.png',
-		x => 20,
-		y => 20,
-		w => $khonsu->page->w - 40,
-		h => $khonsu->page->h - 40,
+		x => $padding,
+		y => $padding,
+		w => $khonsu->page->w - $page_padding,
+		h => $khonsu->page->h - $page_padding,
+	)->add_page;
+
+	$khonsu->add_toc();
+
+	$khonsu->set_columns(2);
+
+	for (0 .. 100) {
+		$khonsu->add_h1(
+			text => $generate_text->(3),
+			toc => 1,
+		)->add_text(
+			text => $generate_text->(2000),
+			indent => 4,
+			font => {
+				colour => '#fff'
+			},
+		);
+	}
+
+	$khonsu->set_columns(1);
+
+	$khonsu->add_h1(
+		text => 'A simple form',
+		toc => 1
+	);
+
+	$khonsu->add_input(
+		text => 'Name:'
+	);
+
+	$khonsu->add_select(
+		text => 'Colour:',
+		options => [qw/red yellow green/]
 	);
 
 	$khonsu->save();
 
+=head1 METHODS
+
+=cut
+
+=head2 add_page
+
+=cut
+
+=head2 set_columns
+
+=cut
+
+=head2 open_page
+
+=cut
+
+=head2 add_page_header
+
+=cut
+
+=head2 add_page_footer
+
+=cut
+
+=head2 remove_page_header_and_footer 
+
+=cut
+
+=head2 remove_page_header
+
+=cut
+
+=head2 remove_page_footer
+
+=cut
+
+=head2 add_toc
+
+=cut
+
+=head2 add_text
+
+=cut
+
+=head2 add_h1
+
+=cut
+
+=head2 add_h2
+
+=cut
+
+=head2 add_h3
+
+=cut
+
+=head2 add_h4
+
+=cut
+
+=head2 add_h5
+
+=cut
+
+=head2 add_h6
+
+=cut
+
+=head2 add_image
+
+=cut
+
+=head2 add_form
+
+=cut
+
+=head2 add_input
+
+=cut
+
+=head2 add_select
+
+=cut
+
+=head2 add_line
+
+=cut
+
+=head2 add_box
+
+=cut
+
+=head2 add_circle
+
+=cut
+
+=head2 add_pie
+
+=cut
+
+=head2 add_ellipse
+
+=cut
+
+=head2 load_font
+
+=cut
 
 =head1 AUTHOR
 

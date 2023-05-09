@@ -14,8 +14,10 @@ use SPVM 'Double';
 
 use SPVM 'TestCase::Sys::IO';
 
+my $api = SPVM::api();
+
 # Start objects count
-my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
+my $start_memory_blocks_count = $api->get_memory_blocks_count();
 
 # is_windows
 {
@@ -39,19 +41,19 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   # value
   if ($^O eq 'linux') {
     {
-      my $value = SPVM::Int->new(0);
-      SPVM::Sys::OS->defined('__linux', $value);
-      ok($value->value);
+      my $value_ref = $api->new_int_array([0]);
+      SPVM::Sys::OS->defined('__linux', $value_ref);
+      ok($value_ref->[0]);
     }
     {
-      my $value = SPVM::Long->new(0);
-      SPVM::Sys::OS->defined('__linux', $value);
-      ok($value->value);
+      my $value_ref = $api->new_long_array([0]);
+      SPVM::Sys::OS->defined('__linux', $value_ref);
+      ok($value_ref->[0]);
     }
     {
-      my $value = SPVM::Double->new(0);
-      SPVM::Sys::OS->defined('__linux', $value);
-      ok($value->value);
+      my $value_ref = $api->new_double_array([0]);
+      SPVM::Sys::OS->defined('__linux', $value_ref);
+      ok($value_ref->[0]);
     }
   }
   
@@ -83,10 +85,10 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   }
 }
 
-SPVM::api->set_exception(undef);
+$api->set_exception(undef);
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
+my $end_memory_blocks_count = $api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

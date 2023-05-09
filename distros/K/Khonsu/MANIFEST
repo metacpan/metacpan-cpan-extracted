@@ -3,6 +3,10 @@ ignore.txt
 lib/Khonsu.pm
 lib/Khonsu/File.pm
 lib/Khonsu/Font.pm
+lib/Khonsu/Form.pm
+lib/Khonsu/Form/Field.pm
+lib/Khonsu/Form/Field/Input.pm
+lib/Khonsu/Form/Field/Select.pm
 lib/Khonsu/Image.pm
 lib/Khonsu/Page.pm
 lib/Khonsu/Page/Footer.pm
@@ -30,6 +34,9 @@ META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-file.t
+t/02-simpler.t
+t/03-easy.t
+t/04-columns.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -1,0 +1,10 @@
+Revision history for Acme-No-MakefilePL-No-BuildPL
+
+0.03    04/05/2023
+        Fix META.yml duplicate requires
+
+0.02    04/05/2023
+        Static install with x_static_install
+
+0.01    04/05/2023
+        First version, released on an unsuspecting world.

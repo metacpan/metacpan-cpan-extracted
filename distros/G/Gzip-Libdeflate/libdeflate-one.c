@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -32,11 +32,26 @@ SOFTWARE.
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -44,14 +59,237 @@ SOFTWARE.
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -120,21 +358,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -143,63 +372,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -293,8 +544,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -488,7 +739,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -507,7 +758,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -538,7 +789,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -557,7 +808,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -585,7 +836,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -594,7 +845,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -647,192 +898,6 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #endif 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
 
 
 #define DIVISOR 65521
@@ -877,7 +942,7 @@ adler32_generic(u32 adler, const u8 *p, size_t len)
 #undef DEFAULT_IMPL
 #undef arch_select_adler32_func
 typedef u32 (*adler32_func_t)(u32 adler, const u8 *p, size_t len);
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 /* #  include "arm/adler32_impl.h" */
 
 
@@ -897,11 +962,26 @@ typedef u32 (*adler32_func_t)(u32 adler, const u8 *p, size_t len);
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -909,14 +989,237 @@ typedef u32 (*adler32_func_t)(u32 adler, const u8 *p, size_t len);
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -985,21 +1288,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -1008,63 +1302,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -1158,8 +1474,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -1353,7 +1669,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -1372,7 +1688,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -1403,7 +1719,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -1422,7 +1738,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -1450,7 +1766,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -1459,7 +1775,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -1515,12 +1831,13 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING) && \
-	(defined(__linux__) || \
-	 (defined(__aarch64__) && defined(__APPLE__)))
+#if !defined(FREESTANDING) && \
+    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__linux__) || \
+     (defined(__APPLE__) && defined(ARCH_ARM64)) || \
+     (defined(_WIN32) && defined(ARCH_ARM64)))
 #  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
 #  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
 #endif
@@ -1554,15 +1871,14 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif 
 
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(ARCH_ARM64)
 #  define HAVE_NEON_NATIVE	1
 #else
 #  define HAVE_NEON_NATIVE	0
 #endif
-#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
 
 #if HAVE_NEON_NATIVE || \
-	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
 #  define HAVE_NEON_INTRIN	1
 #else
 #  define HAVE_NEON_INTRIN	0
@@ -1574,16 +1890,29 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_PMULL_NATIVE	0
 #endif
-#define HAVE_PMULL_TARGET \
+#if HAVE_PMULL_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
-
-#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
-	!(defined(__arm__) && defined(__clang__)) && \
-	CPU_IS_LITTLE_ENDIAN() 
-#  define HAVE_PMULL_INTRIN	1
+	 HAVE_NEON_INTRIN  && \
+	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
+	  defined(_MSC_VER)) && \
+	   \
+	 !(defined(ARCH_ARM32) && defined(__clang__)))
+#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+   
+#  ifdef _MSC_VER
+#    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
+#  else
+#    define compat_vmull_p64(a, b)  vmull_p64((a), (b))
+#  endif
 #else
 #  define HAVE_PMULL_INTRIN	0
+#endif
+
+#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
+		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
+#else
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
 #endif
 
 
@@ -1592,19 +1921,31 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_CRC32_NATIVE	0
 #endif
-#define HAVE_CRC32_TARGET \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+#undef HAVE_CRC32_INTRIN
+#if HAVE_CRC32_NATIVE
+#  define HAVE_CRC32_INTRIN	1
+#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  if GCC_PREREQ(1, 0)
+    
+#    if (GCC_PREREQ(11, 3) || \
+	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
+	!defined(__ARM_ARCH_6KZ__) && \
+	!defined(__ARM_ARCH_7EM__)
+#      define HAVE_CRC32_INTRIN	1
+#    endif
+#  elif CLANG_PREREQ(3, 4, 6000000)
+#    define HAVE_CRC32_INTRIN	1
+#  elif defined(_MSC_VER)
+#    define HAVE_CRC32_INTRIN	1
+#  endif
+#endif
+#ifndef HAVE_CRC32_INTRIN
+#  define HAVE_CRC32_INTRIN	0
+#endif
 
-#define HAVE_CRC32_INTRIN \
-	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
-			       (!GCC_PREREQ(1, 0) || \
-				GCC_PREREQ(11, 3) || \
-				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
 
-
-#ifdef __aarch64__
+#if defined(ARCH_ARM64) && !defined(_MSC_VER)
 #  ifdef __ARM_FEATURE_SHA3
 #    define HAVE_SHA3_NATIVE	1
 #  else
@@ -1613,9 +1954,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
 				 (GCC_PREREQ(8, 1)  || \
 				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
+				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
 				 (GCC_PREREQ(9, 1)  || \
-				  __has_builtin(__builtin_neon_veor3q_v)))
+				  CLANG_PREREQ(13, 0, 13160000)))
 #else
 #  define HAVE_SHA3_NATIVE	0
 #  define HAVE_SHA3_TARGET	0
@@ -1623,26 +1965,28 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif
 
 
-#ifdef __aarch64__
+#ifdef ARCH_ARM64
 #  ifdef __ARM_FEATURE_DOTPROD
 #    define HAVE_DOTPROD_NATIVE	1
 #  else
 #    define HAVE_DOTPROD_NATIVE	0
 #  endif
-#  define HAVE_DOTPROD_TARGET \
+#  if HAVE_DOTPROD_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
-#  define HAVE_DOTPROD_INTRIN \
-	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
+	  defined(_MSC_VER)))
+#    define HAVE_DOTPROD_INTRIN	1
+#  else
+#    define HAVE_DOTPROD_INTRIN	0
+#  endif
 #else
 #  define HAVE_DOTPROD_NATIVE	0
-#  define HAVE_DOTPROD_TARGET	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
 
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  define __ARM_FEATURE_CRC32	1
 #endif
 #if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
@@ -1652,7 +1996,7 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define __ARM_FEATURE_DOTPROD	1
 #endif
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  include <arm_acle.h>
 #  undef __ARM_FEATURE_CRC32
 #endif
@@ -1682,10 +2026,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  if HAVE_NEON_NATIVE
 #    define ATTRIBUTES
 #  else
-#    ifdef __arm__
-#      define ATTRIBUTES	__attribute__((target("fpu=neon")))
+#    ifdef ARCH_ARM32
+#      define ATTRIBUTES	_target_attribute("fpu=neon")
 #    else
-#      define ATTRIBUTES	__attribute__((target("+simd")))
+#      define ATTRIBUTES	_target_attribute("+simd")
 #    endif
 #  endif
 #  include <arm_neon.h>
@@ -1693,26 +2037,32 @@ static forceinline ATTRIBUTES void
 adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 		   u32 *s1, u32 *s2)
 {
-	const uint16x8_t mults_a = { 64, 63, 62, 61, 60, 59, 58, 57, };
-	const uint16x8_t mults_b = { 56, 55, 54, 53, 52, 51, 50, 49, };
-	const uint16x8_t mults_c = { 48, 47, 46, 45, 44, 43, 42, 41, };
-	const uint16x8_t mults_d = { 40, 39, 38, 37, 36, 35, 34, 33, };
-	const uint16x8_t mults_e = { 32, 31, 30, 29, 28, 27, 26, 25, };
-	const uint16x8_t mults_f = { 24, 23, 22, 21, 20, 19, 18, 17, };
-	const uint16x8_t mults_g = { 16, 15, 14, 13, 12, 11, 10,  9, };
-	const uint16x8_t mults_h = {  8,  7,  6,  5,  4,  3,  2,  1, };
+	static const u16 _aligned_attribute(16) mults[64] = {
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const uint16x8_t mults_a = vld1q_u16(&mults[0]);
+	const uint16x8_t mults_b = vld1q_u16(&mults[8]);
+	const uint16x8_t mults_c = vld1q_u16(&mults[16]);
+	const uint16x8_t mults_d = vld1q_u16(&mults[24]);
+	const uint16x8_t mults_e = vld1q_u16(&mults[32]);
+	const uint16x8_t mults_f = vld1q_u16(&mults[40]);
+	const uint16x8_t mults_g = vld1q_u16(&mults[48]);
+	const uint16x8_t mults_h = vld1q_u16(&mults[56]);
 
-	uint32x4_t v_s1 = { 0, 0, 0, 0 };
-	uint32x4_t v_s2 = { 0, 0, 0, 0 };
+	uint32x4_t v_s1 = vdupq_n_u32(0);
+	uint32x4_t v_s2 = vdupq_n_u32(0);
 	
-	uint16x8_t v_byte_sums_a = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_b = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_c = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_d = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_e = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_f = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_g = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_h = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_a = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_b = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_c = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_d = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_e = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_f = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_g = vdupq_n_u16(0);
+	uint16x8_t v_byte_sums_h = vdupq_n_u16(0);
 
 	do {
 		
@@ -1723,7 +2073,7 @@ adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 		uint16x8_t tmp;
 
 		
-		v_s2 += v_s1;
+		v_s2 = vaddq_u32(v_s2, v_s1);
 
 		
 		tmp = vpaddlq_u8(bytes1);
@@ -1743,7 +2093,7 @@ adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 	} while (p != end);
 
 	
-#ifdef __arm__
+#ifdef ARCH_ARM32
 #  define umlal2(a, b, c)  vmlal_u16((a), vget_high_u16(b), vget_high_u16(c))
 #else
 #  define umlal2	   vmlal_high_u16
@@ -1768,8 +2118,15 @@ adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 #undef umlal2
 
 	
-	*s1 += v_s1[0] + v_s1[1] + v_s1[2] + v_s1[3];
-	*s2 += v_s2[0] + v_s2[1] + v_s2[2] + v_s2[3];
+#ifdef ARCH_ARM32
+	*s1 += vgetq_lane_u32(v_s1, 0) + vgetq_lane_u32(v_s1, 1) +
+	       vgetq_lane_u32(v_s1, 2) + vgetq_lane_u32(v_s1, 3);
+	*s2 += vgetq_lane_u32(v_s2, 0) + vgetq_lane_u32(v_s2, 1) +
+	       vgetq_lane_u32(v_s2, 2) + vgetq_lane_u32(v_s2, 3);
+#else
+	*s1 += vaddvq_u32(v_s1);
+	*s2 += vaddvq_u32(v_s2);
+#endif
 }
 /* #include "adler32_vec_template.h" */
 
@@ -1847,12 +2204,12 @@ FUNCNAME(u32 adler, const u8 *p, size_t len)
 #    define ATTRIBUTES
 #  else
 #    ifdef __clang__
-#      define ATTRIBUTES  __attribute__((target("dotprod")))
+#      define ATTRIBUTES  _target_attribute("dotprod")
      
 #    elif defined(__ARM_FEATURE_JCVT)
-#      define ATTRIBUTES  __attribute__((target("+dotprod")))
+#      define ATTRIBUTES  _target_attribute("+dotprod")
 #    else
-#      define ATTRIBUTES  __attribute__((target("arch=armv8.2-a+dotprod")))
+#      define ATTRIBUTES  _target_attribute("arch=armv8.2-a+dotprod")
 #    endif
 #  endif
 #  include <arm_neon.h>
@@ -1860,35 +2217,32 @@ static forceinline ATTRIBUTES void
 adler32_neon_dotprod_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 			   u32 *s1, u32 *s2)
 {
-	const uint8x16_t mults_a = {
+	static const u8 _aligned_attribute(16) mults[64] = {
 		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
-	};
-	const uint8x16_t mults_b = {
 		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
-	};
-	const uint8x16_t mults_c = {
 		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
-	};
-	const uint8x16_t mults_d = {
 		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
 	};
-	const uint8x16_t ones = {
-		 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1 , 1,  1,
-	};
-	uint32x4_t v_s1_a = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_b = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_c = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_d = { 0, 0, 0, 0 };
-	uint32x4_t v_s2_a = { 0, 0, 0, 0 };
-	uint32x4_t v_s2_b = { 0, 0, 0, 0 };
-	uint32x4_t v_s2_c = { 0, 0, 0, 0 };
-	uint32x4_t v_s2_d = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_sums_a = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_sums_b = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_sums_c = { 0, 0, 0, 0 };
-	uint32x4_t v_s1_sums_d = { 0, 0, 0, 0 };
+	const uint8x16_t mults_a = vld1q_u8(&mults[0]);
+	const uint8x16_t mults_b = vld1q_u8(&mults[16]);
+	const uint8x16_t mults_c = vld1q_u8(&mults[32]);
+	const uint8x16_t mults_d = vld1q_u8(&mults[48]);
+	const uint8x16_t ones = vdupq_n_u8(1);
+	uint32x4_t v_s1_a = vdupq_n_u32(0);
+	uint32x4_t v_s1_b = vdupq_n_u32(0);
+	uint32x4_t v_s1_c = vdupq_n_u32(0);
+	uint32x4_t v_s1_d = vdupq_n_u32(0);
+	uint32x4_t v_s2_a = vdupq_n_u32(0);
+	uint32x4_t v_s2_b = vdupq_n_u32(0);
+	uint32x4_t v_s2_c = vdupq_n_u32(0);
+	uint32x4_t v_s2_d = vdupq_n_u32(0);
+	uint32x4_t v_s1_sums_a = vdupq_n_u32(0);
+	uint32x4_t v_s1_sums_b = vdupq_n_u32(0);
+	uint32x4_t v_s1_sums_c = vdupq_n_u32(0);
+	uint32x4_t v_s1_sums_d = vdupq_n_u32(0);
 	uint32x4_t v_s1;
 	uint32x4_t v_s2;
+	uint32x4_t v_s1_sums;
 
 	do {
 		uint8x16_t bytes_a = *p++;
@@ -1896,29 +2250,31 @@ adler32_neon_dotprod_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 		uint8x16_t bytes_c = *p++;
 		uint8x16_t bytes_d = *p++;
 
-		v_s1_sums_a += v_s1_a;
+		v_s1_sums_a = vaddq_u32(v_s1_sums_a, v_s1_a);
 		v_s1_a = vdotq_u32(v_s1_a, bytes_a, ones);
 		v_s2_a = vdotq_u32(v_s2_a, bytes_a, mults_a);
 
-		v_s1_sums_b += v_s1_b;
+		v_s1_sums_b = vaddq_u32(v_s1_sums_b, v_s1_b);
 		v_s1_b = vdotq_u32(v_s1_b, bytes_b, ones);
 		v_s2_b = vdotq_u32(v_s2_b, bytes_b, mults_b);
 
-		v_s1_sums_c += v_s1_c;
+		v_s1_sums_c = vaddq_u32(v_s1_sums_c, v_s1_c);
 		v_s1_c = vdotq_u32(v_s1_c, bytes_c, ones);
 		v_s2_c = vdotq_u32(v_s2_c, bytes_c, mults_c);
 
-		v_s1_sums_d += v_s1_d;
+		v_s1_sums_d = vaddq_u32(v_s1_sums_d, v_s1_d);
 		v_s1_d = vdotq_u32(v_s1_d, bytes_d, ones);
 		v_s2_d = vdotq_u32(v_s2_d, bytes_d, mults_d);
 	} while (p != end);
 
-	v_s1 = v_s1_a + v_s1_b + v_s1_c + v_s1_d;
-	v_s2 = v_s2_a + v_s2_b + v_s2_c + v_s2_d +
-	       vqshlq_n_u32(v_s1_sums_a + v_s1_sums_b +
-			    v_s1_sums_c + v_s1_sums_d, 6);
-	*s1 += v_s1[0] + v_s1[1] + v_s1[2] + v_s1[3];
-	*s2 += v_s2[0] + v_s2[1] + v_s2[2] + v_s2[3];
+	v_s1 = vaddq_u32(vaddq_u32(v_s1_a, v_s1_b), vaddq_u32(v_s1_c, v_s1_d));
+	v_s2 = vaddq_u32(vaddq_u32(v_s2_a, v_s2_b), vaddq_u32(v_s2_c, v_s2_d));
+	v_s1_sums = vaddq_u32(vaddq_u32(v_s1_sums_a, v_s1_sums_b),
+			      vaddq_u32(v_s1_sums_c, v_s1_sums_d));
+	v_s2 = vaddq_u32(v_s2, vqshlq_n_u32(v_s1_sums, 6));
+
+	*s1 += vaddvq_u32(v_s1);
+	*s2 += vaddvq_u32(v_s2);
 }
 /* #include "arm-../adler32_vec_template.h" */
 
@@ -2007,7 +2363,7 @@ arch_select_adler32_func(void)
 
 #endif 
 
-#elif defined(__i386__) || defined(__x86_64__)
+#elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #  include "x86/adler32_impl.h" */
 
 
@@ -2027,11 +2383,26 @@ arch_select_adler32_func(void)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -2039,14 +2410,237 @@ arch_select_adler32_func(void)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -2115,21 +2709,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -2138,63 +2723,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -2288,8 +2895,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -2483,7 +3090,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -2502,7 +3109,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -2533,7 +3140,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -2552,7 +3159,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -2580,7 +3187,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -2589,7 +3196,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -2645,9 +3252,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -2681,50 +3288,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -2732,11 +3325,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -2744,23 +3339,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -2771,29 +3370,38 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 
 #define ADLER32_FINISH_VEC_CHUNK_128(s1, s2, v_s1, v_s2)		    \
 {									    \
-	__v4su s1_last = (v_s1), s2_last = (v_s2);			    \
+	__m128i  s1_last = (v_s1), s2_last = (v_s2);	    \
 									    \
 							    \
-	s2_last += (__v4su)_mm_shuffle_epi32((__m128i)s2_last, 0x31);	    \
-	s1_last += (__v4su)_mm_shuffle_epi32((__m128i)s1_last, 0x02);	    \
-	s2_last += (__v4su)_mm_shuffle_epi32((__m128i)s2_last, 0x02);	    \
+	s2_last = _mm_add_epi32(s2_last, _mm_shuffle_epi32(s2_last, 0x31)); \
+	s1_last = _mm_add_epi32(s1_last, _mm_shuffle_epi32(s1_last, 0x02)); \
+	s2_last = _mm_add_epi32(s2_last, _mm_shuffle_epi32(s2_last, 0x02)); \
 									    \
-	*(s1) += (u32)_mm_cvtsi128_si32((__m128i)s1_last);		    \
-	*(s2) += (u32)_mm_cvtsi128_si32((__m128i)s2_last);		    \
+	*(s1) += (u32)_mm_cvtsi128_si32(s1_last);			    \
+	*(s2) += (u32)_mm_cvtsi128_si32(s2_last);			    \
 }
 
 #define ADLER32_FINISH_VEC_CHUNK_256(s1, s2, v_s1, v_s2)		    \
 {									    \
-	__v4su s1_128bit, s2_128bit;					    \
+	__m128i  s1_128bit, s2_128bit;			    \
 									    \
 							    \
-	s1_128bit = (__v4su)_mm256_extracti128_si256((__m256i)(v_s1), 0) +  \
-		    (__v4su)_mm256_extracti128_si256((__m256i)(v_s1), 1);   \
-	s2_128bit = (__v4su)_mm256_extracti128_si256((__m256i)(v_s2), 0) +  \
-		    (__v4su)_mm256_extracti128_si256((__m256i)(v_s2), 1);   \
+	s1_128bit = _mm_add_epi32(_mm256_extracti128_si256((v_s1), 0),	    \
+				  _mm256_extracti128_si256((v_s1), 1));	    \
+	s2_128bit = _mm_add_epi32(_mm256_extracti128_si256((v_s2), 0),	    \
+				  _mm256_extracti128_si256((v_s2), 1));	    \
 									    \
 	ADLER32_FINISH_VEC_CHUNK_128((s1), (s2), s1_128bit, s2_128bit);	    \
 }
+
+
+#if GCC_PREREQ(1, 0)
+#  define GCC_UPDATE_VARS(a, b, c, d, e, f) \
+	__asm__("" : "+x" (a), "+x" (b), "+x" (c), "+x" (d), "+x" (e), "+x" (f))
+#else
+#  define GCC_UPDATE_VARS(a, b, c, d, e, f) \
+	(void)a, (void)b, (void)c, (void)d, (void)e, (void)f
+#endif
 
 
 #if HAVE_SSE2_INTRIN
@@ -2807,25 +3415,33 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #  if HAVE_SSE2_NATIVE
 #    define ATTRIBUTES
 #  else
-#    define ATTRIBUTES		__attribute__((target("sse2")))
+#    define ATTRIBUTES		_target_attribute("sse2")
 #  endif
 #  include <emmintrin.h>
 static forceinline ATTRIBUTES void
 adler32_sse2_chunk(const __m128i *p, const __m128i *const end, u32 *s1, u32 *s2)
 {
 	const __m128i zeroes = _mm_setzero_si128();
+	const __m128i  mults_a =
+		_mm_setr_epi16(32, 31, 30, 29, 28, 27, 26, 25);
+	const __m128i  mults_b =
+		_mm_setr_epi16(24, 23, 22, 21, 20, 19, 18, 17);
+	const __m128i  mults_c =
+		_mm_setr_epi16(16, 15, 14, 13, 12, 11, 10, 9);
+	const __m128i  mults_d =
+		_mm_setr_epi16(8,  7,  6,  5,  4,  3,  2,  1);
 
 	
-	__v4su v_s1 = (__v4su)zeroes;
+	__m128i  v_s1 = zeroes;
 
 	
-	__v4su v_s2 = (__v4su)zeroes;
+	__m128i  v_s2 = zeroes;
 
 	
-	__v8hu v_byte_sums_a = (__v8hu)zeroes;
-	__v8hu v_byte_sums_b = (__v8hu)zeroes;
-	__v8hu v_byte_sums_c = (__v8hu)zeroes;
-	__v8hu v_byte_sums_d = (__v8hu)zeroes;
+	__m128i  v_byte_sums_a = zeroes;
+	__m128i  v_byte_sums_b = zeroes;
+	__m128i  v_byte_sums_c = zeroes;
+	__m128i  v_byte_sums_d = zeroes;
 
 	do {
 		
@@ -2833,30 +3449,32 @@ adler32_sse2_chunk(const __m128i *p, const __m128i *const end, u32 *s1, u32 *s2)
 		const __m128i bytes2 = *p++;
 
 		
-		v_s2 += v_s1;
+		v_s2 = _mm_add_epi32(v_s2, v_s1);
 
 		
-		v_s1 += (__v4su)_mm_sad_epu8(bytes1, zeroes);
-		v_s1 += (__v4su)_mm_sad_epu8(bytes2, zeroes);
+		v_s1 = _mm_add_epi32(v_s1, _mm_sad_epu8(bytes1, zeroes));
+		v_s1 = _mm_add_epi32(v_s1, _mm_sad_epu8(bytes2, zeroes));
 
 		
-		v_byte_sums_a += (__v8hu)_mm_unpacklo_epi8(bytes1, zeroes);
-		v_byte_sums_b += (__v8hu)_mm_unpackhi_epi8(bytes1, zeroes);
-		v_byte_sums_c += (__v8hu)_mm_unpacklo_epi8(bytes2, zeroes);
-		v_byte_sums_d += (__v8hu)_mm_unpackhi_epi8(bytes2, zeroes);
+		v_byte_sums_a = _mm_add_epi16(
+			v_byte_sums_a, _mm_unpacklo_epi8(bytes1, zeroes));
+		v_byte_sums_b = _mm_add_epi16(
+			v_byte_sums_b, _mm_unpackhi_epi8(bytes1, zeroes));
+		v_byte_sums_c = _mm_add_epi16(
+			v_byte_sums_c, _mm_unpacklo_epi8(bytes2, zeroes));
+		v_byte_sums_d = _mm_add_epi16(
+			v_byte_sums_d, _mm_unpackhi_epi8(bytes2, zeroes));
 
+		GCC_UPDATE_VARS(v_s1, v_s2, v_byte_sums_a, v_byte_sums_b,
+				v_byte_sums_c, v_byte_sums_d);
 	} while (p != end);
 
 	
-	v_s2 = (__v4su)_mm_slli_epi32((__m128i)v_s2, 5);
-	v_s2 += (__v4su)_mm_madd_epi16((__m128i)v_byte_sums_a,
-				       (__m128i)(__v8hu){ 32, 31, 30, 29, 28, 27, 26, 25 });
-	v_s2 += (__v4su)_mm_madd_epi16((__m128i)v_byte_sums_b,
-				       (__m128i)(__v8hu){ 24, 23, 22, 21, 20, 19, 18, 17 });
-	v_s2 += (__v4su)_mm_madd_epi16((__m128i)v_byte_sums_c,
-				       (__m128i)(__v8hu){ 16, 15, 14, 13, 12, 11, 10, 9 });
-	v_s2 += (__v4su)_mm_madd_epi16((__m128i)v_byte_sums_d,
-				       (__m128i)(__v8hu){ 8,  7,  6,  5,  4,  3,  2,  1 });
+	v_s2 = _mm_slli_epi32(v_s2, 5);
+	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_a, mults_a));
+	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_b, mults_b));
+	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_c, mults_c));
+	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_d, mults_d));
 
 	
 	ADLER32_FINISH_VEC_CHUNK_128(s1, s2, v_s1, v_s2);
@@ -2936,51 +3554,63 @@ FUNCNAME(u32 adler, const u8 *p, size_t len)
 #  if HAVE_AVX2_NATIVE
 #    define ATTRIBUTES
 #  else
-#    define ATTRIBUTES		__attribute__((target("avx2")))
+#    define ATTRIBUTES		_target_attribute("avx2")
 #  endif
 #  include <immintrin.h>
+  
+#  if defined(__clang__) && defined(_MSC_VER)
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#  endif
 static forceinline ATTRIBUTES void
 adler32_avx2_chunk(const __m256i *p, const __m256i *const end, u32 *s1, u32 *s2)
 {
 	const __m256i zeroes = _mm256_setzero_si256();
 	
-	const __v16hu mults_a = { 64, 63, 62, 61, 60, 59, 58, 57,
-				  48, 47, 46, 45, 44, 43, 42, 41, };
-	const __v16hu mults_b = { 56, 55, 54, 53, 52, 51, 50, 49,
-				  40, 39, 38, 37, 36, 35, 34, 33, };
-	const __v16hu mults_c = { 32, 31, 30, 29, 28, 27, 26, 25,
-				  16, 15, 14, 13, 12, 11, 10,  9, };
-	const __v16hu mults_d = { 24, 23, 22, 21, 20, 19, 18, 17,
-				  8,  7,  6,  5,  4,  3,  2,  1, };
-	__v8su v_s1 = (__v8su)zeroes;
-	__v8su v_s2 = (__v8su)zeroes;
-	__v16hu v_byte_sums_a = (__v16hu)zeroes;
-	__v16hu v_byte_sums_b = (__v16hu)zeroes;
-	__v16hu v_byte_sums_c = (__v16hu)zeroes;
-	__v16hu v_byte_sums_d = (__v16hu)zeroes;
+	const __m256i  mults_a =
+		_mm256_setr_epi16(64, 63, 62, 61, 60, 59, 58, 57,
+				  48, 47, 46, 45, 44, 43, 42, 41);
+	const __m256i  mults_b =
+		_mm256_setr_epi16(56, 55, 54, 53, 52, 51, 50, 49,
+				  40, 39, 38, 37, 36, 35, 34, 33);
+	const __m256i  mults_c =
+		_mm256_setr_epi16(32, 31, 30, 29, 28, 27, 26, 25,
+				  16, 15, 14, 13, 12, 11, 10,  9);
+	const __m256i  mults_d =
+		_mm256_setr_epi16(24, 23, 22, 21, 20, 19, 18, 17,
+				  8,  7,  6,  5,  4,  3,  2,  1);
+	__m256i  v_s1 = zeroes;
+	__m256i  v_s2 = zeroes;
+	__m256i  v_byte_sums_a = zeroes;
+	__m256i  v_byte_sums_b = zeroes;
+	__m256i  v_byte_sums_c = zeroes;
+	__m256i  v_byte_sums_d = zeroes;
 
 	do {
 		const __m256i bytes1 = *p++;
 		const __m256i bytes2 = *p++;
 
-		v_s2 += v_s1;
-		v_s1 += (__v8su)_mm256_sad_epu8(bytes1, zeroes);
-		v_s1 += (__v8su)_mm256_sad_epu8(bytes2, zeroes);
-		v_byte_sums_a += (__v16hu)_mm256_unpacklo_epi8(bytes1, zeroes);
-		v_byte_sums_b += (__v16hu)_mm256_unpackhi_epi8(bytes1, zeroes);
-		v_byte_sums_c += (__v16hu)_mm256_unpacklo_epi8(bytes2, zeroes);
-		v_byte_sums_d += (__v16hu)_mm256_unpackhi_epi8(bytes2, zeroes);
+		v_s2 = _mm256_add_epi32(v_s2, v_s1);
+		v_s1 = _mm256_add_epi32(v_s1, _mm256_sad_epu8(bytes1, zeroes));
+		v_s1 = _mm256_add_epi32(v_s1, _mm256_sad_epu8(bytes2, zeroes));
+		v_byte_sums_a = _mm256_add_epi16(
+			v_byte_sums_a, _mm256_unpacklo_epi8(bytes1, zeroes));
+		v_byte_sums_b = _mm256_add_epi16(
+			v_byte_sums_b, _mm256_unpackhi_epi8(bytes1, zeroes));
+		v_byte_sums_c = _mm256_add_epi16(
+			v_byte_sums_c, _mm256_unpacklo_epi8(bytes2, zeroes));
+		v_byte_sums_d = _mm256_add_epi16(
+			v_byte_sums_d, _mm256_unpackhi_epi8(bytes2, zeroes));
+
+		GCC_UPDATE_VARS(v_s1, v_s2, v_byte_sums_a, v_byte_sums_b,
+				v_byte_sums_c, v_byte_sums_d);
 	} while (p != end);
 
-	v_s2 = (__v8su)_mm256_slli_epi32((__m256i)v_s2, 6);
-	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_a,
-					  (__m256i)mults_a);
-	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_b,
-					  (__m256i)mults_b);
-	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_c,
-					  (__m256i)mults_c);
-	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_d,
-					  (__m256i)mults_d);
+	v_s2 = _mm256_slli_epi32(v_s2, 6);
+	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_a, mults_a));
+	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_b, mults_b));
+	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_c, mults_c));
+	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_d, mults_d));
 	ADLER32_FINISH_VEC_CHUNK_256(s1, s2, v_s1, v_s2);
 }
 /* #include "x86-../adler32_vec_template.h" */
@@ -3097,14 +3727,14 @@ static u32 adler32_dispatch_adler32(u32 adler, const u8 *p, size_t len)
 #define adler32_impl DEFAULT_IMPL
 #endif
 
-LIBDEFLATEEXPORT u32 LIBDEFLATEAPI
+LIBDEFLATEAPI u32
 libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 {
 	if (buffer == NULL) 
 		return 1;
 	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/crc32.c */
 
 
 
@@ -3116,11 +3746,26 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -3128,14 +3773,237 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -3204,21 +4072,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -3227,63 +4086,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -3377,8 +4258,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -3572,7 +4453,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -3591,7 +4472,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -3622,7 +4503,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -3641,7 +4522,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -3669,7 +4550,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -3678,7 +4559,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -3728,192 +4609,6 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define CONCAT_IMPL(a, b)	a##b
 #define CONCAT(a, b)		CONCAT_IMPL(a, b)
 #define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
-
-#endif 
-
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif 
 
@@ -4876,7 +5571,7 @@ crc32_slice1(u32 crc, const u8 *p, size_t len)
 #undef DEFAULT_IMPL
 #undef arch_select_crc32_func
 typedef u32 (*crc32_func_t)(u32 crc, const u8 *p, size_t len);
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 /* #  include "arm/crc32_impl.h" */
 
 
@@ -4896,11 +5591,26 @@ typedef u32 (*crc32_func_t)(u32 crc, const u8 *p, size_t len);
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -4908,14 +5618,237 @@ typedef u32 (*crc32_func_t)(u32 crc, const u8 *p, size_t len);
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -4984,21 +5917,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -5007,63 +5931,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -5157,8 +6103,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -5352,7 +6298,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -5371,7 +6317,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -5402,7 +6348,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -5421,7 +6367,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -5449,7 +6395,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -5458,7 +6404,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -5514,12 +6460,13 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING) && \
-	(defined(__linux__) || \
-	 (defined(__aarch64__) && defined(__APPLE__)))
+#if !defined(FREESTANDING) && \
+    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__linux__) || \
+     (defined(__APPLE__) && defined(ARCH_ARM64)) || \
+     (defined(_WIN32) && defined(ARCH_ARM64)))
 #  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
 #  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
 #endif
@@ -5553,15 +6500,14 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif 
 
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(ARCH_ARM64)
 #  define HAVE_NEON_NATIVE	1
 #else
 #  define HAVE_NEON_NATIVE	0
 #endif
-#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
 
 #if HAVE_NEON_NATIVE || \
-	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
 #  define HAVE_NEON_INTRIN	1
 #else
 #  define HAVE_NEON_INTRIN	0
@@ -5573,16 +6519,29 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_PMULL_NATIVE	0
 #endif
-#define HAVE_PMULL_TARGET \
+#if HAVE_PMULL_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
-
-#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
-	!(defined(__arm__) && defined(__clang__)) && \
-	CPU_IS_LITTLE_ENDIAN() 
-#  define HAVE_PMULL_INTRIN	1
+	 HAVE_NEON_INTRIN  && \
+	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
+	  defined(_MSC_VER)) && \
+	   \
+	 !(defined(ARCH_ARM32) && defined(__clang__)))
+#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+   
+#  ifdef _MSC_VER
+#    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
+#  else
+#    define compat_vmull_p64(a, b)  vmull_p64((a), (b))
+#  endif
 #else
 #  define HAVE_PMULL_INTRIN	0
+#endif
+
+#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
+		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
+#else
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
 #endif
 
 
@@ -5591,19 +6550,31 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_CRC32_NATIVE	0
 #endif
-#define HAVE_CRC32_TARGET \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+#undef HAVE_CRC32_INTRIN
+#if HAVE_CRC32_NATIVE
+#  define HAVE_CRC32_INTRIN	1
+#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  if GCC_PREREQ(1, 0)
+    
+#    if (GCC_PREREQ(11, 3) || \
+	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
+	!defined(__ARM_ARCH_6KZ__) && \
+	!defined(__ARM_ARCH_7EM__)
+#      define HAVE_CRC32_INTRIN	1
+#    endif
+#  elif CLANG_PREREQ(3, 4, 6000000)
+#    define HAVE_CRC32_INTRIN	1
+#  elif defined(_MSC_VER)
+#    define HAVE_CRC32_INTRIN	1
+#  endif
+#endif
+#ifndef HAVE_CRC32_INTRIN
+#  define HAVE_CRC32_INTRIN	0
+#endif
 
-#define HAVE_CRC32_INTRIN \
-	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
-			       (!GCC_PREREQ(1, 0) || \
-				GCC_PREREQ(11, 3) || \
-				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
 
-
-#ifdef __aarch64__
+#if defined(ARCH_ARM64) && !defined(_MSC_VER)
 #  ifdef __ARM_FEATURE_SHA3
 #    define HAVE_SHA3_NATIVE	1
 #  else
@@ -5612,9 +6583,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
 				 (GCC_PREREQ(8, 1)  || \
 				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
+				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
 				 (GCC_PREREQ(9, 1)  || \
-				  __has_builtin(__builtin_neon_veor3q_v)))
+				  CLANG_PREREQ(13, 0, 13160000)))
 #else
 #  define HAVE_SHA3_NATIVE	0
 #  define HAVE_SHA3_TARGET	0
@@ -5622,26 +6594,28 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif
 
 
-#ifdef __aarch64__
+#ifdef ARCH_ARM64
 #  ifdef __ARM_FEATURE_DOTPROD
 #    define HAVE_DOTPROD_NATIVE	1
 #  else
 #    define HAVE_DOTPROD_NATIVE	0
 #  endif
-#  define HAVE_DOTPROD_TARGET \
+#  if HAVE_DOTPROD_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
-#  define HAVE_DOTPROD_INTRIN \
-	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
+	  defined(_MSC_VER)))
+#    define HAVE_DOTPROD_INTRIN	1
+#  else
+#    define HAVE_DOTPROD_INTRIN	0
+#  endif
 #else
 #  define HAVE_DOTPROD_NATIVE	0
-#  define HAVE_DOTPROD_TARGET	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
 
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  define __ARM_FEATURE_CRC32	1
 #endif
 #if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
@@ -5651,7 +6625,7 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define __ARM_FEATURE_DOTPROD	1
 #endif
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  include <arm_acle.h>
 #  undef __ARM_FEATURE_CRC32
 #endif
@@ -5674,22 +6648,27 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  if HAVE_CRC32_NATIVE
 #    define ATTRIBUTES
 #  else
-#    ifdef __arm__
+#    ifdef ARCH_ARM32
 #      ifdef __clang__
-#        define ATTRIBUTES	__attribute__((target("armv8-a,crc")))
+#        define ATTRIBUTES	_target_attribute("armv8-a,crc")
+#      elif defined(__ARM_PCS_VFP)
+	 
+#        define ATTRIBUTES	_target_attribute("arch=armv8-a+crc+simd")
 #      else
-#        define ATTRIBUTES	__attribute__((target("arch=armv8-a+crc")))
+#        define ATTRIBUTES	_target_attribute("arch=armv8-a+crc")
 #      endif
 #    else
 #      ifdef __clang__
-#        define ATTRIBUTES	__attribute__((target("crc")))
+#        define ATTRIBUTES	_target_attribute("crc")
 #      else
-#        define ATTRIBUTES	__attribute__((target("+crc")))
+#        define ATTRIBUTES	_target_attribute("+crc")
 #      endif
 #    endif
 #  endif
 
-#include <arm_acle.h>
+#ifndef _MSC_VER
+#  include <arm_acle.h>
+#endif
 
 
 static forceinline ATTRIBUTES u32
@@ -5817,33 +6796,43 @@ crc32_arm_crc(u32 crc, const u8 *p, size_t len)
 #endif 
 
 
-#if HAVE_CRC32_INTRIN && HAVE_PMULL_INTRIN && \
-	((HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE) || \
-	 (HAVE_CRC32_TARGET && HAVE_PMULL_TARGET))
-#  if HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE
+#if HAVE_CRC32_INTRIN && HAVE_PMULL_INTRIN
+#  if HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE && !USE_PMULL_TARGET_EVEN_IF_NATIVE
 #    define ATTRIBUTES
 #  else
-#    ifdef __arm__
-#      define ATTRIBUTES	__attribute__((target("arch=armv8-a+crc,fpu=crypto-neon-fp-armv8")))
+#    ifdef ARCH_ARM32
+#      define ATTRIBUTES	_target_attribute("arch=armv8-a+crc,fpu=crypto-neon-fp-armv8")
 #    else
 #      ifdef __clang__
-#        define ATTRIBUTES	__attribute__((target("crc,crypto")))
+#        define ATTRIBUTES	_target_attribute("crc,aes")
 #      else
-#        define ATTRIBUTES	__attribute__((target("+crc,+crypto")))
+#        define ATTRIBUTES	_target_attribute("+crc,+crypto")
 #      endif
 #    endif
 #  endif
 
-#include <arm_acle.h>
+#ifndef _MSC_VER
+#  include <arm_acle.h>
+#endif
 #include <arm_neon.h>
+
+
+static forceinline ATTRIBUTES u64
+clmul_u32(u32 a, u32 b)
+{
+	uint64x2_t res = vreinterpretq_u64_p128(
+				compat_vmull_p64((poly64_t)a, (poly64_t)b));
+
+	return vgetq_lane_u64(res, 0);
+}
 
 
 static forceinline ATTRIBUTES u32
 combine_crcs_fast(u32 crc0, u32 crc1, u32 crc2, u32 crc3, size_t i)
 {
-	u64 res0 = vmull_p64(crc0, crc32_mults_for_chunklen[i][0]);
-	u64 res1 = vmull_p64(crc1, crc32_mults_for_chunklen[i][1]);
-	u64 res2 = vmull_p64(crc2, crc32_mults_for_chunklen[i][2]);
+	u64 res0 = clmul_u32(crc0, crc32_mults_for_chunklen[i][0]);
+	u64 res1 = clmul_u32(crc1, crc32_mults_for_chunklen[i][1]);
+	u64 res2 = clmul_u32(crc2, crc32_mults_for_chunklen[i][2]);
 
 	return __crc32d(0, res0 ^ res1 ^ res2) ^ crc3;
 }
@@ -5997,36 +6986,181 @@ crc32_arm_crc_pmullcombine(u32 crc, const u8 *p, size_t len)
 #if HAVE_PMULL_INTRIN
 #  define crc32_arm_pmullx4	crc32_arm_pmullx4
 #  define SUFFIX			 _pmullx4
-#  if HAVE_PMULL_NATIVE
+#  if HAVE_PMULL_NATIVE && !USE_PMULL_TARGET_EVEN_IF_NATIVE
 #    define ATTRIBUTES
 #  else
-#    ifdef __arm__
-#      define ATTRIBUTES    __attribute__((target("fpu=crypto-neon-fp-armv8")))
+#    ifdef ARCH_ARM32
+#      define ATTRIBUTES    _target_attribute("fpu=crypto-neon-fp-armv8")
 #    else
 #      ifdef __clang__
-#        define ATTRIBUTES  __attribute__((target("crypto")))
+	 
+#        define ATTRIBUTES  _target_attribute("aes")
 #      else
-#        define ATTRIBUTES  __attribute__((target("+crypto")))
+	 
+#        define ATTRIBUTES  _target_attribute("+crypto")
 #      endif
 #    endif
 #  endif
 #  define ENABLE_EOR3		0
-#include "arm-crc32_pmull_helpers.h"
+/* #include "arm-crc32_pmull_helpers.h" */
+
+
+
+
+#include <arm_neon.h>
+
+
+#undef u32_to_bytevec
+static forceinline ATTRIBUTES uint8x16_t
+ADD_SUFFIX(u32_to_bytevec)(u32 a)
+{
+	return vreinterpretq_u8_u32(vsetq_lane_u32(a, vdupq_n_u32(0), 0));
+}
+#define u32_to_bytevec	ADD_SUFFIX(u32_to_bytevec)
+
+
+#undef load_multipliers
+static forceinline ATTRIBUTES poly64x2_t
+ADD_SUFFIX(load_multipliers)(const u64 p[2])
+{
+	return vreinterpretq_p64_u64(vld1q_u64(p));
+}
+#define load_multipliers	ADD_SUFFIX(load_multipliers)
+
+
+#undef clmul_low
+static forceinline ATTRIBUTES uint8x16_t
+ADD_SUFFIX(clmul_low)(uint8x16_t a, poly64x2_t b)
+{
+	return vreinterpretq_u8_p128(
+		     compat_vmull_p64(vgetq_lane_p64(vreinterpretq_p64_u8(a), 0),
+				      vgetq_lane_p64(b, 0)));
+}
+#define clmul_low	ADD_SUFFIX(clmul_low)
+
+
+#undef clmul_high
+static forceinline ATTRIBUTES uint8x16_t
+ADD_SUFFIX(clmul_high)(uint8x16_t a, poly64x2_t b)
+{
+#if defined(__clang__) && defined(ARCH_ARM64)
+	
+	uint8x16_t res;
+
+	__asm__("pmull2 %0.1q, %1.2d, %2.2d" : "=w" (res) : "w" (a), "w" (b));
+	return res;
+#else
+	return vreinterpretq_u8_p128(vmull_high_p64(vreinterpretq_p64_u8(a), b));
+#endif
+}
+#define clmul_high	ADD_SUFFIX(clmul_high)
+
+#undef eor3
+static forceinline ATTRIBUTES uint8x16_t
+ADD_SUFFIX(eor3)(uint8x16_t a, uint8x16_t b, uint8x16_t c)
+{
+#if ENABLE_EOR3
+#if HAVE_SHA3_INTRIN
+	return veor3q_u8(a, b, c);
+#else
+	uint8x16_t res;
+
+	__asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"
+		: "=w" (res) : "w" (a), "w" (b), "w" (c));
+	return res;
+#endif
+#else 
+	return veorq_u8(veorq_u8(a, b), c);
+#endif 
+}
+#define eor3	ADD_SUFFIX(eor3)
+
+#undef fold_vec
+static forceinline ATTRIBUTES uint8x16_t
+ADD_SUFFIX(fold_vec)(uint8x16_t src, uint8x16_t dst, poly64x2_t multipliers)
+{
+	uint8x16_t a = clmul_low(src, multipliers);
+	uint8x16_t b = clmul_high(src, multipliers);
+
+	return eor3(a, b, dst);
+}
+#define fold_vec	ADD_SUFFIX(fold_vec)
+
+#undef vtbl
+static forceinline ATTRIBUTES uint8x16_t
+ADD_SUFFIX(vtbl)(uint8x16_t table, uint8x16_t indices)
+{
+#ifdef ARCH_ARM64
+	return vqtbl1q_u8(table, indices);
+#else
+	uint8x8x2_t tab2;
+
+	tab2.val[0] = vget_low_u8(table);
+	tab2.val[1] = vget_high_u8(table);
+
+	return vcombine_u8(vtbl2_u8(tab2, vget_low_u8(indices)),
+			   vtbl2_u8(tab2, vget_high_u8(indices)));
+#endif
+}
+#define vtbl	ADD_SUFFIX(vtbl)
+
+
+#undef fold_partial_vec
+static forceinline ATTRIBUTES MAYBE_UNUSED uint8x16_t
+ADD_SUFFIX(fold_partial_vec)(uint8x16_t v, const u8 *p, size_t len,
+			     poly64x2_t multipliers_1)
+{
+	
+	static const u8 shift_tab[48] = {
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	};
+	const uint8x16_t lshift = vld1q_u8(&shift_tab[len]);
+	const uint8x16_t rshift = vld1q_u8(&shift_tab[len + 16]);
+	uint8x16_t x0, x1, bsl_mask;
+
+	
+	x0 = vtbl(v, lshift);
+
+	
+	bsl_mask = vreinterpretq_u8_s8(
+			vshrq_n_s8(vreinterpretq_s8_u8(rshift), 7));
+
+	
+	x1 = vbslq_u8(bsl_mask ,
+		      vld1q_u8(p + len - 16), vtbl(v, rshift));
+
+	return fold_vec(x0, x1, multipliers_1);
+}
+#define fold_partial_vec	ADD_SUFFIX(fold_partial_vec)
+
 
 static u32 ATTRIBUTES MAYBE_UNUSED
 crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 {
-	const poly64x2_t multipliers_4 = (poly64x2_t)CRC32_4VECS_MULTS;
-	const poly64x2_t multipliers_2 = (poly64x2_t)CRC32_2VECS_MULTS;
-	const poly64x2_t multipliers_1 = (poly64x2_t)CRC32_1VECS_MULTS;
-	const uint8x16_t zeroes = (uint8x16_t){ 0 };
-	const uint8x16_t mask32 = (uint8x16_t)(uint32x4_t){ 0xFFFFFFFF };
+	static const u64 _aligned_attribute(16) mults[3][2] = {
+		CRC32_1VECS_MULTS,
+		CRC32_4VECS_MULTS,
+		CRC32_2VECS_MULTS,
+	};
+	static const u64 _aligned_attribute(16) final_mults[3][2] = {
+		{ CRC32_FINAL_MULT, 0 },
+		{ CRC32_BARRETT_CONSTANT_1, 0 },
+		{ CRC32_BARRETT_CONSTANT_2, 0 },
+	};
+	const uint8x16_t zeroes = vdupq_n_u8(0);
+	const uint8x16_t mask32 = vreinterpretq_u8_u64(vdupq_n_u64(0xFFFFFFFF));
+	const poly64x2_t multipliers_1 = load_multipliers(mults[0]);
 	uint8x16_t v0, v1, v2, v3;
 
 	if (len < 64 + 15) {
 		if (len < 16)
 			return crc32_slice1(crc, p, len);
-		v0 = vld1q_u8(p) ^ (uint8x16_t)(uint32x4_t){ crc };
+		v0 = veorq_u8(vld1q_u8(p), u32_to_bytevec(crc));
 		p += 16;
 		len -= 16;
 		while (len >= 16) {
@@ -6035,10 +7169,12 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 			len -= 16;
 		}
 	} else {
+		const poly64x2_t multipliers_4 = load_multipliers(mults[1]);
+		const poly64x2_t multipliers_2 = load_multipliers(mults[2]);
 		const size_t align = -(uintptr_t)p & 15;
 		const uint8x16_t *vp;
 
-		v0 = vld1q_u8(p) ^ (uint8x16_t)(uint32x4_t){ crc };
+		v0 = veorq_u8(vld1q_u8(p), u32_to_bytevec(crc));
 		p += 16;
 		
 		if (align) {
@@ -6075,21 +7211,19 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 		v0 = fold_partial_vec(v0, p, len, multipliers_1);
 
 	
-	v0 = vextq_u8(v0, zeroes, 8) ^
-	     (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v0),
-				   CRC32_1VECS_MULT_2);
+
+	v0 = veorq_u8(vextq_u8(v0, zeroes, 8),
+		      clmul_high(vextq_u8(zeroes, v0, 8), multipliers_1));
 
 	
-	v0 = vextq_u8(v0, zeroes, 4) ^
-		(uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v0 & mask32),
-				      CRC32_FINAL_MULT);
+	v0 = veorq_u8(vextq_u8(v0, zeroes, 4),
+		      clmul_low(vandq_u8(v0, mask32),
+				load_multipliers(final_mults[0])));
 
 	
-	v1 = (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v0 & mask32),
-				   CRC32_BARRETT_CONSTANT_1);
-	v1 = (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v1 & mask32),
-				   CRC32_BARRETT_CONSTANT_2);
-	return ((uint32x4_t)(v0 ^ v1))[1];
+	v1 = clmul_low(vandq_u8(v0, mask32), load_multipliers(final_mults[1]));
+	v1 = clmul_low(vandq_u8(v1, mask32), load_multipliers(final_mults[2]));
+	return vgetq_lane_u32(vreinterpretq_u32_u8(veorq_u8(v0, v1)), 1);
 }
 #undef SUFFIX
 #undef ATTRIBUTES
@@ -6097,18 +7231,16 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 #endif 
 
 
-#if defined(__aarch64__) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && \
-	((HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE) || \
-	 (HAVE_PMULL_TARGET && HAVE_CRC32_TARGET))
+#if defined(ARCH_ARM64) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN
 #  define crc32_arm_pmullx12_crc	crc32_arm_pmullx12_crc
 #  define SUFFIX				 _pmullx12_crc
-#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE
+#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && !USE_PMULL_TARGET_EVEN_IF_NATIVE
 #    define ATTRIBUTES
 #  else
 #    ifdef __clang__
-#      define ATTRIBUTES  __attribute__((target("crypto,crc")))
+#      define ATTRIBUTES  _target_attribute("aes,crc")
 #    else
-#      define ATTRIBUTES  __attribute__((target("+crypto,+crc")))
+#      define ATTRIBUTES  _target_attribute("+crypto,+crc")
 #    endif
 #  endif
 #  define ENABLE_EOR3	0
@@ -6116,21 +7248,21 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 #endif
 
 
-#if defined(__aarch64__) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && \
-	((HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE) || \
-	 (HAVE_PMULL_TARGET && HAVE_CRC32_TARGET && HAVE_SHA3_TARGET))
+#if defined(ARCH_ARM64) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && \
+	(HAVE_SHA3_TARGET || HAVE_SHA3_NATIVE)
 #  define crc32_arm_pmullx12_crc_eor3	crc32_arm_pmullx12_crc_eor3
 #  define SUFFIX				 _pmullx12_crc_eor3
-#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE
+#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE && \
+	!USE_PMULL_TARGET_EVEN_IF_NATIVE
 #    define ATTRIBUTES
 #  else
 #    ifdef __clang__
-#      define ATTRIBUTES  __attribute__((target("crypto,crc,sha3")))
+#      define ATTRIBUTES  _target_attribute("aes,crc,sha3")
      
 #    elif defined(__ARM_FEATURE_JCVT)
-#      define ATTRIBUTES  __attribute__((target("+crypto,+crc,+sha3")))
+#      define ATTRIBUTES  _target_attribute("+crypto,+crc,+sha3")
 #    else
-#      define ATTRIBUTES  __attribute__((target("arch=armv8.2-a+crypto+crc+sha3")))
+#      define ATTRIBUTES  _target_attribute("arch=armv8.2-a+crypto+crc+sha3")
 #    endif
 #  endif
 #  define ENABLE_EOR3	1
@@ -6187,7 +7319,7 @@ arch_select_crc32_func(void)
 
 #endif 
 
-#elif defined(__i386__) || defined(__x86_64__)
+#elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #  include "x86/crc32_impl.h" */
 
 
@@ -6207,11 +7339,26 @@ arch_select_crc32_func(void)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -6219,14 +7366,237 @@ arch_select_crc32_func(void)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -6295,21 +7665,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -6318,63 +7679,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -6468,8 +7851,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -6663,7 +8046,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -6682,7 +8065,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -6713,7 +8096,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -6732,7 +8115,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -6760,7 +8143,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -6769,7 +8152,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -6825,9 +8208,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -6861,50 +8244,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -6912,11 +8281,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -6924,23 +8295,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -6954,7 +8329,7 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #  if HAVE_PCLMUL_NATIVE
 #    define ATTRIBUTES
 #  else
-#    define ATTRIBUTES		__attribute__((target("pclmul")))
+#    define ATTRIBUTES		_target_attribute("pclmul")
 #  endif
 #  define FOLD_PARTIAL_VECS	0
 /* #include "x86-crc32_pclmul_template.h" */
@@ -6964,13 +8339,20 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 
 #include <immintrin.h>
 
+#if defined(__clang__) && defined(_MSC_VER)
+#  include <tmmintrin.h>
+#  include <smmintrin.h>
+#  include <wmmintrin.h>
+#endif
+
 #undef fold_vec
 static forceinline ATTRIBUTES __m128i
-ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __v2di multipliers)
+ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __m128i  multipliers)
 {
 	
-	return dst ^ _mm_clmulepi64_si128(src, multipliers, 0x00) ^
-		_mm_clmulepi64_si128(src, multipliers, 0x11);
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x11));
+	return dst;
 }
 #define fold_vec	ADD_SUFFIX(fold_vec)
 
@@ -6979,7 +8361,7 @@ ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __v2di multipliers)
 #undef fold_partial_vec
 static forceinline ATTRIBUTES __m128i
 ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
-			     __v2di multipliers_1)
+			     __m128i  multipliers_1)
 {
 	
 	static const u8 shift_tab[48] = {
@@ -7011,13 +8393,20 @@ ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
 static u32 ATTRIBUTES MAYBE_UNUSED
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 {
-	const __v2di multipliers_8 = (__v2di)CRC32_8VECS_MULTS;
-	const __v2di multipliers_4 = (__v2di)CRC32_4VECS_MULTS;
-	const __v2di multipliers_2 = (__v2di)CRC32_2VECS_MULTS;
-	const __v2di multipliers_1 = (__v2di)CRC32_1VECS_MULTS;
-	const __v2di final_multiplier = (__v2di){ CRC32_FINAL_MULT };
-	const __m128i mask32 = (__m128i)(__v4si){ 0xFFFFFFFF };
-	const __v2di barrett_reduction_constants = (__v2di)CRC32_BARRETT_CONSTANTS;
+	const __m128i  multipliers_8 =
+		_mm_set_epi64x(CRC32_8VECS_MULT_2, CRC32_8VECS_MULT_1);
+	const __m128i  multipliers_4 =
+		_mm_set_epi64x(CRC32_4VECS_MULT_2, CRC32_4VECS_MULT_1);
+	const __m128i  multipliers_2 =
+		_mm_set_epi64x(CRC32_2VECS_MULT_2, CRC32_2VECS_MULT_1);
+	const __m128i  multipliers_1 =
+		_mm_set_epi64x(CRC32_1VECS_MULT_2, CRC32_1VECS_MULT_1);
+	const __m128i  final_multiplier =
+		_mm_set_epi64x(0, CRC32_FINAL_MULT);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i  barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2,
+			       CRC32_BARRETT_CONSTANT_1);
 	__m128i v0, v1, v2, v3, v4, v5, v6, v7;
 
 	
@@ -7025,7 +8414,8 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 		if (len < 16)
 			return crc32_slice1(crc, p, len);
 
-		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
+				   _mm_cvtsi32_si128(crc));
 		p += 16;
 
 		if (len >= 64) {
@@ -7077,7 +8467,8 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 		const __m128i *vp;
 
 	#if FOLD_PARTIAL_VECS
-		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
+				   _mm_cvtsi32_si128(crc));
 		p += 16;
 		
 		if (align) {
@@ -7094,7 +8485,7 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			len -= align;
 		}
 		vp = (const __m128i *)p;
-		v0 = *vp++ ^ (__m128i)(__v4si){crc};
+		v0 = _mm_xor_si128(*vp++, _mm_cvtsi32_si128(crc));
 	#endif
 		v1 = *vp++;
 		v2 = *vp++;
@@ -7148,18 +8539,24 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 #endif
 
 	
-	v0 = _mm_srli_si128(v0, 8) ^
-	     _mm_clmulepi64_si128(v0, multipliers_1, 0x10);
+	v0 = _mm_xor_si128(_mm_srli_si128(v0, 8),
+			   _mm_clmulepi64_si128(v0, multipliers_1, 0x10));
 
 	
-	v0 = _mm_srli_si128(v0, 4) ^
-	     _mm_clmulepi64_si128(v0 & mask32, final_multiplier, 0x00);
+	v0 = _mm_xor_si128(_mm_srli_si128(v0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
+						final_multiplier, 0x00));
 
 	
-	v1 = _mm_clmulepi64_si128(v0 & mask32, barrett_reduction_constants, 0x00);
-	v1 = _mm_clmulepi64_si128(v1 & mask32, barrett_reduction_constants, 0x10);
-	crc = ((__v4si)(v0 ^ v1))[1];
-#if !FOLD_PARTIAL_VECS
+	v1 = _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
+				  barrett_reduction_constants, 0x00);
+	v1 = _mm_clmulepi64_si128(_mm_and_si128(v1, mask32),
+				  barrett_reduction_constants, 0x10);
+	v0 = _mm_xor_si128(v0, v1);
+#if FOLD_PARTIAL_VECS
+	crc = _mm_extract_epi32(v0, 1);
+#else
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(v0, 0x01));
 	
 	crc = crc32_slice1(crc, p, len);
 #endif
@@ -7173,15 +8570,13 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 #endif
 
 
-#if HAVE_PCLMUL_INTRIN && HAVE_AVX_INTRIN && \
-	((HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE) || \
-	 (HAVE_PCLMUL_TARGET && HAVE_AVX_TARGET))
+#if HAVE_PCLMUL_INTRIN && HAVE_AVX_INTRIN
 #  define crc32_x86_pclmul_avx	crc32_x86_pclmul_avx
 #  define SUFFIX			 _pclmul_avx
 #  if HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE
 #    define ATTRIBUTES
 #  else
-#    define ATTRIBUTES		__attribute__((target("pclmul,avx")))
+#    define ATTRIBUTES		_target_attribute("pclmul,avx")
 #  endif
 #  define FOLD_PARTIAL_VECS	1
 /* #include "x86-crc32_pclmul_template.h" */
@@ -7191,13 +8586,20 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 
 #include <immintrin.h>
 
+#if defined(__clang__) && defined(_MSC_VER)
+#  include <tmmintrin.h>
+#  include <smmintrin.h>
+#  include <wmmintrin.h>
+#endif
+
 #undef fold_vec
 static forceinline ATTRIBUTES __m128i
-ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __v2di multipliers)
+ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __m128i  multipliers)
 {
 	
-	return dst ^ _mm_clmulepi64_si128(src, multipliers, 0x00) ^
-		_mm_clmulepi64_si128(src, multipliers, 0x11);
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x11));
+	return dst;
 }
 #define fold_vec	ADD_SUFFIX(fold_vec)
 
@@ -7206,7 +8608,7 @@ ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __v2di multipliers)
 #undef fold_partial_vec
 static forceinline ATTRIBUTES __m128i
 ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
-			     __v2di multipliers_1)
+			     __m128i  multipliers_1)
 {
 	
 	static const u8 shift_tab[48] = {
@@ -7238,13 +8640,20 @@ ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
 static u32 ATTRIBUTES MAYBE_UNUSED
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 {
-	const __v2di multipliers_8 = (__v2di)CRC32_8VECS_MULTS;
-	const __v2di multipliers_4 = (__v2di)CRC32_4VECS_MULTS;
-	const __v2di multipliers_2 = (__v2di)CRC32_2VECS_MULTS;
-	const __v2di multipliers_1 = (__v2di)CRC32_1VECS_MULTS;
-	const __v2di final_multiplier = (__v2di){ CRC32_FINAL_MULT };
-	const __m128i mask32 = (__m128i)(__v4si){ 0xFFFFFFFF };
-	const __v2di barrett_reduction_constants = (__v2di)CRC32_BARRETT_CONSTANTS;
+	const __m128i  multipliers_8 =
+		_mm_set_epi64x(CRC32_8VECS_MULT_2, CRC32_8VECS_MULT_1);
+	const __m128i  multipliers_4 =
+		_mm_set_epi64x(CRC32_4VECS_MULT_2, CRC32_4VECS_MULT_1);
+	const __m128i  multipliers_2 =
+		_mm_set_epi64x(CRC32_2VECS_MULT_2, CRC32_2VECS_MULT_1);
+	const __m128i  multipliers_1 =
+		_mm_set_epi64x(CRC32_1VECS_MULT_2, CRC32_1VECS_MULT_1);
+	const __m128i  final_multiplier =
+		_mm_set_epi64x(0, CRC32_FINAL_MULT);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i  barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2,
+			       CRC32_BARRETT_CONSTANT_1);
 	__m128i v0, v1, v2, v3, v4, v5, v6, v7;
 
 	
@@ -7252,7 +8661,8 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 		if (len < 16)
 			return crc32_slice1(crc, p, len);
 
-		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
+				   _mm_cvtsi32_si128(crc));
 		p += 16;
 
 		if (len >= 64) {
@@ -7304,7 +8714,8 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 		const __m128i *vp;
 
 	#if FOLD_PARTIAL_VECS
-		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
+				   _mm_cvtsi32_si128(crc));
 		p += 16;
 		
 		if (align) {
@@ -7321,7 +8732,7 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			len -= align;
 		}
 		vp = (const __m128i *)p;
-		v0 = *vp++ ^ (__m128i)(__v4si){crc};
+		v0 = _mm_xor_si128(*vp++, _mm_cvtsi32_si128(crc));
 	#endif
 		v1 = *vp++;
 		v2 = *vp++;
@@ -7375,18 +8786,24 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 #endif
 
 	
-	v0 = _mm_srli_si128(v0, 8) ^
-	     _mm_clmulepi64_si128(v0, multipliers_1, 0x10);
+	v0 = _mm_xor_si128(_mm_srli_si128(v0, 8),
+			   _mm_clmulepi64_si128(v0, multipliers_1, 0x10));
 
 	
-	v0 = _mm_srli_si128(v0, 4) ^
-	     _mm_clmulepi64_si128(v0 & mask32, final_multiplier, 0x00);
+	v0 = _mm_xor_si128(_mm_srli_si128(v0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
+						final_multiplier, 0x00));
 
 	
-	v1 = _mm_clmulepi64_si128(v0 & mask32, barrett_reduction_constants, 0x00);
-	v1 = _mm_clmulepi64_si128(v1 & mask32, barrett_reduction_constants, 0x10);
-	crc = ((__v4si)(v0 ^ v1))[1];
-#if !FOLD_PARTIAL_VECS
+	v1 = _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
+				  barrett_reduction_constants, 0x00);
+	v1 = _mm_clmulepi64_si128(_mm_and_si128(v1, mask32),
+				  barrett_reduction_constants, 0x10);
+	v0 = _mm_xor_si128(v0, v1);
+#if FOLD_PARTIAL_VECS
+	crc = _mm_extract_epi32(v0, 1);
+#else
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(v0, 0x01));
 	
 	crc = crc32_slice1(crc, p, len);
 #endif
@@ -7450,14 +8867,14 @@ static u32 crc32_dispatch_crc32(u32 crc, const u8 *p, size_t len)
 #define crc32_impl DEFAULT_IMPL
 #endif
 
-LIBDEFLATEEXPORT u32 LIBDEFLATEAPI
+LIBDEFLATEAPI u32
 libdeflate_crc32(u32 crc, const void *p, size_t len)
 {
 	if (p == NULL) 
 		return 0;
 	return ~crc32_impl(~crc, p, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/deflate_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/deflate_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -7471,11 +8888,26 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -7483,14 +8915,237 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -7559,21 +9214,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -7582,63 +9228,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -7732,8 +9400,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -7927,7 +9595,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -7946,7 +9614,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -7977,7 +9645,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -7996,7 +9664,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -8024,7 +9692,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -8033,7 +9701,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -8147,193 +9815,6 @@ unsigned int libdeflate_get_compression_level(struct libdeflate_compressor *c);
 #endif 
 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
-
 
 
 
@@ -8401,11 +9882,26 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -8413,14 +9909,237 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -8489,21 +10208,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -8512,63 +10222,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -8662,8 +10394,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -8857,7 +10589,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -8876,7 +10608,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -8907,7 +10639,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -8926,7 +10658,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -8954,7 +10686,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -8963,7 +10695,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -9059,7 +10791,7 @@ typedef s16 mf_pos_t;
 #undef matchfinder_rebase
 #ifdef _aligned_attribute
 #  define MATCHFINDER_ALIGNED _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
-#  if defined(__arm__) || defined(__aarch64__)
+#  if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 /* #    include "arm/matchfinder_impl.h" */
 
 
@@ -9079,11 +10811,26 @@ typedef s16 mf_pos_t;
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -9091,14 +10838,237 @@ typedef s16 mf_pos_t;
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -9167,21 +11137,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -9190,63 +11151,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -9340,8 +11323,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -9535,7 +11518,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -9554,7 +11537,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -9585,7 +11568,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -9604,7 +11587,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -9632,7 +11615,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -9641,7 +11624,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -9697,12 +11680,13 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING) && \
-	(defined(__linux__) || \
-	 (defined(__aarch64__) && defined(__APPLE__)))
+#if !defined(FREESTANDING) && \
+    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__linux__) || \
+     (defined(__APPLE__) && defined(ARCH_ARM64)) || \
+     (defined(_WIN32) && defined(ARCH_ARM64)))
 #  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
 #  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
 #endif
@@ -9736,15 +11720,14 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif 
 
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(ARCH_ARM64)
 #  define HAVE_NEON_NATIVE	1
 #else
 #  define HAVE_NEON_NATIVE	0
 #endif
-#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
 
 #if HAVE_NEON_NATIVE || \
-	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
 #  define HAVE_NEON_INTRIN	1
 #else
 #  define HAVE_NEON_INTRIN	0
@@ -9756,16 +11739,29 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_PMULL_NATIVE	0
 #endif
-#define HAVE_PMULL_TARGET \
+#if HAVE_PMULL_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
-
-#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
-	!(defined(__arm__) && defined(__clang__)) && \
-	CPU_IS_LITTLE_ENDIAN() 
-#  define HAVE_PMULL_INTRIN	1
+	 HAVE_NEON_INTRIN  && \
+	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
+	  defined(_MSC_VER)) && \
+	   \
+	 !(defined(ARCH_ARM32) && defined(__clang__)))
+#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+   
+#  ifdef _MSC_VER
+#    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
+#  else
+#    define compat_vmull_p64(a, b)  vmull_p64((a), (b))
+#  endif
 #else
 #  define HAVE_PMULL_INTRIN	0
+#endif
+
+#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
+		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
+#else
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
 #endif
 
 
@@ -9774,19 +11770,31 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_CRC32_NATIVE	0
 #endif
-#define HAVE_CRC32_TARGET \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+#undef HAVE_CRC32_INTRIN
+#if HAVE_CRC32_NATIVE
+#  define HAVE_CRC32_INTRIN	1
+#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  if GCC_PREREQ(1, 0)
+    
+#    if (GCC_PREREQ(11, 3) || \
+	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
+	!defined(__ARM_ARCH_6KZ__) && \
+	!defined(__ARM_ARCH_7EM__)
+#      define HAVE_CRC32_INTRIN	1
+#    endif
+#  elif CLANG_PREREQ(3, 4, 6000000)
+#    define HAVE_CRC32_INTRIN	1
+#  elif defined(_MSC_VER)
+#    define HAVE_CRC32_INTRIN	1
+#  endif
+#endif
+#ifndef HAVE_CRC32_INTRIN
+#  define HAVE_CRC32_INTRIN	0
+#endif
 
-#define HAVE_CRC32_INTRIN \
-	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
-			       (!GCC_PREREQ(1, 0) || \
-				GCC_PREREQ(11, 3) || \
-				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
 
-
-#ifdef __aarch64__
+#if defined(ARCH_ARM64) && !defined(_MSC_VER)
 #  ifdef __ARM_FEATURE_SHA3
 #    define HAVE_SHA3_NATIVE	1
 #  else
@@ -9795,9 +11803,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
 				 (GCC_PREREQ(8, 1)  || \
 				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
+				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
 				 (GCC_PREREQ(9, 1)  || \
-				  __has_builtin(__builtin_neon_veor3q_v)))
+				  CLANG_PREREQ(13, 0, 13160000)))
 #else
 #  define HAVE_SHA3_NATIVE	0
 #  define HAVE_SHA3_TARGET	0
@@ -9805,26 +11814,28 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif
 
 
-#ifdef __aarch64__
+#ifdef ARCH_ARM64
 #  ifdef __ARM_FEATURE_DOTPROD
 #    define HAVE_DOTPROD_NATIVE	1
 #  else
 #    define HAVE_DOTPROD_NATIVE	0
 #  endif
-#  define HAVE_DOTPROD_TARGET \
+#  if HAVE_DOTPROD_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
-#  define HAVE_DOTPROD_INTRIN \
-	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
+	  defined(_MSC_VER)))
+#    define HAVE_DOTPROD_INTRIN	1
+#  else
+#    define HAVE_DOTPROD_INTRIN	0
+#  endif
 #else
 #  define HAVE_DOTPROD_NATIVE	0
-#  define HAVE_DOTPROD_TARGET	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
 
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  define __ARM_FEATURE_CRC32	1
 #endif
 #if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
@@ -9834,7 +11845,7 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define __ARM_FEATURE_DOTPROD	1
 #endif
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  include <arm_acle.h>
 #  undef __ARM_FEATURE_CRC32
 #endif
@@ -9858,11 +11869,7 @@ static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
 {
 	int16x8_t *p = (int16x8_t *)data;
-	int16x8_t v = (int16x8_t) {
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-	};
+	int16x8_t v = vdupq_n_s16(MATCHFINDER_INITVAL);
 
 	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
 	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
@@ -9883,12 +11890,7 @@ static forceinline void
 matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 {
 	int16x8_t *p = (int16x8_t *)data;
-	int16x8_t v = (int16x8_t) {
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-	};
+	int16x8_t v = vdupq_n_s16((u16)-MATCHFINDER_WINDOW_SIZE);
 
 	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
 	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
@@ -9909,7 +11911,7 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
-#  elif defined(__i386__) || defined(__x86_64__)
+#  elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #    include "x86/matchfinder_impl.h" */
 
 
@@ -9929,11 +11931,26 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -9941,14 +11958,237 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -10017,21 +12257,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -10040,63 +12271,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -10190,8 +12443,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -10385,7 +12638,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -10404,7 +12657,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -10435,7 +12688,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -10454,7 +12707,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -10482,7 +12735,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -10491,7 +12744,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -10547,9 +12800,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -10583,50 +12836,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -10634,11 +12873,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -10646,23 +12887,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -10867,7 +13112,7 @@ word_differs:
 	(((1UL << HC_MATCHFINDER_HASH3_ORDER) +		\
 	  (1UL << HC_MATCHFINDER_HASH4_ORDER)) * sizeof(mf_pos_t))
 
-struct hc_matchfinder {
+struct MATCHFINDER_ALIGNED hc_matchfinder  {
 
 	
 	mf_pos_t hash3_tab[1UL << HC_MATCHFINDER_HASH3_ORDER];
@@ -10877,8 +13122,7 @@ struct hc_matchfinder {
 
 	
 	mf_pos_t next_tab[MATCHFINDER_WINDOW_SIZE];
-
-} MATCHFINDER_ALIGNED;
+};
 
 
 static forceinline void
@@ -11114,11 +13358,26 @@ hc_matchfinder_skip_bytes(struct hc_matchfinder * const mf,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -11126,14 +13385,237 @@ hc_matchfinder_skip_bytes(struct hc_matchfinder * const mf,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -11202,21 +13684,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -11225,63 +13698,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -11375,8 +13870,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -11570,7 +14065,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -11589,7 +14084,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -11620,7 +14115,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -11639,7 +14134,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -11667,7 +14162,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -11676,7 +14171,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -11772,7 +14267,7 @@ typedef s16 mf_pos_t;
 #undef matchfinder_rebase
 #ifdef _aligned_attribute
 #  define MATCHFINDER_ALIGNED _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
-#  if defined(__arm__) || defined(__aarch64__)
+#  if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 /* #    include "arm/matchfinder_impl.h" */
 
 
@@ -11792,11 +14287,26 @@ typedef s16 mf_pos_t;
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -11804,14 +14314,237 @@ typedef s16 mf_pos_t;
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -11880,21 +14613,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -11903,63 +14627,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -12053,8 +14799,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -12248,7 +14994,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -12267,7 +15013,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -12298,7 +15044,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -12317,7 +15063,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -12345,7 +15091,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -12354,7 +15100,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -12410,12 +15156,13 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING) && \
-	(defined(__linux__) || \
-	 (defined(__aarch64__) && defined(__APPLE__)))
+#if !defined(FREESTANDING) && \
+    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__linux__) || \
+     (defined(__APPLE__) && defined(ARCH_ARM64)) || \
+     (defined(_WIN32) && defined(ARCH_ARM64)))
 #  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
 #  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
 #endif
@@ -12449,15 +15196,14 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif 
 
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(ARCH_ARM64)
 #  define HAVE_NEON_NATIVE	1
 #else
 #  define HAVE_NEON_NATIVE	0
 #endif
-#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
 
 #if HAVE_NEON_NATIVE || \
-	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
 #  define HAVE_NEON_INTRIN	1
 #else
 #  define HAVE_NEON_INTRIN	0
@@ -12469,16 +15215,29 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_PMULL_NATIVE	0
 #endif
-#define HAVE_PMULL_TARGET \
+#if HAVE_PMULL_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
-
-#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
-	!(defined(__arm__) && defined(__clang__)) && \
-	CPU_IS_LITTLE_ENDIAN() 
-#  define HAVE_PMULL_INTRIN	1
+	 HAVE_NEON_INTRIN  && \
+	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
+	  defined(_MSC_VER)) && \
+	   \
+	 !(defined(ARCH_ARM32) && defined(__clang__)))
+#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+   
+#  ifdef _MSC_VER
+#    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
+#  else
+#    define compat_vmull_p64(a, b)  vmull_p64((a), (b))
+#  endif
 #else
 #  define HAVE_PMULL_INTRIN	0
+#endif
+
+#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
+		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
+#else
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
 #endif
 
 
@@ -12487,19 +15246,31 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_CRC32_NATIVE	0
 #endif
-#define HAVE_CRC32_TARGET \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+#undef HAVE_CRC32_INTRIN
+#if HAVE_CRC32_NATIVE
+#  define HAVE_CRC32_INTRIN	1
+#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  if GCC_PREREQ(1, 0)
+    
+#    if (GCC_PREREQ(11, 3) || \
+	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
+	!defined(__ARM_ARCH_6KZ__) && \
+	!defined(__ARM_ARCH_7EM__)
+#      define HAVE_CRC32_INTRIN	1
+#    endif
+#  elif CLANG_PREREQ(3, 4, 6000000)
+#    define HAVE_CRC32_INTRIN	1
+#  elif defined(_MSC_VER)
+#    define HAVE_CRC32_INTRIN	1
+#  endif
+#endif
+#ifndef HAVE_CRC32_INTRIN
+#  define HAVE_CRC32_INTRIN	0
+#endif
 
-#define HAVE_CRC32_INTRIN \
-	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
-			       (!GCC_PREREQ(1, 0) || \
-				GCC_PREREQ(11, 3) || \
-				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
 
-
-#ifdef __aarch64__
+#if defined(ARCH_ARM64) && !defined(_MSC_VER)
 #  ifdef __ARM_FEATURE_SHA3
 #    define HAVE_SHA3_NATIVE	1
 #  else
@@ -12508,9 +15279,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
 				 (GCC_PREREQ(8, 1)  || \
 				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
+				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
 				 (GCC_PREREQ(9, 1)  || \
-				  __has_builtin(__builtin_neon_veor3q_v)))
+				  CLANG_PREREQ(13, 0, 13160000)))
 #else
 #  define HAVE_SHA3_NATIVE	0
 #  define HAVE_SHA3_TARGET	0
@@ -12518,26 +15290,28 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif
 
 
-#ifdef __aarch64__
+#ifdef ARCH_ARM64
 #  ifdef __ARM_FEATURE_DOTPROD
 #    define HAVE_DOTPROD_NATIVE	1
 #  else
 #    define HAVE_DOTPROD_NATIVE	0
 #  endif
-#  define HAVE_DOTPROD_TARGET \
+#  if HAVE_DOTPROD_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
-#  define HAVE_DOTPROD_INTRIN \
-	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
+	  defined(_MSC_VER)))
+#    define HAVE_DOTPROD_INTRIN	1
+#  else
+#    define HAVE_DOTPROD_INTRIN	0
+#  endif
 #else
 #  define HAVE_DOTPROD_NATIVE	0
-#  define HAVE_DOTPROD_TARGET	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
 
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  define __ARM_FEATURE_CRC32	1
 #endif
 #if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
@@ -12547,7 +15321,7 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define __ARM_FEATURE_DOTPROD	1
 #endif
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  include <arm_acle.h>
 #  undef __ARM_FEATURE_CRC32
 #endif
@@ -12571,11 +15345,7 @@ static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
 {
 	int16x8_t *p = (int16x8_t *)data;
-	int16x8_t v = (int16x8_t) {
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-	};
+	int16x8_t v = vdupq_n_s16(MATCHFINDER_INITVAL);
 
 	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
 	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
@@ -12596,12 +15366,7 @@ static forceinline void
 matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 {
 	int16x8_t *p = (int16x8_t *)data;
-	int16x8_t v = (int16x8_t) {
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-	};
+	int16x8_t v = vdupq_n_s16((u16)-MATCHFINDER_WINDOW_SIZE);
 
 	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
 	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
@@ -12622,7 +15387,7 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
-#  elif defined(__i386__) || defined(__x86_64__)
+#  elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #    include "x86/matchfinder_impl.h" */
 
 
@@ -12642,11 +15407,26 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -12654,14 +15434,237 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -12730,21 +15733,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -12753,63 +15747,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -12903,8 +15919,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -13098,7 +16114,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -13117,7 +16133,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -13148,7 +16164,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -13167,7 +16183,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -13195,7 +16211,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -13204,7 +16220,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -13260,9 +16276,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -13296,50 +16312,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -13347,11 +16349,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -13359,23 +16363,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -13580,10 +16588,10 @@ word_differs:
 
 #define HT_MATCHFINDER_REQUIRED_NBYTES	5
 
-struct ht_matchfinder {
+struct MATCHFINDER_ALIGNED ht_matchfinder {
 	mf_pos_t hash_tab[1UL << HT_MATCHFINDER_HASH_ORDER]
 			 [HT_MATCHFINDER_BUCKET_SIZE];
-} MATCHFINDER_ALIGNED;
+};
 
 static forceinline void
 ht_matchfinder_init(struct ht_matchfinder *mf)
@@ -13775,11 +16783,26 @@ ht_matchfinder_skip_bytes(struct ht_matchfinder * const mf,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -13787,14 +16810,237 @@ ht_matchfinder_skip_bytes(struct ht_matchfinder * const mf,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -13863,21 +17109,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -13886,63 +17123,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -14036,8 +17295,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -14231,7 +17490,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -14250,7 +17509,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -14281,7 +17540,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -14300,7 +17559,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -14328,7 +17587,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -14337,7 +17596,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -14433,7 +17692,7 @@ typedef s16 mf_pos_t;
 #undef matchfinder_rebase
 #ifdef _aligned_attribute
 #  define MATCHFINDER_ALIGNED _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
-#  if defined(__arm__) || defined(__aarch64__)
+#  if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 /* #    include "arm/matchfinder_impl.h" */
 
 
@@ -14453,11 +17712,26 @@ typedef s16 mf_pos_t;
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -14465,14 +17739,237 @@ typedef s16 mf_pos_t;
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -14541,21 +18038,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -14564,63 +18052,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -14714,8 +18224,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -14909,7 +18419,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -14928,7 +18438,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -14959,7 +18469,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -14978,7 +18488,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -15006,7 +18516,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -15015,7 +18525,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -15071,12 +18581,13 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING) && \
-	(defined(__linux__) || \
-	 (defined(__aarch64__) && defined(__APPLE__)))
+#if !defined(FREESTANDING) && \
+    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__linux__) || \
+     (defined(__APPLE__) && defined(ARCH_ARM64)) || \
+     (defined(_WIN32) && defined(ARCH_ARM64)))
 #  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
 #  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
 #endif
@@ -15110,15 +18621,14 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif 
 
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(ARCH_ARM64)
 #  define HAVE_NEON_NATIVE	1
 #else
 #  define HAVE_NEON_NATIVE	0
 #endif
-#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
 
 #if HAVE_NEON_NATIVE || \
-	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
 #  define HAVE_NEON_INTRIN	1
 #else
 #  define HAVE_NEON_INTRIN	0
@@ -15130,16 +18640,29 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_PMULL_NATIVE	0
 #endif
-#define HAVE_PMULL_TARGET \
+#if HAVE_PMULL_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
-
-#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
-	!(defined(__arm__) && defined(__clang__)) && \
-	CPU_IS_LITTLE_ENDIAN() 
-#  define HAVE_PMULL_INTRIN	1
+	 HAVE_NEON_INTRIN  && \
+	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
+	  defined(_MSC_VER)) && \
+	   \
+	 !(defined(ARCH_ARM32) && defined(__clang__)))
+#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+   
+#  ifdef _MSC_VER
+#    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
+#  else
+#    define compat_vmull_p64(a, b)  vmull_p64((a), (b))
+#  endif
 #else
 #  define HAVE_PMULL_INTRIN	0
+#endif
+
+#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
+		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
+#else
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
 #endif
 
 
@@ -15148,19 +18671,31 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_CRC32_NATIVE	0
 #endif
-#define HAVE_CRC32_TARGET \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+#undef HAVE_CRC32_INTRIN
+#if HAVE_CRC32_NATIVE
+#  define HAVE_CRC32_INTRIN	1
+#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  if GCC_PREREQ(1, 0)
+    
+#    if (GCC_PREREQ(11, 3) || \
+	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
+	!defined(__ARM_ARCH_6KZ__) && \
+	!defined(__ARM_ARCH_7EM__)
+#      define HAVE_CRC32_INTRIN	1
+#    endif
+#  elif CLANG_PREREQ(3, 4, 6000000)
+#    define HAVE_CRC32_INTRIN	1
+#  elif defined(_MSC_VER)
+#    define HAVE_CRC32_INTRIN	1
+#  endif
+#endif
+#ifndef HAVE_CRC32_INTRIN
+#  define HAVE_CRC32_INTRIN	0
+#endif
 
-#define HAVE_CRC32_INTRIN \
-	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
-			       (!GCC_PREREQ(1, 0) || \
-				GCC_PREREQ(11, 3) || \
-				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
 
-
-#ifdef __aarch64__
+#if defined(ARCH_ARM64) && !defined(_MSC_VER)
 #  ifdef __ARM_FEATURE_SHA3
 #    define HAVE_SHA3_NATIVE	1
 #  else
@@ -15169,9 +18704,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
 				 (GCC_PREREQ(8, 1)  || \
 				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
+				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
 				 (GCC_PREREQ(9, 1)  || \
-				  __has_builtin(__builtin_neon_veor3q_v)))
+				  CLANG_PREREQ(13, 0, 13160000)))
 #else
 #  define HAVE_SHA3_NATIVE	0
 #  define HAVE_SHA3_TARGET	0
@@ -15179,26 +18715,28 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif
 
 
-#ifdef __aarch64__
+#ifdef ARCH_ARM64
 #  ifdef __ARM_FEATURE_DOTPROD
 #    define HAVE_DOTPROD_NATIVE	1
 #  else
 #    define HAVE_DOTPROD_NATIVE	0
 #  endif
-#  define HAVE_DOTPROD_TARGET \
+#  if HAVE_DOTPROD_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
-#  define HAVE_DOTPROD_INTRIN \
-	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
+	  defined(_MSC_VER)))
+#    define HAVE_DOTPROD_INTRIN	1
+#  else
+#    define HAVE_DOTPROD_INTRIN	0
+#  endif
 #else
 #  define HAVE_DOTPROD_NATIVE	0
-#  define HAVE_DOTPROD_TARGET	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
 
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  define __ARM_FEATURE_CRC32	1
 #endif
 #if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
@@ -15208,7 +18746,7 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define __ARM_FEATURE_DOTPROD	1
 #endif
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  include <arm_acle.h>
 #  undef __ARM_FEATURE_CRC32
 #endif
@@ -15232,11 +18770,7 @@ static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
 {
 	int16x8_t *p = (int16x8_t *)data;
-	int16x8_t v = (int16x8_t) {
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
-	};
+	int16x8_t v = vdupq_n_s16(MATCHFINDER_INITVAL);
 
 	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
 	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
@@ -15257,12 +18791,7 @@ static forceinline void
 matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 {
 	int16x8_t *p = (int16x8_t *)data;
-	int16x8_t v = (int16x8_t) {
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
-	};
+	int16x8_t v = vdupq_n_s16((u16)-MATCHFINDER_WINDOW_SIZE);
 
 	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
 	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
@@ -15283,7 +18812,7 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
-#  elif defined(__i386__) || defined(__x86_64__)
+#  elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #    include "x86/matchfinder_impl.h" */
 
 
@@ -15303,11 +18832,26 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -15315,14 +18859,237 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -15391,21 +19158,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -15414,63 +19172,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -15564,8 +19344,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -15759,7 +19539,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -15778,7 +19558,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -15809,7 +19589,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -15828,7 +19608,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -15856,7 +19636,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -15865,7 +19645,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -15921,9 +19701,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -15957,50 +19737,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -16008,11 +19774,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -16020,23 +19788,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -16252,7 +20024,7 @@ struct lz_match {
 	u16 offset;
 };
 
-struct bt_matchfinder {
+struct MATCHFINDER_ALIGNED bt_matchfinder {
 
 	
 	mf_pos_t hash3_tab[1UL << BT_MATCHFINDER_HASH3_ORDER][BT_MATCHFINDER_HASH3_WAYS];
@@ -16262,8 +20034,7 @@ struct bt_matchfinder {
 
 	
 	mf_pos_t child_tab[2UL * MATCHFINDER_WINDOW_SIZE];
-
-} MATCHFINDER_ALIGNED;
+};
 
 
 static forceinline void
@@ -16791,6 +20562,8 @@ struct libdeflate_compressor {
 			
 			struct deflate_costs costs;
 
+			struct deflate_costs costs_producing_best_true_cost;
+
 			
 			u8 offset_slot_full[DEFLATE_MAX_MATCH_OFFSET + 1];
 
@@ -16802,7 +20575,15 @@ struct libdeflate_compressor {
 			u32 new_match_len_freqs[DEFLATE_MAX_MATCH_LEN + 1];
 			u32 match_len_freqs[DEFLATE_MAX_MATCH_LEN + 1];
 
-			unsigned num_optim_passes;
+			
+			unsigned max_optim_passes;
+
+			
+			unsigned min_improvement_to_continue;
+
+			
+			unsigned min_bits_to_use_nonfinal_path;
+
 		} n; 
 	#endif 
 
@@ -17480,15 +21261,6 @@ deflate_flush_block(struct libdeflate_compressor *c,
 	ASSERT((bitbuf & ~(((bitbuf_t)1 << bitcount) - 1)) == 0);
 	ASSERT(out_next <= out_end);
 
-	if (sequences != NULL  ||
-	    !SUPPORT_NEAR_OPTIMAL_PARSING) {
-		
-		c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
-
-		
-		deflate_make_huffman_codes(&c->freqs, &c->codes);
-	} 
-
 	
 	deflate_precompute_huffman_header(c);
 
@@ -17749,6 +21521,19 @@ out:
 	os->bitbuf = bitbuf;
 	os->bitcount = bitcount;
 	os->next = out_next;
+}
+
+static void
+deflate_finish_block(struct libdeflate_compressor *c,
+		     struct deflate_output_bitstream *os,
+		     const u8 *block_begin, u32 block_length,
+		     const struct deflate_sequence *sequences,
+		     bool is_final_block)
+{
+	c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
+	deflate_make_huffman_codes(&c->freqs, &c->codes);
+	deflate_flush_block(c, os, block_begin, block_length, sequences,
+			    is_final_block);
 }
 
 
@@ -18112,9 +21897,9 @@ deflate_compress_fastest(struct libdeflate_compressor * restrict c,
 		} while (in_next < in_max_block_end &&
 			 seq < &c->p.f.sequences[FAST_SEQ_STORE_LENGTH]);
 
-		deflate_flush_block(c, os, in_block_begin,
-				    in_next - in_block_begin,
-				    c->p.f.sequences, in_next == in_end);
+		deflate_finish_block(c, os, in_block_begin,
+				     in_next - in_block_begin,
+				     c->p.f.sequences, in_next == in_end);
 	} while (in_next != in_end);
 }
 
@@ -18189,9 +21974,9 @@ deflate_compress_greedy(struct libdeflate_compressor * restrict c,
 			 !should_end_block(&c->split_stats,
 					   in_block_begin, in_next, in_end));
 
-		deflate_flush_block(c, os, in_block_begin,
-				    in_next - in_block_begin,
-				    c->p.g.sequences, in_next == in_end);
+		deflate_finish_block(c, os, in_block_begin,
+				     in_next - in_block_begin,
+				     c->p.g.sequences, in_next == in_end);
 	} while (in_next != in_end);
 }
 
@@ -18361,9 +22146,9 @@ have_cur_match:
 			 !should_end_block(&c->split_stats,
 					   in_block_begin, in_next, in_end));
 
-		deflate_flush_block(c, os, in_block_begin,
-				    in_next - in_block_begin,
-				    c->p.g.sequences, in_next == in_end);
+		deflate_finish_block(c, os, in_block_begin,
+				     in_next - in_block_begin,
+				     c->p.g.sequences, in_next == in_end);
 	} while (in_next != in_end);
 }
 
@@ -18413,6 +22198,55 @@ deflate_tally_item_list(struct libdeflate_compressor *c, u32 block_length)
 
 	
 	c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
+}
+
+static void
+deflate_choose_all_literals(struct libdeflate_compressor *c,
+			    const u8 *block, u32 block_length)
+{
+	u32 i;
+
+	deflate_reset_symbol_frequencies(c);
+	for (i = 0; i < block_length; i++)
+		c->freqs.litlen[block[i]]++;
+	c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
+
+	deflate_make_huffman_codes(&c->freqs, &c->codes);
+}
+
+
+static u32
+deflate_compute_true_cost(struct libdeflate_compressor *c)
+{
+	u32 cost = 0;
+	unsigned sym;
+
+	deflate_precompute_huffman_header(c);
+
+	memset(&c->codes.lens.litlen[c->o.precode.num_litlen_syms], 0,
+	       DEFLATE_NUM_LITLEN_SYMS - c->o.precode.num_litlen_syms);
+
+	cost += 5 + 5 + 4 + (3 * c->o.precode.num_explicit_lens);
+	for (sym = 0; sym < DEFLATE_NUM_PRECODE_SYMS; sym++) {
+		cost += c->o.precode.freqs[sym] *
+			(c->o.precode.lens[sym] +
+			 deflate_extra_precode_bits[sym]);
+	}
+
+	for (sym = 0; sym < DEFLATE_FIRST_LEN_SYM; sym++)
+		cost += c->freqs.litlen[sym] * c->codes.lens.litlen[sym];
+
+	for (; sym < DEFLATE_FIRST_LEN_SYM +
+	       ARRAY_LEN(deflate_extra_length_bits); sym++)
+		cost += c->freqs.litlen[sym] *
+			(c->codes.lens.litlen[sym] +
+			 deflate_extra_length_bits[sym - DEFLATE_FIRST_LEN_SYM]);
+
+	for (sym = 0; sym < ARRAY_LEN(deflate_extra_offset_bits); sym++)
+		cost += c->freqs.offset[sym] *
+			(c->codes.lens.offset[sym] +
+			 deflate_extra_offset_bits[sym]);
+	return cost;
 }
 
 
@@ -18720,7 +22554,10 @@ deflate_adjust_costs(struct libdeflate_compressor *c,
 	cutoff = ((u64)c->p.n.prev_num_observations *
 		  c->split_stats.num_observations * 200) / 512;
 
-	if (4 * total_delta > 9 * cutoff)
+	if (total_delta > 3 * cutoff)
+		
+		deflate_set_default_costs(c, lit_cost, len_sym_cost);
+	else if (4 * total_delta > 9 * cutoff)
 		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 3);
 	else if (2 * total_delta > 3 * cutoff)
 		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 2);
@@ -18728,6 +22565,21 @@ deflate_adjust_costs(struct libdeflate_compressor *c,
 		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 1);
 	else
 		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 0);
+}
+
+static void
+deflate_set_initial_costs(struct libdeflate_compressor *c,
+			  const u8 *block_begin, u32 block_length,
+			  bool is_first_block)
+{
+	u32 lit_cost, len_sym_cost;
+
+	deflate_choose_default_litlen_costs(c, block_begin, block_length,
+					    &lit_cost, &len_sym_cost);
+	if (is_first_block)
+		deflate_set_default_costs(c, lit_cost, len_sym_cost);
+	else
+		deflate_adjust_costs(c, lit_cost, len_sym_cost);
 }
 
 
@@ -18790,18 +22642,32 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 		}
 		cur_node->cost_to_end = best_cost_to_end;
 	} while (cur_node != &c->p.n.optimum_nodes[0]);
+
+	deflate_reset_symbol_frequencies(c);
+	deflate_tally_item_list(c, block_length);
+	deflate_make_huffman_codes(&c->freqs, &c->codes);
 }
 
 
 static void
-deflate_optimize_block(struct libdeflate_compressor *c,
-		       const u8 *block_begin, u32 block_length,
-		       const struct lz_match *cache_ptr, bool is_first_block,
-		       bool is_final_block)
+deflate_optimize_and_flush_block(struct libdeflate_compressor *c,
+				 struct deflate_output_bitstream *os,
+				 const u8 *block_begin, u32 block_length,
+				 const struct lz_match *cache_ptr,
+				 bool is_first_block, bool is_final_block,
+				 bool *used_only_literals)
 {
-	unsigned num_passes_remaining = c->p.n.num_optim_passes;
-	u32 lit_cost, len_sym_cost;
+	unsigned num_passes_remaining = c->p.n.max_optim_passes;
+	u32 best_true_cost = UINT32_MAX;
+	u32 true_cost;
+	u32 only_lits_cost;
+	struct deflate_sequence seq_;
+	struct deflate_sequence *seq = NULL;
 	u32 i;
+
+	
+	deflate_choose_all_literals(c, block_begin, block_length);
+	only_lits_cost = deflate_compute_true_cost(c);
 
 	
 	for (i = block_length;
@@ -18810,28 +22676,45 @@ deflate_optimize_block(struct libdeflate_compressor *c,
 		c->p.n.optimum_nodes[i].cost_to_end = 0x80000000;
 
 	
-	deflate_choose_default_litlen_costs(c, block_begin, block_length,
-					    &lit_cost, &len_sym_cost);
-	if (is_first_block)
-		deflate_set_default_costs(c, lit_cost, len_sym_cost);
-	else
-		deflate_adjust_costs(c, lit_cost, len_sym_cost);
+	deflate_set_initial_costs(c, block_begin, block_length, is_first_block);
 
 	do {
 		
 		deflate_find_min_cost_path(c, block_length, cache_ptr);
 
 		
-		deflate_reset_symbol_frequencies(c);
-		deflate_tally_item_list(c, block_length);
+		true_cost = deflate_compute_true_cost(c);
 
 		
-		deflate_make_huffman_codes(&c->freqs, &c->codes);
+		if (true_cost + c->p.n.min_improvement_to_continue >
+		    best_true_cost)
+			break;
+
+		best_true_cost = true_cost;
+		c->p.n.costs_producing_best_true_cost = c->p.n.costs;
 
 		
-		if (--num_passes_remaining || !is_final_block)
-			deflate_set_costs_from_codes(c, &c->codes.lens);
-	} while (num_passes_remaining);
+		deflate_set_costs_from_codes(c, &c->codes.lens);
+
+	} while (--num_passes_remaining);
+
+	*used_only_literals = false;
+	if (only_lits_cost < best_true_cost) {
+		
+		deflate_choose_all_literals(c, block_begin, block_length);
+		deflate_set_costs_from_codes(c, &c->codes.lens);
+		seq_.litrunlen_and_length = block_length;
+		seq = &seq_;
+		*used_only_literals = true;
+	} else if (true_cost >=
+		   best_true_cost + c->p.n.min_bits_to_use_nonfinal_path) {
+		
+		c->p.n.costs = c->p.n.costs_producing_best_true_cost;
+		deflate_find_min_cost_path(c, block_length, cache_ptr);
+		deflate_set_costs_from_codes(c, &c->codes.lens);
+	}
+	deflate_flush_block(c, os, block_begin, block_length, seq,
+			    is_final_block);
 }
 
 static void
@@ -18893,6 +22776,7 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 	unsigned nice_len = MIN(c->nice_match_length, max_len);
 	struct lz_match *cache_ptr = c->p.n.match_cache;
 	u32 next_hashes[2] = {0, 0};
+	bool prev_block_used_only_literals = false;
 
 	bt_matchfinder_init(&c->p.n.bt_mf);
 	deflate_near_optimal_init_stats(c);
@@ -18907,7 +22791,10 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 		unsigned min_len;
 
 		
-		min_len = calculate_min_match_len(
+		if (prev_block_used_only_literals)
+			min_len = DEFLATE_MAX_MATCH_LEN + 1;
+		else
+			min_len = calculate_min_match_len(
 					in_block_begin,
 					in_max_block_end - in_block_begin,
 					c->max_search_depth);
@@ -19034,10 +22921,11 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 			} while (--num_bytes_to_rewind);
 			cache_len_rewound = orig_cache_ptr - cache_ptr;
 
-			deflate_optimize_block(c, in_block_begin, block_length,
-					       cache_ptr, is_first, is_final);
-			deflate_flush_block(c, os, in_block_begin, block_length,
-					    NULL, is_final);
+			deflate_optimize_and_flush_block(
+						c, os, in_block_begin,
+						block_length, cache_ptr,
+						is_first, is_final,
+						&prev_block_used_only_literals);
 			memmove(c->p.n.match_cache, cache_ptr,
 				cache_len_rewound * sizeof(*cache_ptr));
 			cache_ptr = &c->p.n.match_cache[cache_len_rewound];
@@ -19052,10 +22940,11 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 			bool is_final = (in_next == in_end);
 
 			deflate_near_optimal_merge_stats(c);
-			deflate_optimize_block(c, in_block_begin, block_length,
-					       cache_ptr, is_first, is_final);
-			deflate_flush_block(c, os, in_block_begin, block_length,
-					    NULL, is_final);
+			deflate_optimize_and_flush_block(
+						c, os, in_block_begin,
+						block_length, cache_ptr,
+						is_first, is_final,
+						&prev_block_used_only_literals);
 			cache_ptr = &c->p.n.match_cache[0];
 			deflate_near_optimal_save_stats(c);
 			deflate_near_optimal_init_stats(c);
@@ -19085,7 +22974,7 @@ deflate_init_offset_slot_full(struct libdeflate_compressor *c)
 
 #endif 
 
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
+LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level)
 {
 	struct libdeflate_compressor *c;
@@ -19175,22 +23064,28 @@ libdeflate_alloc_compressor(int compression_level)
 		c->impl = deflate_compress_near_optimal;
 		c->max_search_depth = 35;
 		c->nice_match_length = 75;
-		c->p.n.num_optim_passes = 2;
+		c->p.n.max_optim_passes = 2;
+		c->p.n.min_improvement_to_continue = 32;
+		c->p.n.min_bits_to_use_nonfinal_path = 32;
 		deflate_init_offset_slot_full(c);
 		break;
 	case 11:
 		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 70;
+		c->max_search_depth = 100;
 		c->nice_match_length = 150;
-		c->p.n.num_optim_passes = 3;
+		c->p.n.max_optim_passes = 4;
+		c->p.n.min_improvement_to_continue = 16;
+		c->p.n.min_bits_to_use_nonfinal_path = 16;
 		deflate_init_offset_slot_full(c);
 		break;
 	case 12:
 	default:
 		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 150;
+		c->max_search_depth = 300;
 		c->nice_match_length = DEFLATE_MAX_MATCH_LEN;
-		c->p.n.num_optim_passes = 4;
+		c->p.n.max_optim_passes = 10;
+		c->p.n.min_improvement_to_continue = 1;
+		c->p.n.min_bits_to_use_nonfinal_path = 1;
 		deflate_init_offset_slot_full(c);
 		break;
 #endif 
@@ -19201,7 +23096,7 @@ libdeflate_alloc_compressor(int compression_level)
 	return c;
 }
 
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
+LIBDEFLATEAPI size_t
 libdeflate_deflate_compress(struct libdeflate_compressor *c,
 			    const void *in, size_t in_nbytes,
 			    void *out, size_t out_nbytes_avail)
@@ -19230,7 +23125,7 @@ libdeflate_deflate_compress(struct libdeflate_compressor *c,
 	return os.next - (u8 *)out;
 }
 
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
+LIBDEFLATEAPI void
 libdeflate_free_compressor(struct libdeflate_compressor *c)
 {
 	libdeflate_aligned_free(c);
@@ -19242,7 +23137,7 @@ libdeflate_get_compression_level(struct libdeflate_compressor *c)
 	return c->compression_level;
 }
 
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
+LIBDEFLATEAPI size_t
 libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 				  size_t in_nbytes)
 {
@@ -19266,10 +23161,8 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 
 	return bound;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/deflate_decompress.c */
 
-
-#include <limits.h>
 
 /* #include "lib_common.h" */
 
@@ -19278,11 +23171,26 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -19290,14 +23198,237 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -19366,21 +23497,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -19389,63 +23511,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -19539,8 +23683,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -19734,7 +23878,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -19753,7 +23897,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -19784,7 +23928,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -19803,7 +23947,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -19831,7 +23975,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -19840,7 +23984,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -19941,193 +24085,6 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define DEFLATE_MAX_EXTRA_LENGTH_BITS		5
 #define DEFLATE_MAX_EXTRA_OFFSET_BITS		13
-
-#endif 
-
-
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif 
 
@@ -20868,6 +24825,9 @@ next_block:
 			}
 		} while (i < num_litlen_syms + num_offset_syms);
 
+		
+		SAFETY_CHECK(i == num_litlen_syms + num_offset_syms);
+
 	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
 		u16 len, nlen;
 
@@ -21280,7 +25240,7 @@ block_done:
 
 #undef DEFAULT_IMPL
 #undef arch_select_decompress_func
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #  include "x86/decompress_impl.h" */
 #ifndef LIB_X86_DECOMPRESS_IMPL_H
 #define LIB_X86_DECOMPRESS_IMPL_H
@@ -21298,11 +25258,26 @@ block_done:
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -21310,14 +25285,237 @@ block_done:
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -21386,21 +25584,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -21409,63 +25598,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -21559,8 +25770,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -21754,7 +25965,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -21773,7 +25984,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -21804,7 +26015,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -21823,7 +26034,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -21851,7 +26062,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -21860,7 +26071,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -21916,9 +26127,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -21952,50 +26163,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -22003,11 +26200,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -22015,23 +26214,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -22043,12 +26246,12 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #  define deflate_decompress_bmi2	deflate_decompress_bmi2
 #  define FUNCNAME			deflate_decompress_bmi2
 #  if !HAVE_BMI2_NATIVE
-#    define ATTRIBUTES			__attribute__((target("bmi2")))
+#    define ATTRIBUTES			_target_attribute("bmi2")
 #  endif
    
 #  ifndef __clang__
 #    include <immintrin.h>
-#    ifdef __x86_64__
+#    ifdef ARCH_X86_64
 #      define EXTRACT_VARBITS(word, count)  _bzhi_u64((word), (count))
 #      define EXTRACT_VARBITS8(word, count) _bzhi_u64((word), (count))
 #    else
@@ -22245,6 +26448,9 @@ next_block:
 				i += rep_count;
 			}
 		} while (i < num_litlen_syms + num_offset_syms);
+
+		
+		SAFETY_CHECK(i == num_litlen_syms + num_offset_syms);
 
 	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
 		u16 len, nlen;
@@ -22710,7 +26916,7 @@ dispatch_decomp(struct libdeflate_decompressor *d,
 #endif
 
 
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+LIBDEFLATEAPI enum libdeflate_result
 libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *d,
 				 const void *in, size_t in_nbytes,
 				 void *out, size_t out_nbytes_avail,
@@ -22721,7 +26927,7 @@ libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *d,
 			       actual_in_nbytes_ret, actual_out_nbytes_ret);
 }
 
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+LIBDEFLATEAPI enum libdeflate_result
 libdeflate_deflate_decompress(struct libdeflate_decompressor *d,
 			      const void *in, size_t in_nbytes,
 			      void *out, size_t out_nbytes_avail,
@@ -22732,7 +26938,7 @@ libdeflate_deflate_decompress(struct libdeflate_decompressor *d,
 						NULL, actual_out_nbytes_ret);
 }
 
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
+LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void)
 {
 	
@@ -22744,12 +26950,12 @@ libdeflate_alloc_decompressor(void)
 	return d;
 }
 
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
+LIBDEFLATEAPI void
 libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 {
 	libdeflate_free(d);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/gzip_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/gzip_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -22763,11 +26969,26 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -22775,14 +26996,237 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -22851,21 +27295,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -22874,63 +27309,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -23024,8 +27481,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -23219,7 +27676,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -23238,7 +27695,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -23269,7 +27726,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -23288,7 +27745,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -23316,7 +27773,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -23325,7 +27782,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -23433,194 +27890,7 @@ unsigned int libdeflate_get_compression_level(struct libdeflate_compressor *c);
 #endif 
 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
+LIBDEFLATEAPI size_t
 libdeflate_gzip_compress(struct libdeflate_compressor *c,
 			 const void *in, size_t in_nbytes,
 			 void *out, size_t out_nbytes_avail)
@@ -23673,14 +27943,14 @@ libdeflate_gzip_compress(struct libdeflate_compressor *c,
 	return out_next - (u8 *)out;
 }
 
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
+LIBDEFLATEAPI size_t
 libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 			       size_t in_nbytes)
 {
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/gzip_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -23690,11 +27960,26 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -23702,14 +27987,237 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -23778,21 +28286,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -23801,63 +28300,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -23951,8 +28472,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -24146,7 +28667,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -24165,7 +28686,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -24196,7 +28717,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -24215,7 +28736,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -24243,7 +28764,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -24252,7 +28773,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -24351,194 +28872,7 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+LIBDEFLATEAPI enum libdeflate_result
 libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *d,
 			      const void *in, size_t in_nbytes,
 			      void *out, size_t out_nbytes_avail,
@@ -24642,7 +28976,7 @@ libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *d,
 	return LIBDEFLATE_SUCCESS;
 }
 
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+LIBDEFLATEAPI enum libdeflate_result
 libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 			   const void *in, size_t in_nbytes,
 			   void *out, size_t out_nbytes_avail,
@@ -24652,7 +28986,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -24662,11 +28996,26 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -24674,14 +29023,237 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -24750,21 +29322,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -24773,63 +29336,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -24923,8 +29508,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -25118,7 +29703,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -25137,7 +29722,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -25168,7 +29753,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -25187,7 +29772,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -25215,7 +29800,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -25224,7 +29809,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -25278,193 +29863,6 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
-
 #ifdef FREESTANDING
 #  define malloc NULL
 #  define free NULL
@@ -25506,7 +29904,7 @@ libdeflate_aligned_free(void *ptr)
 		libdeflate_free(((void **)ptr)[-1]);
 }
 
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
+LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *))
 {
@@ -25583,7 +29981,7 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 	abort();
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/zlib_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -25597,11 +29995,26 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -25609,14 +30022,237 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -25685,21 +30321,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -25708,63 +30335,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -25858,8 +30507,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -26053,7 +30702,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -26072,7 +30721,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -26103,7 +30752,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -26122,7 +30771,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -26150,7 +30799,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -26159,7 +30808,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -26243,194 +30892,7 @@ unsigned int libdeflate_get_compression_level(struct libdeflate_compressor *c);
 #endif 
 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
+LIBDEFLATEAPI size_t
 libdeflate_zlib_compress(struct libdeflate_compressor *c,
 			 const void *in, size_t in_nbytes,
 			 void *out, size_t out_nbytes_avail)
@@ -26475,14 +30937,14 @@ libdeflate_zlib_compress(struct libdeflate_compressor *c,
 	return out_next - (u8 *)out;
 }
 
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
+LIBDEFLATEAPI size_t
 libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 			       size_t in_nbytes)
 {
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/zlib_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -26492,11 +30954,26 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -26504,14 +30981,237 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -26580,21 +31280,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -26603,63 +31294,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -26753,8 +31466,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -26948,7 +31661,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -26967,7 +31680,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -26998,7 +31711,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -27017,7 +31730,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -27045,7 +31758,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -27054,7 +31767,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -27129,194 +31842,7 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-/* #include "libdeflate.h" */
-
-
-#ifndef LIBDEFLATE_H
-#define LIBDEFLATE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	14
-#define LIBDEFLATE_VERSION_STRING	"1.14"
-
-#include <stddef.h>
-#include <stdint.h>
-
-
-#ifdef LIBDEFLATE_DLL
-#  ifdef BUILDING_LIBDEFLATE
-#    define LIBDEFLATEEXPORT	LIBEXPORT
-#  elif defined(_WIN32) || defined(__CYGWIN__)
-#    define LIBDEFLATEEXPORT	__declspec(dllimport)
-#  endif
-#endif
-#ifndef LIBDEFLATEEXPORT
-#  define LIBDEFLATEEXPORT
-#endif
-
-#if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
-	defined(_WIN32) && !defined(_WIN64)
-    
-#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
-#else
-#  define LIBDEFLATEAPI
-#endif
-
-
-
-
-
-struct libdeflate_compressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
-libdeflate_alloc_compressor(int compression_level);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
-			    const void *in, size_t in_nbytes,
-			    void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
-				  size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
-			 const void *in, size_t in_nbytes,
-			 void *out, size_t out_nbytes_avail);
-
-
-LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
-libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
-			       size_t in_nbytes);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_compressor(struct libdeflate_compressor *compressor);
-
-
-
-
-
-struct libdeflate_decompressor;
-
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void);
-
-
-enum libdeflate_result {
-	
-	LIBDEFLATE_SUCCESS = 0,
-
-	
-	LIBDEFLATE_BAD_DATA = 1,
-
-	
-	LIBDEFLATE_SHORT_OUTPUT = 2,
-
-	
-	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
-};
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
-				 const void *in, size_t in_nbytes,
-				 void *out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
-			   const void *in, size_t in_nbytes,
-			   void *out, size_t out_nbytes_avail,
-			   size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
-			      const void *in, size_t in_nbytes,
-			      void *out, size_t out_nbytes_avail,
-			      size_t *actual_in_nbytes_ret,
-			      size_t *actual_out_nbytes_ret);
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
-
-
-
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
-
-
-
-LIBDEFLATEEXPORT uint32_t LIBDEFLATEAPI
-libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
-
-
-
-
-
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *));
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif 
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+LIBDEFLATEAPI enum libdeflate_result
 libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *d,
 			      const void *in, size_t in_nbytes,
 			      void *out, size_t out_nbytes_avail,
@@ -27380,7 +31906,7 @@ libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *d,
 	return LIBDEFLATE_SUCCESS;
 }
 
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+LIBDEFLATEAPI enum libdeflate_result
 libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 			   const void *in, size_t in_nbytes,
 			   void *out, size_t out_nbytes_avail,
@@ -27390,14 +31916,15 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/arm/cpu_features.c */
 
 
 
 
 #ifdef __APPLE__
-#undef _ANSI_SOURCE
-#define _DARWIN_C_SOURCE 
+#  undef _ANSI_SOURCE
+#  undef _DARWIN_C_SOURCE
+#  define _DARWIN_C_SOURCE 
 #endif
 
 /* #include "cpu_features_common.h" */
@@ -27407,9 +31934,11 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 #define LIB_CPU_FEATURES_COMMON_H
 
 #if defined(TEST_SUPPORT__DO_NOT_USE) && !defined(FREESTANDING)
-#  undef _ANSI_SOURCE	
+   
+#  undef _ANSI_SOURCE
 #  ifndef __APPLE__
-#    define _GNU_SOURCE 1
+#    undef _GNU_SOURCE
+#    define _GNU_SOURCE
 #  endif
 #  include <stdio.h>
 #  include <stdlib.h>
@@ -27423,11 +31952,26 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -27435,14 +31979,237 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -27511,21 +32278,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -27534,63 +32292,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -27684,8 +32464,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -27879,7 +32659,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -27898,7 +32678,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -27929,7 +32709,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -27948,7 +32728,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -27976,7 +32756,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -27985,7 +32765,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -28102,11 +32882,26 @@ disable_cpu_features_for_testing(u32 *features,
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -28114,14 +32909,237 @@ disable_cpu_features_for_testing(u32 *features,
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -28190,21 +33208,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -28213,63 +33222,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -28363,8 +33394,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -28558,7 +33589,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -28577,7 +33608,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -28608,7 +33639,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -28627,7 +33658,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -28655,7 +33686,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -28664,7 +33695,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -28720,12 +33751,13 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING) && \
-	(defined(__linux__) || \
-	 (defined(__aarch64__) && defined(__APPLE__)))
+#if !defined(FREESTANDING) && \
+    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__linux__) || \
+     (defined(__APPLE__) && defined(ARCH_ARM64)) || \
+     (defined(_WIN32) && defined(ARCH_ARM64)))
 #  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
 #  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
 #endif
@@ -28759,15 +33791,14 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif 
 
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(ARCH_ARM64)
 #  define HAVE_NEON_NATIVE	1
 #else
 #  define HAVE_NEON_NATIVE	0
 #endif
-#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
 
 #if HAVE_NEON_NATIVE || \
-	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
 #  define HAVE_NEON_INTRIN	1
 #else
 #  define HAVE_NEON_INTRIN	0
@@ -28779,16 +33810,29 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_PMULL_NATIVE	0
 #endif
-#define HAVE_PMULL_TARGET \
+#if HAVE_PMULL_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
-
-#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
-	!(defined(__arm__) && defined(__clang__)) && \
-	CPU_IS_LITTLE_ENDIAN() 
-#  define HAVE_PMULL_INTRIN	1
+	 HAVE_NEON_INTRIN  && \
+	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
+	  defined(_MSC_VER)) && \
+	   \
+	 !(defined(ARCH_ARM32) && defined(__clang__)))
+#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+   
+#  ifdef _MSC_VER
+#    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
+#  else
+#    define compat_vmull_p64(a, b)  vmull_p64((a), (b))
+#  endif
 #else
 #  define HAVE_PMULL_INTRIN	0
+#endif
+
+#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
+		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
+#else
+#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
 #endif
 
 
@@ -28797,19 +33841,31 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #else
 #  define HAVE_CRC32_NATIVE	0
 #endif
-#define HAVE_CRC32_TARGET \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+#undef HAVE_CRC32_INTRIN
+#if HAVE_CRC32_NATIVE
+#  define HAVE_CRC32_INTRIN	1
+#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  if GCC_PREREQ(1, 0)
+    
+#    if (GCC_PREREQ(11, 3) || \
+	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
+	!defined(__ARM_ARCH_6KZ__) && \
+	!defined(__ARM_ARCH_7EM__)
+#      define HAVE_CRC32_INTRIN	1
+#    endif
+#  elif CLANG_PREREQ(3, 4, 6000000)
+#    define HAVE_CRC32_INTRIN	1
+#  elif defined(_MSC_VER)
+#    define HAVE_CRC32_INTRIN	1
+#  endif
+#endif
+#ifndef HAVE_CRC32_INTRIN
+#  define HAVE_CRC32_INTRIN	0
+#endif
 
-#define HAVE_CRC32_INTRIN \
-	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
-			       (!GCC_PREREQ(1, 0) || \
-				GCC_PREREQ(11, 3) || \
-				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
 
-
-#ifdef __aarch64__
+#if defined(ARCH_ARM64) && !defined(_MSC_VER)
 #  ifdef __ARM_FEATURE_SHA3
 #    define HAVE_SHA3_NATIVE	1
 #  else
@@ -28818,9 +33874,10 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
 				 (GCC_PREREQ(8, 1)  || \
 				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
+				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
 				 (GCC_PREREQ(9, 1)  || \
-				  __has_builtin(__builtin_neon_veor3q_v)))
+				  CLANG_PREREQ(13, 0, 13160000)))
 #else
 #  define HAVE_SHA3_NATIVE	0
 #  define HAVE_SHA3_TARGET	0
@@ -28828,26 +33885,28 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #endif
 
 
-#ifdef __aarch64__
+#ifdef ARCH_ARM64
 #  ifdef __ARM_FEATURE_DOTPROD
 #    define HAVE_DOTPROD_NATIVE	1
 #  else
 #    define HAVE_DOTPROD_NATIVE	0
 #  endif
-#  define HAVE_DOTPROD_TARGET \
+#  if HAVE_DOTPROD_NATIVE || \
 	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
-#  define HAVE_DOTPROD_INTRIN \
-	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
+	  defined(_MSC_VER)))
+#    define HAVE_DOTPROD_INTRIN	1
+#  else
+#    define HAVE_DOTPROD_INTRIN	0
+#  endif
 #else
 #  define HAVE_DOTPROD_NATIVE	0
-#  define HAVE_DOTPROD_TARGET	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
 
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  define __ARM_FEATURE_CRC32	1
 #endif
 #if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
@@ -28857,7 +33916,7 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define __ARM_FEATURE_DOTPROD	1
 #endif
 #if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(__arm__))
+	(defined(__clang__) || defined(ARCH_ARM32))
 #  include <arm_acle.h>
 #  undef __ARM_FEATURE_CRC32
 #endif
@@ -28938,7 +33997,7 @@ static u32 query_arm_cpu_features(void)
 
 	scan_auxv(&hwcap, &hwcap2);
 
-#ifdef __arm__
+#ifdef ARCH_ARM32
 	STATIC_ASSERT(sizeof(long) == 4);
 	if (hwcap & (1 << 12))	
 		features |= ARM_CPU_FEATURE_NEON;
@@ -28997,6 +34056,23 @@ static u32 query_arm_cpu_features(void)
 	}
 	return features;
 }
+#elif defined(_WIN32)
+
+#include <windows.h>
+
+static u32 query_arm_cpu_features(void)
+{
+	u32 features = ARM_CPU_FEATURE_NEON;
+
+	if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE))
+		features |= ARM_CPU_FEATURE_PMULL;
+	if (IsProcessorFeaturePresent(PF_ARM_V8_CRC32_INSTRUCTIONS_AVAILABLE))
+		features |= ARM_CPU_FEATURE_CRC32;
+
+	
+
+	return features;
+}
 #else
 #error "unhandled case"
 #endif
@@ -29022,7 +34098,7 @@ void libdeflate_init_arm_cpu_features(void)
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -29039,11 +34115,26 @@ void libdeflate_init_arm_cpu_features(void)
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
+ 
 #  error "lib_common.h must always be included before libdeflate.h"
-   
 #endif
 
-#define BUILDING_LIBDEFLATE
+#if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#  define LIBDEFLATE_EXPORT_SYM  __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBDEFLATE_EXPORT_SYM  __attribute__((visibility("default")))
+#else
+#  define LIBDEFLATE_EXPORT_SYM
+#endif
+
+
+#if defined(__GNUC__) && defined(__i386__)
+#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#else
+#  define LIBDEFLATE_ALIGN_STACK
+#endif
+
+#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 /* #include "../common_defs.h" */
 
@@ -29051,14 +34142,237 @@ void libdeflate_init_arm_cpu_features(void)
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
+/* #include "libdeflate.h" */
+
+
+#ifndef LIBDEFLATE_H
+#define LIBDEFLATE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBDEFLATE_VERSION_MAJOR	1
+#define LIBDEFLATE_VERSION_MINOR	18
+#define LIBDEFLATE_VERSION_STRING	"1.18"
+
+
+#ifndef LIBDEFLATEAPI
+#  if defined(LIBDEFLATE_DLL) && (defined(_WIN32) || defined(__CYGWIN__))
+#    define LIBDEFLATEAPI	__declspec(dllimport)
+#  else
+#    define LIBDEFLATEAPI
+#  endif
+#endif
+
+
+
+
+
+struct libdeflate_compressor;
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress(struct libdeflate_compressor *compressor,
+			    const void *in, size_t in_nbytes,
+			    void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_deflate_compress_bound(struct libdeflate_compressor *compressor,
+				  size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_zlib_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress(struct libdeflate_compressor *compressor,
+			 const void *in, size_t in_nbytes,
+			 void *out, size_t out_nbytes_avail);
+
+
+LIBDEFLATEAPI size_t
+libdeflate_gzip_compress_bound(struct libdeflate_compressor *compressor,
+			       size_t in_nbytes);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_compressor(struct libdeflate_compressor *compressor);
+
+
+
+
+
+struct libdeflate_decompressor;
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void);
+
+
+enum libdeflate_result {
+	
+	LIBDEFLATE_SUCCESS = 0,
+
+	
+	LIBDEFLATE_BAD_DATA = 1,
+
+	
+	LIBDEFLATE_SHORT_OUTPUT = 2,
+
+	
+	LIBDEFLATE_INSUFFICIENT_SPACE = 3,
+};
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *decompressor,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_zlib_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress(struct libdeflate_decompressor *decompressor,
+			   const void *in, size_t in_nbytes,
+			   void *out, size_t out_nbytes_avail,
+			   size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI enum libdeflate_result
+libdeflate_gzip_decompress_ex(struct libdeflate_decompressor *decompressor,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_in_nbytes_ret,
+			      size_t *actual_out_nbytes_ret);
+
+
+LIBDEFLATEAPI void
+libdeflate_free_decompressor(struct libdeflate_decompressor *decompressor);
+
+
+
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_adler32(uint32_t adler, const void *buffer, size_t len);
+
+
+
+LIBDEFLATEAPI uint32_t
+libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
+
+
+
+
+
+
+LIBDEFLATEAPI void
+libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+				void (*free_func)(void *));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif 
+
+
 #include <stdbool.h>
 #include <stddef.h>	
 #include <stdint.h>
 #ifdef _MSC_VER
+#  include <intrin.h>	
 #  include <stdlib.h>	
+   
+   
+#  pragma warning(disable : 4146) 
+   
+#  pragma warning(disable : 4018) 
+#  pragma warning(disable : 4244) 
+#  pragma warning(disable : 4267) 
+#  pragma warning(disable : 4310) 
+   
+#  pragma warning(disable : 4100) 
+#  pragma warning(disable : 4127) 
+#  pragma warning(disable : 4189) 
+#  pragma warning(disable : 4232) 
+#  pragma warning(disable : 4245) 
+#  pragma warning(disable : 4295) 
 #endif
 #ifndef FREESTANDING
 #  include <string.h>	
+#endif
+
+
+
+
+
+
+#undef ARCH_X86_64
+#undef ARCH_X86_32
+#undef ARCH_ARM64
+#undef ARCH_ARM32
+#ifdef _MSC_VER
+#  if defined(_M_X64)
+#    define ARCH_X86_64
+#  elif defined(_M_IX86)
+#    define ARCH_X86_32
+#  elif defined(_M_ARM64)
+#    define ARCH_ARM64
+#  elif defined(_M_ARM)
+#    define ARCH_ARM32
+#  endif
+#else
+#  if defined(__x86_64__)
+#    define ARCH_X86_64
+#  elif defined(__i386__)
+#    define ARCH_X86_32
+#  elif defined(__aarch64__)
+#    define ARCH_ARM64
+#  elif defined(__arm__)
+#    define ARCH_ARM32
+#  endif
 #endif
 
 
@@ -29127,21 +34441,12 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef _WIN32
-#  define LIBEXPORT		__declspec(dllexport)
-#elif defined(__GNUC__)
-#  define LIBEXPORT		__attribute__((visibility("default")))
-#else
-#  define LIBEXPORT
-#endif
-
-
 #ifdef _MSC_VER
 #  define inline		__inline
 #endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(always_inline)
 #  define forceinline		inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #  define forceinline		__forceinline
@@ -29150,63 +34455,85 @@ typedef size_t machine_word_t;
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(unused)
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
 #endif
 
 
-#ifdef __GNUC__
-#  define restrict		__restrict__
-#elif defined(_MSC_VER)
-    
-#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#    define restrict		restrict
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112L)
+#  if defined(__GNUC__) || defined(__clang__)
+#    define restrict		__restrict__
 #  else
 #    define restrict
 #  endif
-#else
-#  define restrict
-#endif
+#endif 
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define likely(expr)		__builtin_expect(!!(expr), 1)
 #else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_expect)
 #  define unlikely(expr)	__builtin_expect(!!(expr), 0)
 #else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchr
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchr(addr)	__builtin_prefetch((addr), 0)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchr(addr)	_mm_prefetch((addr), _MM_HINT_T0)
+#  elif defined(ARCH_ARM64)
+#    define prefetchr(addr)	__prefetch2((addr), 0x00 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchr(addr)	__prefetch(addr)
+#  endif
+#endif
+#ifndef prefetchr
 #  define prefetchr(addr)
 #endif
 
 
-#ifdef __GNUC__
+#undef prefetchw
+#if defined(__GNUC__) || __has_builtin(__builtin_prefetch)
 #  define prefetchw(addr)	__builtin_prefetch((addr), 1)
-#else
+#elif defined(_MSC_VER)
+#  if defined(ARCH_X86_32) || defined(ARCH_X86_64)
+#    define prefetchw(addr)	_m_prefetchw(addr)
+#  elif defined(ARCH_ARM64)
+#    define prefetchw(addr)	__prefetch2((addr), 0x10 )
+#  elif defined(ARCH_ARM32)
+#    define prefetchw(addr)	__prefetchw(addr)
+#  endif
+#endif
+#ifndef prefetchw
 #  define prefetchw(addr)
 #endif
 
 
 #undef _aligned_attribute
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_attribute(aligned)
 #  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#  define _aligned_attribute(n)	__declspec(align(n))
 #endif
 
 
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
+#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#  define _target_attribute(attrs)	__attribute__((target(attrs)))
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
+#else
+#  define _target_attribute(attrs)
+#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
+#endif
 
 
 
@@ -29300,8 +34627,8 @@ static forceinline u64 bswap64(u64 v)
 
 
 
-#if defined(__GNUC__) && \
-	(defined(__x86_64__) || defined(__i386__) || \
+#if (defined(__GNUC__) || defined(__clang__)) && \
+	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
@@ -29495,7 +34822,7 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 static forceinline unsigned
 bsr32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clz)
 	return 31 - __builtin_clz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -29514,7 +34841,7 @@ bsr32(u32 v)
 static forceinline unsigned
 bsr64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
 	return 63 - __builtin_clzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -29545,7 +34872,7 @@ bsrw(machine_word_t v)
 static forceinline unsigned
 bsf32(u32 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctz)
 	return __builtin_ctz(v);
 #elif defined(_MSC_VER)
 	unsigned long i;
@@ -29564,7 +34891,7 @@ bsf32(u32 v)
 static forceinline unsigned
 bsf64(u64 v)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) || __has_builtin(__builtin_ctzll)
 	return __builtin_ctzll(v);
 #elif defined(_MSC_VER) && defined(_WIN64)
 	unsigned long i;
@@ -29592,7 +34919,7 @@ bsfw(machine_word_t v)
 
 
 #undef rbit32
-#if defined(__GNUC__) && defined(__arm__) && \
+#if (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM32) && \
 	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
 static forceinline u32
 rbit32(u32 v)
@@ -29601,7 +34928,7 @@ rbit32(u32 v)
 	return v;
 }
 #define rbit32 rbit32
-#elif defined(__GNUC__) && defined(__aarch64__)
+#elif (defined(__GNUC__) || defined(__clang__)) && defined(ARCH_ARM64)
 static forceinline u32
 rbit32(u32 v)
 {
@@ -29657,9 +34984,9 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
 #  undef HAVE_DYNAMIC_X86_CPU_FEATURES
 #  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
 #endif
@@ -29693,50 +35020,36 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#define HAVE_TARGET_INTRINSICS \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
-	defined(__INTEL_COMPILER)
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-#ifdef __INTEL_COMPILER
-typedef int   __v16si __attribute__((__vector_size__(64)));
-typedef short __v32hi __attribute__((__vector_size__(64)));
-typedef char  __v64qi __attribute__((__vector_size__(64)));
+#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
+#  define HAVE_TARGET_INTRINSICS	1
+#else
+#  define HAVE_TARGET_INTRINSICS	0
 #endif
 
 
-#ifdef __SSE2__
+#if defined(__SSE2__) || \
+	(defined(_MSC_VER) && \
+	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #  define HAVE_SSE2_NATIVE	1
 #else
 #  define HAVE_SSE2_NATIVE	0
 #endif
-#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
-#define HAVE_SSE2_INTRIN \
-	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
 
 
-#ifdef __PCLMUL__
+#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMUL_NATIVE	1
 #else
 #  define HAVE_PCLMUL_NATIVE	0
 #endif
-#define HAVE_PCLMUL_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
-#define HAVE_PCLMUL_INTRIN \
-	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
+			    defined(_MSC_VER)))
+#  define HAVE_PCLMUL_INTRIN	1
+#else
+#  define HAVE_PCLMUL_INTRIN	0
+#endif
 
 
 #ifdef __AVX__
@@ -29744,11 +35057,13 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX_NATIVE	0
 #endif
-#define HAVE_AVX_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
-#define HAVE_AVX_INTRIN \
-	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
+			 defined(_MSC_VER)))
+#  define HAVE_AVX_INTRIN	1
+#else
+#  define HAVE_AVX_INTRIN	0
+#endif
 
 
 #ifdef __AVX2__
@@ -29756,23 +35071,27 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #else
 #  define HAVE_AVX2_NATIVE	0
 #endif
-#define HAVE_AVX2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
-#define HAVE_AVX2_INTRIN \
-	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_AVX2_INTRIN	1
+#else
+#  define HAVE_AVX2_INTRIN	0
+#endif
 
 
-#ifdef __BMI2__
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_BMI2_NATIVE	1
 #else
 #  define HAVE_BMI2_NATIVE	0
 #endif
-#define HAVE_BMI2_TARGET \
-	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
-#define HAVE_BMI2_INTRIN \
-	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
+			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
+			  defined(_MSC_VER)))
+#  define HAVE_BMI2_INTRIN	1
+#else
+#  define HAVE_BMI2_INTRIN	0
+#endif
 
 #endif 
 
@@ -29782,7 +35101,7 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 #if HAVE_DYNAMIC_X86_CPU_FEATURES
 
 
-#if defined(__i386__) && defined(__PIC__)
+#if defined(ARCH_X86_32) && defined(__PIC__)
 #  define EBX_CONSTRAINT "=&r"
 #else
 #  define EBX_CONSTRAINT "=b"
@@ -29792,23 +35111,37 @@ typedef char  __v64qi __attribute__((__vector_size__(64)));
 static inline void
 cpuid(u32 leaf, u32 subleaf, u32 *a, u32 *b, u32 *c, u32 *d)
 {
+#ifdef _MSC_VER
+	int result[4];
+
+	__cpuidex(result, leaf, subleaf);
+	*a = result[0];
+	*b = result[1];
+	*c = result[2];
+	*d = result[3];
+#else
 	__asm__(".ifnc %%ebx, %1; mov  %%ebx, %1; .endif\n"
 		"cpuid                                  \n"
 		".ifnc %%ebx, %1; xchg %%ebx, %1; .endif\n"
 		: "=a" (*a), EBX_CONSTRAINT (*b), "=c" (*c), "=d" (*d)
 		: "a" (leaf), "c" (subleaf));
+#endif
 }
 
 
 static inline u64
 read_xcr(u32 index)
 {
+#ifdef _MSC_VER
+	return _xgetbv(index);
+#else
 	u32 edx, eax;
 
 	
 	__asm__ (".byte 0x0f, 0x01, 0xd0" : "=d" (edx), "=a" (eax) : "c" (index));
 
 	return ((u64)edx << 32) | eax;
+#endif
 }
 
 #undef BIT
@@ -29816,9 +35149,6 @@ read_xcr(u32 index)
 
 #define XCR0_BIT_SSE		BIT(1)
 #define XCR0_BIT_AVX		BIT(2)
-#define XCR0_BIT_OPMASK		BIT(5)
-#define XCR0_BIT_ZMM_HI256	BIT(6)
-#define XCR0_BIT_HI16_ZMM	BIT(7)
 
 #define IS_SET(reg, nr)		((reg) & BIT(nr))
 #define IS_ALL_SET(reg, mask)	(((reg) & (mask)) == (mask))

@@ -9,7 +9,7 @@ use Pod::Usage;
 use Text::CSV qw(csv);
 use WebService::IdoitAPI;
 
-use version; our $VERSION = qv('v0.2.0');
+use version; our $VERSION = qv('v0.2.2');
 
 sub get_reports {
     my $config = shift;
@@ -121,7 +121,7 @@ idoit-reports - get i-doit reports
 
 =head1 VERSION
 
-This is version v0.2.0
+This is version v0.2.2
 
 =head1 SYNOPSIS
 

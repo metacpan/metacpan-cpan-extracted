@@ -7,7 +7,7 @@ package Rex::Interface::Fs::Local;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Interface::Fs::Base;
 use base qw(Rex::Interface::Fs::Base);

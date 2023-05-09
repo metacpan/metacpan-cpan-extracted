@@ -1,5 +1,9 @@
 Revision history for App::FatPacker::Simple
 
+0.20  2023-05-05 09:04:08 JST
+
+    - Require perl v5.16
+
 0.09  2019-04-14 17:24:21 JST
 
     - Add --cache option for perl-strip

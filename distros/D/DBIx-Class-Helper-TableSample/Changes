@@ -1,5 +1,17 @@
 Revision history for DBIx-Class-Helper-TableSample:
 
+v0.4.0    2023-05-08 20:15:52+01:00 Europe/London
+  [Incompatible Changes]
+  - Perl v5.14 or later is required to use this module.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Support policy for older Perls is documented.
+
+  [Other]
+  - Sign release.
+
 v0.3.2    2022-10-13 22:08:00+01:00 Europe/London
   [Documentation]
   - Fixed typos.

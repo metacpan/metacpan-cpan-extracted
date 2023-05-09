@@ -1,5 +1,8 @@
 Revision history for RT-Client-CLI
 
+5.0.4 2023-05-04
+ - Support arbitrary user names in .rt_sessions
+
 5.0.3 2022-07-13
  - Include rt-mailgate
 

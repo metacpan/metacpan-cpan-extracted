@@ -1,6 +1,6 @@
 package SPVM::Digest::SHA;
 
-our $VERSION = '0.06';
+our $VERSION = "0.061";
 
 1;
 
@@ -10,12 +10,7 @@ SPVM::Digest::SHA - SHA-1/224/256/384/512
 
 =head1 Description
 
-C<SPVM::Digest::SHA> is the C<Digest::SHA> class in L<SPVM>.
-
-C<Digest::SHA> is a complete implementation of the NIST Secure Hash Standard.
-It gives SPVM programmers a convenient way to calculate SHA-1, SHA-224,
-SHA-256, SHA-384, SHA-512, SHA-512/224, and SHA-512/256 message digests.
-The module can handle all types of input, including partial-byte data.
+The SPVM::Digest::SHA of L<SPVM> has methods for SHA-1/224/256/384/512.
 
 =head1 Usage
 
@@ -28,8 +23,9 @@ The module can handle all types of input, including partial-byte data.
   my $digest = Digest::SHA->sha256($data);
   my $digest = Digest::SHA->sha384_hex($data);
   my $digest = Digest::SHA->sha512_base64($data);
-  
-  # Object-oriented
+
+Object Oriented Programming:
+
   my $sha = Digest::SHA->new($alg);
   
   $sha->add($data);
@@ -401,8 +397,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 

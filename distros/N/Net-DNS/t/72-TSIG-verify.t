@@ -1,11 +1,13 @@
 #!/usr/bin/perl
-# $Id: 72-TSIG-verify.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 72-TSIG-verify.t 1909 2023-03-23 11:36:16Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 use Test::More;
+use TestToolkit;
+
 use Net::DNS;
 
 my @prerequisite = qw(
@@ -21,78 +23,66 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 28;
+plan tests => 26;
 
 
 my $tsig  = Net::DNS::RR->new( type => 'TSIG' );
 my $class = ref($tsig);
 
 
-my $privatekey = 'Khmac-sha1.example.+161+39562.private';
-END { unlink($privatekey) if defined $privatekey; }
+my $tsigkey = 'tsigkey.txt';
+END { unlink($tsigkey) if defined $tsigkey; }
 
-my $fh_private = IO::File->new( $privatekey, '>' ) || die "$privatekey $!";
-print $fh_private <<'END';
-Private-key-format: v1.2
-Algorithm: 161 (HMAC_SHA1)
-Key: xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
+my $fh_tsigkey = IO::File->new( $tsigkey, '>' ) || die "$tsigkey $!";
+print $fh_tsigkey <<'END';
+key "host1-host2.example." {
+	algorithm hmac-sha256;
+	secret "f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=";
+};
 END
-close($fh_private);
+close($fh_tsigkey);
 
 
-my $publickey = 'Khmac-md5.example.+157+53335.key';
-END { unlink($publickey) if defined $publickey; }
-
-my $fh_public = IO::File->new( $publickey, '>' ) || die "$publickey $!";
-print $fh_public <<'END';
-HMAC-MD5.example. IN KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=
-END
-close($fh_public);
-
-
-{
-	my $packet = Net::DNS::Packet->new('query.example');
-	$packet->sign_tsig($privatekey);
+for my $packet ( Net::DNS::Packet->new('query.example') ) {
+	$packet->sign_tsig($tsigkey);
 	$packet->data;
 
-	my $verified = $packet->verify();
-	ok( $verified, 'verify signed packet' );
-	is( ref($verified),	$class,	   'packet->verify returns TSIG' );
-	is( $packet->verifyerr, 'NOERROR', 'observe packet->verifyerr' );
+	my $verified  = $packet->verify();
+	my $verifyerr = $packet->verifyerr();
+	ok( $verified, "verify signed packet	$verifyerr" );
+	is( ref($verified), $class, 'packet->verify returns TSIG' );
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new('query.example');
-	$packet->sign_tsig($privatekey);
+for my $packet ( Net::DNS::Packet->new('query.example') ) {
+	$packet->sign_tsig($tsigkey);
 	$packet->data;
 	$packet->push( update => rr_add( type => 'NULL' ) );
 
-	my $verified = $packet->verify();
-	ok( !$verified, 'unverifiable signed packet' );
-	is( $verified,		undef,	  'failed packet->verify returns undef' );
-	is( $packet->verifyerr, 'BADSIG', 'observe packet->verifyerr' );
+	my $verified  = $packet->verify();
+	my $verifyerr = $packet->verifyerr();
+	ok( !$verified, "verify corrupt packet	$verifyerr" );
+	is( $verified, undef, 'packet->verify returns undef' );
 }
 
 
-{
-	my $query = Net::DNS::Packet->new('query.example');
-	$query->sign_tsig($privatekey);
+for my $query ( Net::DNS::Packet->new('query.example') ) {
+	$query->sign_tsig($tsigkey);
 	$query->data;
 
 	my $reply = $query->reply;
 	$reply->sign_tsig($query);
 	$reply->data;
 
-	my $verified = $reply->verify($query);
-	ok( $verified, 'verify reply packet' );
-	is( $reply->verifyerr, 'NOERROR', 'observe packet->verifyerr' );
+	my $verified  = $reply->verify($query);
+	my $verifyerr = $reply->verifyerr();
+	ok( $verified, "verify reply packet	$verifyerr" );
 }
 
 
 {
-	my @packet = map { Net::DNS::Packet->new($_) } 0 .. 3;
-	my $signed = $privatekey;
+	my @packet = map { Net::DNS::Packet->new($_) } ( 0 .. 3 );
+	my $signed = $tsigkey;
 	foreach my $packet (@packet) {
 		$signed = $packet->sign_tsig($signed);
 		$packet->data;
@@ -101,25 +91,26 @@ close($fh_public);
 
 	my @verified;
 	foreach my $packet (@packet) {
-		my ($verified) = $packet->verify(@verified);
-		@verified = ($verified);
-		ok( $verified, 'verify multi-packet' );
+		@verified = $packet->verify(@verified);
+		my ($verified) = @verified;
+		my $verifyerr = $packet->verifyerr();
+		ok( $verified, "verify multi-packet	$verifyerr" );
 	}
 
-	my @state;
+	my @unverifiable;
 	$packet[2]->sigrr->fudge(0);
 	foreach my $packet (@packet) {
-		my $tsig = $packet->verify(@state);
-		@state = ($tsig);
-		my $result = $packet->verifyerr;
-		ok( $result, "unverifiable multi-packet: $result" );
+		@unverifiable = $packet->verify(@unverifiable);
+		my $verifyerr = $packet->verifyerr();
+		ok( 1, "verify corrupt multi-packet	$verifyerr" );
 	}
+	my ($verified) = @unverifiable;
+	is( $verified, undef, 'final packet->verify returns undef' );
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new('query.example');
-	$packet->sign_tsig( $privatekey, fudge => 0 );
+for my $packet ( Net::DNS::Packet->new('query.example') ) {
+	$packet->sign_tsig( $tsigkey, fudge => 0 );
 	my $encoded = $packet->data;
 	sleep 2;						# guarantee one complete second delay
 
@@ -129,9 +120,8 @@ close($fh_public);
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new();
-	$packet->sign_tsig($privatekey);
+for my $packet ( Net::DNS::Packet->new() ) {
+	$packet->sign_tsig($tsigkey);
 	$packet->sigrr->error('BADTIME');
 	my $encoded = $packet->data;
 	my $decoded = Net::DNS::Packet->new( \$encoded );
@@ -139,40 +129,36 @@ close($fh_public);
 }
 
 
-{
-	my $query = Net::DNS::Packet->new('query.example');
-	$query->sign_tsig($privatekey);
+for my $query ( Net::DNS::Packet->new('query.example') ) {
+	$query->sign_tsig($tsigkey);
 	$query->data;
 
 	my $reply = $query->reply;
-	$reply->sign_tsig($publickey);
+	$reply->sign_tsig($query);
 	$reply->data;
+	$reply->sigrr->algorithm('hmac-sha1');
 
-	my $verified = $reply->verify($query);
-	is( $reply->verifyerr, 'BADKEY', 'unverifiable reply packet: BADKEY' );
+	my $verified  = $reply->verify($query);
+	my $verifyerr = $reply->verifyerr();
+	ok( !$verified, "mismatched verify keys	$verifyerr" );
 }
 
 
-{
-	my $packet0 = Net::DNS::Packet->new();
-	my $chain   = $packet0->sign_tsig($privatekey);
-	$packet0->data;
-	my $packet1 = Net::DNS::Packet->new();
-	$packet1->sign_tsig($chain);
-	$packet1->data;
+for my $packet ( Net::DNS::Packet->new('query.example') ) {
+	$packet->sign_tsig($tsigkey);
+	$packet->data;
 
-	my $packetx = Net::DNS::Packet->new();
-	$packetx->sign_tsig($publickey);
-	$packetx->data;
-	my $tsig     = $packetx->verify();
-	my $verified = $packet1->verify($tsig);
-	is( $packet1->verifyerr, 'BADKEY', 'unverifiable multi-packet: BADKEY' );
+	my $tsig = $packet->reply->sign_tsig($tsigkey);
+	$tsig->algorithm('hmac-sha1');
+
+	my $verified  = $packet->verify($tsig);
+	my $verifyerr = $packet->verifyerr();
+	ok( !$verified, "mismatched verify keys	$verifyerr" );
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new();
-	$packet->sign_tsig($publickey);
+for my $packet ( Net::DNS::Packet->new() ) {
+	$packet->sign_tsig($tsigkey);
 	$packet->data;
 	$packet->sigrr->macbin( substr $packet->sigrr->macbin, 0, 9 );
 
@@ -181,9 +167,8 @@ close($fh_public);
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new();
-	$packet->sign_tsig($publickey);
+for my $packet ( Net::DNS::Packet->new() ) {
+	$packet->sign_tsig($tsigkey);
 	$packet->data;
 	my $macbin = $packet->sigrr->macbin;
 	$packet->sigrr->macbin( join '', $packet->sigrr->macbin, 'x' );
@@ -193,27 +178,13 @@ close($fh_public);
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new();
-	$packet->sign_tsig($privatekey);
-
+for my $packet ( Net::DNS::Packet->new() ) {
+	$packet->sign_tsig($tsigkey);
 	my $null = Net::DNS::RR->new( type => 'NULL' );
-	eval { $packet->sigrr->verify($null); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "unexpected argument\t[$exception]" );
+
+	exception( 'unexpected argument', sub { $packet->sigrr->verify($null) } );
+	exception( 'unexpected argument', sub { $packet->sigrr->verify( $packet, $null ) } );
 }
 
-
-{
-	my $packet = Net::DNS::Packet->new();
-	$packet->sign_tsig($privatekey);
-
-	my $null = Net::DNS::RR->new( type => 'NULL' );
-	eval { $packet->sigrr->verify( $packet, $null ); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "unexpected argument\t[$exception]" );
-}
-
-
-__END__
+exit;
 

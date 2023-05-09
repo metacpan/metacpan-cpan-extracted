@@ -13,13 +13,13 @@ With this module you can get information of the routing table, current network c
 =head1 SYNOPSIS
 
  use Rex::Commands::Network;
- 
+
  my @routes = route;
  print Dumper(\@routes);
- 
+
  my $default_gw = default_gateway;
  default_gateway "192.168.2.1";
- 
+
  my @netstat = netstat;
  my @tcp_connections = grep { $_->{"proto"} eq "tcp" } netstat;
 
@@ -32,7 +32,7 @@ package Rex::Commands::Network;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 require Rex::Exporter;
 use Rex::Commands::Gather;

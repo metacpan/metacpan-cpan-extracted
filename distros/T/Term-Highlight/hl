@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.1.2";
+$VERSION = "2.2.0";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -32,6 +32,8 @@ Global options affect the behaviour of the program globally:
        If the file list is empty then grep starts in the current directory.
     -a greps inside hidden files and directories, implies '-r'.
        Names of hidden files and directories start with a dot symbol.
+    -gi (-gitignore) ignores paths not tracked or ignored by git inside git
+       repositories. Effective in recursive grep.
     -f (-flist) builds the file list from the trailing arguments automatically
        when option '-' is not specified.
     -l prints the list of files where matches were found, implies '-g'.
@@ -153,7 +155,7 @@ sub LoadSnippets
         }
         $command = undef;
     }
-    close ( RC );
+    close RC;
 }
 
 
@@ -222,6 +224,10 @@ while ( defined ( my $arg = shift ) )
         if ( $arg eq "-t" || $arg eq "-term" )
         {
             $TAGTYPE = "term"; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-gi" || $arg eq "-gitignore" )
+        {
+            $Gitignore = 1; last SWITCH_ARGS;
         }
         if ( $arg =~ $CTX_OPT_PTN )
         {
@@ -318,6 +324,21 @@ if ( exists $ENV{ HL_CTXDELIM } && ! $GrepList && $CheckCtx )
                                                         skip_nl_check => 1 );
     $hl_ctx->LoadArgs( [ split '\s+', $ENV{ HL_CTXDELIM } ] );
     $hl_ctx->Process( \$CtxDelim );
+}
+
+if ( $GrepRecursively && $Gitignore )
+{
+    if ( open( GIT_STATUS, 'git status --ignored -s 2>/dev/null|' ) )
+    {
+        require Cwd;
+        while ( <GIT_STATUS> )
+        {
+            my ( $mode, $file ) = split;
+            $GitignoreList{ Cwd::abs_path( $file ) } = 1
+                                            if $mode eq '??' || $mode eq '!!';
+        }
+        close GIT_STATUS;
+    }
 }
 
 my $Location = '';
@@ -478,12 +499,14 @@ sub ProcessFile
 
 sub VisitNode
 {
-    no warnings 'once';     #for $File::Find::name
+    no warnings qw( once );     #needed for File::Find variables
     ( $FullFile, $CurFile ) = ( $File::Find::name, $_ );
-    unless ( $GrepAll )
+    my $abs_cur_file = Cwd::abs_path( $CurFile );
+    my $top = $abs_cur_file eq $AbsTopPath;
+    unless ( $top )
     {
-        if ( $_ =~ $HIDDEN_FILE_PTN &&
-            ! grep { $FullFile eq $_ || $FullFile eq "./$_" } @Files )
+        if ( ! $GrepAll && $CurFile =~ $HIDDEN_FILE_PTN ||
+                                    exists $GitignoreList{ $abs_cur_file } )
         {
             $File::Find::prune = 1;
             return;
@@ -491,7 +514,15 @@ sub VisitNode
     }
     return unless -f $CurFile;
     $FileIsBinary = -B $CurFile;
-    return if $FileIsBinary && ! $BinarySupport;
+    if ( $FileIsBinary && ! $BinarySupport )
+    {
+        if ( $top )
+        {
+            Flush( *STDOUT );
+            warn( "WARNING: $FullFile is a binary file, ignored" );
+        }
+        return;
+    }
     unless ( open $FileHandle, "< $CurFile" )
     {
         Flush( *STDOUT );
@@ -505,21 +536,18 @@ sub VisitNode
 #process file list or STDIN line by line
 if ( $GrepRecursively )
 {
-    my $count = 0;
+    require File::Find;
+    @Files || push @Files, './';
     for my $File ( @Files )
     {
         unless ( -e $File )
         {
+            Flush( *STDOUT );
             warn( "WARNING: File $File does not exist" );
-            ++$count;
+            next;
         }
-    }
-    if ( $count == 0 || $count != @Files )
-    {
-        require File::Find;
-        File::Find->import( qw( find ) );
-        @Files || push @Files, './';
-        find ( \&VisitNode, @Files );
+        $AbsTopPath = Cwd::abs_path( $File );
+        File::Find::find( \&VisitNode, $File );
     }
 }
 else
@@ -608,6 +636,11 @@ If the file list is empty then grep starts in the current directory.
 
 greps inside hidden files and directories, implies '-r'.
 Names of hidden files and directories start with a dot symbol.
+
+=item -gi (-gitignore)
+
+ignores paths not tracked or ignored by git inside git repositories.
+Effective in recursive grep.
 
 =item -f (-flist)
 
@@ -800,7 +833,7 @@ Alexey Radkov <alexey.radkov@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 by A. Radkov.
+Copyright (C) 2008-2023 by A. Radkov.
 
 This is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

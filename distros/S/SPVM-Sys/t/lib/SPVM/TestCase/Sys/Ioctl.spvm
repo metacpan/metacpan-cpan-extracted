@@ -22,9 +22,9 @@ class TestCase::Sys::Ioctl {
     # Close socket at the end of this scope
     my $socket_auto_close = TestUtil::SocketAutoClose->new($socket);
     
-    my $value = (Int)1;
+    my $value_ref = [1];
     my $status_ioctl = 0;
-    eval { $status_ioctl = Sys::Ioctl->ioctl($socket, IOCTL->FIONBIO, $value); };
+    eval { $status_ioctl = Sys::Ioctl->ioctl($socket, IOCTL->FIONBIO, $value_ref); };
     
     if (Sys::OS->is_windows) {
       unless ($status_ioctl == 0) {

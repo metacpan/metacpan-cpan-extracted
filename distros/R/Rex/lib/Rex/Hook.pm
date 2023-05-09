@@ -7,7 +7,7 @@ package Rex::Hook;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ This module manages hooks of various Rex functions.
 =head1 SYNOPSIS
 
  use Rex::Hook;
- 
+
  register_function_hooks { $state => { $function => $coderef, }, };
 
 =cut

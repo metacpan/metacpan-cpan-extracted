@@ -23,14 +23,13 @@ int32_t SPVM__Sys__OS__is_windows(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  int32_t items = env->get_args_stack_length(env, stack);
-  
   void* obj_macro_name = stack[0].oval;
   if (!obj_macro_name) {
     return env->die(env, stack, "The $macro_name must be defined", __func__, FILE_NAME, __LINE__);
   }
-  
   const char* macro_name = env->get_chars(env, stack, obj_macro_name);
+  
+  void* obj_value_ref = stack[1].oval;
   
   int32_t defined = 0;
   int32_t ival = 0;
@@ -240,27 +239,25 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
   else {
     return env->die(env, stack, "The macro name \"%s\" is not supported yet", macro_name, __func__, FILE_NAME, __LINE__);
   }
-
-  if (items > 1) {
-    void* obj_value = stack[1].oval;
+  
+  if (obj_value_ref) {
     
     int32_t e = 0;
     
-    // Int
-    if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS, 0)) {
-      env->set_field_int_by_name(env, stack, obj_value, "value", ival, &e, __func__, FILE_NAME, __LINE__);
-      if (e) { return e; }
+    if (env->is_type(env, stack, obj_value_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_INT, 1)) {
+      int32_t* value_ref = env->get_elems_int(env, stack, obj_value_ref);
+      *value_ref = ival;
     }
-    else if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS, 0)) {
-      env->set_field_long_by_name(env, stack, obj_value, "value", lval, &e, __func__, FILE_NAME, __LINE__);
-      if (e) { return e; }
+    else if (env->is_type(env, stack, obj_value_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG, 1)) {
+      int64_t* value_ref = env->get_elems_long(env, stack, obj_value_ref);
+      *value_ref = lval;
     }
-    else if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS, 0)) {
-      env->set_field_double_by_name(env, stack, obj_value, "value", dval, &e, __func__, FILE_NAME, __LINE__);
-      if (e) { return e; }
+    else if (env->is_type(env, stack, obj_value_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE, 1)) {
+      double* value_ref = env->get_elems_double(env, stack, obj_value_ref);
+      *value_ref = dval;
     }
     else {
-      return env->die(env, stack, "The $value must be the Int, Long, or Double class", macro_name, __func__, FILE_NAME, __LINE__);
+      return env->die(env, stack, "The $value_ref must be the int[], long[], or double[] type", macro_name, __func__, FILE_NAME, __LINE__);
     }
   }
   

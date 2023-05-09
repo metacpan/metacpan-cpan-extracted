@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Object::Pad ':experimental(mop)';
 
@@ -27,7 +26,7 @@ is( $fieldmeta->get_attribute_value( "mutator" ), "field",
 is( $fieldmeta->get_attribute_value( "param" ), "initial_field",
    'value of $fieldmeta "param" attribute' );
 
-is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
+is( [ $classmeta->fields ], [ $fieldmeta ],
    '$classmeta->fields' );
 
 # $fieldmeta->value as accessor
@@ -87,7 +86,7 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
    }
    class B :isa(A) :does(R) {}
 
-   is_deeply( [ B->new( data => 456 )->m ], [ 1, 2, 3 ],
+   is( [ B->new( data => 456 )->m ], [ 1, 2, 3 ],
       'Role params are embedded correctly' );
 }
 
@@ -102,15 +101,15 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
    my $arrayfieldmeta = Object::Pad::MOP::Class->for_class( "List" )
       ->get_field( '@values' );
 
-   like( exception { no warnings; $arrayfieldmeta->value( $list ) = [] },
+   like( dies { no warnings; $arrayfieldmeta->value( $list ) = [] },
       qr/^Modification of a read-only value attempted at /,
       'Attempt to set value of list field fails' );
 
    my $e;
-   ok( !defined( $e = exception { @{ $arrayfieldmeta->value( $list ) } = (1,2,3) } ),
+   ok( !defined( $e = dies { @{ $arrayfieldmeta->value( $list ) } = (1,2,3) } ),
       '->value accessor still works fine' ) or
       diag( "Exception was $e" );
-   is_deeply( [ $list->values ], [ 1,2,3 ], '$list->values after modification via fieldmeta' );
+   is( [ $list->values ], [ 1,2,3 ], '$list->values after modification via fieldmeta' );
 }
 
 done_testing;

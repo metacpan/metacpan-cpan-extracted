@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 75;
+use Test::More tests => 78;
 use Geo::FIT;
 use File::Temp qw/ tempfile tempdir /;
 
@@ -29,8 +29,8 @@ is(	$h_crc_expected, $h_crc_calculated,     "   test fetch_header() -- crc (expe
 # B - Definition Messages - Testing that we get expected definition/descriptors get defined
 
 my @msg_names = (qw/ file_id file_creator/, undef, qw/ event device_info source /, undef,
-                qw/ device_settings user_profile sensor /, undef, qw/ sport /,  undef,
-                qw/ zones_target record battery / );
+                 qw/ device_settings user_profile sensor /, undef, qw/ sport /, undef,
+                 qw/ zones_target record battery / );
 
 my ($i, $n_descriptors, $n_previous_pass) = (0, 0, 0);
 while ( $o->fetch ) {
@@ -46,6 +46,7 @@ while ( $o->fetch ) {
     $n_previous_pass = $n_descriptors
 }
 $o->close();
+is( $n_descriptors, 16,  "   test that we fetched the expected total number of descriptors");
 
 #
 # C - Data Messages - Testing that we get the expected data messages (checking with a callback)
@@ -102,14 +103,20 @@ while ( my $ret = $o->fetch ) {
     last if $i==@msg_names_data
 }
 $o->close();
+is( $i, 17,  "   test that we fetched the expected total number of descriptors");
 
 #
-# Test errors
+# Test clone()
 
 $o = Geo::FIT->new();
 isa_ok($o, 'Geo::FIT');
 $o->file( 't/10004793344_ACTIVITY.fit' );
 my $c = $o->clone;
+isa_ok($c, 'Geo::FIT');
+
+#
+# Test errors
+
 $o->open();
 my @header_things = $o->fetch_header;
 my $ret_val;
@@ -118,7 +125,6 @@ delete $o->{data_message_descriptor}[0];
 $ret_val = $o->fetch;        # should encounter an error since no descriptor for the local message type
 is( $ret_val, undef,  "   test_fetch() -- should encounter error and return undef, not croak");
 $o->close();
-
 
 my $callback_die_on_error = sub {
     my $self = shift;

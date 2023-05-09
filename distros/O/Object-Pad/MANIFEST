@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/cv_copy_flags.c.inc
@@ -60,6 +61,7 @@ t/25fields-weak.t
 t/26fields-initexpr.t
 t/30unit-class.t
 t/31pad-outside.t
+t/32threads.t
 t/40role.t
 t/41role-repr.t
 t/42role-BUILD.t

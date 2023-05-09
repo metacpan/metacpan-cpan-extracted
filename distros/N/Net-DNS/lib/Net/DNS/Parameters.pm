@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2023-03-01)
+##	(last updated 2023-04-28)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1903 2023-03-06 08:51:09Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1921 2023-05-08 18:39:59Z willem $)[2];
 
 use integer;
 use Carp;
@@ -112,8 +112,8 @@ my @typebyname = (
 	OPENPGPKEY => 61,					# RFC7929
 	CSYNC	   => 62,					# RFC7477
 	ZONEMD	   => 63,					# RFC8976
-	SVCB	   => 64,					# RFC-ietf-dnsop-svcb-https-10
-	HTTPS	   => 65,					# RFC-ietf-dnsop-svcb-https-10
+	SVCB	   => 64,					# RFC-ietf-dnsop-svcb-https-12
+	HTTPS	   => 65,					# RFC-ietf-dnsop-svcb-https-12
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -282,6 +282,7 @@ my @dnserrorbyval = (
 	26 => 'Too Early',					# RFC9250
 	27 => 'Unsupported NSEC3 Iterations Value',		# RFC9276
 	28 => 'Unable to conform to policy',			# draft-homburg-dnsop-codcp-00
+	29 => 'Synthesized',					# https://github.com/PowerDNS/pdns/pull/12334
 	);
 our %dnserrorbyval = @dnserrorbyval;
 
@@ -296,18 +297,18 @@ sub classbyname {
 	return $classbyname{$name} || $classbyname{uc $name} || return do {
 		croak qq[unknown class "$name"] unless $name =~ m/^(CLASS)?(\d+)/i;
 		my $val = 0 + $2;
-		croak qq[classbyname("$name") out of range] if $val > 0xffff;
+		croak qq[classbyname("$name") out of range] if $val > 0x7fff;
 		return $val;
 	}
 }
 
 sub classbyval {
-	my $val = shift;
+	my $arg = shift;
 
-	return $classbyval{$val} || return do {
-		$val += 0;
-		croak qq[classbyval($val) out of range] if $val > 0xffff;
-		return "CLASS$val";
+	return $classbyval{$arg} || return do {
+		my $val = ( $arg += 0 ) & 0x7fff;		# MSB used by mDNS
+		croak qq[classbyval($arg) out of range] if $arg > 0xffff;
+		return $classbyval{$arg} = $classbyval{$val} || "CLASS$val";
 	}
 }
 

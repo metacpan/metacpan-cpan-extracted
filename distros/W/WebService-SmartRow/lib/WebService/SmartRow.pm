@@ -4,7 +4,7 @@ use warnings;
 use v5.010;
 
 package WebService::SmartRow;
-$WebService::SmartRow::VERSION = '0.007';
+$WebService::SmartRow::VERSION = '0.008';
 # ABSTRACT: Connect and get data from SmartRow API
 
 use HTTP::Tiny;
@@ -138,7 +138,7 @@ WebService::SmartRow - Connect and get data from SmartRow API
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -59,7 +59,7 @@ use HTTP::Cookies;
 use HTML::TokeParser;
 # use Data::Dumper;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 $FTFUNDS_MAIN_URL   =   "https://markets.ft.com";
 $FTFUNDS_LOOK_LD    =   "https://markets.ft.com/data/funds/tearsheet/summary?s=";
@@ -182,7 +182,7 @@ DEBUG > 1 and print "\nCookie Jar = : \n",Dumper($cj),"\n\n";
 		my $currency;
 		my $price;
 		if ($webdoc->content =~
-		m[<span class="mod-ui-data-list__label">Price [(]([A-Z]{3})[)]</span><span class="mod-ui-data-list__value">([\.\,0-9]*)</span>]  )
+		m[<span class="mod-ui-data-list__label"[^>]*>Price [(]([A-Z]{3})[)]</span><span class="mod-ui-data-list__value">([\.\,0-9]*)</span>]  )
         {
 			$currency = $1;
 			$price    = $2;

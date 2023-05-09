@@ -3,7 +3,7 @@ package Crypt::Passphrase::Argon2::AES;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 use parent 'Crypt::Passphrase::Argon2::Encrypted';
 use Crypt::Passphrase 0.010 -encoder;
@@ -43,6 +43,10 @@ sub decrypt_hash {
 	my $mode = $mode{$cipher} or croak "No such cipher $cipher";
 	my $secret = $self->{peppers}{$id} or croak "No such pepper $id";
 	return Crypt::Rijndael->new($secret, $mode)->decrypt($raw, $iv);
+}
+
+sub supported_ciphers {
+	return keys %mode;
 }
 
 1;
@@ -106,4 +110,4 @@ This software is copyright (c) 2023 by Leon Timmermans.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-
+=cut

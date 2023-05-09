@@ -1,8 +1,7 @@
-package PAUSE::Permissions::MetaCPAN;
-use strict;
+package PAUSE::Permissions::MetaCPAN 0.100;
+use v5.16;
 use warnings;
 
-our $VERSION = '0.001';
 use Carp ();
 use HTTP::Tiny 0.055;
 use IO::Socket::SSL 1.42;
@@ -11,8 +10,7 @@ use JSON::PP ();
 sub new {
     my ($class, %args) = @_;
     my $http = $args{http} || do {
-        (my $agent = $class) =~ s/::/-/g;
-        $agent = "$agent/$VERSION";
+        my $agent = sprintf "%s/%s", $class =~ s/::/-/gr, $class->VERSION;
         HTTP::Tiny->new(verify_SSL => 1, agent => $agent);
     };
     my $url = $args{url} || "https://fastapi.metacpan.org/v1/permission/_search";

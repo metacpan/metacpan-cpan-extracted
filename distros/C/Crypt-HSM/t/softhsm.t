@@ -19,12 +19,12 @@ note explain $info;
 
 my @slots = $provider->slots;
 
-for my $id ( @slots ) {
-	note 'slotID: ', $id;
-	my $slotInfo = $provider->slot_info($id);
+for my $slot ( @slots ) {
+	note 'slotID: ', $slot->id;
+	my $slotInfo = $provider->info;
 	note explain $slotInfo;
 
-	my $tokenInfo = $provider->token_info($id);
+	my $tokenInfo = $slot->token_info;
 	note explain $tokenInfo;
 }
 

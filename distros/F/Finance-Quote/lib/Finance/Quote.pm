@@ -46,7 +46,7 @@ use vars qw/@ISA @EXPORT @EXPORT_OK @EXPORT_TAGS
             $TIMEOUT @MODULES %MODULES %METHODS $AUTOLOAD
             @CURRENCY_RATES_MODULES $USE_EXPERIMENTAL_UA/;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 @CURRENCY_RATES_MODULES = qw/
     AlphaVantage
@@ -89,14 +89,17 @@ our $VERSION = '1.5301'; # VERSION
     Oslobors
     SEB
     SIX
-    Tradeville
-    TSP
-    TMX
-    Tiaacref
+    Sinvestor
     TesouroDireto
+    Tiaacref
+    TMX
+    Tradegate
+    Tradeville
     TreasuryDirect
     Troweprice
+    TSP
     Union
+    XETRA
     YahooJSON
     ZA
 /;

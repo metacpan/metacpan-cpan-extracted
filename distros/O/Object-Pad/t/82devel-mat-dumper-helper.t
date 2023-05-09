@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    eval { require Devel::MAT; Devel::MAT->VERSION( '0.49' ) } or
       plan skip_all => "No Devel::MAT version 0.49";
@@ -34,7 +34,7 @@ my $df = $pmat->dumpfile;
       ->sv;
 
    ok( $classmeta, 'AClass has a classmeta' );
-   isa_ok( $classmeta, "Devel::MAT::SV::C_STRUCT", '$classmeta' );
+   isa_ok( $classmeta, [ "Devel::MAT::SV::C_STRUCT" ], '$classmeta' );
 
    is( $classmeta->desc, "C_STRUCT(Object::Pad/ClassMeta.class)", '$classmeta->desc' );
 
@@ -45,7 +45,7 @@ my $df = $pmat->dumpfile;
    is( scalar @fieldmetas, 1, '$classmeta has 1 fieldmeta' );
 
    my $fieldmeta = $fieldmetas[0];
-   isa_ok( $fieldmeta, "Devel::MAT::SV::C_STRUCT", '$fieldmeta' );
+   isa_ok( $fieldmeta, [ "Devel::MAT::SV::C_STRUCT" ], '$fieldmeta' );
 
    is( $fieldmeta->desc, "C_STRUCT(Object::Pad/FieldMeta)", '$fieldmeta->desc' );
 
@@ -57,7 +57,7 @@ my $df = $pmat->dumpfile;
    is( scalar @methodmetas, 1, '$classmeta has 1 methodmeta' );
 
    my $methodmeta = $methodmetas[0];
-   isa_ok( $methodmeta, "Devel::MAT::SV::C_STRUCT", '$methodmeta' );
+   isa_ok( $methodmeta, [ "Devel::MAT::SV::C_STRUCT" ], '$methodmeta' );
 
    is( $methodmeta->desc, "C_STRUCT(Object::Pad/MethodMeta)", '$methodmeta->desc' );
 

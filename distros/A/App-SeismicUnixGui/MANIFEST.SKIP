@@ -16,6 +16,7 @@
 \/tbd
 \/bck
 \/temp
+\.temp
 
 # Skip git-related files
 \.git

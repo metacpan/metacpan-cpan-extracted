@@ -1,5 +1,7 @@
 #!perl
 
+use Test::Needs qw( CPAN::Meta File::Find::Rule::Perl );
+
 use Test::Builder::Tester tests => 2;
 require Test::Dependencies;           # must not be 'use' to avoid import + plan set
 

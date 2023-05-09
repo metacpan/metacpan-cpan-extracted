@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 04-packet-truncate.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+# $Id: 04-packet-truncate.t 1910 2023-03-30 19:16:30Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -13,8 +13,7 @@ my $source = Net::DNS::ZoneFile->new( \*DATA );
 
 my @rr = $source->read;
 
-{
-	my $packet = Net::DNS::Packet->new('query.example.');
+for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
@@ -32,8 +31,7 @@ my @rr = $source->read;
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new('query.example.');
+for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
@@ -51,8 +49,7 @@ my @rr = $source->read;
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new('query.example.');
+for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
@@ -77,12 +74,11 @@ my @rr = $source->read;
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new('query.example.');
-	my @auth   = map { Net::DNS::RR->new( type => 'NS', nsdname => $_->name ) } @rr;
+for my $packet ( Net::DNS::Packet->new('query.example.') ) {
+	my @auth = map { Net::DNS::RR->new( type => 'NS', nsdname => $_->name ) } @rr;
 	$packet->unique_push( authority => @auth );
 	$packet->push( additional => @rr );
-	$packet->edns->size(2048);				# + all bells and whistles
+	$packet->edns->UDPsize(2048);				# + all bells and whistles
 	my $unlimited = length $packet->data;
 	my %before    = map { ( $_, scalar $packet->$_ ) } qw(answer authority additional);
 	my $truncated = length $packet->truncate;
@@ -103,8 +99,7 @@ my @rr = $source->read;
 }
 
 
-{
-	my $packet = Net::DNS::Packet->new('query.example.');
+for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( additional => @rr, @rr );		# two of everything
 	my $unlimited = length $packet->data;
 	my $truncated = length $packet->truncate( $unlimited >> 1 );

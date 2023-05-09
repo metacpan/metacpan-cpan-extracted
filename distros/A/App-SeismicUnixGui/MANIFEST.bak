@@ -3940,6 +3940,7 @@ App-SeismicUnixGui-0.82.4/t/misc_files.txt
 App-SeismicUnixGui-0.82.4/t/script.t
 App-SeismicUnixGui-0.82.4/t/specs.t
 App-SeismicUnixGui-0.82.5.tar.gz
+App-SeismicUnixGui-0.82.8.tar.gz
 archive/big_streams_param.pm
 archive/color_listbox_tbd.pm
 archive/config_superflows_fix.pm
@@ -4059,6 +4060,7 @@ lib/App/SeismicUnixGui/big_streams/Synseis.pl
 lib/App/SeismicUnixGui/big_streams/Synseis.pm
 lib/App/SeismicUnixGui/c/bin/synseis
 lib/App/SeismicUnixGui/c/bin/test
+lib/App/SeismicUnixGui/c/bin/zrhov
 lib/App/SeismicUnixGui/c/obj/keep
 lib/App/SeismicUnixGui/c/synseis/makefile
 lib/App/SeismicUnixGui/c/synseis/run_me_only.sh
@@ -4419,6 +4421,7 @@ lib/App/SeismicUnixGui/developer/code/sunix/sunix_package_use.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sunix_spec.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sustkvel_changes.pm
 lib/App/SeismicUnixGui/developer/code/sunix/update.pm
+lib/App/SeismicUnixGui/developer/code/sunix/update_main_version_number.pl
 lib/App/SeismicUnixGui/developer/Stripped/data/ctrlstrip.cwp.main
 lib/App/SeismicUnixGui/developer/Stripped/data/dt1tosu.su.main.data_conversion
 lib/App/SeismicUnixGui/developer/Stripped/data/segbread.Sfio.main
@@ -4852,6 +4855,7 @@ lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_L_SU
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.82.5.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile
@@ -5168,6 +5172,7 @@ lib/App/SeismicUnixGui/script/c55_file
 lib/App/SeismicUnixGui/script/cmguiTMEeyS
 lib/App/SeismicUnixGui/script/convert2V07
 lib/App/SeismicUnixGui/script/convert2V08
+lib/App/SeismicUnixGui/script/dev.null
 lib/App/SeismicUnixGui/script/gui_history.txt
 lib/App/SeismicUnixGui/script/iBottomMute
 lib/App/SeismicUnixGui/script/immodpg

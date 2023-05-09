@@ -206,7 +206,7 @@ t/54-DS-SHA384.t
 t/71-TSIG-create.t
 t/72-TSIG-verify.t
 t/99-cleanup.t
-t/NonFatal.pm
+t/TestToolkit.pm
 t/custom.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,6 +1,7 @@
 package Distribution::Metadata::Factory;
-use strict;
+use v5.16;
 use warnings;
+
 use Distribution::Metadata;
 
 sub new {

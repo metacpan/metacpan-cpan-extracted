@@ -24,7 +24,7 @@ package Rex::Group::Lookup::INI;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex -base;
 
@@ -46,7 +46,7 @@ File example:
  [webservers]
  fe01
  fe02
-    
+
  [backends]
  be[01..03]
 

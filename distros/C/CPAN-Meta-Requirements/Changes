@@ -1,5 +1,15 @@
 Revision history for CPAN-Meta-Requirements
 
+2.142     2023-05-09 07:15:05-04:00 America/New_York
+    - no changes since previous trial releae
+    - note: this version now requires perl v5.10 rather than v5.6
+
+2.141     2023-04-30 15:42:35+02:00 Europe/Paris (TRIAL RELEASE)
+    - confess() replaced with croak(): fewer stack traces
+    - broke the version range handling into the Range class (thanks, Leon
+      Timmermans!)
+    - note: this version now requires perl v5.10 rather than v5.6
+
 2.140     2015-12-12 16:17:15-05:00 America/New_York
 
     - no changes from 2.139

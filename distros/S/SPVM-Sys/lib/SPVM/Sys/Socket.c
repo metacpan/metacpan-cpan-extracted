@@ -380,8 +380,6 @@ int32_t SPVM__Sys__Socket__listen(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
 
-  int32_t items = env->get_args_stack_length(env, stack);
-
   int32_t sockfd = stack[0].ival;
 
   void* obj_buf = stack[1].oval;
@@ -397,10 +395,7 @@ int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t flags = stack[3].ival;
   
-  int32_t buf_offset = 0;
-  if (items > 4) {
-    buf_offset = stack[4].ival;
-  }
+  int32_t buf_offset = stack[4].ival;
   if (!(len <= buf_length - buf_offset)) {
     return env->die(env, stack, "The $len must be less than the length of the $buf - the $buf_offset", __func__, FILE_NAME, __LINE__);
   }
@@ -419,8 +414,6 @@ int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Socket__send(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  int32_t items = env->get_args_stack_length(env, stack);
-  
   int32_t sockfd = stack[0].ival;
 
   void* obj_buf = stack[1].oval;
@@ -436,10 +429,7 @@ int32_t SPVM__Sys__Socket__send(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t flags = stack[3].ival;
   
-  int32_t buf_offset = 0;
-  if (items > 4) {
-    buf_offset = stack[4].ival;
-  }
+  int32_t buf_offset = stack[4].ival;
   if (!(len <= buf_length - buf_offset)) {
     return env->die(env, stack, "The $len must be less than the length of the $buf - the $buf_offset", __func__, FILE_NAME, __LINE__);
   }

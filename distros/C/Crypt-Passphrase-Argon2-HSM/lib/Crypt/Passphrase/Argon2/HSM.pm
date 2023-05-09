@@ -3,13 +3,13 @@ package Crypt::Passphrase::Argon2::HSM;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use parent 'Crypt::Passphrase::Argon2::Encrypted';
 use Crypt::Passphrase 0.010 -encoder;
 
 use Carp 'croak';
-use Crypt::HSM;
+use Crypt::HSM 0.010;
 
 sub new {
 	my ($class, %args) = @_;
@@ -51,6 +51,11 @@ sub decrypt_hash {
 	croak "No such key $label" if not defined $key;
 
 	return $self->{session}->decrypt($algorithm, $key, $raw, $iv);
+}
+
+sub supported_ciphers {
+	my $self = shift;
+	return map { $_->name } grep { $_->has_flags('encrypt', 'decrypt') } $self->{session}->slot->mechanisms;
 }
 
 1;

@@ -4,13 +4,13 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Log::Log4perl: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,11 +18,16 @@ meta-spec:
 name: Log-Log4perl-Appender-TAP
 requires:
   Log::Log4perl: '0'
+  Log::Log4perl::Appender: '0'
   Test2::API: '1.302015'
+  parent: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/Log-Log4perl-Appender-TAP/issues
+  bugtracker: https://github.com/uperl/Log-Log4perl-Appender-TAP/issues
   homepage: https://metacpan.org/pod/Log::Log4perl::Appender::TAP
-  repository: git://github.com/plicease/Log-Log4perl-Appender-TAP.git
-version: '0.04'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  repository: git://github.com/uperl/Log-Log4perl-Appender-TAP.git
+version: '0.05'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

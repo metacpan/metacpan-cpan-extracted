@@ -6,6 +6,27 @@ use Khonsu::Page;
 use Khonsu::Page::Header;
 use Khonsu::Page::Footer;
 
+sub new {
+	my ($self, %params) = @_;
+	$self = $self->SUPER::new(%params);
+	$self->add_page();
+	if ($params{configure}) {
+		$self->add_page_header(%{delete $params{configure}->{page_header}})
+			if ($params{configure}->{page_header});
+		$self->add_page_footer(%{delete $params{configure}->{page_footer}})
+			if ($params{configure}->{page_footer});
+		for my $key ( keys %{ $params{configure} }) {
+			if ($self->{$key}) {
+				if ($params{configure}->{$key}->{font}) {
+					$self->$key->font->load($self, %{ delete $params{configure}->{$key}->{font} });
+				}
+				$self->$key->set_attributes(%{$params{configure}->{$key}});
+			}
+		}
+	}
+	return $self;
+}
+
 
 sub attributes {
 	my $a = shift;
@@ -32,7 +53,10 @@ sub attributes {
 		$a->H5,
 		$a->H6,
 		$a->IMAGE,
-		$a->TOC
+		$a->TOC,
+		$a->FORM,
+		$a->INPUT,
+		$a->SELECT,
 	);
 }
 
@@ -44,20 +68,45 @@ sub open_page {
 	return $self;
 }
 
+sub set_columns {
+	my ($self, $columns) = @_;
+	$self->page->columns($columns);
+	$self->page->column_y($self->page->y);
+	return $self;
+}
+
 sub add_page {
 	my ($self, %args) = @_;
 
 	my $page = $self->page(Khonsu::Page->new(
-		header => $self->page ? $self->page->header : undef,
-		footer => $self->page ? $self->page->footer : undef,
+		header => $self->page && $self->page->header ? $self->page->header->clone() : undef,
+		footer => $self->page && $self->page->footer ? $self->page->footer->clone() : undef,
+		columns => $self->page ? $self->page->columns : 1,
 		page_size =>'A4',
 		num => scalar @{$self->pages} + 1,
 		%{ $self->page_args },
 		%args
 	))->add($self);
-	
 	splice @{$self->pages}, $page->num - 1, 0, $page;
 
+	return $self;
+}
+
+sub remove_page_header_and_footer {
+	my ($self) = @_;
+	$self->remove_page_header();
+	$self->remove_page_footer();
+}
+
+sub remove_page_header {
+	my ($self, %args) = @_;
+	$self->page->header->active(0);
+	return $self;
+}
+
+sub remove_page_footer {
+	my ($self, %args) = @_;
+	$self->page->footer->active(0);
 	return $self;
 }
 
@@ -167,6 +216,24 @@ sub add_h6 {
 sub add_image {
 	my ($self, %args) = @_;
 	$self->image->add($self, %args);
+	return $self;
+}
+
+sub add_form {
+	my ($self, %args) = @_;
+	$self->form->add($self, %args);
+	return $self;
+}
+
+sub add_input {
+	my ($self, %args) = @_;
+	$self->input->add($self, %args);
+	return $self;
+}
+
+sub add_select {
+	my ($self, %args) = @_;
+	$self->select->add($self, %args);
 	return $self;
 }
 

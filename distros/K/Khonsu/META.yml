@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new Khonsu!'
+abstract: 'PDF Generation!'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -19,8 +19,9 @@ no_index:
     - t
     - inc
 requires:
+  Clone: '0'
   PDF::API2: '0'
   Types::Standard: '0'
   perl: '5.006'
-version: '0.04'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

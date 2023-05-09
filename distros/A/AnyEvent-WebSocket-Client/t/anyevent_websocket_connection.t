@@ -488,12 +488,12 @@ subtest 'other end is closed' => sub {
 subtest 'close codes' => sub {
 
   my @test_data = (
-    [ [],                 [1005, ''],         'empty list defaults to 1005'     ],
-    [ [undef, undef],     [1005, ''] ,        'both undef'                      ],
-    [ [undef, 'error'],   [1005, 'error'] ,   'undef code with explicit reason' ],
+    [ [],                 [1000, ''],         'empty list defaults to 1005'     ],
+    [ [undef, undef],     [1000, ''] ,        'both undef'                      ],
+    [ [undef, 'error'],   [1000, 'error'] ,   'undef code with explicit reason' ],
     [ [1003, undef],      [1003, ''] ,        'other code with undef reason'    ],
-    [ [1000],             [1000, ''],         'normal close code'               ],
-    [ [1000, 'a reason'], [1000, 'a reason'], 'normal close code with reason'   ],
+    [ [1001],             [1001, ''],         'normal close code'               ],
+    [ [1001, 'a reason'], [1001, 'a reason'], 'normal close code with reason'   ],
   );
 
   foreach my $test_data (@test_data)

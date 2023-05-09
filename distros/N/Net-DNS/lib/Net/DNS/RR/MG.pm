@@ -2,7 +2,7 @@ package Net::DNS::RR::MG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MG.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: MG.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -29,16 +29,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my ( $self, @argument ) = @_;
 
-	my $mgmname = $self->{mgmname} || return '';
-	return $mgmname->encode(@argument);
+	return $self->{mgmname}->encode(@argument);
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $mgmname = $self->{mgmname} || return '';
-	return $mgmname->string;
+	return $self->{mgmname}->string;
 }
 
 

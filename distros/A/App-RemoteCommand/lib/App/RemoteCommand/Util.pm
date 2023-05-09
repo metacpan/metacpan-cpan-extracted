@@ -1,6 +1,7 @@
 package App::RemoteCommand::Util;
-use strict;
+use v5.16;
 use warnings;
+
 use Exporter 'import';
 our @EXPORT_OK = qw(prompt DEBUG logger);
 

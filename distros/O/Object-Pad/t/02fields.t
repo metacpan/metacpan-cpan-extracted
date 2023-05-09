@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Object::Pad;
 
@@ -37,9 +36,9 @@ class Counter {
       field %hash   = ( 89 => 10 );
 
       method test {
-         Test::More::is( $scalar, 123, '$scalar field' );
-         Test::More::is_deeply( \@array, [ 45, 67 ], '@array field' );
-         Test::More::is_deeply( \%hash, { 89 => 10 }, '%hash field' );
+         ::is( $scalar, 123, '$scalar field' );
+         ::is( \@array, [ 45, 67 ], '@array field' );
+         ::is( \%hash, { 89 => 10 }, '%hash field' );
       }
    }
 
@@ -74,9 +73,9 @@ class Counter {
       field $__dummy { $class_in_fieldblock = __CLASS__ }
 
       method test {
-         Test::More::is( $scalar, "one", '$scalar field' );
-         Test::More::is_deeply( \@array, [qw( two three )], '@array field' );
-         Test::More::is_deeply( \%hash, { four => "five" }, '%hash field' );
+         ::is( $scalar, "one", '$scalar field' );
+         ::is( \@array, [qw( two three )], '@array field' );
+         ::is( \%hash, { four => "five" }, '%hash field' );
       }
    }
 

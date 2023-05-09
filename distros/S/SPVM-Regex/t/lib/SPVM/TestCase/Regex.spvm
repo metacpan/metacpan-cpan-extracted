@@ -1,5 +1,6 @@
 class TestCase::Regex {
   use Regex;
+  use Regex::ReplaceInfo;
   
   static method compile : int () {
     my $re = Regex->new("abc");
@@ -14,9 +15,10 @@ class TestCase::Regex {
       my $target = "ppzabczabcz";
       my $offset = 0;
       my $length = -1;
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1});
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
       
-      unless ($re->replaced_count == 2) {
+      unless ($replace_info_ref->[0]->replaced_count == 2) {
         return 0;
       }
       
@@ -31,9 +33,10 @@ class TestCase::Regex {
       my $target = "ppzabczabczabcz";
       my $offset = 6;
       my $length = -1;
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1});
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
       
-      unless ($re->replaced_count == 2) {
+      unless ($replace_info_ref->[0]->replaced_count == 2) {
         return 0;
       }
       
@@ -48,9 +51,10 @@ class TestCase::Regex {
       my $target = "za123bz";
       my $offset = 0;
       my $length = -1;
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1});
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
       
-      unless ($re->replaced_count == 1) {
+      unless ($replace_info_ref->[0]->replaced_count == 1) {
         return 0;
       }
       
@@ -65,9 +69,10 @@ class TestCase::Regex {
       my $target = "pppp";
       my $offset = 0;
       my $length = -1;
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1});
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
       
-      unless ($re->replaced_count == 0) {
+      unless ($replace_info_ref->[0]->replaced_count == 0) {
         return 0;
       }
       
@@ -85,9 +90,10 @@ class TestCase::Regex {
       my $re = Regex->new("abc");
       my $target = "ppzabcz";
       my $offset = 0;
-      my $result = $re->replace_common($target, "ABC", \$offset);
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, -1, {info => $replace_info_ref});
       
-      unless ($re->replaced_count == 1) {
+      unless ($replace_info_ref->[0]->replaced_count == 1) {
         return 0;
       }
       
@@ -101,9 +107,10 @@ class TestCase::Regex {
       my $re = Regex->new("abc");
       my $target = "ppzabczabczabcz";
       my $offset = 6;
-      my $result = $re->replace_common($target, "ABC", \$offset);
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, -1, {info => $replace_info_ref});
       
-      unless ($re->replaced_count == 1) {
+      unless ($replace_info_ref->[0]->replaced_count == 1) {
         return 0;
       }
       
@@ -117,9 +124,10 @@ class TestCase::Regex {
       my $re = Regex->new("a\d+b");
       my $target = "za123bz";
       my $offset = 0;
-      my $result = $re->replace_common($target, "ABC", \$offset);
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, -1, {info => $replace_info_ref});
       
-      unless ($re->replaced_count == 1) {
+      unless ($replace_info_ref->[0]->replaced_count == 1) {
         return 0;
       }
       
@@ -133,9 +141,10 @@ class TestCase::Regex {
       my $re = Regex->new("a\d+b");
       my $target = "pppp";
       my $offset = 0;
-      my $result = $re->replace_common($target, "ABC", \$offset);
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, "ABC", \$offset, -1, {info => $replace_info_ref});
       
-      unless ($re->replaced_count == 0) {
+      unless ($replace_info_ref->[0]->replaced_count == 0) {
         return 0;
       }
       
@@ -153,11 +162,12 @@ class TestCase::Regex {
       my $re = Regex->new("a(bc)");
       my $target = "ppzabcz";
       my $offset = 0;
-      my $result = $re->replace_common($target, method : string ($re : Regex) {
-        return "AB" . $re->captures->[1] . "C";
-      }, \$offset);
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace_common($target, method : string ($re : Regex, $match : Regex::Match) {
+        return "AB" . $match->captures(1) . "C";
+      }, \$offset, -1, {info => $replace_info_ref});
       
-      unless ($re->replaced_count == 1) {
+      unless ($replace_info_ref->[0]->replaced_count == 1) {
         return 0;
       }
       
@@ -179,10 +189,10 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->match_start == 3) {
+      unless ($match->match_start == 3) {
         return 0;
       }
-      unless ($re->match_length == 3) {
+      unless ($match->match_length == 3) {
         return 0;
       }
     }
@@ -197,10 +207,10 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->match_start == 6) {
+      unless ($match->match_start == 6) {
         return 0;
       }
-      unless ($re->match_length == 18) {
+      unless ($match->match_length == 18) {
         return 0;
       }
     }
@@ -215,10 +225,10 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->match_start == 2) {
+      unless ($match->match_start == 2) {
         return 0;
       }
-      unless ($re->match_length == 1) {
+      unless ($match->match_length == 1) {
         return 0;
       }
     }
@@ -234,10 +244,10 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->match_start == 0) {
+      unless ($match->match_start == 0) {
         return 0;
       }
-      unless ($re->match_length == 0) {
+      unless ($match->match_length == 0) {
         return 0;
       }
     }
@@ -250,8 +260,8 @@ class TestCase::Regex {
     {
       my $re = Regex->new("(a*)");
       my $target = "aaa";
-      $re->match($target);
-      unless ($re->captures->[1] eq "aaa") {
+      my $match = $re->match($target);
+      unless ($match->captures(1) eq "aaa") {
         return 0;
       }
     }
@@ -266,7 +276,7 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->captures->[1] eq "b") {
+      unless ($match->captures(1) eq "b") {
         return 0;
       }
     }
@@ -281,7 +291,7 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->captures->[1] eq "い") {
+      unless ($match->captures(1) eq "い") {
         return 0;
       }
     }
@@ -296,7 +306,7 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->captures->[1] eq "") {
+      unless ($match->captures(1) eq "") {
         return 0;
       }
     }
@@ -312,7 +322,7 @@ class TestCase::Regex {
       }
 
       
-      unless ($re->captures->[1] eq "abc89") {
+      unless ($match->captures(1) eq "abc89") {
         return 0;
       }
     }
@@ -327,23 +337,23 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->captures->[1] eq "abc1") {
+      unless ($match->captures(1) eq "abc1") {
         return 0;
       }
 
-      unless ($re->captures->[2] eq "abc2") {
+      unless ($match->captures(2) eq "abc2") {
         return 0;
       }
 
-      unless ($re->captures->[3] eq "abc3") {
+      unless ($match->captures(3) eq "abc3") {
         return 0;
       }
 
-      unless ($re->captures->[4] eq "abc4") {
+      unless ($match->captures(4) eq "abc4") {
         return 0;
       }
 
-      unless ($re->captures->[5] eq "abc5") {
+      unless ($match->captures(5) eq "abc5") {
         return 0;
       }
     }
@@ -366,8 +376,8 @@ class TestCase::Regex {
     {
       my $re = Regex->new("(a*)");
       my $target = "aaa";
-      $re->match($target);
-      unless ($re->captures->[1] eq "aaa") {
+      my $match = $re->match($target);
+      unless ($match->captures(1) eq "aaa") {
         return 0;
       }
     }
@@ -411,7 +421,7 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->captures->[1] eq "abc") {
+      unless ($match->captures(1) eq "abc") {
         return 0;
       }
     }
@@ -427,7 +437,7 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->captures->[1] eq "abc\ndef") {
+      unless ($match->captures(1) eq "abc\ndef") {
         return 0;
       }
     }
@@ -1417,34 +1427,34 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->cap1 eq "1") {
+      unless ($match->cap1 eq "1") {
         return 0;
       }
-      unless ($re->cap2 eq "2") {
+      unless ($match->cap2 eq "2") {
         return 0;
       }
-      unless ($re->cap3 eq "3") {
+      unless ($match->cap3 eq "3") {
         return 0;
       }
-      unless ($re->cap4 eq "4") {
+      unless ($match->cap4 eq "4") {
         return 0;
       }
-      unless ($re->cap5 eq "5") {
+      unless ($match->cap5 eq "5") {
         return 0;
       }
-      unless ($re->cap6 eq "6") {
+      unless ($match->cap6 eq "6") {
         return 0;
       }
-      unless ($re->cap7 eq "7") {
+      unless ($match->cap7 eq "7") {
         return 0;
       }
-      unless ($re->cap8 eq "8") {
+      unless ($match->cap8 eq "8") {
         return 0;
       }
-      unless ($re->cap9 eq "9") {
+      unless ($match->cap9 eq "9") {
         return 0;
       }
-      unless ($re->cap10 eq "10") {
+      unless ($match->cap10 eq "10") {
         return 0;
       }
     }
@@ -1482,15 +1492,15 @@ class TestCase::Regex {
         return 0;
       }
       
-      unless ($re->cap1 eq "12") {
+      unless ($match->cap1 eq "12") {
         return 0;
       }
       
-      unless ($re->cap2 eq "34") {
+      unless ($match->cap2 eq "34") {
         return 0;
       }
       
-      unless ($re->cap3 eq "56") {
+      unless ($match->cap3 eq "56") {
         return 0;
       }
     }
@@ -1621,8 +1631,8 @@ class TestCase::Regex {
     
     # URL escape
     my $regex = Regex->new("([^A-Za-z0-9\-\._~])");
-    my $output = $regex->replace_g($input, method : string ($re : Regex) {
-      my $bytes = $re->cap1;
+    my $output = $regex->replace_g($input, method : string ($re : Regex, $match : Regex::Match) {
+      my $bytes = $match->cap1;
       
       my $escaped_char_buffer = StringBuffer->new;
       
@@ -1644,8 +1654,8 @@ class TestCase::Regex {
     
     # URL unescape
     my $regex = Regex->new("%([0-9a-fA-F]{2,2})");
-    my $output = $regex->replace_g($input, method : string ($re : Regex) {
-      my $cap1 = $re->cap1;
+    my $output = $regex->replace_g($input, method : string ($re : Regex, $match : Regex::Match) {
+      my $cap1 = $match->cap1;
       my $hex = Fn->hex($cap1);
       my $ch = (string)[(byte)$hex];
       return $ch;

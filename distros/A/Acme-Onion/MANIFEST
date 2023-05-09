@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+examples/lib/Hello.pm
+lib/Acme/Onion.pm
+minil.toml
+t/synopsis.t
+META.yml
+MANIFEST

@@ -3,7 +3,7 @@ package Net::DNS::Mailbox;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Mailbox.pm 1895 2023-01-16 13:38:08Z willem $)[2];
+our $VERSION = (qw$Id: Mailbox.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 
 =head1 NAME
@@ -61,18 +61,13 @@ sub new {
 
 	s/^.*<//g;						# strip excess on left
 	s/>.*$//g;						# strip excess on right
+	s/^\@.+://;						# strip deprecated source route
+	s/\\\./\\046/g;						# disguise escaped dots
 
-	s/\\\@/\\064/g;						# disguise escaped @
-	s/("[^"]*)\@([^"]*")/$1\\064$2/g;			# disguise quoted @
+	my ( $localpart, @domain ) = split /[@.]([^@;:"]*$)/;	# split on rightmost @
+	s/\./\\046/g for $localpart ||= '';			# escape dots in local part
 
-	my ( $mbox, @host ) = split /\@/;			# split on @ if present
-	for ( $mbox ||= '' ) {
-		s/^.*"(.*)".*$/$1/;				# strip quotes
-		s/\\\./\\046/g;					# disguise escaped dot
-		s/\./\\046/g if @host;				# escape dots in local part
-	}
-
-	return bless __PACKAGE__->SUPER::new( join '.', $mbox, @host ), $class;
+	return bless __PACKAGE__->SUPER::new( join '.', $localpart, @domain ), $class;
 }
 
 
@@ -91,10 +86,10 @@ sub address {
 	my @label = shift->label;
 	local $_ = shift(@label) || return '<>';
 	s/\\\\//g;						# delete escaped \
+	s/^\\034(.*)\\034$/"$1"/;				# unescape enclosing quotes
 	s/\\\d\d\d//g;						# delete non-printable
 	s/\\\./\./g;						# unescape dots
-	s/[\\"]//g;						# delete \ "
-	s/^(.*)$/"$1"/ if /["(),:;<>@\[\\\]]/;			# quote local part
+	s/\\//g;						# delete escapes
 	return $_ unless scalar(@label);
 	return join '@', $_, join '.', @label;
 }

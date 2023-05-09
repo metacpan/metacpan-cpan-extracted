@@ -22,40 +22,40 @@ name: Crypt-Passphrase
 provides:
   Crypt::Passphrase:
     file: lib/Crypt/Passphrase.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::Encoder:
     file: lib/Crypt/Passphrase/Encoder.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::Fallback:
     file: lib/Crypt/Passphrase/Fallback.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::MD5::Base64:
     file: lib/Crypt/Passphrase/MD5/Base64.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::MD5::Hex:
     file: lib/Crypt/Passphrase/MD5/Hex.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::PassphraseHash:
     file: lib/Crypt/Passphrase/PassphraseHash.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::Pepper::Base:
     file: lib/Crypt/Passphrase/Pepper/Base.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::Pepper::Simple:
     file: lib/Crypt/Passphrase/Pepper/Simple.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::SHA1::Base64:
     file: lib/Crypt/Passphrase/SHA1/Base64.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::SHA1::Hex:
     file: lib/Crypt/Passphrase/SHA1/Hex.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::System:
     file: lib/Crypt/Passphrase/System.pm
-    version: '0.015'
+    version: '0.016'
   Crypt::Passphrase::Validator:
     file: lib/Crypt/Passphrase/Validator.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Carp: '0'
   Crypt::URandom: '0'
@@ -73,7 +73,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase/issues
   repository: git://github.com/Leont/crypt-passphrase.git
-version: '0.015'
+version: '0.016'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -57,3 +57,18 @@ package Here {
 package There {
     sub inc { 1 + $_[0] }
 };
+
+## name Multiple BEGIN, UNITCHECK, CHECK, INIT or END blocks
+## failures 0
+## cut
+
+BEGIN {}
+BEGIN {}
+UNITCHECK {}
+UNITCHECK {}
+CHECK {}
+CHECK {}
+INIT {}
+INIT {}
+END {}
+END {}

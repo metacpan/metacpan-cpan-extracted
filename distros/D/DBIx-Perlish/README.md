@@ -1282,18 +1282,18 @@ cannot be done in Perl"?
 
 DBIx::Perlish requires no configuration files or environment variables.
 
-## Running under [Devel::Cover](https://metacpan.org/pod/Devel::Cover)
+## Running under [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover)
 
 When the `DBIx::Perlish` module detects that the current program
-is being run under [Devel::Cover](https://metacpan.org/pod/Devel::Cover),
-it tries to cheat a little bit and feeds [Devel::Cover](https://metacpan.org/pod/Devel::Cover)
+is being run under [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover),
+it tries to cheat a little bit and feeds [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover)
 with _false_ information to make those
 query subs which were parsed by the module
 to appear "covered".
 
 This is done because the query subs are **never** executed,
 and thus would normally be presented as "not covered" by
-the [Devel::Cover](https://metacpan.org/pod/Devel::Cover) reporter.
+the [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover) reporter.
 Although a developer has no trouble deciding to ignore
 such "red islands", he has to perform this decision every
 time he looks at the coverage data, which tends to become
@@ -1325,7 +1325,7 @@ column (not counting the key fields) was specified
 in the return statement.  The current behavior is
 to return simple values in this case.
 
-If you use `DBIx::Perlish` together with [HTML::Mason](https://metacpan.org/pod/HTML::Mason),
+If you use `DBIx::Perlish` together with [HTML::Mason](https://metacpan.org/pod/HTML%3A%3AMason),
 you are likely to see warnings "Useless use of ... in void context"
 that Mason helpfully converts into fatal errors.
 

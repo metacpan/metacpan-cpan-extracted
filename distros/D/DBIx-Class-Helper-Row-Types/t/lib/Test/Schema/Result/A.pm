@@ -2,7 +2,7 @@ package Test::Schema::Result::A;
 
 use base qw/DBIx::Class::Core/;
 
-use Types::SQL v0.3.0 qw/ Serial Varchar /;
+use Types::SQL qw/ Serial Varchar /;
 use Types::Standard qw/ Maybe /;
 use Types::Common::String qw/ LowerCaseSimpleStr UpperCaseStr /;
 

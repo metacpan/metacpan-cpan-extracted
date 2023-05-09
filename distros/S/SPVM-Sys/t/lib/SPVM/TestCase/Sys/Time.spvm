@@ -6,6 +6,34 @@ class TestCase::Sys::Time {
   use Sys::Time::Constant as TIME;
   use Sys::Time::Itimerval;
   
+  static method new_tm : int () {
+    my $tm = Sys::Time::Tm->new;
+    
+    unless ($tm isa Sys::Time::Tm) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method time : long () {
+    my $time = Sys::Time->time;
+    
+    return $time;
+  }
+
+  static method localtime : Sys::Time::Tm ($time : long) {
+    my $time_info = Sys::Time->localtime($time);
+    
+    return $time_info;
+  }
+
+  static method gmtime : Sys::Time::Tm ($time : long) {
+    my $time_info = Sys::Time->gmtime($time);
+    
+    return $time_info;
+  }
+
   static method gettimeofday : int () {
     
     my $tv = Sys::Time::Timeval->new;

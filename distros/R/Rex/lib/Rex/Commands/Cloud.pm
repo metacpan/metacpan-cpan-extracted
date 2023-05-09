@@ -53,7 +53,7 @@ package Rex::Commands::Cloud;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -178,7 +178,7 @@ Get all instances of a cloud service.
 There are some parameters for this function that can change the gathering of ip addresses for some cloud providers (like OpenStack).
 
  task "list", sub {
-   my @instances = cloud_instance_list 
+   my @instances = cloud_instance_list
                       private_network => 'private',
                       public_network  => 'public',
                       public_ip_type  => 'floating',
@@ -244,7 +244,7 @@ Upload public SSH key to cloud provider
 
  private_key '~/.ssh/mykey
  public_key  '~/.ssh/mykey.pub';
- 
+
  task "cloudprovider", sub {
    cloud_upload_key;
 

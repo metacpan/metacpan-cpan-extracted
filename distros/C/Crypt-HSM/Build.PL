@@ -11,15 +11,14 @@ my $builder = Module::Build->new(
     'IPC::Open3' => '0',
     'Module::Build' => '0.28',
     'Test::More' => '0',
-    'perl' => '5.006'
+    'perl' => '5.010'
   },
   'configure_requires' => {
-    'Module::Build' => '0.28',
-    'perl' => '5.006'
+    'Module::Build' => '0.28'
   },
   'requires' => {
     'XSLoader' => '0',
-    'perl' => '5.006',
+    'perl' => '5.010',
     'strict' => '0',
     'warnings' => '0'
   },

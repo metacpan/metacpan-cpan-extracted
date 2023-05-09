@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-CDNSKEY.t 1857 2021-12-07 13:38:02Z willem $	-*-perl-*-
+# $Id: 05-CDNSKEY.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -18,13 +18,16 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 35;
+plan tests => 34;
 
 
 my $name = 'CDNSKEY.example';
 my $type = 'CDNSKEY';
 my $code = 60;
 my @attr = qw( flags protocol algorithm publickey );
+
+my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
+is( $typecode, $code, "$type RR type code = $code" );
 
 my @data = (
 	256, 3, 5, join '', qw(
@@ -45,19 +48,10 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 		7D5468DBEFE3 );
 
 
-{
-	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
-	is( $typecode, $code, "$type RR type code = $code" );
+my $hash = {};
+@{$hash}{@attr} = @data;
 
-	my $hash = {};
-	@{$hash}{@attr} = @data;
-
-	my $rr = Net::DNS::RR->new(
-		name => $name,
-		type => $type,
-		%$hash
-		);
-
+for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 	my $string = $rr->string;
 	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
@@ -72,28 +66,20 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 		is( $rr2->$_, $rr->$_, "additional attribute rr->$_()" );
 	}
 
-
-	my $empty   = Net::DNS::RR->new("$name NULL");
 	my $encoded = $rr->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $decoded->encode;
 	my $hex2    = uc unpack 'H*', $encoded;
-	my $hex3    = uc unpack 'H*', substr( $encoded, length $empty->encode );
+	my $hex3    = uc unpack 'H*', $rr->rdata;
 	is( $hex1, $hex2, 'encode/decode transparent' );
 	is( $hex3, $wire, 'encoded RDATA matches example' );
 }
 
 
-{
-	my $rr = Net::DNS::RR->new(". $type");
+for my $rr ( Net::DNS::RR->new(". $type") ) {
 	foreach ( @attr, qw(keylength keytag rdstring) ) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
-}
-
-
-{
-	my $rr = Net::DNS::RR->new(". $type");
 
 	$rr->algorithm(255);
 	is( $rr->algorithm(), 255, 'algorithm number accepted' );
@@ -104,40 +90,25 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 }
 
 
-{
-	my @arg = qw(0 3 0 AA==);				# per RFC8078(4), erratum 5049
-	my $rr	= Net::DNS::RR->new("$name. $type @arg");
-	ok( ref($rr), "DNSKEY delete: $name. $type @arg" );
+for my $rr ( Net::DNS::RR->new("$name. $type 0 3 0 AA==") ) {	# per RFC8078(4), erratum 5049
+	ok( ref($rr), "DNSKEY delete: $name. $type 0 3 0 AA==" );
 	is( $rr->flags(),     0, 'DNSKEY delete: flags 0' );
 	is( $rr->protocol(),  3, 'DNSKEY delete: protocol 3' );
 	is( $rr->algorithm(), 0, 'DNSKEY delete: algorithm 0' );
 
-	is( $rr->string(), "$name.\tIN\t$type\t@arg", 'DNSKEY delete: presentation format' );
-
 	my $rdata = unpack 'H*', $rr->rdata();
 	is( $rdata, '0000030000', 'DNSKEY delete: rdata wire-format' );
+
+	is( $rr->rdstring(), '0 3 0 AA==', 'DNSKEY delete: presentation format' );
 }
 
 
-{
-	my @arg = qw(0 3 0 0);					# per RFC8078(4) as published
-	my $rr	= Net::DNS::RR->new("$name. $type @arg");
+for my $rr ( Net::DNS::RR->new("$name. $type 0 3 0 0") ) {	# per RFC8078(4) as published
 	is( $rr->rdstring(), '0 3 0 AA==', 'DNSKEY delete: accept old format' );
 }
 
 
-{
-	my @arg = qw(0 0 0 -);					# unexpected empty field
-	my $rr	= Net::DNS::RR->new("$name. $type @arg");
-	is( $rr->rdstring(), '0 3 0 -', 'DNSKEY delete: represent empty key' );
-}
-
-
-{
-	my $rr = Net::DNS::RR->new("$name $type @data");
-	$rr->print;
-}
-
+Net::DNS::RR->new("$name $type @data")->print;
 
 exit;
 

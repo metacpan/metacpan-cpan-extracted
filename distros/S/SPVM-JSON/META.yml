@@ -22,5 +22,5 @@ requires:
   SPVM::Math: '1.001'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-JSON.git
-version: '1.001'
+version: '1.001001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

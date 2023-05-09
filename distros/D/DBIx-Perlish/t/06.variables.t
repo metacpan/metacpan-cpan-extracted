@@ -294,7 +294,7 @@ test_select_sql {
 
 SKIP: {
 
-skip "https://github.com/Perl/perl5/issues/17301", 6 if $] > 5.025 && $] < 5.031;
+skip "https://github.com/Perl/perl5/issues/17301", 6 if $] > 5.024 && $] < 5.031;
 
 test_select_sql {
 	my $t : table1;

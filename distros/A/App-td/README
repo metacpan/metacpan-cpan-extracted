@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.110 of App::td (from Perl distribution
-    App-td), released on 2023-02-10.
+    This document describes version 0.111 of App::td (from Perl distribution
+    App-td), released on 2023-02-11.
 
 FUNCTIONS
   td
@@ -56,10 +56,10 @@ FUNCTIONS
 
     What scripts/modules accept table data?
 
-    This *td* script, for one, accept table data.
+    This *td* script, for one, accepts table data.
 
-    If a module/script expects CSV, you can feed table data and convert it
-    to CSV using td2csv utility.
+    If a module/script expects CSV, you can feed it table data and convert
+    the table data to CSV using td2csv utility.
 
     Several other formats can also be converted to table data, e.g. JSON,
     YAML, XLS/XLSX/ODS.

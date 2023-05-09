@@ -11,7 +11,7 @@ use strict;
 use POSIX qw(strftime);
 use IO::Uncompress::Unzip qw(unzip $UnzipError);
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 use vars qw($BSE_URL);
 $BSE_URL = "https://www.bseindia.com";

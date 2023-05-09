@@ -1,0 +1,32 @@
+cpanm (App::cpanminus) 1.7042 on perl 5.010001 built for MSWin32-x86-multi-thread
+Searching Encode () on cpanmetadb ...
+--> Working on Encode
+Fetching http://www.cpan.org/authors/id/D/DA/DANKOGAI/Encode-2.88.tar.gz
+-> OK
+Unpacking Encode-2.88.tar.gz
+Entering Encode-2.88
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (6.98)
+Configuring Encode-2.88
+Running Makefile.PL
+Writing MYMETA.yml and MYMETA.json
+Generating a dmake-style Makefile
+Writing Makefile for Encode
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Exporter 5.57 ... Yes (5.63)
+Building and testing Encode-2.88
+cp lib/Encode/JP/H2Z.pm blib\lib\Encode\JP\H2Z.pm
+cp Byte.pm ..\blib\lib\Encode\Byte.pm
+Running Mkbootstrap for Encode::Byte ()
+C:\Strawberry\perl\bin\perl.exe -MExtUtils::Command -e chmod -- 644 Byte.bs
+C:\Strawberry\perl\bin\perl.exe  ..\bin\enc2xs -"Q" -"O" -o byte_t.c -f byte_t.fnm
+Reading iso-8859-2 (iso-8859-2)
+C:\Strawberry\perl\bin\perl.exe C:\home\tennis\perl5\lib\perl5\ExtUtils\xsubpp  -nolinenumbers -typemap C:\strawberry\perl\lib\ExtUtils\typemap  Byte.xs > Byte.xsc && C:\Strawberry\perl\bin\perl.exe -MExtUtils::Command -e mv -- Byte.xsc Byte.c
+gcc -c  -I../Encode 	-s -O2 -DWIN32 -DHAVE_DES_FCRYPT -DUSE_SITECUSTOMIZE -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -fno-strict-aliasing -DPERL_MSVCRT_READFIX -s -O2 	  -DVERSION=\"2.04\" 	-DXS_VERSION=\"2.04\"  "-IC:\strawberry\perl\lib\CORE"   Byte.c
+gcc -c  -IEncode 	-s -O2 -DWIN32 -DHAVE_DES_FCRYPT  -DUSE_SITECUSTOMIZE -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -fno-strict-aliasing -DPERL_MSVCRT_READFIX -Werror=declaration-after-statement -Wpointer-sign -s -O2 	  -DVERSION=\"2.88\" 	-DXS_VERSION=\"2.88\"  "-IC:\strawberry\perl\lib\CORE"   Encode.c
+cc1.exe: error: unrecognized command line option "-Werror=declaration-after-statement"
+cc1.exe: error: unrecognized command line option "-Wpointer-sign"
+dmake.exe:  Error code 129, while making 'Encode.o'
+-> FAIL Installing Encode failed. See C:\home\tennis\.cpanm\work\1488070176.5640\build.log for details. Retry with --force to force install it.

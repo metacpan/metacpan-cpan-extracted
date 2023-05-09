@@ -11,7 +11,7 @@ use Time::HiRes qw(time);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-12'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our %Timestamps; # key=module name, value=epoch
 
@@ -45,7 +45,7 @@ Require::HookChain::timestamp::hires - Record timestamp of each module's loading
 
 =head1 VERSION
 
-This document describes version 0.009 of Require::HookChain::timestamp::hires (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.011 of Require::HookChain::timestamp::hires (from Perl distribution Require-HookChain), released on 2023-02-12.
 
 =head1 SYNOPSIS
 

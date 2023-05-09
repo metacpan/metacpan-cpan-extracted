@@ -1,0 +1,349 @@
+=pod
+
+=head1 NAME
+
+I<MIME::Mini> - Minimal code to parse/create mbox files and mail messages
+
+=head1 SYNOPSIS
+
+ use MIME::Mini ':all';
+
+or:
+
+ use MIME::Mini qw(
+     formail mail2str mail2multipart mail2singlepart mail2mbox
+     insert_header append_header replace_header delete_header
+     insert_part append_part replace_part delete_part
+     header headers header_names
+     param mimetype encoding filename
+     body message parts
+     newparam newmail
+ );
+
+ # Parse mbox file, doing something with each mail message
+ formail(sub { <> }, sub { my $mail = shift; ...; })
+
+ # Create an email with text/plain, image/png, and message/rfc822 attachments
+ my $mail = newmail
+ (
+     To => 'you@there.com',
+     From => 'me@here.com',
+     Subject => 'test',
+     parts => [
+         newmail(body => "hi\n"),
+         newmail(body => $png, type => 'image/png', filename => 'hi.png'),
+         newmail(message => newmail(qw(To to@you From from@me body hi")))
+     ]
+ );
+ print mail2str($mail);
+
+=head1 DESCRIPTION
+
+I<MIME::Mini> is a collection of functions that parse and produce mailbox
+files and individual mail messages. It started out as I<minimail>, a
+non-module cut-and-paste version, intended to be compact enough to cut and
+paste directly into perl scripts that don't want to require non-standard
+perl modules. I<MIME::Mini> is for people that prefer a CPAN module.
+
+It is intended to be yet another alternative to I<MIME-tools>. I<MIME-tools>
+does things that this code doesn't (such as uuencode and binhex decoding).
+And I<MIME::Mini> does things that I<MIME-tools> doesn't such as reading and
+writing mailbox files correctly (repairing incorrectly formatted ones along
+the way), and transparently unravelling C<winmail.dat> attachments (aka
+I<MS-TNEF>). I<MIME::Mini> is much smaller (about 3% of the size of
+I<MIME-tools> and the other modules it requires, and about 20% of the size
+of I<MIME-Lite> (which doesn't parse)), and so takes much less time during
+program start up.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item formail(sub { <> }, sub { $mail = shift })
+
+Parses a mailbox or a mail message. Calls the first function argument to
+retrieve input lines and calls the second function argument with every mail
+message found. Terminates when the first argument returns undef or when the
+second function returns false. Quoted C<From_> lines are unquoted.
+
+=item mail2str($mail)
+
+Returns a string version of a mail message. If the mail message includes a
+mailbox header, lines in the body starting with C<From_> are quoted and the
+string result will definitely be terminated with a blank line. This means
+that mailbox files with blank lines missing between mail messages and with
+unquoted C<From_> lines will be automatically repaired with the code below
+(Incidentally, malformed nested multipart body parts are also repaired).
+
+ formail(sub { <> }, sub { print mail2str(shift) });
+
+=item mail2multipart($mail)
+
+Converts a singlepart mail message into a multipart mail message with a
+single body part (i.e. the body of the original mail message). Returns the
+mail message. Does nothing to mail messages that are already multipart mail
+messages.
+
+=item mail2singlepart($mail)
+
+Converts a multipart mail message with a single body part into a singlepart
+mail message whose body is the original body part. Returns the mail message.
+Does nothing to mail messages that are already singlepart mail messages or
+multipart mail messages with multiple parts. Acts recursively.
+
+=item mail2mbox($mail)
+
+Converts a mail message into an mailbox item. Does nothing to mail messages
+that are already mailbox items. This affects the result of I<mail2str()>.
+
+=item insert_header($mail, $header[, $language[, $charset]])
+
+Inserts a new mail header before any existing mail headers. If the header
+contains non-ascii characters, it will be encoded in accordance with
+RFC2047. If the I<$language> and I<$charset> parameters are not supplied,
+they default to C<en> and C<iso-8859-1> (if possible, C<utf-8> otherwise),
+respectively.
+
+=item append_header($mail, $header[, $language[, $charset]])
+
+Appends a new mail header after any existing mail headers.
+
+=item replace_header($mail, $header[, $language[, $charset]])
+
+Replaces all instances of a mail header with a new mail header.
+
+=item delete_header($mail, $header, $recurse)
+
+Deletes all headers that match the I<$header> pattern. If the I<$recurse>
+parameter is provided and non-zero, matching headers in internal body parts
+will also be deleted.
+
+=item insert_part($mail, $part, $index)
+
+Inserts the given body part at the given index. The I<$part> parameter must
+have been produced by I<formail()> or I<newmail()>. The I<$mail> parameter
+must already be a multipart mail message.
+
+=item append_part($mail, $part)
+
+Appends the given body part.
+
+=item replace_part($mail, $part, $index)
+
+Replaces the body part at the given index with the given body part.
+
+=item delete_part($mail, $index)
+
+Deletes the body part at the given index.
+
+=item header($mail, $header)
+
+Returns a list of values of headers with the given name. RFC2822 comments
+are removed. If any of the values contain RFC2047 encoded words (i.e.
+C<=?charset?[qb]?...?=>), they are decoded, and the bytes in the given
+charset (e.g., C<us-ascii>, C<iso-8859-*>, C<utf-8>) are then decoded into
+"characters" (i.e., unicode codepoints). They are also unfolded. If this is
+not what you want, use $mail->{header} or $mail->{headers} directly.
+
+=item headers($mail)
+
+Returns a list of all complete headers with decoding and unfolding performed
+as with I<header()>.
+
+=item header_names($mail)
+
+Returns a list of the names of headers present in the given mail message.
+
+=item param($mail, $header, $param)
+
+Returns the value of the given parameter of the given MIME header of the
+given mail message. I<header()> is used for RFC2047 decoding. If the
+parameter has been split or encoded in accordance with RFC2231 (i.e.
+C<param1*0="a" param1*1="b" param2*="charset'lang'%63">), it is decoded (if
+C<us-ascii> or C<iso-8859-*> or C<utf-8>) and reassembled.
+
+=item mimetype($mail, $parent)
+
+Returns the declared or default mimetype of the given mail message or body
+part. Returns C<octet/application> when the encoding is invalid.
+
+=item encoding($mail)
+
+Returns the declared or implied encoding of the given mail message or body
+part.
+
+=item filename($part)
+
+Returns the RFC2183 filename of the given body part. Uses I<param()> to
+perform any decoding that might be necessary. Also removes any directory
+component of the filename and replaces any unfriendly characters with dash
+characters.
+
+=item body($mail)
+
+Returns the decoded body of the given mail message or body part. Must not be
+called on a multipart mail message or a mail message whose mimetype is
+C<message/rfc822>.
+
+=item message($mail)
+
+Returns the message inside the given mail message whose mimetype is
+C<message/rfc822>. Must not be called on a multipart message or a mail
+message whose mimetype is not C<message/rfc822>.
+
+=item parts($mail[, $parts])
+
+When no I<$parts> parameter is given, returns a reference to an array of
+body parts in the given multipart message. When the I<$parts> parameter is
+given, it is a reference to an array of body parts, and it will replace the
+existing body parts. Must not be called on a singlepart mail message.
+
+=item newparam($name, $value[, $language[, $charset]]])
+
+Creates a MIME header parameter, possibly split and encoded in accordance
+with RFC2231. Returns a string that looks like C<"; name=value"> which can
+be used as part of the I<$header> argument in functions like
+I<append_header()> and as part of any header value in the function
+I<newmail()>. If the value contains non-ascii characters, and the
+I<$language> and I<$charset> parameters are not supplied, they default to
+C<en> and C<utf-8> or C<iso-8859-1>, respectively.
+
+=item newmail(...)
+
+Creates a new mail message based on the given arguments (which take the form
+of a hash). It is not necessary to supply all information. Anything that
+needs to be added will be added automatically. The important parameters are:
+
+ [A-Z]*      - Arbitrary mail headers: e.g. From To Subject
+ type        - Content-Type: e.g. image/png
+ charset     - Content-Type's charset parameter: e.g. iso-8859-1
+ encoding    - Content-Transfer-Encoding: e.g. base64
+ filename    - Content-Disposition's filename parameter
+ body        - body of the message (don't use with parts or message)
+ parts       - array-ref of parts (don't use with body or message)
+ message     - body of message/rfc822 message (don't use with body or parts)
+ mbox        - Mbox From_ header
+
+Supplying I<body> implies C<text/plain>. Supplying I<parts> implies
+C<multipart/mixed>. Supplying I<message> implies C<message/rfc822>. Default
+I<disposition> is C<inline> for C<text/*> and C<message/rfc822>, or
+C<attachment> for all other types. The default I<charset> is C<us-ascii>
+when I<body> contains only ASCII bytes. Otherwise, it is C<utf-8> when
+I<body> is a valid UTF-8 byte sequence. Otherwise, it is your local
+(non-utf8) charset, or C<iso-8859-1>. Default I<encoding> is determined from
+the type and nature of the mail message and its data. You shouldn't have to
+supply I<encoding> unless you want to create messages with C<8bit> encoding.
+If the mail message really is a mail message, and not just a body part,
+C<Date>, C<MIME-Version> and C<Message-ID> headers are automatically
+included if they have not been supplied by the caller.
+
+Less important parameters are:
+
+ disposition - Content-Disposition: i.e. inline or attachment
+ created     - Content-Disposition's creation-date parameter
+ modified    - Content-Disposition's modification-date parameter
+ read        - Content-Disposition's read-date parameter
+ size        - Content-Disposition's size parameter
+ description - Content-Description
+ language    - Content-Language
+ duration    - Content-Duration
+ location    - Content-Location
+ base        - Content-Base
+ features    - Content-Features
+ alternative - Content-Alternative
+ id          - Content-ID
+ md5         - Content-MD5
+
+Note: If you supply C<filename> but not C<body> (or C<message> or C<parts>),
+and the filename refers to a readable file, then the following parameters
+will be determined automatically: C<body>, C<modified>, C<read>, C<size>.
+
+The rest of the less important parameters are just shortcuts for standard
+MIME headers. There is no support beyond that for any of them.
+
+=back
+
+=head1 STRUCTURE
+
+A mail message (or body part) is a hash containing some of the following
+entries:
+
+ mbox          - mailbox From_ header
+ warn          - parser errors in the form: X-Warning: ...
+ headers       - arrayref of mail headers in order of appearance
+ header        - hashref by name of arrayrefs of mail headers
+ body          - text of singlepart mail message
+ mime_type     - mimetype of the mail message or body part
+ mime_parts    - arrayref of mail messages (body parts)
+ mime_message  - message of a message/rfc822 mail message
+ mime_boundary - boundary for a multipart mail message
+ mime_preamble - any text before the first multipart boundary
+ mime_epilogue - any text after the last multipart boundary
+ mime_prev_boundary - saved boundary of message after mail2singlepart
+ mime_prev_preamble - saved preamble of message after mail2singlepart
+ mime_prev_epilogue - saved epilogue of message after mail2singlepart
+
+Note that I<body>, I<mime_parts> and I<mime_message> are mutually exclusive
+and that I<mime_type> only exists when I<mime_parts> or I<mime_message> exist.
+
+=head1 EXAMPLES
+
+Parsing example: Repair mailbox files
+
+ formail(sub { <> }, sub { print mail2str(shift) });
+
+Building example: A mail message with attachments
+
+ print mail2str(newmail(
+  To => 'you@there.com', From => 'me@here.com', Subject => 'test',
+  parts => [
+    newmail(body => "hi\n"),
+    newmail(body => $png, type => 'image/png', filename => 'hi.png'),
+    newmail(message => newmail(qw(To to@you From from@me body hi")))
+ ]));
+
+=head1 CAVEAT
+
+The I<header()> and I<headers()> functions automatically decode RFC2047
+encoded headers. This is an attempt to satisfy the following requirement in
+RFC2047:
+
+ The program must be able to display the unencoded text if the
+ character set is "US-ASCII".  For the ISO-8859-* character sets,
+ the mail reading program must at least be able to display the
+ characters which are also in the ASCII set.
+
+Rather than discarding C<iso-8859-*> characters that are not also
+C<us-ascii>, I<header()> and I<headers()> decode them to "characters"
+(unicode codeponts) in perl's internal string format. This is arguably more
+useful, but knowledge of the original character set is lost. Hopefully, that
+isn't important. But actually "displaying" these characters will require the
+client application to encode the headers appropriately for the local system.
+
+The original, encoded headers can be accessed directly via
+C<$mail-E<gt>{headers}> which is a reference to an array of raw encoded
+headers.
+
+=head1 SEE ALSO
+
+RFC2822, RFC2045, RFC2046, RFC2047, RFC2231, RFC2183 (also RFC3282, RFC3066,
+RFC2424, RFC2557, RFC2110, RFC3297, RFC2912, RFC2533, RFC1864, RFC2387,
+RFC2912, RFC2533, RFC2387, RFC2076).
+
+The mailbox format used is the mboxrd format described in
+C<http://www.qmail.org/man/man5/mbox.html>.
+
+=head1 AUTHOR
+
+20230508 raf <raf@raf.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2007, 2023 raf <raf@raf.org>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+# vi:set ts=4 sw=4:

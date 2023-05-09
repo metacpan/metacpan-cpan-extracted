@@ -1,4 +1,7 @@
 Revision history for PAUSE-Permissions-MetaCPAN
 
+0.100  2023-05-05 09:23:57 JST
+    - Require perl v5.16
+
 0.001  2018-06-10 02:38:04 JST
     - Initial release

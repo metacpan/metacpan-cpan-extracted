@@ -44,7 +44,7 @@ You can also look for information at:
         http://cpanratings.perl.org/d/Test-Dependencies
 
 # LICENCE AND COPYRIGHT
-    Copyright (c) 2016-2019, Erik Huelsmann. All rights reserved.
+    Copyright (c) 2016-2023, Erik Huelsmann. All rights reserved.
     Copyright (c) 2007, Best Practical Solutions, LLC. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it

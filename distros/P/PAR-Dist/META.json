@@ -4,7 +4,7 @@
       "Audrey Tang <cpan@audreyt.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Dist/Display.html?Queue=PAR-Dist"
+         "web" : "https://github.com/rschupp/PAR-Dist/issues"
       },
       "repository" : {
          "type" : "git",
@@ -56,6 +56,6 @@
       },
       "x_MailingList" : "mailto:par@perl.org"
    },
-   "version" : "0.51",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.52",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

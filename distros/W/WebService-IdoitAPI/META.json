@@ -40,12 +40,20 @@
       },
       "test" : {
          "requires" : {
+            "IO::ScalarArray" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.2.0",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/matwei-perl/WebService-IdoitAPI.git",
+         "web" : "https://github.com/matwei-perl/WebService-IdoitAPI"
+      }
+   },
+   "version" : "v0.2.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -70,9 +70,8 @@ test 'build query' => sub {
 
     ok my $rs = $self->resultset, 'build resultset';
 
-    my $sql = $self->sql;
     my $alias = $self->current_source_alias;
-    $sql =~ s/\bme\b/$alias/g;
+    my $sql = $self->sql =~ s/\bme\b/$alias/gr;
 
     is_same_sql_bind(
         $rs->as_query,
@@ -80,7 +79,6 @@ test 'build query' => sub {
         $self->bind,
         'expected sql and bind'
     );
-
 
 };
 

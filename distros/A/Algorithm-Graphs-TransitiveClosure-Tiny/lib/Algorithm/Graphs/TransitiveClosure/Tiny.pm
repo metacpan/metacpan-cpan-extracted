@@ -8,7 +8,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(floyd_warshall);
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 
 sub floyd_warshall {
@@ -55,7 +55,7 @@ Algorithm::Graphs::TransitiveClosure::Tiny - Calculate the transitive closure.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 
 =head1 SYNOPSIS
@@ -86,7 +86,7 @@ The latter can also be written shorter provided you accept autovivification:
 
 This module provides a single function, C<floyd_warshall>, which is exported
 on demand. It is an implementation of the well known I<Floyd-Warshall>
-algorithm computing the transitive closure of a graph.
+algorithm for computing the transitive closure of a graph.
 
 The code is taken from L<Algorithm::Graphs::TransitiveClosure> but has been
 modified. The difference is that this implementation of C<floyd_warshall()>:
@@ -201,13 +201,13 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-Graphs-TransitiveClosure-Tiny>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Algorithm-Graphs-TransitiveClosure-Tiny>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Algorithm-Graphs-TransitiveClosure-Tiny>
+
+=item * GitHub Repository
+
+L<https://github.com/AAHAZRED/perl-Algorithm-Graphs-TransitiveClosure-Tiny.git>
 
 =back
 

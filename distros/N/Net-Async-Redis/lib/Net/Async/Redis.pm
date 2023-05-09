@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.022';
+our $VERSION = '3.023';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -616,6 +616,48 @@ async sub subscribe {
     return @{$self->{subscription_channel}}{@channels};
 }
 
+=head2 ssubscribe
+
+Subscribes to one or more sharded channels.
+
+This behaves similarly to L</subscribe>, but applies to messages received on a specific
+shard. This is mostly relevant in a cluster context, where subscriptions can be localised
+to one shard (group of nodes) in the cluster to improve performance.
+
+More details are in the L<sharded pubsub documentation|https://redis.io/topics/pubsub#sharded-pubsub>.
+
+Returns a L<Future> which resolves to a L<Net::Async::Redis::Subscription> instance.
+
+Example:
+
+ # Subscribe to 'notifications' channel,
+ # print the first 5 messages, then unsubscribe
+ $redis->subscribe('notifications')
+    ->then(sub {
+        my $sub = shift;
+        $sub->events
+            ->map('payload')
+            ->take(5)
+            ->say
+            ->completed
+    })->then(sub {
+        $redis->unsubscribe('notifications')
+    })->get
+
+=cut
+
+async sub ssubscribe {
+    my ($self, @channels) = @_;
+    my @pending = map {
+        $self->{pending_subscription_channel}{$_} //= $self->future('subscription[' . $_ . ']')
+    } @channels;
+    await $self->next::method(@channels);
+    $self->{pubsub} //= 0;
+    await Future->wait_all(@pending);
+    $log->tracef('Subscriptions established, we are go');
+    return @{$self->{subscription_channel}}{@channels};
+}
+
 =head1 METHODS - Transactions
 
 =head2 multi
@@ -792,7 +834,6 @@ around get => async sub {
     );
     # ... and then rewrite or remove the cache entry once we get a response:
     $f->on_ready(sub {
-        my $f = shift;
         if($f->is_done) {
             # If we had an invalidation message, we may have removed
             # our cache entry already: we shouldn't cache this value if so.
@@ -977,7 +1018,7 @@ Deal with an incoming pubsub-related message.
 sub handle_pubsub_message {
     my ($self, $type, @details) = @_;
     $type = lc $type;
-    if($type eq 'message') {
+    if($type eq 'message' or $type eq 'smessage') {
         my ($channel, $payload) = @details;
         if(my $sub = $self->{subscription_channel}{$channel}) {
             my $msg = Net::Async::Redis::Subscription::Message->new(
@@ -1143,7 +1184,6 @@ sub execute_command {
             return $f;
         }
         my $data = $self->wire_protocol->encode_from_client(@cmd);
-        return $self->stream->write($data)->on_ready($f) if $is_sub_command;
 
         # Void-context write allows IaStream to combine multiple writes on the same connection.
         push @{$self->{pending}}, [ $cmd, $f ];
@@ -1174,6 +1214,7 @@ sub execute_command {
 around [qw(xread xreadgroup)] => async sub {
     my ($code, $self, @args) = @_;
     my $response = await $self->$code(@args);
+    return [] unless ref $response;
 
     # protocol_level is detected while connecting checking before this point is wrong.
     return $response if $self->{protocol_level} eq 'resp2' || $self->{hashrefs};

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Argon2::Encrypted;
-$Crypt::Passphrase::Argon2::Encrypted::VERSION = '0.008';
+$Crypt::Passphrase::Argon2::Encrypted::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -18,7 +18,6 @@ my %multiplier = (
 
 sub new {
 	my ($class, %args) = @_;
-	$args{output_size} //= 32;
 	my $self = bless Crypt::Passphrase::Argon2::_settings_for(%args), $class;
 	$self->{memory_cost} =~ s/ \A (\d+) ([kMG]) \z / $1 * $multiplier{$2} /xe;
 	$self->{cipher} = $args{cipher};
@@ -26,36 +25,36 @@ sub new {
 	return $self;
 }
 
-my $format = '$%s-encrypted$v=1,cipher=%s,id=%s$v=19$m=%d,t=%d,p=%d$%s$%s';
+my $format = '$%s-encrypted-%s$v=19$m=%d,t=%d,p=%d,keyid=%s$%s$%s';
 
 sub _pack_hash {
 	my ($subtype, $cipher, $id, $m_cost, $t_cost, $parallel, $salt, $hash) = @_;
 	my $encoded_salt = encode_base64($salt, '') =~ tr/=//dr;
 	my $encoded_hash = encode_base64($hash, '') =~ tr/=//dr;
-	return sprintf $format, $subtype, $cipher, $id, $m_cost / 1024, $t_cost, $parallel, $encoded_salt, $encoded_hash;
+	return sprintf $format, $subtype, $cipher, $m_cost / 1024, $t_cost, $parallel, $id, $encoded_salt, $encoded_hash;
 }
 
-my $regex = qr/ ^ \$ ($Crypt::Argon2::type_regex)-encrypted \$ v=1, cipher=([^\$,]+) , id=([^\$,]+) \$ v=(\d+) \$ m=(\d+), t=(\d+), p=(\d+) \$ ([^\$]+) \$ (.*) $ /x;
+my $regex = qr/ ^ \$ ($Crypt::Argon2::type_regex)-encrypted-([^\$]+) \$ v=19 \$ m=(\d+), t=(\d+), p=(\d+), keyid=([^\$,]+)  \$ ([^\$]+) \$ (.*) $ /x;
 
 sub _unpack_hash {
 	my ($pwhash) = @_;
-	my ($subtype, $alg, $id, $version, $m_cost, $t_cost, $parallel, $encoded_salt, $encoded_hash) = $pwhash =~ $regex or return;
+	my ($subtype, $alg, $m_cost, $t_cost, $parallel, $id, $encoded_salt, $encoded_hash) = $pwhash =~ $regex or return;
 	my $salt = decode_base64($encoded_salt);
 	my $hash = decode_base64($encoded_hash);
-	return ($subtype, $alg, $id, $version, $m_cost * 1024, $t_cost, $parallel, $salt, $hash);
+	return ($subtype, $alg, $id, $m_cost * 1024, $t_cost, $parallel, $salt, $hash);
 }
 
-my $unencrypted_regex = qr/ ^ \$ ($Crypt::Argon2::type_regex) \$ v=(\d+) \$ m=(\d+), t=(\d+), p=(\d+) \$ ([^\$]+) \$ (.*) $ /x;
-sub recrypt_hash {
+my $unencrypted_regex = qr/ ^ \$ ($Crypt::Argon2::type_regex) \$ v=19 \$ m=(\d+), t=(\d+), p=(\d+) \$ ([^\$]+) \$ (.*) $ /x;
+sub recode_hash {
 	my ($self, $input, $to) = @_;
 	$to //= $self->{active};
-	if (my ($subtype, $alg, $id, $version, $m_cost, $t_cost, $parallel, $salt, $hash) = _unpack_hash($input)) {
+	if (my ($subtype, $alg, $id, $m_cost, $t_cost, $parallel, $salt, $hash) = _unpack_hash($input)) {
 		return $input if $id eq $to and $alg eq $self->{cipher};
 		my $decrypted = $self->decrypt_hash($alg, $id, $salt, $hash);
 		my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $decrypted);
 		return _pack_hash($subtype, $self->{cipher}, $to, $m_cost, $t_cost, $parallel, $salt, $encrypted);
 	}
-	elsif (($subtype, $version, $m_cost, $t_cost, $parallel, my $encoded_salt, my $encoded_hash) = $input =~ $unencrypted_regex) {
+	elsif (($subtype, $m_cost, $t_cost, $parallel, my $encoded_salt, my $encoded_hash) = $input =~ $unencrypted_regex) {
 		my $salt = decode_base64($encoded_salt);
 		my $hash = decode_base64($encoded_hash);
 		my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $hash);
@@ -78,19 +77,24 @@ sub hash_password {
 
 sub needs_rehash {
 	my ($self, $pwhash) = @_;
-	my ($subtype, $alg, $id, $version, $m_cost, $t_cost, $parallel, $salt, $hash) = _unpack_hash($pwhash) or return 1;
+	my ($subtype, $alg, $id, $m_cost, $t_cost, $parallel, $salt, $hash) = _unpack_hash($pwhash) or return 1;
 	return 1 if $pwhash ne _pack_hash(@{$self}{qw/subtype cipher active memory_cost time_cost parallelism/}, $salt, $hash);
 	return length $salt != $self->{salt_size} || length $hash != $self->{output_size};
 }
 
 sub crypt_subtypes {
 	my $self = shift;
-	return map { ("$_-encrypted", $_) } argon2_types;
+	my @result;
+	my @supported = $self->supported_ciphers;
+	for my $argon2 (argon2_types) {
+		push @result, $argon2, map { "$argon2-encrypted-$_" } @supported
+	}
+	return @result;
 }
 
 sub verify_password {
 	my ($self, $password, $pwhash) = @_;
-	if (my ($subtype, $alg, $id, $version, $m_got, $t_got, $parallel_got, $salt, $hash) = _unpack_hash($pwhash)) {
+	if (my ($subtype, $alg, $id, $m_got, $t_got, $parallel_got, $salt, $hash) = _unpack_hash($pwhash)) {
 		my $raw = eval { argon2_raw($subtype, $password, $salt, $t_got, $m_got, $parallel_got, length $hash) } or return !!0;
 		my $decrypted = eval { $self->decrypt_hash($alg, $id, $salt, $hash) } or return !!0;
 
@@ -115,7 +119,7 @@ Crypt::Passphrase::Argon2::Encrypted - A base-class for encrypting/peppered Argo
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -125,7 +129,7 @@ This is a base-class for pre-peppering implementations. You probably want to use
 
 =head2 new()
 
-This constructor takes all arguments also taken by L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2>, with the following additions: C<cipher> and C<active>.
+This constructor takes all arguments also taken by L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2>, with the following additions: C<cipher> (the name of the used cipher) and C<active> (the identifier of the active pepper).
 
 =head2 hash_password($password)
 
@@ -139,7 +143,7 @@ This will check if a password matches an encrypted or unencrypted argon2 hash.
 
 This returns true if the hash uses a different cipher or subtype, or if any of the parameters is lower that desired by the encoder.
 
-=head2 recrypt_hash($input, $to = $active)
+=head2 recode_hash($input, $to = $active)
 
 This recrypts the hash in C<$input> to the key identified by C<$to>, if it's not already.
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 =encoding utf-8
 
@@ -26,7 +26,7 @@ C<fitdump.pl> reads the contents of the Garmin FIT files specified on command li
 use Geo::FIT;
 use Getopt::Long;
 
-my ($mps_to_kph, $semicircles_to_deg, $use_gmtime, $maybe_chained, $force, $version, $help) = (1, 1, 0, 0, 0, 0, 0);
+my ($mps_to_kph, $semicircles_to_deg, $use_gmtime, $maybe_chained, $force, $version, $help) = (1, 1, 1, 0, 0, 0, 0);
 sub usage { "Usage: $0 [ --help --version --mps_to_kph=\$boole --semicircles_to_deg=\$boole --use_gmtime=\$boole --maybe_chained=\$boole --force ] \$input_file [ \$output_file ]\n" }
 
 GetOptions( "mps_to_kph=i"          =>  \$mps_to_kph,
@@ -50,9 +50,6 @@ if (@ARGV) {
     @ARGV and $output_file = shift @ARGV
 }
 
-# disable warnings until I resolve them all, will soon delete this
-local $SIG{__WARN__} = sub { };
-
 my $fh;
 if ($output_file) {
     if (-f $output_file) {
@@ -64,13 +61,13 @@ if ($output_file) {
 sub dump_it {
     my ($self, $desc, $v, $o_cbmap) = @_;
 
-    if ($desc->{message_name} ne '') {
+    if (defined $desc->{message_name}) {
         my $o_cb = $o_cbmap->{$desc->{message_name}};
         ref $o_cb eq 'ARRAY' and ref $o_cb->[0] eq 'CODE' and $o_cb->[0]->($self, $desc, $v, @$o_cb[1 .. $#$o_cb])
     }
 
     print "Local message type: $desc->{local_message_type} ($desc->{message_length} octets";
-    print ", message name: $desc->{message_name}" if $desc->{message_name} ne '';
+    print ", message name: $desc->{message_name}" if defined $desc->{message_name};
     print ", message number: $desc->{message_number})\n";
     $self->print_all_fields($desc, $v, indent => '  ')
 }
@@ -142,7 +139,7 @@ sub fetch_from {
             $chained = 1
         } else {
             my $garbage_size = $obj->trailing_garbages;
-            print "Trailing $garbage_size octets garbages skipped\n" if $garbage_size > 0;
+            print "Trailing $garbage_size octets garbages skipped\n" if defined $garbage_size and $garbage_size > 0;
             last
         }
     }
@@ -161,7 +158,7 @@ fetch_from( $input_file, $fh );
 
 =item C<--use_gmtime=($boolean)>
 
-Options corresponding to object methods in L<Geo::FIT>. The first two default to true, C<-use_gmtime> to false.
+Options corresponding to object methods in L<Geo::FIT>. All of the above default to true.
 
 =item C<--$maybe_chained=($boolean)>
 
@@ -193,7 +190,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.08
+1.10
 
 =head1 LICENSE AND COPYRIGHT
 

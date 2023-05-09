@@ -5,7 +5,7 @@
       "Ricardo Signes <rjbs@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17",
-            "perl" : "5.006"
+            "perl" : "v5.10.0"
          }
       },
       "develop" : {
@@ -87,28 +87,30 @@
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::Plugin::TestRelease" : "0",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
-            "English" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver::PluginBundle::DAGOLDEN" : "0",
             "Pod::Wordlist" : "0",
             "Software::License::Perl_5" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1",
-            "blib" : "1.01"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
             "B" : "0",
             "Carp" : "0",
-            "perl" : "5.006",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "version" : "0.88",
             "warnings" : "0"
@@ -122,7 +124,7 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::More" : "0.88",
-            "perl" : "5.006",
+            "perl" : "v5.10.0",
             "version" : "0.88"
          }
       }
@@ -130,7 +132,11 @@
    "provides" : {
       "CPAN::Meta::Requirements" : {
          "file" : "lib/CPAN/Meta/Requirements.pm",
-         "version" : "2.140"
+         "version" : "2.142"
+      },
+      "CPAN::Meta::Requirements::Range" : {
+         "file" : "lib/CPAN/Meta/Requirements/Range.pm",
+         "version" : "2.142"
       }
    },
    "release_status" : "stable",
@@ -145,13 +151,20 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/CPAN-Meta-Requirements"
       }
    },
-   "version" : "2.140",
+   "version" : "2.142",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Ed J <mohawk2@users.noreply.github.com>",
+      "Graham Knop <haarg@haarg.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Leon Timmermans <fawaka@gmail.com>",
-      "robario <webmaster@robario.com>"
-   ]
+      "Ricardo Signes <rjbs@semiotic.systems>",
+      "robario <webmaster@robario.com>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Tatsuhiko Miyagawa <miyagawa@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.37.10",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

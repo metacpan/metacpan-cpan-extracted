@@ -2,7 +2,7 @@
 # MIT License
 
 class JSON : precompile {
-  version "1.001";
+  version "1.001001";
   
   use Hash;
   use List;
@@ -146,7 +146,7 @@ class JSON : precompile {
       }
     }
     else {
-      my $type_name = ref $spvm_data;
+      my $type_name = type_name $spvm_data;
       
       die "The \$spvm_data contains a value of an invalid type. The type is $type_name. The found depth is $depth.";
     }

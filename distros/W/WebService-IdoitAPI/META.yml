@@ -3,6 +3,7 @@ abstract: 'a library to access the i-doit JSON RPC API'
 author:
   - 'Mathias Weidner <mamawe@cpan.org>'
 build_requires:
+  IO::ScalarArray: '0'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
@@ -22,5 +23,7 @@ requires:
   JSON::RPC::Legacy::Client: '0'
   Text::CSV: '0'
   perl: '5.006'
-version: v0.2.0
+resources:
+  repository: https://github.com/matwei-perl/WebService-IdoitAPI.git
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

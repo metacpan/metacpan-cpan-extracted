@@ -26,7 +26,7 @@ use strict;
 use JSON qw( decode_json );
 use HTTP::Request::Common;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 # Alpha Vantage recommends that API call frequency does not extend far
 # beyond ~1 call per second so that they can continue to deliver
@@ -53,12 +53,13 @@ my %currencies_by_suffix = (
     '.PK'  => "USD",    # USA		Pink Sheets
     '.X'   => "USD",    # USA		US Options
     '.BA'  => "ARS",    # Argentina	Buenos Aires
-    '.VI'  => "EUR",    # Austria		Vienna
+    '.VI'  => "EUR",    # Austria	Vienna
     '.AX'  => "AUD",    # Australia
-    '.SA'  => "BRL",    # Brazil		Sao Paolo
-    '.BR'  => "EUR",    # Belgium		Brussels
-    '.TO'  => "CAD",    # Canada		Toronto
-    '.V'   => "CAD",    # 		Toronto Venture
+    '.SA'  => "BRL",    # Brazil	Sao Paolo
+    '.BR'  => "EUR",    # Belgium	Brussels
+    '.TO'  => "CAD",    # Canada	Toronto
+    '.TRV' => "CAD",    # Canada        Toronto Venture
+    '.V'   => "CAD",    # Canada	Toronto Venture
     '.TRT' => "CAD",    # Canada        Toronto
     '.SN'  => "CLP",    # Chile		Santiago
     '.SS'  => "CNY",    # China		Shanghai

@@ -46,7 +46,7 @@ This policy scan for large code blocks of the following type.
     do { ... };
 
 By default a large block is one with more than 10 statements. If
-you need an other limit, you can set the parameter
+you need another limit, you can set the parameter
 C<block_statement_count_limit>.
 
 For example in the I<.perlcriticrc> file

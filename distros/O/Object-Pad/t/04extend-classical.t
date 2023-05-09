@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -18,7 +18,7 @@ package ExtendedClass {
 }
 
 my $obj = ExtendedClass->new;
-isa_ok( $obj, "ExtendedClass", '$obj' );
+isa_ok( $obj, [ "ExtendedClass" ], '$obj' );
 
 is( $obj->moremethod, 456, '$obj has methods from ExtendedClass' );
 

@@ -1,3 +1,10 @@
+0.061 2023-05-08
+  [Prerequirement Changes]
+    * SPVM 0.973+ is required.
+  [License Change]
+    * The license is changed to MIT License.
+  [New Features]
+    * The version string of the MIME::Base64 can be got.
 0.06 2023-03-19
   [Internal Compatible Changes]
     * Use pointer instead of pointer_t

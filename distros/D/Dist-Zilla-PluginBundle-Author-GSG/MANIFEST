@@ -20,4 +20,5 @@ t/Dist-Zilla-Plugin-Author-GSG.t
 t/Dist-Zilla-PluginBundle-Author-GSG.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/release-has-version.t
 t/strict.t

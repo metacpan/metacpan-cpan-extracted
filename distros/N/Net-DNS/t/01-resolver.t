@@ -1,10 +1,11 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 29;
+use Test::More tests => 34;
+use TestToolkit;
 
 use Net::DNS::Resolver;
 use Net::DNS::Resolver::Recurse;
@@ -13,6 +14,8 @@ use Net::DNS::Resolver::Recurse;
 my @NOIP = qw(:: 0.0.0.0);
 
 my $resolver = Net::DNS::Resolver->new( retrans => 0, retry => 0 );
+
+$resolver->nameservers(@NOIP);
 
 my $recursive = Net::DNS::Resolver::Recurse->new( retrans => 0, retry => 0 );
 
@@ -71,9 +74,9 @@ $resolver->nameservers();
 ok( !$resolver->send('.'), 'no TCP nameservers' );
 
 $resolver->nameservers(@NOIP);
-ok( !$resolver->send('.'),	  '$resolver->send   TCP socket error' );
-ok( !$resolver->bgsend('.'),	  '$resolver->bgsend TCP socket error' );
-ok( !scalar( $resolver->axfr() ), '$resolver->axfr   TCP socket error' );
+ok( !$resolver->send('.'),   '$resolver->send	TCP socket error' );
+ok( !$resolver->bgsend('.'), '$resolver->bgsend TCP socket error' );
+ok( !$resolver->axfr('.'),   '$resolver->axfr	TCP socket error' );
 
 
 $recursive->hints(@NOIP);
@@ -83,35 +86,22 @@ $recursive->nameservers(@NOIP);
 ok( !$recursive->send( 'www.net-dns.org', 'A' ), 'fail if no reachable server' );
 
 
-sub warning {
-	my ( $test, $method ) = @_;
-	local $SIG{__WARN__} = sub { die @_ };
-	eval {&$method};
-	my ($warning) = split /\n/, "$@\n";
-	ok( $warning, "$test\t[$warning]" );
-	return eval {&$method};
-}
+is( $resolver->DESTROY, undef, 'DESTROY() exists to placate pre-5.18 AUTOLOAD' );
+exception( 'AUTOLOAD: unrecognised method', sub { $resolver->unknown() } );
 
-warning( 'unresolved nameserver warning', sub { $resolver->nameserver('bogus.example.com.') } );
+exception( 'new( config_file => ... )', sub { Net::DNS::Resolver->new( config_file => 'nonexist.txt' ) } );
 
-warning( 'deprecated bgisready() method', sub { $resolver->bgisready(undef) } );
+exception( 'unresolved nameserver warning',   sub { $resolver->nameserver('bogus.example.com.') } );
+exception( 'unspecified axfr() zone name',    sub { $resolver->axfr(undef) } );
+exception( 'deprecated axfr_start() method',  sub { $resolver->axfr_start('net-dns.org') } );
+exception( 'deprecated axfr_next() method',   sub { $resolver->axfr_next() } );
+exception( 'deprecated query_dorecursion()',  sub { $recursive->query_dorecursion( 'www.net-dns.org', 'A' ) } );
+exception( 'deprecated recursion_callback()', sub { $recursive->recursion_callback(undef) } );
+exception( 'deprecated bgisready() method',   sub { $resolver->bgisready(undef) } );
 
-warning( 'deprecated axfr_start() method', sub { $resolver->axfr_start('net-dns.org') } );
-
-warning('deprecated axfr_next() method',
-	sub {
-		$resolver->{axfr_iter} = sub { };
-		$resolver->axfr_next();
-	} );
-
-warning( 'deprecated query_dorecursion()', sub { $recursive->query_dorecursion( 'www.net-dns.org', 'A' ) } );
-
-warning('deprecated recursion_callback()',
-	sub {
-		$recursive->recursion_callback( sub { } );
-	} );
-
-warning( 'deprecated make_query_packet()', sub { $resolver->make_query_packet('example.com') } );
+my $deprecated = sub { $resolver->make_query_packet('example.com') };
+exception( 'deprecated make_query_packet()', $deprecated );
+noexception( 'no repeated deprecation warning', $deprecated );
 
 exit;
 
@@ -119,7 +109,6 @@ exit;
 package Net::DNS::Resolver;		## off-line dry test
 sub _create_tcp_socket {return}		## stub
 sub _create_udp_socket {return}		## stub
-
 
 __END__
 

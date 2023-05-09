@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -16,13 +16,13 @@ class Point {
 
 {
    my $point = Point->new( x => 10 );
-   is_deeply( [ $point->pos ], [ 10, 0 ],
+   is( [ $point->pos ], [ 10, 0 ],
       'Point with default y' );
 }
 
 {
    my $point = Point->new( x => 30, y => 40 );
-   is_deeply( [ $point->pos ], [ 30, 40 ],
+   is( [ $point->pos ], [ 30, 40 ],
       'Point fully specified' );
 }
 
@@ -34,7 +34,7 @@ class Point3D :isa(Point) {
 
 {
    my $point = Point3D->new( x => 50, y => 60, z => 70 );
-   is_deeply( [ $point->pos ], [ 50, 60, 70 ],
+   is( [ $point->pos ], [ 50, 60, 70 ],
       'Point3D inherits params' );
 }
 
@@ -72,19 +72,19 @@ class Point3D :isa(Point) {
       method values { return ( $exists, $defined, $true ); }
    }
 
-   is_deeply( [ AllTheOps->new(exists => "value", defined => "value", true => "value")->values ],
+   is( [ AllTheOps->new(exists => "value", defined => "value", true => "value")->values ],
       [ "value", "value", "value" ],
       'AllTheOps for true values' );
 
-   is_deeply( [ AllTheOps->new(exists => 0, defined => 0, true => 0)->values ],
+   is( [ AllTheOps->new(exists => 0, defined => 0, true => 0)->values ],
       [ 0, 0, "default" ],
       'AllTheOps for false values' );
 
-   is_deeply( [ AllTheOps->new(exists => undef, defined => undef, true => undef)->values ],
+   is( [ AllTheOps->new(exists => undef, defined => undef, true => undef)->values ],
       [ undef, "default", "default" ],
       'AllTheOps for undef values' );
 
-   is_deeply( [ AllTheOps->new()->values ],
+   is( [ AllTheOps->new()->values ],
       [ "default", "default", "default" ],
       'AllTheOps for missing values' );
 }

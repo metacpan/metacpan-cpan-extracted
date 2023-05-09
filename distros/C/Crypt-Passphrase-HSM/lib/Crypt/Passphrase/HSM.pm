@@ -3,12 +3,12 @@ package Crypt::Passphrase::HSM;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.005';
 
 use Crypt::Passphrase -encoder;
 
 use Carp 'croak';
-use Crypt::HSM;
+use Crypt::HSM 0.010;
 use MIME::Base64;
 
 sub new {
@@ -16,17 +16,24 @@ sub new {
 
 	my $active = delete $args{active} // die 'No active pepper specified';
 	my $algorithm = delete $args{algorithm} // 'sha512-hmac';
-	my @subtypes = ($algorithm, @{ delete $args{subtypes} || [] });
-	my $prefix = delete $args{prefix} // 'pepper-';
-	my $salt_size = delete $args{salt_size} // 16;
 
 	my $session = $args{session} // do {
-		my $provider = ref $args{provider} ? delete $args{provider} : Crypt::HSM->load(delete $args{provider});
-		my $slot = delete $args{slot} // ($provider->slots)[0];
-		$provider->open_session($slot);
+		if (ref $args{slot}) {
+			(delete $args{slot})->open_session;
+		} else {
+			my $provider = ref $args{provider} ? delete $args{provider} : Crypt::HSM->load(delete $args{provider});
+			my $slot = defined $args{slot} ? $provider->slot(delete $args{slot}) : ($provider->slots)[0];
+			$slot->open_session;
+		}
 	};
 	my $user_type = delete $args{user_type} // 'user';
 	$session->login($user_type, delete $args{pin}) if $args{pin};
+
+	die "Algorithm '$algorithm' not supported" unless $session->slot->mechanism($algorithm)->has_flags('sign', 'verify');
+
+	my @subtypes = map { $_->name } grep { $_->has_flags('sign', 'verify') } $session->slot->mechanisms;
+	my $prefix = delete $args{prefix} // 'pepper-';
+	my $salt_size = delete $args{salt_size} // 16;
 
 	my $label = "$prefix$active";
 	my ($key) = $session->find_objects({ label => $label, sign => 1 });
@@ -58,20 +65,20 @@ sub hash_password {
 
 sub crypt_subtypes {
 	my $self = shift;
-	return @{ $self->{subtypes} }
+	return @{ $self->{subtypes} };
 }
 
 my $regex = qr/ \A \$ ([^\$]+) \$ v=2, id=([^\$,]) \$ ([^\$]*) \$ (.*) /x;
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	my ($algorithm, $id) = $hash =~ $regex or return !!1;
-	return $algorithm ne $self->{algorithm} || $id ne $self->{active};
+	my ($algorithm, $id, $salt) = $hash =~ $regex or return !!1;
+	return $algorithm ne $self->{algorithm} || $id ne $self->{active} || length $salt != int(($self->{salt_size} * 4 + 2) / 3);
 }
 
 sub verify_password {
 	my ($self, $password, $hash) = @_;
-	my ($algorithm, $id, $encoded_salt, $encoded_hmac) = $hash =~ $regex or die "Fail!";
+	my ($algorithm, $id, $encoded_salt, $encoded_hmac) = $hash =~ $regex or return !!0;
 	my $salt = decode_base64($encoded_salt);
 	my $hmac = decode_base64($encoded_hmac);
 
@@ -160,7 +167,7 @@ This will check if the hash needs a rehash.
 
 =head2 crypt_subtypes
 
-This returns the chosen algorithm.
+This returns the supported algorithms.
 
 =head1 AUTHOR
 

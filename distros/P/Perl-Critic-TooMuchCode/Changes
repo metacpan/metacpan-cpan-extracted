@@ -1,3 +1,9 @@
+0.19
+	- Released at 2023-05-05T21:24:23+0900
+	- ProhibitDuplicateLiteral: Improve description by including the literal and excluding line and column numbers.
+	- ProhibitDuplicateSub: Allow multiple BEGIN, UNITCHECK, CHECK, INIT and END code blocks
+	- Some improvements of documentation.
+
 0.18
 	- Released at 2021-09-29T08:43:04+0900
 	- ProhibitDuplicateLiteral: the parameter "whitelist" is renamed to "allowlist"

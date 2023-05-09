@@ -6,7 +6,7 @@ use utf8;
 
 BEGIN { binmode STDOUT, ":encoding(UTF-8)" }
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental(mop)';
 
@@ -22,7 +22,7 @@ class Sandviĉon {
 }
 
 my $s = Sandviĉon->new;
-isa_ok( $s, "Sandviĉon", '$s' );
+isa_ok( $s, [ "Sandviĉon" ], '$s' );
 
 my $classmeta = Object::Pad::MOP::Class->for_class( "Sandviĉon" );
 ok( $classmeta, 'Can obtain classmeta for UTF-8 class name' );

@@ -50,7 +50,7 @@ sub violates {
 
         if ($firstSeen{"$val"}) {
             push @violations, $self->violation(
-                "A duplicate literal value at line: " . $el->line_number . ", column: " . $el->column_number,
+                "A duplicate literal: '$el->string'",
                 "Another literal value in the same piece of code.",
                 $el,
             );
@@ -64,7 +64,7 @@ sub violates {
         next if $self->{"_allowlist"}{$val};
         if ($firstSeen{$val}) {
             push @violations, $self->violation(
-                "A duplicate literal value at line: " . $el->line_number . ", column: " . $el->column_number,
+                "A duplicate literal: $el->content",
                 "Another literal value in the same piece of code.",
                 $el,
             );

@@ -8,7 +8,7 @@ my $khonsu = Khonsu->new(
 	page_args => {
 		background => '#3ff'
 	}
-)->add_page;
+);
 
 $khonsu->add_image(
 	image => 't/test.png',
@@ -120,7 +120,7 @@ $khonsu->add_text(
 	x => 20,
 	y => 120,
 	w => 100,
-	h => 100,
+	h => 120,
 );
 
 $khonsu->add_text( 
@@ -128,7 +128,7 @@ $khonsu->add_text(
 	x => 140,
 	y => 120,
 	w => 100,
-	h => 100,
+	h => 120,
 );
 
 $khonsu->add_text( 
@@ -136,7 +136,7 @@ $khonsu->add_text(
 	x => 260,
 	y => 120,
 	w => 100,
-	h => 100,
+	h => 120,
 );
 
 $khonsu->add_text( 
@@ -144,7 +144,7 @@ $khonsu->add_text(
 	x => 380,
 	y => 120,
 	w => 100,
-	h => 100,
+	h => 120,
 );
 
 for (0..50) {

@@ -14,6 +14,7 @@ requires 'Dist::Zilla::Role::LicenseProvider';
 
 requires 'Dist::Zilla::Plugin::Test::Compile', '2.055';
 requires 'Dist::Zilla::Plugin::Test::ReportPrereqs';
+requires 'Dist::Zilla::Plugin::HasVersionTests';
 
 requires 'Dist::Zilla::Plugin::StaticInstall';
 
@@ -31,7 +32,7 @@ requires 'Dist::Zilla::Plugin::Git::Commit';
 requires 'Dist::Zilla::Plugin::Git::Tag', '2.046';
 requires 'Dist::Zilla::Plugin::Git::Push';
 
-requires 'Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes';
+requires 'Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes', '> 0.230480';
 
 requires 'Dist::Zilla::Plugin::Git::Contributors';
 requires 'Dist::Zilla::Plugin::PodWeaver';

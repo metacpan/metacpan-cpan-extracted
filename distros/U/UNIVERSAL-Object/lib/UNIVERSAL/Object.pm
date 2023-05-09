@@ -7,7 +7,7 @@ use warnings;
 use Carp       ();
 use Hash::Util ();
 
-our $VERSION   = '0.16';
+our $VERSION   = '0.17';
 our $AUTHORITY = 'cpan:STEVAN';
 
 BEGIN { $] >= 5.010 ? require mro : require MRO::Compat }
@@ -145,7 +145,7 @@ UNIVERSAL::Object - A useful base class
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -366,7 +366,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016, 2017, 2018 by Stevan Little.
+This software is copyright (c) 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

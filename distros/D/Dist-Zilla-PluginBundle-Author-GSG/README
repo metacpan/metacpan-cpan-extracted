@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.4.0
+    version v0.5.0
 
 SYNOPSIS
 
@@ -107,6 +107,7 @@ SYNOPSIS
         ; test_compile_switch
     
         [Test::ReportPrereqs]
+        [HasVersionTests]
         [PodSyntaxTests]
         [PodCoverageTests]
 

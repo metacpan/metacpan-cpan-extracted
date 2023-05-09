@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1903 2023-03-06 08:51:09Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1921 2023-05-08 18:39:59Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -32,10 +32,10 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset ) = @_;
 
 	my $class = delete $self->{class};			# OPT redefines CLASS and TTL fields
-	$self->{udpsize} = $class if defined $class;
+	$self->udpsize($class) if defined $class;
 
 	my $ttl = delete $self->{ttl};
-	@{$self}{qw(rcode version flags)} = unpack 'C2n', pack( 'N', $ttl ) if defined $ttl;
+	$self->_ttl($ttl) if defined $ttl;
 
 	my $limit = $offset + $self->{rdlength} - 4;
 	my @index;
@@ -64,8 +64,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub encode {				## override RR method
 	my $self = shift;
 	my $data = $self->_encode_rdata;
-	my @xttl = ( $self->rcode >> 4, $self->version, $self->flags );
-	return pack 'C n n C2n na*', 0, OPT, $self->udpsize, @xttl, length($data), $data;
+	return pack 'C n n N na*', 0, OPT, $self->udpsize, $self->_ttl, length($data), $data;
 }
 
 
@@ -80,14 +79,26 @@ sub class {				## override RR method
 	return $self->udpsize(@value);
 }
 
+sub size {
+	my ( $self, @value ) = @_;				# uncoverable pod
+	$self->_deprecate(qq[size() is an alias of "UDPsize()"]);
+	return $self->udpsize(@value);
+}
+
 sub ttl {				## override RR method
 	my ( $self, @value ) = @_;
-	$self->_deprecate(qq[please use "flags()" or "rcode()"]);
+	$self->_deprecate(qq[please use "flags()", "rcode()" or "version()"]);
+	return $self->_ttl(@value);
+}
+
+sub _ttl {
+	my ( $self, @value ) = @_;
 	for (@value) {
-		@{$self}{qw(rcode version flags)} = unpack 'C2n', pack 'N', $_;
-		@{$self}{rcode} = @{$self}{rcode} << 4;
+		@{$self}{qw(rcode version flags)} = unpack 'C2n', pack( 'N', $_ );
+		$self->{rcode} = $self->{rcode} << 4;
+		return;
 	}
-	return pack 'C2n', $self->rcode >> 4, $self->version, $self->flags;
+	return unpack 'N', pack( 'C2n', $self->rcode >> 4, $self->version, $self->flags );
 }
 
 sub generic {				## override RR method
@@ -142,16 +153,14 @@ sub version {
 
 sub udpsize {
 	my ( $self, @value ) = @_;				# uncoverable pod
-	for (@value) { $self->{udpsize} = 0 + $_ }
-	return ( $self->{udpsize} || 0 ) > 512 ? $self->{udpsize} : 0;
+	for (@value) { $self->{udpsize} = ( $_ > 512 ) ? $_ : 0 }
+	return $self->{udpsize} || 0;
 }
-
-sub size { return &udpsize; }					# uncoverable pod
 
 
 sub rcode {
 	my ( $self, @value ) = @_;
-	for (@value) { $self->{rcode} = $_ < 16 ? 0 : $_ }	# discard non-EDNS rcodes 1 .. 15
+	for (@value) { $self->{rcode} = ( $_ < 16 ) ? 0 : $_ }	# discard non-EDNS rcodes 1 .. 15
 	return $self->{rcode} || 0;
 }
 

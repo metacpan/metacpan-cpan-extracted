@@ -1,6 +1,7 @@
 package App::RemoteCommand::Select;
-use strict;
+use v5.16;
 use warnings;
+
 use IO::Select;
 use App::RemoteCommand::LineBuffer;
 

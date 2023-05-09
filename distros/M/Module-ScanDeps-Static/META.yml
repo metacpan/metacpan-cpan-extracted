@@ -23,7 +23,7 @@ no_index:
 provides:
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Class::Accessor::Fast: '0.51'
   IO::Scalar: '2.111'
@@ -31,5 +31,5 @@ requires:
   Pod::Find: '0'
   Readonly: '2.05'
   version: '0'
-version: '1.002'
+version: '1.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

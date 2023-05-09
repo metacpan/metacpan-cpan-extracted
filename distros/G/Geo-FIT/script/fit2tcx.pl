@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 =encoding utf-8
 
@@ -21,6 +21,9 @@ fit2tcx.pl - script to convert a FIT file to a TCX file
 C<fit2tcx.pl> reads the contents of a I<$fit_activity_file> and converts it to correspoding TCX format. If <$new_filename> is provided, writes the resulting TCX content to it, otherwise prints the content to standard output.
 
 =cut
+
+use FindBin;
+use lib $FindBin::Bin;
 
 use Geo::FIT;
 use POSIX qw(strftime);
@@ -46,7 +49,7 @@ if ($version) {
 }
 die usage() if $help;
 
-my ($from, $to);
+my ($from, $to) = qw(- -);
 if (@ARGV) {
     $from = shift @ARGV;
     @ARGV and $to = shift @ARGV
@@ -913,7 +916,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.08
+1.10
 
 =head1 LICENSE AND COPYRIGHT
 

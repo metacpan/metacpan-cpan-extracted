@@ -1,5 +1,12 @@
 Revision history for MIDI-Drummer
 
+0.4208 2023-05-08 14:43:40
+    - Odd. A cpan smoker failed because the DeBruijn module
+      was not installed via Music::CreatingRhythms. ...Ok.
+
+0.4207 2023-05-05 21:05:34
+    - Accent the 1st note of a bar for count_in().
+
 0.4206 2023-04-07 11:42:24
     - Fix a dumb typo - ugh!
 

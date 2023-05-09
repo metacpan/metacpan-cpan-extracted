@@ -288,6 +288,7 @@ sub get_values {
 
  length is not the last index but one beyond
  print("config_superflows, lengthis $config_superflows->{_length}\n");
+ 	 print("config_superflows, length (x2) is $config_superflows->{_length}\n");
  	TODO: subroutine will fail unless _defaults are first called
 
 =cut 
@@ -295,6 +296,7 @@ sub get_values {
 sub length {
 
 	my ($self) = @_;
+
 	
 	_get_all();
 
@@ -497,11 +499,12 @@ sub save {
 
 				@format = @{ $var_immodpg->{_format_aref} };
 
-#		        print("config_superflows, _write,formats =@format  \n");
+#		        print("1. config_superflows, _write,formats =@format  \n");
 				$files_LSU->set_superflow_config_file_format( \@format );
 
 			}
 			else {
+#				print("2. config_superflows, _write,formats =@format  \n");
 				$format[0] = $var->{_config_file_format};
 				$files_LSU->set_superflow_config_file_format( \@format );
 			}

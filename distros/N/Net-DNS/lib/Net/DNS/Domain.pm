@@ -3,7 +3,7 @@ package Net::DNS::Domain;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Domain.pm 1898 2023-02-15 14:27:22Z willem $)[2];
+our $VERSION = (qw$Id: Domain.pm 1913 2023-04-20 12:33:30Z willem $)[2];
 
 
 =head1 NAME
@@ -171,7 +171,7 @@ sub name {
 
 =head2 fqdn
 
-    @fqdn = $domain->fqdn;
+    $fqdn = $domain->fqdn;
 
 Returns a character string containing the fully qualified domain
 name, including the trailing dot.
@@ -180,7 +180,7 @@ name, including the trailing dot.
 
 sub fqdn {
 	my $name = &name;
-	return $name =~ /[.]$/ ? $name : $name . '.';		# append trailing dot
+	return $name =~ /[.]$/ ? $name : "$name.";		# append trailing dot
 }
 
 
@@ -244,10 +244,7 @@ represented by the appropriate escape sequence.
 
 =cut
 
-sub string {
-	my $name = &name;
-	return $name =~ /[.]$/ ? $name : $name . '.';		# append trailing dot
-}
+sub string { return &fqdn }
 
 
 =head2 origin

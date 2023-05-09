@@ -3,6 +3,8 @@ package Khonsu::Ra;
 use strict;
 use warnings;
 
+use Clone;
+
 use Khonsu::Shape::Line;
 use Khonsu::Shape::Box;
 use Khonsu::Shape::Circle;
@@ -20,6 +22,10 @@ use Khonsu::Text::H5;
 use Khonsu::Text::H6;
 
 use Khonsu::Image;
+
+use Khonsu::Form;
+use Khonsu::Form::Field::Input;
+use Khonsu::Form::Field::Select;
 
 use Khonsu::TOC;
 
@@ -86,6 +92,15 @@ use constant IMAGE => (
 );
 use constant TOC => (
 	toc => {is => 'rw', isa => Object, default => sub { Khonsu::TOC->new() }}
+);
+use constant FORM => (
+	form => {is => 'rw', isa => Object, default => sub { Khonsu::Form->new() }}
+);
+use constant INPUT => (
+	input => {is => 'rw', isa => Object, default => sub { Khonsu::Form::Field::Input->new() }}
+);
+use constant SELECT => (
+	select => {is => 'rw', isa => Object, default => sub { Khonsu::Form::Field::Select->new() }}
 );
 sub new {
 	my ($pkg, %params) = @_;
@@ -154,6 +169,12 @@ sub set_attributes {
 		$self->{attributes}->{$_}($self, $params{$_});
 	}
 	return $self;
+}
+
+sub clone {
+	my ($self) = @_;
+	my $ref = ref $self;
+	return bless Clone::clone($self), $ref;
 }
 
 sub DESTROY {}

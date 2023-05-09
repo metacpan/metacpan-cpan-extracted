@@ -3,13 +3,13 @@ package Crypt::Passphrase::Pepper::HSM;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.005';
 
 use parent 'Crypt::Passphrase::Pepper::Base';
-use Crypt::Passphrase -encoder;
+use Crypt::Passphrase 0.016 -encoder;
 
 use Carp 'croak';
-use Crypt::HSM;
+use Crypt::HSM 0.010;
 
 sub new {
 	my ($class, %args) = @_;
@@ -18,12 +18,17 @@ sub new {
 	$args{prefix} //= 'pepper-';
 
 	$args{session} //= do {
-		my $provider = ref $args{provider} ? $args{provider} : Crypt::HSM->load(delete $args{provider});
-		my $slot = delete $args{slot} // ($provider->slots)[0];
-		$provider->open_session($slot);
+		if (ref $args{slot}) {
+			(delete $args{slot})->open_session;
+		} else {
+			my $provider = ref $args{provider} ? delete $args{provider} : Crypt::HSM->load(delete $args{provider});
+			my $slot = defined $args{slot} ? $provider->slot(delete $args{slot}) : ($provider->slots)[0];
+			$slot->open_session;
+		}
 	};
 	my $user_type = delete $args{user_type} // 'user';
 	$args{session}->login($user_type, delete $args{pin}) if $args{pin};
+	$args{supported_hashes} //= [ map { $_->name } grep { $_->has_flags('sign') && $_->min_key_size <= 64 } $args{session}->slot->mechanisms ];
 
 	return $class->SUPER::new(%args);
 }
@@ -69,7 +74,7 @@ Crypt::Passphrase::Pepper::HSM - A pepper-wrapper using hardware for Crypt::Pass
 
 This module wraps another encoder to pepper the input to the hash. By using identifiers for the peppers, it allows for easy rotation of peppers. Unlike L<Crypt::Passphrase::Pepper::Simple|Crypt::Passphrase::Pepper::Simple> it stores the peppers in a hardware security module (or some other PKCS11 implementation of choice) to ensure their confidentiality.
 
-It will be able to validate both peppered and unpeppered hashes.
+It will be able to validate both peppered and unpeppered hashes but only create the former.
 
 =head1 METHODS
 

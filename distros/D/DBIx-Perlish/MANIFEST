@@ -29,7 +29,6 @@ t/40.mysql.t
 t/41.oracle.t
 t/42.pg.t
 t/50.sqlite-real.t
-t/52.pglite-real.t
 t/78.sequences.t
 t/80.parse-bad.t
 t/pod-coverage.t

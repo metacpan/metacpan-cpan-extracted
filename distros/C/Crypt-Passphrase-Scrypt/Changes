@@ -1,5 +1,10 @@
 Revision history for Crypt-Passphrase-Scrypt
 
+0.004     2023-05-04 17:34:07+02:00 Europe/Amsterdam
+          - Increase default output size to 32 bytes
+          - make needs_rehash stricter
+          - Add support for $7$ hashes
+
 0.003     2023-03-11 03:23:42+01:00 Europe/Amsterdam
           - Fix typo in prereqs
 

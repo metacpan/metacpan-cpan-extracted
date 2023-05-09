@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/tabledata/tabledata
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-18'; # DATE
+our $DATE = '2023-02-12'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/tabledata/tabledata",
@@ -39,15 +39,15 @@ tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.005 of tabledata (from Perl distribution App-tabledata), released on 2022-10-18.
+This document describes version 0.006 of tabledata (from Perl distribution App-tabledata), released on 2023-02-12.
 
 =head1 SYNOPSIS
 
-B<tabledata> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<tabledata> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<tabledata> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+B<tabledata> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<tabledata> [L<--action|/"--actions">=I<str>|L<-H|/"--actions">|L<-L|/"--actions">|L<-R|/"--actions">|L<-S|/"--actions">|L<--actions|/"--actions">] [L<--config-path|/"--config-path=s, -c">=I<path>|L<-c|/"--config-path=s, -c">|L<--no-config|/"--no-config, -C">|L<-C|/"--no-config, -C">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--num|/"--num=s, -n">=L<posint|Sah::Schema::posint>|L<-n|/"--num=s, -n">=L<posint|Sah::Schema::posint>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] -- [L<module|/"--module=s">]
+B<tabledata> [B<L<--action|/"--actions">>=I<str>|B<L<-H|/"--actions">>|B<L<-L|/"--actions">>|B<L<-R|/"--actions">>|B<L<-S|/"--actions">>|B<L<--actions|/"--actions">>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--num|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>|B<L<-n|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<module|/"--module=s">>]
 
 =head1 OPTIONS
 
@@ -391,6 +391,14 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tabled
 
 Source repository is at L<https://github.com/perlancar/perl-App-tabledata>.
 
+=head1 SEE ALSO
+
+L<td>.
+
+L<arraydata>.
+
+L<hashdata>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
@@ -415,7 +423,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

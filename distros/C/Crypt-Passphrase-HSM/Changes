@@ -1,5 +1,13 @@
 Revision history for Crypt-Passphrase-HSM
 
+0.005     2023-05-08 14:09:07+0200
+          - Take salt length into account for rehashing need
+
+0.004     2023-05-03 19:10:10+0200
+          - Adapt to Crypt::HSM 0.010
+          - Adapt to having pepper-hash in identifier
+          - Fail more graciously on non well-formed hash
+
 0.003     2023-04-20 14:21:52+0200
           - Change Crypt::Passphrase::HSM to a salt+pepper construct
 

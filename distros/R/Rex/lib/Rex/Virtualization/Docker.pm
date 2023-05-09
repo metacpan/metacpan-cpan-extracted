@@ -13,27 +13,27 @@ With this module you can manage Docker.
 =head1 SYNOPSIS
 
  use Rex::Commands::Virtualization;
-   
+
  set virtualization => "Docker";
-   
- use Data::Dumper;  
-  
+
+ use Data::Dumper;
+
  print Dumper vm list => "all";
  print Dumper vm list => "running";
- 
+
  print Dumper vm info => "vm01";
-   
+
  vm destroy => "vm01";
-   
- vm delete => "vm01"; 
-    
+
+ vm delete => "vm01";
+
  vm start => "vm01";
-   
+
  vm shutdown => "vm01";
-   
+
  vm reboot => "vm01";
-   
- # creating a vm 
+
+ # creating a vm
  my $id = vm create => "vm01",
     image => "ubuntu",
     command => 'echo hello world',
@@ -50,7 +50,7 @@ package Rex::Virtualization::Docker;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Virtualization::Base;
 use base qw(Rex::Virtualization::Base);

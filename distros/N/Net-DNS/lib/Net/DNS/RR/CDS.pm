@@ -2,7 +2,7 @@ package Net::DNS::RR::CDS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CDS.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: CDS.pm 1909 2023-03-23 11:36:16Z willem $)[2];
 
 use base qw(Net::DNS::RR::DS);
 
@@ -20,21 +20,15 @@ sub algorithm {
 	my ( $self, $arg ) = @_;
 	return $self->SUPER::algorithm($arg) if $arg;
 	return $self->SUPER::algorithm() unless defined $arg;
-	@{$self}{qw(keytag algorithm digtype)} = ( 0, 0, 0 );
+	@{$self}{qw(keytag algorithm digtype digestbin)} = ( 0, 0, 0, chr(0) );
 	return;
 }
 
 
 sub digtype {
 	my ( $self, $arg ) = @_;
-	return $self->SUPER::digtype( $arg ? $arg : () );
-}
-
-
-sub digest {
-	my ( $self, @arg ) = @_;
-	return $self->SUPER::digest(@arg) unless defined( $arg[0] ) && length( $arg[0] ) < 2;
-	return $self->SUPER::digestbin( $arg[0] ? '' : chr(0) );
+	return $self->SUPER::digtype($arg) if $arg;
+	return $self->SUPER::digtype();
 }
 
 

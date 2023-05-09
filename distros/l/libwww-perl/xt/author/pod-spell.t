@@ -36,6 +36,7 @@ BooK
 Bron
 Bryan
 Buenzli
+Burak
 Burke
 CGI
 CPAN
@@ -71,11 +72,13 @@ Duret
 Dvornik
 Eckankar
 Eldridge
+Eric
 Etheridge
 FWILES
 Fabian
 Father
 Fesler
+Fiegehenn
 Finch
 Fowler
 Frank
@@ -98,6 +101,7 @@ Gregoire
 Gregory
 Grossmann
 Guenther
+Gursoy
 Gurusamy
 Gustafsson
 Hakanson
@@ -125,8 +129,10 @@ Joe
 Joerg
 Johannessen
 John
+Johnson
 Jonathan
 Jr
+Julien
 KONISHI
 Kaji
 Kaminsky
@@ -316,6 +322,7 @@ at
 bin
 brong
 bryan
+burak
 capoeirab
 cjm
 colin
@@ -331,6 +338,7 @@ dot
 doug
 dpettit
 dsteinbrunner
+eric
 erik
 ether
 faz
@@ -354,6 +362,7 @@ haarg
 hfroehlich
 http
 iank
+instantiation
 jefflee
 jfesler
 jmates

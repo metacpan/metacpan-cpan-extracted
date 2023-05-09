@@ -1,6 +1,7 @@
 package App::RemoteCommand::SSH;
-use strict;
+use v5.16;
 use warnings;
+
 use App::RemoteCommand::Util qw(DEBUG logger);
 use Net::OpenSSH;
 use IO::Pty;

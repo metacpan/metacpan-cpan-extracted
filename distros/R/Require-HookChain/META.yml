@@ -19,31 +19,40 @@ name: Require-HookChain
 provides:
   RHC:
     file: lib/RHC.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain:
     file: lib/Require/HookChain.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain::log::logger:
     file: lib/Require/HookChain/log/logger.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain::log::stderr:
     file: lib/Require/HookChain/log/stderr.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain::munge::prepend:
     file: lib/Require/HookChain/munge/prepend.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain::r:
     file: lib/Require/HookChain.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain::test::fail:
     file: lib/Require/HookChain/test/fail.pm
-    version: '0.009'
+    version: '0.011'
+  Require::HookChain::test::noop:
+    file: lib/Require/HookChain/test/noop.pm
+    version: '0.011'
+  Require::HookChain::test::noop_all:
+    file: lib/Require/HookChain/test/noop_all.pm
+    version: '0.011'
+  Require::HookChain::test::random_fail:
+    file: lib/Require/HookChain/test/random_fail.pm
+    version: '0.011'
   Require::HookChain::timestamp::hires:
     file: lib/Require/HookChain/timestamp/hires.pm
-    version: '0.009'
+    version: '0.011'
   Require::HookChain::timestamp::std:
     file: lib/Require/HookChain/timestamp/std.pm
-    version: '0.009'
+    version: '0.011'
 requires:
   Log::ger: '0.038'
   Scalar::Util: '0'
@@ -55,7 +64,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Require-HookChain
   homepage: https://metacpan.org/release/Require-HookChain
   repository: git://github.com/perlancar/perl-Require-HookChain.git
-version: '0.009'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

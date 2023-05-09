@@ -1,5 +1,5 @@
 package DBIx::Class::CryptColumn;
-$DBIx::Class::CryptColumn::VERSION = '0.005';
+$DBIx::Class::CryptColumn::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -50,6 +50,20 @@ sub register_column {
 			});
 		}
 
+		if (defined(my $name = $args->{verify_and_rehash_method})) {
+			$self->_export_sub($name, sub {
+				my ($row, $password) = @_;
+
+				my $hash = $row->get_column($column);
+				my $result = $crypt_passphrase->verify_password($password, $hash);
+				if ($result && $crypt_passphrase->needs_rehash($hash)) {
+					$row->update({ $column => $password })->discard_changes;
+				}
+
+				return $result;
+			});
+		}
+
 		$info->{inflate_passphrase} = $crypt_passphrase;
 	}
 
@@ -63,6 +77,12 @@ sub set_column {
 	$val = $inflate->hash_password($val) if $inflate;
 
 	return $self->next::method($col, $val, @rest);
+}
+
+sub set_inflated_column {
+	my ($self, $col, $val, @rest) = @_;
+	local $self->column_info($col)->{inflate_passphrase};
+	$self->next::method($col, $val, @rest);
 }
 
 1;
@@ -81,7 +101,7 @@ DBIx::Class::CryptColumn - Automatically hash password/passphrase columns
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -96,8 +116,7 @@ version 0.005
          data_type          => 'text',
          inflate_passphrase => {
              encoder        => 'Argon2',
-             verify_method  => 'verify_password',
-             rehash_method  => 'password_needs_rehash',
+             verify_and_rehash_method  => 'verify_and_rehash_password',
          },
      },
  );
@@ -112,17 +131,20 @@ In application code:
 
  my $row = $rs->find({ id => $id });
 
- # Returns a Crypt::Passphrase::PassphraseHash object, which has
- # verify_password and needs_rehash as methods
- my $password = $row->password;
+ if ($row->verify_and_rehash_password($given_password)) {
+   ...
+ }
 
- if ($row->verify_password($input)) {
-   if ($row->password_needs_rehash) {
+ # equivalent to
+
+ if ($row->password->verify_password($given_password)) {
+   if ($row->password->needs_rehash) {
      $row->update({ password => $input });
    }
    ...
  }
 
+ # Change password
  $row->password('new password');
 
 =head1 DESCRIPTION
@@ -138,10 +160,33 @@ to check passwords against. It will be able to tell you if you should rehash
 your password, not only because the scheme is outdated, but also because the
 desired parameters have changed.
 
-If the C<verify_method> option is set it adds a method with that name to the row
-class to verify if a password matches the known hash, and likewise
-C<rehash_method> will add a method for checking if a password needs to be
-rehashed.
+=head1 ARGUMENTS
+
+In addition to the usual C<Crypt::Passphrase> arguments, this module takes three
+extra arguments that each set a method on the row.
+
+=over 4
+
+=item * verify_method
+
+If this option is set it adds a method with that name to the row class to verify
+if a password matches the known hash. This method takes a password as its single
+argument.
+
+=item * rehash_method
+
+If this option is set it will add a method with the given name that checks if a
+password needs to be rehashed. It takes no arguments.
+
+=item * verify_and_rehash_method
+
+If this option is set it will add a method with the given name that verifies if
+a password matches the known hash. If it does and the hash needs a rehash it
+will rehash the password and store the result to the database. In either case it
+returns the result of the verification. This method takes a password as its
+only argument. This option is recommended over the others for most deployments.
+
+=back
 
 =head1 METHODS
 
@@ -154,6 +199,10 @@ normally be directly called by end users.
 =head2 set_column
 
 Hash a passphrase column whenever it is set.
+
+=head2 set_inflated_column
+
+Sets an inflated password column that does not need to be hashed again.
 
 =head2 new
 

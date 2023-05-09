@@ -8,23 +8,25 @@ use Moose;
 use namespace::autoclean;
 
 use Data::Dmp;
+use Require::Hook::Source::DzilBuild;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-27'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-TableData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 with (
     'Dist::Zilla::Role::FileMunger',
     'Dist::Zilla::Role::FileFinderUser' => {
         default_finders => [':InstallModules'],
     },
+    #'Dist::Zilla::Role::RequireFromBuild',
 );
 
 sub munge_files {
     my $self = shift;
 
-    local @INC = ("lib", @INC);
+    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
 
     my %seen_mods;
     for my $file (@{ $self->found_files }) {
@@ -51,13 +53,7 @@ sub munge_files {
                 num_rows => 0,
                 num_columns => 0,
             );
-            $td->each_item(
-                sub {
-                    my $row = shift;
-                    $stats{num_rows}++;
-                    1;
-                }
-            );
+            $stats{num_rows} = $td->get_row_count;
             $stats{num_columns} = $td->get_column_count;
 
             $content =~ s{^(#\s*STATS)$}{"our \%STATS = ".dmp(%stats)."; " . $1}em
@@ -86,7 +82,7 @@ Dist::Zilla::Plugin::TableData - Plugin to use when building TableData::* distri
 
 =head1 VERSION
 
-This document describes version 0.001 of Dist::Zilla::Plugin::TableData (from Perl distribution Dist-Zilla-Plugin-TableData), released on 2021-09-27.
+This document describes version 0.002 of Dist::Zilla::Plugin::TableData (from Perl distribution Dist-Zilla-Plugin-TableData), released on 2023-02-10.
 
 =head1 SYNOPSIS
 
@@ -138,13 +134,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

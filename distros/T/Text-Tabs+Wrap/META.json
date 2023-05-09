@@ -4,13 +4,13 @@
       "David Muir Sharnoff <muir@idiom.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Tabs+Wrap",
    "no_index" : {
@@ -32,21 +32,21 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "perl" : "5.006001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Text-Tabs/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Tabs"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Text-Tabs.git",
+         "url" : "https://github.com/ap/Text-Tabs.git",
          "web" : "https://github.com/ap/Text-Tabs"
       }
    },
-   "version" : "2021.0814",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "2023.0509",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

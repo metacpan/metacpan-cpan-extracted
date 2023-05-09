@@ -26,7 +26,7 @@ use Web::Scraper;
 use Spreadsheet::XLSX;
 use String::Util qw(trim);
 
-our $VERSION = '1.5301'; # VERSION 
+our $VERSION = '1.5402'; # VERSION 
 
 our @labels = qw/symbol date isodate close volume high low isin/;
 

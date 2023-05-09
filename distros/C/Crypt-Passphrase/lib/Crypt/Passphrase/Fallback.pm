@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Fallback;
-$Crypt::Passphrase::Fallback::VERSION = '0.015';
+$Crypt::Passphrase::Fallback::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Crypt::Passphrase::Fallback - a fallback validator for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 METHODS
 

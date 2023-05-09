@@ -6,6 +6,7 @@ sub attributes {
 	my ($a) = shift;
 	return (
 		$a->SUPER::attributes(),
+		active => {$a->RW, $a->BOOL, default => sub { 1 }},
 		show_page_num => {$a->RW, $a->STR},
 		page_num_text => {$a->RW, $a->STR},
 		padding => {$a->RW, $a->NUM},
@@ -15,6 +16,7 @@ sub attributes {
 
 sub render {
 	my ($self, $file) = @_;
+	return unless $self->active;
 	my $y = ($self->h / 2) - ($self->font->size / 2);
 	my $w = $file->page->w - ($self->padding ? ( $self->padding * 2 ) : $self->padding);
 	my $x = $self->padding || 0;
@@ -47,6 +49,13 @@ sub process_page_num_text {
 		return $text;
 	}
 	return $file->page->num;
+}
+
+sub clone {
+	my ($self) = @_;
+	$self = $self->SUPER::clone();
+	$self->active(1);
+	return $self;
 }
 
 =pod

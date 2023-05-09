@@ -29,7 +29,7 @@ WriteMakefile1(
           web  => 'https://github.com/rschupp/PAR-Dist',
         },
         MailingList => 'mailto:par@perl.org',
-        bugtracker => { web => 'https://rt.cpan.org/Dist/Display.html?Queue=PAR-Dist' },
+        bugtracker => { web => 'https://github.com/rschupp/PAR-Dist/issues' },
       },
     },
 );

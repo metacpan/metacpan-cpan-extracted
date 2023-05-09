@@ -56,35 +56,15 @@ The module also provides a script to read and print the contents of FIT files ([
 
 ## Class methods
 
-- message\_name(_message spec_)
-
-    returns the message name for _message spec_ or undef.
-
-- message\_number(_message spec_)
-
-    returns the message number for _message spec_ or undef.
-
-- field\_name(_message spec_, _field spec_)
-
-    returns the field name for _field spec_ in _message spec_ or undef.
-
-- field\_number(_message spec_, _field spec_)
-
-    returns the field index for _field spec_ in _message spec_ or undef.
-
-- protocol\_version\_string()
-
-    returns a string representing the .FIT protocol version on which this class based.
-
 - profile\_version\_string()
 
     returns a string representing the .FIT profile version on which this class based.
 
 ## Object methods
 
-- file(_file name_)
+- file( $filename )
 
-    sets the name _file name_ of a .FIT file.
+    returns the name of a .FIT file. Sets the name to _$filename_ if called with an argument (raises an exception if the file does not exist).
 
 - open()
 
@@ -128,17 +108,17 @@ The module also provides a script to read and print the contents of FIT files ([
 
     returns real data type attributes for a C's union like field.
 
-- string\_value(_array of values_, _offset in the array_, _counts_)
+- fields\_list( $descriptor \[, keep\_unknown => $boole )
 
-    converts an array of character codes to a Perl string.
+    Given a data message descriptor (_$descriptor_), returns the list of fields described in it. If `keep_unknown` is set to true, unknown field names will also be listed.
 
-- field\_list( _$descriptor_ )
+- fields\_defined( $descriptor, $values )
 
-    Given a data message descriptor, returns the list of fields described in it.
+    Given a data message descriptor (_$descriptor_) and a corresponding data array reference of values (_$values_), returns the list of fields whose value is defined. Unknow field names are never listed.
 
 - field\_value( _$field_, _$descriptor_, _$values_ )
 
-    Returns the value the field named _$field_ (a string).
+    Returns the value of the field named _$field_ (a string).
 
     The other arguments consist of the data message descriptor (_$descriptor_, a hash reference) and the values fetched from a data message (_$values_, an array reference). These are simply the references passed to data message callbacks by `fetch()`, if any are registered, and are simply to be passed on to this method (please do not modifiy them).
 
@@ -155,18 +135,18 @@ The module also provides a script to read and print the contents of FIT files ([
 
         1 while ( $fit->fetch );
 
-- field\_value\_as\_read( _$field_, _$descriptor_, _$value_ \[, $type \] )
+- field\_value\_as\_read( _$field_, _$descriptor_, _$value_ \[, $type\_name\_or\_aref \] )
 
-    Convert the value parsed and returned by `field_value()` back to what it was when read from the FIT file and returns it.
+    Converts the value parsed and returned by `field_value()` back to what it was when read from the FIT file and returns it.
 
-    This method is mostly for developers or if there is a particular need to inspect the data more closely, it should be seldomly used. Arguments are similar to `field_value()`, except for the last one, which should be a single value (not a reference) corresponding to the value the former method has or would return.
+    This method is mostly for developers or if there is a particular need to inspect the data more closely, it should seldomly be used. Arguments are similar to `field_value()` except that a single value _$value_ is passed instead of an array reference. That value corresponds to the value the former method has or would have returned.
 
-    If _$value_ was obtained from a call to `named_type_value()` after having provided an explicit named type derived from `switch()`, that named type needs to be provided as a fourth argument.
-
-    As an example, we can obtain the actual value recorded in the FIT file for the manufacturer by adding these to the callback defined above:
+    As an example, we can obtain the actual value recorded in the FIT file for the manufacturer by adding these lines to the callback defined above:
 
             my $as_read = $self->field_value_as_read( 'manufacturer', $descriptor, $value );
             print "The manufacturer's value as recorded in the FIT file is: ", $as_read, "\n"
+
+    The method will raise an exception if _$value_ would have been obtained by `field_value()` via an internal call to `switched()`. In that case, the type name or the original array reference of values that was passed to the callback must be provided as the last argument. Otherwise, there is no way to guess what the value read from the file may have been.
 
 - value\_cooked(_type name_, _field attributes table_, _invalid_, _value_)
 
@@ -202,6 +182,26 @@ The module also provides a script to read and print the contents of FIT files ([
     Returns a string representation of the profile version used by the device or application that created the FIT file opened in the instance.
 
     `fetch_header()` must have been called at least once for this method to be able to return a value, will raise an exception otherwise.
+
+## Functions
+
+The following functions are provided. None are exported, they may be called as `Geo::FIT::message_name(20)`, `Geo::FIT::field_name('device_info', 4)` `Geo::FIT::field_number('device_info', 'product')`, etc.
+
+- message\_name(_message spec_)
+
+    returns the message name for _message spec_ or undef.
+
+- message\_number(_message spec_)
+
+    returns the message number for _message spec_ or undef.
+
+- field\_name(_message spec_, _field spec_)
+
+    returns the field name for _field spec_ in _message spec_ or undef.
+
+- field\_number(_message spec_, _field spec_)
+
+    returns the field index for _field spec_ in _message spec_ or undef.
 
 ## Constants
 
@@ -347,7 +347,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-fit](https://g
 
 # VERSION
 
-1.08
+1.10
 
 # LICENSE AND COPYRIGHT
 

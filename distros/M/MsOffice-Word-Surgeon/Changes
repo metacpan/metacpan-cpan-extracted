@@ -1,6 +1,9 @@
 Revision history for MsOffice-Word-Surgeon
 
 
+  - ->replace(..., keep_xml_as_is => ) is deprecated; use (cleanup_XML => ...) instead
+  - new option 'no_caps' for automatic upcase of runs with the 'caps' property
+
 2.01     25.01.2023
   - index images by either title or description field in alternative text
      (because recent versions of MsWord no longer have a 'title' field)

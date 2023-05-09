@@ -23,4 +23,8 @@ sub decrypt_hash {
 	return $raw =~ s/(.)/chr((ord($1) + (256 - $id)) % 256)/gers;
 }
 
+sub supported_ciphers {
+	return 'rot';
+}
+
 1;

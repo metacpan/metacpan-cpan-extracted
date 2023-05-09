@@ -1,3 +1,7 @@
+0.008           2023-05-07
+   - Maintenace release
+     - Update the README to help new people start development
+     - Update the challenges xt test to reflect changes in the API
 0.007           2022-10-30
    - Bump dependencies
    - Apply "dzil perltidy" to repo

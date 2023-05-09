@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 =encoding utf-8
 
@@ -168,7 +168,7 @@ sub _message {
         }
         if ($j < $c) { # skip invalid
             if ($type == FIT_STRING) {
-                $msg->{$pname} = $fit->string_value($v, $i, $c)
+                $msg->{$pname} = Geo::FIT::_string_value($v, $i, $c)
             }
             else {
                 # return only the first value if array
@@ -286,7 +286,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.08
+1.10
 
 =head1 LICENSE AND COPYRIGHT
 

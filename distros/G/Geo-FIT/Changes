@@ -1,5 +1,20 @@
 Revision history for Geo-FIT
 
+1.10 [2023-05-07]
+    Fix for backward compatibility with Perl versions prior to 5.20 in fields_list() method
+
+1.09 [2023-05-05]
+    New method: fields_defined()
+
+    Methods that are now functions: message_name(), message_number(), field_name(), field_number()
+
+    Removed documentation of class method protocol_version_string()
+        - this method will eventually be removed
+        - there is no such thing as a protocol for the class
+
+    Minor tweaks to allow the pytrainer Python application to use fit2tcx.pl and Geo/FIT.pm
+        - no change to functionality
+
 1.08 [2023-04-09]
     New methods and deprecations:
         - field_list(), field_value(), field_value_as_read() added

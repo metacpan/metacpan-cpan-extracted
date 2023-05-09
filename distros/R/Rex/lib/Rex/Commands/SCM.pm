@@ -17,31 +17,31 @@ All these functions are not idempotent.
 =head1 SYNOPSIS
 
  use Rex::Commands::SCM;
- 
+
  set repository => "myrepo",
     url => 'git@foo.bar:myrepo.git';
- 
+
  set repository => "myrepo2",
     url      => "https://foo.bar/myrepo",
     type     => "subversion",
     username => "myuser",
     password => "mypass";
- 
+
  task "checkout", sub {
    checkout "myrepo";
- 
+
    checkout "myrepo",
      path => "webapp";
- 
+
    checkout "myrepo",
      path   => "webapp",
      branch => 1.6;    # branch only for git
- 
+
    # For Git only, will replay any local commits on top of pulled commits
    checkout "myrepo",
      path   => "script_dir",
      rebase => TRUE;
- 
+
    checkout "myrepo2";
  };
 
@@ -55,7 +55,7 @@ package Rex::Commands::SCM;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Logger;
 use Rex::Config;

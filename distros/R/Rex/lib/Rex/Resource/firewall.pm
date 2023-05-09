@@ -8,7 +8,7 @@ Rex::Resource::firewall - Firewall functions
 
 =head1 DESCRIPTION
 
-With this module it is easy to manage different firewall systems. 
+With this module it is easy to manage different firewall systems.
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ package Rex::Resource::firewall;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Data::Dumper;
 

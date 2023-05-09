@@ -37,7 +37,7 @@ INTERFACE
         Config::Any->load_files( { files => \@files, use_ext => 1 } );
         Config::Any->load_files( { files => \@files, flatten_to_hash => 1 } );
 
-    "load_files()" attempts to load configuration from the list of files
+    load_files() attempts to load configuration from the list of files
     passed in the "files" parameter, if the file exists.
 
     If the "filter" parameter is set, it is used as a callback to modify the
@@ -57,7 +57,7 @@ INTERFACE
     a hash keyed on the file names, as opposed to the usual list of
     single-key hashes.
 
-    "load_files()" also supports a 'force_plugins' parameter, whose value
+    load_files() also supports a 'force_plugins' parameter, whose value
     should be an arrayref of plugin names like "Config::Any::INI". Its
     intended use is to allow the use of a non-standard file extension while
     forcing it to be offered to a particular parser. It is not compatible
@@ -76,32 +76,32 @@ INTERFACE
         Config::Any->load_stems( { stems => \@stems, use_ext => 1 } );
         Config::Any->load_stems( { stems => \@stems, flatten_to_hash => 1 } );
 
-    "load_stems()" attempts to load configuration from a list of files which
+    load_stems() attempts to load configuration from a list of files which
     it generates by combining the filename stems list passed in the "stems"
     parameter with the potential filename extensions from each loader, which
-    you can check with the "extensions()" classmethod described below. Once
+    you can check with the extensions() classmethod described below. Once
     this list of possible filenames is built it is treated exactly as in
-    "load_files()" above, as which it takes the same parameters. Please read
-    the "load_files()" documentation before using this method.
+    load_files() above, as which it takes the same parameters. Please read
+    the load_files() documentation before using this method.
 
   finder( )
-    The "finder()" classmethod returns the Module::Pluggable::Object object
+    The finder() classmethod returns the Module::Pluggable::Object object
     which is used to load the plugins. See the documentation for that module
     for more information.
 
   plugins( )
-    The "plugins()" classmethod returns the names of configuration loading
+    The plugins() classmethod returns the names of configuration loading
     plugins as found by Module::Pluggable::Object.
 
   extensions( )
-    The "extensions()" classmethod returns the possible file extensions
-    which can be loaded by "load_stems()" and "load_files()". This may be
-    useful if you set the "use_ext" parameter to those methods.
+    The extensions() classmethod returns the possible file extensions which
+    can be loaded by load_stems() and load_files(). This may be useful if
+    you set the "use_ext" parameter to those methods.
 
 DIAGNOSTICS
     "No files specified!" or "No stems specified!"
-        The "load_files()" and "load_stems()" methods will issue this
-        warning if called with an empty list of files/stems to load.
+        The load_files() and load_stems() methods will issue this warning if
+        called with an empty list of files/stems to load.
 
     "_load requires a arrayref of file paths"
         This fatal error will be thrown by the internal "_load" method. It
@@ -115,15 +115,25 @@ CONFIGURATION AND ENVIRONMENT
 DEPENDENCIES
     Module::Pluggable::Object
 
-    And at least one of the following: Config::General Config::Tiny JSON
-    YAML JSON::Syck YAML::Syck XML::Simple
+    And at least one of the following for each file type to be supported:
 
-INCOMPATIBILITIES
-    None reported.
+    *   For ".cnf", ".conf" files: Config::General
+
+    *   For ".ini" files: Config::Tiny
+
+    *   For ".json", ".jsn" files: Cpanel::JSON::XS, JSON::MaybeXS,
+        JSON::DWIW, JSON::XS, JSON::Syck, JSON::PP, JSON
+
+    *   For ".pl", ".perl" files: no additional requirements
+
+    *   For ".xml" files: XML::Simple
+
+    *   For ".yml", ".yaml" files: YAML::XS, YAML::Syck, YAML
+
+    Additionally, other file types are supported by third-party plugins in
+    the "Config::Any::" namespace, installed separately.
 
 BUGS AND LIMITATIONS
-    No bugs have been reported.
-
     Please report any bugs or feature requests to
     "bug-config-any@rt.cpan.org", or through the web interface at
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Any>.

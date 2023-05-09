@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-10'; # DATE
+our $DATE = '2023-02-11'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.110'; # VERSION
+our $VERSION = '0.111'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/td/td",
@@ -38,7 +38,7 @@ td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.110 of td (from Perl distribution App-td), released on 2023-02-10.
+This document describes version 0.111 of td (from Perl distribution App-td), released on 2023-02-11.
 
 =head1 SYNOPSIS
 
@@ -92,10 +92,10 @@ XLS/XLSX/ODS.
 
 B<What scripts/modules accept table data?>
 
-This I<td> script, for one, accept table data.
+This I<td> script, for one, accepts table data.
 
-If a module/script expects CSV, you can feed table data and convert it to CSV
-using L<td2csv> utility.
+If a module/script expects CSV, you can feed it table data and convert the table
+data to CSV using L<td2csv> utility.
 
 Several other formats can also be converted to table data, e.g. JSON,
 YAML, XLS/XLSX/ODS.

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4206';
+our $VERSION = '0.4208';
 
 use Moo;
 use strictures 2;
@@ -171,19 +171,28 @@ sub rest {
 sub count_in {
     my ($self, $args) = @_;
 
-    my $bars  = $self->bars;
-    my $patch = $self->closed_hh;
+    my $bars   = $self->bars;
+    my $patch  = $self->pedal_hh;
+    my $accent = $self->closed_hh;
 
     if ($args && ref $args) {
-        $bars  = $args->{bars}  if defined $args->{bars};
-        $patch = $args->{patch} if defined $args->{patch};
+        $bars   = $args->{bars}   if defined $args->{bars};
+        $patch  = $args->{patch}  if defined $args->{patch};
+        $accent = $args->{accent} if defined $args->{accent};
     }
-    else {
+    elsif ($args) {
         $bars = $args; # given a simple integer
     }
 
+    my $j = 1;
     for my $i ( 1 .. $self->beats * $bars ) {
-        $self->note( $self->quarter, $patch );
+        if ($i == $self->beats * $j - $self->beats + 1) {
+            $self->accent_note( 127, $self->quarter, $accent );
+            $j++;
+        }
+        else {
+            $self->note( $self->quarter, $patch );
+        }
     }
 }
 
@@ -636,7 +645,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4206
+version 0.4208
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,16 @@
+0.011   2023-02-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention about debug:: subnamespace.
+
+
+0.010   2023-02-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Add hooks: test::fail, test::random_fail, test::noop,
+          test::noop_all.
+
+
 0.009   2023-02-12  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

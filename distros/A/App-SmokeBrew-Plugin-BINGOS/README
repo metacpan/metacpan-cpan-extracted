@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.16
+    version 1.00
 
 SYNOPSIS
 
@@ -14,6 +14,7 @@ SYNOPSIS
       [BINGOS]
       relay = myrelay
       port = 8080
+      testskip = 0
     
       # then run
     
@@ -44,6 +45,9 @@ CONFIGURATION
       relay = some.host
       port = 8080
 
+    An optional boolean attribute testskip may be specified. This will skip
+    tests when installing modules. This defaults to 0.
+
 METHODS
 
     configure
@@ -70,7 +74,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Chris Williams.
+    This software is copyright (c) 2023 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

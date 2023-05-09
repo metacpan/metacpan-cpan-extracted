@@ -1,4 +1,9 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Digest::SHA {
+  version "0.061";
+  
   use Digest::SHA::State;
   has state : Digest::SHA::State;
 

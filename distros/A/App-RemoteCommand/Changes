@@ -1,5 +1,8 @@
 Revision history for Perl extension App-RemoteCommand
 
+0.990  2023-05-08 00:02:09 JST
+  - Require perl v5.16
+
 0.982  2018-09-01 18:36:29 JST
   - Add -F (ssh configfile) option
 

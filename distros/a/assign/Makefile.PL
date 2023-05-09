@@ -16,15 +16,25 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "assign",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.0.1",
+  "PREREQ_PM" => {
+    "Filter::Simple" => "0.95",
+    "PPI" => "1.276",
+    "XXX" => "0.38",
+    "YAML::PP" => "0.35"
+  },
+  "VERSION" => "0.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Filter::Simple" => "0.95",
+  "PPI" => "1.276",
+  "XXX" => "0.38",
+  "YAML::PP" => "0.35"
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

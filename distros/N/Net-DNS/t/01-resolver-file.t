@@ -1,11 +1,12 @@
 #!/usr/bin/perl
-# $Id: 01-resolver-file.t 1815 2020-10-14 21:55:18Z willem $
+# $Id: 01-resolver-file.t 1910 2023-03-30 19:16:30Z willem $
 #
 
 use strict;
 use warnings;
 use File::Spec;
 use Test::More tests => 16;
+use TestToolkit;
 
 use Net::DNS::Resolver;
 
@@ -19,9 +20,8 @@ my $class = 'Net::DNS::Resolver';
 
 my $config = File::Spec->catfile(qw(t custom.txt));		# .txt to run on Windows
 
-{
-	$class->domain('domain.default');
-	my $resolver = $class->new( config_file => $config );
+
+for my $resolver ( $class->new( config_file => $config ) ) {
 	ok( $resolver->isa($class), "new( config_file => '$config' )" );
 
 	my @servers = $resolver->nameservers;
@@ -34,37 +34,31 @@ my $config = File::Spec->catfile(qw(t custom.txt));		# .txt to run on Windows
 	is( $search[0], 'alt.net-dns.org', 'searchlist correct' );
 	is( $search[1], 'ext.net-dns.org', 'searchlist correct' );
 
-	is( $resolver->domain, 'alt.net-dns.org', 'domain correct' );
+	is( $resolver->domain, $search[0], 'domain correct' );
 
 	is( $class->domain, $resolver->domain, 'initial config sets defaults' );
 }
 
 
-{
-	$class->domain('domain.default');
-	my $resolver = $class->new( config_file => $config );
+$class->domain('domain.default');
+
+for my $resolver ( $class->new( config_file => $config ) ) {
 	ok( $resolver->isa($class), "new( config_file => $config )" );
 
 	my @servers = $resolver->nameservers;
 	ok( scalar(@servers), 'nameservers list populated' );
 
-	my $domain = 'alt.net-dns.org';
 	my @search = $resolver->searchlist;
 	ok( scalar(@search), 'searchlist populated' );
-	is( shift(@search), $domain, 'searchlist correct' );
+	is( $search[0], 'alt.net-dns.org', 'searchlist correct' );
 
-	is( $resolver->domain, $domain, 'domain correct' );
+	is( $resolver->domain, $search[0], 'domain correct' );
 
 	isnt( $class->domain, $resolver->domain, 'default config unchanged' );
 }
 
 
-{								# file presumed not to exist
-	eval { $class->new( config_file => 'nonexist.txt' ); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "new( config_file => ?\t[$exception]" );
-}
-
+exception( 'new( config_file => ?', sub { $class->new( config_file => 'nonexist.txt' ) } );
 
 exit;
 

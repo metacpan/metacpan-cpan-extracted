@@ -1,0 +1,39 @@
+---
+abstract: '.🧅 file extension in Perl.'
+author:
+  - 'kobaken <kentafly88@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Onion
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Onion:
+    file: lib/Acme/Onion.pm
+    version: '0.03'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kfly8/Acme-Onion/issues
+  homepage: https://github.com/kfly8/Acme-Onion
+  repository: https://github.com/kfly8/Acme-Onion.git
+version: '0.03'
+x_authority: cpan:KFLY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

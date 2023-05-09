@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.024     2023-05-03 19:56:39-04:00 America/New_York
+        - "toolchain" in "perl-window" now follows the Lyon Amendment, meaning
+          that it's tied to "ten years ago", not 5.8.1.  (There is a one year
+          period during which we're at twelve years, though.  v5.16 in 2023,
+          v5.20 in 2024.)
+
 5.023     2023-01-26 09:49:07-05:00 America/New_York
         - improvements to workflow installed by "dzil workflower"
 

@@ -10,7 +10,7 @@ use B;
 use Carp;
 use Devel::Caller qw(caller_cv);
 
-sub _o($) { ref($_[0]) . ( $_[0]->can('name') ? ("." . $_[0]->name) : '' ) }
+sub _o($) { ref($_[0]) . sprintf (" (0x%x)", ${$_[0]}) . ( $_[0]->can('name') ? (" " . $_[0]->name) : '' ) }
 
 sub bailout
 {
@@ -536,7 +536,7 @@ sub get_value
 sub get_var
 {
 	my ($S, $op) = @_;
-	if (is_op($op, "padsv")) {
+	if (is_op($op, "padsv") || is_unop($op, "padsv_store")) {
 		return padname($S, $op);
 	} elsif (is_unop($op, "null")) {
 		$op = $op->first;
@@ -577,6 +577,7 @@ sub get_tab_field
 {
 	my ($S, $unop, %p) = @_;
 	my $op = want_unop($S, $unop, "entersub");
+	$op = $op->first if is_unop($op, 'null');
 	want_pushmark_or_padrange($S, $op);
 	$op = $op->sibling;
 	my $tab = is_const($S, $op);
@@ -986,9 +987,14 @@ sub try_get_subselect
 	return if is_null($dbfetch);
 	return unless is_null($dbfetch->sibling);
 
-	return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
-	$rg = $rg->first if is_unop($rg->first, "null");
-	my $codeop = $rg->first;
+	my $codeop;
+	if ( $] < 5.037 ) {
+		return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
+		$rg = $rg->first if is_unop($rg->first, "null");
+		$codeop = $rg->first;
+	} else {
+		$codeop = $sub->first->sibling;
+	}
 	$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
 	return unless is_svop($codeop, "anoncode");
 
@@ -1134,7 +1140,9 @@ sub handle_subselect
 sub parse_assign
 {
 	my ($S, $op) = @_;
-	if (is_listop($op->last, "list") &&
+	if (
+		$op->name eq 'sassign' &&
+		is_listop($op->last, "list") &&
 		is_pushmark_or_padrange($op->last->first) &&
 		is_unop($op->last->first->sibling, "entersub"))
 	{
@@ -1197,6 +1205,23 @@ sub callarg
 	return $op;
 }
 
+sub get_codeop
+{
+	my $op = shift;
+	my $codeop;
+	if ( $] < 5.037 ) {
+		my $rg = $op;
+		return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
+		$rg = $rg->first if is_unop($rg->first, "null");
+		$codeop = $rg->first;
+	} else {
+		$codeop = $op;
+	}
+	$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
+	return unless is_svop($codeop, "anoncode");
+	return $codeop;
+}
+
 sub try_funcall
 {
 	my ($S, $op, %p) = @_;
@@ -1218,12 +1243,7 @@ sub try_funcall
 		if ($func =~ /^(union|intersect|except)$/) {
 			return if $p{only_normal_funcs};
 			return unless @args == 1 || @args == 2;
-			my $rg = $args[0];
-			return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
-			$rg = $rg->first if is_unop($rg->first, "null");
-			my $codeop = $rg->first;
-			$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
-			return unless is_svop($codeop, "anoncode");
+			my $codeop = get_codeop($args[0]) or return;
 			return unless $S->{operation} eq "select";
 			my $cv = $codeop->sv;
 			if (!$$cv) {
@@ -1255,12 +1275,7 @@ sub try_funcall
 		if ($func eq 'subselect') {
 			return if $p{only_normal_funcs};
 			return unless @args == 1;
-			my $rg = $args[0];
-			return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
-			$rg = $rg->first if is_unop($rg->first, "null");
-			my $codeop = $rg->first;
-			$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
-			return unless is_svop($codeop, "anoncode");
+			my $codeop = get_codeop($args[0]) or return;
 			my $sql = handle_subselect($S, $codeop, returns_dont_care => 1);
 			return "exists ($sql)";
 		} elsif ($func eq "sql") {
@@ -1351,11 +1366,12 @@ sub parse_multi_assign
 	}
 
 	$S->{values} = $saved_values;
-
-	$op = $op->last;
+	if ( !is_unop($op, 'padsv_store')) {
+		$op = $op->last;
+	}
 
 	my $tab;
-	if (is_op($op, "padsv")) {
+	if (is_op($op, "padsv") || is_unop($op, "padsv_store")) {
 		my $var = get_var($S, $op);
 		$tab = $S->{vars}{$var};
 	} elsif (is_unop($op, "entersub")) {
@@ -1485,7 +1501,7 @@ sub parse_expr
 		my $left = parse_term($S, $op->first);
 		my $right = parse_term($S, $op->last);
 		return "$left < $right";
-	} elsif ($op->name eq "sassign") {
+	} elsif ($op->name eq "sassign" || $op->name eq 'padsv_store') {
 		parse_assign($S, $op);
 		return ();
 	} else {
@@ -2063,12 +2079,23 @@ sub parse_table_label
 {
 	my ($S, $label, $lop, $op) = @_;
 
-	bailout $S, "label ", $lop->label, " must be followed by an assignment"
-		unless $op->name eq "sassign";
+	if ( $] >= 5.037 ) {
+		bailout $S, "label ", $lop->label, " must be followed by an assignment"
+			unless $op->name eq "padsv_store";
+	} else {
+		bailout $S, "label ", $lop->label, " must be followed by an assignment"
+			unless $op->name eq "sassign";
+	}
 	my $attr = parse_simple_term($S, $op->first);
 	my $varn;
-	bailout $S, "label ", $lop->label, " must be followed by a lexical variable declaration"
-		unless is_op($op->last, "padsv") && ($varn = padname($S, $op->last, no_fakes => 1));
+	if ( $] >= 5.037 ) {
+		$varn = padname($S, $op, no_fakes => 1);
+		bailout $S, "label ", $lop->label, " must be followed by a lexical variable declaration"
+			unless defined $varn;
+	} else {
+		bailout $S, "label ", $lop->label, " must be followed by a lexical variable declaration"
+			unless is_op($op->last, "padsv") && ($varn = padname($S, $op->last, no_fakes => 1));
+	}
 	new_var($S, $varn, $attr);
 	$S->{skipnext} = 1;
 }
@@ -2174,7 +2201,7 @@ sub parse_op
 		parse_list($S, $op->last);
 	} elsif (is_listop($op, "return")) {
 		parse_return($S, $op);
-	} elsif (is_binop($op)) {
+	} elsif (is_binop($op) || is_unop($op, 'padsv_store') ) {
 		where_or_having($S, parse_expr($S, $op));
 	} elsif (is_unop($op, "not")) {
 		where_or_having($S, scalar parse_term($S, $op));
@@ -2262,6 +2289,11 @@ sub parse_sub
 	$S->{padlists}->{ $root->PADLIST->id } = $S->{padlist} if $root->PADLIST->can('id');
 	$root = $root->ROOT;
 	parse_op($S, $root);
+}
+
+sub B::OP::foo
+{
+	printf "%s 0x%x\n", _o($_[0]), ${$_[0]};
 }
 
 sub init

@@ -108,7 +108,12 @@ while ( 1 ) {
 die $@ if $@;
 
 if ( $opt{deparse} ) {
-	B::Terse::compile($sub)->();
+	no warnings 'redefine';
+	my $old = \&DBIx::Perlish::gen_sql;
+	*DBIx::Perlish::gen_sql = sub {
+		B::Terse::compile($_[0])->();
+		$old->(@_);
+	};
 }
 
 my ($sql, $bind_values, $nret, %flags) = DBIx::Perlish::gen_sql($sub, $mode,

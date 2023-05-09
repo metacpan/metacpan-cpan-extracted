@@ -26,7 +26,7 @@ use v5.12.5;
 use warnings;
 use Rex -base;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 require Exporter;
 use base qw(Exporter);
@@ -53,9 +53,9 @@ File example:
        <server name="machine03" user="root" password="blue123"/>
    </group>
  </configuration>
- 
+
 The XML file is validated against the DTD schema stored in C<Rex::Group::Lookup::XML::$schema_file> as string.
- 
+
 =cut
 
 =head2 $schema_file

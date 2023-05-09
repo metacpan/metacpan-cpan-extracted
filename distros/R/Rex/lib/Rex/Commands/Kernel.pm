@@ -17,7 +17,7 @@ All these functions are not idempotent.
 =head1 SYNOPSIS
 
  kmod load => "ipmi_si";
- 
+
  kmod unload => "ipmi_si";
 
 =head1 EXPORTED FUNCTIONS
@@ -29,7 +29,7 @@ package Rex::Commands::Kernel;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -51,7 +51,7 @@ This function loads or unloads a kernel module.
  task "load", sub {
    kmod load => "ipmi_si";
  };
- 
+
  task "unload", sub {
    kmod unload => "ipmi_si";
  };

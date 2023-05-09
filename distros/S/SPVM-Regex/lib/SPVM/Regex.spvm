@@ -2,9 +2,13 @@
 # MIT License
 
 class Regex {
+  version "0.241002";
+  
   use Fn;
   use Regex::Replacer;
   use Regex::Re2;
+  use Regex::Match;
+  use Regex::ReplaceInfo;
   use Hash;
   use List;
   
@@ -33,11 +37,12 @@ class Regex {
   
   private native method compile : void ($pattern : string);
   
-  method match : int ($string : string, $offset = 0 : int, $length = -1 : int) {
-    return $self->match_forward($string, \$offset, $length);
+  method match : Regex::Match ($string : string, $offset = 0 : int, $length = -1 : int) {
+    my $regex_match = $self->match_forward($string, \$offset, $length);
+    return $regex_match;
   }
 
-  native method match_forward : int ($string : string, $offset : int*, $length = -1 : int);
+  native method match_forward : Regex::Match ($string : string, $offset : int*, $length = -1 : int);
 
   method cap1 : string () { return $self->captures->[1]; }
   method cap2 : string () { return $self->captures->[2]; }
@@ -65,22 +70,23 @@ class Regex {
   }
   
   method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[]) {
-    my $new_options_list = List->new($options);
-    $new_options_list->push("global");
-    $new_options_list->push(1);
-    $options = $new_options_list->to_array;
+    unless ($options) {
+      $options = {};
+    }
+    $options = Fn->merge_options({global => 1}, $options);
+    
     return $self->replace_common($string, $replace, \$offset, $length, $options);
   }
   
   precompile method replace_common : string ($string : string, $replace : object of string|Regex::Replacer, $offset_ref : int*, $length = -1 : int, $options = undef : object[]) {
     
-    my $opt = Hash->new($options);
+    my $optiton_h = Hash->new($options);
     
     my $offset = $$offset_ref;
     my $original_offset = $offset;
     
     my $global = 0;
-    if (my $global_obj = $opt->get("global")) {
+    if (my $global_obj = $optiton_h->get("global")) {
       $global = (int)$global_obj;
     }
     
@@ -110,9 +116,9 @@ class Regex {
     while (1) {
       my $result_buffer_value = $result_buffer->to_string;
       
-      my $match = $self->match_forward($result_buffer_value, \$offset, $length);
+      my $regex_match = $self->match_forward($result_buffer_value, \$offset, $length);
       
-      if ($match) {
+      if ($regex_match) {
         $match_count++;
       }
       else {
@@ -125,7 +131,7 @@ class Regex {
       }
       elsif ($replace isa Regex::Replacer) {
         my $replacer = (Regex::Replacer)$replace;
-        $replace_string = $replacer->($self);
+        $replace_string = $replacer->($self, $regex_match);
       }
       else {
         die "The \$replace must be a string or a Regex::Replacer object";
@@ -133,8 +139,8 @@ class Regex {
       
       my $replace_string_length = length $replace_string;
       
-      my $match_start = $self->match_start;
-      my $match_length = $self->match_length;
+      my $match_start = $regex_match->match_start;
+      my $match_length = $regex_match->match_length;
       
       $result_buffer->replace($match_start, $match_length, $replace_string);
 
@@ -147,6 +153,14 @@ class Regex {
       my $next_offset = $match_start + $replace_string_length;
       $offset = $next_offset;
       $length = $result_buffer->length - $offset;
+    }
+    
+    my $regex_replace_info = Regex::ReplaceInfo->new({replaced_count => $match_count});
+    
+    my $option_regex_replace_info = (Regex::ReplaceInfo[])$optiton_h->get("info");
+    
+    if ($option_regex_replace_info) {
+      $option_regex_replace_info->[0] = $regex_replace_info;
     }
     
     $result = $result_buffer->to_string;
@@ -171,12 +185,12 @@ class Regex {
       }
       
       my $current_offset = $offset;
-      my $match = $self->match_forward($string, \$offset);
-      if ($match) {
+      my $regex_match = $self->match_forward($string, \$offset);
+      if ($regex_match) {
         $match_count++;
 
-        my $match_start = $self->match_start;
-        my $match_length = $self->match_length;
+        my $match_start = $regex_match->match_start;
+        my $match_length = $regex_match->match_length;
         
         my $part = Fn->substr($string, $current_offset, $match_start - $current_offset);
         $parts_list->push($part);

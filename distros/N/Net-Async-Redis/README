@@ -325,6 +325,37 @@ METHODS - Subscriptions
             $redis->unsubscribe('notifications')
         })->get
 
+ ssubscribe
+
+    Subscribes to one or more sharded channels.
+
+    This behaves similarly to "subscribe", but applies to messages received
+    on a specific shard. This is mostly relevant in a cluster context,
+    where subscriptions can be localised to one shard (group of nodes) in
+    the cluster to improve performance.
+
+    More details are in the sharded pubsub documentation
+    <https://redis.io/topics/pubsub#sharded-pubsub>.
+
+    Returns a Future which resolves to a Net::Async::Redis::Subscription
+    instance.
+
+    Example:
+
+     # Subscribe to 'notifications' channel,
+     # print the first 5 messages, then unsubscribe
+     $redis->subscribe('notifications')
+        ->then(sub {
+            my $sub = shift;
+            $sub->events
+                ->map('payload')
+                ->take(5)
+                ->say
+                ->completed
+        })->then(sub {
+            $redis->unsubscribe('notifications')
+        })->get
+
 METHODS - Transactions
 
  multi

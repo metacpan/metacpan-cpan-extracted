@@ -1,132 +1,84 @@
 #!/usr/bin/perl
-# $Id: 03-parameters.t 1865 2022-05-21 09:57:49Z willem $	-*-perl-*-
+# $Id: 03-parameters.t 1921 2023-05-08 18:39:59Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
+use Test::More;
+use TestToolkit;
 
 use Net::DNS::Parameters qw(:class :type :opcode :rcode :ednsoption :dsotype);
 
-use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
-		( 3 + scalar keys %Net::DNS::Parameters::typebyval ) +
-		( 3 + scalar keys %Net::DNS::Parameters::opcodebyval ) +
+plan tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
+		( 4 + scalar keys %Net::DNS::Parameters::typebyval ) +
+		( 5 + scalar keys %Net::DNS::Parameters::opcodebyval ) +
 		( 3 + scalar keys %Net::DNS::Parameters::rcodebyval ) +
 		( 2 + scalar keys %Net::DNS::Parameters::ednsoptionbyval ) +
 		( 2 + scalar keys %Net::DNS::Parameters::dsotypebyval );
 
 
-{					## check class conversion functions
-	my $anon = 65500;
-	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::classbyval ) {
-		my $name	= classbyval($_);
-		my $code	= eval { classbyname($name) };
-		my ($exception) = split /\n/, "$@\n";
-		is( $code, $_, "classbyname($name)\t$exception" );
-	}
-
-	my $large = 65536;
-	foreach my $testcase ( "BOGUS", "Bogus", "CLASS$large" ) {
-		eval { classbyname($testcase); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "classbyname($testcase)\t[$exception]" );
-	}
-
-	eval { classbyval($large); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "classbyval($large)\t[$exception]" );
+foreach ( sort { $a <=> $b } 32767, keys %Net::DNS::Parameters::classbyval ) {
+	my $name = classbyval($_);	## check class conversion functions
+	my $code = eval { classbyname($name) };
+	is( $code, $_, "classbyname($name)" );
 }
 
 
-{					## check type conversion functions
-	foreach ( sort { $a <=> $b } keys %Net::DNS::Parameters::typebyval ) {
-		my $name	= typebyval($_);
-		my $code	= eval { typebyname($name) };
-		my ($exception) = split /\n/, "$@\n";
-		is( $code, $_, "typebyname($name)\t$exception" );
-	}
-	is( typebyname('*'), typebyname('ANY'), "typebyname(*)" );
+foreach ( sort { $a <=> $b } 65535, keys %Net::DNS::Parameters::typebyval ) {
+	my $name = typebyval($_);	## check type conversion functions
+	my $code = eval { typebyname($name) };
+	is( $code, $_, "typebyname($name)" );
+}
+is( typebyname('*'), typebyname('ANY'), "typebyname(*)" );
 
-	my $large = 65536;
-	foreach my $testcase ("TYPE$large") {
-		eval { typebyname($testcase); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "typebyname($testcase)\t[$exception]" );
-	}
 
-	eval { typebyval($large); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "typebyval($large)\t[$exception]" );
+foreach ( sort { $a <=> $b } 255, keys %Net::DNS::Parameters::opcodebyval ) {
+	my $name = opcodebyval($_);	## check OPCODE type conversion functions
+	my $code = eval { opcodebyname($name) };
+	is( $code, $_, "opcodebyname($name)" );
+}
+is( opcodebyname('NS_NOTIFY_OP'), opcodebyname('NOTIFY'), "opcodebyname(NS_NOTIFY_OP)" );
+
+
+foreach ( sort { $a <=> $b } 4095, keys %Net::DNS::Parameters::rcodebyval ) {
+	my $name = rcodebyval($_);	## check RCODE conversion functions
+	my $code = eval { rcodebyname($name) };
+	is( $code, $_, "rcodebyname($name)" );
+}
+is( rcodebyname('BADVERS'), rcodebyname('BADSIG'), "rcodebyname(BADVERS)" );
+
+
+foreach ( sort { $a <=> $b } 65535, keys %Net::DNS::Parameters::ednsoptionbyval ) {
+	my $name = ednsoptionbyval($_);	## check EDNS option conversion functions
+	my $code = eval { ednsoptionbyname($name) };
+	is( $code, $_, "ednsoptionbyname($name)" );
 }
 
 
-{					## check OPCODE type conversion functions
-	my $anon = 255;
-	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::opcodebyval ) {
-		my $name	= opcodebyval($_);
-		my $code	= eval { opcodebyname($name) };
-		my ($exception) = split /\n/, "$@\n";
-		is( $code, $_, "opcodebyname($name)\t$exception" );
-	}
-	is( opcodebyname('NS_NOTIFY_OP'), opcodebyname('NOTIFY'), "opcodebyname(NS_NOTIFY_OP)" );
-
-	foreach my $testcase ('BOGUS') {
-		eval { opcodebyname($testcase); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "opcodebyname($testcase)\t[$exception]" );
-	}
+foreach ( sort { $a <=> $b } 65535, keys %Net::DNS::Parameters::dsotypebyval ) {
+	my $name = dsotypebyval($_);	## check DSO type conversion functions
+	my $code = eval { dsotypebyname($name) };
+	is( $code, $_, "dsotypebyname($name)" );
 }
 
 
-{					## check RCODE conversion functions
-	my $anon = 4095;
-	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::rcodebyval ) {
-		my $name	= rcodebyval($_);
-		my $code	= eval { rcodebyname($name) };
-		my ($exception) = split /\n/, "$@\n";
-		is( $code, $_, "rcodebyname($name)\t$exception" );
-	}
-	is( rcodebyname('BADVERS'), rcodebyname('BADSIG'), "rcodebyname(BADVERS)" );
+exception( 'classbyval',  sub { classbyval(65536) } );
+exception( 'classbyname', sub { classbyname(65536) } );
+exception( 'classbyname', sub { classbyname('CLASS65536') } );
+exception( 'classbyname', sub { classbyname('BOGUS') } );
 
-	foreach my $testcase ('BOGUS') {
-		eval { rcodebyname($testcase); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "rcodebyname($testcase)\t[$exception]" );
-	}
-}
+exception( 'typebyval',	 sub { typebyval(65536) } );
+exception( 'typebyname', sub { typebyname(65536) } );
+exception( 'typebyname', sub { typebyname('CLASS65536') } );
+exception( 'typebyname', sub { typebyname('BOGUS') } );
 
+exception( 'opcodebyname', sub { opcodebyname('BOGUS') } );
 
-{					## check EDNS option conversion functions
-	my $anon = 65535;
-	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::ednsoptionbyval ) {
-		my $name	= ednsoptionbyval($_);
-		my $code	= eval { ednsoptionbyname($name) };
-		my ($exception) = split /\n/, "$@\n";
-		is( $code, $_, "ednsoptionbyname($name)\t$exception" );
-	}
+exception( 'rcodebyname', sub { rcodebyname('BOGUS') } );
 
-	foreach my $testcase ('BOGUS') {
-		eval { ednsoptionbyname($testcase); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "ednsoptionbyname($testcase)\t[$exception]" );
-	}
-}
+exception( 'ednsoptionbyname', sub { ednsoptionbyname('BOGUS') } );
 
-
-{					## check DSO type conversion functions
-	my $anon = 65535;
-	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::dsotypebyval ) {
-		my $name	= dsotypebyval($_);
-		my $code	= eval { dsotypebyname($name) };
-		my ($exception) = split /\n/, "$@\n";
-		is( $code, $_, "dsotypebyname($name)\t$exception" );
-	}
-
-	foreach my $testcase ('BOGUS') {
-		eval { dsotypebyname($testcase); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "dsotypebyname($testcase)\t[$exception]" );
-	}
-}
+exception( 'dsotypebyname', sub { dsotypebyname('BOGUS') } );
 
 
 exit;

@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+# tlock
+# Locking with timeouts.
+# (c) 2022-2023 Bjørn Hee
+# Licensed under the Apache License, version 2.0
+# https://www.apache.org/licenses/LICENSE-2.0.txt
+
+use strict;
+use experimental qw(signatures);
+$| = 1;
+
+use Sys::Tlock;
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+sub usage( $x ) { print STDERR q[
+
+Locking with timeouts.
+
+tlock take <label> <timeout> [<patience>]
+    Takes the specified tlock if possible. Returns the token value.
+
+tlock renew <label> <token> <timeout>
+    Renews the tlock.
+
+tlock release <label> <token>
+    Releases the tlock.
+
+tlock alive <label> <token>
+    Returns true if the specified tlock is still alive.
+
+tlock taken <label>
+    Returns true if any tlock with the given label, is alive.
+
+tlock expiry <label>
+    Returns the time when the tlock with the given label will expire.
+
+tlock zing
+    Cleans up the lock directory.
+
+tlock --help
+    Writes out this help text.
+
+] =~ s/^\s+//r =~ s/\s+$/\n/r ; exit $x;};
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+usage(1) if scalar @ARGV == 0;
+
+my $cmd = shift @ARGV;
+
+if ($cmd eq 'take') {
+    usage(1) if scalar @ARGV < 2;
+    usage(1) if scalar @ARGV > 3;
+    tlock_take(@ARGV) || exit 1;
+    print $_."\n";
+    }
+elsif ($cmd eq 'renew') {
+    usage(1) if scalar @ARGV != 3;
+    tlock_renew(@ARGV) || exit 1;
+    }
+elsif ($cmd eq 'release') {
+    usage(1) if scalar @ARGV != 2;
+    tlock_release(@ARGV) || exit 1;
+    }
+elsif ($cmd eq 'alive') {
+    usage(1) if scalar @ARGV != 2;
+    tlock_alive(@ARGV) || exit 1;
+    }
+elsif ($cmd eq 'taken') {
+    usage(1) if scalar @ARGV != 1;
+    tlock_taken(@ARGV) || exit 1;
+    }
+elsif ($cmd eq 'expiry') {
+    usage(1) if scalar @ARGV != 1;
+    my $expiry = tlock_expiry(@ARGV);
+    exit 1 if not defined $expiry;
+    print $expiry."\n";
+    }
+elsif ($cmd eq 'zing') {
+    usage(1) if scalar @ARGV != 0;
+    tlock_zing;
+    }
+elsif ($cmd eq '--help') {
+    usage(0);
+    }
+else {
+    usage(1);
+    };
+
+exit 0; # ------------------------------------------------------------------- #
+
+__END__
+

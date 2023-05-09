@@ -18,6 +18,47 @@ sub dies_ok (&@) {
 
 use CPAN::Meta::Requirements;
 
+
+my $base = 'CPAN::Meta::Requirements::Range';
+
+# Test ==
+my $range = $base->with_string_requirement('== 1.3');
+ok($range->accepts('1.3'), 'exact version (==)');
+ok(!$range->accepts('1.2'), 'lower version (==)');
+ok(!$range->accepts('1.4'), 'higher version (==)');
+
+# Test !=
+$range = $base->with_string_requirement('!= 1.3');
+ok(!$range->accepts('1.3'), 'exact version (!=)');
+ok($range->accepts('1.2'), 'lower version (!=)');
+ok($range->accepts('1.4'), 'higher version (!=)');
+
+# Test >=
+$range = $base->with_string_requirement('>= 1.3');
+ok($range->accepts('1.3'), 'exact version (>=)');
+ok(!$range->accepts('1.2'), 'lower version (>=)');
+ok($range->accepts('1.4'), 'higher version (>=)');
+
+# Test <=
+$range = $range = $base->with_string_requirement('<= 1.3');
+ok($range->accepts('1.3'), 'exact version (<=)');
+ok($range->accepts('1.2'), 'lower version (<=)');
+ok(!$range->accepts('1.4'), 'higher version (<=)');
+
+# Test ""
+$range = $base->with_string_requirement('>= 1.3');
+ok($range->accepts('1.3'), 'exact version (>=)');
+ok(!$range->accepts('1.2'), 'lower version (>=)');
+ok($range->accepts('1.4'), 'higher version (>=)');
+
+# Test multiple requirements
+$range = $base->with_string_requirement('>= 1.3, <= 2.0, != 1.6');
+ok($range->accepts('1.5'), 'middle version (>=, <=, !)');
+ok(!$range->accepts('1.2'), 'lower version (>=, <=, !)');
+ok(!$range->accepts('2.1'), 'higher version (>=, <=, !)');
+ok(!$range->accepts('1.6'), 'excluded version (>=, <=, !)');
+
+
 my $req = CPAN::Meta::Requirements->new;
 
 # Test ==

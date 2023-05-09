@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.008';
+$Crypt::Passphrase::Argon2::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ sub _settings_for {
 		memory_cost => $args{memory_cost} // $settings_for{$profile}{memory_cost},
 		time_cost   => $args{time_cost}   // $settings_for{$profile}{time_cost},
 		parallelism => $args{parallelism} //  1,
-		output_size => $args{output_size} // 16,
+		output_size => $args{output_size} // 32,
 		salt_size   => $args{salt_size}   // 16,
 		subtype     => $subtype,
 	};
@@ -80,7 +80,7 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ The number of lanes (and potentially threads) used for the hash. This defaults t
 
 =item * output_size
 
-The size of a hashed value. This defaults to 16 bytes, increasing it only makes sense if your passwords actually contain more than 128 bits of entropy.
+The size of a hashed value. This defaults to 32 bytes.
 
 =item * salt_size
 

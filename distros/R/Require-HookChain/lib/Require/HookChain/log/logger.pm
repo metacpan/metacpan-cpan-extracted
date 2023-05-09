@@ -10,7 +10,7 @@ use Log::ger;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-12'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -42,7 +42,7 @@ Require::HookChain::log::logger - Log a message to Log::ger
 
 =head1 VERSION
 
-This document describes version 0.009 of Require::HookChain::log::logger (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.011 of Require::HookChain::log::logger (from Perl distribution Require-HookChain), released on 2023-02-12.
 
 =head1 SYNOPSIS
 

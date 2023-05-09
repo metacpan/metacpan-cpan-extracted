@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -12,8 +11,8 @@ package Base::Class {
    sub new {
       my $class = shift;
       my ( $ok ) = @_;
-      Test::More::is( $ok, "ok", '@_ to Base::Class::new' );
-      Test::More::is( scalar @_, 1, 'scalar @_ to Base::Class::new' );
+      ::is( $ok, "ok", '@_ to Base::Class::new' );
+      ::is( scalar @_, 1, 'scalar @_ to Base::Class::new' );
 
       return bless [ 123 ], $class;
    }
@@ -29,7 +28,7 @@ class Derived::Class :isa(Base::Class) {
 
    BUILD {
       my @args = @_;
-      Test::More::is_deeply( \@args, [ "ok" ], '@_ to Derived::Class::BUILD' );
+      ::is( \@args, [ "ok" ], '@_ to Derived::Class::BUILD' );
    }
 
    method fields {

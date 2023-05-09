@@ -27,7 +27,7 @@ use LWP::UserAgent;
 use Web::Scraper;
 use String::Util qw(trim);
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 our @labels = qw/method source name symbol currency last date isodate high low p_change/;
 

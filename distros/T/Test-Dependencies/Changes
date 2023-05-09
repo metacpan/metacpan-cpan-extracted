@@ -1,5 +1,14 @@
 Revision history for Test-Dependencies
 
+0.32    2023-05-07
+        * Fix dist.ini preventing uploading all deps
+
+0.31    2023-05-07
+        * Strip __END__ and __DATA__ sections before searching the code
+        * Prevent loading of CPAN::Meta and File::Find::Rule when
+          'legacy' feature is disabled
+        * Check that File::Find::Rule::Perl is installed for all tests
+
 0.30    2020-11-08
         * Recognize 'use v5.10;', 'use 5.008001;' and 'use 5.10.1;' as
           a minimum version pragma, not a module

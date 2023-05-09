@@ -1,5 +1,8 @@
 Revision history for string-eertree
 
+0.03    2023-05-03
+        Remove CPAN Ratings links as the page no longer exists.
+
 0.02    2022-01-09
         Require Test::V0 with working bag implementation.
 

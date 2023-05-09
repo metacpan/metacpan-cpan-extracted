@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-18'; # DATE
+our $DATE = '2023-02-12'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -61,13 +61,19 @@ $SPEC{tabledata} = {
                 'dump_as_aoaos',
                 'dump_as_aohos',
                 'dump_as_csv',
+                'stream_as_csv',
                 'list_columns',
                 'count_rows',
                 'pick_rows',
                 'head',
                 'stat',
             ]}],
-            default => 'dump_as_aoaos',
+            description => <<'_',
+
+The default is `dump_as_aoaos` except when the table has infinite rows in which
+case the default action is `stream_as_csv`.
+
+_
             cmdline_aliases => {
                 actions => {
                     summary=>'List available actions (alias for --action=list_actions)',
@@ -126,7 +132,7 @@ $SPEC{tabledata} = {
 };
 sub tabledata {
     my %args = @_;
-    my $action = $args{action} // 'dump';
+    my $action = $args{action} // '_dump_or_stream';
 
     if ($action eq 'list_actions') {
         return [200, "OK", $SPEC{tabledata}{args}{action}{schema}[1]{in}];
@@ -145,6 +151,14 @@ sub tabledata {
     require Module::Load::Util;
     my $obj = Module::Load::Util::instantiate_class_with_optional_args(
         {ns_prefix=>"TableData"}, $args{module});
+
+    if ($action eq '_dump_or_stream') {
+        if ($obj->get_row_count == -1) {
+            $action = 'stream_as_csv';
+        } else {
+            $action = 'dump_as_aoaos';
+        }
+    }
 
     if ($action eq 'pick_rows') {
         return [200, "OK", [$obj->pick_items(n=>$args{num})]];
@@ -178,6 +192,27 @@ sub tabledata {
 
     if ($action eq 'dump_as_csv') {
         return [200, "OK", scalar $obj->as_csv];
+    }
+
+    if ($action eq 'stream_as_csv') {
+        require Text::CSV;
+        my $csv = Text::CSV->new;
+        my $i = 0;
+        return
+            [200, "OK",
+             sub {
+                 if ($i++ == 0) {
+                     my $fields = $obj->get_column_names;
+                     my $res = $csv->combine(@$fields);
+                     die "Can't combine [".join(", ", @$fields)."] as CSV" unless $res;
+                     return $csv->string;
+                 } else {
+                     my $row = $obj->get_next_item;
+                     my $res = $csv->combine(@$row);
+                     die "Can't combine [".join(", ", @$row)."] as CSV" unless $res;
+                     return $csv->string;
+                 }
+             }, {stream=>1, schema=>["str",{}]}];
     }
 
     if ($action eq 'dump_as_aohos') {
@@ -224,7 +259,7 @@ App::tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.005 of App::tabledata (from Perl distribution App-tabledata), released on 2022-10-18.
+This document describes version 0.006 of App::tabledata (from Perl distribution App-tabledata), released on 2023-02-12.
 
 =head1 SYNOPSIS
 
@@ -247,9 +282,10 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<action> => I<str> (default: "dump_as_aoaos")
+=item * B<action> => I<str>
 
-(No description)
+The default is C<dump_as_aoaos> except when the table has infinite rows in which
+case the default action is C<stream_as_csv>.
 
 =item * B<detail> => I<bool>
 
@@ -317,7 +353,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

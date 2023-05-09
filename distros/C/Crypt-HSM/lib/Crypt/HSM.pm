@@ -1,10 +1,17 @@
 package Crypt::HSM;
-$Crypt::HSM::VERSION = '0.008';
+$Crypt::HSM::VERSION = '0.010';
 use strict;
 use warnings;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
+
+#backwards compat
+sub open_session {
+	my ($self, $slot, @args) = @_;
+	my $object = ref($slot) ? $slot : $self->slot($slot);
+	return $object->open_session(@args);
+}
 
 1;
 
@@ -22,13 +29,13 @@ Crypt::HSM - A PKCS11 interface for Perl
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
  my $hsm = Crypt::HSM->load('/usr/lib/pkcs11/libsofthsm2.so');
  my ($slot) = $hsm->slots;
- my $session = $hsm->open_session($slot);
+ my $session = $slot->open_session;
  $session->login('user', '1234');
 
  my ($key) = $session->find_objects({ class => 'secret-key', label => "my-key" });
@@ -46,55 +53,19 @@ This loads the pkcs11 found a $path, and returns it as a new Crypt::HSM object.
 
 =head2 slots($available = 1)
 
-This lists the slots of this interface. If C<$available> is true only slots with a token available will be listed.
+This lists the slots of this interface as L<Crypt::HSM::Slot|Crypt::HSM::Slot>. If C<$available> is true only slots with a token available will be listed.
 
-=head2 mechanisms($slot)
+=head2 slot($identifier)
 
-This returns all mechanisms supported by the token in the slot.
-
-=head2 mechanism_info($slot, $mechanism)
-
-This returns more information about the mechanism. This includes the following fields.
-
-=over 4
-
-=item * min-key-size
-
-The minimum key size
-
-=item * max-key-size
-
-The maximum key size
-
-=item * flags
-
-This array lists properties of the mechanism. It may contain values like C<'encrypt'>, C<'decrypt'>, C<'sign'>, C<'verify'>, C<'generate'>, C<'wrap'> and C<'unwrap'>.
-
-=back
-
-=head2 open_session($slot, $flags = [])
-
-This opens a session to C<$slot>. C<$flag> is an optional array that may currenlt contain the value C<'rw-session'> to enable writing to the token. This returns a Crypt::HSM::Session object.
-
-=head2 close_all_sessions($slot)
-
-This closes all sessions on C<$slot>.
+This returns a L<Crypt::HSM::Slot|Crypt::HSM::Slot> for the slot with the given identifier.
 
 =head2 info()
 
 This returns a hash with information about the HSM.
 
-=head2 slot_info($slot)
+=head2 open_session($slot, $flags)
 
-This returns a hash with information about the slot.
-
-=head2 token_info($slot)
-
-This returns a hash with information about the token in the slot.
-
-=head2 init_token($slot, $pin, $label)
-
-This initializes a token on C<$slot>, with the associalted C<$pin> and C<$label> (max 32 characters).
+This methods wraps around C<Crypt::HSM::Slot>'s C<open_session> method [depreciated].
 
 =head1 AUTHOR
 

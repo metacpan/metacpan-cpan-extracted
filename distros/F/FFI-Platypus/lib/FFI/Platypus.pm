@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.07'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -598,7 +598,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 SYNOPSIS
 
@@ -698,10 +698,10 @@ L<EXAMPLES|/EXAMPLES> to get a taste of what you can do with Platypus.
 Platypus has extensive documentation of types at L<FFI::Platypus::Type>
 and its custom types API at L<FFI::Platypus::API>.
 
-You are B<strongly> encouraged to use API level 1 for all new code.
+You are B<strongly> encouraged to use API level 2 for all new code.
 There are a number of improvements and design fixes that you get
 for free.  You should even consider updating existing modules to
-use API level 1 where feasible.  How do I do that you might ask?
+use API level 2 where feasible.  How do I do that you might ask?
 Simply pass in the API level to the platypus constructor.
 
  my $ffi = FFI::Platypus->new( api => 2 );
@@ -734,7 +734,11 @@ the L<lib|/lib> attribute.
 
 [version 0.91]
 
-Sets the API level.  Legal values are
+Sets the API level.  The recommended value for all new code is C<2>.
+The Platypus documentation assumes API level C<2> except for a few
+places that specifically document older versions.  You should
+only use a lower value for a legacy code base that cannot be migrated to
+a newer API level. Legal values are:
 
 =over
 
@@ -750,7 +754,7 @@ and type decoration on basic types.
 
 =item C<2>
 
-Enable version 2 API. All new code should be written with this set to 1!
+Enable version 2 API.
 The Platypus documentation assumes this api level is set.
 
 API version 2 is identical to version 1, except:
@@ -2910,6 +2914,10 @@ written it yet.
 
 =head1 SUPPORT
 
+The intent of the C<FFI-Platypus> team is to support the same versions of
+Perl that are supported by the Perl toolchain.  As of this writing that
+means 5.16 and better.
+
 IRC: #native on irc.perl.org
 
 L<(click for instant chat room login)|http://chat.mibbit.com/#native@irc.perl.org>
@@ -3033,9 +3041,10 @@ requests.
 
 =item
 
-Platypus supports all production Perl releases since 5.8.1.  For that
-reason, please do not introduce any code that requires a newer version
-of Perl.
+The intent of the C<FFI-Platypus> team is to support the same versions of
+Perl that are supported by the Perl toolchain.  As of this writing that
+means 5.16 and better.  As such, please do not include any code that
+requires a newer version of Perl.
 
 =back
 

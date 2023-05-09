@@ -7,7 +7,7 @@ package Rex::Cron;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Commands::Gather;
 use List::Util qw'first';

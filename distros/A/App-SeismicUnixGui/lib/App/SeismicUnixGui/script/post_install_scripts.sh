@@ -38,7 +38,7 @@ Afile2find="post_install_fortran_compile.pl"
 
 echo -e " Please be patient."
 echo -e " Looking for scripts to compile fortran and C code  ...\n"
-echo -e " Hint: Choose a path with $Afile2find in its path."
+echo -e " Hint: Choose a path with \"bin/$Afile2find\" in its name."
 echo -e " A local installation also has \"perl5/bin\" in the path."
 echo -e " Ignore the case with \"blib\" in its path.\n"
 readarray -d '' -t list < <(find $starting_points -type $file -name $Afile2find -print 2>/dev/null )

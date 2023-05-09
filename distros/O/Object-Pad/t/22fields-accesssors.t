@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -52,8 +52,8 @@ class Colour {
    }
 
    my $allthetypes = AllTheTypesReader->new;
-   is_deeply( [ $allthetypes->av ], [qw( one two three )], ':reader on array field' );
-   is_deeply( { $allthetypes->hv }, { one => 1, two => 2 }, ':reader on hash field' );
+   is( [ $allthetypes->av ], [qw( one two three )], ':reader on array field' );
+   is( { $allthetypes->hv }, { one => 1, two => 2 }, ':reader on hash field' );
 
    is( scalar $allthetypes->av, 3, ':reader on array field in scalar context' );
 
@@ -72,7 +72,7 @@ class Colour {
    $col->blue = 100;
    $col->white( 110 );
 
-   is_deeply( [ $col->rgbw ], [ 80, 90, 100, 110 ],
+   is( [ $col->rgbw ], [ 80, 90, 100, 110 ],
       '$col->rgbw after writers' );
 
    # Writer complains if not given enough arguments
@@ -87,8 +87,8 @@ class Colour {
       field %hv :writer;
       method test
       {
-         Test::More::is_deeply( \@av, [qw( four five six )], ':writer on array field' );
-         Test::More::is_deeply( \%hv, { three => 3, four => 4 }, ':writer on hash field' );
+         ::is( \@av, [qw( four five six )], ':writer on array field' );
+         ::is( \%hv, { three => 3, four => 4 }, ':writer on hash field' );
       }
    }
 

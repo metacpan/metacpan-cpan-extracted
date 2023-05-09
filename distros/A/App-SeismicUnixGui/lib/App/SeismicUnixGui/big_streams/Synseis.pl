@@ -414,7 +414,7 @@ flow 2 create zrhoreg.bin
 
 # run main
 $run->flow( \$flow[1] );
-#print  "Synseis.pl,flow1: $flow[1]\n";
+# print  "Synseis.pl,flow1: $flow[1]\n";
 
 # create zrho_reg.bin
 $run->flow( \$flow[2] );
@@ -422,7 +422,7 @@ $run->flow( \$flow[2] );
 
 #get meta-data from zrhoreg
 my $num_points_zrho_reg = $manage_files_by->count_lines( \$zrho_reg );
-#print("num_points_zrho_reg  $num_points_zrho_reg \n");
+# print("num_points_zrho_reg  $num_points_zrho_reg \n");
 
 #create zv_reg.bin
 $run->flow( \$flow[3] );
@@ -469,7 +469,7 @@ $xgraph->x1beg( quotemeta($plot_depth_min_m) );
 $xgraph->x1end( quotemeta($plot_depth_max_m) );
 $xgraph->line_color( quotemeta(2) );
 $xgraph->nTic2( quotemeta(2) );
-$xgraph->grid2_type( quotemeta('dash') );
+#$xgraph->grid2_type( quotemeta('dash') );
 $xgraph->geometry( ( quotemeta( $geometry[1] ) ) );
 $xgraph->box_width( quotemeta($wbox) );
 $xgraph->num_points( quotemeta($num_points_zrho_reg) );
@@ -501,7 +501,7 @@ $xgraph->x1end( quotemeta($plot_depth_max_m) );
 $xgraph->x2beg( quotemeta($plot_velocity_min) );
 $xgraph->x2end( quotemeta($plot_velocity_max) );
 $xgraph->nTic2( quotemeta(2) );
-$xgraph->grid2_type( quotemeta('solid') );
+#$xgraph->grid2_type( quotemeta('solid') );
 $xgraph->geometry( quotemeta( $geometry[2] ) );
 $xgraph->box_width( quotemeta($wbox) );
 $xgraph->num_points( quotemeta($num_points_zv_reg) );
@@ -529,8 +529,8 @@ $xgraph->x2end( quotemeta($plot_reflection_coefficient_max) );
 $xgraph->x1beg( quotemeta($plot_depth_min_m) );
 $xgraph->x1end( quotemeta($plot_depth_max_m) );
 $xgraph->nTic2( quotemeta(2) );
-$xgraph->grid2_type( quotemeta('solid') );
-$xgraph->grid1_type( quotemeta('solid') );
+#$xgraph->grid2_type( quotemeta('solid') );
+#$xgraph->grid1_type( quotemeta('solid') );
 $xgraph->geometry( quotemeta( $geometry[3] ) );
 $xgraph->box_width( quotemeta($wbox) );
 $xgraph->num_points( quotemeta($num_points_depth) );
@@ -558,7 +558,7 @@ $xgraph->x2end( quotemeta($plot_reflection_coefficient_max) );
 $xgraph->x1beg( quotemeta($plot_time_min_s) );
 $xgraph->x1end( quotemeta($plot_time_max_s) );
 $xgraph->nTic2( quotemeta(2) );
-$xgraph->grid2_type( quotemeta('solid') );
+#$xgraph->grid2_type( quotemeta('solid') );
 $xgraph->geometry( quotemeta( $geometry[4] ) );
 $xgraph->box_width( quotemeta($wbox) );
 $xgraph->num_points( quotemeta($num_points_time) );
@@ -585,7 +585,7 @@ $xgraph->x2end( quotemeta($plot_ss_amplitude_max) );
 $xgraph->x1beg( quotemeta($plot_time_min_s) );
 $xgraph->x1end( quotemeta($plot_time_max_s) );
 $xgraph->nTic2( quotemeta(2) );
-$xgraph->grid2_type( quotemeta('solid') );
+#$xgraph->grid2_type( quotemeta('solid') );
 $xgraph->geometry( quotemeta( $geometry[5] ) );
 $xgraph->box_width( quotemeta($wbox) );
 $xgraph->num_points( quotemeta($num_points_synthetic_seismogram) );
@@ -599,16 +599,16 @@ $flow[11] = $run->modules( \@items );
 # plot zrho_reg.bin
 $run->flow( \$flow[7] );
 
-# plot zv_reg.bin
+## plot zv_reg.bin
 $run->flow( \$flow[8] );
-
-# plot rc_depth.bin
+#
+## plot rc_depth.bin
 $run->flow( \$flow[9] );
-
-# plot rc_time.bin
+#
+## plot rc_time.bin
 $run->flow( \$flow[10] );
-
-# plot ss.bin
+#
+## plot ss.bin
 $run->flow( \$flow[11] );
 
 =head2 LOG FLOW(S)

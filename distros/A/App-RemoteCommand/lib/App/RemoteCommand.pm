@@ -1,5 +1,5 @@
-package App::RemoteCommand;
-use strict;
+package App::RemoteCommand 0.990;
+use v5.16;
 use warnings;
 
 use App::RemoteCommand::Pool;
@@ -10,16 +10,14 @@ use App::RemoteCommand::Util qw(prompt DEBUG logger);
 use File::Basename ();
 use File::Copy ();
 use File::Temp ();
-use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
+use Getopt::Long ();
 use IO::Select;
 use List::Util ();
 use POSIX 'strftime';
-use Pod::Usage 'pod2usage';
+use Pod::Usage ();
 use String::Glob::Permute 'string_glob_permute';
 
 use constant TICK_SECOND => 0.1;
-
-our $VERSION = '0.982';
 
 my $SCRIPT = File::Basename::basename($0);
 my $SUDO_PROMPT = sprintf "sudo password (asking with %s): ", $SCRIPT;
@@ -65,14 +63,32 @@ sub run {
     return @fail ? 1 : 0;
 }
 
+sub show_help {
+    my $self = shift;
+    open my $fh, '>', \my $out;
+    Pod::Usage::pod2usage
+        exitval => 'noexit',
+        input => $0,
+        output => $fh,
+        sections => 'SYNOPSIS|OPTIONS|EXAMPLES',
+        verbose => 99,
+    ;
+    $out =~ s/^[ ]{4,6}/  /mg;
+    $out =~ s/\n$//;
+    print $out;
+}
+
 sub parse_options {
     my ($self, @argv) = @_;
-    local @ARGV = @argv;
-    GetOptions
+    my $parser = Getopt::Long::Parser->new(
+        config => [qw(no_auto_abbrev no_ignore_case)],
+    );
+    $parser->getoptionsfromarray(
+        \@argv,
         "c|concurrency=i"     => \($self->{concurrency} = 5),
-        "h|help"              => sub { pod2usage(verbose => 99, sections => 'SYNOPSIS|OPTIONS|EXAMPLES') },
+        "h|help"              => sub { $self->show_help; exit 1 },
         "s|script=s"          => \($self->{script}),
-        "v|version"           => sub { printf "%s %s\n", __PACKAGE__, $VERSION; exit },
+        "v|version"           => sub { printf "%s %s\n", __PACKAGE__, __PACKAGE__->VERSION; exit },
         "a|ask-sudo-password" => \(my $ask_sudo_password),
         "H|host-file=s"       => \(my $host_file),
         "sudo-password=s"     => \($self->{sudo_password}),
@@ -81,13 +97,13 @@ sub parse_options {
         "sudo=s"              => \($self->{sudo_user}),
         "q|quiet"             => \($self->{quiet}),
         "F=s"                 => \($self->{configfile}),
-    or exit(2);
+    ) or exit(2);
 
-    my $host_arg = $host_file ? undef : shift @ARGV;
+    my $host_arg = $host_file ? undef : shift @argv;
     if ($self->{script}) {
-        $self->{script_arg} = \@ARGV;
+        $self->{script_arg} = \@argv;
     } else {
-        $self->{command} = \@ARGV;
+        $self->{command} = \@argv;
     }
 
     if (!@{$self->{command} || []} && !$self->{script}) {
@@ -313,9 +329,11 @@ App::RemoteCommand - simple remote command launcher via ssh
 
 =head1 SYNOPSIS
 
-    > rcommand [OPTIONS] HOSTS COMMANDS
-    > rcommand [OPTIONS] --script SCRIPT HOSTS
-    > rcommand [OPTIONS] --host-file FILE COMMANDS
+  $ rcommand [OPTIONS] HOSTS COMMANDS
+  $ rcommand [OPTIONS] --script SCRIPT HOSTS
+  $ rcommand [OPTIONS] --host-file FILE COMMANDS
+
+See L<rcommad|https://metacpan.org/pod/distribution/App-RemoteCommand/script/rcommand>.
 
 =head1 DESCRIPTION
 

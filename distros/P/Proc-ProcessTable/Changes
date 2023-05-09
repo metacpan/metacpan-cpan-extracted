@@ -1,5 +1,8 @@
 Revision history for Perl extension Proc::ProcessTable.
 
+0.635 2023-05-08
+  - Do not try to scan /dev/.lxd-mounts
+
 0.634 2021-09-27
   - Published the wrong branch (sorry, it was late). Now it is really fixed!
 

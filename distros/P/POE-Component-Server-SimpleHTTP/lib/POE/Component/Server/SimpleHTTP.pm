@@ -1,5 +1,5 @@
 package POE::Component::Server::SimpleHTTP;
-$POE::Component::Server::SimpleHTTP::VERSION = '2.28';
+$POE::Component::Server::SimpleHTTP::VERSION = '2.30';
 #ABSTRACT: Perl extension to serve HTTP requests in POE.
 
 use strict;
@@ -689,8 +689,7 @@ event 'got_input' => sub {
    # a request object, or should we keep it from being ?undef'd?
 
    if ( $self->loghandler and scalar keys %{ $self->loghandler } == 2 ) {
-      $! = undef;
-      $kernel->post(
+      my $ok = $kernel->post(
          $self->loghandler->{'SESSION'},
          $self->loghandler->{'EVENT'},
          $request, $response->connection->remote_ip()
@@ -703,7 +702,7 @@ event 'got_input' => sub {
          "' of the log handler alias '",
          $self->loghandler->{'SESSION'},
 "'. As reported by Kernel: '$!', perhaps the alias is spelled incorrectly for this handler?"
-      ) if $!;
+      ) unless $ok;
    }
 
    # If we received a malformed request then
@@ -728,14 +727,14 @@ event 'got_input' => sub {
       if ( $path =~ $handler->{'RE'} ) {
 
           # Send this off!
-          $kernel->post( $handler->{'SESSION'}, $handler->{'EVENT'}, $request,
+          my $ok = $kernel->post( $handler->{'SESSION'}, $handler->{'EVENT'}, $request,
                $response, $handler->{'DIR'}, );
 
             # Make sure we croak if we have an issue posting
             croak(
 "I had a problem posting to event $handler->{'EVENT'} of session $handler->{'SESSION'} for DIR handler '$handler->{'DIR'}'",
 ". As reported by Kernel: '$!', perhaps the session name is spelled incorrectly for this handler?"
-            ) if $!;
+            ) unless $ok;
 
             # All done!
             return;
@@ -1210,7 +1209,7 @@ POE::Component::Server::SimpleHTTP - Perl extension to serve HTTP requests in PO
 
 =head1 VERSION
 
-version 2.28
+version 2.30
 
 =head1 SYNOPSIS
 
@@ -1769,7 +1768,7 @@ Apocalypse <APOCAL@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
+This software is copyright (c) 2023 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

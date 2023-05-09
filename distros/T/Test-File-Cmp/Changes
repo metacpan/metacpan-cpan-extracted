@@ -1,9 +1,18 @@
 Revision history for Test-File-Cmp
 
+0.05    2023/05/05
+        POD: minor fix
+
+0.04    2023/05/03
+        Added LICENSE file
+        POD, README: Removed link to cpanratings.perl.org
+
 0.03    2022/10/27
         Adapted META.yml
+
 0.02    2022/03/07
         Read into string, then split instead of s///.
+
 0.01    2022/03/06
         First version, released on an unsuspecting world.
 

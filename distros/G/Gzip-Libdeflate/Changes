@@ -1,5 +1,9 @@
 Revision history for Perl module Gzip::Libdeflate
 
+0.05 2023-05-08
+
+- Update libdeflate to 1.18
+
 0.04 2022-10-13
 
 - Update libdeflate to 1.14
@@ -8,7 +12,7 @@ Revision history for Perl module Gzip::Libdeflate
 
 - Add convenience functions compress_file and decompress_file
 
-0.02 2021-02-21
+0.02_01 2023-05-07
 
 - Work around issue with malloc/free on Windows (Strawberry Perl)
 

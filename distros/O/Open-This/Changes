@@ -1,5 +1,8 @@
 Revision history for Open-This
 
+0.000032  2023-05-05 02:22:25Z
+    - Make boolean check pass for Perl 5.37 (GH#49) (Olaf Alders)
+
 0.000031  2022-11-15 21:41:18Z
     - Search recursively for .go files (GH#47) (E. Choroba)
 

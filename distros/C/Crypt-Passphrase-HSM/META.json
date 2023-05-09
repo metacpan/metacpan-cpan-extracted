@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.040",
+   "generated_by" : "App::ModuleBuildTiny version 0.041",
    "license" : [
       "perl_5"
    ],
@@ -21,14 +21,14 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.040"
+            "App::ModuleBuildTiny" : "0.041"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Crypt::HSM" : "0",
-            "Crypt::Passphrase" : "0",
+            "Crypt::HSM" : "0.010",
+            "Crypt::Passphrase" : "0.016",
             "Crypt::Passphrase::Pepper::Base" : "0",
             "MIME::Base64" : "0",
             "parent" : "0",
@@ -47,11 +47,11 @@
    "provides" : {
       "Crypt::Passphrase::HSM" : {
          "file" : "lib/Crypt/Passphrase/HSM.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       },
       "Crypt::Passphrase::Pepper::HSM" : {
          "file" : "lib/Crypt/Passphrase/Pepper/HSM.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase-hsm"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

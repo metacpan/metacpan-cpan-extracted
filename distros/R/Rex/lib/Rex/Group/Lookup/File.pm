@@ -14,7 +14,7 @@ With this module you can define hostgroups out of a file.
 
  use Rex::Group::Lookup::File;
  group "webserver" => lookup_file("./hosts.lst");
- 
+
 
 =head1 EXPORTED FUNCTIONS
 
@@ -25,7 +25,7 @@ package Rex::Group::Lookup::File;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

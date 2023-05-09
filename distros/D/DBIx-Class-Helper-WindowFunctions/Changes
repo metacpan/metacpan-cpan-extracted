@@ -1,5 +1,19 @@
 Revision history for DBIx-Class-Helper-WindowFunctions:
 
+v0.4.0    2023-05-08 20:15:22+01:00 Europe/London
+  [Incompatible Changes]
+  - Upgraded the minimum Perl version to v5.14.
+
+  [Documentation]
+  - Documented support policy for older Perls.
+
+  - Fixed encoding of links in README.
+
+  - Bumped copyright year.
+
+  [Other]
+  - Sign distribution.
+
 v0.3.0    2019-08-31 23:17:38+01:00 Europe/London
   [Important Changes]
   - Renamed to DBIx::Class::Helper::WindowFunctions.

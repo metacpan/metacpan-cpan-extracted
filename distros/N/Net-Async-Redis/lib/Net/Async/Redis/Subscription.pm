@@ -3,7 +3,7 @@ package Net::Async::Redis::Subscription;
 use strict;
 use warnings;
 
-our $VERSION = '3.022'; # VERSION
+our $VERSION = '3.023'; # VERSION
 
 =head1 NAME
 
@@ -53,8 +53,8 @@ Normally called by L<Net::Async::Redis> itself once the subscription is no longe
 
 sub cancel {
     my ($self) = @_;
-    my $f = $self->events->completed;
-    $f->fail('cancelled') unless $f->is_ready;
+    my $ev = $self->events;
+    $ev->fail('cancelled') unless $ev->is_ready;
     $self
 }
 

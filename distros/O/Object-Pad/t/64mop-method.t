@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Object::Pad ':experimental(mop)';
 
@@ -22,10 +21,10 @@ ok( !$methodmeta->is_common, '$methodmeta->is_common' );
 
 is( $classmeta->get_method( 'm' )->name, "m", '$classmeta->get_method' );
 
-is_deeply( [ $classmeta->direct_methods ], [ $methodmeta ],
+is( [ $classmeta->direct_methods ], [ $methodmeta ],
    '$classmeta->direct_methods' );
 
-is_deeply( [ $classmeta->all_methods ], [ $methodmeta ],
+is( [ $classmeta->all_methods ], [ $methodmeta ],
    '$classmeta->all_methods' );
 
 class SubClass :isa(Example) {}

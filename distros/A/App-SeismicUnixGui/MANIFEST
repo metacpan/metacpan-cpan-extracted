@@ -1,16 +1,13 @@
 .bashrc
-.temp
 App-SeismicUnixGui-0.80.1.tar.gz
 App-SeismicUnixGui-0.80.6.tar.gz
 App-SeismicUnixGui-0.80.7.tar.gz
 App-SeismicUnixGui-0.82.0.tar
 App-SeismicUnixGui-0.82.0.tar.gz
 App-SeismicUnixGui-0.82.0/.bashrc
-App-SeismicUnixGui-0.82.0/.temp
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0.tar
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0.tar.gz
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/.bashrc
-App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/.temp
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/dist/cpan-upload.sh
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/dist/manifest.pl
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/dist/my_uninstall.sh
@@ -563,7 +560,6 @@ App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/wipe.pm
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/write_LSU.pm
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/writefiles.pm
-App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/.temp
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/100
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/c55_file
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/gui_history.txt
@@ -1967,7 +1963,6 @@ App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/whereami2.pm
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/wipe.pm
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/write_LSU.pm
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/writefiles.pm
-App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/.temp
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/100
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/c15_file
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/c35_file
@@ -2624,7 +2619,6 @@ App-SeismicUnixGui-0.82.0/t/specs.t
 App-SeismicUnixGui-0.82.0/t/sunix.t
 App-SeismicUnixGui-0.82.3.tar.gz
 App-SeismicUnixGui-0.82.4/.bashrc
-App-SeismicUnixGui-0.82.4/.temp
 App-SeismicUnixGui-0.82.4/dist/cpan-upload.sh
 App-SeismicUnixGui-0.82.4/dist/my_uninstall.sh
 App-SeismicUnixGui-0.82.4/dist/uninstall_module.pl
@@ -3940,6 +3934,7 @@ App-SeismicUnixGui-0.82.4/t/misc_files.txt
 App-SeismicUnixGui-0.82.4/t/script.t
 App-SeismicUnixGui-0.82.4/t/specs.t
 App-SeismicUnixGui-0.82.5.tar.gz
+App-SeismicUnixGui-0.82.8.tar.gz
 archive/big_streams_param.pm
 archive/color_listbox_tbd.pm
 archive/config_superflows_fix.pm
@@ -4059,6 +4054,7 @@ lib/App/SeismicUnixGui/big_streams/Synseis.pl
 lib/App/SeismicUnixGui/big_streams/Synseis.pm
 lib/App/SeismicUnixGui/c/bin/synseis
 lib/App/SeismicUnixGui/c/bin/test
+lib/App/SeismicUnixGui/c/bin/zrhov
 lib/App/SeismicUnixGui/c/obj/keep
 lib/App/SeismicUnixGui/c/synseis/makefile
 lib/App/SeismicUnixGui/c/synseis/run_me_only.sh
@@ -4419,6 +4415,7 @@ lib/App/SeismicUnixGui/developer/code/sunix/sunix_package_use.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sunix_spec.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sustkvel_changes.pm
 lib/App/SeismicUnixGui/developer/code/sunix/update.pm
+lib/App/SeismicUnixGui/developer/code/sunix/update_main_version_number.pl
 lib/App/SeismicUnixGui/developer/Stripped/data/ctrlstrip.cwp.main
 lib/App/SeismicUnixGui/developer/Stripped/data/dt1tosu.su.main.data_conversion
 lib/App/SeismicUnixGui/developer/Stripped/data/segbread.Sfio.main
@@ -5161,7 +5158,6 @@ lib/App/SeismicUnixGui/script/.split_cdp0000058.su
 lib/App/SeismicUnixGui/script/.split_cdp0000059.su
 lib/App/SeismicUnixGui/script/.split_cdp0000060.su
 lib/App/SeismicUnixGui/script/.split_cdp0000061.su
-lib/App/SeismicUnixGui/script/.temp
 lib/App/SeismicUnixGui/script/100
 lib/App/SeismicUnixGui/script/c15_file
 lib/App/SeismicUnixGui/script/c35_file

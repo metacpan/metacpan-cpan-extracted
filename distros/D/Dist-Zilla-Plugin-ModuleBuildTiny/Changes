@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ModuleBuildTiny
 
+0.017     2023-05-08 18:42:37+02:00 Europe/Amsterdam
+          - Include extra newline in Build.PL to facilitate other plugins
+
 0.016     2023-04-28 15:51:16+02:00 Europe/Brussels
           - Add header and footer attributes
           - Add configure dependency on MBT version 0.044 if include/ or src/

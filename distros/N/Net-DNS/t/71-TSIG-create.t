@@ -1,16 +1,17 @@
 #!/usr/bin/perl
-# $Id: 71-TSIG-create.t 1883 2022-11-03 14:38:19Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1909 2023-03-23 11:36:16Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 use Test::More;
+use TestToolkit;
+
 use Net::DNS;
 
 my @prerequisite = qw(
 		Digest::HMAC
-		Digest::MD5
 		Digest::SHA
 		MIME::Base64
 		);
@@ -21,19 +22,23 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 22;
+plan tests => 18;
 
 
 my $tsig  = Net::DNS::RR->new( type => 'TSIG' );
 my $class = ref($tsig);
 
 
-my $tsigkey = 'HMAC-SHA256.key';
+my $tsigkey = 'tsigkey.txt';
 END { unlink($tsigkey) if defined $tsigkey; }
 
 my $fh_tsigkey = IO::File->new( $tsigkey, '>' ) || die "$tsigkey $!";
 print $fh_tsigkey <<'END';
-key "HMAC-SHA256.example." {
+
+Algorithm: name		; BIND dnssec-keygen private key
+Key:	secret		; syntax check only
+
+key "host1-host2.example." {	; BIND tsig-keygen key
 	algorithm hmac-sha256;
 	secret "f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=";
 };
@@ -41,120 +46,59 @@ END
 close($fh_tsigkey);
 
 
-my $keyrr = Net::DNS::RR->new( <<'END' );			# dnssec-keygen key pair
-HMAC-SHA256.example. IN KEY 512 3 163 f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8='
-END
-
-my $privatekey = $keyrr->privatekeyname;
-END { unlink($privatekey) if defined $privatekey; }
-
-my $publickey;
-( $publickey = $privatekey ) =~ s/\.private$/\.key/;
-END { unlink($publickey) if defined $publickey; }
-
-my $fh_bindpublic = IO::File->new( $publickey, '>' ) || die "$publickey $!";
-print $fh_bindpublic $keyrr->plain;
-close($fh_bindpublic);
-
-
-my $fh_bindprivate = IO::File->new( $privatekey, '>' ) || die "$privatekey $!";
-print $fh_bindprivate <<'END';
-Private-key-format: v1.2
-Algorithm: 163 (HMAC_SHA256)
-Key: f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=
-END
-close($fh_bindprivate);
-
-
-SKIP: {
-	my $tsig = $class->create($tsigkey);
-	skip( 'TSIG attribute test', 2 )
-			unless is( ref($tsig), $class, 'create TSIG from BIND tsig key' );
-	is( $tsig->name, $keyrr->name, 'TSIG key name' );
-	my $algorithm = $tsig->algorithm;
-	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
+for my $tsig ( $class->create($tsigkey) ) {
+	is( ref($tsig), $class, 'create TSIG from BIND tsig-keygen key' );
+	ok( $tsig->name,      'TSIG key name' );
+	ok( $tsig->algorithm, 'TSIG algorithm' );
 }
 
 
-SKIP: {
-	my $tsig = $class->create($privatekey);
-	skip( 'TSIG attribute test', 2 )
-			unless is( ref($tsig), $class, 'create TSIG from BIND dnssec private key' );
-	is( $tsig->name, lc( $keyrr->name ), 'TSIG key name' );
-	my $algorithm = $tsig->algorithm;
-	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
-}
+for my $packet ( Net::DNS::Packet->new('query.example') ) {
+	$packet->sign_tsig($tsigkey);
+	$packet->data;
 
-
-SKIP: {
-	my $tsig = $class->create($publickey);
-	skip( 'TSIG attribute test', 2 )
-			unless is( ref($tsig), $class, 'create TSIG from BIND dnssec public key' );
-	is( $tsig->name, $keyrr->name, 'TSIG key name' );
-	my $algorithm = $tsig->algorithm;
-	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
-}
-
-
-SKIP: {
-	my $tsig = $class->create($keyrr);
-	skip( 'TSIG attribute test', 2 )
-			unless is( ref($tsig), $class, 'create TSIG from KEY RR' );
-	is( $tsig->name, $keyrr->name, 'TSIG key name' );
-	my $algorithm = $tsig->algorithm;
-	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
-}
-
-
-{
-	my $packet = Net::DNS::Packet->new('query.example');
-	$packet->sign_tsig($privatekey);
 	my $tsig = $class->create($packet);
-	is( ref($tsig), $class, 'create TSIG from signed packet' );
+	is( ref($tsig),	      $class,			 'create TSIG from packet->sigrr' );
+	is( $tsig->name,      $packet->sigrr->name,	 'TSIG key name' );
+	is( $tsig->algorithm, $packet->sigrr->algorithm, 'TSIG algorithm' );
 }
 
 
-{
-	my $chain = eval { $class->create($tsig); };
+for my $chain ( $class->create($tsig) ) {
 	is( ref($chain), $class, 'create successor to existing TSIG' );
 }
 
 
-{
-	eval { $class->create(); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "empty argument list\t[$exception]" );
+my $keyrr = Net::DNS::RR->new( <<'END' );			# BIND dnssec-keygen public key
+host1-host2.example.	IN KEY	512 3 163 mvojlAdUskQEtC7J8OTXU5LNvt0=
+END
+
+my $dnsseckey = 'Khmac-sha256.example.+163+52011.key';
+END { unlink($dnsseckey) if defined $dnsseckey; }
+
+my $fh_dnsseckey = IO::File->new( $dnsseckey, '>' ) || die "$dnsseckey $!";
+print $fh_dnsseckey $keyrr->string, "\n";
+close($fh_dnsseckey);
+
+for my $tsig ( $class->create($dnsseckey) ) {
+	is( ref($tsig), $class, 'create TSIG from BIND dnssec public key' );
+	ok( $tsig->name,      'TSIG key name' );
+	ok( $tsig->algorithm, 'TSIG algorithm' );
 }
 
 
-{
-	eval { $class->create(undef); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "argument undefined\t[$exception]" );
-}
+exception( 'empty argument list', sub { $class->create() } );
+exception( 'argument undefined',  sub { $class->create(undef) } );
 
 
-{
-	my $null = Net::DNS::RR->new( type => 'NULL' );
-	eval { $class->create($null); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "unexpected argument\t[$exception]" );
-}
+my $null = Net::DNS::RR->new( type => 'NULL' );
+exception( 'unexpected argument', sub { $class->create($null) } );
+
+exception( '2-argument create', sub { $class->create( $keyrr->owner, $keyrr->key ) } );
 
 
-{
-	eval { $class->create( $keyrr->owner, $keyrr->key ); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "2-argument create\t[$exception]" );
-}
-
-
-{
-	my $packet = Net::DNS::Packet->new('query.example');
-	eval { $class->create($packet); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "no TSIG in packet\t[$exception]" );
-}
+my $packet = Net::DNS::Packet->new('query.example');
+exception( 'no TSIG in packet', sub { $class->create($packet) } );
 
 
 my $dnskey = 'Kbad.example.+161+39562.key';
@@ -166,11 +110,7 @@ HMAC-SHA1.example. IN DNSKEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
 END
 close($fh_dnskey);
 
-{
-	eval { $class->create($dnskey); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "unrecognised key format\t[$exception]" );
-}
+exception( 'unrecognised key format', sub { $class->create($dnskey) } );
 
 
 my $renamedBINDkey = 'arbitrary.key';
@@ -182,6 +122,9 @@ HMAC-SHA1.example. IN KEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
 END
 close($fh_renamed);
 
+exception( 'renamed BIND public key', sub { $class->create($renamedBINDkey) } );
+
+
 my $corruptBINDkey = 'Kcorrupt.example.+161+13198.key';		# unmatched keytag
 END { unlink($corruptBINDkey) if defined $corruptBINDkey; }
 
@@ -192,23 +135,7 @@ HMAC-SHA1.example. IN KEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
 END
 close($fh_corrupt);
 
-{
-	my @warning;
-	local $SIG{__WARN__} = sub { @warning = @_ };
-	$class->create($renamedBINDkey);
-	my ($warning) = split /\n/, "@warning\n";
-	ok( $warning, "renamed BIND public key\t[$warning]" );
-}
+exception( 'corrupt BIND public key', sub { $class->create($corruptBINDkey) } );
 
-
-{
-	my @warning;
-	local $SIG{__WARN__} = sub { @warning = @_ };
-	$class->create($corruptBINDkey);
-	my ($warning) = split /\n/, "@warning\n";
-	ok( $warning, "corrupt BIND public key\t[$warning]" );
-}
-
-
-__END__
+exit;
 

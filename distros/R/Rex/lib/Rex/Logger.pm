@@ -15,7 +15,7 @@ This module is the logging module. You can define custom logformats.
  $Rex::Logger::format = '[%D] %s';
  # will output something like
  # [2012-04-12 18:35:12] Installing package vim
-   
+
  $Rex::Logger::format = '%h - %D - %s';
  # will output something like
  # srv001 - 2012-04-12 18:35:12 - Installing package vim
@@ -31,7 +31,7 @@ package Rex::Logger;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use English qw(-no_match_vars);
 use Term::ANSIColor;

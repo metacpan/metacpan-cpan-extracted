@@ -1,5 +1,5 @@
 package POE::Component::Server::SimpleHTTP::State;
-$POE::Component::Server::SimpleHTTP::State::VERSION = '2.28';
+$POE::Component::Server::SimpleHTTP::State::VERSION = '2.30';
 use strict;
 use warnings;
 use POE::Wheel::ReadWrite;
@@ -97,7 +97,7 @@ POE::Component::Server::SimpleHTTP::State
 
 =head1 VERSION
 
-version 2.28
+version 2.30
 
 =for Pod::Coverage        close_wheel
        reset
@@ -109,7 +109,7 @@ Apocalypse <APOCAL@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
+This software is copyright (c) 2023 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

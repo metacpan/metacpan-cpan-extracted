@@ -1,26 +1,28 @@
 #!/usr/bin/perl
-# $Id: 05-OPT.t 1901 2023-03-02 14:46:11Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 80;
+use Test::More tests => 82;
+use TestToolkit;
 
 use Net::DNS;
 use Net::DNS::Parameters;
 
-use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };
+use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };	## no critic
 
 
 my $code = 41;
+my $type = 'OPT';
 my @attr = qw( version udpsize rcode flags );
 my $wire = '0000290000000000000000';
 
+my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
+is( $typecode, $code, "$type RR type code = $code" );
+
 
 for my $edns ( Net::DNS::Packet->new()->edns ) {
-	my $typecode = unpack 'xn', $edns->encode;
-	is( $typecode, $code, "RR type code = $code" );
-
 	my $encoded = $edns->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $encoded;
@@ -28,10 +30,10 @@ for my $edns ( Net::DNS::Packet->new()->edns ) {
 	is( $hex1, $hex2, 'encode/decode transparent' );
 	is( $hex1, $wire, 'encoded RDATA matches example' );
 
+	like( $edns->string, '/EDNS-VERSION/', '$edns->string works' );
+
 	$edns->rdata( pack 'H*', '00040002beef' );
 	like( $edns->plain, '/TYPE41/', '$edns->generic works' );    # join token(generic)
-
-	like( $edns->string, '/EDNS-VERSION/', '$edns->string works' );
 
 	$edns->version(1);
 	like( $edns->string, '/EDNS-VERSION/', '$edns->string (version 1)' );
@@ -43,22 +45,14 @@ for my $edns ( Net::DNS::Packet->new()->edns ) {
 		$edns->$_(0);
 	}
 
-	foreach my $method (qw(class ttl)) {
-		local $SIG{__WARN__} = sub { die @_ };
-
-		eval { $edns->$method(512) };
-		my ($warning) = split /\n/, "$@\n";
-		ok( 1, "deprecated $method method\t[$warning]" );    # first warning
-
-		eval { $edns->$method(512) };
-		my ($repeated) = split /\n/, "$@\n";
-		ok( !$repeated, "warning not repeated\t[$repeated]" );
+	foreach my $method (qw(class ttl size)) {
+		exception( "deprecated $method method", sub { $edns->$method(512) } );
+		noexception( "$method warning not repeated", sub { $edns->$method(512) } );
 	}
 }
 
 
 for my $edns ( Net::DNS::Packet->new()->edns ) {
-
 	is( scalar( $edns->options ), 0, 'EDNS option list initially empty' );
 
 	my $non_existent = $edns->option(0);
@@ -74,17 +68,11 @@ for my $edns ( Net::DNS::Packet->new()->edns ) {
 
 	ok( !$edns->_specified, 'state unmodified following delete' );
 
-	my @exception = ( {8 => {"FAMILY" => 99}}, {8 => {"BASE16" => '00990000'}}, {65001 => []} );
-	foreach (@exception) {
+	my @transgression = ( {8 => {"FAMILY" => 99}}, {8 => {"BASE16" => '00990000'}}, {65001 => []} );
+	foreach (@transgression) {
 		my @test = _presentable($_);
 		my ($option) = keys %$_;
-		eval {
-			local $SIG{__WARN__} = sub { die @_ };
-			my $value = $edns->option(%$_);
-			my @value = $edns->option($option);
-		};
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "compose(@test):\t[$exception]" );
+		exception( "compose(@test)", sub { $edns->option(%$_); my @value = $edns->option($option) } );
 	}
 }
 

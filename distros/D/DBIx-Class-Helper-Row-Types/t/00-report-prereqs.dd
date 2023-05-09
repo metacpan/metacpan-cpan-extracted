@@ -32,7 +32,8 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Safe::Isa' => '1.000008',
                                       'Types::SQL::Util' => 'v0.3.0',
-                                      'perl' => 'v5.10.0'
+                                      'perl' => 'v5.14.0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -49,8 +50,10 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'Types::Common::String' => '0',
-                                   'Types::SQL' => 'v0.3.0',
-                                   'Types::Standard' => '0'
+                                   'Types::Standard' => '0',
+                                   'base' => '0',
+                                   'lib' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

@@ -1,15 +1,11 @@
 #!/usr/bin/perl
-# $Id: 08-IPv4.t 1883 2022-11-03 14:38:19Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1908 2023-03-15 07:28:50Z willem $ -*-perl-*-
 #
 
 use strict;
 use warnings;
 use Test::More;
-
-BEGIN {
-	local @INC = ( @INC, qw(t) );
-	require NonFatal;
-}
+use TestToolkit;
 
 use Net::DNS;
 use IO::Select;
@@ -325,14 +321,11 @@ SKIP: {
 	is( ref($soa), 'Net::DNS::RR::SOA', '$iterator->() returns initial SOA RR' );
 
 	my $iterations;
-	eval {
-		$soa->serial(undef) if $soa;			# force SOA mismatch
-		while ( $iterator->() ) { $iterations++; }
-	};
-	my ($exception) = split /\n/, "$@\n";
+	$soa->serial(undef) if $soa;				# force SOA mismatch
+	exception( 'mismatched SOA serial', sub { $iterations++ while $iterator->() } );
+
 	ok( $iterations, '$iterator->() iterates through remaining RRs' );
 	is( $iterator->(), undef, '$iterator->() returns undef after last RR' );
-	ok( $exception, "iterator exception\t[$exception]" );
 }
 
 
@@ -376,42 +369,34 @@ SKIP: {
 }
 
 
-{					## exercise exceptions in _axfr_next()
+{					## exercise error paths in _axfr_next()
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
+	$resolver->tcp_timeout(10);
+	exception( 'TCP time out', sub { $resolver->_axfr_next( IO::Select->new ) } );
+
+	my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA));
+	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
+	my $select = IO::Select->new($socket);
+	while ( $resolver->bgbusy($socket) ) { sleep 1 }
+	my $discarded = '';		## [size][id][status]	[qdcount]...
+	$socket->recv( $discarded, 6 ) if $socket;
+	exception( 'corrupt data', sub { $resolver->_axfr_next($select) } );
+}
+
+
+SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->domain('net-dns.org');
 	eval { $resolver->tsig($tsig_key) };
 	$resolver->tcp_timeout(10);
 
-	{
-		my $select = IO::Select->new();
-		eval { $resolver->_axfr_next($select); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "TCP time out\t[$exception]" );
-	}
+	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
+	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
+	my $tsigrr = $packet->sigrr;
+	skip( 'verify fail', 1 ) unless $tsigrr;
 
-	{
-		my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA));
-		my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
-		my $select = IO::Select->new($socket);
-		while ( $resolver->bgbusy($socket) ) { sleep 1 }
-		my $discarded = '';	## [size][id][status]	[qdcount]...
-		$socket->recv( $discarded, 6 ) if $socket;
-		eval { $resolver->_axfr_next($select); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "corrupt data\t[$exception]" );
-	}
-
-SKIP: {
-		my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-		my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
-		my $tsigrr = $packet->sigrr;
-		skip( 'verify fail', 1 ) unless $tsigrr;
-
-		my $select = IO::Select->new($socket);
-		eval { $resolver->_axfr_next( $select, $tsigrr ); };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "verify fail\t[$exception]" );
-	}
+	my $select = IO::Select->new($socket);
+	exception( 'verify fail', sub { $resolver->_axfr_next( $select, $tsigrr ) } );
 }
 
 

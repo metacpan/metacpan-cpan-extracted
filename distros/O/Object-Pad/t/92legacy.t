@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -22,7 +22,7 @@ class CClass isa AClass does ARole {}
 
 {
    my $obj = CClass->new;
-   isa_ok( $obj, "CClass", '$obj' );
+   isa_ok( $obj, [ "CClass" ], '$obj' );
 
    is( $obj->rolem, "ARole", 'CClass has ->rolem' );
    is( $obj->classm, "AClass", 'CClass has ->classm' );
@@ -67,8 +67,8 @@ BEGIN {
    }
 
    EClass->new( key => "val" );
-   is_deeply( \@called, [qw( ADJUST ADJUSTPARAMS ADJUST )], 'ADJUST and ADJUSTPARAMS invoked together' );
-   is_deeply( $paramsref, { key => "val" }, 'ADJUSTPARAMS received HASHref' );
+   is( \@called, [qw( ADJUST ADJUSTPARAMS ADJUST )], 'ADJUST and ADJUSTPARAMS invoked together' );
+   is( $paramsref, { key => "val" }, 'ADJUSTPARAMS received HASHref' );
 }
 
 my $ADJUST_LINE;

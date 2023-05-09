@@ -4,7 +4,7 @@ package Require::HookChain;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-12'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -127,7 +127,7 @@ Require::HookChain - Chainable require hook
 
 =head1 VERSION
 
-This document describes version 0.009 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.011 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-12.
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,11 @@ constructor as well as C<INC> handler.
 
 =over
 
+=item * Require::HookChain::debug::
+
+Hooks that do debugging-related stuffs. See also: C<log::> subnamespace,
+C<timestamp::> subnamespace.
+
 =item * Require::HookChain::filter::
 
 Hooks that filter module loading due to some criteria. These hooks can fail a
@@ -215,7 +220,8 @@ criteria are not met.
 
 =item * Require::HookChain::log::
 
-Hooks that add logging to module loading process.
+Hooks that add logging to module loading process. See also: C<debug::>
+subnamespace.
 
 =item * Require::HookChain::munge::
 

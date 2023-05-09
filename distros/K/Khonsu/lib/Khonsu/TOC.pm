@@ -31,6 +31,12 @@ sub attributes {
 
 sub add {
 	my ($self, $file, %attributes) = @_;
+	if (!$attributes{x}) {
+		$attributes{x} = $file->page->x;
+		$attributes{y} = $file->page->y;
+		$attributes{h} = $file->page->remaining_height();
+		$attributes{w} = $file->page->width();
+	}
 	$self->set_attributes(%attributes);	
 	$self->toc_placeholder({
 		page => $file->page,
@@ -90,7 +96,7 @@ sub render {
 	$file->page->toc(1);
 	
 	if ($self->title) {
-		$self->SUPER::add($file, text => $self->title, font => $self->title_font_args);
+		$self->SUPER::add($file, text => $self->title, font => $self->title_font_args, %position);
 		$position{y} += $self->font->size;
 		$position{y} += $self->title_padding if $self->title_padding;
 	}
@@ -114,7 +120,7 @@ sub render {
 
 	%attributes = (%attributes, %position);
 
-	my $y = %attributes{y};
+	my $y = $attributes{y};
 	my $num = $self->toc_placeholder->{page}->num();
 	for my $outline (@{$self->outlines}) { 
 		$outline->render(

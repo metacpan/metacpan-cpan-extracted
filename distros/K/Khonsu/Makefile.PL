@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'Types::Standard' => 0,
 	'PDF::API2' => 0,
+	'Clone' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Khonsu-*' },

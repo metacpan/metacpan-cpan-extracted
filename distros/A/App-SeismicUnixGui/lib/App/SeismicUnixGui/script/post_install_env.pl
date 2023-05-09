@@ -67,7 +67,8 @@ print("\n\tHOW TO SET UP YOUR WORKING ENVIRONMENT\n");
 print(" Please be patient.\n");
 print(" Examining the system ... for $paths2find\n");
 print(" Hint: Choose a path with either $default_hintA (global) or
-       $default_hintB (local installation) in its name\n");
+       $default_hintB (local installation) in its name.
+       Ignore paths with \"blib\" intheir name.\n");
 
 # remove pre-existing files
 unlink($fifo);

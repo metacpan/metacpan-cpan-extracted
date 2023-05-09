@@ -8,7 +8,7 @@ use v5.12.5;
 use warnings;
 use Rex::Interface::Shell::Bash;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use base qw(Rex::Interface::Shell::Bash);
 

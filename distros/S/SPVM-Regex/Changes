@@ -1,3 +1,41 @@
+0.241002 2023-05-08
+  [Prerequirement Changes]
+    * SPVM 0.973+ is required.
+0.241001 2023-05-05
+  * Nothing to changed. This is the relese because the pause indexer failed.
+0.241 2023-05-04
+  [Prerequirement Changes]
+    * SPVM 0.971012+ is required.
+
+  [New Features]
+    * The Regex::Match class is added.
+    * The Regex::ReplaceInfo class is added.
+    * The version string can be got.
+  [Changes]
+    * The definition of the following methods in the Regex::Replacer interface are changed.
+    
+    [Before]
+    required method : string ($re : Regex);
+    
+    [After]
+    required method : string ($re : Regex, $match = undef : Regex::Match);
+    
+  [Incompatible Changes]
+    * The definition of the following methods in the Regex class are changed.
+      
+      [Before]
+      method match_forward : int ($string : string, $offset : int*, $length = -1 : int);
+      
+      [After]
+      method match_forward : Regex::Match ($string : string, $offset : int*, $length = -1 : int);
+  [Deprecation]
+    * The following fields in the Regex class are deprecated. These will be removed. Use a Regex::Match or Regex::ReplaceInfo object instead.
+    
+      has captures : ro string[];
+      has match_start : ro int;
+      has match_length : ro int;
+      has replaced_count : ro int;
+    
 0.23 2023-04-05
   [Exception Message Improvement]
     * Exception messages are improved.

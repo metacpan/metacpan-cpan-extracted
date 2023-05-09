@@ -4,6 +4,10 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+  XML::LibXML: '2.0203'
+  XML::LibXSLT: '1.99'
+  XML::XPath: '1.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -27,5 +31,5 @@ requires:
   XML::SAX: '0'
 resources:
   repository: https://github.com/asb-capfan/XML-Schematron
-version: '1.10'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

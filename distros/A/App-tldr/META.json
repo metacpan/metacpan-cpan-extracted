@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,19 +27,19 @@
       "runtime" : {
          "requires" : {
             "File::Which" : "0",
-            "HTTP::Tiny" : "0",
+            "Getopt::Long" : "2.39",
+            "HTTP::Tiny" : "0.082",
             "IO::Socket::SSL" : "0",
-            "Pod::Usage" : "1.33",
             "Term::ReadKey" : "0",
             "Text::Fold" : "0",
-            "perl" : "5.008005"
+            "perl" : "v5.16.0"
          }
       }
    },
    "provides" : {
       "App::tldr" : {
          "file" : "lib/App/tldr.pm",
-         "version" : "0.13"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -54,13 +54,13 @@
          "web" : "https://github.com/skaji/perl-tldr"
       }
    },
-   "version" : "0.13",
+   "version" : "0.21",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>",
       "zhumengu <m.zhumeng@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

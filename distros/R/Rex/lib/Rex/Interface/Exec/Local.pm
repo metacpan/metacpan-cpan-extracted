@@ -7,11 +7,12 @@ package Rex::Interface::Exec::Local;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands;
 
+use English qw(-no_match_vars);
 use Symbol 'gensym';
 use IPC::Open3;
 use IO::Select;
@@ -49,7 +50,8 @@ sub exec {
   my ( $out, $err, $pid );
 
   if ( exists $option->{cwd} ) {
-    $cmd = "cd " . $option->{cwd} . " && $cmd";
+    my $cd_cmd = $OSNAME eq 'MSWin32' ? 'cd /d' : 'cd';
+    $cmd = "$cd_cmd " . $option->{cwd} . " && $cmd";
   }
 
   if ( exists $option->{path} ) {

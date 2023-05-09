@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental(adjust_params)';
 
@@ -20,11 +20,11 @@ use Object::Pad ':experimental(adjust_params)';
 
    undef %captured;
    WithAdjustParams->new( req => "the req", opt => "the opt" );
-   is_deeply( \%captured, { req => "the req", opt => "the opt" }, 'ADJUST :params saw req and opt' );
+   is( \%captured, { req => "the req", opt => "the opt" }, 'ADJUST :params saw req and opt' );
 
    undef %captured;
    WithAdjustParams->new( req => "the req" );
-   is_deeply( \%captured, { req => "the req", opt => "default opt" }, 'ADJUST :params saw req and default opt' );
+   is( \%captured, { req => "the req", opt => "default opt" }, 'ADJUST :params saw req and default opt' );
 
    my $LINE = __LINE__+1;
    ok( !defined eval { WithAdjustParams->new(); 1 }, 'Missing required parameter throws exception' );
@@ -46,21 +46,21 @@ use Object::Pad ':experimental(adjust_params)';
 
    undef %captured;
    WithAdjustParamsDefaults->new( x => "the X", y => "the Y", z => "the Z" );
-   is_deeply( \%captured, { x => "the X", y => "the Y", z => "the Z" }, 'ADJUST :params saw passed values' );
+   is( \%captured, { x => "the X", y => "the Y", z => "the Z" }, 'ADJUST :params saw passed values' );
 
    undef %captured;
    WithAdjustParamsDefaults->new();
-   is_deeply( \%captured, { x => "default X", y => "default Y", z => "default Z" },
+   is( \%captured, { x => "default X", y => "default Y", z => "default Z" },
       'ADJUST :params saw defaults when absent' );
 
    undef %captured;
    WithAdjustParamsDefaults->new( x => undef, y => undef, z => undef );
-   is_deeply( \%captured, { x => undef, y => "default Y", z => "default Z" },
+   is( \%captured, { x => undef, y => "default Y", z => "default Z" },
       'ADJUST :params saw x undef but y z defaults when undef' );
 
    undef %captured;
    WithAdjustParamsDefaults->new( x => "", y => "", z => "" );
-   is_deeply( \%captured, { x => "", y => "", z => "default Z" },
+   is( \%captured, { x => "", y => "", z => "default Z" },
       'ADJUST :params saw x y "" but z defaults when ""' );
 }
 
@@ -86,7 +86,7 @@ use Object::Pad ':experimental(adjust_params)';
 
    undef %captured;
    WithRestParams->new( one => 111, three => 3 );
-   is_deeply( \%captured, { three => 3 }, 'ADJUST :params rest views remaining params' );
+   is( \%captured, { three => 3 }, 'ADJUST :params rest views remaining params' );
 }
 
 {
@@ -99,7 +99,7 @@ use Object::Pad ':experimental(adjust_params)';
    }
 
    StrictlyWithRestParams->new( unknown => "OK" );
-   is_deeply( \%captured, { unknown => "OK" }, 'ADJUST :params rest can consume params' );
+   is( \%captured, { unknown => "OK" }, 'ADJUST :params rest can consume params' );
 }
 
 {

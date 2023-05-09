@@ -7,13 +7,13 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0.88'
-  perl: '5.006'
+  perl: v5.10.0
   version: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-  perl: '5.006'
+  perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,11 +30,14 @@ no_index:
 provides:
   CPAN::Meta::Requirements:
     file: lib/CPAN/Meta/Requirements.pm
-    version: '2.140'
+    version: '2.142'
+  CPAN::Meta::Requirements::Range:
+    file: lib/CPAN/Meta/Requirements/Range.pm
+    version: '2.142'
 requires:
   B: '0'
   Carp: '0'
-  perl: '5.006'
+  perl: v5.10.0
   strict: '0'
   version: '0.88'
   warnings: '0'
@@ -42,10 +45,17 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/CPAN-Meta-Requirements/issues
   homepage: https://github.com/Perl-Toolchain-Gang/CPAN-Meta-Requirements
   repository: https://github.com/Perl-Toolchain-Gang/CPAN-Meta-Requirements.git
-version: '2.140'
+version: '2.142'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Ed J <mohawk2@users.noreply.github.com>'
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Ricardo Signes <rjbs@semiotic.systems>'
   - 'robario <webmaster@robario.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+x_generated_by_perl: v5.37.10
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

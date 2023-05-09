@@ -1,0 +1,84 @@
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org, hah@raf.org, fish@sport.com, eye@tea.net
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 1, singlepart body
+
+body 1
+
+From me  Wed Apr 19 23:26:01 2023
+To: you
+From: me
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 2, singlepart message/rfc822
+MIME-Version: 1.0
+Content-Type: message/rfc822
+
+To: youhou
+From: meeyee
+Subject: Inner message
+Date: Thu Apr 14 22:35:22 EST 2005
+
+body
+
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 3, (1 part) multipart
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=unique
+
+This is a multipart mime message.
+--unique
+Content-Type: text/plain
+
+part
+--unique--
+
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf org <raf@raf.org>
+To: Nobody Inparticular <nobody@inparticu.com>
+Date: Sun, 21 Mar 1993 23:56:48 -0800 (PST)
+Subject: test 4, (2 part) multipart
+MIME-Version: 1.0
+Content-type: multipart/mixed; boundary="simple boundary"
+
+This is the preamble.  It is to be ignored, though it
+is a handy place for composition agents to include an
+explanatory note to non-MIME conformant readers.
+
+--simple boundary
+
+This is implicitly typed plain US-ASCII text.
+It does NOT end with a linebreak.
+--simple boundary
+Content-type: text/plain; charset=us-ascii
+
+This is explicitly typed plain US-ASCII text.
+It DOES end with a linebreak.
+
+--simple boundary--
+
+This is the epilogue.  It is also to be ignored.
+
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 5, preamble, (1 part) multipart, nested (1 part) multipart
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=unique
+
+This is a multipart mime message.
+--unique
+Content-Type: multipart/mixed; boundary="too-unique"
+
+--too-unique
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><title>title</title></head><body>body 5 inner</body></html>
+--too-unique--
+--unique--
+

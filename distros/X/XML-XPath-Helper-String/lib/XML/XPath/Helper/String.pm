@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 our @EXPORT_OK = qw(quoted_string one_of_quoted not_one_of_quoted);
 
@@ -86,12 +86,12 @@ __END__
 
 =head1 NAME
 
-XML::XPath::Helper::String - Helper functions for xpath expression.
+XML::XPath::Helper::String - Helper functions for XPath expression.
 
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ Version 1.03
 
 =head1 DESCRIPTION
 
-This modules provides functions that helps building xpath expressions. The
+This modules provides functions that helps building XPath expressions. The
 functions are exported on demand, you can use the C<:all> tag to export all
 functions.
 
@@ -123,9 +123,9 @@ functions.
 
 =item C<quoted_string(I<ARG>)>
 
-This function makes it easier to create xpath expressions seaching for values
-that contains single quotes. The problem with xpath is that it does not
-support an escape character, so you have to use a C<concat(...)> in such
+This function makes it easier to create XPath expressions that search for
+values which contains single quotes. The problem with XPath is that it does
+not support an escape character, so you have to use a C<concat(...)> in such
 cases. This function creates a C<concat(...)> expression if needed.
 
 I<C<ARG>> must be a string or a reference to an array of strings. If it is a
@@ -156,7 +156,7 @@ prints:
 
 =item C<one_of_quoted(I<VALUES>)>
 
-This function creates an xpath expressions checking if I<C<NAME>> contains one
+This function creates an XPath expressions checking if I<C<NAME>> contains one
 of the values in I<C<VALUES>>. It calls C<quoted_string> to handle single
 quotes correctly. Example:
 
@@ -187,7 +187,7 @@ prints
 
 =item C<not_one_of_quoted(I<VALUES>)>
 
-Like C<one_of_quoted> but creates an xpath expressions checking if
+Like C<one_of_quoted> but creates an XPath expressions checking if
 I<C<NAME>> contains B<none> of the values in I<C<VALUES>>. Example:
 
 This:
@@ -233,13 +233,14 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-XPath-Helper-String>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/XML-XPath-Helper-String>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/XML-XPath-Helper-String>
+
+=item * GitHub Repository
+
+L<https://github.com/AAHAZRED/perl-XML-XPath-Helper-String.git>
+
 
 =back
 

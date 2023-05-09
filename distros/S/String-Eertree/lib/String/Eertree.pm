@@ -117,11 +117,11 @@ String::Eertree - Build the palindromic tree aka Eertree for a string
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,12 @@ fast way.
 
     my $tree = 'String::Eertree'->new(string => 'referee');
     my @palindromes = $tree->uniq_palindromes;  # r e f efe refer ere ee
+
+To see how fast it is, check the file F<examples/rosetta-code.pl>. It compares
+the speed of the Eertree algorithm to a naive generation of all the unique
+palindromes as found at L<Rosetta
+Code|https://rosettacode.org/wiki/Eertree#Perl>. Eertree is almost 40 times
+faster on a string of length 79.
 
 =head1 METHODS
 
@@ -186,10 +192,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=string-eertree>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/string-eertree>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/string-eertree>
@@ -208,7 +210,7 @@ Thanks Mikhail Rubinchik and Arseny M. Shur for inventing the eertree
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by E. Choroba.
+This software is Copyright (c) 2022-2023 by E. Choroba.
 
 This is free software, licensed under:
 

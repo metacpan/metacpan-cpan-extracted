@@ -58,6 +58,23 @@ is(exception {
     $publisher->publish('test::somewhere' => 'example data')->get;
 }, undef, 'can publish without problems');
 
+# test that we detect and handle cases when redis closes the connection
+subtest 'disconnect handling' => sub {
+    note 'start sub test';
+    my $redis1 = redis();
+    my $sub = $redis1->subscribe('non-existent-topic')->get;
+
+    my $f = Future->wait_any(
+        $loop->timeout_future(after => 1),
+        $sub->events->completed,
+    );
+    note 'close stream';
+    $redis1->{stream}->close_now;
+    note 'wait for subscription to complete';
+    like(exception {
+        $f->get;
+    }, qr/cancelled/, 'marked as cancelled');
+    ok($sub->events->is_ready, "redis disconnect has been handled");
+    done_testing;
+};
 done_testing;
-
-

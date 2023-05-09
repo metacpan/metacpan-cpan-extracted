@@ -8,6 +8,9 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use File::Basename;
 
+use SPVM 'Fn';
+use SPVM::File::Basename;
+
 use SPVM 'File::Basename';
 use SPVM 'TestCase::File::Basename';
 
@@ -167,6 +170,11 @@ warn "[Test Output]The file separator in this system is $sep";
     my $path = "c:/foo/bar/";
     is(SPVM::File::Basename->dirname($path)->to_string, File::Basename::dirname($path));
   }
+}
+
+# Version
+{
+  is($SPVM::File::Basename::VERSION, SPVM::Fn->get_version_string('File::Basename'));
 }
 
 done_testing;

@@ -2,7 +2,7 @@ package Net::DNS::RR::IPSECKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: IPSECKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: IPSECKEY.pm 1909 2023-03-23 11:36:16Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -16,11 +16,19 @@ Net::DNS::RR::IPSECKEY - DNS IPSECKEY resource record
 use integer;
 
 use Carp;
-use MIME::Base64;
 
 use Net::DNS::DomainName;
 use Net::DNS::RR::A;
 use Net::DNS::RR::AAAA;
+
+use constant BASE64 => defined eval { require MIME::Base64 };
+
+my %wireformat = (
+	0 => 'C3 a0 a*',
+	1 => 'C3 a4 a*',
+	2 => 'C3 a16 a*',
+	3 => 'C3 a* a*',
+	);
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -46,7 +54,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	} elsif ( $gatetype == 3 ) {
 		my $name;
 		( $name, $offset ) = Net::DNS::DomainName->decode( $data, $offset );
-		$self->{gateway} = $name;
+		$self->{gateway} = $name->encode;
 
 	} else {
 		die "unknown gateway type ($gatetype)";
@@ -66,29 +74,17 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $algorithm  = $self->algorithm;
 	my $keybin     = $self->keybin;
 
-	if ( not $gatetype ) {
-		return pack 'C3 a*', $precedence, $gatetype, $algorithm, $keybin;
-
-	} elsif ( $gatetype == 1 ) {
-		return pack 'C3 a4 a*', $precedence, $gatetype, $algorithm, $gateway, $keybin;
-
-	} elsif ( $gatetype == 2 ) {
-		return pack 'C3 a16 a*', $precedence, $gatetype, $algorithm, $gateway, $keybin;
-
-	} elsif ( $gatetype == 3 ) {
-		my $namebin = $gateway->encode;
-		return pack 'C3 a* a*', $precedence, $gatetype, $algorithm, $namebin, $keybin;
-	}
-	die "unknown gateway type ($gatetype)";
+	return pack $wireformat{$gatetype}, $precedence, $gatetype, $algorithm, $gateway, $keybin;
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my @params = map { $self->$_ } qw(precedence gatetype algorithm);
-	my @base64 = split /\s+/, encode_base64( $self->keybin );
-	my @rdata  = ( @params, $self->gateway, @base64 );
+	return $self->SUPER::_format_rdata() unless BASE64;
+	my @rdata  = map { $self->$_ } qw(precedence gatetype algorithm);
+	my @base64 = split /\s+/, MIME::Base64::encode( $self->keybin );
+	push @rdata, ( $self->gateway, @base64 );
 	return @rdata;
 }
 
@@ -127,7 +123,7 @@ sub gateway {
 	for (@value) {
 		/^\.*$/ && do {
 			$self->{gatetype} = 0;
-			$self->{gateway}  = undef;		# no gateway
+			$self->{gateway}  = '';			# no gateway
 			last;
 		};
 		/:.*:/ && do {
@@ -142,22 +138,20 @@ sub gateway {
 		};
 		/\..+/ && do {
 			$self->{gatetype} = 3;
-			$self->{gateway}  = Net::DNS::DomainName->new($_);
+			$self->{gateway}  = Net::DNS::DomainName->new($_)->encode;
 			last;
 		};
 		croak 'unrecognised gateway type';
 	}
 
 	if ( defined wantarray ) {
-		my $gatetype = $self->{gatetype};
-		return wantarray ? '.' : undef unless $gatetype;
 		my $gateway = $self->{gateway};
-		for ($gatetype) {
+		for ( $self->gatetype ) {
 			/^1$/ && return Net::DNS::RR::A::address( {address => $gateway} );
 			/^2$/ && return Net::DNS::RR::AAAA::address( {address => $gateway} );
-			/^3$/ && return wantarray ? $gateway->string : $gateway->name;
-			die "unknown gateway type ($gatetype)";
+			/^3$/ && return Net::DNS::DomainName->decode( \$gateway )->name;
 		}
+		return wantarray ? '.' : undef;
 	}
 	return;
 }

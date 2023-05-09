@@ -32,7 +32,7 @@ use v5.12.5;
 use warnings;
 use Rex::Interface::File;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use constant DEFAULT_READ_LEN => 64;
 
@@ -44,7 +44,7 @@ object
 
  my $fh = Rex::Interface::File->create('Local');
  $fh->open( '<', 'filename' );
- 
+
  my $file = Rex::FS::File->new(fh => $fh);
 
 Create a C<Rex::FS::File> object with a filename
@@ -55,10 +55,10 @@ Create a C<Rex::FS::File> object with a filename
    mode     => 'r', # or '<'
    type     => 'Local',
  );
- 
+
  # or shorter
  my $file = Rex::FS::File->new( filename => 'filename' );
- 
+
  # open a local file in write mode
  my $file = Rex::FS::File->new(
    filename => 'filename',

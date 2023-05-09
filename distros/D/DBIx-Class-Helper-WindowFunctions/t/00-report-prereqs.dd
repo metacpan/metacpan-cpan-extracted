@@ -31,7 +31,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'namespace::clean' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.10.0'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {

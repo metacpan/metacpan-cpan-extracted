@@ -8,7 +8,7 @@ use XML::Schematron::Test;
 use Check::ISA;
 
 use vars qw/$VERSION/;
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 
 has '+_trait_namespace' => ( default => 'XML::Schematron' );
@@ -51,7 +51,6 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
-# Below is the stub of documentation for your module. You better edit it!
 
 =head1 NAME
 

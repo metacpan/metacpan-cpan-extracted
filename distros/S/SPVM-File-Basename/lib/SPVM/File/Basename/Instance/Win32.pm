@@ -6,13 +6,11 @@ package SPVM::File::Basename::Instance::Win32;
 
 =head1 Name
 
-SPVM::File::Basename::Instance::Win32 - File::Basename::Instance Implementation for Windows.
+SPVM::File::Basename::Instance::Win32 - Windows Implementation of File::Basename::Instance
 
 =head1 Description
 
-C<SPVM::File::Basename::Instance::Win32> is the C<File::Basename::Instance::Win32> class in L<SPVM> language.
-
-This class is a child class of the L<File::Basename::Instance|SPVM::File::Basename::Instance> class for Windows.
+The File::Basename::Instance::Win32 class of L<SPVM> is the Windows implementation of L<File::Basename::Instance|SPVM::File::Basename::Instance>.
 
 =head1 Usage
 
@@ -42,7 +40,7 @@ This class is a child class of the L<File::Basename::Instance|SPVM::File::Basena
 
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
+

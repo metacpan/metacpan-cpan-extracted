@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -12,8 +11,8 @@ package Base::Class {
    sub new {
       my $class = shift;
       my ( $ok ) = @_;
-      Test::More::is( $ok, "ok", '@_ to Base::Class::new' );
-      Test::More::is( scalar @_, 1, 'scalar @_ to Base::Class::new' );
+      ::is( $ok, "ok", '@_ to Base::Class::new' );
+      ::is( scalar @_, 1, 'scalar @_ to Base::Class::new' );
 
       return bless { base_field => 123 }, $class;
    }
@@ -31,7 +30,7 @@ class Derived::Class :isa(Base::Class) {
 
    BUILD {
       my @args = @_;
-      Test::More::is_deeply( \@args, [ "ok" ], '@_ to Derived::Class::BUILD' );
+      ::is( \@args, [ "ok" ], '@_ to Derived::Class::BUILD' );
       push @BUILDS_INVOKED, __PACKAGE__;
    }
 
@@ -44,7 +43,7 @@ class Derived::Class :isa(Base::Class) {
    my $obj = Derived::Class->new( "ok" );
    is( $obj->fields, "base_field=123,derived_field=456",
       '$obj->fields' );
-   is_deeply( \@BUILDS_INVOKED, [qw( Derived::Class )],
+   is( \@BUILDS_INVOKED, [qw( Derived::Class )],
       'BUILD invoked correctly' );
 
    # We don't mind what the output here is but it should be well-behaved
@@ -74,7 +73,7 @@ class Derived::Class :isa(Base::Class) {
    is( DoubleDerived->new( "ok" )->fields,
       "base_field=123,derived_field=456,doubled=yes",
       'Double-derived from foreign still invokes base constructor' );
-   is_deeply( \@BUILDS_INVOKED, [qw( Derived::Class DoubleDerived )],
+   is( \@BUILDS_INVOKED, [qw( Derived::Class DoubleDerived )],
       'BUILD invoked correctly for double-derived class' );
 }
 
@@ -96,7 +95,7 @@ class Derived::Class :isa(Base::Class) {
    }
 
    my $e;
-   ok( !defined( $e = exception { RT132263::Child1->new } ),
+   ok( !defined( $e = dies { RT132263::Child1->new } ),
       'RT132263 case 1 constructs OK' ) or
       diag( "Exception was $e" );
 }
@@ -110,15 +109,9 @@ class Derived::Class :isa(Base::Class) {
 
    my $obj;
    my $e;
-   ok( !defined( $e = exception { $obj = RT132263::Child2->new } ),
+   ok( !defined( $e = dies { $obj = RT132263::Child2->new } ),
       'RT132263 case 2 constructs OK' ) or
       diag( "Exception was $e" );
-
-   {
-      local our $TODO = "field initialisers no longer run during foreign superconstructor";
-
-      $obj and is( $obj->{result}, 456, '$obj->{result} has correct value' );
-   }
 
    # gutwrench into internals
    is( scalar @{ $obj->{'Object::Pad/slots'} }, 1,
@@ -127,7 +120,7 @@ class Derived::Class :isa(Base::Class) {
 
 # Check we are not allowed to switch the representation type back to native
 {
-   like( exception {
+   like( dies {
          eval( "class SwitchedToNative :isa(Base::Class) :repr(native) { }" ) or die $@;
       },
       qr/^Cannot switch a subclass of a foreign superclass type to :repr\(native\) at /,

@@ -1,6 +1,6 @@
 package App::SeismicUnixGui;
 
-$VERSION = '0.82.6';
+$VERSION = '0.82.9';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ object-oriented graphical user interface for Perl.
 
 =head1 EXTRA PACKAGES
 
-If you want to additional fortran and c packages
+If you want to additional fortran and c packages,
 run the following instruction post-installation:
 
 bash post_install_scripts.sh
@@ -37,7 +37,7 @@ B.
 =head1 ENVIRONMENTAL VARIABLES
 
 GLOBAL INSTALLATION:
-It is advisable to have you environment variables
+It is advisable to have your environment variables
 properly defined. That is you should already have active the
 following definitions in your ".bashrc" file. For example:
 

@@ -15,7 +15,7 @@ sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 
 #======================================================================
@@ -412,8 +412,10 @@ Returns the L<MsOffice::Word::Surgeon::PackagePart> object corresponding to the 
   my $result = $surgeon->all_parts_do($method_name => %args);
 
 Calls the given method on all part objects. Results are accumulated
-in a hash, with part names as keys to the results. In most cases this is
-used to invoqke the L<MsOffice::Word::Surgeon::PackagePart/replace> method.
+in a hash, with part names as keys to the results. This is mostly
+used to invoke the L<MsOffice::Word::Surgeon::PackagePart/replace> method, i.e. 
+
+  $surgeon->all_parts_do(replace => qr[$pattern], $replacement_callback, %replacement_args);
 
 
 =head3 xml_member
@@ -561,7 +563,7 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019-2022 by Laurent Dami.
+Copyright 2019-2023 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

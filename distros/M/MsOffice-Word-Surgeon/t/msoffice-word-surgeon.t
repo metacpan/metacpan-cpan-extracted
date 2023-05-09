@@ -13,7 +13,7 @@ diag( "Testing MsOffice::Word::Surgeon $MsOffice::Word::Surgeon::VERSION, Perl $
 
 my $surgeon = MsOffice::Word::Surgeon->new($sample_file);
 
-$surgeon->part($_)->replace(qr/\bPage\b/ => sub {"Pagina"}, keep_xml_as_is => 1) for $surgeon->headers;
+$surgeon->part($_)->replace(qr/\bPage\b/ => sub {"Pagina"}, cleanup_XML => 0) for $surgeon->headers;
 
 
 my $plain_text = $surgeon->plain_text;
@@ -25,7 +25,9 @@ like $plain_text, qr/1st/, "found 1st";
 like $plain_text, qr/2nd/, "found 2nd";
 like $plain_text, qr/paragraph\ncontains a soft line break/, "soft line break";
 
-$surgeon->all_parts_do(cleanup_XML => (no_caps => 1));
+# $surgeon->all_parts_do(cleanup_XML => (no_caps => 1));
+$surgeon->document->cleanup_XML(no_caps => 1);
+
 
 my $contents = $surgeon->contents;
 like $contents, qr/because documents edited in MsWord often have run boundaries across sentences/,
@@ -57,7 +59,7 @@ is_deeply [$surgeon->headers], [qw/header1 header2 header3/],     "headers";
 is_deeply [$surgeon->footers], [qw/footer1 footer2 footer3/],     "footers";
 
 
-$surgeon->all_parts_do(replace => qr/\bSurgeon\b/ => sub {"Physician"});
+$surgeon->all_parts_do(replace => qr/\bSurgeon\b/ => sub {"Physician"}, cleanup_XML => 0);
 
 
 

@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 # VERSION
 
-version v0.3.2
+version v0.3.3
 
 # SYNOPSIS
 
@@ -52,12 +52,14 @@ arguments.
 
 By default, it will match against any "text/" MIME type.
 
-# KNOWN ISSUES
-
-## Support for older Perl versions
+# SUPPORT FOR OLDER PERL VERSIONS
 
 This module requires Perl v5.9.3 or newer, which is the minimum
 version supported by [Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS).
+
+Future releases may only support Perl versions released in the last ten years.
+
+# KNOWN ISSUES
 
 ## Use with templating directive that collapse whitespace
 
@@ -107,7 +109,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2022 by Robert Rothenberg.
+This software is Copyright (c) 2020-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

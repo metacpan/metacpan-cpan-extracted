@@ -1,5 +1,9 @@
 Revision history for Sub-Exporter
 
+0.114     2023-05-06 17:25:36-04:00 America/New_York
+        - Data::OptList now requires perl v5.12.0
+        - tests no longer add "-T" to shebang, so do not invoke taint mode
+
 0.113     2022-12-31 21:07:47-05:00 America/New_York
         - update author contact info
 

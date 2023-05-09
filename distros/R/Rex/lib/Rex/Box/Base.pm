@@ -21,7 +21,7 @@ package Rex::Box::Base;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Commands -no => [qw/auth/];
 use Rex::Helper::Run;
@@ -238,7 +238,7 @@ Currently it supports 2 modes: I<nat> and I<bridged>. Currently it supports only
      type => "nat",
    },
  }
- 
+
  $box->network(
    1 => {
      type => "bridged",

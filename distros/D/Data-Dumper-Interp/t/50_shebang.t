@@ -55,8 +55,8 @@ confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 #    [ 'avis($_[1])',             '(_Q_)' ],
 #    [ 'avisq($_[1])',            '(_q_)' ],
 #    #currently broken due to $VAR problem: [ 'avisq($_[1], $_[1])',     '(_q_, _q_)' ],
-#    [ 'avisl($_[1])',             '_Q_' ],
-#    [ 'avislq($_[1])',            '_q_' ],
+#    [ 'alvis($_[1])',             '_Q_' ],
+#    [ 'alvisq($_[1])',            '_q_' ],
 #    [ 'ivis(\'$_[1]\')',         '_Q_' ],
 #    [ 'ivis(\'foo$_[1]\')',      'foo_Q_' ],
 #    [ 'ivis(\'foo$\'."_[1]")',   'foo_Q_' ],
@@ -77,7 +77,7 @@ confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 #}#checkstringy()
 
 # Run a variety of tests on non-string item, i.e. something which is a
-# number or structured object (which might contains strings within, e.g.
+# number or structured object (which might contain strings within, e.g.
 # values or quoted keys in a hash).
 #
 # The given regexp specifies the expected result with Useqq(1), i.e.
@@ -94,8 +94,8 @@ sub checklit(&$$) {
     [ 'avis($_[1])',             '(_Q_)' ],
     [ 'avisq($_[1])',            '(_q_)' ],
     #currently broken due to $VAR problem: [ 'avisq($_[1], $_[1])',     '(_q_, _q_)' ],
-    [ 'avisl($_[1])',             '_Q_' ],
-    [ 'avislq($_[1])',            '_q_' ],
+    [ 'alvis($_[1])',             '_Q_' ],
+    [ 'alvisq($_[1])',            '_q_' ],
     [ 'ivis(\'$_[1]\')',         '_Q_' ],
     [ 'ivis(\'foo$_[1]\')',      'foo_Q_' ],
     [ 'ivis(\'foo$\'."_[1]")',   'foo_Q_' ],
@@ -140,7 +140,7 @@ foreach (
 {
   my ($confname, @values) = @$_;
   foreach my $value (@values) {
-    foreach my $base (qw(vis avis hvis avisl hvisl dvis ivis)) {
+    foreach my $base (qw(vis avis hvis alvis hlvis dvis ivis)) {
       foreach my $q ("", "q") {
         my $codestr = $base . $q . "(42";
          $codestr .= ", 43" if $base =~ /^[ahl]/;
@@ -220,7 +220,7 @@ our $ABC_regexp = $main::global_regexp;
 package main::Mybase;
 sub new { bless \do{ my $t = 1000+$_[1] }, $_[0] }
 use overload 
-  '""' => sub{ my $self=shift; "Mybase-ish-".$$self },
+  '""' => sub{ my $self=shift; "Mybase-ish-".$$self }, # "Mybase-ish-1xxxx"
   # Implement '&' so Data::Dumper::Interp::_show_as_number 
   # will decide it should be displayed as an unquoted number.
   '&'  => sub{ my ($self,$operand,$swapped)=@_; $$self & $operand },
@@ -255,10 +255,10 @@ $_ = "GroupA.GroupB";
 { my $code = 'vis'; check $code, "\"${_}\"", eval $code; }
 { my $code = 'avis($_,1,2,3)'; check $code, "(\"${_}\",1,2,3)", eval $code; }
 { my $code = 'hvis("foo",$_)'; check $code, "(foo => \"${_}\")", eval $code; }
-{ my $code = 'hvisl("foo",$_)'; check $code, "foo => \"${_}\"", eval $code; }
+{ my $code = 'hlvis("foo",$_)'; check $code, "foo => \"${_}\"", eval $code; }
 { my $code = 'avis(@_)'; check $code, '()', eval $code; }
 { my $code = 'hvis(@_)'; check $code, '()', eval $code; }
-{ my $code = 'hvisl(@_)'; check $code, '', eval $code; }
+{ my $code = 'hlvis(@_)'; check $code, '', eval $code; }
 { my $code = 'avis(undef)'; check $code, "(undef)", eval $code; }
 { my $code = 'hvis("foo",undef)'; check $code, "(foo => undef)", eval $code; }
 { my $code = 'vis(undef)'; check $code, "undef", eval $code; }
@@ -345,7 +345,8 @@ my $ratstr  = '1/9';
   # Confirm that various Objects values disable
   foreach my $Sval (0, undef, "", [], [0], [""]) {
     local $Data::Dumper::Interp::Objects = $Sval;
-    my $s = vis($bigf);
+    #my $s = vis($bigf);
+    my $s = visnew->Debug(0)->vis($bigf);
     die "bug(",u($Sval),")($s)" unless $s =~ /^\(?bless.*BigFloat/s;
   }
 }

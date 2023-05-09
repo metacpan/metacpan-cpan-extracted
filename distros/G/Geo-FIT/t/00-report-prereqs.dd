@@ -12,6 +12,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
+                                      'Clone' => '0',
                                       'HTML::Entities' => '0',
                                       'IPC::System::Simple' => '1.30',
                                       'perl' => '5.008'

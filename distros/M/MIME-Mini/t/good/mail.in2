@@ -1,0 +1,46 @@
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 4, preamble, (1 part) multipart, nested malformed (1 part) multipart
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=unique
+
+This is a multipart mime message.
+--unique
+Content-Type: multipart/mixed; boundary="too-unique"
+
+--too-unique
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><title>title</title></head><body>body 4 inner</body></html>
+--too-unique--
+--unique--
+
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 5, preamble, (1 part) multipart, nested malformed (2 part) multipart with inner preamble, inner nested (1 part) malformed multipart
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=unique
+
+This is a multipart mime message.
+--unique
+Content-Type: multipart/mixed; boundary="too-unique"
+
+inner preamble 5
+--too-unique
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><title>title</title></head><body>body 5 inner</body></html>
+--too-unique
+Content-Type: multipart/mixed; boundary="metoo-unique"
+
+--metoo-unique
+--metoo-unique--
+--too-unique--
+--unique--
+

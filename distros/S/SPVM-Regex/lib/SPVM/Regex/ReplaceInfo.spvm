@@ -1,0 +1,23 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Regex::ReplaceInfo {
+  # Fields
+  has replaced_count : ro int;
+  
+  # Class Methods
+  static method new : Regex::ReplaceInfo ($options = undef : object[]) {
+    
+    my $self = new Regex::ReplaceInfo;
+    
+    my $options_h = Hash->new($options);
+    
+    $self->{replaced_count} = $options_h->delete_or_default_int("replaced_count", 0);
+    
+    for my $name (@{$options_h->keys}) {
+      die "The \"$name\" option is not supported";
+    }
+    
+    return $self;
+  }
+}

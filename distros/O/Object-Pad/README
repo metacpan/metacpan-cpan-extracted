@@ -374,7 +374,7 @@ KEYWORDS
     
           ADJUST { $f = "a value"; }
     
-          method field { return $f; }
+          method f { return $f; }
        }
 
     Since version 0.57 a role can declare that it provides another role:
@@ -540,7 +540,7 @@ KEYWORDS
        # equivalent to
        field $x;
     
-       method field {
+       method x {
           $x = shift if @_;
           return $x;
        }

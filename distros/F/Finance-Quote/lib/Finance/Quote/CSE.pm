@@ -27,7 +27,7 @@ use LWP::UserAgent;
 use JSON qw( decode_json );
 use String::Util qw(trim);
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 our @labels = qw/last date isodate/;
 

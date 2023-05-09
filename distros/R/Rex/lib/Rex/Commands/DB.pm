@@ -19,20 +19,20 @@ Version <= 1.0: All these functions will not be reported.
                   user    => "username",
                   password => "password",
                 };
- 
+
  task "list", sub {
    my @data = db select => {
             fields => "*",
             from  => "table",
             where  => "enabled=1",
           };
- 
+
   db insert => "table", {
            field1 => "value1",
             field2 => "value2",
             field3 => 5,
           };
- 
+
   db update => "table", {
               set => {
                 field1 => "newvalue",
@@ -40,11 +40,11 @@ Version <= 1.0: All these functions will not be reported.
               },
               where => "id=5",
            };
- 
+
   db delete => "table", {
             where => "id < 5",
           };
- 
+
  };
 
 
@@ -57,7 +57,7 @@ package Rex::Commands::DB;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -81,13 +81,13 @@ Do a database action.
           from  => "table",
           where  => "host='myhost'",
         };
- 
+
  db insert => "table", {
           field1 => "value1",
           field2 => "value2",
           field3 => 5,
         };
- 
+
  db update => "table", {
             set => {
               field1 => "newvalue",
@@ -95,7 +95,7 @@ Do a database action.
             },
             where => "id=5",
          };
- 
+
  db delete => "table", {
           where => "id < 5",
         };

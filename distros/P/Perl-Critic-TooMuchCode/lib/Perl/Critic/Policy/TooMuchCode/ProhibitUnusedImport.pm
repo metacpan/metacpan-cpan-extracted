@@ -69,7 +69,7 @@ sub violates {
         $used{"$el_word"}++;
     }
 
-    __get_symbol_usage(\%used, $doc);
+    Perl::Critic::TooMuchCode::__get_symbol_usage(\%used, $doc);
 
     my @violations;
     my @to_report = grep { !$used{$_} } (keys %imported);
@@ -121,58 +121,6 @@ sub gather_imports_generic {
     }
 }
 
-sub __get_symbol_usage {
-    my ($usage, $doc) = @_;
-
-    ## Look for the signature of misparsed ternary operator.
-    ## https://github.com/adamkennedy/PPI/issues/62
-    ## Once PPI is fixed, this workaround can be eliminated.
-    Perl::Critic::TooMuchCode::__get_terop_usage($usage, $doc);
-
-    Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_regexp_symbol_usage($usage, $doc);
-
-    for my $e (@{ $doc->find('PPI::Token::Symbol') || [] }) {
-        $usage->{ $e->symbol() }++;
-    }
-
-    for my $class (qw{
-        PPI::Token::Quote::Double
-        PPI::Token::Quote::Interpolate
-        PPI::Token::QuoteLike::Backtick
-        PPI::Token::QuoteLike::Command
-        PPI::Token::QuoteLike::Readline
-        PPI::Token::HereDoc
-     }) {
-        for my $e (@{ $doc->find( $class ) || [] }) {
-            my $str = PPIx::QuoteLike->new( $e ) or next;
-            for my $var ( $str->variables() ) {
-                $usage->{ $var }++;
-            }
-        }
-    }
-
-    # Gather usages in the exact form of:
-    #     our @EXPORT = qw( ... );
-    #     our @EXPORT_OK = qw( ... );
-    for my $st (@{ $doc->find('PPI::Statement::Variable') || [] }) {
-        next unless $st->schildren == 5;
-
-        my @children = $st->schildren;
-        next unless $children[0]->content() eq 'our'
-            && ($children[1]->content() eq '@EXPORT'
-                || $children[1]->content() eq '@EXPORT_OK')
-            && $children[2]->content() eq '='
-            && $children[3]->isa('PPI::Token::QuoteLike::Words')
-            && $children[4]->content() eq ';';
-
-        for my $w ($children[3]->literal) {
-            $usage->{ $w }++;
-        }
-    }
-
-    return;
-}
-
 1;
 
 =encoding utf-8
@@ -183,61 +131,82 @@ TooMuchCode::ProhibitUnusedImport -- Find unused imports
 
 =head1 DESCRIPTION
 
-An "Unused Import" is usually a subroutine name imported by a C<use> statement.
-For example, the word C<Dumper> in the following statement:
+An "import" is a subroutine brought by a C<use> statement.
+
+From the documentation of L<use>, there are several forms of calling `use`. This policy scans for the following two forms:
+
+    use Module VERSION LIST
+    use Module LIST
+
+... and only the one with LIST written in C<qw()>.
+
+Conventionally the LIST after c<use Module> is known as arguments and
+conventionally when it is written with C<qw()>, the LIST is treated as
+a import list -- which is a list of symbols that becomes avaiable in
+the current namespace.
+
+For example, the word C<baz> in the following statement is one of such:
 
     use Foo qw( baz );
 
-The word C<baz> can be removed if it is not mentioned in the rest of this program.
+Symbols in the import list are often subroutine names or variable
+names. If they are not used in the following program, they do not neet
+to be imported.
 
-Conventionally, this policy looks only for the C<use> statement with a C<qw()>
-operator at the end. This syntax is easier to deal with. It also works with
-the usage of C<Importer> module -- as long as a C<qw()> is there at the end:
+Although an experienced perl programmer would know that the
+description above is only true by convention, there are many modules
+on CPAN that already follows such convetion. Which is a good one to
+follow, and I recommend you to follow.
+
+This policy checks only import lists written in C<qw()>, other forms
+are ignored, or rather, too complicated to be correctly supported.
+
+The syntax of C<Importer> module is also supported, but only the ones
+with C<qw()> at the end.
 
     use Importer 'Foo' => qw( baz );
 
-This may be adjusted to be a bit smarter, but it is a clear convention in the
-beginning.
-
-Modules which will be ignored, generally because the args of import do not mean
-the symbols to be imported.
+Modules with non-trivial form of arguments may have nothing to with
+symbol-importing. But it might be used with a C<qw()> LIST at the end.
+Should you wish to do so, you may let chose to let perlcritic to
+ignore certain modules by setting the C<ignored_modules> in
+C<.perlcriticrc>. For example:
 
     [TooMuchCode::ProhibitUnusedImport]
     ignored_modules = Git::Sub Regexp::Common
 
+Alternatively, you may choose not to write the module arguments as a
+C<qw()> list.
+
 =head2 Moose Types
 
-When importing types from a Moose type library, you may run into the following
-situation:
+Moose Types can also be imported, but their symbols may not be used
+as-is. Instead, some other helper functions are generated with names
+based on the Type. For example:
 
     use My::Type::Library::Numeric qw( PositiveInt );
-
-    my $foo = 'bar';
-    my $ok  = is_PositiveInt($foo);
-
-In this case,  C<My::Type::Library::Numeric> exports C<is_PositiveInt> as well
-as C<PositiveInt>.  Even though C<PositiveInt> has not specifically been called
-by the code, it should be considered as being used. In order to allow for this case,
-you can specify class names of Moose-like type libraries which you intend to
-import from.
-
-A similar case exists for coercions:
-
     use My::Type::Library::String qw( LowerCaseStr );
-    my $foo   = 'Bar';
+
+    my $foo = 'Bar';
+    my $ok  = is_PositiveInt($foo);
     my $lower = to_LowerCaseStr($foo);
 
-In the above case, C<LowerCaseStr> has not specifically been called by the
-code, but it should be considered as being used.
+The module C<My::Type::Library::Numeric> exports
+C<is_PositiveInt> as well as C<PositiveInt>. While C<PositiveInt> is
+not directly used in the following code, is should be considered as
+being used. Similar for C<LowerCaseStr>.
 
-The imports of C<is_*> and C<to_*> from the following modules be handled by
-default:
+When importing from a Type library, subroutines named like C<is_*> and C<to_*>
+are not in the import list, but they are also imported.
+
+By default, the following modules are treated as Type libraries
 
     * MooseX::Types::Moose
     * MooseX::Types::Common::Numeric
     * MooseX::Types::Common::String
 
-You can configure this behaviour by adding more modules to the list:
+The list can be grown by including your module names to the
+C<moose_type_modules> in the C<.perlcriticrc>:
 
     [TooMuchCode::ProhibitUnusedImport]
     moose_type_modules = My::Type::Library::Numeric My::Type::Library::String

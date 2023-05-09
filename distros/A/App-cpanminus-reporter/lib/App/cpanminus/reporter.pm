@@ -3,7 +3,7 @@ package App::cpanminus::reporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp ();
 use File::Spec     3.19;
@@ -353,6 +353,10 @@ sub process_logfile {
           $result = $1;
           if ($result eq 'FAIL' && $recording eq 'configure') {
             $result = 'NA';
+          }
+          elsif ($result eq 'FAIL' && @test_output > 1 && $test_output[-2] =~ /make.*?[1-9]/) {
+            # [dn]make error returning non-zero status should be graded UNKNOWN
+            $result = 'UNKNOWN';
           }
           elsif ($result eq 'OK') {
             $result = $has_tests ? 'PASS' : 'UNKNOWN';

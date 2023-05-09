@@ -104,5 +104,6 @@ DBIx-Class-Helper-Row-Types-.*\.tar\.gz
 \.mailmap$
 perltidy\.(LOG|ERR)
 fatlib/
+^\.mite$
 cpanfile\.snapshot$
 local/

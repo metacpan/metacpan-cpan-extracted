@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase
 
+0.016     2023-05-03 19:19:41+02:00 Europe/Amsterdam
+          - Make pepper algorithm part of crypt identifiers
+          - Better encode salts in System encoder
+
 0.015     2023-04-04 15:54:56+02:00 Europe/Amsterdam
           - Fix compilation issue on perls < 5.22.0
 

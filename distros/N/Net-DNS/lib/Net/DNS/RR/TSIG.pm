@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 1909 2023-03-23 11:36:16Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -53,7 +53,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$offset += $other_size + 2;
 
 	croak('misplaced or corrupt TSIG') unless $limit == length $$data;
-	my $raw = substr $$data, 0, $self->{offset};
+	my $raw = substr $$data, 0, $self->{offset}++;
 	$self->{rawref} = \$raw;
 	return;
 }
@@ -107,7 +107,7 @@ sub _size {				## estimate encoded size
 }
 
 
-sub encode {				## overide RR method
+sub encode {				## override RR method
 	my ( $self, @argument ) = @_;
 	my $kname = $self->{owner}->encode();			# uncompressed key name
 	my $rdata = eval { $self->_encode_rdata(@argument) } || '';
@@ -115,9 +115,8 @@ sub encode {				## overide RR method
 }
 
 
-sub string {				## overide RR method
-	my $self = shift;
-
+sub string {				## override RR method
+	my $self	= shift;
 	my $owner	= $self->{owner}->string;
 	my $type	= $self->type;
 	my $algorithm	= $self->algorithm;
@@ -217,16 +216,18 @@ sub original_id {
 
 sub error {
 	my ( $self, @value ) = @_;
-	for (@value) { $self->{error} = rcodebyname($_) }
-	return rcodebyval( $self->{error} );
+	for (@value) {
+		my $error = $self->{error} = rcodebyname($_);
+		$self->other( time() ) if $error == 18;
+	}
+	return rcodebyval( $self->{error} || '' );
 }
 
 
 sub other {
 	my ( $self, @value ) = @_;
-	for (@value) { $self->{other} = $_ }
-	my $time = $self->{error} == 18 ? pack 'xxN', time() : '';
-	return $self->{other} ? $self->{other} : ( $self->{other} = $time );
+	for (@value) { $self->{other} = $_ ? pack( 'xxN', $_ ) : '' }
+	return $self->{other} ? unpack( 'N', $self->{other} ) : '';
 }
 
 
@@ -332,19 +333,19 @@ sub create {
 		my ( $keyname, $keytag ) = ( $1, $2 );
 
 		my $keyfile = Net::DNS::ZoneFile->new($karg);
-		my ( $algorithm, $secret, $x );
+		my ( $algorithm, $secret );
 		while ( $keyfile->_getline ) {
 			/^key "([^"]+)"/     and $keyname   = $1;    # BIND tsig key
 			/algorithm ([^;]+);/ and $algorithm = $1;
 			/secret "([^"]+)";/  and $secret    = $1;
 
-			/^Algorithm:/ and ( $x, $algorithm ) = split;	 # BIND dnssec private key
-			/^Key:/	      and ( $x, $secret )    = split;
+			/^Algorithm:/ and ( undef, $algorithm ) = split;    # BIND dnssec private key
+			/^Key:/	      and ( undef, $secret )	= split;
 
 			next unless /\bIN\s+KEY\b/;		# BIND dnssec public key
 			my $keyrr = Net::DNS::RR->new($_);
 			carp "$karg  does not appear to be a BIND dnssec public key"
-					unless $keytag and ( $keytag == $keyrr->keytag );
+					unless $keyrr->keytag == ( $keytag || 0 );
 			return $class->create( $keyrr, @argument );
 		}
 
@@ -366,34 +367,35 @@ sub create {
 
 
 sub verify {
-	my $self = shift;
-	my $data = shift;
+	my ( $self, $data, @link ) = @_;
+	my $fail = undef;
 
-	if ( scalar @_ ) {
-		my $arg = shift;
+	if ( scalar @link ) {
 
-		unless ( ref($arg) ) {
-			$self->error(16);			# BADSIG (multi-packet)
-			return;
+		my $link = shift @link;
+		unless ( ref($link) ) {
+			$self->error('BADSIG');			# (multi-packet)
+			return $fail;
 		}
 
 		my $signerkey = lc( join '+', $self->name, $self->algorithm );
-		if ( $arg->isa('Net::DNS::Packet') ) {
-			my $request = $arg->sigrr;		# request TSIG
+		if ( $link->isa('Net::DNS::Packet') ) {
+			my $request = $link->sigrr;		# request TSIG
 			my $rqstkey = lc( join '+', $request->name, $request->algorithm );
-			$self->error(17) unless $signerkey eq $rqstkey;			     # BADKEY
+			$self->error('BADKEY') unless $signerkey eq $rqstkey;
 			$self->request_macbin( $request->macbin );
 
-		} elsif ( $arg->isa(__PACKAGE__) ) {
-			my $priorkey = lc( join '+', $arg->name, $arg->algorithm );
-			$self->error(17) unless $signerkey eq $priorkey;		     # BADKEY
-			$self->prior_macbin( $arg->macbin );
+		} elsif ( $link->isa(__PACKAGE__) ) {
+			my $priorkey = lc( join '+', $link->name, $link->algorithm );
+			$self->error('BADKEY') unless $signerkey eq $priorkey;
+			$self->prior_macbin( $link->macbin );
 
 		} else {
 			croak 'Usage: $tsig->verify( $reply, $query )';
 		}
 	}
-	return if $self->{error};
+
+	return $fail if $self->{error};
 
 	my $sigdata = $self->sig_data($data);			# form data to be verified
 	my $tsigmac = $self->_mac_function($sigdata);
@@ -401,18 +403,22 @@ sub verify {
 
 	my $macbin = $self->macbin;
 	my $maclen = length $macbin;
+	$self->error('BADSIG') if $macbin ne substr $tsigmac, 0, $maclen;
+
 	my $minlen = length($tsigmac) >> 1;			# per RFC4635, 3.1
-	$self->error(16) if $macbin ne substr $tsigmac, 0, $maclen;			       # BADSIG
-	$self->error(22) if $maclen < $minlen or $maclen < 10 or $maclen > length $tsigmac;    # BADTRUNC
-	$self->error(18) if abs( time() - $self->time_signed ) > $self->fudge;		       # BADTIME
+	$self->error('BADTRUNC') if $maclen < $minlen or $maclen > length $tsigmac;
+	$self->error('BADTRUNC') if $maclen < 10;
 
-	return $self->{error} ? undef : $tsig;
+	my $time_signed = $self->time_signed;
+	if ( abs( time() - $time_signed ) > $self->fudge ) {
+		$self->error('BADTIME');
+		$self->other($time_signed);
+	}
+
+	return $self->{error} ? $fail : $tsig;
 }
 
-sub vrfyerrstr {
-	my $self = shift;
-	return $self->error;
-}
+sub vrfyerrstr { return shift->error; }
 
 
 ########################################
@@ -499,7 +505,7 @@ sub vrfyerrstr {
 
 	sub _keybin {			## install key in key table
 		my ( $self, @argument ) = @_;
-		croak 'Unauthorised access to TSIG key material denied' unless scalar @argument;
+		croak 'access to TSIG key material denied' unless scalar @argument;
 		my $keyref  = $keytable{$self->{owner}->canonical} ||= {};
 		my $private = shift @argument;			# closure keeps private key private
 		$keyref->{key} = sub {

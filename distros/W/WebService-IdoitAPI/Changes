@@ -1,5 +1,12 @@
 Revision history for WebService-IdoitAPI
 
+v0.2.2 Sun May  7 11:03:46 CEST 2023
+	- add IO::ScalarArray to test dependencies
+
+v0.2.1 Sat May  6 18:58:50 CEST 2023
+	- move author tests to xt/
+	- remove links to CPAN ratings, fix #148066
+
 v0.2.0 Thu Mar 16 12:15:18 CET 2023
 	- add CLI options '--json' and '--pretty' to bin/idoit-reports
 	- WebService::IdoitAPI::read_config() tries to find a config file

@@ -10,6 +10,8 @@ README
 lib/assign.pm
 lib/assign.pod
 lib/assign/Test.pm
-t/000-compile-modules.t
+t/01-forms.t
+t/02-use-assign.t
+t/03-line-numbers.t
 t/author-pod-syntax.t
-t/test.t
+t/line-numbers.pl

@@ -1,14 +1,7 @@
-/*
- * sha.c: routines to compute SHA-1/224/256/384/512 digests
- *
- * Ref: NIST FIPS PUB 180-4 Secure Hash Standard
- *
- * Copyright (C) 2003-2018 Mark Shelor, All Rights Reserved
- *
- * Version: 6.02
- * Fri Apr 20 16:25:30 MST 2018
- *
- */
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
+// This source is originally copied from Perl Digest::SHA
 
 #include <stdio.h>
 #include <stdlib.h>

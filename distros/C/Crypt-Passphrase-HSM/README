@@ -74,7 +74,7 @@ METHODS
 
  crypt_subtypes
 
-    This returns the chosen algorithm.
+    This returns the supported algorithms.
 
 AUTHOR
 

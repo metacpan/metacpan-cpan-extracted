@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Geo::FIT",
   "PREREQ_PM" => {
+    "Clone" => 0,
     "HTML::Entities" => 0,
     "IPC::System::Simple" => "1.30"
   },
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.08",
+  "VERSION" => "1.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTML::Entities" => 0,

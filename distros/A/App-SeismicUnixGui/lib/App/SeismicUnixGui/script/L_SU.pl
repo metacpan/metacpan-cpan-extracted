@@ -4,7 +4,7 @@
 
 =head2 SYNOPSIS 
 
- PERL PROGRAM NAME: L_SUV0.82.6.pl 
+ PERL PROGRAM NAME: L_SUV0.82.9.pl 
  AUTHOR: 	Juan Lorenzo
  DATE: 		June 22 2017 
 

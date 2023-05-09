@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental(init_expr)';
 
@@ -38,7 +38,7 @@ use Object::Pad ':experimental(init_expr)';
    }
 
    WithThreeFields->new;
-   is_deeply( \@inited, [qw( x y z )], 'initexprs run in declared order' );
+   is( \@inited, [qw( x y z )], 'initexprs run in declared order' );
 }
 
 # :param overrides initexpr

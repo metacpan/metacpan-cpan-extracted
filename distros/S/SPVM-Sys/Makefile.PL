@@ -80,7 +80,6 @@ sub MY::postamble {
   
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Windows');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Constant');

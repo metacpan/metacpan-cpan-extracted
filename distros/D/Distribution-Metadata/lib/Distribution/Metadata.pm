@@ -1,23 +1,22 @@
-package Distribution::Metadata;
-use 5.008001;
-use strict;
+package Distribution::Metadata 0.10;
+use v5.16;
 use warnings;
+
 use CPAN::DistnameInfo;
 use CPAN::Meta;
-use Config;
+use Config ();
 use Cwd ();
 use ExtUtils::Packlist;
-use File::Basename qw(basename dirname);
-use File::Find 'find';
-use File::Spec::Functions qw(catdir catfile);
+use File::Basename ();
+use File::Find ();
+use File::Spec;
 use JSON ();
 use Module::Metadata;
+
 use constant DEBUG => $ENV{PERL_DISTRIBUTION_METADATA_DEBUG};
 
 my $SEP = qr{/|\\}; # path separater
-my $ARCHNAME = $Config{archname};
-
-our $VERSION = "0.06";
+my $ARCHNAME = $Config::Config{archname};
 
 our $CACHE;
 
@@ -73,7 +72,7 @@ sub _new {
         return $self;
     }
 
-    my $archlib = catdir($lib, $ARCHNAME);
+    my $archlib = File::Spec->catdir($lib, $ARCHNAME);
     my $main_metadata = Module::Metadata->new_from_module(
         $main_module, inc => [$archlib, $lib]
     );
@@ -91,7 +90,7 @@ sub _new {
 
     my ($meta_directory, $install_json, $install_json_hash, $mymeta_json) = $class->_find_meta(
         $main_module, $find_module, $find_version,
-        catdir($archlib, ".meta")
+        File::Spec->catdir($archlib, ".meta")
     );
     $self->{meta_directory}    = $meta_directory;
     $self->{install_json}      = $install_json;
@@ -102,7 +101,7 @@ sub _new {
 
 sub _guess_main_module {
     my ($self, $packlist) = @_;
-    my @piece = File::Spec->splitdir( dirname($packlist) );
+    my @piece = File::Spec->splitdir( File::Basename::dirname($packlist) );
     if ($piece[-1] eq $ARCHNAME) {
         return ("perl", undef);
     }
@@ -116,7 +115,7 @@ sub _guess_main_module {
         }
     }
     return unless @module;
-    return ( _fix_module_name( join("::", @module) ), catdir(@lib) );
+    return ( _fix_module_name( join("::", @module) ), File::Spec->catdir(@lib) );
 }
 
 # ugly workaround for case insensitive filesystem
@@ -140,7 +139,7 @@ sub _fill_archlib {
     for my $inc (@$incs) {
         push @out, $inc;
         next if $inc =~ /$ARCHNAME$/o;
-        my $archlib = catdir($inc, $ARCHNAME);
+        my $archlib = File::Spec->catdir($inc, $ARCHNAME);
         if (-d $archlib && !$incs{$archlib}) {
             push @out, $archlib;
         }
@@ -161,6 +160,7 @@ sub _decode_install_json {
         $decode_install_json->($file);
     }
 }
+
 sub _find_meta {
     my ($class, $main_module, $module, $version, $dir) = @_;
     return unless -d $dir;
@@ -172,7 +172,7 @@ sub _find_meta {
         @install_json = do {
             opendir my $dh, $dir or die "opendir $dir: $!";
             my @meta_dir = grep { !/^[.]{1,2}$/ } readdir $dh;
-            grep -f, map { catfile($dir, $_, "install.json") } @meta_dir;
+            grep -f, map { File::Spec->catfile($dir, $_, "install.json") } @meta_dir;
         };
         if ($CACHE) {
             $CACHE->{install_json}{$dir}{$_} ||= undef for @install_json;
@@ -200,9 +200,9 @@ sub _find_meta {
         for my $provide (sort keys %$provides) {
             if ($provide eq $module
                 && ($provides->{$provide}{version} || "") eq $version) {
-                $meta_directory = dirname($file);
+                $meta_directory = File::Basename::dirname($file);
                 $install_json = $file;
-                $mymeta_json  = catfile($meta_directory, "MYMETA.json");
+                $mymeta_json  = File::Spec->catfile($meta_directory, "MYMETA.json");
                 $install_json_hash = $hash;
                 last INSTALL_JSON_LOOP;
             }
@@ -217,8 +217,8 @@ sub _naive_packlist {
     my ($class, $module_file, $inc) = @_;
     for my $i (@$inc) {
         if (my ($path) = $module_file =~ /$i $SEP (.+)\.pm /x) {
-            my $archlib = $i =~ /$ARCHNAME$/o ? $i : catdir($i, $ARCHNAME);
-            my $try = catfile( $archlib, "auto", $path, ".packlist" );
+            my $archlib = $i =~ /$ARCHNAME$/o ? $i : File::Spec->catdir($i, $ARCHNAME);
+            my $try = File::Spec->catfile( $archlib, "auto", $path, ".packlist" );
             return $try if -f $try;
         }
     }
@@ -249,7 +249,7 @@ sub _core_packlist {
     my ($self, $inc) = @_;
     for my $dir (grep -d, @$inc) {
         opendir my $dh, $dir or die "Cannot open dir $dir: $!\n";
-        my ($packlist) = map { catfile($dir, $_) } grep {$_ eq ".packlist"} readdir $dh;
+        my ($packlist) = map { File::Spec->catfile($dir, $_) } grep {$_ eq ".packlist"} readdir $dh;
         return $packlist if $packlist;
     }
     return;
@@ -282,11 +282,11 @@ sub _find_packlist {
             push @packlists, $core_packlist;
             $CACHE->{core_packlist} = $core_packlist if $CACHE;
         }
-        find sub {
+        File::Find::find sub {
             return unless -f;
             return unless $_ eq ".packlist";
             push @packlists, $File::Find::name;
-        }, grep -d, map { catdir($_, "auto") } @{$class->_fill_archlib($inc)};
+        }, grep -d, map { File::Spec->catdir($_, "auto") } @{$class->_fill_archlib($inc)};
         if ($CACHE) {
             $CACHE->{packlist}{$_} ||= undef for @packlists;
             $CACHE->{packlist_collected}++;
@@ -570,16 +570,11 @@ L<Module::Metadata>
 
 L<App::cpanminus>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 Shoichi Kaji
+Copyright (C) 2015 Shoichi Kaji E<lt>skaji@cpan.orgE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shoichi Kaji E<lt>skaji@cpan.orgE<gt>
-
 =cut
-

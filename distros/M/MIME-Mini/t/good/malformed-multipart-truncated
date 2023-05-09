@@ -1,0 +1,125 @@
+From "dneary@maemo.org" Wed Oct 13 19:48:21 2010
+Received: from vaebh102.NOE.Nokia.com (10.160.244.23) by
+ NOK-AM1MHUB-02.mgdnok.nokia.com (65.54.30.6) with Microsoft SMTP Server id
+ 8.2.254.0; Wed, 13 Oct 2010 18:51:59 +0200
+Received: from esebh106.NOE.Nokia.com ([172.21.138.213]) by
+ vaebh102.NOE.Nokia.com with Microsoft SMTPSVC(6.0.3790.4675);	 Wed, 13 Oct
+ 2010 19:51:57 +0300
+Received: from mx-sa01.nokia.com ([147.243.177.56]) by esebh106.NOE.Nokia.com
+ with Microsoft SMTPSVC(6.0.3790.4675);	 Wed, 13 Oct 2010 19:51:57 +0300
+Received: from mail.meego.com (mail.meego.com [208.43.41.65])	by
+ mx-sa01.nokia.com (Switch-3.4.3/Switch-3.4.3) with ESMTP id o9DGpslV023474;
+	Wed, 13 Oct 2010 19:51:55 +0300
+X-DKIM: Sendmail DKIM Filter v2.8.4 mx-sa01.nokia.com o9DGpslV023474
+Authentication-Results: mx-sa01.nokia.com; dkim=neutral
+	(verification failed) header.i=@gmail.com; x-dkim-adsp=none
+Received: from localhost (localhost [127.0.0.1])	by mail.meego.com (Postfix)
+ with ESMTP id D5E8D10B0CA;	Wed, 13 Oct 2010 09:51:53 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at mail.moblin.org
+Received: from mail.meego.com ([127.0.0.1])	by localhost (mail.moblin.org
+ [127.0.0.1]) (amavisd-new, port 10024)	with ESMTP id NHDZ5S7Inp3o; Wed, 13
+ Oct 2010 09:51:52 -0700 (PDT)
+Received: from otc01.sl.ssgisp.com (localhost [127.0.0.1])	by mail.meego.com
+ (Postfix) with ESMTP;	Wed, 13 Oct 2010 09:51:52 -0700 (PDT)
+X-Original-To: meego-dev@meego.com
+Delivered-To: meego-dev@meego.com
+Received: from localhost (localhost [127.0.0.1])	by mail.meego.com (Postfix)
+ with ESMTP id B43D410B0CC	for <meego-dev@meego.com>; Wed, 13 Oct 2010
+ 09:48:34 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at mail.moblin.org
+Received: from mail.meego.com ([127.0.0.1])	by localhost (mail.moblin.org
+ [127.0.0.1]) (amavisd-new, port 10024)	with ESMTP id rHGmEA9yZU-R for
+ <meego-dev@meego.com>;	Wed, 13 Oct 2010 09:48:27 -0700 (PDT)
+Received: from mail-ww0-f48.google.com (mail-ww0-f48.google.com
+ [74.125.82.48])	by mail.meego.com (Postfix) with ESMTP	for
+ <meego-dev@meego.com>; Wed, 13 Oct 2010 09:48:26 -0700 (PDT)
+Received: by wwi14 with SMTP id 14so92446wwi.5	for <meego-dev@meego.com>; Wed,
+ 13 Oct 2010 09:48:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=gamma;
+	h=domainkey-signature:received:received:sender:message-id:date:from
+	:reply-to:organization:user-agent:mime-version:to:subject
+	:x-enigmail-version:content-type;
+	bh=8mOSD8KfW+FGSmGIumHAs9auaL6zBlPdozt0rbw14IE=;
+	b=HCWFXbpQqAk8Tebb5dAk+Loj29ek3gg/KIeGgVqi/0bmW9KU3rgPZHZ4UGosFFdOti
+	T4kaLbACBBq0RfsKQz8JWzNa9cKrn5QexEm0iuxylxzC4qc2LxRKcnQCPK1G2WeuieCr
+	2HIRgWPm6wAQr9KjWMKq/SquYSACIpJzkkC18=
+DomainKey-Signature: a=rsa-sha1; c=nofws; d=gmail.com; s=gamma;
+	h=sender:message-id:date:from:reply-to:organization:user-agent
+	:mime-version:to:subject:x-enigmail-version:content-type;
+	b=Yno3wge63XPt2MOW80/tIXtQz9tQyzgy1Sy8m4wCeP8H4rCoi4/ZKUOum9UlHqKCbx
+	NR0UaMzS6gZ86AFLyArS9mnFRSFOg8hBomojUhspQXJrxr/l2+wN2Ld5IRnFwn1LykW/
+	jYG+Dz9x79EFEqlD0dj9+5EkFC7ZK9ZLENLT0=
+Received: by 10.227.152.131 with SMTP id g3mr8838258wbw.108.1286988504131;
+	Wed, 13 Oct 2010 09:48:24 -0700 (PDT)
+Received: from [192.168.1.10] (ALyon-152-1-99-113.w86-202.abo.wanadoo.fr
+	[86.202.50.113])	by mx.google.com with ESMTPS id
+ g9sm8456296wbh.19.2010.10.13.09.48.22	(version=SSLv3 cipher=RC4-MD5); Wed, 13
+ Oct 2010 09:48:23 -0700 (PDT)
+Message-ID: <4CB5E2D5.2040509@maemo.org>
+Date: Wed, 13 Oct 2010 18:48:21 +0200
+From: ext Dave Neary <dneary@maemo.org>
+Organization: maemo.org
+User-Agent: Thunderbird 2.0.0.24 (X11/20100411)
+To: meego-dev <meego-dev@meego.com>, "maemo-developers@maemo.org"
+	<maemo-developers@maemo.org>
+X-Enigmail-Version: 0.96.0
+Subject: [MeeGo-dev] [Fwd: GTK+/MeeGo Handset integration work,
+	call for bids]
+X-BeenThere: meego-dev@meego.com
+X-Mailman-Version: 2.1.13
+Precedence: list
+List-Id: "Development for the MeeGo Project \(discussion list\)"
+	<meego-dev.meego.com>
+List-Unsubscribe: <http://lists.meego.com/options/meego-dev>,
+	<mailto:meego-dev-request@meego.com?subject=unsubscribe>
+List-Archive: <http://lists.meego.com/pipermail/meego-dev>
+List-Post: <mailto:meego-dev@meego.com>
+List-Help: <mailto:meego-dev-request@meego.com?subject=help>
+List-Subscribe: <http://lists.meego.com/listinfo/meego-dev>,
+	<mailto:meego-dev-request@meego.com?subject=subscribe>
+Sender: <meego-dev-bounces@meego.com>
+Errors-To: meego-dev-bounces@meego.com
+X-Nokia-AV: Clean
+X-pstn-spam: N
+X-Spam-Score: 0.00%
+Return-Path: meego-dev-bounces@meego.com
+X-OriginalArrivalTime: 13 Oct 2010 16:51:57.0395 (UTC) FILETIME=[F28BFA30:01CB6AF6]
+X-MS-Exchange-Organization-SCL: 0
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="--boundary-LibPST-iamunique-440479721_-_-"
+
+
+----boundary-LibPST-iamunique-440479721_-_-
+Content-Type: text/plain; charset="windows-1252"
+
+Hi all,
+
+This announcement looks relevant both to MeeGo and Maemo developers, so
+I hope people won't mind me forwarding it along (for information).
+
+Thanks,
+Dave.
+
+-- 
+maemo.org docsmaster
+Email: dneary@maemo.org
+Jabber: bolsh@jabber.org
+
+
+----boundary-LibPST-iamunique-440479721_-_-
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="ATT00001..txt"
+
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCk1lZUdvLWRl
+diBtYWlsaW5nIGxpc3QNCk1lZUdvLWRldkBtZWVnby5jb20NCmh0dHA6Ly9saXN0cy5tZWVnby5j
+b20vbGlzdGluZm8vbWVlZ28tZGV2DQo=
+
+
+----boundary-LibPST-iamunique-440479721_-_-
+Content-Type: message/rfc822
+
+
+----boundary-LibPST-iamunique-440479721_-_---
+

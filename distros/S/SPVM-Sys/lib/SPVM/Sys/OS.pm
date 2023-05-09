@@ -20,11 +20,11 @@ C<SPVM::Sys::OS> is the C<Sys::OS> class in L<SPVM> language. It provides system
 
 =head2 defined
 
-  static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
+  static method defined : int ($macro_name : string, $value_ref = undef : object of int[]|long[]|double[])
 
-Checks if the macro in C<C langauge> is defined. If the macro is defined, returns C<1>. Otherwise returns C<0>.
+Checks if the macro in the C langauge is defined. If the macro is defined, returns C<1>. Otherwise returns C<0>.
 
-If C<$value> is specifed and C<$macro_name> is defined, the macro value converted to the given type is set to C<$value>.
+If $value_ref is specifed and $macro_name is defined, the macro value converted to the given type is set to the first element of the C<$value_ref>.
 
 Supports the following macro names.
 

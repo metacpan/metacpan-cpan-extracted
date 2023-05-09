@@ -9,8 +9,8 @@ for f in "$build_parent"/*/t/*ommon*.pm ; do
   if [ -r "$f" ] ; then common_files+=($(basename "$f") 1); fi
 done
 
-diffs_found=""
-count=0
+totcount=0
+diffcount=0
 for fname in "${!common_files[@]}" ; do
   declare -a files=()
   for f in "$build_parent"/*/t/"$fname" ; do
@@ -18,16 +18,16 @@ for fname in "${!common_files[@]}" ; do
   done
   first="${files[0]}"
   files=("${files[@]:1}") # shift
-  ((count++)) || :
+  ((totcount++)) || :
   for other in "${files[@]}" ; do
-    (set -x; diff "$other" "$first") 2>&1 || diffs_found=yes
-    ((count++)) || :
+    (diff --brief "$other" "$first") 2>&1 || ((diffcount++)) || :
+    ((totcount++)) || :
   done
 done
-if [ -n "$diffs_found" ] ; then
-  echo "$count files found. DIFFERENCES FOUND"
+if [ $totcount != 0 ] ; then
+  echo "$totcount files: $diffcount are DIFFERENT"
   exit 1
 else 
-  echo "$count files found. No diffs."
+  echo "$totcount files: No diffs."
   exit 0
 fi

@@ -1,5 +1,9 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.55      2023-05-04 10:28:24 -0600
+  [WARNING: change in behavior]
+  - Fix the default code for close to be 1000 (gh#61, gh#62)
+
 0.54      2021-03-19 06:13:48 -0600
   - Delay loading AnyEvent::Connector until needed.
   - Moved git repository to new github org.

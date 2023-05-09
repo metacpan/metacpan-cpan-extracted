@@ -1,4 +1,5 @@
 package XML::Schematron::LibXSLT;
+
 use Moose::Role;
 use namespace::autoclean;
 
@@ -54,9 +55,7 @@ with 'XML::Schematron::XSLTProcessor';
 
 1;
 
-1;
 __END__
-# Below is the stub of documentation for your module. You better edit it!
 
 =head1 NAME
 
@@ -66,7 +65,7 @@ XML::Schematron::LibXSLT - Perl extension for validating XML with XPath/XSLT exp
 
 
   use XML::Schematron;
-  my $pseudotron = XML::Schematron->>new_with_traits( traits => ['LibXSLT'], schema => 'my_schema.xml');
+  my $pseudotron = XML::Schematron->new_with_traits( traits => ['LibXSLT'], schema => 'my_schema.xml');
   my $messages = $pseudotron->verify('my_doc.xml');
 
   if ($messages) {
@@ -131,7 +130,7 @@ reference to a list of lists where the format of the sub-lists must conform to t
 When called with a single scalar as its argument, this method sets/updates the schema file to be used for generatng
 tests. Otherwise, it simply returns the name of the schema file (if any).
 
-The add_test() method allows you push additional a additional test on to the stack before validation. This method's argument must be an XML::Schematron::Test object or a hash reference with the following structure:
+The C<add_test()> method allows you push additional a additional test on to the stack before validation. This method's argument must be an XML::Schematron::Test object or a hash reference with the following structure:
 
 Arguments for this method:
 
@@ -169,13 +168,15 @@ Example:
                  type => 'assert',
                  pattern => 'Basic tests'});
 
-Note that add_test() pushes a new test on to the existing test list, while tests() redefines the entire list.
+Note that C<add_test()> pushes a new test on to the existing test list, while C<tests()> redefines the entire list.
 
 =back
 
 =item add_tests( @tests );
 
-The add_tests() method allows you push an additional list of tests on to the stack before validation. Each element must be an XML::Schematron::Test object or a hash reference. See above for the list of key/value pairs expected if hashrefs are used.
+The C<add_tests()> method allows you push an additional list of tests on to the stack before validation.
+Each element must be an XML::Schematron::Test object or a hash reference.
+See above for the list of key/value pairs expected if hashrefs are used.
 
 =back
 
@@ -183,20 +184,20 @@ The add_tests() method allows you push an additional list of tests on to the sta
 
 =item verify('my_xml_file.xml' or $some_xml_string)
 
-The verify() method takes the path to the XML document that you wish to validate, or a scalar containing the entire document  
+The C<verify()> method takes the path to the XML document that you wish to validate, or a scalar containing the entire document  
 as a string, as its sole argument. It returns the messages  that are returned during validation. When called in an array
 context, this method returns an array of the messages generated during validation. When called in a scalar context, this
 method returns a concatenated string of all output.
 
 =item dump_xsl;
 
-The dump_xsl method will return the internal XSLT script created from your schema.
+The C<dump_xsl> method will return the internal XSLT script created from your schema.
 
 =back
 
 =head1 CONFORMANCE
 
-Internally, XML::Schematron::LibXSLT uses the Gnome Project's XSLT proccessor via L<XML::LibXSLT>, the best XSLT libraray available to the Perl World at
+Internally, XML::Schematron::LibXSLT uses the Gnome Project's XSLT proccessor via L<XML::LibXSLT>, the best XSLT library available to the Perl World at
 the moment.
 
 For those platforms on which libxslt is not available, please see the documentation for L<XML::Schematron::XPath> (also in this distribution) for alternatives. 
@@ -213,11 +214,11 @@ under the same terms as Perl itself.
 =head1 SEE ALSO
 
 For information about Schematron, sample schemas, and tutorials to help you write your own schmemas, please visit the
-Schematron homepage at: http://www.ascc.net/xml/resource/schematron/
+Schematron homepage at: L<https://www.schematron.com/>
 
-For information about how to install libxslt and the necessary XML::LibXSLT Perl module, please see http://xmlsoft.org/XSLT/
+For information about how to install libxslt and the necessary L<XML::LibXSLT> Perl module, please see L<http://xmlsoft.org/XSLT/>
 and CPAN, repectively. 
 
-For detailed information about the XPath syntax, please see the W3C XPath Specification at: http://www.w3.org/TR/xpath.html 
+For detailed information about the XPath syntax, please see the W3C XPath Specification at: L<http://www.w3.org/TR/xpath.html>
 
 =cut

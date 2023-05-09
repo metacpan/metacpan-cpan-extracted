@@ -13,12 +13,12 @@ sub attributes {
 		current => {$a->RW, $a->OBJ},
 		columns => {$a->RW, $a->NUM, default => sub { 1 }},
 		column => {$a->RW, $a->NUM, default => sub { 1 }},
-		rows => {$a->RW, $a->NUM, default => sub { 1 }},
-		row => {$a->RW, $a->NUM, default => sub { 1 }},
+		column_y => {$a->RW, $a->NUM, default => sub {1 }},
 		is_rotated => {$a->RW, $a->NUM},
 		header => {$a->RW, $a->OBJ},
 		footer => {$a->RW, $a->OBJ},
 		toc => {$a->RW, $a->BOOL},
+		padding => {$a->RW, $a->NUM},
 		$a->POINTS,
 		$a->BOX,
 	);
@@ -39,6 +39,14 @@ sub add {
 			fill_colour => $self->background,
 			$self->get_points
 		);
+	}
+
+	if ($self->header) {
+		$self->column_y($self->y($self->header->h));
+	}
+
+	if ($self->padding) {
+		$self->x($self->padding);
 	}
 	return $self;
 }
@@ -61,6 +69,28 @@ sub render {
 	$self->header->render($file) if $self->header;
 	$self->footer->render($file) if $self->footer;
 
+}
+
+sub remaining_height {
+	my ($self) = @_;
+	return $self->h - ($self->y + ($self->footer ? $self->footer->h : 0))
+}
+
+sub width {
+	my ($self) = @_;
+	return ($self->w - ($self->padding * (2 + ($self->columns - 1)))) / $self->columns;
+}
+
+sub next {
+	my ($self, $file) = @_;
+	if ($self->column < $self->columns) {
+		$self->column($self->column + 1);
+		$self->x($self->x + $self->width + $self->padding);
+		$self->y($self->column_y);
+	} else {
+		$self->column(1);
+		$file->add_page();
+	}
 }
 
 1;

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -24,7 +24,7 @@ package AClass {
 
 {
    my $obj = AClass->new;
-   isa_ok( $obj, "AClass", '$obj' );
+   isa_ok( $obj, [ "AClass" ], '$obj' );
 
    is( $obj->one, 1, 'AClass has a ->one method' );
    is( $obj->redir, 2, 'AClass has a ->redir method' );

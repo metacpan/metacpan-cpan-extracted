@@ -4,7 +4,7 @@ DBIx::Class::Helper::WindowFunctions - Add support for window functions to DBIx:
 
 # VERSION
 
-version v0.3.0
+version v0.4.0
 
 # SYNOPSIS
 
@@ -41,7 +41,7 @@ my $rs = $schema->resultset('Wobbles')->search_rs(
 # DESCRIPTION
 
 This helper adds rudimentary support for window functions to
-[DBIx::Class](https://metacpan.org/pod/DBIx::Class) resultsets.
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) resultsets.
 
 # CAVEATS
 
@@ -49,9 +49,19 @@ This module is experimental.
 
 Not all databases support window functions.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.4.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.3.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 # SEE ALSO
 
-[DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
 
 # SOURCE
 
@@ -77,7 +87,7 @@ Peter Rabbitson <ribasushi@leporine.io>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

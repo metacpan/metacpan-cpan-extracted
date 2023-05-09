@@ -7,7 +7,7 @@ package Rex::Output::Base;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 sub write { die "Must be implemented by inheriting class" }
 sub add   { die "Must be implemented by inheriting class" }

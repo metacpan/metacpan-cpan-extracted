@@ -1,6 +1,6 @@
 package App::SeismicUnixGui;
 
-$VERSION = '0.82.6';
+$VERSION = '0.82.9';
 use strict;
 use warnings;
 

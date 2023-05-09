@@ -19,11 +19,12 @@ my %module_build_args = (
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-FIT",
-  "dist_version" => "1.08",
+  "dist_version" => "1.10",
   "license" => "perl",
   "module_name" => "Geo::FIT",
   "recursive_test_files" => 1,
   "requires" => {
+    "Clone" => 0,
     "HTML::Entities" => 0,
     "IPC::System::Simple" => "1.30",
     "perl" => "5.008"

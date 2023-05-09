@@ -16,7 +16,7 @@ use Text::Minify::XS v0.6.2 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.3.2';
+our $VERSION = 'v0.3.3';
 
 sub call {
     my ($self, $env) = @_;
@@ -97,7 +97,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.3.2
+version v0.3.3
 
 =head1 SYNOPSIS
 
@@ -143,12 +143,14 @@ arguments.
 
 By default, it will match against any "text/" MIME type.
 
-=head1 KNOWN ISSUES
-
-=head2 Support for older Perl versions
+=head1 SUPPORT FOR OLDER PERL VERSIONS
 
 This module requires Perl v5.9.3 or newer, which is the minimum
 version supported by L<Text::Minify::XS>.
+
+Future releases may only support Perl versions released in the last ten years.
+
+=head1 KNOWN ISSUES
 
 =head2 Use with templating directive that collapse whitespace
 
@@ -196,7 +198,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2022 by Robert Rothenberg.
+This software is Copyright (c) 2020-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -3,13 +3,12 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental(mop)';
 
 class AClass {
-   use Test::More;
-   use Test::Fatal;
+   use Test2::V0;
 
    BEGIN {
       # Most of this test has to happen at BEGIN time before AClass gets
@@ -22,14 +21,14 @@ class AClass {
 
       is( $methodmeta->name, "method", '$methodmeta->name' );
 
-      like( exception { $classmeta->add_method( undef, sub {} ) },
+      like( dies { $classmeta->add_method( undef, sub {} ) },
          qr/^methodname must not be undefined or empty /,
          'Failure from ->add_method undef' );
-      like( exception { $classmeta->add_method( "", sub {} ) },
+      like( dies { $classmeta->add_method( "", sub {} ) },
          qr/^methodname must not be undefined or empty /,
          'Failure from ->add_method on empty string' );
 
-      like( exception { $classmeta->add_method( 'method', sub {} ) },
+      like( dies { $classmeta->add_method( 'method', sub {} ) },
          qr/^Cannot add another method named method /,
          'Failure from ->add_method duplicate' );
 

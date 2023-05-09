@@ -7,7 +7,7 @@ package Rex::Helper::IP;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Data::Validate::IP 'is_ipv4', 'is_ipv6';
 

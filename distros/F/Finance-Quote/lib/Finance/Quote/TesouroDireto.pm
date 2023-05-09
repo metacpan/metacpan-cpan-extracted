@@ -31,7 +31,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use JSON;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 sub methods { return (tesouro_direto => \&tesouro); }
 sub labels { return (tesouro_direto => [qw/exchange date isodate symbol name price last method currency/]); }

@@ -37,16 +37,22 @@ my @resp2 = (
 
 my @resp3 = (
     [ "_$Z" => undef, 'single-character null' ],
-    [ ",1.23$Z" => 1.23, 'double' ],
-    [ ",inf$Z" => 0+"Inf", 'infinity' ],
-    [ ",-inf$Z" => 0+"-Inf", 'infinity' ],
+    #    [ ",1.23$Z" => 1.23, 'double' ],
+    #[ ",inf$Z" => 0+"Inf", 'infinity' ],
+    #[ ",-inf$Z" => 0+"-Inf", 'infinity' ],
     # Requires some poking around in internals, since
     # we would only need this for the server implementation
     # have left it out for now.
     # [ "#t$Z" => !!1, 'true' ],
     # [ "#f$Z" => !!0, 'false' ],
-    [ "%2$Z+key$Z:1$Z+second$Z:2$Z", +{ key => 1, second => 2 }, 'map' ],
+    #[ "%2$Z+key$Z:1$Z+second$Z:2$Z", +{ key => 1, second => 2 }, 'map' ],
 );
+my $count = 1000;
+push @resp3, [
+    "*1$Z*$count$Z" . (join '' => map { "*2$Z:$_$Z*6$Z+a$Z+1$Z+b$Z+2$Z+c$Z+3$Z" } 1..$count),
+    [[ map { [ $_ => [ a => "1", b => "2", c => "3" ] ] } 1..$count ]],
+    'larger nested array'
+];
 
 subtest decoding => sub {
     my $proto = new_ok('Net::Async::Redis::Protocol', [

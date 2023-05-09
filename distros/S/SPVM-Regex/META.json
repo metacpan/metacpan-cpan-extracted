@@ -4,7 +4,7 @@
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -27,13 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9691",
+            "SPVM" : "0.973",
             "SPVM::Resource::RE2" : "0.01"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9691",
+            "SPVM" : "0.973",
             "SPVM::Resource::RE2" : "0.01"
          }
       },
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Regex"
       }
    },
-   "version" : "0.23",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.241002",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

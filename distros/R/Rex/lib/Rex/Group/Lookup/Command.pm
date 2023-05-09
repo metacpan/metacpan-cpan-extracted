@@ -13,9 +13,9 @@ With this module you can define hostgroups out of a command.
 =head1 SYNOPSIS
 
  use Rex::Group::Lookup::Command;
- 
+
  group "dbserver"  => lookup_command("cat ip.list | grep -v -E '^#'");
- 
+
  rex xxxx                            # dbserver
 
 =head1 EXPORTED FUNCTIONS
@@ -27,7 +27,7 @@ package Rex::Group::Lookup::Command;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 require Rex::Exporter;
 use Rex -base;

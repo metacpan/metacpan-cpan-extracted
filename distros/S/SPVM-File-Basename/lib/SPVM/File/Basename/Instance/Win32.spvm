@@ -1,4 +1,19 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Basename::Instance::Win32 extends File::Basename::Instance::Unix {
+  use Regex;
+  
+  our $RE_FILEPARSE1 : Regex;
+  our $RE_FILEPARSE2 : Regex;
+  our $RE_STRIP_TRAILING_SEP : Regex;
+  
+  INIT {
+    Regex->INIT;
+    $RE_FILEPARSE1 = Regex->new("(?s)^((?:.*[:\\\/])?)(.*)");
+    $RE_FILEPARSE2 = Regex->new("[\\\/]\z");
+    $RE_STRIP_TRAILING_SEP = Regex->new("([^:])[\\\/]*\z");
+  }
   
   # Class Methods
   static method new : File::Basename::Instance::Win32 () {
@@ -16,13 +31,12 @@ class File::Basename::Instance::Win32 extends File::Basename::Instance::Unix {
     my $dirpath = (string)undef;
     my $basename = (string)undef;
     
-    my $re = Regex->new("(?s)^((?:.*[:\\\/])?)(.*)");
-    if ($re->match($path)) {
-      $dirpath = $re->cap1;
-      $basename = $re->cap2;
+    if (my $match = $RE_FILEPARSE1->match($path)) {
+      $dirpath = $match->cap1;
+      $basename = $match->cap2;
     }
     
-    unless (Regex->new("[\\\/]\z")->match($dirpath)) {
+    unless ($RE_FILEPARSE2->match($dirpath)) {
       $dirpath .= ".\\";
     }
     
@@ -31,9 +45,8 @@ class File::Basename::Instance::Win32 extends File::Basename::Instance::Unix {
   
   method _strip_trailing_sep : string ($path : string)  {
     
-    my $re = Regex->new("([^:])[\\\/]*\z");
-    $path = $re->replace($path, method : string ($re : Regex) {
-      return $re->cap1;
+    $path = $RE_STRIP_TRAILING_SEP->replace($path, method : string ($re : Regex, $match : Regex::Match) {
+      return $match->cap1;
     });
     
     return $path;

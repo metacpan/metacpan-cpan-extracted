@@ -4,13 +4,11 @@ package SPVM::File::Basename::Instance;
 
 =head1 Name
 
-SPVM::File::Basename::Instance - Parsing File Path into Directory and Base Name.
+SPVM::File::Basename::Instance - Object-Oriented File::Basename
 
 =head1 Description
 
-C<SPVM::File::Basename::Instance> is the C<File::Basename::Instance> class in L<SPVM> language.
-
-This class parses a file path into a directory and a base name.
+The SPVM::File::Basename::Instance class of L<SPVM> has the methods for Object-Oriented L<File::Basename|SPVM::File::Basename>.
 
 =head1 Usage
 
@@ -73,18 +71,9 @@ This class parses a file path into a directory and a base name.
 
 =back
 
-=head1 Repository
-
-L<SPVM::File::Basename::Instance - Github|https://github.com/yuki-kimoto/SPVM-File-Basename>
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
-
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 

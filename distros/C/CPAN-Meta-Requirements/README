@@ -2,7 +2,7 @@ NAME
     CPAN::Meta::Requirements - a set of version requirements for a CPAN dist
 
 VERSION
-    version 2.140
+    version 2.142
 
 SYNOPSIS
       use CPAN::Meta::Requirements;
@@ -20,7 +20,7 @@ SYNOPSIS
 DESCRIPTION
     A CPAN::Meta::Requirements object models a set of version constraints
     like those specified in the META.yml or META.json files in CPAN
-    distributions, and as defined by CPAN::Meta::Spec; It can be built up by
+    distributions, and as defined by CPAN::Meta::Spec. It can be built up by
     adding more and more constraints, and it will reduce them to the
     simplest representation.
 
@@ -86,6 +86,9 @@ METHODS
     given version. No other version would be considered acceptable.
 
     This method returns the requirements object.
+
+  version_range_for_module
+      $req->version_range_for_module( $another_req_object );
 
   add_requirements
       $req->add_requirements( $another_req_object );
@@ -246,11 +249,19 @@ AUTHORS
 CONTRIBUTORS
     *   Ed J <mohawk2@users.noreply.github.com>
 
+    *   Graham Knop <haarg@haarg.org>
+
     *   Karen Etheridge <ether@cpan.org>
 
     *   Leon Timmermans <fawaka@gmail.com>
 
+    *   Ricardo Signes <rjbs@semiotic.systems>
+
     *   robario <webmaster@robario.com>
+
+    *   Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    *   Tatsuhiko Miyagawa <miyagawa@gmail.com>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2010 by David Golden and Ricardo Signes.

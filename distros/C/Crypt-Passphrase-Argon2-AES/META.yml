@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.039, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.041, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,15 +16,18 @@ name: Crypt-Passphrase-Argon2-AES
 provides:
   Crypt::Passphrase::Argon2::AES:
     file: lib/Crypt/Passphrase/Argon2/AES.pm
-    version: '0.002'
+    version: '0.004'
 requires:
   Carp: '0'
   Crypt::Passphrase: '0.010'
-  Crypt::Passphrase::Argon2::Encrypted: '0'
+  Crypt::Passphrase::Argon2::Encrypted: '0.009'
   Crypt::Rijndael: '1.16'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.002'
+resources:
+  bugtracker: https://github.com/Leont/crypt-passphrase-argon2-aes/issues
+  repository: git://github.com/Leont/crypt-passphrase-argon2-aes.git
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

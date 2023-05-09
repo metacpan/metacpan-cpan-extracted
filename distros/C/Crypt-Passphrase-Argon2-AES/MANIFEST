@@ -8,4 +8,5 @@ META.yml
 README
 dist.json
 lib/Crypt/Passphrase/Argon2/AES.pm
+metamerge.yml
 t/basic.t

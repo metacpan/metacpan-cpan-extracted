@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -18,7 +18,7 @@ class Counter {
 
 # Counter::count has both :lvalue :method attrs
 {
-   is_deeply( [ sort +attributes::get( \&Counter::count ) ],
+   is( [ sort +attributes::get( \&Counter::count ) ],
       [ 'lvalue', 'method' ],
       'attributes of &Counter::count' );
 }

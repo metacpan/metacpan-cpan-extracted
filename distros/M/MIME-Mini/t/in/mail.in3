@@ -1,0 +1,52 @@
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 1, message/rfc822 body
+MIME-Version: 1.0
+Content-Type: message/rfc822
+
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 1.1
+
+body inner 1
+
+From raf@raf.org Thu Apr 14 22:35:22 EST 2005
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 2, (3 part) multipart/digest, each is implicitly a mail message
+MIME-Version: 1.0
+Content-Type: multipart/digest; boundary=unique
+
+--unique
+
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 2.1
+
+body inner 2.1
+
+--unique
+
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 2.2
+
+body inner 2.2
+
+--unique
+
+From: raf@raf.org
+To: nobody@inparticu.com
+Date: Thu Apr 14 22:35:22 EST 2005
+Subject: test 2.3
+
+body inner 2.3
+
+--unique--
+

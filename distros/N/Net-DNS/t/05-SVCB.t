@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -8,12 +8,13 @@ use Net::DNS;
 use Net::DNS::ZoneFile;
 
 use Test::More;
+use TestToolkit;
 
 exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
 		if ( $] == 5.018000 )
 		or ( $] == 5.018001 );
 
-plan tests => 50;
+plan tests => 44;
 
 
 my $name = 'SVCB.example';
@@ -25,20 +26,14 @@ my @also = qw(mandatory alpn no-default-alpn port ipv4hint ech ipv6hint);
 
 my $wire = '000104706f6f6c03737663076578616d706c65000003000204d2';
 
+my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
+is( $typecode, $code, "$type RR type code = $code" );
 
-{
-	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
-	is( $typecode, $code, "$type RR type code = $code" );
+my $hash = {};
+@{$hash}{@attr} = @data;
 
-	my $hash = {};
-	@{$hash}{@attr} = @data;
 
-	my $rr = Net::DNS::RR->new(
-		name => $name,
-		type => $type,
-		%$hash
-		);
-
+for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 	my $string = $rr->string;
 	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
@@ -49,63 +44,37 @@ my $wire = '000104706f6f6c03737663076578616d706c65000003000204d2';
 		is( $rr->$_, $hash->{$_}, "expected result from rr->$_()" );
 	}
 
-
-	my $null    = Net::DNS::RR->new("$name NULL")->encode;
-	my $empty   = Net::DNS::RR->new("$name $type")->encode;
-	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
-	my $txtext  = Net::DNS::RR->new("$name $type")->string;
-	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
 	my $encoded = $rr->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
-	my $hex3    = unpack 'H*', substr( $encoded, length $null );
-	is( $hex2,	     $hex1,	    'encode/decode transparent' );
-	is( $hex3,	     $wire,	    'encoded RDATA matches example' );
-	is( length($empty),  length($null), 'encoded RDATA can be empty' );
-	is( length($rxbin),  length($null), 'decoded RDATA can be empty' );
-	is( length($rxtext), length($null), 'string RDATA can be empty' );
+	my $hex3    = unpack 'H*', $rr->rdata;
+	is( $hex2, $hex1, 'encode/decode transparent' );
+	is( $hex3, $wire, 'encoded RDATA matches example' );
 }
 
 
-{
-	my @rdata	= qw(0 svc.example.net);
-	my $lc		= Net::DNS::RR->new( lc ". $type @rdata" );
-	my $rr		= Net::DNS::RR->new( uc ". $type @rdata" );
-	my $hash	= {};
-	my $predecessor = $rr->encode( 0,		    $hash );
-	my $compressed	= $rr->encode( length $predecessor, $hash );
-	ok( length $compressed == length $predecessor, 'encoded RDATA not compressible' );
-	isnt( $rr->encode,    $lc->encode, 'encoded RDATA names not downcased' );
-	isnt( $rr->canonical, $lc->encode, 'canonical RDATA names not downcased' );
-}
-
-
-{
-	my $rr = Net::DNS::RR->new(". $type");
+for my $rr ( Net::DNS::RR->new(". $type") ) {
 	foreach ( qw(TargetName), @also ) {
 		is( $rr->$_(), undef, "empty RR has undefined $_" );
 	}
-}
 
-
-{
-	my $l0 = length( Net::DNS::RR->new(". $type 1 .")->encode );
-	my $rr = Net::DNS::RR->new(". $type 1 . port=1234");
+	$rr->svcpriority(1);
+	$rr->targetname('.');
+	my $l0 = length $rr->encode;
+	$rr->key3(1234);
 	$rr->key3(undef);
 	is( length( $rr->encode ), $l0, 'delete SvcParams key' );
 }
 
 
-END {
-	Net::DNS::RR->new( <<'END' )->print;
+Net::DNS::RR->new( <<'END' )->print;
 example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			no-default-alpn port=1234 ipv4hint=192.0.2.1
 			ech=Li4u ipv6hint=2001:db8::1
 			dohpath=/dns-query{?dns}
 			)
 END
-}
 
 
 ####	Test Vectors
@@ -122,9 +91,7 @@ sub testcase {
 
 sub failure {
 	my $ident = shift;
-	eval { $zonefile->read };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "$ident\t[$exception]" );
+	exception( "$ident", sub { $zonefile->read } );
 	return;
 }
 

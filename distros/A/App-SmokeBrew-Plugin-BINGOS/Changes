@@ -1,47 +1,17 @@
 ==================================================
-Changes from 2012-06-08 00:00:00 +0000 to present.
+Changes from 2018-05-07 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.16 at 2017-06-07 17:06:41 +0000
+version 1.00 at 2023-05-06 09:38:42 +0000
 -----------------------------------------
 
-  Change: 9ef627b6bf9edbcca7efacd7071fefdb24dd69c0
+  Change: dd55ba943e6a750478db51cc1c3a10f5bdd3965c
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-06-07 18:06:41 +0000
+  Date : 2023-05-06 10:38:42 +0000
 
-    On perl less than v5.10.1 install parent ahead of version 
-
------------------------------------------
-version 0.14 at 2017-05-31 10:19:57 +0000
------------------------------------------
-
-  Change: 63489636200e7c199fa85314d08cd63f285e056d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-05-31 11:19:57 +0000
-
-    Update for changes in how CPANPLUS now works 
-
------------------------------------------
-version 0.12 at 2016-05-25 16:47:39 +0000
------------------------------------------
-
-  Change: 8f52665dfa3c61f597b0bf7c4e60c0053722220d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-05-25 17:47:39 +0000
-
-    Require Test::More update before version for 5.010000 
-
------------------------------------------
-version 0.10 at 2013-11-25 20:01:57 +0000
------------------------------------------
-
-  Change: dc36832762e87941760dc2da227e5379737ac18a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-11-25 20:01:57 +0000
-
-    Move update/install of version before EUMM and M::B 
+    Added testskip option to skip tests when installing modules 
 
 ================================================
-Plus 4 releases after 2012-06-08 00:00:00 +0000.
+Plus 8 releases after 2018-05-07 00:00:00 +0000.
 ================================================

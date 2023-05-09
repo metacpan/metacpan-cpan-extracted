@@ -11,12 +11,14 @@ my $challenges = $sr->get_challenges;
 
 is $challenges->[0],
     {
+    description => E,    
     distance => E,
     end      => E,
     id       => E,
     image    => E,
     name     => E,
     start    => E,
+    type     => E,
     },
     'Challenges from API are as expected';
 

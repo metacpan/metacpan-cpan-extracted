@@ -1,5 +1,5 @@
 package App::RemoteCommand::Pool;
-use strict;
+use v5.16;
 use warnings;
 
 sub new {

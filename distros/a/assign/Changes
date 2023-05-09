@@ -1,2 +1,22 @@
+0.0.7 Mon May  8 07:23:08 AM CEST 2023
+ - Support basic hash destructuring
+
+0.0.6 Sun May  7 11:50:34 PM CEST 2023
+ - Implement line renumbering for code transformations
+
+0.0.5 Sun May  7 12:29:09 PM CEST 2023
+ - Add Implementation section to the doc
+ - Support assignment statements without declarators
+
+0.0.4 Sun May  7 08:38:40 AM CEST 2023
+ - Add "local" declarations
+
+0.0.3 Sun May  7 08:25:35 AM CEST 2023
+ - Refactor code to be more generic
+ - Support "our" declarations
+
+0.0.2 Sun May  7 12:15:57 AM CEST 2023
+ - First destructuring assignment form works
+
 0.0.1 Wed May  3 03:51:09 PM CEST 2023
  - Initial release

@@ -2,7 +2,7 @@ package Net::DNS::RR::GPOS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: GPOS.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: GPOS.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -23,9 +23,11 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
-	( $self->{latitude},  $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
-	( $self->{longitude}, $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
-	( $self->{altitude},  $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
+	for (qw(latitude longitude altitude)) {
+		my $text;
+		( $text, $offset ) = Net::DNS::Text->decode( $data, $offset );
+		$self->$_( $text->value );
+	}
 	croak('corrupt GPOS data') unless $offset == $limit;	# more or less FUBAR
 	return;
 }
@@ -34,24 +36,23 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{altitude};
-	return join '', map { $self->{$_}->encode } qw(latitude longitude altitude);
+	return join '', map { Net::DNS::Text->new($_)->encode } @{$self}{qw(latitude longitude altitude)};
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{altitude};
-	return join ' ', map { $self->{$_}->string } qw(latitude longitude altitude);
+	return map { Net::DNS::Text->new($_)->string } @{$self}{qw(latitude longitude altitude)};
 }
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my ( $self, @argument ) = @_;
 
-	foreach (qw(latitude longitude altitude)) { $self->$_( shift @argument ) }
-	die 'too many arguments for GPOS' if scalar @argument;
+	$self->latitude( shift @argument );
+	$self->longitude( shift @argument );
+	$self->altitude(@argument);
 	return;
 }
 
@@ -66,34 +67,30 @@ sub _defaults {				## specify RR attribute default values
 
 sub latitude {
 	my ( $self, @value ) = @_;
-	for (@value) { $self->{latitude} = _fp2text($_) }
-	return defined(wantarray) ? _text2fp( $self->{latitude} ) : undef;
+	for (@value) { return $self->{latitude} = _fp($_) }
+	return $self->{latitude};
 }
 
 
 sub longitude {
 	my ( $self, @value ) = @_;
-	for (@value) { $self->{longitude} = _fp2text($_) }
-	return defined(wantarray) ? _text2fp( $self->{longitude} ) : undef;
+	for (@value) { return $self->{longitude} = _fp($_) }
+	return $self->{longitude};
 }
 
 
 sub altitude {
 	my ( $self, @value ) = @_;
-	for (@value) { $self->{altitude} = _fp2text($_) }
-	return defined(wantarray) ? _text2fp( $self->{altitude} ) : undef;
+	for (@value) { return $self->{altitude} = _fp($_) }
+	return $self->{altitude};
 }
 
 
 ########################################
 
-sub _fp2text {
-	return Net::DNS::Text->new( sprintf( '%1.10g', shift ) );
-}
-
-sub _text2fp {
+sub _fp {
 	no integer;
-	return ( 0.0 + shift->value );
+	return sprintf( '%1.10g', 0.0 + shift );
 }
 
 ########################################

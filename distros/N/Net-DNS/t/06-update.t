@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 06-update.t 1856 2021-12-02 14:36:25Z willem $  -*-perl-*-
+# $Id: 06-update.t 1910 2023-03-30 19:16:30Z willem $  -*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 85;
+use Test::More tests => 84;
 
 use Net::DNS;
 
@@ -34,35 +34,25 @@ my $type   = "A";
 my $ttl	   = 43200;
 my $rdata  = "10.1.2.3";
 
+my $default = Net::DNS::Resolver->domain('example.org');	# resolver default domain
+
 #------------------------------------------------------------------------------
 # Packet creation.
 #------------------------------------------------------------------------------
 
-{
-	my $packet = Net::DNS::Update->new( $zone, $class );
-	my ($z) = $packet->zone;
-
+for my $packet ( Net::DNS::Update->new( $zone, $class ) ) {	# specified domain
 	ok( $packet, 'new() returned packet' );
 	is( $packet->header->opcode, 'UPDATE', 'header opcode correct' );
-	is( $z->zname,		     $zone,    'zname from explicit argument' );
-	is( $z->zclass,		     $class,   'zclass correct' );
-	is( $z->ztype,		     'SOA',    'ztype correct' );
-}
-
-
-{
-	Net::DNS::Resolver->domain($zone);			# overides config files
-	my $packet = Net::DNS::Update->new();
 	my ($z) = $packet->zone;
-	is( $z->zname, $zone, 'zname from resolver defaults' );
+	is( $z->zname,	$zone, 'zname from explicit argument' );
+	is( $z->zclass,	$class,'zclass correct' );
+	is( $z->ztype,	'SOA', 'ztype correct' );
 }
 
 
-{
-	Net::DNS::Resolver->searchlist();			# overides config files
-	my $packet	= eval { Net::DNS::Update->new(undef); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "argument undefined\t[$exception]" );
+for my $packet ( Net::DNS::Update->new() ) {
+	my ($z) = $packet->zone;
+	is( $z->zname, $default, 'zname from resolver defaults' );
 }
 
 
@@ -70,11 +60,9 @@ my $rdata  = "10.1.2.3";
 # RRset exists (value-independent).
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name $ttl $class $type";
-	my $rr	= yxrrset($arg);
+for my $rr ( yxrrset( my $arg = "$name $ttl $class $type" ) ) {
+	ok( $rr, "yxrrset($arg)" );
 
-	ok( $rr, "yxrrset($arg)" );				#9
 	is( $rr->name,	$name, 'yxrrset - right name' );
 	is( $rr->ttl,	0,     'yxrrset - ttl	0' );
 	is( $rr->class, 'ANY', 'yxrrset - class ANY' );
@@ -82,15 +70,14 @@ my $rdata  = "10.1.2.3";
 	ok( is_empty( $rr->rdstring ), 'yxrrset - data empty' );
 }
 
+
 #------------------------------------------------------------------------------
 # RRset exists (value-dependent).
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name $ttl $class $type $rdata";
-	my $rr	= yxrrset($arg);
-
+for my $rr ( yxrrset( my $arg = "$name $ttl $class $type $rdata" ) ) {
 	ok( $rr, "yxrrset($arg)" );
+
 	is( $rr->name,	   $name,  'yxrrset - right name' );
 	is( $rr->ttl,	   0,	   'yxrrset - ttl   0' );
 	is( $rr->class,	   $class, "yxrrset - class $class" );
@@ -103,11 +90,9 @@ my $rdata  = "10.1.2.3";
 # RRset does not exist.
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name $ttl $class $type $rdata";
-	my $rr	= nxrrset($arg);
+for my $rr ( nxrrset( my $arg = "$name $ttl $class $type $rdata" ) ) {
+	ok( $rr, "nxrrset($arg)" );
 
-	ok( $rr, "nxrrset($arg)" );				#21
 	is( $rr->name,	$name,	'nxrrset - right name' );
 	is( $rr->ttl,	0,	'nxrrset - ttl	 0' );
 	is( $rr->class, 'NONE', 'nxrrset - class NONE' );
@@ -120,11 +105,9 @@ my $rdata  = "10.1.2.3";
 # Name is in use.
 #------------------------------------------------------------------------------
 
-{
-	my @arg = "$name";
-	my $rr	= yxdomain(@arg);
+for my $rr ( yxdomain( my $arg = "$name" ) ) {
+	ok( $rr, "yxdomain($arg)" );
 
-	ok( $rr, "yxdomain(@arg)" );				#27
 	is( $rr->name,	$name, 'yxdomain - right name' );
 	is( $rr->ttl,	0,     'yxdomain - ttl	 0' );
 	is( $rr->class, 'ANY', 'yxdomain - class ANY' );
@@ -132,11 +115,9 @@ my $rdata  = "10.1.2.3";
 	ok( is_empty( $rr->rdstring ), 'yxdomain - data empty' );
 }
 
-{
-	my @arg = ( name => $name );
-	my $rr	= yxdomain(@arg);
-
+for my $rr ( yxdomain( my @arg = ( name => $name ) ) ) {
 	ok( $rr, "yxdomain(@arg)" );
+
 	is( $rr->name,	$name, 'yxdomain - right name' );
 	is( $rr->ttl,	0,     'yxdomain - ttl	 0' );
 	is( $rr->class, 'ANY', 'yxdomain - class ANY' );
@@ -149,11 +130,9 @@ my $rdata  = "10.1.2.3";
 # Name is not in use.
 #------------------------------------------------------------------------------
 
-{
-	my @arg = "$name";
-	my $rr	= nxdomain(@arg);
+for my $rr ( nxdomain( my $arg = "$name" ) ) {
+	ok( $rr, "nxdomain($arg)" );
 
-	ok( $rr, "nxdomain(@arg)" );				#39
 	is( $rr->name,	$name,	'nxdomain - right name' );
 	is( $rr->ttl,	0,	'nxdomain - ttl	  0' );
 	is( $rr->class, 'NONE', 'nxdomain - class NONE' );
@@ -161,11 +140,9 @@ my $rdata  = "10.1.2.3";
 	ok( is_empty( $rr->rdstring ), 'nxdomain - data empty' );
 }
 
-{
-	my @arg = ( name => $name );
-	my $rr	= nxdomain(@arg);
-
+for my $rr ( nxdomain( my @arg = ( name => $name ) ) ) {
 	ok( $rr, "nxdomain(@arg)" );
+
 	is( $rr->name,	$name,	'nxdomain - right name' );
 	is( $rr->ttl,	0,	'nxdomain - ttl	  0' );
 	is( $rr->class, 'NONE', 'nxdomain - class NONE' );
@@ -178,11 +155,9 @@ my $rdata  = "10.1.2.3";
 # Add to an RRset.
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name $ttl $class $type $rdata";
-	my $rr	= rr_add($arg);
+for my $rr ( rr_add( my $arg = "$name $ttl $class $type $rdata" ) ) {
+	ok( $rr, "rr_add($arg)" );
 
-	ok( $rr, "rr_add($arg)" );				#51
 	is( $rr->name,	   $name,  'rr_add - right name' );
 	is( $rr->ttl,	   $ttl,   "rr_add - ttl   $ttl" );
 	is( $rr->class,	   $class, "rr_add - class $class" );
@@ -190,8 +165,7 @@ my $rdata  = "10.1.2.3";
 	is( $rr->rdstring, $rdata, 'rr_add - right data' );
 }
 
-{
-	my $arg = "$name      $class $type $rdata";
+for my $rr ( rr_add( my $arg = "$name $class $type $rdata" ) ) {
 	my $rr	= rr_add($arg);
 
 	ok( $rr, "rr_add($arg)" );
@@ -207,11 +181,9 @@ my $rdata  = "10.1.2.3";
 # Delete an RRset.
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name $class $type";
-	my $rr	= rr_del($arg);
+for my $rr ( rr_del( my $arg = "$name $class $type" ) ) {
+	ok( $rr, "rr_del($arg)" );
 
-	ok( $rr, "rr_del($arg)" );				#63
 	is( $rr->name,	$name, 'rr_del - right name' );
 	is( $rr->ttl,	0,     'rr_del - ttl   0' );
 	is( $rr->class, 'ANY', 'rr_del - class ANY' );
@@ -223,11 +195,9 @@ my $rdata  = "10.1.2.3";
 # Delete All RRsets From A Name.
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name";
-	my $rr	= rr_del($arg);
-
+for my $rr ( rr_del( my $arg = "$name" ) ) {
 	ok( $rr, "rr_del($arg)" );
+
 	is( $rr->name,	$name, 'rr_del - right name' );
 	is( $rr->ttl,	0,     'rr_del - ttl   0' );
 	is( $rr->class, 'ANY', 'rr_del - class ANY' );
@@ -240,11 +210,9 @@ my $rdata  = "10.1.2.3";
 # Delete An RR From An RRset.
 #------------------------------------------------------------------------------
 
-{
-	my $arg = "$name $class $type $rdata";
-	my $rr	= rr_del($arg);
-
+for my $rr ( rr_del( my $arg = "$name $class $type $rdata" ) ) {
 	ok( $rr, "rr_del($arg)" );
+
 	is( $rr->name,	   $name,  'rr_del - right name' );
 	is( $rr->ttl,	   0,	   'rr_del - ttl   0' );
 	is( $rr->class,	   'NONE', 'rr_del - class NONE' );
@@ -258,9 +226,8 @@ my $rdata  = "10.1.2.3";
 # the class is NONE or ANY.
 #------------------------------------------------------------------------------
 
-{
-	my $packet = Net::DNS::Update->new( $zone, $class );
-	ok( $packet, 'packet created' );			#81
+for my $packet ( Net::DNS::Update->new( $zone, $class ) ) {
+	ok( $packet, 'packet created' );
 
 	$packet->push( "pre", yxrrset("$name $class $type $rdata") );
 	$packet->push( "pre", yxrrset("$name $class2 $type $rdata") );

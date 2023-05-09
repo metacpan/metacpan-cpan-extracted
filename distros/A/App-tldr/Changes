@@ -1,5 +1,11 @@
 Revision history for App-tldr
 
+0.21  2023-05-05 11:37:28 JST
+    - Fix TLDR_REPOSITORY environment variable
+
+0.20  2023-05-05 09:41:09 JST
+    - Require perl v5.16
+
 0.13  2022-09-05 21:32:15 JST
     - Fix argument validation (zhumengu #8)
 

@@ -74,6 +74,7 @@ requires:
   DateTime::Format::Strptime: '0'
   Encode: '0'
   Exporter: '0'
+  HTML::Entities: '0'
   HTML::TableExtract: '0'
   HTML::TokeParser: '0'
   HTML::TokeParser::Simple: '0'
@@ -90,9 +91,10 @@ requires:
   LWP::Protocol::https: '0'
   LWP::Simple: '0'
   LWP::UserAgent: '6.48'
-  Module::Load: '0'
+  Module::Load: '0.36'
   Mozilla::CA: '0'
   POSIX: '0'
+  Readonly: '0'
   Scalar::Util: '0'
   Spreadsheet::XLSX: '0'
   String::Util: '0'
@@ -114,7 +116,7 @@ resources:
   bugtracker: https://github.com/finance-quote/finance-quote/issues
   homepage: http://finance-quote.sourceforge.net/
   repository: git://github.com/finance-quote/finance-quote
-version: '1.5301'
+version: '1.5402'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-2.0-only

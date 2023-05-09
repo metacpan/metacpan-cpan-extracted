@@ -32,7 +32,7 @@
          "requires" : {
             "Carp" : "0",
             "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" : "> 0.230480",
             "Dist::Zilla::Plugin::Git::Commit" : "0",
             "Dist::Zilla::Plugin::Git::Contributors" : "0",
             "Dist::Zilla::Plugin::Git::NextVersion" : "2.044",
@@ -40,6 +40,7 @@
             "Dist::Zilla::Plugin::Git::Tag" : "2.046",
             "Dist::Zilla::Plugin::GitHub::Meta" : "0.46",
             "Dist::Zilla::Plugin::GitHub::UploadRelease" : "0",
+            "Dist::Zilla::Plugin::HasVersionTests" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::OurPkgVersion" : "0.20",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
@@ -87,11 +88,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GSG" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       },
       "Dist::Zilla::PluginBundle::Author::GSG" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       }
    },
    "release_status" : "stable",
@@ -106,8 +107,8 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "v0.4.0",
-   "x_generated_by_perl" : "v5.36.0",
+   "version" : "v0.5.0",
+   "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

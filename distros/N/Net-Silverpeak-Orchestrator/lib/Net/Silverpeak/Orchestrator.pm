@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.005000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.006000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -90,6 +90,11 @@ sub login($self) {
     $self->_error_handler($res)
         unless $res->code == 200;
 
+    my @cookies = $self->user_agent->cookie_jar->cookies_for($self->server);
+    if (my ($csrf_cookie) = grep { $_->{name} eq 'orchCsrfToken' } @cookies ) {
+        $self->set_persistent_header('X-XSRF-TOKEN' => $csrf_cookie->{value});
+    }
+
     $self->_set_is_logged_in(1);
 
     return 1;
@@ -103,6 +108,8 @@ sub logout($self) {
     my $res = $self->get('/gms/rest/authentication/logout');
     $self->_error_handler($res)
         unless $res->code == 200;
+
+    delete $self->persistent_headers->{'X-XSRF-TOKEN'};
 
     $self->_set_is_logged_in(0);
 
@@ -397,7 +404,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.005000
+version 0.006000
 
 =head1 SYNOPSIS
 
@@ -515,11 +522,11 @@ Returns an arrayref of address group names.
 
 =head2 get_addressgroup
 
-Returns a address group by name.
+Returns an address group by name.
 
 =head2 create_or_update_addressgroup
 
-Takes a address group name and a hashref of address group config.
+Takes an address group name and a hashref of address group config.
 
 Returns true on success.
 
@@ -527,7 +534,7 @@ Throws an exception on error.
 
 =head2 update_addressgroup
 
-Takes a address group name and a hashref of address group config.
+Takes an address group name and a hashref of address group config.
 
 Returns true on success.
 
@@ -535,7 +542,7 @@ Throws an exception on error.
 
 =head2 delete_addressgroup
 
-Takes a address group name.
+Takes an address group name.
 
 Returns true on success.
 
@@ -650,7 +657,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexander Hartmaier.
+This software is copyright (c) 2023 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

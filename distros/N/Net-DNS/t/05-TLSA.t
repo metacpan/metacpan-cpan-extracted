@@ -1,10 +1,11 @@
 #!/usr/bin/perl
-# $Id: 05-TLSA.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 05-TLSA.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 16;
+use TestToolkit;
 
 use Net::DNS;
 
@@ -20,20 +21,14 @@ my @also = qw( certbin babble );
 my $wire =
 '01010292003ba34942dc74152e2f2c408d29eca5a520e7f2e06bb944f4dca346baf63c1b177615d466f6c4b71c216a50292bd58c9ebdd2f74e38fe51ffd48c43326cbc';
 
+my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
+is( $typecode, $code, "$type RR type code = $code" );
 
-{
-	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
-	is( $typecode, $code, "$type RR type code = $code" );
+my $hash = {};
+@{$hash}{@attr} = @data;
 
-	my $hash = {};
-	@{$hash}{@attr} = @data;
 
-	my $rr = Net::DNS::RR->new(
-		name => $name,
-		type => $type,
-		%$hash
-		);
-
+for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 	my $string = $rr->string;
 	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
@@ -48,30 +43,13 @@ my $wire =
 		is( $rr2->$_, $rr->$_, "additional attribute rr->$_()" );
 	}
 
-
-	my $null    = Net::DNS::RR->new("$name NULL")->encode;
-	my $empty   = Net::DNS::RR->new("$name $type")->encode;
-	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
-	my $txtext  = Net::DNS::RR->new("$name $type")->string;
-	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
 	my $encoded = $rr->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
-	my $hex3    = unpack 'H*', substr( $encoded, length $null );
-	is( $hex2,	     $hex1,	    'encode/decode transparent' );
-	is( $hex3,	     $wire,	    'encoded RDATA matches example' );
-	is( length($empty),  length($null), 'encoded RDATA can be empty' );
-	is( length($rxbin),  length($null), 'decoded RDATA can be empty' );
-	is( length($rxtext), length($null), 'string RDATA can be empty' )
-}
-
-
-{
-	my $rr = Net::DNS::RR->new(". $type @data");
-	eval { $rr->certificate('123456789XBCDEF'); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "corrupt hexadecimal\t[$exception]" );
+	my $hex3    = unpack 'H*', $rr->rdata;
+	is( $hex2, $hex1, 'encode/decode transparent' );
+	is( $hex3, $wire, 'encoded RDATA matches example' );
 }
 
 
@@ -80,6 +58,8 @@ my $wire =
 	foreach (@attr) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
+
+	exception( 'corrupt hexadecimal', sub { $rr->certificate('123456789XBCDEF') } );
 }
 
 

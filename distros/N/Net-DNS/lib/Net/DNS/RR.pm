@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1906 2023-03-10 07:09:31Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 
 =head1 NAME
@@ -51,14 +51,14 @@ you will get an error message and execution will be terminated.
 
 sub new {
 	my ( $class, @list ) = @_;
-	return eval {
+	my $rr = eval {
 		local $SIG{__DIE__};
 		scalar @list > 1 ? &_new_hash : &_new_string;
-	} || do {
-		my @param = map { defined($_) ? split /\s+/ : 'undef' } @list;
-		my $stmnt = substr "$class->new( @param )", 0, 80;
-		croak "${@}in $stmnt\n";
 	};
+	return $rr if $rr;
+	my @param = map { defined($_) ? split /\s+/ : 'undef' } @list;
+	my $stmnt = substr "$class->new( @param )", 0, 80;
+	croak "${@}in $stmnt\n";
 }
 
 
@@ -90,8 +90,8 @@ my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]+/;		# NB: *not* \s (matches 
 sub _new_string {
 	my ( $base, $string ) = @_;
 	local $_ = $string;
-	croak 'argument absent or undefined' unless defined $_;
-	croak 'non-scalar argument' if ref $_;
+	die 'argument absent or undefined' unless defined $_;
+	die 'non-scalar argument' if ref $_;
 
 	# parse into quoted strings, contiguous non-whitespace and (discarded) comments
 	s/\\\\/\\092/g;						# disguise escaped escape
@@ -101,7 +101,7 @@ sub _new_string {
 	s/\\;/\\059/g;						# disguise escaped semicolon
 	my ( $owner, @token ) = grep { defined && length } split /$PARSE_REGEX/o;
 
-	croak 'unable to parse RR string' unless scalar @token;
+	die 'unable to parse RR string' unless scalar @token;
 	my $t1 = $token[0];
 	my $t2 = $token[1];
 
@@ -130,7 +130,7 @@ sub _new_string {
 		shift @token;					# RFC3597 hexadecimal format
 		my $rdlen = shift(@token) || 0;
 		my $rdata = pack 'H*', join( '', @token );
-		croak 'length and hexadecimal data inconsistent' unless $rdlen == length $rdata;
+		die 'length and hexadecimal data inconsistent' unless $rdlen == length $rdata;
 		$self->rdata($rdata);				# unpack RDATA
 	} else {
 		$self->_parse_rdata(@token);			# parse arguments
@@ -234,7 +234,7 @@ sub decode {
 	my $next = $index + $self->{rdlength};
 	die 'corrupt wire-format data' if length $$data < $next;
 
-	local $self->{offset} = $offset || 0;
+	local $self->{offset} = $offset;
 	$self->_decode_rdata( $data, $index, @opaque ) if $next > $index or $self->type eq 'OPT';
 
 	return wantarray ? ( $self, $next ) : $self;
@@ -323,18 +323,18 @@ sub string {
 	my @ttl	 = grep {defined} $self->{ttl};
 	my @core = ( $name, @ttl, $self->class, $self->type );
 
+	local $SIG{__DIE__};
 	my $empty = $self->_empty;
 	my @rdata = $empty ? () : eval { $self->_format_rdata };
 	carp $@ if $@;
 
 	my $tab = length($name) < 72 ? "\t" : ' ';
-	$self->_annotation('no data') if $empty;
-
 	my @line = _wrap( join( $tab, @core, '(' ), @rdata, ')' );
 
 	my $last = pop(@line);					# last or only line
 	$last = join $tab, @core, "@rdata" unless scalar(@line);
 
+	$self->_annotation('no data') if $empty;
 	return join "\n\t", @line, _wrap( $last, map {"; $_"} $self->_annotation );
 }
 
@@ -525,7 +525,9 @@ sub dump {				## print internal data structure
 }
 
 sub rdatastr {				## historical RR subtype method
-	return &rdstring;					# uncoverable pod
+	my $self = shift;					# uncoverable pod
+	$self->_deprecate('prefer $rr->rdstring()');
+	return $self->rdstring;
 }
 
 
@@ -558,6 +560,7 @@ Returns a string representation of the RR-specific data.
 
 sub rdstring {
 	my $self = shift;
+	local $SIG{__DIE__};
 
 	my @rdata = $self->_empty ? () : eval { $self->_format_rdata };
 	carp $@ if $@;
@@ -718,7 +721,8 @@ my %warned;
 
 sub _deprecate {
 	my ( undef, @note ) = @_;
-	return carp "deprecated method; @note" unless $warned{"@note"}++;
+	carp "deprecated method; @note" unless $warned{"@note"}++;
+	return;
 }
 
 
@@ -766,12 +770,12 @@ sub AUTOLOAD {				## Default method
 		tr [A-Z-] [a-z_];
 		if ( $self->can($action) ) {
 			*{$AUTOLOAD} = sub { shift->$action(@_) };
-			return &{$AUTOLOAD};
+			return &$AUTOLOAD;
 		}
 	}
 
 	my $oref = ref($self);
-	*{$AUTOLOAD} = sub {undef};	## suppress deep recursion
+	*{$AUTOLOAD} = sub {};		## suppress deep recursion
 	croak qq[$self has no class method "$method"] unless $oref;
 
 	my $string = $self->string;
@@ -792,7 +796,7 @@ $string
 @object
 $@
 END
-	goto &{'Carp::confess'};
+	goto &Carp::confess;
 }
 
 

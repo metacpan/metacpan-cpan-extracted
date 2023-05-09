@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.008';
+$Crypt::HSM::Session::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -36,11 +36,11 @@ version 0.008
 
  my @keys = $session->find_objects({ class => 'secret-key' });
 
- my $attr = $session->get_attribute
+ my $attrs = $session->get_attributes($key, [ 'private', 'sensitive' ]);
 
 =head1 DESCRIPTION
 
-This represents a session with a PKCS module such as an HSM. It does all 
+This represents a session with a PKCS module such as an HSM. It does most of the cryptographic work of using a PKCS11 interface.
 
 =head2 Constants
 
@@ -88,7 +88,7 @@ Derive a new key from C<$key>, using mechanism and setting C<$attributes> on it.
 
 =head2 destroy_object($object)
 
-This deletes the object with the identifier C<$object>
+This deletes the object with the identifier C<$object>.
 
 =head2 digest($mechanism, $key, $input, ...)
 
@@ -100,7 +100,7 @@ Encrypt C<$plaintext> with C<$mechanism> and C<$key>.
 
 =head2 find_objects($attributes)
 
-Find all objects that satisfy the given C<$attributes>
+Find all objects that satisfy the given C<$attributes>.
 
 =head2 generate_key($mechanism, $attributes, ...)
 
@@ -146,11 +146,15 @@ Most of these have implementation-specific defaults.
 
 =head2 generate_keypair($mechanism, $public_attributes, $private_attributes, ...)
 
-This generates a key pair. The attributes for the 
+This generates a key pair. The attributes for the public and private keys work similar to `generate_key`.
 
 =head2 generate_random($length)
 
 This generate C<$length> bytes of randomness.
+
+=head2 get_attribute($object, $attribute_name)
+
+This returns the value of the named attribute.
 
 =head2 get_attributes($object, $attribute_list)
 
@@ -174,7 +178,7 @@ Log the current session out.
 
 =head2 object_size($object)
 
-This returns the size of C<$object>
+This returns the size of C<$object>.
 
 =head2 open_decrypt($mechanism, $key, ...)
 
@@ -196,9 +200,13 @@ Start an signing with C<$mechanism> and C<$key>. This returns a L<Crypt::HSM::Si
 
 Start an verification with C<$mechanism> and C<$key>. This returns a L<Crypt::HSM::Verify|Crypt::HSM::Verify> object.
 
+=head2 provider()
+
+Returns the provider object for this session.
+
 =head2 seed_random($seed)
 
-Mix additional seed material into the token’s random number generator
+Mix additional seed material into the token’s random number generator.
 
 =head2 set_attributes($object, $attributes)
 
@@ -212,9 +220,13 @@ This changes the PIN from C<$old_pin> to C<$new_pin>.
 
 This creates a signature over C<$input> using C<$mechanism> and C<$key>.
 
+=head2 slot()
+
+Returns the slot identifier used for this session.
+
 =head2 unwrap_key($mechanism, $unwrap_key, $wrapped_key, $attributes, ...)
 
-This unwraps the key wrapped in the bytearray C<$wrapped_key> using C<mechanism> and C<$unwrap_key>, setting C<$attributes> on the new key.
+This unwraps the key wrapped in the bytearray C<$wrapped_key> using C<mechanism> and key C<$unwrap_key>, setting C<$attributes> on the new key.
 
 =head2 verify($mechanism, $key, $data, $signature, ...)
 
@@ -222,7 +234,7 @@ Verify that C<$signature> matches C<$data>, using C<$mechanism> and C<$key>.
 
 =head2 wrap_key($mechanism, $wrap_key, $key, ...)
 
-This wraps C<$key> using C<$mechanism> and C<$wrap_key>.
+This wraps key C<$key> using C<$mechanism> and key C<$wrap_key>.
 
 =head1 AUTHOR
 

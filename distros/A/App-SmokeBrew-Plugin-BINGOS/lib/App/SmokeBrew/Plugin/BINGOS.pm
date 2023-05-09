@@ -1,5 +1,5 @@
 package App::SmokeBrew::Plugin::BINGOS;
-$App::SmokeBrew::Plugin::BINGOS::VERSION = '0.16';
+$App::SmokeBrew::Plugin::BINGOS::VERSION = '1.00';
 #ABSTRACT: a smokebrew plugin to configure things like BINGOS does
 
 use strict;
@@ -18,6 +18,12 @@ has 'port' => (
   is => 'ro',
   isa => 'Str',
   required => 1,
+);
+
+has 'testskip' => (
+  is => 'ro',
+  isa => 'Bool',
+  default => 0,
 );
 
 sub _boxed {
@@ -110,6 +116,7 @@ my $ConfigFile  = $ConfObj->_config_pm_to_file( $Config => $PRIV_LIB );
         $ConfObj->set_conf( prefer_makefile => 1 ); # prefer Makefile.PL because of v5.10.0
         $ConfObj->set_conf( enable_custom_sources => 0 ); # install prereqs
         $ConfObj->set_conf( hosts => + . $self->_mirrors . q+ );
+        $ConfObj->set_conf( skiptest => + . $self->testskip . q+ );
         $ConfObj->set_program( sudo => undef );
         $ConfObj->save(     $Config => $PRIV_LIB ); # save the pm in that dir
     }
@@ -204,7 +211,7 @@ App::SmokeBrew::Plugin::BINGOS - a smokebrew plugin to configure things like BIN
 
 =head1 VERSION
 
-version 0.16
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -213,6 +220,7 @@ version 0.16
   [BINGOS]
   relay = myrelay
   port = 8080
+  testskip = 0
 
   # then run
 
@@ -238,6 +246,9 @@ These attributes should be specified in the C<smokebrew.cfg> file under a named 
 
   relay = some.host
   port = 8080
+
+An optional boolean attribute C<testskip> may be specified. This will skip tests when installing modules.
+This defaults to C<0>.
 
 =head1 METHODS
 
@@ -269,7 +280,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

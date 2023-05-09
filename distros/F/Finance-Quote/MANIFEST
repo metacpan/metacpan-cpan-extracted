@@ -16,6 +16,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 htdocs/Images/Button1.gif
 htdocs/Images/Button2.gif
 htdocs/Images/bg.jpg
@@ -71,15 +72,18 @@ lib/Finance/Quote/OnVista.pm
 lib/Finance/Quote/Oslobors.pm
 lib/Finance/Quote/SEB.pm
 lib/Finance/Quote/SIX.pm
+lib/Finance/Quote/Sinvestor.pm
 lib/Finance/Quote/TMX.pm
 lib/Finance/Quote/TSP.pm
 lib/Finance/Quote/TesouroDireto.pm
 lib/Finance/Quote/Tiaacref.pm
+lib/Finance/Quote/Tradegate.pm
 lib/Finance/Quote/Tradeville.pm
 lib/Finance/Quote/TreasuryDirect.pm
 lib/Finance/Quote/Troweprice.pm
 lib/Finance/Quote/Union.pm
 lib/Finance/Quote/UserAgent.pm
+lib/Finance/Quote/XETRA.pm
 lib/Finance/Quote/YahooJSON.pm
 lib/Finance/Quote/ZA.pm
 t/00-store-date.t
@@ -128,10 +132,12 @@ t/onvista.t
 t/oslobors.t
 t/quote.t
 t/seb.t
+t/sinvestor.t
 t/six.t
 t/tesouro_direto.t
 t/tiaacref.t
 t/tmx.t
+t/tradegate.t
 t/tradeville.t
 t/treasurydirect.t
 t/troweprice.t
@@ -139,5 +145,6 @@ t/tsp.t
 t/ukfunds.t
 t/union.t
 t/usfedbonds.t
+t/xetra.t
 t/yahoojson.t
 t/za.t

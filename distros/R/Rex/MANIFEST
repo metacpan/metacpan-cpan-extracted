@@ -426,6 +426,7 @@ t/ip.out_centos7_alias
 t/ip.out_issue_539
 t/issue/1008.t
 t/issue/1439.t
+t/issue/1583.t
 t/issue/513.t
 t/issue/513_t1.rex
 t/issue/513_t2.rex
@@ -474,6 +475,7 @@ t/rexfiles/Rexfile_warnings_print.stdout
 t/rexfiles/no_Rexfile.log
 t/rsync.t
 t/runlist.t
+t/scm/git.t
 t/shared.t
 t/ssh_config.1
 t/summary.t

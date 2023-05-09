@@ -1,10 +1,11 @@
 #!/usr/bin/perl
-# $Id: 05-HIP.t 1857 2021-12-07 13:38:02Z willem $	-*-perl-*-
+# $Id: 05-HIP.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use Test::More;
+use TestToolkit;
 
 use Net::DNS;
 
@@ -18,7 +19,7 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 22;
+plan tests => 19;
 
 
 my $name = 'HIP.example';
@@ -39,19 +40,14 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 		616d706c6503636f6d000472767332076578616d706c6503636f6d00
 		);
 
-{
-	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
-	is( $typecode, $code, "$type RR type code = $code" );
+my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
+is( $typecode, $code, "$type RR type code = $code" );
 
-	my $hash = {};
-	@{$hash}{@attr} = @data;
+my $hash = {};
+@{$hash}{@attr} = @data;
 
-	my $rr = Net::DNS::RR->new(
-		name => $name,
-		type => $type,
-		%$hash
-		);
 
+for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 	my $string = $rr->string;
 	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
@@ -74,71 +70,36 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 }
 
 
-{
-	my $rr	    = Net::DNS::RR->new("$name $type @data");
-	my $null    = Net::DNS::RR->new("$name NULL")->encode;
-	my $empty   = Net::DNS::RR->new("$name $type")->encode;
-	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
-	my $txtext  = Net::DNS::RR->new("$name $type")->string;
-	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
+for my $rr ( Net::DNS::RR->new("$name $type @data") ) {
 	my $encoded = $rr->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
-	my $hex3    = unpack 'H*', substr( $encoded, length $null );
-	is( $hex2,	     $hex1,	    'encode/decode transparent' );
-	is( $hex3,	     $wire,	    'encoded RDATA matches example' );
-	is( length($empty),  length($null), 'encoded RDATA can be empty' );
-	is( length($rxbin),  length($null), 'decoded RDATA can be empty' );
-	is( length($rxtext), length($null), 'string RDATA can be empty' );
+	my $hex3    = unpack 'H*', $rr->rdata;
+	is( $hex2, $hex1, 'encode/decode transparent' );
+	is( $hex3, $wire, 'encoded RDATA matches example' );
 
-	my @wire = unpack 'C*', $encoded;
-	$wire[length($empty) - 1]--;
-	my $wireformat = pack 'C*', @wire;
-	eval { Net::DNS::RR->decode( \$wireformat ); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "corrupt wire-format\t[$exception]" );
+	my $emptyrr = Net::DNS::RR->new("$name $type")->encode;
+	my $corrupt = pack 'a*X2na*', $emptyrr, $decoded->rdlength - 1, $rr->rdata;
+	exception( 'corrupt wire-format', sub { Net::DNS::RR->decode( \$corrupt ) } );
 }
 
 
-{
-	my $rr = Net::DNS::RR->new(". $type @data");
-	eval { $rr->hit('123456789XBCDEF'); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "corrupt hexadecimal\t[$exception]" );
-}
-
-
-{
-	my $lc		= Net::DNS::RR->new( lc ". $type @data" );
-	my $rr		= Net::DNS::RR->new( uc ". $type @data" );
-	my $hash	= {};
-	my $predecessor = $rr->encode( 0,		    $hash );
-	my $compressed	= $rr->encode( length $predecessor, $hash );
-	ok( length $compressed == length $predecessor, 'encoded RDATA not compressible' );
-	isnt( $rr->encode,    $lc->encode, 'encoded RDATA names not downcased' );
-	isnt( $rr->canonical, $lc->encode, 'canonical RDATA names not downcased' );
-}
-
-
-{
-	my $rr = Net::DNS::RR->new(". $type");
+for my $rr ( Net::DNS::RR->new(". $type") ) {
 	foreach (@attr) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
+
+	exception( 'corrupt hexadecimal', sub { $rr->hit('123456789XBCDEF') } );
+
+	noexception( 'deprecate pkalgorithm',	    sub { $rr->pkalgorithm	 for ( 1 .. 2 ) } );
+	noexception( 'deprecate pubkey',	    sub { $rr->pubkey		 for ( 1 .. 2 ) } );
+	noexception( 'deprecate rendezvousservers', sub { $rr->rendezvousservers for ( 1 .. 2 ) } );
+
 }
 
 
-{
-	my $rr = Net::DNS::RR->new("$name $type @data");
-	local $SIG{__WARN__} = sub { };				# suppress deprecation warning
-	eval { $rr->pkalgorithm() };				# historical
-	eval { $rr->pubkey() };					# historical
-	eval { $rr->rendezvousservers() };			# historical
-
-	$rr->print;
-}
-
+Net::DNS::RR->new("$name $type @data")->print;
 
 exit;
 

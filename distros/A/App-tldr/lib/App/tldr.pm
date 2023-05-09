@@ -1,37 +1,38 @@
-package App::tldr;
-use strict;
+package App::tldr 0.21;
+use v5.16;
 use warnings;
+
 use Encode ();
 use File::Spec;
 use File::Which ();
-use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
+use Getopt::Long ();
 use HTTP::Tiny;
-use IO::Handle;
 use IO::Socket::SSL;
-use Pod::Usage 1.33 ();
+use Pod::Usage ();
 use Term::ReadKey ();
 use Text::Fold ();
 
-use constant DEBUG => $ENV{TLDR_DEBUG};
-use constant REPOSITORY => $ENV{TLDR_REPOSITORY};
-
-our $VERSION = '0.13';
+use constant DEBUG => !!$ENV{TLDR_DEBUG};
+use constant REPOSITORY => $ENV{TLDR_REPOSITORY} // '';
 
 my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages%s/%s/%s.md";
 
 sub new {
     my ($class, %option) = @_;
-    my $http = HTTP::Tiny->new;
+    my $http = HTTP::Tiny->new(verify_SSL => 1);
     bless { http => $http, %option }, $class;
 }
 
 sub parse_options {
     my ($self, @argv) = @_;
-    local @ARGV = @argv;
     $self->{platform} = [];
 
     $self->{unicode} = ($ENV{LANG} || "") =~ /UTF-8/i ? 1 : 0;
-    GetOptions
+    my $parser = Getopt::Long::Parser->new(
+        config => [qw(no_auto_abbrev no_ignore_case)],
+    );
+    $parser->getoptionsfromarray(
+        \@argv,
         "h|help"       => sub { print $self->_help; exit },
         "l|language=s" => \my $language,
         "o|os=s@"      => \($self->{platform}),
@@ -39,8 +40,8 @@ sub parse_options {
         "pager=s"      => \my $pager,
         "no-pager"     => \my $no_pager,
         "unicode!"     => \$self->{unicode},
-    or exit(2);
-    $self->{argv} = \@ARGV;
+    ) or exit(2);
+    $self->{argv} = \@argv;
     if ($language) {
         $language = $language =~ /^\./ ? $language : ".$language";
     }
@@ -105,7 +106,11 @@ sub _http_get {
     if ($res->{success}) {
         (Encode::decode_utf8($res->{content}), undef);
     } else {
-        (undef, "$url: $res->{status} $res->{reason}");
+        my $err = "$res->{status} $res->{reason}";
+        if ($res->{status} == 599) {
+            $err .= ", $res->{content}";
+        }
+        (undef, "$url: $err");
     }
 }
 

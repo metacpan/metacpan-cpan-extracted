@@ -1,7 +1,6 @@
-#!/usr/bin/perl
-use strict;
+#!perl
+use v5.16;
 use warnings;
-use utf8;
 use App::FatPacker::Simple;
 
 App::FatPacker::Simple->new->parse_options(@ARGV)->run;

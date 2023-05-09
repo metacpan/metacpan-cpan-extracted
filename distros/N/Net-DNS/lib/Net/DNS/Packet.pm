@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1901 2023-03-02 14:46:11Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 
 =head1 NAME
@@ -289,7 +289,7 @@ sub reply {
 
 	my $edns = $reply->edns();
 	CORE::push( @{$reply->{additional}}, $edns );
-	$edns->size($UDPmax);
+	$edns->udpsize($UDPmax);
 	return $reply;
 }
 
@@ -727,8 +727,9 @@ sub sigrr {
 
 	my ($sig) = reverse $self->additional;
 	return unless $sig;
-	return $sig if $sig->type eq 'TSIG';
-	return $sig if $sig->type eq 'SIG';
+	for ( $sig->type ) {
+		return $sig if /TSIG|SIG/;
+	}
 	return;
 }
 

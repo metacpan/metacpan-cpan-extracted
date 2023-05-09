@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental( mop custom_field_attr )';
 
@@ -40,7 +40,7 @@ EOPERL
    ok( $fieldmeta->has_attribute( "SomeAttr" ), '$y field has :SomeAttr' );
    is( $fieldmeta->get_attribute_value( "SomeAttr" ), "result-1", 'stored value for :SomeAttr' );
 
-   is_deeply( [ $fieldmeta->get_attribute_values( "SomeAttr" ) ], [ "result-1", "result-2" ],
+   is( [ $fieldmeta->get_attribute_values( "SomeAttr" ) ], [ "result-1", "result-2" ],
       'can get multiple values' );
 }
 

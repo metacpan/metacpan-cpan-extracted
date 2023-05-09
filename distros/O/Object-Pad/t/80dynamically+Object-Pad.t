@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Syntax::Keyword::Dynamically is not available"
@@ -24,14 +24,14 @@ class Datum {
    method value { $value }
 
    method test {
-      Test::More::is( $self->value, 1, 'value is 1 initially' );
+      ::is( $self->value, 1, 'value is 1 initially' );
 
       {
          dynamically $value = 2;
-         Test::More::is( $self->value, 2, 'value is 2 inside dynamically-assigned block' );
+         ::is( $self->value, 2, 'value is 2 inside dynamically-assigned block' );
       }
 
-      Test::More::is( $self->value, 1, 'value is 1 finally' );
+      ::is( $self->value, 1, 'value is 1 finally' );
    }
 }
 

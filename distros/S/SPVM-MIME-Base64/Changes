@@ -1,3 +1,6 @@
+1.001001 2023-04-26
+  [Prerequirement Changes]
+    * SPVM 0.973+ is required.
 1.001 2023-04-26
   [New Features]
     * The version string of the MIME::Base64 can be got.

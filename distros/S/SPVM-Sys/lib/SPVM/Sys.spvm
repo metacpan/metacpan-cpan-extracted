@@ -2,6 +2,8 @@
 # MIT License
 
 class Sys {
+  version "0.481";
+  
   use Sys::OS;
   use Sys::Env;
   use Sys::FileTest;

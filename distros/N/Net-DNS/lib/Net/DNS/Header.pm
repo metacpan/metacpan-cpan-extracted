@@ -3,7 +3,7 @@ package Net::DNS::Header;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Header.pm 1901 2023-03-02 14:46:11Z willem $)[2];
+our $VERSION = (qw$Id: Header.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 
 =head1 NAME
@@ -313,11 +313,9 @@ to the number of RRs in the zone section.
 
 =cut
 
-our $warned;
-
 sub qdcount {
 	my ( $self, @value ) = @_;
-	for (@value) { carp 'packet->header->qdcount attribute is read-only' unless $warned++ }
+	for (@value) { $self->_warn('packet->header->qdcount is read-only') }
 	return $$self->{count}[0] || scalar @{$$self->{question}};
 }
 
@@ -336,7 +334,7 @@ to the number of RRs in the prerequisite section.
 
 sub ancount {
 	my ( $self, @value ) = @_;
-	for (@value) { carp 'packet->header->ancount attribute is read-only' unless $warned++ }
+	for (@value) { $self->_warn('packet->header->ancount is read-only') }
 	return $$self->{count}[1] || scalar @{$$self->{answer}};
 }
 
@@ -355,7 +353,7 @@ to the number of RRs in the update section.
 
 sub nscount {
 	my ( $self, @value ) = @_;
-	for (@value) { carp 'packet->header->nscount attribute is read-only' unless $warned++ }
+	for (@value) { $self->_warn('packet->header->nscount is read-only') }
 	return $$self->{count}[2] || scalar @{$$self->{authority}};
 }
 
@@ -373,7 +371,7 @@ In dynamic update packets, this field is known as C<adcount>.
 
 sub arcount {
 	my ( $self, @value ) = @_;
-	for (@value) { carp 'packet->header->arcount attribute is read-only' unless $warned++ }
+	for (@value) { $self->_warn('packet->header->arcount is read-only') }
 	return $$self->{count}[3] || scalar @{$$self->{additional}};
 }
 
@@ -408,20 +406,16 @@ EDNS extended rcodes are handled transparently by $packet->header->rcode().
 
 =head2 UDP packet size
 
-    $udp_max = $packet->header->size;
-    $udp_max = $packet->edns->size;
+    $udp_max = $packet->edns->UDPsize;
 
 EDNS offers a mechanism to advertise the maximum UDP packet size
 which can be assembled by the local network stack.
 
-UDP size advertisement can be viewed as either a header extension or
-an EDNS feature.  Endless debate is avoided by supporting both views.
-
 =cut
 
-sub size {
+sub size {				## historical
 	my ( $self, @value ) = @_;
-	return $$self->edns->size(@value);
+	return $$self->edns->UDPsize(@value);
 }
 
 
@@ -431,7 +425,7 @@ sub size {
     $version = $header->edns->version;
     @options = $header->edns->options;
     $option  = $header->edns->option(n);
-    $udp_max = $packet->edns->size;
+    $udp_max = $packet->edns->UDPsize;
 
 Auxiliary function which provides access to the EDNS protocol
 extension OPT RR.
@@ -466,6 +460,14 @@ sub _ednsflag {
 		$flag &= $_;
 	}
 	return $flag ? 1 : 0;
+}
+
+
+my %warned;
+
+sub _warn {
+	my ( undef, @note ) = @_;
+	return carp "usage; @note" unless $warned{"@note"}++;
 }
 
 

@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Object::Pad;
 
@@ -39,7 +38,7 @@ class Point {
    my $p = Point3->new( 1, 2, 3 );
    $p->$Point3::clearer();
 
-   is_deeply( [ @$p ], [ 0, 0, 0 ],
+   is( [ @$p ], [ 0, 0, 0 ],
       'anon method' );
 }
 

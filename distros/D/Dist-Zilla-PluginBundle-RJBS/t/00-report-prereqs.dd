@@ -50,7 +50,7 @@ do { my $x = {
                                       'Pod::Weaver::Section::GenerateSection' => '0.000',
                                       'Sub::Exporter::ForMethods' => '0',
                                       'experimental' => '0',
-                                      'perl' => 'v5.20.0',
+                                      'perl' => 'v5.26.0',
                                       'utf8' => '0',
                                       'warnings' => '0'
                                     }

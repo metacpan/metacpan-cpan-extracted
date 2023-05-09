@@ -1,13 +1,24 @@
 Revision history for Hash-Util-Exists-Tiny
 
+0.07    2023/05/05
+        POD: minor fix
+
+0.06    2023/05/03
+        Added LICENSE file
+        POD, README: Removed link to cpanratings.perl.org
+
 0.05    2022/10/27
         Adapted META.yml
+
 0.04    2021/11/19
         Added functions defined_one_of, list_defined, num_defined
+
 0.03    2021/11/19
         Corrected license info
+
 0.02    2021/11/18
         Corrected MANIFEST; set minimal version of perl to 5.10
+
 0.01    2021/11/18
         First version, released on an unsuspecting world.
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::SIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SIG.pm 1898 2023-02-15 14:27:22Z willem $)[2];
+our $VERSION = (qw$Id: SIG.pm 1908 2023-03-15 07:28:50Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -54,7 +54,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$self->{sigbin} = substr $$data, $offset, $limit - $offset;
 
 	croak('misplaced or corrupt SIG') unless $limit == length $$data;
-	my $raw = substr $$data, 0, $self->{offset};
+	my $raw = substr $$data, 0, $self->{offset}++;
 	$self->{rawref} = \$raw;
 	return;
 }

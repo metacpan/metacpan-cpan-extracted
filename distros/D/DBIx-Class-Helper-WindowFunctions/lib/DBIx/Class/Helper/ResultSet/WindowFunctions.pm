@@ -2,14 +2,12 @@ package DBIx::Class::Helper::ResultSet::WindowFunctions;
 
 # ABSTRACT: (DEPRECATED) Add support for window functions to DBIx::Class
 
-use v5.10;
-
-use strict;
+use v5.14;
 use warnings;
 
 use parent 'DBIx::Class::Helper::WindowFunctions';
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 
 
 sub _resolved_attrs {
@@ -78,7 +76,7 @@ DBIx::Class::Helper::ResultSet::WindowFunctions - (DEPRECATED) Add support for w
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.0
 
 =head1 DESCRIPTION
 
@@ -105,7 +103,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

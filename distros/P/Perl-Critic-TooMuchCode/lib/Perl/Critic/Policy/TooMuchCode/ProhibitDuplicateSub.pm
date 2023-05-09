@@ -7,6 +7,20 @@ use parent 'Perl::Critic::Policy';
 sub default_themes       { return qw( bugs maintenance )     }
 sub applies_to           { return 'PPI::Document' }
 
+sub initialize_if_enabled {
+    my ($self, $config) = @_;
+
+    $self->{_allow_duplicates_for} = {
+        BEGIN     => 1,
+        UNITCHECK => 1,
+        CHECK     => 1,
+        INIT      => 1,
+        END       => 1,
+    };
+
+    return $TRUE;
+}
+
 sub violates {
     my ($self, undef, $doc) = @_;
     my $packages = $doc->find('PPI::Statement::Package') || [];
@@ -20,6 +34,7 @@ sub violates {
     my @duplicates;
     for my $sub (@$subdefs) {
         next if $sub->forward || (! $sub->name);
+        next if $self->{_allow_duplicates_for}{$sub->name};
 
         if (exists $seen{ $sub->name }) {
             push @duplicates, $seen{ $sub->name };

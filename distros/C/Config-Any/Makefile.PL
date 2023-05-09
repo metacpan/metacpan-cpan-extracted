@@ -14,7 +14,7 @@ my %META = (
         'Module::Pluggable::Object' => '3.6',
       },
       suggests => {
-        'Config::General'       => '2.47',
+        'Config::General'       => '2.48',
         'Config::Tiny'          => 0,
         'Cpanel::JSON::XS'      => 0,
         'XML::Simple'           => 0,
@@ -24,7 +24,7 @@ my %META = (
     },
     develop => {
       requires => {
-        'Config::General'       => '2.47',
+        'Config::General'       => '2.48',
         'Config::Tiny'          => 0,
         'Cpanel::JSON::XS'      => 0,
         'XML::Simple'           => 0,
@@ -37,8 +37,8 @@ my %META = (
   },
   resources => {
     repository => {
-      url => 'git://git.shadowcat.co.uk/p5sagit/Config-Any.git',
-      web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Config-Any.git;a=summary',
+      url => 'https://github.com/p5sagit/Config-Any.git',
+      web => 'https://github.com/p5sagit/Config-Any',
       type => 'git',
     },
     bugtracker => {
@@ -53,11 +53,7 @@ my %META = (
   x_authority => 'cpan:RATAXIS',
 );
 
-my %MM_ARGS = (
-  PREREQ_PM => {
-    (eval { require Config::General } ? ('Config::General' => '2.47') : ()),
-  },
-);
+my %MM_ARGS = ();
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;
@@ -78,6 +74,9 @@ $MM_ARGS{NO_MYMETA} = 1
   if $mymeta_broken;
 $MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
   unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
 
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';

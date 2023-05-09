@@ -272,8 +272,8 @@ sub get_whole {
 	my ($self) = @_;
 	my @all_lines;
 
-	if (   length $manage_files_by2->{_directory}
-		&& length $manage_files_by2->{_file_in}
+	if (  ( length $manage_files_by2->{_directory}
+		&& length $manage_files_by2->{_file_in})
 		or length $manage_files_by2->{_pathNfile} )
 	{
 		my $inbound;
@@ -287,14 +287,14 @@ sub get_whole {
 				$manage_files_by2->{_directory} . '/'
 			  . $manage_files_by2->{_file_in};
 
-			#			print("manage_files_by2, get_whole, $inbound\n");
+#			print("manage_files_by2, get_whole, $inbound\n");
 
 		}
 		elsif ( length $manage_files_by2->{_pathNfile} ) {
 
 			$inbound = $manage_files_by2->{_pathNfile};
 
-			#				print("manage_files_by2, get_whole, $inbound\n");
+#			print("manage_files_by2, get_whole, $inbound\n");
 
 		}
 		else {

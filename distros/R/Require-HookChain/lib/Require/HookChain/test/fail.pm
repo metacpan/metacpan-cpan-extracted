@@ -9,7 +9,7 @@ package Require::HookChain::test::fail;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-12'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -38,7 +38,7 @@ Require::HookChain::test::fail - Always fail a module loading
 
 =head1 VERSION
 
-This document describes version 0.009 of Require::HookChain::test::fail (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.011 of Require::HookChain::test::fail (from Perl distribution Require-HookChain), released on 2023-02-12.
 
 =head1 SYNOPSIS
 
@@ -61,9 +61,7 @@ Source repository is at L<https://github.com/perlancar/perl-Require-HookChain>.
 
 =head1 SEE ALSO
 
-Other L<Require::HookChain::*> hooks.
-
-L<Require::HookChain>
+L<Require::HookChain::test::random_fail>
 
 =head1 AUTHOR
 

@@ -100,6 +100,7 @@ subtest 'Build a basic dist' => sub {
        't/00-report-prereqs.dd',
        't/author-pod-coverage.t',
        't/author-pod-syntax.t',
+       't/release-has-version.t',
      ], "Gathered the files we expect";
 
     my $built = $tzil->slurp_file('build/lib/External/Package.pm');
@@ -225,6 +226,7 @@ subtest 'NextVersion' => sub {
         # XXX: NextVersion won't work but ChangelogFromGit::CPAN::Changes will
         [ '0.90'                => 'v0.0.2' ],
         [ 'v1.2.3.4'            => 'v1.2.4' ],
+        [ 'release/v2.30.0'     => 'v2.30.1' ],
         [ 'dist/v2.31.1.2/prod' => 'v2.31.2' ],
     );
 
@@ -318,19 +320,21 @@ subtest 'NextVersion' => sub {
     # I don't know why "init" and "v0.0.1" changes are in the wrong release.
     my %expect = (
         'Changelog for Versioned' => [],
-        'v0.0.1'                  => ['No changes found'],
-        '0.90'                    => [
-            'Changes for 0.90',
+        'v0.0.1'                  => [
             'Changes for v0.0.1',
             'init',
         ],
+        '0.90'                    => [
+            'Changes for 0.90',
+        ],
         'v1.2.3.4'                => [
             'Changes for v1.2.3.4',
-            'Changes for 0.90',
+        ],
+        'v2.30.0'                 => [
+            'Changes for release/v2.30.0',
         ],
         'v2.31.1.2'               => [
             'Changes for dist/v2.31.1.2/prod',
-            'Changes for v1.2.3.4',
         ],
         'v3.0.0' => ['No changes found'],
         'v4.0.0' => [
@@ -338,7 +342,6 @@ subtest 'NextVersion' => sub {
             'Merge remote-tracking branch \'origin/stage\' into prod',
             'Merge remote-tracking branch \'origin/test\' into stage',
             'Merge remote-tracking branch \'origin/master\' into test',
-            'Changes for dist/v2.31.1.2/prod'
         ]
     );
 

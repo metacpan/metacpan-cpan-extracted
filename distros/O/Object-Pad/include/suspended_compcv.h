@@ -11,6 +11,13 @@ typedef struct {
   bool cv_has_eval, pad_reset_pending;
 } SuspendedCompCVBuffer;
 
+/* perl 5.37.9 defined a set of these but they will collide with ours. we
+ * should keep ours separate for now
+ */
+#undef suspend_compcv
+#undef resume_compcv
+#undef resume_compcv_and_save
+
 #define suspend_compcv(buffer)  MY_suspend_compcv(aTHX_ buffer)
 void MY_suspend_compcv(pTHX_ SuspendedCompCVBuffer *buffer);
 

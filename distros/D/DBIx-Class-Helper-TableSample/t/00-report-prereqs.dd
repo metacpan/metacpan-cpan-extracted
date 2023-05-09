@@ -30,7 +30,7 @@ do { my $x = {
                                       'DBIx::Class::ResultSet' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => 'v5.10.1'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {

@@ -12,21 +12,32 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.006',
     BUILD_REQUIRES => {
         'Test::More' => '0',
-	'Test::Exception' => '0',
+        'Test::Exception' => '0',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     EXE_FILES => [
-	'bin/idoit-reports',
+        'bin/idoit-reports',
     ],
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'https://github.com/matwei-perl/WebService-IdoitAPI.git',
+                web => 'https://github.com/matwei-perl/WebService-IdoitAPI',
+            },
+        },
+    },
     TEST_REQUIRES => {
         'Test::More' => '0',
-	'Test::Exception' => '0',
+        'Test::Exception' => '0',
+        'IO::ScalarArray' => '0',
     },
     PREREQ_PM => {
-	'JSON::RPC::Legacy::Client' => 0,
-	'Text::CSV' => 0,
+        'JSON::RPC::Legacy::Client' => 0,
+        'Text::CSV' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WebService-IdoitAPI-*' },

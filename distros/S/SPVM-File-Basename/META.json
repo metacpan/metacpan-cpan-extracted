@@ -1,10 +1,10 @@
 {
-   "abstract" : "Parsing File Path into Directory and Base Name.",
+   "abstract" : "Parsing File Path into Directory and Base Name",
    "author" : [
-      "USER_NAME<USER_MAIL>"
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,14 +27,14 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9695"
+            "SPVM" : "0.976"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9695",
-            "SPVM::Regex" : "0.17",
-            "SPVM::Sys" : "0.43"
+            "SPVM" : "0.976",
+            "SPVM::Regex" : "0.241002",
+            "SPVM::Sys" : "0.481"
          }
       },
       "test" : {
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Basename"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.041",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.28
+    version 2.30
 
 SYNOPSIS
 
@@ -571,7 +571,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2018 by Apocalypse, Chris Williams,
+    This software is copyright (c) 2023 by Apocalypse, Chris Williams,
     Eriam Schaffter, Marlon Bailey and Philip Gwyn.
 
     This is free software; you can redistribute it and/or modify it under

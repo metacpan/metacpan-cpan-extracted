@@ -2,7 +2,7 @@ package Net::DNS::RR::DNSKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DNSKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: DNSKEY.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -24,8 +24,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
-	$self->{keybin} = unpack '@4 a*', $rdata;
-	@{$self}{qw(flags protocol algorithm)} = unpack 'n C*', $rdata;
+	@{$self}{qw(flags protocol algorithm keybin)} = unpack 'n C2 a*', $rdata;
 	return;
 }
 
@@ -40,11 +39,14 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $algorithm = $self->{algorithm};
-	$self->_annotation( 'Key ID =', $self->keytag ) if $algorithm;
-	return $self->SUPER::_format_rdata() unless BASE64;
-	my @param = ( @{$self}{qw(flags protocol)}, $algorithm );
-	my @rdata = ( @param, split /\s+/, MIME::Base64::encode( $self->{keybin} ) || '-' );
+	my @rdata = @{$self}{qw(flags protocol algorithm)};
+	if ( my $keybin = $self->keybin ) {
+		$self->_annotation( 'Key ID =', $self->keytag );
+		return $self->SUPER::_format_rdata() unless BASE64;
+		push @rdata, split /\s+/, MIME::Base64::encode($keybin);
+	} else {
+		push @rdata, '""';
+	}
 	return @rdata;
 }
 
@@ -52,11 +54,11 @@ sub _format_rdata {			## format rdata portion of RR string.
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my ( $self, @argument ) = @_;
 
-	my $flags = shift @argument;	## avoid destruction by CDNSKEY algorithm(0)
+	$self->flags( shift @argument );
 	$self->protocol( shift @argument );
-	$self->algorithm( shift @argument );
-	$self->key(@argument);
-	$self->flags($flags);
+	my $algorithm = shift @argument;
+	$self->key(@argument) if $algorithm;
+	$self->algorithm($algorithm);
 	return;
 }
 
@@ -64,9 +66,9 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
-	$self->algorithm(1);
 	$self->flags(256);
 	$self->protocol(3);
+	$self->algorithm(1);
 	$self->keybin('');
 	return;
 }
@@ -81,37 +83,37 @@ sub flags {
 
 sub zone {
 	my ( $self, @value ) = @_;
-	if ( scalar @value ) {
-		for ( $self->{flags} ) {
-			$_ = 0x0100 | ( $_ || 0 );
+	for ( $self->{flags} |= 0 ) {
+		if ( scalar @value ) {
+			$_ |= 0x0100;
 			$_ ^= 0x0100 unless shift @value;
 		}
 	}
-	return 0x0100 & ( $self->{flags} || 0 );
+	return $self->{flags} & 0x0100;
 }
 
 
 sub revoke {
 	my ( $self, @value ) = @_;
-	if ( scalar @value ) {
-		for ( $self->{flags} ) {
-			$_ = 0x0080 | ( $_ || 0 );
+	for ( $self->{flags} |= 0 ) {
+		if ( scalar @value ) {
+			$_ |= 0x0080;
 			$_ ^= 0x0080 unless shift @value;
 		}
 	}
-	return 0x0080 & ( $self->{flags} || 0 );
+	return $self->{flags} & 0x0080;
 }
 
 
 sub sep {
 	my ( $self, @value ) = @_;
-	if ( scalar @value ) {
-		for ( $self->{flags} ) {
-			$_ = 0x0001 | ( $_ || 0 );
+	for ( $self->{flags} |= 0 ) {
+		if ( scalar @value ) {
+			$_ |= 0x0001;
 			$_ ^= 0x0001 unless shift @value;
 		}
 	}
-	return 0x0001 & ( $self->{flags} || 0 );
+	return $self->{flags} & 0x0001;
 }
 
 
@@ -202,7 +204,7 @@ sub keylength {
 sub keytag {
 	my $self = shift;
 
-	my $keybin = $self->keybin || return 0;
+	my $keybin = $self->{keybin} || return;
 
 	# RFC4034 Appendix B.1: most significant 16 bits of least significant 24 bits
 	return unpack 'n', substr $keybin, -3 if $self->{algorithm} == 1;

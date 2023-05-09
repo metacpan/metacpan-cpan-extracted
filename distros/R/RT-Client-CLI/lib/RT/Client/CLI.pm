@@ -3,7 +3,7 @@ package RT::Client::CLI;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '5.0.3';
+our $VERSION = '5.0.4';
 
 1;
 __END__
@@ -32,7 +32,7 @@ version from which the included commands were extracted.
 
 =head1 COPYRIGHT
 
-Copyright 2014-2022 by Best Practical Solutions, LLC
+Copyright 2023 by Best Practical Solutions, LLC
 
 =head1 LICENSE
 

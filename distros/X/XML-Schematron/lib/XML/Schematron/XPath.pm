@@ -64,7 +64,6 @@ sub verify {
 
 1;
 __END__
-# Below is the stub of documentation for your module. You better edit it!
 
 =head1 NAME
 
@@ -94,17 +93,18 @@ XML::Schematron::XPath - Perl extension for validating XML with XPath expression
 XML::Schematron::XPath serves as a simple validator for XML based on Rick JELLIFFE's Schematron XSLT script. A Schematron
 schema defines a set of rules in the XPath language that are used to examine the contents of an XML document tree.
 
-A simplified example: 
- <?xml version="1.0"?>
- <schema>
-  <pattern>
-   <rule context="page">
-    <assert test="count(*)=count(title|body)">The page element may only contain title or body elements.</assert> 
-    <assert test="@name">A page element must contain a name attribute.</assert> 
-    <report test="string-length(@name) &lt; 5">A page element name attribute must be at least 5 characters long.</report> 
-   </rule>
-  </pattern>
- </schema>
+A simplified example:
+
+    <?xml version="1.0"?>
+    <schema>
+     <pattern>
+      <rule context="page">
+       <assert test="count(*)=count(title|body)">The page element may only contain title or body elements.</assert> 
+       <assert test="@name">A page element must contain a name attribute.</assert> 
+       <report test="string-length(@name) &lt; 5">A page element name attribute must be at least 5 characters long.</report> 
+      </rule>
+     </pattern>
+    </schema>
 
 Note that an 'assert' rule will return if the result of the test expression is I<not> true, while a 'report' rule will return
 only if the test expression evalutes to true.
@@ -115,7 +115,8 @@ only if the test expression evalutes to true.
 
 =item add_test(\%args);
 
-The add_test() method allows you push additional a additional test on to the stack before validation. This method's argument must be an XML::Schematron::Test object or a hash reference with the following structure:
+The C<add_test()> method allows you push additional a additional test on to the stack before validation.
+This method's argument must be an C<XML::Schematron::Test> object or a hash reference with the following structure:
 
 Arguments for this method:
 
@@ -153,17 +154,18 @@ Example:
                  type => 'assert',
                  pattern => 'Basic tests'});
 
-Note that add_test() pushes a new test on to the existing test list, while tests() redefines the entire list.
+Note that C<add_test()> pushes a new test on to the existing test list, while C<tests()> redefines the entire list.
 
 =back
 
 =item add_tests( @tests );
 
-The add_tests() method allows you push an additional list of tests on to the stack before validation. Each element must be an XML::Schematron::Test object or a hash reference. See above for the list of key/value pairs expected if hashrefs are used.
+The C<add_tests()> method allows you push an additional list of tests on to the stack before validation.
+Each element must be an XML::Schematron::Test object or a hash reference. See above for the list of key/value pairs expected if hashrefs are used.
 
 =item verify('my_xml_file.xml' or $some_xml_string)
 
-The verify() method takes the path to the XML document that you wish to validate, or a scalar containing the entire document
+The C<verify()> method takes the path to the XML document that you wish to validate, or a scalar containing the entire document
 as a string, as its sole argument. It returns the messages  that are returned during validation. When called in an array
 context, this method returns an array of the messages generated during validation. When called in a scalar context, this
 method returns a concatenated string of all output.
@@ -188,8 +190,8 @@ under the same terms as Perl itself.
 =head1 SEE ALSO
 
 For information about Schematron, sample schemas, and tutorials to help you write your own schmemas, please visit the
-Schematron homepage at: http://www.ascc.net/xml/resource/schematron/
+Schematron homepage at: L<https://www.schematron.com/>
 
-For detailed information about the XPath syntax, please see the W3C XPath Specification at: http://www.w3.org/TR/xpath.html 
+For detailed information about the XPath syntax, please see the W3C XPath Specification at: L<http://www.w3.org/TR/xpath.html>
 
 =cut

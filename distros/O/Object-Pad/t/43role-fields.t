@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Object::Pad;
 
@@ -20,7 +19,7 @@ class AClass :does(ARole) {
 
 {
    my $obj = AClass->new;
-   isa_ok( $obj, "AClass", '$obj' );
+   isa_ok( $obj, [ "AClass" ], '$obj' );
 
    is( $obj->one, 1, 'AClass has a ->one method' );
    is( $obj->two, 2, 'AClass has a ->two method' );

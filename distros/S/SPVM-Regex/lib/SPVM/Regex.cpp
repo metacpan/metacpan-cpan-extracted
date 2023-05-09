@@ -61,8 +61,6 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t e = 0;
   
-  int32_t items = env->get_args_stack_length(env, stack);
-  
   void* obj_self = stack[0].oval;
   
   void* obj_string = stack[1].oval;
@@ -80,13 +78,7 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The string offset must be greater than or equal to 0", __func__, FILE_NAME, __LINE__);
   }
   
-  int32_t length;
-  if (items > 3) {
-    length = stack[3].ival;
-  }
-  else {
-    length = -1;
-  }
+  int32_t length = stack[3].ival;
   
   if (length < 0) {
     length = string_length - offset;
@@ -113,17 +105,22 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
   std::vector<re2::StringPiece> submatch(doller0_and_captures_length);
   int32_t match = re2->Match(stp_string, offset, offset + length, re2::RE2::Anchor::UNANCHORED, submatch.data(), doller0_and_captures_length);
   
+  void* obj_regex_match = NULL;
   if (match) {
+    int32_t success = 1;
+    int32_t match_start = -1;
+    int32_t match_length = -1;
+    void* obj_captures = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, doller0_and_captures_length);
+    if (!obj_captures) {
+      return env->die(env, stack, "Captures can't be created", __func__, FILE_NAME, __LINE__);; 
+    }
+    
     // Captures
     {
-      void* obj_captures = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, doller0_and_captures_length);
-      if (!obj_captures) {
-        return env->die(env, stack, "Captures can't be created", __func__, FILE_NAME, __LINE__);; 
-      }
       for (int32_t i = 0; i < doller0_and_captures_length; ++i) {
         if (i == 0) {
-          int32_t match_start = (submatch[0].data() - string);
-          int32_t match_length = submatch[0].length();
+          match_start = (submatch[0].data() - string);
+          match_length = submatch[0].length();
           
           env->set_field_int_by_name(env, stack, obj_self, "match_start", match_start, &e, __func__, FILE_NAME, __LINE__);
           if (e) { return e; }
@@ -140,14 +137,32 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
       if (e) { return e; }
     }
     
+    {
+      stack[0].ival = success;
+      stack[1].oval = obj_captures;
+      stack[2].ival = match_start;
+      stack[3].ival = match_length;
+      
+      e = env->call_class_method_by_name(env, stack, "Regex::Match", "_new", 4, __func__, FILE_NAME, __LINE__);
+      if (e) { return e; }
+      
+      obj_regex_match = stack[0].oval;
+      
+      int32_t ref_count = env->get_ref_count(env, stack, obj_regex_match);
+      
+      if (ref_count == 0) {
+        env->push_mortal(env, stack, obj_regex_match);
+      }
+    }
+    
     // Next offset
     int32_t next_offset = (submatch[0].data() - string) + submatch[0].length();
     *offset_ref = next_offset;
     
-    stack[0].ival = 1;
+    stack[0].oval = obj_regex_match;
   }
   else {
-    stack[0].ival = 0;
+    stack[0].oval = obj_regex_match;
   }
   
   return 0;

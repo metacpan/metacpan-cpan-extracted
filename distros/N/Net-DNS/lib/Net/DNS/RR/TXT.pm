@@ -2,7 +2,7 @@ package Net::DNS::RR::TXT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TXT.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: TXT.pm 1911 2023-04-17 12:30:59Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -74,7 +74,7 @@ sub txtdata {
 }
 
 
-sub char_str_list { return (&txtdata); }			# uncoverable pod
+sub char_str_list { return my @txt = &txtdata }			# uncoverable pod
 
 
 1;

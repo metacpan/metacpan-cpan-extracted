@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental(init_expr)';
 
@@ -37,9 +37,9 @@ class Counter {
       has %hash   = ( 89 => 10 );
 
       method test {
-         Test::More::is( $scalar, 123, '$scalar field' );
-         Test::More::is_deeply( \@array, [ 45, 67 ], '@array field' );
-         Test::More::is_deeply( \%hash, { 89 => 10 }, '%hash field' );
+         ::is( $scalar, 123, '$scalar field' );
+         ::is( \@array, [ 45, 67 ], '@array field' );
+         ::is( \%hash, { 89 => 10 }, '%hash field' );
       }
    }
 
@@ -74,7 +74,7 @@ class Counter {
    seq("new");
    Sequencing->new->test;
 
-   is_deeply( \@order, [qw( start class new construct )],
+   is( \@order, [qw( start class new construct )],
       'seq() calls happened in the correct order' );
 }
 

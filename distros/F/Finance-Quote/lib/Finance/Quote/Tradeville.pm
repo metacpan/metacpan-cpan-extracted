@@ -25,7 +25,7 @@ use if DEBUG, 'Smart::Comments';
 use LWP::UserAgent;
 use Web::Scraper;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 my $TRADEVILLE_URL = 'https://tradeville.ro/actiuni/actiuni-';
 

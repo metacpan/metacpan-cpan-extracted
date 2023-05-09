@@ -32,7 +32,7 @@ package Rex::Commands::Pkg;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Pkg;
 use Rex::Logger;
@@ -261,7 +261,7 @@ This gets executed right after the new package was installed. All original param
 This hook is only available for package installations. If you need file hooks, you have to use the L<file()|Rex::Commands::File#file> function.
 
 =item after
- 
+
 This gets executed right before the C<install()> function returns. All original parameters, and any returned results are passed to it.
 
 =back

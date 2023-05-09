@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 37-NSEC3-encloser.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 37-NSEC3-encloser.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -41,6 +41,7 @@ my $nextcloser;
 my $wildcard;
 foreach my $nsec3 (@nsec3) {
 	for ( $nsec3->encloser('a.c.x.w.example') ) {
+		next unless $nsec3->match($_);
 		next if $encloser && length($encloser) > length;
 		$encloser   = $_;
 		$nextcloser = $nsec3->nextcloser;

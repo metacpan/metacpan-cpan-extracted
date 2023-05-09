@@ -2,7 +2,7 @@ package Geo::FIT;
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 =encoding utf-8
 
@@ -49,7 +49,6 @@ The module also provides a script to read and print the contents of FIT files (L
 =cut
 
 use Carp qw/ croak /;
-use Clone;
 use FileHandle;
 use POSIX qw(BUFSIZ);
 use Time::Local;
@@ -6708,6 +6707,8 @@ The main use for c<clone()> is immediately after C<new()>, and C<file()>, to cre
 
 sub clone {
     my $self = shift;
+
+    require Clone;
     my $clone = Clone::clone( $self );
     return $clone
 }
@@ -6715,84 +6716,6 @@ sub clone {
 =head2 Class methods
 
 =over 4
-
-=item message_name(I<message spec>)
-
-returns the message name for I<message spec> or undef.
-
-=item message_number(I<message spec>)
-
-returns the message number for I<message spec> or undef.
-
-=back
-
-=cut
-
-sub message_name {
-    my ($self, $mspec) = @_;
-    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
-
-    if (ref $msgtype eq 'HASH') {
-        $msgtype->{_name};
-    } else {
-        undef;
-    }
-}
-
-sub message_number {
-    my ($self, $mspec) = @_;
-    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
-
-    if (ref $msgtype eq 'HASH') {
-        $msgtype->{_number};
-    } else {
-        undef;
-    }
-}
-
-=over 4
-
-=item field_name(I<message spec>, I<field spec>)
-
-returns the field name for I<field spec> in I<message spec> or undef.
-
-=item field_number(I<message spec>, I<field spec>)
-
-returns the field index for I<field spec> in I<message spec> or undef.
-
-=back
-
-=cut
-
-sub field_name {
-    my ($self, $mspec, $fspec) = @_;
-    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
-
-    if (ref $msgtype eq 'HASH') {
-        my $flddesc = $msgtype->{$fspec};
-        ref $flddesc eq 'HASH'
-            and return $flddesc->{name};
-    }
-    undef;
-}
-
-sub field_number {
-    my ($self, $mspec, $fspec) = @_;
-    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
-
-    if (ref $msgtype eq 'HASH') {
-        my $flddesc = $msgtype->{$fspec};
-        ref $flddesc eq 'HASH'
-            and return $flddesc->{number};
-    }
-    undef;
-}
-
-=over 4
-
-=item protocol_version_string()
-
-returns a string representing the .FIT protocol version on which this class based.
 
 =item profile_version_string()
 
@@ -6803,7 +6726,8 @@ returns a string representing the .FIT profile version on which this class based
 =cut
 
 my $profile_current  = '21.107';
-my $protocol_current = '2.3';       # is there such a thing as current protocol?
+my $protocol_current = '2.3';       # is there such a thing as current protocol for the class?
+                                    # don't think so, pod was removed for protocol_* above
 
 my $protocol_version_major_shift = 4;
 my $protocol_version_minor_mask  = (1 << $protocol_version_major_shift) - 1;
@@ -6900,6 +6824,7 @@ for ($i = 0 ; $i < 2 ** 8 ; ++$i) {
     $crc_table[$i] = $r;
 }
 
+# delete
 sub dump {
     my ($self, $s, $fh) = @_;
     my ($i, $d);
@@ -6908,10 +6833,13 @@ sub dump {
     }
 }
 
+# delete
 sub safe_isa {
     eval {$_[0]->isa($_[1])};
 }
 
+# make internal
+# move to a section on internal accessors
 sub file_read {
     my $self = shift;
     if (@_) {
@@ -6921,6 +6849,8 @@ sub file_read {
     }
 }
 
+# make internal (or add POD)
+# move to a section on internal accessors (or to object methods)
 sub file_size {
     my $self = shift;
     if (@_) {
@@ -6930,6 +6860,8 @@ sub file_size {
     }
 }
 
+# make internal (or add POD)
+# move to a section on internal accessors (or to object methods)
 sub file_processed {
     my $self = shift;
     if (@_) {
@@ -6939,6 +6871,8 @@ sub file_processed {
     }
 }
 
+# make internal
+# move to a section on internal accessors
 sub offset {
     my $self = shift;
     if (@_) {
@@ -6948,6 +6882,8 @@ sub offset {
     }
 }
 
+# make internal
+# move to a section on internal accessors
 sub buffer {
     my $self = shift;
     if (@_) {
@@ -6957,6 +6893,8 @@ sub buffer {
     }
 }
 
+# make internal
+# move to a section on internal accessors
 sub maybe_chained {
     my $self = shift;
     if (@_) {
@@ -6966,6 +6904,8 @@ sub maybe_chained {
     }
 }
 
+# make internal
+# move to a section on internal methods
 sub clear_buffer {
     my $self = shift;
     if ($self->offset > 0) {
@@ -6982,9 +6922,9 @@ sub clear_buffer {
 
 =over 4
 
-=item file(I<file name>)
+=item file( $filename )
 
-sets the name I<file name> of a .FIT file.
+returns the name of a .FIT file. Sets the name to I<$filename> if called with an argument (raises an exception if the file does not exist).
 
 =back
 
@@ -6993,10 +6933,11 @@ sets the name I<file name> of a .FIT file.
 sub file {
     my $self = shift;
     if (@_) {
-        $self->{file} = $_[0];
-    } else {
-        $self->{file};
+        my $fname = $_[0];
+        croak "file $fname specified in file() does not exist: $!" unless -f $fname;
+        $self->{file} = $fname
     }
+    return $self->{file}
 }
 
 =over 4
@@ -7030,6 +6971,8 @@ sub open {
     }
 }
 
+# make internal
+# move to a section on internal accessors
 sub fh {
     my $self = shift;
     if (@_) {
@@ -7039,6 +6982,8 @@ sub fh {
     }
 }
 
+# make internal
+# move to a section on internal accessors
 sub EOF {
     my $self = shift;
     if (@_) {
@@ -7048,6 +6993,8 @@ sub EOF {
     }
 }
 
+# make internal
+# move to a section on internal accessors
 sub end_of_chunk {
     my $self = shift;
     if (@_) {
@@ -7057,6 +7004,8 @@ sub end_of_chunk {
     }
 }
 
+# make internal
+# move to a section on internal functions
 sub fill_buffer {
     my $self = shift;
     my $buffer = $self->buffer;
@@ -7088,6 +7037,7 @@ sub fill_buffer {
     return 1
 }
 
+# move to a section on internal functions
 sub _buffer_needs_updating {
     my ($self, $bytes_needed) = @_;
     my ($buffer, $offset) = ($self->buffer, $self->offset);     # easier to debug with variables
@@ -7633,7 +7583,7 @@ sub syscallback_devdata_field_desc {
         $emsg = "field_name is not a non-empty string";
         $warn = 1;
     } else {
-        $o_name = $self->string_value($v, $i_field_name, $c_field_name);
+        $o_name = _string_value($v, $i_field_name, $c_field_name);
     }
 
     if ($emsg ne '') {
@@ -7725,7 +7675,7 @@ sub syscallback_devdata_field_desc {
             my $c_aname = 'c_' . $aname;
 
             if ($desc->{$T_aname} == FIT_STRING) {
-                $fdesc{$aname} = $self->string_value($v, $i, $desc->{$c_aname});
+                $fdesc{$aname} = _string_value($v, $i, $desc->{$c_aname});
             } elsif ($v->[$i] != $desc->{$I_aname}) {
                 $fdesc{$aname} = $v->[$i];
             }
@@ -8087,18 +8037,8 @@ sub switched {
     $attr;
 }
 
-=over 4
-
-=item string_value(I<array of values>, I<offset in the array>, I<counts>)
-
-converts an array of character codes to a Perl string.
-
-=back
-
-=cut
-
-sub string_value {
-    my ($self, $v, $i, $n) = @_;
+sub _string_value {
+    my ($v, $i, $n) = @_;           # array of values, offset, count
     my $j;
 
     for ($j = 0 ; $j < $n ; ++$j) {
@@ -8127,10 +8067,10 @@ sub value_processed {
                     $scale += $scale1;
                 }
                 $num -= $offset1 if $offset1;
-                $unit = $unit1 if $unit1 ne '';
+                $unit = $unit1   if defined $unit1
             }
 
-            if ($scale > 0) {
+            if (defined $scale and $scale > 0) {
                 my $below_pt = int(log($scale + 9) / log(10));
 
                 if ($self->without_unit) {
@@ -8161,15 +8101,15 @@ sub value_unprocessed {
         my ($unit, $offset, $scale) = @{$attr}{qw(unit offset scale)};
         my $num = $str;
 
-        if ($unit ne '') {
+        if (defined $unit) {
             my $unit_tab = $self->unit_table($unit);
 
             if (ref $unit_tab eq 'HASH') {
                 my ($unit1, $offset1, $scale1) = @{$unit_tab}{qw(unit offset scale)};
 
-                $scale += $scale1 if $scale1 > 0;
+                $scale  += $scale1  if defined $scale1 and $scale1 > 0;
                 $offset += $offset1 if $offset1;
-                $unit = $unit1 if $unit1 ne '';
+                $unit    = $unit1   if defined $unit1
             }
 
             length($num) >= length($unit) && substr($num, -length($unit)) eq $unit
@@ -8177,7 +8117,7 @@ sub value_unprocessed {
         }
 
         $num += $offset if $offset;
-        $num *= $scale if $scale > 0;
+        $num *= $scale  if defined $scale and $scale > 0;
         $num;
     } else {
         $str;
@@ -8186,34 +8126,64 @@ sub value_unprocessed {
 
 =over 4
 
-=item field_list( I<$descriptor> )
+=item fields_list( $descriptor [, keep_unknown => $boole )
 
-Given a data message descriptor, returns the list of fields described in it.
+Given a data message descriptor (I<$descriptor>), returns the list of fields described in it. If C<keep_unknown> is set to true, unknown field names will also be listed.
 
 =back
 
 =cut
 
-sub field_list {
-    my ($self, $desc) = @_;
-    croak "argument to field_list() does not look like a data descriptor hash" if ref $desc ne 'HASH';
+sub fields_list {
+    my ($self, $desc) = (shift, shift);
+    my %opts = @_;
+    croak "argument to fields_list() does not look like a data descriptor hash" if ref $desc ne 'HASH';
 
-    my (@fields, @fields_sorted, @keys);
-    @keys   = grep /^\d+/, keys %$desc;
-    @fields = @$desc{ @keys };
+    my (@keys, %fields, @fields);
 
-    for my $field (@fields) {           # sort for easy comparison with values aref passed to callbacks
-        my $index = $desc->{'i_' . $field} - 1;
-        $fields_sorted[$index ] = $field
+    @keys = grep /^i_/, keys %$desc;
+    @keys = grep !/^i_unknown/, @keys unless $opts{keep_unknown};
+
+    # %fields = %$desc{ @keys };
+    for my $key (@keys) {                   # hash slices not supported in versions prior to 5.20
+        $fields{$key} = $desc->{$key};
     }
-    return @fields_sorted
+
+    # sort for easy comparison with values aref passed to callbacks
+    @fields = sort { $fields{$a} <=> $fields{$b} } keys %fields;
+    map s/^i_//, @fields;
+    return @fields
 }
+
+=over 4
+
+=item fields_defined( $descriptor, $values )
+
+Given a data message descriptor (I<$descriptor>) and a corresponding data array reference of values (I<$values>), returns the list of fields whose value is defined. Unknow field names are never listed.
+
+=back
+
+=cut
+
+sub fields_defined {
+    my ($self, $descriptor, $values) = @_;
+
+    my @fields = $self->fields_list( $descriptor );
+
+    my @defined;
+    for my $field (@fields) {
+        my $index = $descriptor->{ 'i_' . $field };
+        push @defined, $field if $values->[ $index ] != $descriptor->{'I_' . $field}
+    }
+    return @defined
+}
+
 
 =over 4
 
 =item field_value( I<$field>, I<$descriptor>, I<$values> )
 
-Returns the value the field named I<$field> (a string).
+Returns the value of the field named I<$field> (a string).
 
 The other arguments consist of the data message descriptor (I<$descriptor>, a hash reference) and the values fetched from a data message (I<$values>, an array reference). These are simply the references passed to data message callbacks by C<fetch()>, if any are registered, and are simply to be passed on to this method (please do not modifiy them).
 
@@ -8235,64 +8205,86 @@ For example, we can define and register a callback for C<file_id> data messages 
 =cut
 
 sub field_value {
-    my ($self, $field_name, $descriptor, $values) = @_;
+    my ($self, $field_name, $descriptor, $values_aref) = @_;
 
     my @keys = map $_ . $field_name, qw( t_ a_ I_ );
-    my ($type_name, $attr, $invalid, $val) =
-                ( @{$descriptor}{ @keys }, $values->[ $descriptor->{'i_' . $field_name} ] );
+    my ($type_name, $attr, $invalid, $value) =
+                ( @{$descriptor}{ @keys }, $values_aref->[ $descriptor->{'i_' . $field_name} ] );
 
-    my $value = $val;
-    if ($val != $invalid) {
+    if (defined $attr->{switch}) {
+        my $t_attr = $self->switched($descriptor, $values_aref, $attr->{switch});
+        if (ref $t_attr eq 'HASH') {
+            $attr      = $t_attr;
+            $type_name = $attr->{type_name}
+        }
+    }
+
+    my $ret_val = $value;
+    if ($value != $invalid) {
         if (defined $type_name) {
-            $value = $self->named_type_value($type_name, $val);
-            return $value if defined $value
+            $ret_val = $self->named_type_value($type_name, $value);
+            return $ret_val if defined $ret_val
         }
 
         if (ref $attr eq 'HASH') {
-            $value = $self->value_processed($val, $attr)
+            $ret_val = $self->value_processed($value, $attr)
         }
     }
-    return $value
+    return $ret_val
 }
 
 =over 4
 
-=item field_value_as_read( I<$field>, I<$descriptor>, I<$value> [, $type ] )
+=item field_value_as_read( I<$field>, I<$descriptor>, I<$value> [, $type_name_or_aref ] )
 
-Convert the value parsed and returned by C<field_value()> back to what it was when read from the FIT file and returns it.
+Converts the value parsed and returned by C<field_value()> back to what it was when read from the FIT file and returns it.
 
-This method is mostly for developers or if there is a particular need to inspect the data more closely, it should be seldomly used. Arguments are similar to C<field_value()>, except for the last one, which should be a single value (not a reference) corresponding to the value the former method has or would return.
+This method is mostly for developers or if there is a particular need to inspect the data more closely, it should seldomly be used. Arguments are similar to C<field_value()> except that a single value I<$value> is passed instead of an array reference. That value corresponds to the value the former method has or would have returned.
 
-If I<$value> was obtained from a call to C<named_type_value()> after having provided an explicit named type derived from C<switch()>, that named type needs to be provided as a fourth argument.
-
-As an example, we can obtain the actual value recorded in the FIT file for the manufacturer by adding these to the callback defined above:
+As an example, we can obtain the actual value recorded in the FIT file for the manufacturer by adding these lines to the callback defined above:
 
         my $as_read = $self->field_value_as_read( 'manufacturer', $descriptor, $value );
         print "The manufacturer's value as recorded in the FIT file is: ", $as_read, "\n"
+
+The method will raise an exception if I<$value> would have been obtained by C<field_value()> via an internal call to C<switched()>. In that case, the type name or the original array reference of values that was passed to the callback must be provided as the last argument. Otherwise, there is no way to guess what the value read from the file may have been.
 
 =back
 
 =cut
 
 sub field_value_as_read {
-    my ($self, $field_name, $descriptor, $val, $type_name_switched) = @_;
+    my ($self, $field_name, $descriptor, $value, $optional_last_arg) = @_;
 
     my @keys = map $_ . $field_name, qw( t_ a_ I_ );
     my ($type_name, $attr, $invalid) = ( @{$descriptor}{ @keys } );
-    $type_name = $type_name_switched if defined $type_name_switched;
 
-    my $value = $val;
-    if ($val !~ /^[-+]?\d+$/) {
-        if ($type_name ne '') {
-            my $value = $self->named_type_value($type_name, $val);
-            return $value if defined $value
+    if (defined $attr->{switch}) {
+
+        my $croak_msg = 'this field\'s value was derived from a call to switched(), please provide as the ';
+        $croak_msg   .= 'last argument the type name or the array reference containing the original values';
+        croak $croak_msg unless defined $optional_last_arg;
+
+        if (ref $optional_last_arg eq 'ARRAY') {
+            my $t_attr = $self->switched($descriptor, $optional_last_arg, $attr->{switch});
+            if (ref $t_attr eq 'HASH') {
+                $attr      = $t_attr;
+                $type_name = $attr->{type_name}
+            }
+        } else { $type_name = $optional_last_arg }
+    }
+
+    my $ret_val = $value;
+    if ($value !~ /^[-+]?\d+$/) {
+        if (defined $type_name ) {
+            my $ret_val = $self->named_type_value($type_name, $value);
+            return $ret_val if defined $ret_val
         }
 
         if (ref $attr eq 'HASH') {
-            $value = $self->value_unprocessed($val, $attr)
+            $ret_val = $self->value_unprocessed($value, $attr)
         }
     }
-    return $value
+    return $ret_val
 }
 
 =over 4
@@ -8483,14 +8475,16 @@ sub print_all_fields {
         }
 
         if ($j < $c || !$skip_invalid) {
-            $self->last_timestamp($v->[$i]) if $type == FIT_UINT32 && $tname eq 'date_time' && $pname eq 'timestamp';
+            if (defined $tname) {
+                $self->last_timestamp($v->[$i]) if $type == FIT_UINT32 && $tname eq 'date_time' && $pname eq 'timestamp';
+            }
             $fh->print($indent, $pname, ' (', $desc->{'N_' . $name}, '-', $c, '-', $type_name[$type] ne '' ? $type_name[$type] : $type);
             $fh->print(', original name: ', $name) if $name ne $pname;
             $fh->print(', INVALID') if $j >= $c;
             $fh->print('): ');
 
             if ($type == FIT_STRING) {
-                $fh->print("\"", $self->string_value($v, $i, $c), "\"\n");
+                $fh->print("\"", _string_value($v, $i, $c), "\"\n");
             } else {
                 $fh->print('{') if $c > 1;
 
@@ -8563,7 +8557,7 @@ sub print_all_json {
             $fh->print($indent, '"', $pname, '": ');
 
             if ($type == FIT_STRING) {
-                $fh->print("\"", $self->string_value($v, $i, $c), "\"");
+                $fh->print("\"", _string_value($v, $i, $c), "\"");
             } else {
                 $fh->print('[') if $c > 1;
 
@@ -8702,6 +8696,84 @@ Returns a string representation of the profile version used by the device or app
 C<< fetch_header() >> must have been called at least once for this method to be able to return a value, will raise an exception otherwise.
 
 =back
+
+=head2 Functions
+
+The following functions are provided. None are exported, they may be called as C<< Geo::FIT::message_name(20) >>, C<< Geo::FIT::field_name('device_info', 4) >> C<< Geo::FIT::field_number('device_info', 'product') >>, etc.
+
+=over 4
+
+=item message_name(I<message spec>)
+
+returns the message name for I<message spec> or undef.
+
+=item message_number(I<message spec>)
+
+returns the message number for I<message spec> or undef.
+
+=back
+
+=cut
+
+sub message_name {
+    my $mspec = shift;
+    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
+
+    if (ref $msgtype eq 'HASH') {
+        $msgtype->{_name};
+    } else {
+        undef;
+    }
+}
+
+sub message_number {
+    my $mspec = shift;
+    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
+
+    if (ref $msgtype eq 'HASH') {
+        $msgtype->{_number};
+    } else {
+        undef;
+    }
+}
+
+=over 4
+
+=item field_name(I<message spec>, I<field spec>)
+
+returns the field name for I<field spec> in I<message spec> or undef.
+
+=item field_number(I<message spec>, I<field spec>)
+
+returns the field index for I<field spec> in I<message spec> or undef.
+
+=back
+
+=cut
+
+sub field_name {
+    my ($mspec, $fspec) = @_;
+    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
+
+    if (ref $msgtype eq 'HASH') {
+        my $flddesc = $msgtype->{$fspec};
+        ref $flddesc eq 'HASH'
+            and return $flddesc->{name};
+    }
+    undef;
+}
+
+sub field_number {
+    my ($mspec, $fspec) = @_;
+    my $msgtype = $mspec =~ /^\d+$/ ? $msgtype_by_num{$mspec} : $msgtype_by_name{$mspec};
+
+    if (ref $msgtype eq 'HASH') {
+        my $flddesc = $msgtype->{$fspec};
+        ref $flddesc eq 'HASH'
+            and return $flddesc->{number};
+    }
+    undef;
+}
 
 =head2 Constants
 
@@ -8864,7 +8936,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.08
+1.10
 
 =head1 LICENSE AND COPYRIGHT
 

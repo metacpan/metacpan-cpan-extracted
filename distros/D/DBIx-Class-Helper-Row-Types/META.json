@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "DBIC",
       "DBIx::Class",
@@ -53,7 +53,8 @@
             "Ref::Util" : "0",
             "Safe::Isa" : "1.000008",
             "Types::SQL::Util" : "v0.3.0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.14.0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -70,15 +71,17 @@
             "Test::More" : "0",
             "Test::Most" : "0",
             "Types::Common::String" : "0",
-            "Types::SQL" : "v0.3.0",
-            "Types::Standard" : "0"
+            "Types::Standard" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "DBIx::Class::Helper::Row::Types" : {
          "file" : "lib/DBIx/Class/Helper/Row/Types.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -92,10 +95,10 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-Row-Types"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.4.0",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

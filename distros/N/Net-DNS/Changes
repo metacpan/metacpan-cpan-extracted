@@ -1,4 +1,25 @@
-$Id: Changes 1907 2023-03-12 09:53:46Z willem $                       -*-text-*-
+$Id: Changes 1922 2023-05-08 18:46:00Z willem $                       -*-text-*-
+
+
+**** 1.38 May 9, 2023
+
+	Mailbox.pm: Improve robustness of address parsing.
+	Deprecate packet->edns->size() method.
+	Deprecate rdatastr() historical RR subtype method.
+	Major overhaul of pre-installation test scripts.
+	Add new t/TestToolkit.pm
+	Refactor socket code and control structure in
+	Nameserver.pm and improve efficiency of zonefile
+	data storage and retrieval.
+
+Fix rt.cpan.org #148274
+	Multicast DNS flag breaks Net::DNS::Parameters::classbyval
+
+Fix rt.cpan.org #148273
+	EDNS extended rcode not handled correctly
+
+Fix rt.cpan.org #147507
+	Nameserver.pm: peerhost undefined after $sock->accept
 
 
 **** 1.37 Mar 13, 2023

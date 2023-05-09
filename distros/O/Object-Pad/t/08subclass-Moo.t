@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Moo is not available"
@@ -17,7 +17,7 @@ package Base::Class {
    use Moo;
    sub BUILD {
       my ( $self, $args ) = @_;
-      Test::More::is_deeply( $args, { arg => "value" }, '@_ to Base::Class::BUILD' );
+      ::is( $args, { arg => "value" }, '@_ to Base::Class::BUILD' );
       $moocount++;
    }
 }
@@ -27,7 +27,7 @@ class Derived::Class :isa(Base::Class) {
    field $field;
    BUILD {
       my ( $args ) = @_;
-      Test::More::is_deeply( $args, { arg => "value" }, '@_ to Derived::Class BUILD' );
+      ::is( $args, { arg => "value" }, '@_ to Derived::Class BUILD' );
       $field = 345;
       $opcount++;
    }

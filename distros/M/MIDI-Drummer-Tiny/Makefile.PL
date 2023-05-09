@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "MIDI::Util" => "0.1100",
     "Math::Bezier" => 0,
+    "Math::Sequence::DeBruijn" => 0,
     "Moo" => 2,
     "Music::CreatingRhythms" => 0,
     "Music::Duration" => "0.0900",
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.4206",
+  "VERSION" => "0.4208",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "MIDI::Util" => "0.1100",
   "Math::Bezier" => 0,
+  "Math::Sequence::DeBruijn" => 0,
   "Moo" => 2,
   "Music::CreatingRhythms" => 0,
   "Music::Duration" => "0.0900",

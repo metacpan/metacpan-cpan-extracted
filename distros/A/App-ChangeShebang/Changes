@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ChangeShebang
 
+0.10  2023-05-07 00:55:44 JST
+
+    - Require perl v5.16
+
 0.07  2018-02-17 07:57:12 JST
 
     - Migrate to milla

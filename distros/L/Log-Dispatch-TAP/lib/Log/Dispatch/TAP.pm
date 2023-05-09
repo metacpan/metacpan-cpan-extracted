@@ -2,8 +2,7 @@ package Log::Dispatch::TAP;
 
 # ABSTRACT: Log to TAP output
 
-use v5.10.0;
-use strict;
+use v5.14;
 use warnings;
 
 use Params::ValidationCompiler qw/ validation_for /;
@@ -14,7 +13,7 @@ use base qw/ Log::Dispatch::Output /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.2.1';
 
 
 sub new {
@@ -63,7 +62,7 @@ Log::Dispatch::TAP - Log to TAP output
 
 =head1 VERSION
 
-version v0.1.2
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -83,8 +82,7 @@ version v0.1.2
 This module provides a L<Log::Dispatch> output sink for logging to
 L<Test::Simple> diagnostics.
 
-It is similar to L<Log::Dispatch::TestDiag>, except that it allows you
-to choose the logging method.
+It is similar to L<Log::Dispatch::TestDiag>.
 
 =head1 CONSTRUCTOR
 
@@ -97,6 +95,16 @@ This is the logging method, which is either C<note> or C<diag>
 (corresponding to those functions in L<Test::More>).
 
 =for Pod::Coverage log_message
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.2.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.1.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 =head1 SEE ALSO
 
@@ -127,7 +135,7 @@ and L<Log::Dispatch::TestDiag>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

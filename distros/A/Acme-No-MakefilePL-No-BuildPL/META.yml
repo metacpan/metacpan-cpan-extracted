@@ -1,0 +1,12 @@
+---
+name:                Acme-No-MakefilePL-No-BuildPL
+version:             0.03
+abstract:            Module for testing CPAN
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:
+    Acme::Prereq::None:               0
+author:
+  - 'Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>'
+x_static_install: 1

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1886 2022-12-20 11:27:25Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1921 2023-05-08 18:39:59Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -216,11 +216,15 @@ exit;
 package MY;				## customise generated Makefile
 
 sub test {
-	return shift->SUPER::test() if $^O =~ /cygwin|MSWin/i;
+	return join '', shift->SUPER::test(), <<'END' if $^O =~ /MSWin/i;
+TEST_DIR = t
+FULLPERLRUN = $(FULLPERL) "-I$(TEST_DIR)"
+END
 
 	return join '', shift->SUPER::test(), <<'END';
-# suppress parallel test execution
-FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL)
+# suppress parallel test execution	include test directory
+TEST_DIR = t
+FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL) "-I$(TEST_DIR)"
 END
 }
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension UNIVERSAL::Object
 
+0.17 2023-07-05
+    - Immutable classes are now unlocked within DEMOLISH
+
 0.16 2018-22-09
     - fix some errors in 5.10 and 5.8 that were annoying me
 

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.37';
+$VERSION = '1.38';
 $VERSION = eval {$VERSION};
-our $SVNVERSION = (qw$Id: DNS.pm 1907 2023-03-12 09:53:46Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 1922 2023-05-08 18:46:00Z willem $)[2];
 
 
 =head1 NAME
@@ -112,7 +112,7 @@ sub rrsort {
 
 
 #
-# Auxilliary functions to support policy-driven zone serial numbering.
+# Auxiliary functions to support policy-driven zone serial numbering.
 #
 #	$successor = $soa->serial(SEQUENTIAL);
 #	$successor = $soa->serial(UNIXTIME);
@@ -130,7 +130,7 @@ sub YYYYMMDDxx {
 
 
 #
-# Auxilliary functions to support dynamic update.
+# Auxiliary functions to support dynamic update.
 #
 
 sub yxrrset {

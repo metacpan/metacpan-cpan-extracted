@@ -4,9 +4,12 @@ lib.modern/Text/Wrap.pm
 Makefile.PL
 MANIFEST
 README
+t/124024.t
+t/148291.t
 t/37000.t
 t/39548.t
 t/79766.t
+t/95823.t
 t/belg4mit.t
 t/dandv.t
 t/fill.t

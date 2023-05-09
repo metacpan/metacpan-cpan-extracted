@@ -64,3 +64,17 @@ use constant FOO => 1;
 use constant BAR => 2;
 
 $x = $y ? FOO : BAR;
+
+## name constant in EXPORT
+## failures 0
+## cut
+
+use constant TAU => 6.28;
+our @EXPORT = qw(TAU);
+
+## name constant in EXPORT_OK
+## failures 0
+## cut
+
+use constant TAU => 6.28;
+our @EXPORT_OK = qw(TAU);

@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1895 2023-01-16 13:38:08Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 1910 2023-03-30 19:16:30Z willem $)[2];
 
 
 =head1 NAME
@@ -132,19 +132,22 @@ sub read {
 
 	return &_read unless ref $self;				# compatibility interface
 
-	local $SIG{__DIE__};
-
 	if (wantarray) {
 		my @zone;					# return entire zone
 		eval {
-			my $rr;
-			push( @zone, $rr ) while $rr = $self->_getRR;
+			local $SIG{__DIE__};
+			while ( my $rr = $self->_getRR ) {
+				push( @zone, $rr );
+			}
 		};
 		croak join ' ', $@, ' file', $self->name, 'line', $self->line, "\n " if $@;
 		return @zone;
 	}
 
-	my $rr = eval { $self->_getRR };			# return single RR
+	my $rr = eval {
+		local $SIG{__DIE__};
+		$self->_getRR;					# return single RR
+		};
 	croak join ' ', $@, ' file', $self->name, 'line', $self->line, "\n " if $@;
 	return $rr;
 }
@@ -346,7 +349,7 @@ The return value is undefined if an error is encountered by the parser.
 
 sub parse {
 	my ($arg1) = @_;
-	shift if !ref($arg1) && $arg1 eq __PACKAGE__;
+	shift if $arg1 eq __PACKAGE__;
 	my $string  = shift;
 	my @include = grep {defined} shift;
 	return &readfh( Net::DNS::ZoneFile::Text->new($string), @include );

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Locks with timeouts.",
+   "author" : [
+      "Bjoern Hee <github@spredehagl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sys-Tlock",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Config" : {
+         "file" : "lib/Sys/Tlock/Config.pm"
+      },
+      "Sys::Tlock" : {
+         "file" : "lib/Sys/Tlock.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/spragl/Tlock/issues"
+      },
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/spragl/Tlock"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

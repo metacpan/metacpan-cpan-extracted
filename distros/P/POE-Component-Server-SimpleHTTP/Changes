@@ -1,6 +1,31 @@
 ==================================================
-Changes from 2013-09-18 00:00:00 +0000 to present.
+Changes from 2018-05-09 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.30 at 2023-05-08 11:10:47 +0000
+-----------------------------------------
+
+  Change: 89d04178d93e58d19b6182e713c872bde7271a8c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-05-08 12:10:47 +0000
+
+    Release engineering for 2.30 
+
+  Change: ba688d4b8a7ab7911962d04860d4ec877e89c424
+  Author: Ricardo Signes <rjbs@users.noreply.github.com>
+  Date : 2023-05-08 12:07:43 +0000
+
+    post fails if it returns false; check that, not $!
+
+    I was getting errors with an ENOENT in them, which dngor says
+    shouldn't be coming from the kernel. We discussed this on
+    irc.perl.org #magnet, 2016-12-23 around 15:00 UTC. One possibility,
+    unconfirmed, is that something else in the handler is setting $!, and
+    the kernel does not guarantee clearing $! on success â like lots of
+    Perl 5 stuff. So, this commit relies on post's return value, and then
+    assumes $! will be sensible, rather than assuming a true $! means
+    that the post failed. 
 
 -----------------------------------------
 version 2.28 at 2018-09-17 09:19:09 +0000
@@ -18,124 +43,6 @@ version 2.28 at 2018-09-17 09:19:09 +0000
 
     add support for IPv6 
 
------------------------------------------
-version 2.26 at 2017-03-09 13:03:49 +0000
------------------------------------------
-
-  Change: fbe592d9b2dc8dcfd6da080d208eef0263e1f41e
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-03-09 13:03:49 +0000
-
-    Switch dist to Dist::Zilla 
-
------------------------------------------
-version 2.24 at 2017-02-20 13:55:10 +0000
------------------------------------------
-
-  Change: f426268da1fce459676931cca2e86219e9dbd522
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-02-20 13:55:10 +0000
-
-    Handle perls without dot in @INC 
-
------------------------------------------
-version 2.22 at 2016-02-23 14:01:33 +0000
------------------------------------------
-
-  Change: f96a77938f94bf74fa00449fe941b70e77de0443
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-02-23 14:01:33 +0000
-
-    This is 2.22 
-
-  Change: ef1c866bf188a3cbedc2da5db4e0714d6e195205
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2016-02-23 13:57:50 +0000
-
-    Merge pull request #4 from brewt/silence-keep-alive-warnings
-
-    Silence warnings from must_keepalive() 
-
-  Change: b884aba7fc7548592b71427167485995215ca665
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2016-02-23 13:57:33 +0000
-
-    Merge pull request #3 from brewt/graceful-keep-alive
-
-    Fix graceful shutdowns when keep-alives are in use 
-
-  Change: e2e1b0279b68c0292e2904e4d2212f9293cf2bb1
-  Author: Adrian Yee <adrian@gt.net>
-  Date : 2016-02-19 13:08:59 +0000
-
-    Silence warnings from must_keepalive()
-
-    A simple patch to silence warnings from must_keepalive().
-    HTTP::Request->header() (inherited from HTTP::Header->header())
-    returns undef if the requested header doesn't exist.
-
-    Same patch from RT #107397 
-
-  Change: 53fe993ca858fdcb663ac76c5fe3f6120f6d73a1
-  Author: Adrian Yee <adrian@gt.net>
-  Date : 2016-02-19 00:52:24 +0000
-
-    Fix graceful shutdowns when keep-alives are in use
-
-    If you shut down the httpd gracefully while there's a keep-alive
-    connection is connected, then any subsequent requests through that
-    connection will result in an error. This occurs since the as the
-    handler's post to the DONE event will fail due to the alias being
-    removed. 
-
------------------------------------------
-version 2.20 at 2015-09-28 18:07:04 +0000
------------------------------------------
-
-  Change: 5a7aee1eb2ea8db7a548eb4c3638e14d94c08dda
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-09-28 19:07:04 +0000
-
-    This is 2.20 
-
-  Change: 9c84828f48c8079c754311a7b8f80b8ef3ae634f
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2015-09-28 18:36:32 +0000
-
-    Merge pull request #2 from leejo/rt/73630
-
-    resolve RT #73630 - fix some typos 
-
-  Change: d272889782be6cc751dd7719a5e301d26c9ff3f6
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2015-09-28 18:36:24 +0000
-
-    Merge pull request #1 from leejo/leejo/update_readme
-
-    add more instructions on how to build this dist 
-
-  Change: 7d25abf5522e76e2c22aaa77fde0fedef89eda31
-  Author: Lee Johnson <lee@givengain.ch>
-  Date : 2015-09-23 16:24:50 +0000
-
-    resolve RT #73630 - fix some typos
-
-    apply patch from gregoa@debian.org and fix a couple of other typos
-    spotted 
-
-  Change: 3a65df5092c5eef8a62f53a20d23257560f4e386
-  Author: Lee Johnson <lee@givengain.ch>
-  Date : 2015-09-23 16:10:54 +0000
-
-    add more instructions on how to build this dist
-
-    in the README document that a couple of extra Module::Install mods
-    are required as a vanilla Module::Install does not support some of
-    the options in the Makefile.PL
-
-    update .gitignore to included (well, exclude) files generated by the
-    build process 
-
 =================================================
-Plus 37 releases after 2013-09-18 00:00:00 +0000.
+Plus 41 releases after 2018-05-09 00:00:00 +0000.
 =================================================

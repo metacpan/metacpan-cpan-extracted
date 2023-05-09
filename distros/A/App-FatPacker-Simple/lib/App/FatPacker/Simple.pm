@@ -1,20 +1,18 @@
-package App::FatPacker::Simple;
-use strict;
+package App::FatPacker::Simple 0.20;
+use v5.16;
 use warnings;
-use utf8;
+
 use App::FatPacker;
 use Config;
-use Cwd 'abs_path';
+use Cwd ();
 use Distribution::Metadata;
-use File::Basename 'basename';
-use File::Find 'find';
-use File::Spec::Functions 'catdir';
+use File::Basename ();
+use File::Find ();
+use File::Spec;
 use File::Spec::Unix;
-use Getopt::Long qw(:config no_auto_abbrev no_ignore_case);
+use Getopt::Long ();
 use Perl::Strip;
-use Pod::Usage 1.33 ();
-
-our $VERSION = '0.09';
+use Pod::Usage ();
 
 our $IGNORE_FILE = [
     qr/\.pod$/,
@@ -24,14 +22,17 @@ our $IGNORE_FILE = [
 ];
 
 sub new {
-    my $class = shift;
-    bless {@_}, $class;
+    my ($class, @argv) = @_;
+    bless { @argv }, $class;
 }
 
 sub parse_options {
-    my $self = shift;
-    local @ARGV = @_;
-    GetOptions
+    my ($self, @argv) = @_;
+    my $parser = Getopt::Long::Parser->new(
+        config => [qw(no_auto_abbrev no_ignore_case)],
+    );
+    $parser->getoptionsfromarray(
+        \@argv,
         "d|dir=s"       => \(my $dir = 'lib,fatlib,local,extlib'),
         "e|exclude=s"   => \(my $exclude),
         "h|help"        => sub { $self->show_help; exit 1 },
@@ -44,8 +45,8 @@ sub parse_options {
         "exclude-strip=s@" => \(my $exclude_strip),
         "no-strip|no-perl-strip" => \(my $no_perl_strip),
         "cache=s"       => \(my $cache),
-    or exit 1;
-    $self->{script}     = shift @ARGV or do { warn "Missing scirpt.\n"; pod2usage(1) };
+    ) or exit 1;
+    $self->{script}     = shift @argv or do { warn "Missing script.\n"; $self->show_help; exit 1 };
     $self->{dir}        = $self->build_dir($dir);
     $self->{output}     = $output;
     $self->{quiet}      = $quiet;
@@ -111,7 +112,7 @@ sub output_filename {
     my $self = shift;
     return $self->{output} if $self->{output};
 
-    my $script = basename $self->{script};
+    my $script = File::Basename::basename $self->{script};
     my ($suffix, @other) = reverse split /\./, $script;
     if (!@other) {
         "$script.fatpack";
@@ -181,11 +182,11 @@ sub load_file {
 sub collect_files {
     my ($self, $dir, $files) = @_;
 
-    my $absolute_dir = abs_path($dir);
+    my $absolute_dir = Cwd::abs_path($dir);
     # When $dir is not an archlib,
     # and we are about to search $dir/archlib, skip it!
     # because $dir/archlib itself will be searched another time.
-    my $skip_dir = catdir($absolute_dir, $Config{archname});
+    my $skip_dir = File::Spec->catdir($absolute_dir, $Config{archname});
     $skip_dir = qr/\Q$skip_dir\E/;
 
     my $find = sub {
@@ -194,7 +195,7 @@ sub collect_files {
             $_ =~ $ignore and return;
         }
         my $original = $_;
-        my $absolute = abs_path($original);
+        my $absolute = Cwd::abs_path($original);
         return if $absolute =~ $skip_dir;
         my $relative = File::Spec::Unix->abs2rel($absolute, $absolute_dir);
         for my $exclude (@{$self->{exclude}}) {
@@ -209,18 +210,18 @@ sub collect_files {
         }
         $files->{$relative} = $self->load_file($absolute, $relative, $original);
     };
-    find({wanted => $find, no_chdir => 1}, $dir);
+    File::Find::find({wanted => $find, no_chdir => 1}, $dir);
 }
 
 sub build_dir {
     my ($self, $dir_string) = @_;
     my @dir;
     for my $d (grep -d, split /,/, $dir_string) {
-        my $try = catdir($d, "lib/perl5");
+        my $try = File::Spec->catdir($d, "lib/perl5");
         if (-d $try) {
-            push @dir, $try, catdir($try, $Config{archname});
+            push @dir, $try, File::Spec->catdir($try, $Config{archname});
         } else {
-            push @dir, $d, catdir($d, $Config{archname});
+            push @dir, $d, File::Spec->catdir($d, $Config{archname});
         }
     }
     return [ grep -d, @dir ];

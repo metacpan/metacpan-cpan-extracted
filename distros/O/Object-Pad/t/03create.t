@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Scalar::Util qw( reftype );
 
@@ -42,8 +42,8 @@ class WithBuildargs {
 {
    WithBuildargs->new( 1, 2, 3 );
 
-   is_deeply( \@buildargs, [qw( WithBuildargs 1 2 3 )], '@_ to BUILDARGS' );
-   is_deeply( \@build,     [qw( 4 5 6 )],               '@_ to BUILD' );
+   is( \@buildargs, [qw( WithBuildargs 1 2 3 )], '@_ to BUILDARGS' );
+   is( \@build,     [qw( 4 5 6 )],               '@_ to BUILD' );
 }
 
 {
@@ -62,7 +62,7 @@ class WithBuildargs {
    }
 
    WithAdjust->new;
-   is_deeply( \@called, [qw( BUILD ADJUST )], 'ADJUST invoked after BUILD' );
+   is( \@called, [qw( BUILD ADJUST )], 'ADJUST invoked after BUILD' );
 
    is( $class_in_ADJUST, "WithAdjust", '__CLASS__ during ADJUST block' )
 }

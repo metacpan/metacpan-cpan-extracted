@@ -15,6 +15,16 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
 
         // replace setData method of parent class
         this._form['setData'] = qx.lang.Function.bind(this.setData, this);
+
+        this.addListener('actionResponse', function(e){
+            var data = e.getData();
+            switch (data.action){
+            case 'reload':
+            case 'dataModified':
+                this._loadData();
+                break;
+            }
+        }, this);
     },
     members: {
         __cards    : null,

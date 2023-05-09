@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 17;
 use Geo::FIT;
 
 my $o = Geo::FIT->new();
@@ -33,13 +33,24 @@ my @expect_speed    = qw( 0.000 1.484 );
 
 my $cb_record = sub {
     my ($obj, $desc, $v, $memo) = @_;
+
+    # test fields_list()
+    my @fields_list     = $obj->fields_list( $desc );
+    my @fields_list_exp = qw( timestamp position_lat position_long distance grit flow altitude speed heart_rate temperature );
+    is_deeply( \@fields_list, \@fields_list_exp,        "   test fields_list()");
+
+    # test fields_defined()
+    my @fields_defined     = $obj->fields_defined( $desc, $v);
+    my @fields_defined_exp = qw( timestamp position_lat position_long distance grit flow altitude speed temperature );
+    is_deeply( \@fields_defined, \@fields_defined_exp,  "   test fields_defined()");
+
     my (%tp, $lat, $lon, $speed, $watts);
 
     $tp{Time} = $obj->named_type_value($desc->{t_timestamp}, $v->[$desc->{i_timestamp}]);
     $memo->{id} = $tp{Time} if !defined $memo->{id};
 
     # $desc->{i_timestamp} shows it is at index 1 and $desc->{t_timestamp} says it's a date_time
-    is( $tp{Time}, $expect_time[$j],   "   test named_type_value() -- timestamp");
+    is( $tp{Time}, $expect_time[$j],   "   test named_type_value(): timestamp in record");
 
     $lat = $obj->value_processed($v->[$desc->{i_position_lat}], $desc->{a_position_lat})
         if defined $desc->{i_position_lat} && $v->[$desc->{i_position_lat}] != $desc->{I_position_lat};
@@ -47,20 +58,20 @@ my $cb_record = sub {
     $lon = $obj->value_processed($v->[$desc->{i_position_long}], $desc->{a_position_long})
         if defined $desc->{i_position_long} && $v->[$desc->{i_position_long}] != $desc->{I_position_long};
 
-    is( $lat, $expect_lat[$j],  "   test value_processed() -- latitude");
-    is( $lon, $expect_lon[$j],  "   test value_processed() -- longitude");
+    is( $lat, $expect_lat[$j],  "   test value_processed(): latitude in record");
+    is( $lon, $expect_lon[$j],  "   test value_processed(): longitude in record");
 
     if (defined $desc->{i_enhanced_altitude} && $v->[$desc->{i_enhanced_altitude}] != $desc->{I_enhanced_altitude}) {
         $tp{AltitudeMeters} = $obj->value_processed($v->[$desc->{i_enhanced_altitude}], $desc->{a_enhanced_altitude})
     } elsif (defined $desc->{i_altitude} && $v->[$desc->{i_altitude}] != $desc->{I_altitude}) {
         $tp{AltitudeMeters} = $obj->value_processed($v->[$desc->{i_altitude}], $desc->{a_altitude})
     }
-    is( $tp{AltitudeMeters}, $expect_altitude[$j],  "   test value_processed() -- altitude");
+    is( $tp{AltitudeMeters}, $expect_altitude[$j],  "   test value_processed(): altitude in record");
 
     $tp{DistanceMeters} = $obj->value_processed($v->[$desc->{i_distance}], $desc->{a_distance})
         if defined $desc->{i_distance} && $v->[$desc->{i_distance}] != $desc->{I_distance};
 
-    is( $tp{DistanceMeters}, $expect_distance[$j],  "   test value_processed() -- distance");
+    is( $tp{DistanceMeters}, $expect_distance[$j],  "   test value_processed(): distance in record");
 
     if (defined $desc->{i_enhanced_speed} && $v->[$desc->{i_enhanced_speed}] != $desc->{I_enhanced_speed}) {
         $speed = $obj->value_processed($v->[$desc->{i_enhanced_speed}], $desc->{a_enhanced_speed})
@@ -73,7 +84,7 @@ my $cb_record = sub {
         $tpx{Speed} = $speed if defined $speed;
         $tpx{Watts} = $watts if defined $watts;
         $tp{Extensions} = +{'TPX' => \%tpx};
-        is( $tpx{Speed}, $expect_speed[$j],  "   test value_processed() -- speed");
+        is( $tpx{Speed}, $expect_speed[$j],  "   test value_processed(): speed in record");
     }
 
     my $miss;

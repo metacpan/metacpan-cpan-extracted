@@ -1,3 +1,9 @@
+0.002   2023-02-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Get row count using get_row_count() and not by iterating the
+          rows, to handle table with infinite rows.
+
+
 0.001   2021-09-27  Released-By: PERLANCAR
 
         - First release.

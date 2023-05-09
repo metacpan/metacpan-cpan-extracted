@@ -1,3 +1,24 @@
+0.481 2023-05-09
+  [Incompatible Changes]
+    * The definition of the defined method in the Sys::OS class is changed.
+      [Before]
+      static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
+      [After]
+      static method defined : int ($macro_name : string, $value_ref = undef : object of int[]|long[]|double[])
+    * The definition of the ioctl method in the Sys::Ioctl class is changed.
+      [Before]
+      static method ioctl : int ($fd : int, $request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object);
+      [After]
+      static method ioctl : int ($fd : int, $request : int, $request_arg_ref = undef : object of byte[]|short[]|int[]|long[]|float[]|double[]|object);
+    * The definition of the fcntl method in the Sys::IO class is changed.
+      [Before]
+      static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Byte|Short|Int|Long|Float|Double|Sys::IO::Flock|object);
+      [After]
+      static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object);    
+  [New Features]
+    * The version string can be got.
+  [Changes]
+    * The implementation logic of the ioctl method in the Sys::Ioclt class got to be the one on Linux.
 0.48 2023-04-07
   [New Features and Incompatible Changes]
     * Added the Sys::Time::Tm class.

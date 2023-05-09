@@ -32,7 +32,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.10.0';
+our $VERSION = 'v0.10.1';
 
 
 
@@ -156,7 +156,7 @@ sub require_content {
 
 
 sub script_extensions {
-    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|csc|dll|do|exe|jspa?|lua|mvc?|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
+    my $re = qr{[.](?:as[hp]x?|axd|bat|cc?|cfm|cgi|com|csc|dll|do|exe|jspa?|lua|mvc?|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -208,7 +208,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.10.0
+version v0.10.1
 
 =head1 SYNOPSIS
 
@@ -366,7 +366,7 @@ This was added in v0.4.1.
 
 =head2 script_extensions
 
-This blocks requests that refer to actual scripts, file file
+This blocks requests that refer to actual scripts or source code file
 extension, such as C<.php> or C<.asp>.  It will also block requests
 that refer to these scripts in the query string.
 

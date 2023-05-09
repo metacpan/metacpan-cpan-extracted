@@ -14,5 +14,6 @@ t/files.t
 t/gzip-libdeflate.t
 t/index.html.gz
 typemap
+version.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

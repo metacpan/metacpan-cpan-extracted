@@ -1,6 +1,6 @@
 package SPVM::Regex;
 
-our $VERSION = '0.23';
+our $VERSION = "0.241002";
 
 1;
 
@@ -48,9 +48,9 @@ L<Google RE2|https://github.com/google/re2> is used as the regular expression li
     my $match = $re->match($string);
     
     if ($match) {
-      my $cap1 = $re->cap1;
-      my $cap2 = $re->cap2;
-      my $cpa3 = $re->cap3;
+      my $cap1 = $match->cap1;
+      my $cap2 = $match->cap2;
+      my $cpa3 = $match->cap3;
     }
   }
   
@@ -61,8 +61,6 @@ L<Google RE2|https://github.com/google/re2> is used as the regular expression li
     
     # "ppzABCz"
     my $result = $re->replace($string, "ABC");
-    
-    my $replaced_count = $re->replaced_count;
   }
 
   # Replace with a callback and capture
@@ -71,8 +69,8 @@ L<Google RE2|https://github.com/google/re2> is used as the regular expression li
     my $string = "ppzabcz";
     
     # "ppzABbcCz"
-    my $result = $re->replace($string, method : string ($re : Regex) {
-      return "AB" . $re->cap1 . "C";
+    my $result = $re->replace($string, method : string ($re : Regex, $match : Regex::Match) {
+      return "AB" . $match->cap1 . "C";
     });
   }
 
@@ -91,8 +89,8 @@ L<Google RE2|https://github.com/google/re2> is used as the regular expression li
     my $string = "ppzabczabcz";
     
     # "ppzABCbcPQRSzABCbcPQRSz"
-    my $result = $re->replace_g($string, method : string ($re : Regex) {
-      return "ABC" . $re->cap1 . "PQRS";
+    my $result = $re->replace_g($string, method : string ($re : Regex, $match : Regex::Match) {
+      return "ABC" . $match->cap1 . "PQRS";
     });
   }
 
@@ -107,7 +105,7 @@ L<Google RE2|https://github.com/google/re2> is used as the regular expression li
       return 0;
     }
     
-    unless ($re->cap1 eq "abc\ndef") {
+    unless ($match->cap1 eq "abc\ndef") {
       return 0;
     }
   }
@@ -132,11 +130,15 @@ L<Google RE2 Syntax|https://github.com/google/re2/wiki/Syntax>
 
 The captured strings.
 
+This field is deprecated and will be removed.
+
 =head2  match_start
 
   has match_start : ro int;
 
 The start offset of the matched string.
+
+This field is deprecated and will be removed.
 
 =head2 match_length
 
@@ -144,11 +146,15 @@ The start offset of the matched string.
 
 The length of the matched string.
 
+This field is deprecated and will be removed.
+
 =head2 replaced_count
 
   has replaced_count : ro int;
 
 The replaced count.
+
+This field is deprecated and will be removed.
 
 =head1 Class Methods
 
@@ -165,7 +171,7 @@ Creates a new L<Regex|SPVM::Regex> object and compiles the regex pattern $patter
 
 =head2 match
 
-  method match : int ($string : string, $offset = 0 : int, $length = -1 : int);
+  method match : Regex::Match ($string : string, $offset = 0 : int, $length = -1 : int);
 
 The alias for the following L<match_forward|/"match_forward"> method.
 
@@ -173,13 +179,13 @@ The alias for the following L<match_forward|/"match_forward"> method.
 
 =head2 match_forward
 
-  method match_forward : int ($string : string, $offset : int*, $length = -1 : int)
+  method match_forward : Regex::Match ($string : string, $offset : int*, $length = -1 : int);
 
 Performs pattern matching on the substring from the offset $offset to the length $length of the string $string.
 
 The $offset is updated to the next position.
 
-If the pattern matching is successful, returns 1. Otherwise returns 0.
+If the pattern matching is successful, returns a L<Regex::Match|SPVM::Regex::Match> object. Otherwise returns undef.
 
 Exceptions:
 
@@ -203,10 +209,10 @@ The alias for the following L<replace_common|/"replace_common"> method.
 
 The alias for the following L<replace_common|/"replace_common"> method.
 
-  my $new_options_list = List->new($options);
-  $new_options_list->push("global");
-  $new_options_list->push(1);
-  $options = $new_options_list->to_array;
+  unless ($options) {
+    $options = {};
+  }
+  $options = Fn->merge_options({global => 1}, $options);
   return $self->replace_common($string, $replace, \$offset, $length, $options);
 
 =head2 replace_common
@@ -222,9 +228,17 @@ Options:
 
 =over 2
 
-=item * global : Int
+=item * C<global>
+
+This option must be a L<Int|SPVM::Int> object. Otherwise an exception is thrown.
 
 If the value of the L<Int|SPVM::Int> object is a true value, the global replacement is performed.
+
+=item * C<info>
+
+This option must be an array of the L<Regex::ReplaceInfo|SPVM::Regex::ReplaceInfo> object. Otherwise an exception is thrown.
+
+If this option is specifed, the first element of the array is set to a L<Regex::ReplaceInfo|SPVM::Regex::ReplaceInfo> object of the replacement result.
 
 =back
 
@@ -252,11 +266,15 @@ The same as the L<split||SPVM::Fn/"split"> method in the L<Fn|SPVM::Fn> class, b
 
 The alias for C<$re-E<gt>captures-E<gt>[1]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap2
 
   method cap2 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[2]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap3
 
@@ -264,11 +282,15 @@ The alias for C<$re-E<gt>captures-E<gt>[2]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[3]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap4
 
   method cap4 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[4]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap5
 
@@ -276,11 +298,15 @@ The alias for C<$re-E<gt>captures-E<gt>[4]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[5]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap6
 
   method cap6 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[6]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap7
 
@@ -288,23 +314,29 @@ The alias for C<$re-E<gt>captures-E<gt>[6]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[7]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap8
 
   method cap8 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[8]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap9
 
   method cap9 : string ();
-
 The alias for C<$re-E<gt>captures-E<gt>[9]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap10
 
   method cap10 : string ();
-
 The alias for C<$re-E<gt>captures-E<gt>[10]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap11
 
@@ -312,11 +344,15 @@ The alias for C<$re-E<gt>captures-E<gt>[10]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[11]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap12
 
   method cap12 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[12]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap13
 
@@ -324,11 +360,15 @@ The alias for C<$re-E<gt>captures-E<gt>[12]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[13]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap14
 
   method cap14 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[14]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap15
 
@@ -336,11 +376,15 @@ The alias for C<$re-E<gt>captures-E<gt>[14]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[15]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap16
 
   method cap16 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[16]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap17
 
@@ -348,11 +392,15 @@ The alias for C<$re-E<gt>captures-E<gt>[16]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[17]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap18
 
   method cap18 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[18]>.
+
+This method is deprecated and will be removed.
 
 =head2 cap19
 
@@ -360,11 +408,15 @@ The alias for C<$re-E<gt>captures-E<gt>[18]>.
 
 The alias for C<$re-E<gt>captures-E<gt>[19]>.
 
+This method is deprecated and will be removed.
+
 =head2 cap20
 
   method cap20 : string ();
 
 The alias for C<$re-E<gt>captures-E<gt>[20]>.
+
+This method is deprecated and will be removed.
 
 =head1 Repository
 

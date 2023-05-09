@@ -1,34 +1,37 @@
-package App::ChangeShebang;
-use strict;
+package App::ChangeShebang 0.10;
+use v5.16;
 use warnings;
-use utf8;
-use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
-use Pod::Usage 'pod2usage';
-require ExtUtils::MakeMaker;
-use File::Basename 'dirname';
-use File::Temp 'tempfile';
-sub prompt { ExtUtils::MakeMaker::prompt(@_) }
 
-our $VERSION = '0.07';
+use Getopt::Long ();
+use Pod::Usage ();
+use ExtUtils::MakeMaker ();
+use File::Basename ();
+use File::Temp ();
+
+sub prompt { ExtUtils::MakeMaker::prompt(@_) }
 
 sub new {
     my $class = shift;
     bless {@_}, $class;
 }
+
 sub parse_options {
-    my $self = shift;
-    local @ARGV = @_;
-    GetOptions
-        "version|v" => sub { printf "%s %s\n", __PACKAGE__, $VERSION; exit },
+    my ($self, @argv) = @_;
+    my $parser = Getopt::Long::Parser->new(
+        config => [qw(no_auto_abbrev no_ignore_case)],
+    );
+    $parser->getoptionsfromarray(
+        \@argv,
+        "version|v" => sub { printf "%s %s\n", __PACKAGE__, __PACKAGE__->VERSION; exit },
         "quiet|q"   => \$self->{quiet},
         "force|f"   => \$self->{force},
-        "help|h"    => sub { pod2usage(0) },
-    or pod2usage(1);
+        "help|h"    => sub { Pod::Usage::pod2usage(0) },
+    ) or Pod::Usage::pod2usage(1);
 
-    my @file = @ARGV;
-    unless (@file) {
+    my @file = @argv;
+    if (!@file) {
         warn "Missing file arguments.\n";
-        pod2usage(1);
+        Pod::Usage::pod2usage(1);
     }
     $self->{file} = \@file;
     $self;
@@ -79,7 +82,7 @@ sub change_shebang {
 
     my $mode = (stat $file)[2];
 
-    my ($tmp_fh, $tmp_name) = tempfile UNLINK => 0, DIR => dirname($file);
+    my ($tmp_fh, $tmp_name) = File::Temp::tempfile UNLINK => 0, DIR => File::Basename::dirname($file);
     chmod $mode, $tmp_name;
     print {$tmp_fh} <<'...';
 #!/bin/sh

@@ -23,7 +23,7 @@ use Encode;
 use JSON;
 use Web::Scraper;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 my $BAMOSZ_MAINURL = "http://www.bamosz.hu/";
 my $BAMOSZ_URL = $BAMOSZ_MAINURL . "alapoldal?isin=";

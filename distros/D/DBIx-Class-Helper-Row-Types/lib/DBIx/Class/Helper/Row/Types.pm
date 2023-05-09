@@ -1,10 +1,8 @@
 package DBIx::Class::Helper::Row::Types;
 
-use v5.10;
-
 # ABSTRACT: Use Types to define rows
 
-use strict;
+use v5.14;
 use warnings;
 
 use Ref::Util ();
@@ -14,7 +12,7 @@ use Types::SQL::Util v0.3.0 ();
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.4.0';
 
 
 
@@ -84,7 +82,7 @@ DBIx::Class::Helper::Row::Types - Use Types to define rows
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -143,6 +141,16 @@ This is entirely separate from database-level constraints.
 
 Enabling C<strict> for an inflated column is strongly discouraged.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.4.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.3.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 KNOWN ISSUES
 
 Strict type constraints are only applied when explicitly setting a
@@ -177,7 +185,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2022 by Robert Rothenberg.
+This software is Copyright (c) 2017-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

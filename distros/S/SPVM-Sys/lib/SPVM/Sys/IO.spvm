@@ -142,7 +142,7 @@ class Sys::IO {
     return $status;
   }
   
-  native static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Byte|Short|Int|Long|Float|Double|Sys::IO::Flock|object);
+  native static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object);
 
   native static method readline : mutable string ($stream : Sys::IO::FileStream);
   

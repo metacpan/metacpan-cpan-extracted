@@ -15,11 +15,11 @@ Test::Dependencies - Ensure that the dependency listing is complete
 
 =head1 VERSION
 
-Version 0.30
+Version 0.32
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,8 @@ sub _get_modules_used_in_file {
     my $p = Pod::Strip->new;
     $p->output_string(\$code);
     $p->parse_string_document($data);
+    $code =~ m/^(__DATA__|__END__)$.*/m
+        and $code = $`; # strip data and end sections ($`==$PREMATCH)
     $used{$2}++ while $code =~ /^\s*(use|with|extends)\s+['"]?([\w:.]+)['"]?/gm;
     while ($code =~ m{^\s*use\s+base
                           \s+(?:qw.|(?:(?:['"]|q.|qq.)))([\w\s:]+)}gmx) {
@@ -148,12 +150,8 @@ sub _legacy_ok_dependencies {
     {
         local $@;
 
-        eval {
-            use CPAN::Meta;
-        };
-        eval {
-            use File::Find::Rule::Perl;
-        };
+        eval "use CPAN::Meta;";
+        eval "use File::Find::Rule::Perl;";
 
         $missing_dep = $@;
     }
@@ -383,7 +381,7 @@ L<http://search.cpan.org/dist/Test-Dependencies>
 
 =head1 LICENCE AND COPYRIGHT
 
-    Copyright (c) 2016-2020, Erik Huelsmann. All rights reserved.
+    Copyright (c) 2016-2023, Erik Huelsmann. All rights reserved.
     Copyright (c) 2007, Best Practical Solutions, LLC. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it

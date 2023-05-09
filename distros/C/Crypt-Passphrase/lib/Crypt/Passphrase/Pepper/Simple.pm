@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Pepper::Simple;
-$Crypt::Passphrase::Pepper::Simple::VERSION = '0.015';
+$Crypt::Passphrase::Pepper::Simple::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -23,6 +23,7 @@ sub new {
 	my $peppers = $args{peppers} or croak('No peppers given');
 	$args{active} //= (sort {; no warnings 'numeric'; $b <=> $a || $b cmp $a } keys %{ $peppers })[0];
 	$args{algorithm} //= 'sha512-hmac';
+	$args{supported_hashes} //= [ keys %algorithms ];
 
 	return $class->SUPER::new(%args);
 }
@@ -50,7 +51,7 @@ Crypt::Passphrase::Pepper::Simple - A pepper-wrapper for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

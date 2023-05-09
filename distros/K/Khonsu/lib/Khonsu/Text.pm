@@ -11,6 +11,8 @@ sub attributes {
 		pad => {$a->RW, $a->STR},
 		pad_end => {$a->RW, $a->STR},
 		align => {$a->RW, $a->STR, default => sub { 'left' }},
+		end_w => {$a->RW, $a->NUM},
+		margin => {$a->RW, $a->NUM, default => sub { 5 }},
 		$a->FONT,
 		$a->POINTS
 	);
@@ -20,6 +22,13 @@ sub add {
 	my ($self, $file, %attributes) = @_;
 
 	my $font = $self->font->load($file, %{ delete $attributes{font} || {} });
+
+	if (!$attributes{x} && !$attributes{align}) {
+		$attributes{x} = $file->page->x;
+		$attributes{y} = $file->page->y;
+		$attributes{h} = $file->page->remaining_height();
+		$attributes{w} = $file->page->width();
+	}
 	
 	$self->set_attributes(%attributes);
 
@@ -37,7 +46,7 @@ sub add {
 	);
 
 	my $ypos = $file->page->h - ($pos{y} + $pos{l});
-
+	
 	my $max_height = $ypos - $pos{h};
 
 	my $xpos = $pos{x};
@@ -54,7 +63,7 @@ sub add {
 		unshift @words, map { " " } 0 .. $indent;
 	}
 
-	while ($ypos > $max_height && @words) {
+	while ($ypos - $pos{l} >= $max_height && @words) {
 		my $word = shift @words;
 		my ($width, @line) = ($text->advancewidth($word), ());
 		while ($width <= $pos{w} && $word) {
@@ -63,6 +72,7 @@ sub add {
 			$word = shift @words;
 			$width += $text->advancewidth($word);
 		}
+		$self->end_w($xpos + $width);
 		if ($word) {
 			unshift @words, $word if (scalar @words);
 		} elsif ($self->pad) {
@@ -86,8 +96,11 @@ sub add {
 		$ypos -= $pos{l};
 	}
 
+	$file->page->y($file->page->h - (($ypos + $pos{l}) - $self->margin));
+
 	if (!$self->overflow && scalar @words) {
-		die "Too many words to fit the max height: $pos{h} and width: $pos{w} overflow:" . join " ", @words;
+		$file->page->next($file);
+		return $self->add($file, text => join " ", @words);
 	}
 
 	return $file;

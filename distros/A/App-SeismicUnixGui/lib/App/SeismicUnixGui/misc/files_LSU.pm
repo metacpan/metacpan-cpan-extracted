@@ -442,9 +442,9 @@ sub check2write {
 	# print("files_LSU, check2write,start\n");
 
 	if ( not -e $files_LSU->{_outbound} ) {
-
-		# CASE if configuration file does not already exist
-		# e.g. , IMMODPG/immodpg.config
+		
+        # CASE if configuration file does not already exist
+		# e.g., IMMODPG/immodpg.config
 		use File::Copy;
 		_set_prog_name_config();
 		my $prog_name_config = _get_prog_name_config();
@@ -453,7 +453,7 @@ sub check2write {
 
 		copy( $from, $to );
 
-		print("files_LSU check2write copy $from to $to \n");
+#		print("files_LSU check2write copy $from to $to \n");
 
 		# Now you can overwrite the file
 		_write();
@@ -1404,7 +1404,7 @@ sub write {
 
 		}
 		else {
-			print("files_LSU, write, undefined value or name NADA\n");
+#			print("files_LSU, write, undefined value or name NADA\n");
 		}
 
 	}

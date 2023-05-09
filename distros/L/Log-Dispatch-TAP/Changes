@@ -1,5 +1,27 @@
 Revision history for Log-Dispatch-TAP:
 
+v0.2.1    2023-05-08 10:35:10+01:00 Europe/London
+  [Documentation]
+  - Removed inaccurate statement about Log::Dispatch::TestDiag.
+
+v0.2.0    2023-05-07 12:16:58+01:00 Europe/London
+  [Incompatabilities]
+  - Perl v5.14 or later is now required.
+
+  [Documentation]
+  - Documented support for older Perl versions.
+
+  - Bump copyright year.
+
+  - Fixed encoding of links in README.
+
+  [Other]
+  - Clean up test diagnostics.
+
+  - Signed distribution.
+
+  - Updated MANIFEST.SKIP rules.
+
 v0.1.2    2020-07-31 14:26:06+01:00 Europe/London
   [Toolchain]
   - Add core modules in the prerequisites.

@@ -26,6 +26,7 @@ requires:
   List::Util: '0'
   MIDI::Util: '0.1100'
   Math::Bezier: '0'
+  Math::Sequence::DeBruijn: '0'
   Moo: '2'
   Music::CreatingRhythms: '0'
   Music::Duration: '0.0900'
@@ -37,7 +38,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.4206'
+version: '0.4208'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

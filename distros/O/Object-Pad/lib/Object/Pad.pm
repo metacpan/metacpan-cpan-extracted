@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.78;
+package Object::Pad 0.79;
 
 use v5.14;
 use warnings;
@@ -394,7 +394,7 @@ I<Since version 0.33.>
 
       ADJUST { $f = "a value"; }
 
-      method field { return $f; }
+      method f { return $f; }
    }
 
 I<Since version 0.57> a role can declare that it provides another role:
@@ -557,7 +557,7 @@ returned.
    # equivalent to
    field $x;
 
-   method field {
+   method x {
       $x = shift if @_;
       return $x;
    }

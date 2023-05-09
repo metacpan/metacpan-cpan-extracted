@@ -18,8 +18,10 @@ lib/Crypt/HSM.xs
 lib/Crypt/HSM/Decrypt.pm
 lib/Crypt/HSM/Digest.pm
 lib/Crypt/HSM/Encrypt.pm
+lib/Crypt/HSM/Mechanism.pm
 lib/Crypt/HSM/Session.pm
 lib/Crypt/HSM/Sign.pm
+lib/Crypt/HSM/Slot.pm
 lib/Crypt/HSM/Stream.pm
 lib/Crypt/HSM/Verify.pm
 lib/Crypt/ppport.h

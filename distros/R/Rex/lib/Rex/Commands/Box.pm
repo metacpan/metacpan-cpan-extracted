@@ -15,40 +15,40 @@ Version <= 1.0: All these functions will not be reported.
 =head1 SYNOPSIS
 
  use Rex::Commands::Box;
- 
+
  set box => "VBox";
- 
+
  group all_my_boxes => map { get_box($_->{name})->{ip} } list_boxes;
- 
+
  task mytask => sub {
- 
+
    box {
      my ($box) = @_;
      $box->name("boxname");
      $box->url("http://box.rexify.org/box/base-image.box");
- 
+
      $box->network(1 => {
       type => "nat",
      });
- 
+
      $box->network(1 => {
       type => "bridged",
       bridge => "eth0",
      });
- 
+
      $box->forward_port(ssh => [2222, 22]);
- 
+
      $box->share_folder(myhome => "/home/myuser");
- 
+
      $box->auth(
       user => "root",
       password => "box",
      );
- 
+
      $box->setup(qw/task_to_customize_box/);
- 
+
    };
- 
+
  };
 
 =head1 EXPORTED FUNCTIONS
@@ -60,7 +60,7 @@ package Rex::Commands::Box;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use YAML;
 use Data::Dumper;
@@ -120,25 +120,25 @@ With this function you can create a new Rex/Box. The first parameter of this fun
    my ($box) = @_;
    $box->name("boxname");
    $box->url("http://box.rexify.org/box/base-image.box");
- 
+
    $box->network(1 => {
     type => "nat",
    });
- 
+
    $box->network(1 => {
     type => "bridged",
     bridge => "eth0",
    });
- 
+
    $box->forward_port(ssh => [2222, 22]);
- 
+
    $box->share_folder(myhome => "/home/myuser");
- 
+
    $box->auth(
     user => "root",
     password => "box",
    );
- 
+
    $box->setup(qw/task_to_customize_box/);
  };
 

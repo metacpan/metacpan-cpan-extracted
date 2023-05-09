@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::workflower 5.023;
+package Dist::Zilla::App::Command::workflower 5.024;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
 use Dist::Zilla::Pragmas;
@@ -86,7 +86,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.023
+version 5.024
 
 =head1 SYNOPSIS
 
@@ -106,8 +106,8 @@ not include anything before the minimum perl required for the dist being built.
 This module is shipped with no promise about what version of perl it will
 require in the future.  In practice, this tends to mean "you need a perl from
 the last three years," but you can't rely on that.  If a new version of perl
-ship, this software B<may> begin to require it for any reason, and there is no
-promise that patches will be accepted to lower the minimum required perl.
+ship, this software B<may> begin to require it for any reason, and there is
+no promise that patches will be accepted to lower the minimum required perl.
 
 =head1 AUTHOR
 

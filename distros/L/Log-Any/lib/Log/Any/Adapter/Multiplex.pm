@@ -1,6 +1,6 @@
 package Log::Any::Adapter::Multiplex;
 # ABSTRACT: Adapter to use allow structured logging across other adapters
-our $VERSION = '1.714';
+our $VERSION = '1.715';
 
 use Log::Any;
 use Log::Any::Adapter;
@@ -25,7 +25,7 @@ sub init {
 sub structured {
     my ($self, $level, $category, @structured_log_args) = @_;
     my %adapters = %{ $self->{adapters} };
-    my $unstructured_log_args;
+    my $unstructured_msg;
 
     for my $adapter ( $self->_get_adapters($category) ) {
         my $is_level = "is_$level";
@@ -38,18 +38,16 @@ sub structured {
                 $adapter->structured($level, $category, @structured_log_args)
             }
             else {
-                if (!$unstructured_log_args) {
-                    $unstructured_log_args = [
-                        _unstructured_log_args( @structured_log_args )
-                    ];
+                if (!$unstructured_msg) {
+                    $unstructured_msg = _unstructured_msg(@structured_log_args);
                 }
-                $adapter->$level(@$unstructured_log_args);
+                $adapter->$level($unstructured_msg);
             }
         }
     }
 }
 
-sub _unstructured_log_args {
+sub _unstructured_msg {
     my @structured   = @_;
     my @unstructured = @structured;
 
@@ -59,7 +57,8 @@ sub _unstructured_log_args {
             Log::Any::Proxy::_stringify_params( $structured[-1] ),
         )
     }
-    return @unstructured;
+
+    return join(' ' => @unstructured);
 }
 
 # Delegate detection methods to other adapters
@@ -116,7 +115,7 @@ Log::Any::Adapter::Multiplex - Adapter to use allow structured logging across ot
 
 =head1 VERSION
 
-version 1.714
+version 1.715
 
 =head1 SYNOPSIS
 

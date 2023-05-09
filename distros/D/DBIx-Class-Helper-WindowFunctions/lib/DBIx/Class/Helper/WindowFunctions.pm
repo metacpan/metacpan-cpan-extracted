@@ -2,9 +2,7 @@ package DBIx::Class::Helper::WindowFunctions;
 
 # ABSTRACT: Add support for window functions to DBIx::Class
 
-use v5.10;
-
-use strict;
+use v5.14;
 use warnings;
 
 use parent 'DBIx::Class::ResultSet';
@@ -15,7 +13,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 
 
 sub _resolved_attrs {
@@ -85,7 +83,7 @@ DBIx::Class::Helper::WindowFunctions - Add support for window functions to DBIx:
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -126,6 +124,16 @@ This module is experimental.
 
 Not all databases support window functions.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.4.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.3.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 L<DBIx::Class>
@@ -156,7 +164,7 @@ Peter Rabbitson <ribasushi@leporine.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

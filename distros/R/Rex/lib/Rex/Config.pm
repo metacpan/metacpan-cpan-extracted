@@ -33,7 +33,7 @@ package Rex::Config;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 use Rex::Helper::File::Spec;
 use Rex::Logger;
@@ -111,7 +111,7 @@ sub get_autodie {
 
 Sets and gets the value of the C<$use_net_openssh_if_present> configuration variable.
 
-This controls whether Rex should use L<Net::OpenSSH> for connections if that is available. 
+This controls whether Rex should use L<Net::OpenSSH> for connections if that is available.
 
 Default is C<undef>.
 

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 
@@ -26,10 +26,10 @@ class AClass :does(ARole) {
 
    AClass->new;
 
-   is_deeply( \@BUILD, [qw( ARole AClass )],
+   is( \@BUILD, [qw( ARole AClass )],
       'Roles are built before their implementing classes' );
 
-   is_deeply( \@ADJUST, [qw( ARole AClass )],
+   is( \@ADJUST, [qw( ARole AClass )],
       'Roles are adjusted before their implementing classes' );
 }
 
@@ -42,7 +42,7 @@ class BClass :isa(AClass) :does(ARole) {
 
    BClass->new;
 
-   is_deeply( \@BUILD, [qw( ARole AClass BClass )],
+   is( \@BUILD, [qw( ARole AClass BClass )],
       'Roles are built once only even if implemented multiple times' );
 }
 

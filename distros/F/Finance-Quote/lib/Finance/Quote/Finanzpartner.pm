@@ -25,7 +25,7 @@ use if DEBUG, 'Smart::Comments';
 use Web::Scraper;
 use Encode;
 
-our $VERSION = '1.5301'; # VERSION
+our $VERSION = '1.5402'; # VERSION
 
 my $FINANZPARTNER_URL = "https://www.finanzpartner.de/fi/";
 

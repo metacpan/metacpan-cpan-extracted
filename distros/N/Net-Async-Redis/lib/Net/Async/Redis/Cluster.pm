@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.022'; # VERSION
+our $VERSION = '3.023'; # VERSION
 
 =encoding utf8
 
@@ -100,6 +100,38 @@ our @CONFIG_KEYS = qw(
     hashrefs
     client_side_cache_size
 );
+
+# Sometimes we really want a key to be on a specific node. We can achieve this by maintaining
+# a mapping from all known slots to a sample key which would resolve to that slot - this can
+# then be applied in a `{slot}` entry in the full key to ensure that the value will end up
+# in the desired slot. To map to specific nodes, you'd combine this with the ->cluster_getslots
+# information, can use any slot in the range covered by that server.
+our @SLOT_MAP;
+
+sub key_for_slot {
+    my ($slot) = @_;
+    populate_slot_map() unless @SLOT_MAP;
+    return $SLOT_MAP[$slot];
+}
+
+sub populate_slot_map {
+    return if @SLOT_MAP;
+
+    my $pending = MAX_SLOTS;
+    my $data = '0';
+
+    my @map;
+    ITEM:
+    while($pending) {
+        my $slot = crc($data, 16, 0, 0, 0, 0x1021, 0, 0) & (MAX_SLOTS - 1);
+        unless(defined $map[$slot]) {
+            $map[$slot] = $data;
+            --$pending;
+        }
+        ++$data;
+    }
+    return;
+}
 
 =head1 METHODS
 

@@ -1,0 +1,9 @@
+Sys::Tlock perl module
+
+Installation
+
+In your shell, go to this directory (where this INSTALL.txt file is), and run the commands
+
+perl Build.PL
+./Build
+./Build install

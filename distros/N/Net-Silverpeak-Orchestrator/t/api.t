@@ -629,7 +629,7 @@ subtest_buffered 'application groups' => sub {
         hash {
             all_values hash {
                 field apps => bag {
-                    all_items match qr/^[a-zA-Z0-9\-\.]+$/;
+                    all_items match qr/^[a-zA-Z0-9_\-\.]+$/;
 
                     end();
                 };
@@ -676,7 +676,7 @@ subtest_buffered 'application groups' => sub {
                     end();
                 };
 
-                end();
+                etc();
             };
 
             etc();

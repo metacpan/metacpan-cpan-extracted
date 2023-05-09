@@ -1,6 +1,7 @@
 Changes
 lib/XML/XPath/Helper/String.pm
 Makefile.PL
+LICENSE
 MANIFEST			This list of files
 README
 t/00-load.t

@@ -1,5 +1,17 @@
 Revision history for Net-Async-Redis
 
+3.023     2023-05-08 04:37:32+08:00 Asia/Singapore
+    [New features]
+
+    - support for sharded pubsub (`SSUBSCRIBE` / `SPUBLISH`)
+
+    [Bugs fixed]
+
+    - exception during subscription cancellation, thanks to Pavel Shaydo for patch+test
+    - subscription handling should now work properly and consistently on both RESP2/RESP3
+    - `XREAD`/`XREADGROUP` now returns empty arrayref when no items, for consistency
+    - cancelling a cached `GET` could cause an exception due to the request Future going out of scope
+
 3.022     2022-03-21 02:11:58+08:00 Asia/Kuala_Lumpur
     [New features]
 

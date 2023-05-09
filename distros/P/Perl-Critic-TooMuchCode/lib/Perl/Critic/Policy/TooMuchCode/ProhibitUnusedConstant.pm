@@ -40,10 +40,7 @@ sub violates {
         }
     }
 
-    ## Look for the signature of misparsed ternary operator.
-    ## https://github.com/adamkennedy/PPI/issues/62
-    ## Once PPI is fixed, this workaround can be eliminated.
-    Perl::Critic::TooMuchCode::__get_terop_usage(\%used, $doc);
+    Perl::Critic::TooMuchCode::__get_symbol_usage(\%used, $doc);
 
     my @violations;
     my @to_report = grep { !$used{$_} } (sort keys %defined_constants);

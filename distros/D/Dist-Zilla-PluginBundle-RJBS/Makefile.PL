@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.026000;
 
 use ExtUtils::MakeMaker 6.78;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-RJBS",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Dist::Zilla::PluginBundle::RJBS",
   "PREREQ_PM" => {
     "Data::Section" => 0,
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "strict" => 0
   },
-  "VERSION" => "5.023",
+  "VERSION" => "5.024",
   "test" => {
     "TESTS" => "t/*.t"
   }

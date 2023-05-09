@@ -1,5 +1,12 @@
 Revision history for Algorithm-Graphs-TransitiveClosure-Tiny
 
+1.03    2023/05/05
+        POD: minor fix.
+
+1.02    2023/05/03
+        Added LICENSE file
+        POD, README: Removed link to cpanratings.perl.org
+
 1.01    2022/04/08
         Minor improvement of the POD section
 

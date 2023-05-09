@@ -11,7 +11,7 @@ use Test::Builder;
 use Exporter 'import';
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our @EXPORT_OK = qw(file_is);
 
@@ -58,14 +58,10 @@ Test::File::Cmp - Test routine for file comparison independent of CRLF or LF lin
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 
 =head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
     use Test::File::Cmp qw(file_is);
 
@@ -133,13 +129,14 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-File-Cmp>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Test-File-Cmp>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Test-File-Cmp>
+
+=item * GitHub Repository
+
+L<https://github.com/AAHAZRED/perl-Test-File-Cmp.git>
+
 
 =back
 

@@ -3,13 +3,12 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad ':experimental(mop)';
 
 class AClass {
-   use Test::More;
-   use Test::Fatal;
+   use Test2::V0 qw( :DEFAULT !field ); # don't import the field() check as its name will clash
 
    BEGIN {
       # Most of this test has to happen at BEGIN time before AClass gets
@@ -23,18 +22,18 @@ class AClass {
 
       is( $fieldmeta->name, "\$field", '$fieldmeta->name' );
 
-      like( exception { $classmeta->add_field( undef ) },
+      like( dies { $classmeta->add_field( undef ) },
          qr/^fieldname must not be undefined or empty /,
          'Failure from ->add_field undef' );
-      like( exception { $classmeta->add_field( "" ) },
+      like( dies { $classmeta->add_field( "" ) },
          qr/^fieldname must not be undefined or empty /,
          'Failure from ->add_field on empty string' );
 
-      like( exception { $classmeta->add_field( "foo" ) },
+      like( dies { $classmeta->add_field( "foo" ) },
          qr/^fieldname must begin with a sigil /,
          'Failure from ->add_field without sigil' );
 
-      like( exception { $classmeta->add_field( '$field' ) },
+      like( dies { $classmeta->add_field( '$field' ) },
          qr/^Cannot add another field named \$field /,
          'Failure from ->add_field duplicate' );
 
@@ -44,7 +43,7 @@ class AClass {
       my $anonfield = $classmeta->add_field( '$' );
       *anonfield = sub :lvalue { $anonfield->value( shift ) };
 
-      ok( !exception { $classmeta->add_field( '$' ) },
+      ok( !dies { $classmeta->add_field( '$' ) },
          'Can add a second anonymous field' );
 
       {

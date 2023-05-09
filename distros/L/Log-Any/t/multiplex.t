@@ -140,7 +140,7 @@ require_ok('Log::Any::Adapter::Multiplex');
               [ $structured_adapter, $level, $cat, $message, $log->context ],
               "Passed appropriate structured args";
     is_deeply $_My::Unstructured::Adapter::unstructured_args{$level},
-              [ $unstructured_adapter, $message, $ctx_str ],
+              [ $unstructured_adapter, "$message $ctx_str" ],
               "Passed appropriate unstructured args";
 
     @_My::Structured::Adapter::structured_args = ();

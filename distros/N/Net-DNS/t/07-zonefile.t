@@ -1,12 +1,13 @@
 #!/usr/bin/perl
-# $Id: 07-zonefile.t 1894 2023-01-12 10:59:08Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 
-use Test::More tests => 91;
+use Test::More tests => 88;
+use TestToolkit;
 
 ## vvv	verbatim from Domain.pm
 use constant ASCII => ref eval {
@@ -35,7 +36,8 @@ use constant LIBIDN2OK => LIBIDN2 && scalar eval {
 };
 
 
-use_ok('Net::DNS::ZoneFile');
+my $class = 'Net::DNS::ZoneFile';
+use_ok($class);
 
 
 my @file;
@@ -44,6 +46,7 @@ my $seq;
 END {
 	unlink $_ foreach @file;
 }
+
 
 sub source {				## zone file builder
 	my ( $text, @args ) = @_;
@@ -59,36 +62,20 @@ sub source {				## zone file builder
 	print $handle $text;
 	close $handle;
 
-	return Net::DNS::ZoneFile->new( $file, @args );
+	return $class->new( $file, @args );
 }
 
 
+my $misdirect = join ' ', '$INCLUDE zone0.txt	; presumed not to exist';
 my $recursive = join ' ', '$INCLUDE', source('$INCLUDE zone1.txt')->name;
 
 
-{
-	eval { Net::DNS::ZoneFile->new(undef); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "new(): invalid argument\t[$exception]" );
-}
+exception( 'new(): invalid  argument', sub { $class->new(undef) } );
+exception( 'new(): not a file handle', sub { $class->new( [] ) } );
+exception( 'new(): non-existent file', sub { $class->new('zone0.txt') } );
 
 
-{
-	eval { Net::DNS::ZoneFile->new( [] ); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "new(): not a file handle\t[$exception]" );
-}
-
-
-{
-	eval { Net::DNS::ZoneFile->new('zone0.txt'); };		# presumed not to exist
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "new(): non-existent file\t[$exception]" );
-}
-
-
-{					## public methods
-	my $zonefile = source('');
+for my $zonefile ( source('') ) {	## public methods
 	ok( $zonefile->isa('Net::DNS::ZoneFile'), 'new ZoneFile object' );
 
 	ok( defined $zonefile->name,   'zonefile->name always defined' );
@@ -103,77 +90,32 @@ my $recursive = join ' ', '$INCLUDE', source('$INCLUDE zone1.txt')->name;
 }
 
 
-{					## initial origin
-	my $tld	     = 'test';
-	my $absolute = source( '', "$tld." );
-	is( $absolute->origin, "$tld.", 'new ZoneFile with absolute origin' );
+for my $origin ('example') {		## initial origin
+	my $absolute = source( '', "$origin." );
+	is( $absolute->origin, "$origin.", 'new ZoneFile with absolute origin' );
 
-	my $relative = source( '', "$tld" );
-	is( $relative->origin, "$tld.", 'new ZoneFile->origin always absolute' );
+	my $relative = source( '', "$origin" );
+	is( $relative->origin, "$origin.", 'new ZoneFile->origin always absolute' );
 }
 
 
-{					## line numbering
-	my $lines    = 10;
-	my $zonefile = source( "\n" x $lines );
+for my $zonefile ( source( "\n" x 10 ) ) {	## line numbering
 	is( $zonefile->line, 0, 'zonefile->line zero before calling read()' );
 	my @rr = $zonefile->read;
-	is( $zonefile->line, $lines, 'zonefile->line number incremented by read()' );
+	is( $zonefile->line, 10, 'zonefile->line number incremented by read()' );
 }
 
 
-{
-	my $zonefile = source <<'EOF';
-$TTL
-EOF
-	eval { $zonefile->read; };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "exception:\t[$exception]" );
-}
+exception( 'incomplete $TTL directive',	     sub { source('$TTL')->read } );
+exception( 'incomplete $INCLUDE directive',  sub { source('$INCLUDE')->read } );
+exception( 'incomplete $ORIGIN directive',   sub { source('$ORIGIN')->read } );
+exception( 'incomplete $GENERATE directive', sub { source('$GENERATE')->read } );
+exception( 'unrecognised $BOGUS directive',  sub { source('$BOGUS')->read } );
+exception( 'non-existent include file',	     sub { source("$misdirect")->read } );
+exception( 'recursive include directive',    sub { my @zone = source("$recursive")->read } );
 
 
-{
-	my $zonefile = source <<'EOF';
-$INCLUDE
-EOF
-	eval { $zonefile->read; };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "exception:\t[$exception]" );
-}
-
-
-{
-	my $zonefile = source <<'EOF';
-$ORIGIN
-EOF
-	eval { $zonefile->read; };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "exception:\t[$exception]" );
-}
-
-
-{
-	my $zonefile = source <<'EOF';
-$GENERATE
-EOF
-	eval { $zonefile->read; };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "exception:\t[$exception]" );
-}
-
-
-{
-	my $zonefile = source <<'EOF';
-$BOGUS
-EOF
-	eval { $zonefile->read; };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "exception:\t[$exception]" );
-}
-
-
-{					## $TTL directive at start of zone file
-	my $zonefile = source <<'EOF';
+for my $zonefile ( source <<'EOF' ) {	## $TTL directive at start of zone file
 $TTL 54321
 rr0		SOA	mname rname 99 6h 1h 1w 12345
 EOF
@@ -181,8 +123,7 @@ EOF
 }
 
 
-{					## $TTL directive following implicit default
-	my $zonefile = source <<'EOF';
+for my $zonefile ( source <<'EOF' ) {	## $TTL directive following implicit default
 rr0		SOA	mname rname 99 6h 1h 1w 12345
 rr1		NULL
 $TTL 54321
@@ -197,19 +138,14 @@ EOF
 }
 
 
-{					## $INCLUDE directive
-	my $include = source <<'EOF';
+for my $include ( source <<'EOF' ) {	## $INCLUDE directive
 rr2	NULL
 EOF
-
 	my $directive = join ' ', '$INCLUDE', $include->name, '.';
-	my $misdirect = join ' ', '$INCLUDE zone0.txt	; presumed not to exist';
 	my $zonefile  = source <<"EOF";
 rr1	NULL
 $directive
 rr3	NULL
-$recursive
-$misdirect
 EOF
 
 	my $fn1 = $zonefile->name;
@@ -229,26 +165,10 @@ EOF
 	is( $rr3->name,	     'rr3', 'zonefile->read expected record' );
 	is( $zonefile->name, $fn1,  'zonefile->name identifies file' );
 	is( $zonefile->line, 3,	    'zonefile->line identifies record' );
-
-	{
-		my @rr = eval { $zonefile->read };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "recursive include\t[$exception]" );
-	}
-
-	{
-		my @rr = eval { $zonefile->read };
-		my ($exception) = split /\n/, "$@\n";
-		ok( $exception, "non-existent include\t[$exception]" );
-	}
-	is( $zonefile->name, $fn1, 'zonefile->name identifies file' );
-	is( $zonefile->line, 5,	   'zonefile->line identifies directive' );
 }
 
 
-my $zonefile;
-{					## $ORIGIN directive
-	my $nested = source <<'EOF';
+for my $nested ( source <<'EOF' ) {	## $ORIGIN directive
 nested	NULL
 EOF
 
@@ -264,11 +184,10 @@ $ORIGIN relative
 @	NULL
 EOF
 
-	my $outer = join ' ', '$INCLUDE', $include->name;
-	$zonefile = source <<"EOF";
+	my $outer    = join ' ', '$INCLUDE', $include->name;
+	my $zonefile = source <<"EOF";
 $outer 
 outer	NULL
-
 $ORIGIN $origin
 	NULL
 EOF
@@ -290,8 +209,7 @@ EOF
 }
 
 
-{					## $GENERATE directive
-	my $zonefile = source <<'EOF';
+for my $zonefile ( source <<'EOF' ) {	## $GENERATE directive
 $GENERATE 10-30/10	"@	TXT	$"	; BIND expects template to be quoted
 $GENERATE 30-10/10	@	TXT	$
 $GENERATE 123-123	@	TXT	${,,}
@@ -320,14 +238,12 @@ EOF
 	is( $zonefile->read->rdstring, '107B',		   'generate TXT ${4096,4,X}' );
 	is( $zonefile->read->rdstring, 'f.e.d.',	   'generate TXT ${0,6,n}' );
 	is( $zonefile->read->rdstring, 'F.E.D.C.B.A.0.0.', 'generate TXT ${0,16,N}' );
-	eval { $zonefile->read; };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "unknown format:\t[$exception]" );
+
+	exception( 'unknown generator format', sub { $zonefile->read } );
 }
 
 
-{
-	my $zonefile = source <<'EOF';
+for my $zonefile ( source <<'EOF' ) {	## multi-line parsing
 $TTL 1234
 $ORIGIN example.
 hosta	A	192.0.2.1
@@ -373,8 +289,7 @@ EOF
 }
 
 
-{					## CLASS coersion
-	my $zonefile = source <<'EOF';
+for my $zonefile ( source <<'EOF' ) {	## CLASS coersion
 rr0	CH	NULL
 rr1	CLASS1	NULL
 rr2	CLASS2	NULL
@@ -387,98 +302,44 @@ EOF
 }
 
 
-{					## compatibility with defunct Net::DNS::ZoneFile 1.04 distro
-	my $listref = Net::DNS::ZoneFile->read( $zonefile->name );
-	ok( scalar(@$listref), 'read(): entire zone file' );
+for my $zonefile ( source <<'EOF' ) {	## compatibility with defunct Net::DNS::ZoneFile 1.04 distro
+$ORIGIN example.com
+@	SOA	mname rname 99 6h 1h 1w 12345
+	NS	ns
+ns	AAAA	2001:DB8::add
+EOF
+	my $filename = $zonefile->name;
+
+	my @array = $class->read($filename);
+	ok( scalar(@array), 'class->read( filename )' );
+
+	my $listref = $class->read( $filename, '.' );
+	ok( scalar(@$listref), 'class->read( filename, path )' );
+
+	exception( 'class->read( /nxfile, dir )', sub { $class->read( '/zone0.txt', '.' ) } );
+
+	exception( 'class->read( nxfile, dir )', sub { $class->read( 'zone0.txt', 't' ) } );
+
+	ok( scalar( Net::DNS::ZoneFile::read($filename) ),
+		'class::read( filename ) subroutine call (not object-oriented)' );
 }
 
 
-{
-	my $listref = Net::DNS::ZoneFile->read( $zonefile->name, '.' );
-	ok( scalar(@$listref), 'read(): zone file via path' );
-}
-
-
-{
-	eval {
-		local $SIG{__WARN__} = sub { };			# presumed not to exist
-		my $listref = Net::DNS::ZoneFile->read( '/zone0.txt', '.' );
-	};
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "read(): non-existent file\t[$exception]" );
-}
-
-
-{
-	eval {
-		local $SIG{__WARN__} = sub { };			# presumed not to exist
-		my $listref = Net::DNS::ZoneFile->read( 'zone0.txt', 't' );
-	};
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "read(): non-existent file\t[$exception]" );
-}
-
-
-{
-	my $listref = Net::DNS::ZoneFile::read( $zonefile->name, '.' );
-	ok( scalar(@$listref), 'read(): direct subroutine call (not object-oriented)' );
-}
-
-
-{
-	my $string  = "";
-	my $listref = Net::DNS::ZoneFile::parse( \$string );
-	is( scalar(@$listref), 0, 'parse(): direct subroutine call (not object-oriented)' );
-}
-
-
-{
-	my $string = <<'EOF';
+for my $string ( <<'EOF' ) {
 a1.example A 192.0.2.1
 a2.example A 192.0.2.2
 EOF
-	my $listref = Net::DNS::ZoneFile->parse( \$string );	# this also tests readfh()
-	is( scalar(@$listref), 2, 'parse(): RR string' );
-}
+	my @list = $class->parse($string);			# this also tests readfh()
+	is( scalar(@list), 2, 'class->parse( $string )' );
 
+	my $listref = $class->parse( \$string );
+	is( scalar(@$listref), 2, 'class->parse( \$string )' );
 
-{
-	my $string = <<'EOF';
-a1.example A 192.0.2.1
-$BOGUS
-a2.example A 192.0.2.2
-EOF
-	local $SIG{__WARN__} = sub { };
-	my $listref = Net::DNS::ZoneFile->parse( \$string );
-	is( $listref, undef, 'parse(): erroneous string' );
-}
+	exception( 'class->parse( erroneous )', sub { scalar( $class->parse('$BOGUS') ) } );
+	exception( '@list = class->parse( ) )', sub { my @x = $class->parse('$BOGUS') } );
 
-
-{
-	my $string = <<'EOF';
-a1.example A 192.0.2.1
-a2.example A 192.0.2.2
-EOF
-	my @list = Net::DNS::ZoneFile->parse($string);
-	is( scalar(@list), 2, 'parse(): RR string into array' );
-}
-
-
-{
-	my $string = <<'EOF';
-a1.example A 192.0.2.1
-$BOGUS
-a2.example A 192.0.2.2
-EOF
-	local $SIG{__WARN__} = sub { };
-	my @list = Net::DNS::ZoneFile->parse($string);
-	is( scalar(@list), 1, 'parse(): erroneous string into array' );
-}
-
-
-{
-	my $listref = Net::DNS::ZoneFile::parse('a.example. A 192.0.2.1');
-	ok( scalar(@$listref), 'parse(): called as subroutine (not object-oriented)' );
+	ok( scalar( Net::DNS::ZoneFile::parse($string) ),
+		'class::parse( string ) subroutine call (not object-oriented)' );
 }
 
 
@@ -488,7 +349,7 @@ SKIP: {					## Non-ASCII zone content
 	my $greek = pack 'C*', 103, 114, 9, 84, 88, 84, 9, 229, 224, 241, 231, 234, 225, 10;
 	my $file1 = source($greek);
 	my $fh1	  = IO::File->new( $file1->name, '<:encoding(ISO8859-7)' );    # Greek
-	my $zone1 = Net::DNS::ZoneFile->new($fh1);
+	my $zone1 = $class->new($fh1);
 	my $txtgr = $zone1->read;
 	my $text  = pack 'U*', 949, 944, 961, 951, 954, 945;
 	is( $txtgr->txtdata, $text, 'ISO8859-7 TXT rdata' );
@@ -497,7 +358,7 @@ SKIP: {					## Non-ASCII zone content
 	my $jptxt = join "\n", <DATA>;
 	my $file2 = source($jptxt);
 	my $fh2	  = IO::File->new( $file2->name, '<:utf8' );	# UTF-8 character encoding
-	my $zone2 = Net::DNS::ZoneFile->new($fh2);
+	my $zone2 = $class->new($fh2);
 	my $txtrr = $zone2->read;				# TXT RR with kanji RDATA
 	my @rdata = $txtrr->txtdata;
 	my $rdata = $txtrr->txtdata;

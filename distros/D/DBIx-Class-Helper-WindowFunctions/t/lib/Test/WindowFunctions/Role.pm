@@ -1,5 +1,6 @@
 package Test::WindowFunctions::Role;
 
+use v5.14;
 use Test::Roo::Role;
 
 use Class::Load qw/ load_class /;
@@ -70,9 +71,8 @@ test 'build query' => sub {
 
     ok my $rs = $self->resultset, 'build resultset';
 
-    my $sql = $self->sql;
     my $alias = $self->current_source_alias;
-    $sql =~ s/\bme\b/$alias/g;
+    my $sql = $self->sql =~ s/\bme\b/$alias/gr;
 
     is_same_sql_bind(
         $rs->as_query,

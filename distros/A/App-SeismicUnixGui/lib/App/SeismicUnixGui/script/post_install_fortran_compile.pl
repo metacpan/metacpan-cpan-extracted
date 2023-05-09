@@ -36,6 +36,8 @@ our $VERSION = '0.0.1';
 use Cwd;
 use Env;
 use Shell qw(echo);
+use File::Basename;
+use File::Spec;
 
 my $Fortran_pathNfile;
 my $pgplot_pathNfile;
@@ -43,89 +45,101 @@ my $PGPLOT_DIR_default = '/usr/local/pgplot';
 my $PGPLOT_DIR         = $PGPLOT_DIR_default;
 my $SeismicUnixGui;
 my $default_answer = 'y';
+my ( $filename, $SeismicUnixGui_path, $Fortran_path );
 
 # search for fortran and pgplot codes
-my $starting_point          = '/';
-my $fortran_file            = 'run_me_only.sh';
-my $pgplot_file             = 'drivers.list';
-my $fortran_pathNfile2find  = "*/App/SeismicUnixGui/fortran/$fortran_file";
-my $pgplot_pathNfile2find   = "*/pgplot/$pgplot_file";
+my $starting_point         = '/';
+my $fortran_file           = 'run_me_only.sh';
+my $pgplot_file            = 'drivers.list';
+my $fortran_pathNfile2find = "*/App/SeismicUnixGui/fortran/$fortran_file";
+my $pgplot_pathNfile2find  = "*/pgplot/$pgplot_file";
 my $pgplot_path;
+my $bin = 'bin';
 
 # Searching
 print(" Examining the system ... for pgplot directory\n");
-my $instruction = ("find $starting_point -path $pgplot_pathNfile2find -print 2>/dev/null");
+my $instruction =
+  ("find $starting_point -path $pgplot_pathNfile2find -print 2>/dev/null");
+
 #print "\t".$instruction."\n";
-my @pgplot_list   = `$instruction`;
-my $lengthB = scalar @pgplot_list;
+my @pgplot_list = `$instruction`;
+my $lengthB     = scalar @pgplot_list;
 
 print("\n Found $lengthB locations for the pgplot libraries:\n");
 
 for ( my $i = 0 ; $i < $lengthB ; $i++ ) {
-	
-    $pgplot_list[$i] =~ s/$pgplot_file//;
+
+	$pgplot_list[$i] =~ s/$pgplot_file//;
 	print("Case $i: $pgplot_list[$i]\n");
 
 }
 
 my $ans = 'n';
-while ($ans eq 'n') {
-	
-	print("\nEnter the full path to pgplot libraries,\n or use the default:$pgplot_list[0]\n");
+while ( $ans eq 'n' ) {
+
+	print(
+"\nEnter the full path to pgplot libraries,\n or use the default:$pgplot_list[0]\n"
+	);
 	print("Enter a different name or only Hit Return\n");
 	my $answer = <STDIN>;
 	chomp $answer;
 
 	if ( length $answer ) {
-		
+
 		$pgplot_path = $answer;
-		
+
 	}
 	elsif ( !( length $answer ) ) {
-		
-		$pgplot_path= $pgplot_list[0];
-		
+
+		$pgplot_path = $pgplot_list[0];
+
 	}
 
 	print("You chose: $pgplot_path\n");
 	print("Is that correct? Please answer y or n  [$default_answer]\n");
 	$ans = <STDIN>;
 	chomp $ans;
-	
+
 }
 $PGPLOT_DIR = $pgplot_path;
 
-if (!defined($PGPLOT_DIR) or $PGPLOT_DIR eq '' ) {
+if ( !defined($PGPLOT_DIR) or $PGPLOT_DIR eq '' ) {
 
 	print("Warning: While running as sudo, \n");
 	print("PGPLOT_DIR variable was not found.\n");
 	print("You will need to install pgplot software,\n");
 	print("and define PGPLOT_DIR in you environment.\n");
 	print("If you want to compile FORTRAN programs, \n");
-    print("you should have the \"pgplot\" libraries compiled and installed. \n\n");
-    print("Please come back when you are ready, but first \n");
-	print ("install pgplot and put the following line \n");
-	print ("in your \".bashrc\" file:\n");
+	print(
+		"you should have the \"pgplot\" libraries compiled and installed. \n\n"
+	);
+	print("Please come back when you are ready, but first \n");
+	print("install pgplot and put the following line \n");
+	print("in your \".bashrc\" file:\n");
 	print("      export PGPLOT=/your/path/to/pgplot \n\n");
 
-} elsif ( defined($PGPLOT_DIR) ) {
+}
+elsif ( defined($PGPLOT_DIR) ) {
 
 	print("PGPLOT_DIR variable is defined\n");
 	print("PGPLOT_DIR = $PGPLOT_DIR\n");
 
-} else {
-	print ("Unexpected result from fortran installation script\n");
 }
-
+else {
+	print("Unexpected result from fortran installation script\n");
+}
 
 print("\n Examining the system ... for fortran files\n");
 
-my @fortran_list   = `(find $starting_point -path $fortran_pathNfile2find -print 2>/dev/null)`;
-my $lengthA= scalar @fortran_list;
+my @fortran_list =
+  `(find $starting_point -path $fortran_pathNfile2find -print 2>/dev/null)`;
+my $lengthA = scalar @fortran_list;
 
 print("\n Found $lengthA versions of the script.\n");
-print(" Hint: use one with the \"bin\" in the path name
-		or \"perl5/bin\"  for the case of a local installation\)\n");
+print(
+	" Hint: use one with the \"perl\" in the path name
+		or \"perl5/\"  for the case of a local installation\)\n"
+);
 
 for ( my $i = 0 ; $i < $lengthA ; $i++ ) {
 
@@ -135,47 +149,66 @@ for ( my $i = 0 ; $i < $lengthA ; $i++ ) {
 
 # reset ans
 $ans = 'n';
-while ($ans eq 'n') {
-	
-	print("\nEnter a script name (with Full Path),\n or use the default:$fortran_list[0]\n");
+while ( $ans eq 'n' ) {
+
+	print(
+"\nEnter a script name (with Full Path),\n or use the default:$fortran_list[0]\n"
+	);
 	print("Enter a different name or only Hit Return\n");
 	my $answer = <STDIN>;
 	chomp $answer;
 
 	if ( length $answer ) {
-		
+
 		$Fortran_pathNfile = $answer;
-		
+
 	}
 	elsif ( !( length $answer ) ) {
-		
+
 		$Fortran_pathNfile = $fortran_list[0];
-		
+
 	}
 
 	print("You chose: $Fortran_pathNfile\n");
 	print("Is that correct? Please answer y or n  [$default_answer]\n");
 	$ans = <STDIN>;
 	chomp $ans;
-	
+
 }
 
 print("\n\tINSTALLATION OF EXTERNAL FORTRAN PROGRAMS\n\n");
 
 print("Fortran path=$Fortran_pathNfile\n\n");
 
-my $path = $Fortran_pathNfile; 
+my $path = $Fortran_pathNfile;
 $path =~ s/$fortran_file//;
 chomp $path;
 
 print "Proceeding to compile\n";
 
 system("cd $path; sudo bash run_me_only.sh $PGPLOT_DIR ");
-# my $me = system("whoami");
-# print("post_install_fortran_compile.pl,me=$me\n");
 
+# Explain ENV settings to user
 
-print("End of Fortran Installation\n");
+print("\nMake sure you now set the environment variable properly.");
+
+( $filename, $Fortran_path ) = fileparse($Fortran_pathNfile);
+
+#print ("Directory:$Fortran_path...\n");
+my @dirs = File::Spec->splitdir($Fortran_path);      # parse directories
+#print ("@dirs...\n");
+pop @dirs;                                           # remove top dir
+pop @dirs;                                            # remove top dir
+#print ("@dirs...\n");
+$SeismicUnixGui_path = File::Spec->catdir(@dirs);    # create new path
+print(
+"\nFor your system, the environment variable: \$SeismicUnixGui appears to be:\n $SeismicUnixGui_path\n\n"
+);
+print("Before running SeismicUnixGui, be sure to add the\n");
+print("following  line to the end of your \".bashrc\" file:\n\n");
+print("export PATH=\$PATH:\$SeismicUnixGui:$Fortran_path$bin\n\n");
+
+print("   End of Fortran Installation\n");
 print("Hit Enter to leave\n");
 <STDIN>
 

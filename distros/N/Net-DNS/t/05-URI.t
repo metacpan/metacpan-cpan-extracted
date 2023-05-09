@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-URI.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 05-URI.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -18,20 +18,14 @@ my @also = qw( );
 
 my $wire = '000A00016674703A2F2F667470312E6578616D706C652E636F6D2F7075626C6963';
 
+my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
+is( $typecode, $code, "$type RR type code = $code" );
 
-{
-	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
-	is( $typecode, $code, "$type RR type code = $code" );
+my $hash = {};
+@{$hash}{@attr} = @data;
 
-	my $hash = {};
-	@{$hash}{@attr} = @data;
 
-	my $rr = Net::DNS::RR->new(
-		name => $name,
-		type => $type,
-		%$hash
-		);
-
+for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 	my $string = $rr->string;
 	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
@@ -46,21 +40,17 @@ my $wire = '000A00016674703A2F2F667470312E6578616D706C652E636F6D2F7075626C6963';
 		is( $rr2->$_, $rr->$_, "additional attribute rr->$_()" );
 	}
 
-
-	my $empty   = Net::DNS::RR->new("$name $type");
-	my $nodata  = $empty->string;
 	my $encoded = $rr->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $decoded->encode;
 	my $hex2    = uc unpack 'H*', $encoded;
-	my $hex3    = uc unpack 'H*', substr( $encoded, length $empty->encode );
+	my $hex3    = uc unpack 'H*', $rr->rdata;
 	is( $hex1, $hex2, 'encode/decode transparent' );
 	is( $hex3, $wire, 'encoded RDATA matches example' );
 }
 
 
-{
-	my $rr = Net::DNS::RR->new(". $type");
+for my $rr ( Net::DNS::RR->new(". $type") ) {
 	foreach (@attr) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}

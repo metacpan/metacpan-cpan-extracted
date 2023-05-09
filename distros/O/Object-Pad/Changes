@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.79    2023-05-09
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Support `goto LABEL` entirely within a field initialiser block
+
+        [BUGFIXES]
+         * Docs fix for implied method names to match names of fields
+           (RT146092)
+         * Hide bleadperl's suspended compcv macros when redefining our own of
+           the same name
+
 0.78    2023-01-12
         [BUGFIXES]
          * Don't complain about empty-list field initialisers being

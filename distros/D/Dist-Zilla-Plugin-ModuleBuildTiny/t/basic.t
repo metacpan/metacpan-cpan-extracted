@@ -30,6 +30,7 @@ my $expected = <<"END";
 use strict;
 use warnings;
 
+
 use $];
 use Module::Build::Tiny 0.034;
 Build_PL();

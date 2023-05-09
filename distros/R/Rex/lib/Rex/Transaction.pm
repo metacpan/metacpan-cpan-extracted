@@ -13,13 +13,13 @@ With this module you can define transactions and rollback scenarios on failure.
 =head1 SYNOPSIS
 
  use Rex::Transaction;
- 
+
  task 'do-something', 'server01', sub {
    transaction {
      on_rollback {
        rmdir '/tmp/mydata';
      };
- 
+
      mkdir '/tmp/mydata';
      upload 'files/myapp.tar.gz', '/tmp/mydata';
      run 'tar xzf myapp.tar.gz -C /tmp/mydata';
@@ -36,7 +36,7 @@ package Rex::Transaction;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.1'; # VERSION
+our $VERSION = '1.14.2'; # VERSION
 
 require Exporter;
 
@@ -60,11 +60,11 @@ Start a transaction for C<$codeRef>. If C<$codeRef> dies, Rex will run the L<on_
 
    deploy 'myapp.tar.gz';
  };
- 
+
  task 'restart_server', group => 'frontend', sub {
    service apache2 => 'restart';
  };
- 
+
  task 'all', group => 'frontend', sub {
    transaction {
      do_task [qw/deploy restart_server/];

@@ -30,8 +30,7 @@ do { my $x = {
                                       'Types::Standard' => '0',
                                       'base' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
+                                      'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -43,7 +42,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Log::Dispatch' => '0',
                                    'Module::Metadata' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

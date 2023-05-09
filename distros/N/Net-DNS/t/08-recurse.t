@@ -1,16 +1,11 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 1822 2020-10-29 10:54:43Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1910 2023-03-30 19:16:30Z willem $ -*-perl-*-
 #
 
 use strict;
 use warnings;
 use Test::More;
-
-
-BEGIN {
-	local @INC = ( @INC, qw(t) );
-	require NonFatal;
-}
+use TestToolkit;
 
 use Net::DNS;
 use Net::DNS::Resolver::Recurse;
@@ -56,8 +51,7 @@ plan tests => 10;
 NonFatalBegin();
 
 
-{
-	my $res = Net::DNS::Resolver::Recurse->new( debug => 0 );
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
 
 	ok( $res->isa('Net::DNS::Resolver::Recurse'), 'new() created object' );
 
@@ -66,9 +60,7 @@ NonFatalBegin();
 }
 
 
-{
-	# test the callback
-	my $res = Net::DNS::Resolver::Recurse->new( debug => 0 );
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {	# test the callback
 
 	my $count = 0;
 
@@ -80,8 +72,7 @@ NonFatalBegin();
 }
 
 
-{
-	my $res = Net::DNS::Resolver::Recurse->new( debug => 0 );
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
 
 	my $count = 0;
 

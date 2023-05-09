@@ -2,7 +2,7 @@ package Net::DNS::RR::DS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DS.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: DS.pm 1909 2023-03-23 11:36:16Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -51,9 +51,13 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	$self->_annotation( $self->babble ) if BABBLE && $self->{algorithm};
-	my @param = @{$self}{qw(keytag algorithm digtype)};
-	my @rdata = ( @param, split /(\S{64})/, $self->digest || '-' );
+	my @rdata = @{$self}{qw(keytag algorithm digtype)};
+	if ( my $digest = $self->digest ) {
+		$self->_annotation( $self->babble ) if BABBLE;
+		push @rdata, split /(\S{64})/, $digest;
+	} else {
+		push @rdata, '""';
+	}
 	return @rdata;
 }
 
@@ -61,11 +65,11 @@ sub _format_rdata {			## format rdata portion of RR string.
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my ( $self, @argument ) = @_;
 
-	my $keytag = shift @argument;	## avoid destruction by CDS algorithm(0)
-	$self->algorithm( shift @argument );
+	$self->keytag( shift @argument );
+	my $algorithm = shift @argument;
 	$self->digtype( shift @argument );
 	$self->digest(@argument);
-	$self->keytag($keytag);
+	$self->algorithm($algorithm);
 	return;
 }
 
@@ -129,19 +133,19 @@ sub create {
 	my ( $class, $keyrr, %args ) = @_;
 	my ($type) = reverse split '::', $class;
 
-	croak "Unable to create $type record for non-zone key" unless $keyrr->zone;
-	croak "Unable to create $type record for revoked key" if $keyrr->revoke;
 	croak "Unable to create $type record for invalid key" unless $keyrr->protocol == 3;
+	croak "Unable to create $type record for revoked key" if $keyrr->revoke;
+	croak "Unable to create $type record for non-zone key" unless $keyrr->zone;
 
 	my $self = Net::DNS::RR->new(
-		owner	  => $keyrr->owner,			# per definition, same as keyrr
-		type	  => $type,
-		class	  => $keyrr->class,
-		ttl	  => $keyrr->{ttl},
-		keytag	  => $keyrr->keytag,
+		owner	=> $keyrr->owner,			# per definition, same as keyrr
+		type	=> $type,
+		class	=> $keyrr->class,
+		ttl	=> $keyrr->{ttl},
+		digtype => 1,					# SHA1 by default
+		%args,
 		algorithm => $keyrr->algorithm,
-		digtype	  => 1,					# SHA1 by default
-		%args
+		keytag	  => $keyrr->keytag
 		);
 
 	my $hash = $digest{$self->digtype};

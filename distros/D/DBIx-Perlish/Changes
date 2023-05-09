@@ -1,4 +1,7 @@
 Revision history for DBIx-Perlish
+1.07 7 May 2023
+	Fixes for new opcodes in perl 5.37
+
 1.06 14 May 2020
 	Fix broken field addressing in hash/arrayrefs
 

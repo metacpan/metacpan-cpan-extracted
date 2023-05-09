@@ -1,6 +1,7 @@
 #!perl
-use strict;
+use v5.16;
 use warnings;
+
 use App::RemoteCommand;
 
 exit App::RemoteCommand->run(@ARGV);
@@ -13,9 +14,9 @@ rcommand - simple remote command launcher
 
 =head1 SYNOPSIS
 
-  > rcommand [OPTIONS] HOSTS COMMANDS
-  > rcommand [OPTIONS] --host-file FILE COMMANDS
-  > rcommand [OPTIONS] HOSTS --script SCRIPT [SCRIPT_ARGS]
+  $ rcommand [OPTIONS] HOSTS COMMANDS
+  $ rcommand [OPTIONS] --host-file FILE COMMANDS
+  $ rcommand [OPTIONS] HOSTS --script SCRIPT [SCRIPT_ARGS]
 
 =head1 OPTIONS
 
@@ -34,20 +35,20 @@ rcommand - simple remote command launcher
 
 =head1 EXAMPLES
 
-  > rcommand example.jp 'uname -a'
-  > rcommand example.jp --script foo.pl
-  > rcommand example.jp --script script.pl arg1 arg2 arg3
-  > rcommand --host-file host.txt 'uptime; top -b -n 1'
-  > rcommand --ask-sudo-password '{www1,www2}.example.com' -- sudo rm -rf /tmp/trash
-  > rcommand --ask-sudo-password --sudo root example.com 'service restart httpd'
-  > rcommand --ask-sudo-password --sudo app example.com --script script.sh
+  $ rcommand example.jp 'uname -a'
+  $ rcommand example.jp --script foo.pl
+  $ rcommand example.jp --script script.pl arg1 arg2 arg3
+  $ rcommand --host-file host.txt 'uptime; top -b -n 1'
+  $ rcommand --ask-sudo-password '{www1,www2}.example.com' -- sudo rm -rf /tmp/trash
+  $ rcommand --ask-sudo-password --sudo root example.com 'service restart httpd'
+  $ rcommand --ask-sudo-password --sudo app example.com --script script.sh
 
   HOSTS will be expand by String::Glob::Permute::string_glob_permute function.
   For example,
 
-   'example.{com,jp}'     => example.com, example.jp
-   'example[001-003].com' => example001.com, example002.com, example003.com
-   '{prod,qa}[01-02].com' => prod01.com, prod02.com, qa01.com, qa02.com
+   example.{com,jp}      ->  example.com, example.jp
+   example[001-003].com  ->  example001.com, example002.com, example003.com
+   {prod,qa}[01-02].com  ->  prod01.com, prod02.com, qa01.com, qa02.com
 
 =head1 LICENSE
 

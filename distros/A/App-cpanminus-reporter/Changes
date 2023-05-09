@@ -1,5 +1,10 @@
 Revision history for App-cpanminus-reporter
 
+0.20  2023-05-07
+    BUG FIXES:
+      - send compilation errors as UNKNOWN, not FAIL, so reports
+        are consistent with what CPAN::Reporter does.
+
 0.19  2023-04-30
     NEW FEATURES:
       - analyze multiple reports at once via the new "--all"

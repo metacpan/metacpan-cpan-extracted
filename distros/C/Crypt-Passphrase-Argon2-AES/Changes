@@ -1,5 +1,11 @@
 Revision history for Crypt-Passphrase-Argon2-AES
 
+0.004     2023-05-05 02:22:23+0200
+          - Adapt tests to latest Crypt::Passphrase::Argon2::Encrypted
+
+0.003     2023-05-04 15:24:54+0200
+          - Make cipher part of peppered crypt identifiers
+
 0.002     2023-04-11 14:21:32+0200
           - Explicitly require Crypt::Rijndael 1.16
 
