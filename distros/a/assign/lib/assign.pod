@@ -4,13 +4,13 @@
 
 =head1 NAME
 
-assign - Destructuring Assignment Syntax in Perl
+assign - Destructuring Assignment Syntax for Perl
 
 =head1 SYNOPSIS
 
 This code:
 
-    use assign -0;
+    use assign::0;
 
     my {$foo, bar => [ $first, @rest, $last ]} = $self->data;
 
@@ -19,9 +19,9 @@ works the same as this code:
     my $_temp1 = $self->data;
     my $foo = $_temp1->{foo};
     my $_temp2 = $_temp1->{bar};
-    my $first = shift @$temp2;
-    my $last = pop @$temp2;
-    my @rest = @$temp2;
+    my $first = $_temp2->[0];
+    my @rest = @$_temp2[1..(@$_temp2-2)];
+    my $last = $_temp2->[@$_temp2-1] if @$_temp2 > 1;
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,29 @@ There are many useful combinations, which are documented below. The destructurin
 
 This module is very new and experimental. The hope is that this may one day become a pragma module or possibly even part of the Perl language's syntax.
 
-To preserve backwards compatability for early adopters, the module currently requires you to C<use assign -0;>. When the module becomes stable and vetted, it will become simply C<use assign;>.
+To preserve backwards compatability for early adopters, the module currently requires you to C<use assign::0;>. When the module becomes stable and vetted, it will become simply C<use assign;>.
+
+=head1 USAGE
+
+Simply add a C<use assign::0;> line to your program, and then you can use any of the assignment forms described below. You must C<use> the module I<before> the first line where you use one of the assignment forms.
+
+If you need to turn off C<assign> after turning it on for some reason, you can use the line: C<no assign>.
+
+=head2 DEBUGGING
+
+To see how the C<assign> module turns the new style assignment forms into plain old Perl code in you program, you can use the C<assign::0->debug()> method.
+
+    require assign::0;
+    print assign::0->debug(<perl-file-name>);
+    print assign::0->debug(<perl-code-string-as-scalar-ref>);
+
+This will perform the C<assign> transformations on the Perl code and print the result.
+
+You can do that as a perl one-liner like so:
+
+    perl -e 'require assign::0; print assign::0->debug("program.pl")'
+
+Remember to use C<require assign::0;>, not C<use assign::0;>.
 
 =head1 DESTRUCTURING FORMS
 
@@ -46,6 +68,8 @@ The best way to explain this module is by example.
 All the forms below have been implemented and should work as described for this version of the module.
 
 Here we go...
+
+=head2 BASIC FORMS
 
 =over
 
@@ -93,24 +117,45 @@ Define 2 C<my> variables and use the variable name as the key to extract from th
 
 =back
 
+=head2 EXTENDED ARRAY REF FORMS
+
+=over
+
+=item * C<my [ $foo, _, _, $bar ] = $array_ref;>
+
+You can skip array values with the C<_> symbol.
+
+=item * C<my [ $foo, $_, $bar ] = $array_ref;>
+
+Unpack into global C<$_>, not a my variable. The C<$foo> and C<$bar> here are still C<my> lexical vars.
+
+=item * C<my [ 7, $foo, 42, $bar ] = $array_ref;>
+
+You can skip any number of array values by using a positive integer.
+
+=item * C<my [ $a, $b=42, $c="1\n2", $d=$a ] = $array_ref;>
+
+You can define default values for variables. Currently the default must be a single token (string, number, variable). Also there must not be whitespace on either side of the C<=>.
+
+=back
+
 =head2 TO DO
 
 There are many more forms that are intended to work, and many more cases we haven't thought of yet. Pretty much any place in Perl where a variable can be assigned to should also allow a structure to be assigned to.
 
 Here's the current list of things intended to be added soon:
 
-    my [ _, $x2, _, $x4 ] = $d;         # Use _ ignore an array element
-    my [ $x1, $_ ] = $d;                # $_ actually sets $_
-    my [ $x1, $x2=42 ] = $d;            # Set a default variable
     my [ $x1, @xs ] = $d;               # Set remaining into an array
     my [ $x1, @xs, $x2 ] $d;            # Set all but first and last into array
     my [ $first, [], $last ] = $d;      # Ignore middle
-    my [ 25, $x26, $x27 ] = $d;         # Use a number to ignore muliple
     my [ $x1, $x2, -25 ] = $d;          # Take -27 and -26
 
-    my [ @a, @b, @c ] = $d;             # Evenly distribute values over multiple arrays
-    my [ @a, @_, @_ ] = $d;             # Take every third element (0, 3, 6, ...)
-    my [ @a, @19 ] = $d;                # Take every 19th element
+    my [ @a => @b => @c ] = $d;         # Evenly distribute values over multiple arrays
+    my [ @a => @ => @ ] = $d;           # Take every third element (0, 3, 6, ...)
+    my [ @a => @19 ] = $d;              # Take every 19th element
+
+    my [ @a, @b, @c ] = $d;             # Split into thirds
+    my [ @a, @, @ ] = $d;               # Get first third
 
     # Hash destructuring:
     my { $k1, $k2 } = $d;               # Unpack a hash ref

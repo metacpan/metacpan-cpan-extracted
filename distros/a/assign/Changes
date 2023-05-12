@@ -1,3 +1,13 @@
+0.0.10 Fri May 12 07:30:34 AM PDT 2023
+ - Support default values for array vars
+
+0.0.9 Fri May 12 06:50:22 AM PDT 2023
+ - Define classes for internal objects
+ - Fix YAML::PP version requirement
+
+0.0.8 Thu May 11 03:11:13 PM PDT 2023
+ - Add assign::Array and assign::Hash container classes
+
 0.0.7 Mon May  8 07:23:08 AM CEST 2023
  - Support basic hash destructuring
 

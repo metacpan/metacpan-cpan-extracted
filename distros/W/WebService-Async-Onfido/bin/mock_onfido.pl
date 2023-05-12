@@ -333,7 +333,7 @@ sub clone_and_remove_private {
 }
 
 # Start the Mojolicious command system
-app->start;
+app->start('daemon', '-l', "http://*:3000");
 
 sub END {
     for my $f (values %files) {

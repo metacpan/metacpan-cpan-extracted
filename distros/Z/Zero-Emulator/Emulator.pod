@@ -4,7 +4,7 @@
 
 =head1 Name
 
-Zero::Emulator - Assemble and emulate a program written in the L<Zero|https://github.com/philiprbrenan/zero> assembly programming language.
+Zero::Emulator - Assemble and emulate a program written in the L<Zero|https://github.com/philiprbrenan/zero> assembler programming language.
 
 =for html
 <p><a href="https://github.com/philiprbrenan/zero"><img src="https://github.com/philiprbrenan/zero/workflows/Test/badge.svg"></a>
@@ -33,27 +33,9 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 
 
-=head1 Execution
+=head1 Instruction Set
 
-=head2 Start($version)
-
-Start the current assembly using the specified version of the Zero language.  At  the moment only version 1 works.
-
-     Parameter  Description
-  1  $version   Version desired - at the moment only 1
-
-B<Example:>
-
-
-  if (1)                                                                            
-  
-   {Start 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out "hello World";
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["hello World"];
-   }
-  
+The instruction set used by the Zero assembler programming language.
 
 =head2 Add($target, $s1, $s2)
 
@@ -77,37 +59,6 @@ B<Example:>
     is_deeply $e->out, [5];
    }
   
-  if (1)                                                                           
-   {Start 1;
-    my $a = Subtract 4, 2;
-    Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
-
-=head2 Subtract($target, $s1, $s2)
-
-Subtract the second source operand value from the first source operand value and store the result in the target area.
-
-     Parameter  Description
-  1  $target    Target address
-  2  $s1        Source one
-  3  $s2        Source two
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-  
-    my $a = Subtract 4, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
 
 =head2 Array($name)
 
@@ -127,8 +78,12 @@ B<Example:>
       Mov [$a, 0, "aaa"], 1;
       Mov [$a, 1, "aaa"], 22;
       Mov [$a, 2, "aaa"], 333;
+  
     my $n = ArraySize $a, "aaa";
-    DumpArray $a, "AAAA";
+  
+    Out "Array size:"; Out $n;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ArrayDump $a, "AAAA";
   
     ForArray
      {my ($i, $e, $check, $next, $end) = @_;
@@ -140,157 +95,18 @@ B<Example:>
   
     is_deeply $e->memory, {1=>[1, 22, 333]};
   
-    is_deeply $e->out,
-  [ "AAAA",
-    "bless([1, 22, 333], \"aaa\")",
+  
+    is_deeply $e->out, [ "Array size:", 3,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    "AAAA", "bless([1, 22, 333], \"aaa\")",
+  
     "Stack trace",
-    "    1     6 dumpArray",
-    0,
-    1,
-    1,
-    22,
-    2,
-    333];
-   }
+    "    1     8 arrayDump",
   
-
-=head2 Free($target, $source)
-
-Free the memory area named by the target operand after confirming that it has the name specified on the source operand.
-
-     Parameter  Description
-  1  $target    Target area yielding the id of the area to be freed
-  2  $source    Source area yielding the name of the area to be freed
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Array "node";
-  
-    Free $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, [
-    "Wrong name: aaa for array with name: node",
-    "    1     2 free",
-  ];
-   }
-  
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "node";
-    Out $a;
-    Mov [$a, 1, 'node'], 1;
-    Mov [$a, 2, 'node'], 2;
-    Mov 1, [$a, \1, 'node'];
-    Dump "dddd";
-  
-    Free $a, "node";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, [
-    1,
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1, 1], \"stackArea\")",
-    "1=bless([undef, 1, 2], \"node\")",
-    "Stack trace",
-    "    1     6 dump",
-  ];
-   }
-  
-
-=head2 ArraySize($area, $name)
-
-The current size of an array.
-
-     Parameter  Description
-  1  $area      Location of area
-  2  $name      Name of area
-
-B<Example:>
-
-
-  if (1)                                                                             
-   {Start 1;
-    my $a = Array "aaa";
-      Mov [$a, 0, "aaa"], 1;
-      Mov [$a, 1, "aaa"], 22;
-      Mov [$a, 2, "aaa"], 333;
-  
-    my $n = ArraySize $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    DumpArray $a, "AAAA";
-  
-    ForArray
-     {my ($i, $e, $check, $next, $end) = @_;
-      Out $i; Out $e;
-     }  $a, "aaa";
-  
-    Nop;
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->memory, {1=>[1, 22, 333]};
-  
-    is_deeply $e->out,
-  [ "AAAA",
-    "bless([1, 22, 333], \"aaa\")",
-    "Stack trace",
-    "    1     6 dumpArray",
-    0,
-    1,
-    1,
-    22,
-    2,
-    333];
-   }
-  
-
-=head2 ArrayIndex()
-
-Find the 1 based index of the second source operand in the array referenced by the first source operand if it is present in the array else 0 into the target location.  The business of returning -1 leads to the inferno of try catch.
-
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-    my $a = Array "aaa";
-    Mov [$a, 0, "aaa"], 10;
-    Mov [$a, 1, "aaa"], 20;
-    Mov [$a, 2, "aaa"], 30;
-  
-  
-    Out ArrayIndex $a, 30;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayIndex $a, 20;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayIndex $a, 10;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayIndex $a, 15;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountLess $a, 35;
-    Out ArrayCountLess $a, 25;
-    Out ArrayCountLess $a, 15;
-    Out ArrayCountLess $a,  5;
-  
-    Out ArrayCountGreater $a, 35;
-    Out ArrayCountGreater $a, 25;
-    Out ArrayCountGreater $a, 15;
-    Out ArrayCountGreater $a,  5;
-  
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3,2,1,0,  3,2,1,0, 0,1,2,3];
+    0,   1,
+    1,  22,
+    2, 333];
    }
   
 
@@ -333,7 +149,7 @@ B<Example:>
     Out ArrayCountGreater $a,  5;
   
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3,2,1,0,  3,2,1,0, 0,1,2,3];
+    is_deeply $e->out, [3,2,1,0,  3,2,1,0,  0,1,2,3];
    }
   
 
@@ -376,182 +192,11 @@ B<Example:>
 
   
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3,2,1,0,  3,2,1,0, 0,1,2,3];
+    is_deeply $e->out, [3,2,1,0,  3,2,1,0,  0,1,2,3];
    }
   
 
-=head2 Call($p)
-
-Call the subroutine at the target address.
-
-     Parameter  Description
-  1  $p         Procedure description
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $w = Procedure 'write', sub
-     {Out 'aaa';
-      Return;
-     };
-  
-    Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["aaa"];
-   }
-  
-  if (1)                                                                          
-   {Start 1;
-    my $w = Procedure 'write', sub
-     {my $a = ParamsGet 0;
-      Out $a;
-      Return;
-     };
-    ParamsPut 0, 'bbb';
-  
-    Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["bbb"];
-   }
-  
-  if (1)                                                                            
-   {Start 1;
-    my $w = Procedure 'write', sub
-     {ReturnPut 0, "ccc";
-      Return;
-     };
-  
-    Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    ReturnGet \0, 0;
-    Out \0;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["ccc"];
-   }
-  
-  if (1)                                                                            
-   {Start 1;
-    my $a = Array "aaa";
-    Dump "dddd";
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1], \"stackArea\")",
-    "1=bless([], \"aaa\")",
-    "Stack trace",
-    "    1     2 dump",
-  ];
-   }
-  
-  if (1)                                                                              
-   {Start 1;
-    my $a = Array "aaa";
-    my $i = Mov 1;
-    my $v = Mov 11;
-    ParamsPut 0, $a;
-    ParamsPut 1, $i;
-    ParamsPut 2, $v;
-    my $set = Procedure 'set', sub
-     {my $a = ParamsGet 0;
-      my $i = ParamsGet 1;
-      my $v = ParamsGet 2;
-      Mov [$a, \$i, 'aaa'], $v;
-      Return;
-     };
-  
-    Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $V = Mov [$a, \$i, 'aaa'];
-    AssertEq $v, $V;
-    Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
-   }
-  
-  if (1)                                                                            
-   {Start 1;
-    my $set = Procedure 'set', sub
-     {my $a = ParamsGet 0;
-     };
-    ParamsPut 0, 1;
-  
-    Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    ParamsPut 0, 1;
-  
-    Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [];
-   }
-  
-
-=head2 Confess()
-
-Confess.
-
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $c = Procedure 'confess', sub
-  
-     {Confess;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     };
-    Call $c;
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, ["Confess at:", "    2     3 confess", "    1     6 call"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-   }
-  
-
-=head2 Dump($title)
-
-Dump memory.
-
-     Parameter  Description
-  1  $title     Title
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "node";
-    Out $a;
-    Mov [$a, 1, 'node'], 1;
-    Mov [$a, 2, 'node'], 2;
-    Mov 1, [$a, \1, 'node'];
-  
-    Dump "dddd";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Free $a, "node";
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, [
-    1,
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1, 1], \"stackArea\")",
-    "1=bless([undef, 1, 2], \"node\")",
-    "Stack trace",
-    "    1     6 dump",
-  ];
-   }
-  
-
-=head2 DumpArray($target, $title)
+=head2 ArrayDump($target, $title)
 
 Dump an array.
 
@@ -569,1858 +214,105 @@ B<Example:>
       Mov [$a, 1, "aaa"], 22;
       Mov [$a, 2, "aaa"], 333;
   
-    DumpArray $a, "AAAA";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    ArrayDump $a, "AAAA";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
   
-    is_deeply $e->out,
-   ["AAAA",
+    is_deeply $e->out, [
+    "AAAA",
     "bless([1, 22, 333], \"aaa\")",
     "Stack trace",
-    "    1     5 dumpArray",
-  ];
+    "    1     5 arrayDump"];
    }
   
 
-=head2 Trace($source)
+=head2 ArrayIndex()
 
-Trace.
+Find the 1 based index of the second source operand in the array referenced by the first source operand if it is present in the array else 0 into the target location.  The business of returning -1 would have led to the confusion of "try catch" and we certainly do not want that.
 
-     Parameter  Description
-  1  $source    Trace setting
 
 B<Example:>
 
 
   if (1)                                                                            
    {Start 1;
-  
-    Trace 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfEq 1, 2,
-    Then
-     {Mov 1, 1;
-      Mov 2, 1;
-     },
-    Else
-     {Mov 3, 3;
-      Mov 4, 4;
-     };
-    IfEq 2, 2,
-    Then
-     {Mov 1, 1;
-      Mov 2, 1;
-     },
-    Else
-     {Mov 3, 3;
-      Mov 4, 4;
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply scalar($e->out->@*), 14;
-   }
-  
-
-=head2 TracePoints($source)
-
-Enable trace points.
-
-     Parameter  Description
-  1  $source    Trace points if true
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {my $N = 5;
-    Start 1;
-  
-    TracePoints 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    For
-     {my $a = Mov 1;
-      Inc $a;
-     } $N;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
-  
-    "TracePoints: 1",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-  ];
-   }
-  
-
-=head2 Dec($target)
-
-Decrement the target.
-
-     Parameter  Description
-  1  $target    Target address
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Mov 3;
-  
-    Dec $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
-
-=head2 Inc($target)
-
-Increment the target.
-
-     Parameter  Description
-  1  $target    Target address
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Mov 3;
-  
-    Inc $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [4];
-   }
-  
-
-=head2 Jmp($target)
-
-Jump to a label.
-
-     Parameter  Description
-  1  $target    Target address
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-  
-    Jmp (my $a = label);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Out  1;
-  
-      Jmp (my $b = label);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    setLabel($a);
-      Out  2;
-    setLabel($b);
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
-
-=head2 Jle($target, $source, $source2)
-
-Jump to a target label if the first source field is less than or equal to the second source field.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-  3  $source2
-
-B<Example:>
-
-
-  if (1)                                                                                 
-   {Start 1;
     my $a = Array "aaa";
-    my $b = Array "bbb";
-    Mov [$a, 0, 'aaa'], $b;
-    Mov [$b, 0, 'bbb'], 99;
-    For
-     {my ($i, $check, $next, $end) = @_;
-      my $c = Mov [$a, \0, 'aaa'];
-      my $d = Mov [$c, \0, 'bbb'];
-      Jeq $next, $d, $d;
-      Jne $next, $d, $d;
+    Mov [$a, 0, "aaa"], 10;
+    Mov [$a, 1, "aaa"], 20;
+    Mov [$a, 2, "aaa"], 30;
   
-      Jle $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  
+    Out ArrayIndex $a, 30;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-      Jlt $next, $d, $d;
-      Jge $next, $d, $d;
-      Jgt $next, $d, $d;
-     } 3;
+  
+    Out ArrayIndex $a, 20;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Out ArrayIndex $a, 10;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Out ArrayIndex $a, 15;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Out ArrayCountLess $a, 35;
+    Out ArrayCountLess $a, 25;
+    Out ArrayCountLess $a, 15;
+    Out ArrayCountLess $a,  5;
+  
+    Out ArrayCountGreater $a, 35;
+    Out ArrayCountGreater $a, 25;
+    Out ArrayCountGreater $a, 15;
+    Out ArrayCountGreater $a,  5;
+  
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->out, [3,2,1,0,  3,2,1,0,  0,1,2,3];
    }
   
 
-=head2 Jlt($target, $source, $source2)
+=head2 ArraySize($area, $name)
 
-Jump to a target label if the first source field is less than the second source field.
+The current size of an array.
 
      Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-  3  $source2
+  1  $area      Location of area
+  2  $name      Name of area
 
 B<Example:>
 
 
-  if (1)                                                                                 
-   {Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-    Mov [$a, 0, 'aaa'], $b;
-    Mov [$b, 0, 'bbb'], 99;
-    For
-     {my ($i, $check, $next, $end) = @_;
-      my $c = Mov [$a, \0, 'aaa'];
-      my $d = Mov [$c, \0, 'bbb'];
-      Jeq $next, $d, $d;
-      Jne $next, $d, $d;
-      Jle $next, $d, $d;
-  
-      Jlt $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Jge $next, $d, $d;
-      Jgt $next, $d, $d;
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
-   }
-  
-
-=head2 Jge($target, $source, $source2)
-
-Jump to a target label if the first source field is greater than or equal to the second source field.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-  3  $source2
-
-B<Example:>
-
-
-  if (1)                                                                                 
-   {Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-    Mov [$a, 0, 'aaa'], $b;
-    Mov [$b, 0, 'bbb'], 99;
-    For
-     {my ($i, $check, $next, $end) = @_;
-      my $c = Mov [$a, \0, 'aaa'];
-      my $d = Mov [$c, \0, 'bbb'];
-      Jeq $next, $d, $d;
-      Jne $next, $d, $d;
-      Jle $next, $d, $d;
-      Jlt $next, $d, $d;
-  
-      Jge $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Jgt $next, $d, $d;
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
-   }
-  
-
-=head2 Jgt($target, $source, $source2)
-
-Jump to a target label if the first source field is greater than the second source field.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-  3  $source2
-
-B<Example:>
-
-
-  if (1)                                                                                 
-   {Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-    Mov [$a, 0, 'aaa'], $b;
-    Mov [$b, 0, 'bbb'], 99;
-    For
-     {my ($i, $check, $next, $end) = @_;
-      my $c = Mov [$a, \0, 'aaa'];
-      my $d = Mov [$c, \0, 'bbb'];
-      Jeq $next, $d, $d;
-      Jne $next, $d, $d;
-      Jle $next, $d, $d;
-      Jlt $next, $d, $d;
-      Jge $next, $d, $d;
-  
-      Jgt $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
-   }
-  
-
-=head2 Jeq($target, $source, $source2)
-
-Jump to a target label if the first source field is equal to the second source field.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-  3  $source2
-
-B<Example:>
-
-
-  if (1)                                                                                 
-   {Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-    Mov [$a, 0, 'aaa'], $b;
-    Mov [$b, 0, 'bbb'], 99;
-    For
-     {my ($i, $check, $next, $end) = @_;
-      my $c = Mov [$a, \0, 'aaa'];
-      my $d = Mov [$c, \0, 'bbb'];
-  
-      Jeq $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Jne $next, $d, $d;
-      Jle $next, $d, $d;
-      Jlt $next, $d, $d;
-      Jge $next, $d, $d;
-      Jgt $next, $d, $d;
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
-   }
-  
-
-=head2 Jne($target, $source, $source2)
-
-Jump to a target label if the first source field is not equal to the second source field.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-  3  $source2
-
-B<Example:>
-
-
-  if (1)                                                                                 
-   {Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-    Mov [$a, 0, 'aaa'], $b;
-    Mov [$b, 0, 'bbb'], 99;
-    For
-     {my ($i, $check, $next, $end) = @_;
-      my $c = Mov [$a, \0, 'aaa'];
-      my $d = Mov [$c, \0, 'bbb'];
-      Jeq $next, $d, $d;
-  
-      Jne $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Jle $next, $d, $d;
-      Jlt $next, $d, $d;
-      Jge $next, $d, $d;
-      Jgt $next, $d, $d;
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
-   }
-  
-
-=head2 JFalse($target, $source)
-
-Jump to a target label if the first source field is equal to zero.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Mov 1;
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-      JTrue $end, $a;
-      Out 1;
-     };
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-  
-      JFalse $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Out 2;
-     };
-    Mov $a, 0;
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-      JTrue $end, $a;
-      Out 3;
-     };
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-  
-      JFalse $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Out 4;
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2, 3];
-   }
-  
-
-=head2 JTrue($target, $source)
-
-Jump to a target label if the first source field is not equal to zero.
-
-     Parameter  Description
-  1  $target    Target label
-  2  $source    Source to test
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Mov 1;
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-  
-      JTrue $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Out 1;
-     };
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-      JFalse $end, $a;
-      Out 2;
-     };
-    Mov $a, 0;
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-  
-      JTrue $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Out 3;
-     };
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-      JFalse $end, $a;
-      Out 4;
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2, 3];
-   }
-  
-
-=head2 Label($source)
-
-Create a label.
-
-     Parameter  Description
-  1  $source    Name of label
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    Mov 0, 1;
-    Jlt ((my $a = label), \0, 2);
-      Out  1;
-      Jmp (my $b = label);
-    setLabel($a);
-      Out  2;
-    setLabel($b);
-  
-    Jgt ((my $c = label), \0, 3);
-      Out  1;
-      Jmp (my $d = label);
-    setLabel($c);
-      Out  2;
-    setLabel($d);
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2,1];
-   }
-  
-  if (1)                                                                          
-   {Start 1;
-    Mov 0, 0;
-    my $a = setLabel;
-      Out \0;
-      Inc \0;
-    Jlt $a, \0, 10;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [0..9];
-   }
-  
-
-=head2 Clear($target)
-
-Clear the first bytes of an area.  The area is specified by the first element of the address, the number of locations to clear is specified by the second element of the target address.
-
-     Parameter  Description
-  1  $target    Target address
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "aaa";
-  
-    Clear [$a, 10, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->memory->{1}, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-   }
-  
-
-=head2 LeAddress()
-
-Load the address component.
-
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "array";
-    my $b = Mov 2;
-    my $c = Mov 5;
-  
-    my $d = LeAddress $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $f = LeArea    [$a, \0, 'array'];
-    Out $d;
-    Out $f;
-    Mov [$a, \$b, 'array'], 22;
-    Mov [$a, \$c, 'array'], 33;
-    Mov [$f, \$d, 'array'], 44;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,    [2,1];
-    is_deeply $e->memory, {1=>[undef, undef, 44, undef, undef, 33]};
-   }
-  
-
-=head2 LeArea()
-
-Load the address component.
-
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "array";
-    my $b = Mov 2;
-    my $c = Mov 5;
-    my $d = LeAddress $c;
-  
-    my $f = LeArea    [$a, \0, 'array'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $d;
-    Out $f;
-    Mov [$a, \$b, 'array'], 22;
-    Mov [$a, \$c, 'array'], 33;
-    Mov [$f, \$d, 'array'], 44;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,    [2,1];
-    is_deeply $e->memory, {1=>[undef, undef, 44, undef, undef, 33]};
-   }
-  
-
-=head2 Mov()
-
-Copy a constant or memory address to the target address.
-
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-  
-    my $a = Mov 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-  
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
-   {Start 1;                                                                      
-  
-  if (1)                                                                          
-   {Start 1;
-    my $a = Array "aaa";
-  
-    Mov     [$a,  1, "aaa"],  11;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Mov  1, [$a, \1, "aaa"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out \1;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
-   }
-  
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "alloc";
-  
-    my $b = Mov 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    my $c = Mov $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Mov [$a, 0, 'alloc'], $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Mov [$c, 1, 'alloc'], 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    ok Execute(memory=>  { 1=>  bless([99, 2], "alloc") });
-   }
-  
-  if (1)                                                                            
-   {Start 1;
-    my $a = Array "aaa";
-    Dump "dddd";
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1], \"stackArea\")",
-    "1=bless([], \"aaa\")",
-    "Stack trace",
-    "    1     2 dump",
-  ];
-   }
-  
-  if (1)                                                                              
-   {Start 1;
-    my $a = Array "aaa";
-  
-    my $i = Mov 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    my $v = Mov 11;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    ParamsPut 0, $a;
-    ParamsPut 1, $i;
-    ParamsPut 2, $v;
-    my $set = Procedure 'set', sub
-     {my $a = ParamsGet 0;
-      my $i = ParamsGet 1;
-      my $v = ParamsGet 2;
-  
-      Mov [$a, \$i, 'aaa'], $v;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Return;
-     };
-    Call $set;
-  
-    my $V = Mov [$a, \$i, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    AssertEq $v, $V;
-    Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
-   }
-  
-  if (1)                                                                            
-   {Start 1;
-    my $set = Procedure 'set', sub
-     {my $a = ParamsGet 0;
-     };
-    ParamsPut 0, 1;
-    Call $set;
-    ParamsPut 0, 1;
-    Call $set;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [];
-   }
-  
-  if (1)                                                                                 
-   {Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-  
-    Mov [$a, 0, 'aaa'], $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Mov [$b, 0, 'bbb'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    For
-     {my ($i, $check, $next, $end) = @_;
-  
-      my $c = Mov [$a, \0, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-      my $d = Mov [$c, \0, 'bbb'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Jeq $next, $d, $d;
-      Jne $next, $d, $d;
-      Jle $next, $d, $d;
-      Jlt $next, $d, $d;
-      Jge $next, $d, $d;
-      Jgt $next, $d, $d;
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
-   }
-  
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array 'aaa';
-  
-    my $b = Mov 2;                                                                # Location to move to in a  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    For
-     {my ($i, $check, $next, $end) = @_;
-  
-      Mov [$a, \$b, 'aaa'], 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Jeq $next, [$a, \$b, 'aaa'], 1;
-     } 3;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       19 instructions executed";
-    is_deeply $e->memory, {1=>  bless([undef, undef, 1], "aaa")};
-   }
-  
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "aaa";
-  
-      Mov [$a, 0, "aaa"], 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-      Mov [$a, 1, "aaa"], 22;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-      Mov [$a, 2, "aaa"], 333;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    DumpArray $a, "AAAA";
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out,
-   ["AAAA",
-    "bless([1, 22, 333], \"aaa\")",
-    "Stack trace",
-    "    1     5 dumpArray",
-  ];
-   }
-  
-
-=head2 MoveLong($target, $source, $source2)
-
-Copy the number of elements specified by the second source operand from the location specified by the first source operand to the target operand.
-
-     Parameter  Description
-  1  $target    Target of move
-  2  $source    Source of move
-  3  $source2   Length of move
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {my $N = 10;
-    Start 1;
-    my $a = Array "aaa";
-    my $b = Array "bbb";
-    For
-     {my ($i, $Check, $Next, $End) = @_;
-      Mov [$a, \$i, "aaa"], $i;
-      my $j = Add $i, 100;
-      Mov [$b, \$i, "bbb"], $j;
-     } $N;
-  
-  
-    MoveLong [$b, \2, 'bbb'], [$a, \4, 'aaa'], 3;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->memory,
-  {
-    1 => bless([0 .. 9], "aaa"),
-    2 => bless([100, 101, 4, 5, 6, 105 .. 109], "bbb"),
-  };
-   }
-  
-
-=head2 Not()
-
-Move and not.
-
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Mov 3;
-  
-    my $b = Not $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    my $c = Not $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-    Out $b;
-    Out $c;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3, "", 1];
-   }
-  
-
-=head2 Nop()
-
-Do nothing (but do it well!).
-
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-  
-    Nop;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    ok Execute(out=>[]);
-   }
-  
   if (1)                                                                             
    {Start 1;
     my $a = Array "aaa";
       Mov [$a, 0, "aaa"], 1;
       Mov [$a, 1, "aaa"], 22;
       Mov [$a, 2, "aaa"], 333;
-    my $n = ArraySize $a, "aaa";
-    DumpArray $a, "AAAA";
+  
+  
+    my $n = ArraySize $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out "Array size:"; Out $n;
+    ArrayDump $a, "AAAA";
   
     ForArray
      {my ($i, $e, $check, $next, $end) = @_;
       Out $i; Out $e;
      }  $a, "aaa";
   
-  
-    Nop;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    Nop;
     my $e = Execute(suppressOutput=>1);
   
     is_deeply $e->memory, {1=>[1, 22, 333]};
   
-    is_deeply $e->out,
-  [ "AAAA",
-    "bless([1, 22, 333], \"aaa\")",
+    is_deeply $e->out, [ "Array size:", 3,
+  
+    "AAAA", "bless([1, 22, 333], \"aaa\")",
+  
     "Stack trace",
-    "    1     6 dumpArray",
-    0,
-    1,
-    1,
-    22,
-    2,
-    333];
-   }
-  
-
-=head2 Out($source)
-
-Write memory contents to out.
-
-     Parameter  Description
-  1  $source    Either a scalar constant or memory address to output
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-  
-    Out "hello World";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["hello World"];
-   }
-  
-
-=head2 Procedure($name, $source)
-
-Define a procedure.
-
-     Parameter  Description
-  1  $name      Name of procedure
-  2  $source    Source code as a subroutine# $assembly->instruction(action=>"procedure"
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-  
-    my $add = Procedure 'add2', sub  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {my $a = ParamsGet 0;
-      my $b = Add $a, 2;
-      ReturnPut 0, $b;
-      Return;
-     };
-    ParamsPut 0, 2;
-    Call $add;
-    my $c = ReturnGet 0;
-    Out $c;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [4];
-   }
-  
-  if (1)                                                                          
-   {Start 1;
-    for my $i(1..10)
-     {Out $i;
-     };
-    IfTrue 0,
-    Then
-     {Out 99;
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1..10];
-   }
-  
-
-=head2 ParamsGet()
-
-Get a word from the parameters in the previous frame and store it in the current frame.
-
-
-B<Example:>
-
-
-  if (1)                                                                              
-   {Start 1;
-    my $a = Array "aaa";
-    my $i = Mov 1;
-    my $v = Mov 11;
-    ParamsPut 0, $a;
-    ParamsPut 1, $i;
-    ParamsPut 2, $v;
-    my $set = Procedure 'set', sub
-  
-     {my $a = ParamsGet 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-      my $i = ParamsGet 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-      my $v = ParamsGet 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Mov [$a, \$i, 'aaa'], $v;
-      Return;
-     };
-    Call $set;
-    my $V = Mov [$a, \$i, 'aaa'];
-    AssertEq $v, $V;
-    Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
-   }
-  
-
-=head2 ParamsPut($target, $source)
-
-Put a word into the parameters list to make it visible in a called procedure.
-
-     Parameter  Description
-  1  $target    Parameter number
-  2  $source    Address to fetch parameter from
-
-B<Example:>
-
-
-  if (1)                                                                              
-   {Start 1;
-    my $a = Array "aaa";
-    my $i = Mov 1;
-    my $v = Mov 11;
-  
-    ParamsPut 0, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    ParamsPut 1, $i;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    ParamsPut 2, $v;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $set = Procedure 'set', sub
-     {my $a = ParamsGet 0;
-      my $i = ParamsGet 1;
-      my $v = ParamsGet 2;
-      Mov [$a, \$i, 'aaa'], $v;
-      Return;
-     };
-    Call $set;
-    my $V = Mov [$a, \$i, 'aaa'];
-    AssertEq $v, $V;
-    Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
-   }
-  
-
-=head2 Return()
-
-Return from a procedure via the call stack.
-
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $w = Procedure 'write', sub
-     {Out 'aaa';
-  
-      Return;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     };
-    Call $w;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["aaa"];
-   }
-  
-
-=head2 ReturnGet(if (@_ == 1))
-
-Get a word from the return area and save it.
-
-     Parameter     Description
-  1  if (@_ == 1)  Create a variable
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-    my $w = Procedure 'write', sub
-     {ReturnPut 0, "ccc";
-      Return;
-     };
-    Call $w;
-  
-    ReturnGet \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out \0;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["ccc"];
-   }
-  
-
-=head2 ReturnPut($target, $source)
-
-Put a word into the return area.
-
-     Parameter  Description
-  1  $target    Offset in return area to write to
-  2  $source    Memory address whose contents are to be placed in the return area
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-    my $w = Procedure 'write', sub
-  
-     {ReturnPut 0, "ccc";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Return;
-     };
-    Call $w;
-    ReturnGet \0, 0;
-    Out \0;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["ccc"];
-   }
-  
-
-=head2 Resize($target, $source)
-
-Resize the target area to the source size.
-
-     Parameter  Description
-  1  $target    Target address
-  2  $source    Source address
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Array 'aaa';
-    Mov [$a, 0, 'aaa'], 1;
-    Mov [$a, 1, 'aaa'], 2;
-    Mov [$a, 2, 'aaa'], 3;
-  
-    Resize $a, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->memory, {1=>  [1, 2]};
-   }
-  
-
-=head2 Pop(if (@_ == 0))
-
-Pop the memory area specified by the source operand into the memory address specified by the target operand.
-
-     Parameter     Description
-  1  if (@_ == 0)  Pop current stack frame into a local variable
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "aaa";
-    Push $a, 1;
-    Push $a, 2;
-  
-    my $c = Pop $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    my $d = Pop $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out $c;
-    Out $d;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,    [2, 1];
-    is_deeply $e->memory, { 1=>  []};
-   }
-  
-
-=head2 Push()
-
-Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand.
-
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {Start 1;
-    my $a = Array "aaa";
-  
-    Push $a, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Push $a, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $c = Pop $a;
-    my $d = Pop $a;
-  
-    Out $c;
-    Out $d;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,    [2, 1];
-    is_deeply $e->memory, { 1=>  []};
-   }
-  
-
-=head2 ShiftLeft(my ($target, $source)
-
-Shift left within an element.
-
-     Parameter    Description
-  1  my ($target  Target to shift
-  2  $source      Amount to shift
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Mov 1;
-  
-    ShiftLeft $a, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
-
-=head2 ShiftRight(my ($target, $source)
-
-Shift right with an element.
-
-     Parameter    Description
-  1  my ($target  Target to shift
-  2  $source      Amount to shift
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Mov 4;
-  
-    ShiftRight $a, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
-   }
-  
-
-=head2 ShiftUp($target, $source)
-
-Shift an element up one in an area.
-
-     Parameter  Description
-  1  $target    Target to shift
-  2  $source    Amount to shift
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Array "array";
-    Mov [$a, 0, 'array'], 0;
-    Mov [$a, 1, 'array'], 1;
-    Mov [$a, 2, 'array'], 2;
-  
-    ShiftUp [$a, 1, 'array'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->memory, {1=>[0, 99, 1, 2]};
-   }
-  
-
-=head2 ShiftDown(if (@_ == 1))
-
-Shift an element down one in an area.
-
-     Parameter     Description
-  1  if (@_ == 1)  Create a variable
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Array "array";
-    Mov [$a, 0, 'array'], 0;
-    Mov [$a, 1, 'array'], 99;
-    Mov [$a, 2, 'array'], 2;
-  
-    my $b = ShiftDown [$a, \1, 'array'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Out $b;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->memory, {1=>[0, 2]};
-    is_deeply $e->out,    [99];
-   }
-  
-
-=head2 Watch($target)
-
-Shift an element down one in an area.
-
-     Parameter  Description
-  1  $target    Memory address to watch
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    my $c = Mov 3;
-  
-    Watch $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Mov $a, 4;
-    Mov $b, 5;
-    Mov $c, 6;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,
-  [
-    "Change at watched area: 0 (stackArea), address: 1
-",
-    "    1     6 mov",
-    "Current value: 2",
-    "New     value: 5",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([4, 2, 3], \"stackArea\")",
-  ];
-   }
-  
-
-=head2 Tally($source)
-
-Counts instructions when enabled.
-
-     Parameter  Description
-  1  $source    Tally instructions when true
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {my $N = 5;
-    Start 1;
-    For
-  
-     {Tally 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      my $a = Mov 1;
-  
-      Tally 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      Inc $a;
-  
-      Tally 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     } $N;
-    my $e = Execute;
-  
-    is_deeply $e->tallyCount, 2 * $N;
-    is_deeply $e->tallyCounts,{ 1 => {mov => $N}, 2 => {inc => $N}};
-   }
-  
-
-=head2 Then($t)
-
-Then block.
-
-     Parameter  Description
-  1  $t         Then block subroutine
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-    Trace 1;
-    IfEq 1, 2,
-  
-    Then  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {Mov 1, 1;
-      Mov 2, 1;
-     },
-    Else
-     {Mov 3, 3;
-      Mov 4, 4;
-     };
-    IfEq 2, 2,
-  
-    Then  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {Mov 1, 1;
-      Mov 2, 1;
-     },
-    Else
-     {Mov 3, 3;
-      Mov 4, 4;
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply scalar($e->out->@*), 14;
-   }
-  
-
-=head2 Else($e)
-
-Else block.
-
-     Parameter  Description
-  1  $e         Else block subroutine
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-    Trace 1;
-    IfEq 1, 2,
-    Then
-     {Mov 1, 1;
-      Mov 2, 1;
-     },
-  
-    Else  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {Mov 3, 3;
-      Mov 4, 4;
-     };
-    IfEq 2, 2,
-    Then
-     {Mov 1, 1;
-      Mov 2, 1;
-     },
-  
-    Else  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {Mov 3, 3;
-      Mov 4, 4;
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply scalar($e->out->@*), 14;
-   }
-  
-
-=head2 IfFalse($a, %options)
-
-Execute then clause if the specified memory address is zero representing false.
-
-     Parameter  Description
-  1  $a         Memory address
-  2  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-  
-    IfFalse 1,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Then
-     {Out 1
-     },
-    Else
-     {Out 0
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [0];
-   }
-  
-
-=head2 IfTrue($a, %options)
-
-Execute then clause if the specified memory address is not zero representing true.
-
-     Parameter  Description
-  1  $a         Memory address
-  2  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-  
-    IfTrue 1,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    Then
-     {Out 1
-     },
-    Else
-     {Out 0
-     };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1];
-   }
-  
-
-=head2 IfEq($a, $b, %options)
-
-Execute then or else clause depending on whether two memory locations are equal.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-  
-    IfEq $a, $a, Then {Out "Eq"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfNe $a, $a, Then {Out "Ne"};
-    IfLe $a, $a, Then {Out "Le"};
-    IfLt $a, $a, Then {Out "Lt"};
-    IfGe $a, $a, Then {Out "Ge"};
-    IfGt $a, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-  
-    IfEq $a, $b, Then {Out "Eq"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfNe $a, $b, Then {Out "Ne"};
-    IfLe $a, $b, Then {Out "Le"};
-    IfLt $a, $b, Then {Out "Lt"};
-    IfGe $a, $b, Then {Out "Ge"};
-    IfGt $a, $b, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-  
-    IfEq $b, $a, Then {Out "Eq"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfNe $b, $a, Then {Out "Ne"};
-    IfLe $b, $a, Then {Out "Le"};
-    IfLt $b, $a, Then {Out "Lt"};
-    IfGe $b, $a, Then {Out "Ge"};
-    IfGt $b, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
-   }
-  
-
-=head2 IfNe($a, $b, %options)
-
-Execute then or else clause depending on whether two memory locations are not equal.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $a, Then {Out "Eq"};
-  
-    IfNe $a, $a, Then {Out "Ne"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfLe $a, $a, Then {Out "Le"};
-    IfLt $a, $a, Then {Out "Lt"};
-    IfGe $a, $a, Then {Out "Ge"};
-    IfGt $a, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $b, Then {Out "Eq"};
-  
-    IfNe $a, $b, Then {Out "Ne"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfLe $a, $b, Then {Out "Le"};
-    IfLt $a, $b, Then {Out "Lt"};
-    IfGe $a, $b, Then {Out "Ge"};
-    IfGt $a, $b, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $b, $a, Then {Out "Eq"};
-  
-    IfNe $b, $a, Then {Out "Ne"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfLe $b, $a, Then {Out "Le"};
-    IfLt $b, $a, Then {Out "Lt"};
-    IfGe $b, $a, Then {Out "Ge"};
-    IfGt $b, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
-   }
-  
-
-=head2 IfLt($a, $b, %options)
-
-Execute then or else clause depending on whether two memory locations are less than.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $a, Then {Out "Eq"};
-    IfNe $a, $a, Then {Out "Ne"};
-    IfLe $a, $a, Then {Out "Le"};
-  
-    IfLt $a, $a, Then {Out "Lt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfGe $a, $a, Then {Out "Ge"};
-    IfGt $a, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $b, Then {Out "Eq"};
-    IfNe $a, $b, Then {Out "Ne"};
-    IfLe $a, $b, Then {Out "Le"};
-  
-    IfLt $a, $b, Then {Out "Lt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfGe $a, $b, Then {Out "Ge"};
-    IfGt $a, $b, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $b, $a, Then {Out "Eq"};
-    IfNe $b, $a, Then {Out "Ne"};
-    IfLe $b, $a, Then {Out "Le"};
-  
-    IfLt $b, $a, Then {Out "Lt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfGe $b, $a, Then {Out "Ge"};
-    IfGt $b, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
-   }
-  
-
-=head2 IfLe($a, $b, %options)
-
-Execute then or else clause depending on whether two memory locations are less than or equal.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $a, Then {Out "Eq"};
-    IfNe $a, $a, Then {Out "Ne"};
-  
-    IfLe $a, $a, Then {Out "Le"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfLt $a, $a, Then {Out "Lt"};
-    IfGe $a, $a, Then {Out "Ge"};
-    IfGt $a, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $b, Then {Out "Eq"};
-    IfNe $a, $b, Then {Out "Ne"};
-  
-    IfLe $a, $b, Then {Out "Le"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfLt $a, $b, Then {Out "Lt"};
-    IfGe $a, $b, Then {Out "Ge"};
-    IfGt $a, $b, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $b, $a, Then {Out "Eq"};
-    IfNe $b, $a, Then {Out "Ne"};
-  
-    IfLe $b, $a, Then {Out "Le"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfLt $b, $a, Then {Out "Lt"};
-    IfGe $b, $a, Then {Out "Ge"};
-    IfGt $b, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
-   }
-  
-
-=head2 IfGt($a, $b, %options)
-
-Execute then or else clause depending on whether two memory locations are greater than.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $a, Then {Out "Eq"};
-    IfNe $a, $a, Then {Out "Ne"};
-    IfLe $a, $a, Then {Out "Le"};
-    IfLt $a, $a, Then {Out "Lt"};
-    IfGe $a, $a, Then {Out "Ge"};
-  
-    IfGt $a, $a, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $b, Then {Out "Eq"};
-    IfNe $a, $b, Then {Out "Ne"};
-    IfLe $a, $b, Then {Out "Le"};
-    IfLt $a, $b, Then {Out "Lt"};
-    IfGe $a, $b, Then {Out "Ge"};
-  
-    IfGt $a, $b, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $b, $a, Then {Out "Eq"};
-    IfNe $b, $a, Then {Out "Ne"};
-    IfLe $b, $a, Then {Out "Le"};
-    IfLt $b, $a, Then {Out "Lt"};
-    IfGe $b, $a, Then {Out "Ge"};
-  
-    IfGt $b, $a, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
-   }
-  
-
-=head2 IfGe($a, $b, %options)
-
-Execute then or else clause depending on whether two memory locations are greater than or equal.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options   Then block
-
-B<Example:>
-
-
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $a, Then {Out "Eq"};
-    IfNe $a, $a, Then {Out "Ne"};
-    IfLe $a, $a, Then {Out "Le"};
-    IfLt $a, $a, Then {Out "Lt"};
-  
-    IfGe $a, $a, Then {Out "Ge"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfGt $a, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $a, $b, Then {Out "Eq"};
-    IfNe $a, $b, Then {Out "Ne"};
-    IfLe $a, $b, Then {Out "Le"};
-    IfLt $a, $b, Then {Out "Lt"};
-  
-    IfGe $a, $b, Then {Out "Ge"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfGt $a, $b, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
-   }
-  
-  if (1)                                                                                   
-   {Start 1;
-    my $a = Mov 1;
-    my $b = Mov 2;
-    IfEq $b, $a, Then {Out "Eq"};
-    IfNe $b, $a, Then {Out "Ne"};
-    IfLe $b, $a, Then {Out "Le"};
-    IfLt $b, $a, Then {Out "Lt"};
-  
-    IfGe $b, $a, Then {Out "Ge"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    IfGt $b, $a, Then {Out "Gt"};
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    "    1     8 arrayDump",
+  
+    0,   1,
+    1,  22,
+    2, 333];
    }
   
 
@@ -2469,95 +361,32 @@ B<Example:>
    }
   
 
-=head2 AssertNe($a, $b, %options)
+=head2 AssertFalse($a, %options)
 
-Assert two memory locations are not equal.
+Assert false.
 
      Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options
+  1  $a         Source operand
+  2  %options
 
 B<Example:>
 
 
   if (1)                                                                          
    {Start 1;
-    Mov 0, 1;
+    AssertTrue  1;
   
-    AssertNe \0, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    AssertFalse 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 != 1 failed", "    1     2 assertNe"];
-   }
+    my $e = Execute(suppressOutput=>1, trace=>1);
+    is_deeply $e->out, [
+    "   1     0     1    assertTrue                      ",
   
+    "AssertFalse 1 failed",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-=head2 AssertLt($a, $b, %options)
-
-Assert two memory locations are less than.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    Mov 0, 1;
+    "    1     2 assertFalse",
+    "   2     1     1   assertFalse                      "];
   
-    AssertLt \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 <  0 failed", "    1     2 assertLt"];
-   }
-  
-
-=head2 AssertLe($a, $b, %options)
-
-Assert two memory locations are less than or equal.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    Mov 0, 1;
-  
-    AssertLe \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 <= 0 failed", "    1     2 assertLe"];
-   }
-  
-
-=head2 AssertGt($a, $b, %options)
-
-Assert two memory locations are greater than.
-
-     Parameter  Description
-  1  $a         First memory address
-  2  $b         Second memory address
-  3  %options
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    Mov 0, 1;
-  
-    AssertGt \0, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 >  2 failed", "    1     2 assertGt"];
    }
   
 
@@ -2584,6 +413,98 @@ B<Example:>
    }
   
 
+=head2 AssertGt($a, $b, %options)
+
+Assert two memory locations are greater than.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    Mov 0, 1;
+  
+    AssertGt \0, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Assert 1 >  2 failed", "    1     2 assertGt"];
+   }
+  
+
+=head2 AssertLe($a, $b, %options)
+
+Assert two memory locations are less than or equal.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    Mov 0, 1;
+  
+    AssertLe \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Assert 1 <= 0 failed", "    1     2 assertLe"];
+   }
+  
+
+=head2 AssertLt($a, $b, %options)
+
+Assert two memory locations are less than.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    Mov 0, 1;
+  
+    AssertLt \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Assert 1 <  0 failed", "    1     2 assertLt"];
+   }
+  
+
+=head2 AssertNe($a, $b, %options)
+
+Assert two memory locations are not equal.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    Mov 0, 1;
+  
+    AssertNe \0, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Assert 1 != 1 failed", "    1     2 assertNe"];
+   }
+  
+
 =head2 AssertTrue($a, %options)
 
 Assert true.
@@ -2602,156 +523,13 @@ B<Example:>
     AssertTrue  0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1, trace=>1);
-    is_deeply $e->out,
-  [ "   1     0     1   assertFalse                      
-",
+    is_deeply $e->out, [
+    "   1     0     1   assertFalse                      ",
   
     "AssertTrue 0 failed",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     "    1     2 assertTrue",
-    "   2     1     1    assertTrue                      
-"];
-   }
-  
-
-=head2 AssertFalse($a, %options)
-
-Assert false.
-
-     Parameter  Description
-  1  $a         Source operand
-  2  %options
-
-B<Example:>
-
-
-  if (1)                                                                          
-   {Start 1;
-    AssertTrue  1;
-  
-    AssertFalse 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    my $e = Execute(suppressOutput=>1, trace=>1);
-    is_deeply $e->out,
-  [ "   1     0     1    assertTrue                      
-",
-  
-    "AssertFalse 1 failed",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    "    1     2 assertFalse",
-    "   2     1     1   assertFalse                      
-"];
-  
-   }
-  
-
-=head2 For($block, $range, %options)
-
-For loop 0..range-1 or in reverse.
-
-     Parameter  Description
-  1  $block     Block
-  2  $range     Limit
-  3  %options   Options
-
-B<Example:>
-
-
-  if (1)                                                                           
-   {my $N = 5;
-    Start 1;
-  
-    For  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {Tally 1;
-      my $a = Mov 1;
-      Tally 2;
-      Inc $a;
-      Tally 0;
-     } $N;
-    my $e = Execute;
-  
-    is_deeply $e->tallyCount, 2 * $N;
-    is_deeply $e->tallyCounts,{ 1 => {mov => $N}, 2 => {inc => $N}};
-   }
-  
-
-=head2 ForArray($block, $area, $name, %options)
-
-For loop to process each element of the named area.
-
-     Parameter  Description
-  1  $block     Block of code
-  2  $area      Area
-  3  $name      Area name
-  4  %options   Options
-
-B<Example:>
-
-
-  if (1)                                                                             
-   {Start 1;
-    my $a = Array "aaa";
-      Mov [$a, 0, "aaa"], 1;
-      Mov [$a, 1, "aaa"], 22;
-      Mov [$a, 2, "aaa"], 333;
-    my $n = ArraySize $a, "aaa";
-    DumpArray $a, "AAAA";
-  
-  
-    ForArray  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {my ($i, $e, $check, $next, $end) = @_;
-      Out $i; Out $e;
-     }  $a, "aaa";
-  
-    Nop;
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->memory, {1=>[1, 22, 333]};
-  
-    is_deeply $e->out,
-  [ "AAAA",
-    "bless([1, 22, 333], \"aaa\")",
-    "Stack trace",
-    "    1     6 dumpArray",
-    0,
-    1,
-    1,
-    22,
-    2,
-    333];
-   }
-  
-
-=head2 Good($good)
-
-A good ending.
-
-     Parameter  Description
-  1  $good      What to do on a good ending
-
-B<Example:>
-
-
-  if (1)                                                                            
-   {Start 1;
-    Block
-     {my ($start, $good, $bad, $end) = @_;
-      Out 1;
-      Jmp $good;
-     }
-  
-    Good  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-     {Out 2;
-     },
-    Bad
-     {Out 3;
-     };
-    Out 4;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1,2,4];
+    "   2     1     1    assertTrue                      "];
    }
   
 
@@ -2838,6 +616,262 @@ B<Example:>
    }
   
 
+=head2 Call($p)
+
+Call the subroutine at the target address.
+
+     Parameter  Description
+  1  $p         Procedure description
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $w = Procedure 'write', sub
+     {Out 'aaa';
+      Return;
+     };
+  
+    Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["aaa"];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    my $w = Procedure 'write', sub
+     {my $a = ParamsGet 0;
+      Out $a;
+      Return;
+     };
+    ParamsPut 0, 'bbb';
+  
+    Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["bbb"];
+   }
+  
+  if (1)                                                                            
+   {Start 1;
+    my $w = Procedure 'write', sub
+     {ReturnPut 0, "ccc";
+      Return;
+     };
+  
+    Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ReturnGet \0, 0;
+    Out \0;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["ccc"];
+   }
+  
+  if (1)                                                                            
+   {Start 1;
+    my $a = Array "aaa";
+    Dump "dddd";
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [
+    "dddd",
+    "-2=bless([], \"return\")",
+    "-1=bless([], \"params\")",
+    "0=bless([1], \"stackArea\")",
+    "1=bless([], \"aaa\")",
+    "Stack trace",
+    "    1     2 dump"];
+   }
+  
+  if (1)                                                                              
+   {Start 1;
+    my $a = Array "aaa";
+    my $i = Mov 1;
+    my $v = Mov 11;
+    ParamsPut 0, $a;
+    ParamsPut 1, $i;
+    ParamsPut 2, $v;
+    my $set = Procedure 'set', sub
+     {my $a = ParamsGet 0;
+      my $i = ParamsGet 1;
+      my $v = ParamsGet 2;
+      Mov [$a, \$i, 'aaa'], $v;
+      Return;
+     };
+  
+    Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $V = Mov [$a, \$i, 'aaa'];
+    AssertEq $v, $V;
+    Out [$a, \$i, 'aaa'];
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [11];
+   }
+  
+  if (1)                                                                            
+   {Start 1;
+    my $set = Procedure 'set', sub
+     {my $a = ParamsGet 0;
+      Out $a;
+     };
+  
+    ParamsPut 0, 1;  Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ParamsPut 0, 2;  Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ParamsPut 0, 3;  Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [1..3];
+   }
+  
+
+=head2 Clear($target)
+
+Clear the first bytes of an area.  The area is specified by the first element of the address, the number of locations to clear is specified by the second element of the target address.
+
+     Parameter  Description
+  1  $target    Target address
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "aaa";
+  
+    Clear [$a, 10, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->memory->{1}, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+   }
+  
+
+=head2 Confess()
+
+Confess with a stack trace showing the location bioth in the emulated code and in the code that produced the emulated code.
+
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $c = Procedure 'confess', sub
+  
+     {Confess;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     };
+    Call $c;
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out, ["Confess at:", "    2     3 confess", "    1     6 call"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+   }
+  
+
+=head2 Dec($target)
+
+Decrement the target.
+
+     Parameter  Description
+  1  $target    Target address
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Mov 3;
+  
+    Dec $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2];
+   }
+  
+
+=head2 Dump($title)
+
+Dump all the arrays currently in memory.
+
+     Parameter  Description
+  1  $title     Title
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "node";
+    Out $a;
+    Mov [$a, 1, 'node'], 1;
+    Mov [$a, 2, 'node'], 2;
+    Mov 1, [$a, \1, 'node'];
+  
+    Dump "dddd";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Free $a, "node";
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out, [
+    1,
+  
+    "dddd",
+    "-2=bless([], \"return\")",
+    "-1=bless([], \"params\")",
+    "0=bless([1, 1], \"stackArea\")",
+    "1=bless([undef, 1, 2], \"node\")",
+  
+    "Stack trace",
+    "    1     6 dump"];
+   }
+  
+
+=head2 Else($e)
+
+Else block.
+
+     Parameter  Description
+  1  $e         Else block subroutine
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    Trace 1;
+    IfEq 1, 2,
+    Then
+     {Mov 1, 1;
+      Mov 2, 1;
+     },
+  
+    Else  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Mov 3, 3;
+      Mov 4, 4;
+     };
+    IfEq 2, 2,
+    Then
+     {Mov 1, 1;
+      Mov 2, 1;
+     },
+  
+    Else  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Mov 3, 3;
+      Mov 4, 4;
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply scalar($e->out->@*), 14;
+   }
+  
+
 =head2 Execute(%options)
 
 Execute the current assembly.
@@ -2858,334 +892,1985 @@ B<Example:>
    }
   
 
+=head2 For($block, $range, %options)
 
-=head1 Private Methods
-
-=head2 Zero::Emulator::Execution::areaContent($exec, $address)
-
-Content of an area containing a address in memory in the specified execution.
+For loop 0..range-1 or in reverse.
 
      Parameter  Description
-  1  $exec      Execution environment
-  2  $address   Address specification
-
-=head2 Zero::Emulator::Execution::dumpMemory($exec)
-
-Dump memory.
-
-     Parameter  Description
-  1  $exec      Execution environment
-
-=head2 Zero::Emulator::Execution::analyzeExecutionResultsLeast($exec, %options)
-
-Analyze execution results for least used code.
-
-     Parameter  Description
-  1  $exec      Execution results
-  2  %options   Options
-
-=head2 Zero::Emulator::Execution::analyzeExecutionResultsMost($exec, %options)
-
-Analyze execution results for most used code.
-
-     Parameter  Description
-  1  $exec      Execution results
-  2  %options   Options
-
-=head2 Zero::Emulator::Execution::analyzeExecutionNotRead($exec, %options)
-
-Analyze execution results for variables never read.
-
-     Parameter  Description
-  1  $exec      Execution results
-  2  %options   Options
-
-=head2 Zero::Emulator::Execution::analyzeExecutionResultsDoubleWrite($exec, %options)
-
-Analyze execution results - double writes.
-
-     Parameter  Description
-  1  $exec      Execution results
-  2  %options   Options
-
-=head2 Zero::Emulator::Execution::analyzeExecutionResults($exec, %options)
-
-Analyze execution results.
-
-     Parameter  Description
-  1  $exec      Execution results
-  2  %options   Options
-
-=head2 Zero::Emulator::Execution::check($exec, $area, $name)
-
-Check that a user area access is valid.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Area
-  3  $name      Expected area name
-
-=head2 Zero::Emulator::Execution::getMemory($exec, $area, $address, $name, %options)
-
-Get from memory.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Area
-  3  $address   Address
-  4  $name      Expected name of area
-  5  %options   Options
-
-=head2 Zero::Emulator::Execution::get($exec, $area, $address)
-
-Get from memory.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Area
-  3  $address   Address
-
-=head2 Zero::Emulator::Execution::set($exec, $address, $value)
-
-Set the value of an address at the specified address in memory in the current execution environment.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $address   Address specification
-  3  $value     Value
-
-=head2 Zero::Emulator::Execution::stackArea($exec)
-
-Current stack frame.
-
-     Parameter  Description
-  1  $exec      Execution environment
-
-=head2 Zero::Emulator::Execution::address($exec, $area, $address, $name)
-
-Record a reference to memory.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Area
-  3  $address   Address in area
-  4  $name      Memory
-
-=head2 Zero::Emulator::Execution::stackTrace($exec, $title)
-
-Create a stack trace.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $title     Title
-
-=head2 Zero::Emulator::Execution::stackTraceAndExit($exec, $title, %options)
-
-Create a stack trace and exit from the emulated program.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $title     Title
+  1  $block     Block
+  2  $range     Limit
   3  %options   Options
 
-=head2 Zero::Emulator::Execution::allocMemory($exec, $name, $stacked)
-
-Create the name of a new memory area.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $name      Name of allocation
-  3  $stacked   Stacked if true
-
-=head2 Zero::Emulator::Execution::setMemoryType($exec, $area, $name)
-
-Set the type of a memory area - a name that can be used to confirm the validity of reads and writes to that array represented by that area.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Area name
-  3  $name      Name of allocation
-
-=head2 Zero::Emulator::Execution::notRead()
-
-Record the unused memory locations in the current stack frame.
+B<Example:>
 
 
-=head2 Zero::Emulator::Execution::rwWrite($exec, $area, $address)
+  if (1)                                                                           
+   {my $N = 5;
+    Start 1;
+  
+    For  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-Observe write to memory.
+     {Tally 1;
+      my $a = Mov 1;
+      Tally 2;
+      Inc $a;
+      Tally 0;
+     } $N;
+    my $e = Execute;
+  
+    is_deeply $e->tallyCount, 2 * $N;
+    is_deeply $e->tallyCounts, { 1 => {mov => $N}, 2 => {inc => $N}};
+   }
+  
 
-     Parameter  Description
-  1  $exec      Area in memory
-  2  $area      Address within area
-  3  $address
+=head2 ForArray($block, $area, $name, %options)
 
-=head2 Zero::Emulator::Execution::markAsRead($exec, $area, $address)
-
-Mark a memory address as having been read from.
-
-     Parameter  Description
-  1  $exec      Area in memory
-  2  $area      Address within area
-  3  $address
-
-=head2 Zero::Emulator::Execution::rwRead($exec, $area, $address)
-
-Observe read from memory.
-
-     Parameter  Description
-  1  $exec      Area in memory
-  2  $area      Address within area
-  3  $address
-
-=head2 Zero::Emulator::Execution::left($exec, $ref, $extra)
-
-Address a memory address.
-
-     Parameter  Description
-  1  $exec      Reference
-  2  $ref       An optional extra offset to add or subtract to the final memory address
-  3  $extra
-
-=head2 Zero::Emulator::Execution::leftSuppress($exec, $ref)
-
-Indicate that a memory address has been read.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $ref       Reference
-
-=head2 Zero::Emulator::Execution::right($exec, $ref)
-
-Get a constant or a memory address.
-
-     Parameter  Description
-  1  $exec      Location
-  2  $ref       Optional area
-
-=head2 Zero::Emulator::Execution::jumpOp($exec, $i, $check)
-
-Jump to the target address if the tested memory area if the condition is matched.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $i         Instruction
-  3  $check     Check
-
-=head2 Zero::Emulator::Execution::assert1($exec, $test, $sub)
-
-Assert true or false.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $test      Text of test
-  3  $sub       Subroutine of test
-
-=head2 Zero::Emulator::Execution::assert($exec, $test, $sub)
-
-Assert generically.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $test      Text of test
-  3  $sub       Subroutine of test
-
-=head2 Zero::Emulator::Execution::assign($exec, $target, $value)
-
-Assign - check for pointless assignments.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $target    Target of assign
-  3  $value     Value to assign
-
-=head2 Zero::Emulator::Execution::allocateSystemAreas($exec)
-
-Allocate system areas for a new stack frame.
-
-     Parameter  Description
-  1  $exec      Execution environment
-
-=head2 Zero::Emulator::Execution::freeSystemAreas($exec, $c)
-
-Free system areas for the specified stack frame.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $c         Stack frame
-
-=head2 Zero::Emulator::Execution::currentInstruction($exec)
-
-Locate current instruction.
-
-     Parameter  Description
-  1  $exec      Execution environment
-
-=head2 Zero::Emulator::Execution::createInitialStackEntry($exec)
-
-Create the initial stack frame.
-
-     Parameter  Description
-  1  $exec      Execution environment
-
-=head2 Zero::Emulator::Execution::checkArrayName($exec, $area, $name)
-
-Check the name of an array.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Array
-  3  $name      Array name
-
-=head2 Zero::Emulator::Execution::locateAreaElement($exec, $area, $op)
-
-Locate an element in an array.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Array
-  3  $op        Operation
-
-=head2 Zero::Emulator::Execution::countAreaElement($exec, $area, $op)
-
-Count the number of elements in array that meet some specification.
-
-     Parameter  Description
-  1  $exec      Execution environment
-  2  $area      Array
-  3  $op        Operation
-
-=head2 Zero::Emulator::Code::execute($block, %options)
-
-Execute a block of code.
+For loop to process each element of the named area.
 
      Parameter  Description
   1  $block     Block of code
-  2  %options   Execution options
+  2  $area      Area
+  3  $name      Area name
+  4  %options   Options
 
-=head2 Zero::Emulator::Execution::formatTrace($exec)
+B<Example:>
 
-Describe last memory assignment.
+
+  if (1)                                                                             
+   {Start 1;
+    my $a = Array "aaa";
+      Mov [$a, 0, "aaa"], 1;
+      Mov [$a, 1, "aaa"], 22;
+      Mov [$a, 2, "aaa"], 333;
+  
+    my $n = ArraySize $a, "aaa";
+    Out "Array size:"; Out $n;
+    ArrayDump $a, "AAAA";
+  
+  
+    ForArray  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {my ($i, $e, $check, $next, $end) = @_;
+      Out $i; Out $e;
+     }  $a, "aaa";
+  
+    Nop;
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->memory, {1=>[1, 22, 333]};
+  
+    is_deeply $e->out, [ "Array size:", 3,
+  
+    "AAAA", "bless([1, 22, 333], \"aaa\")",
+  
+    "Stack trace",
+    "    1     8 arrayDump",
+  
+    0,   1,
+    1,  22,
+    2, 333];
+   }
+  
+
+=head2 Free($target, $source)
+
+Free the memory area named by the target operand after confirming that it has the name specified on the source operand.
 
      Parameter  Description
-  1  $exec      Execution
+  1  $target    Target area yielding the id of the area to be freed
+  2  $source    Source area yielding the name of the area to be freed
 
-=head2 TracePoint(%options)
+B<Example:>
 
-Trace point - a point in the code where the flow of execution might change.
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "node";
+  
+    Free $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out, [
+    "Wrong name: aaa for array with name: node",
+    "    1     2 free",
+  ];
+   }
+  
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "node";
+    Out $a;
+    Mov [$a, 1, 'node'], 1;
+    Mov [$a, 2, 'node'], 2;
+    Mov 1, [$a, \1, 'node'];
+    Dump "dddd";
+  
+    Free $a, "node";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out, [
+    1,
+  
+    "dddd",
+    "-2=bless([], \"return\")",
+    "-1=bless([], \"params\")",
+    "0=bless([1, 1], \"stackArea\")",
+    "1=bless([undef, 1, 2], \"node\")",
+  
+    "Stack trace",
+    "    1     6 dump"];
+   }
+  
+
+=head2 Good($good)
+
+A good ending.
 
      Parameter  Description
-  1  %options   Parameters
+  1  $good      What to do on a good ending
 
-=head2 Ifx($cmp, $a, $b, %options)
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+      Out 1;
+      Jmp $good;
+     }
+  
+    Good  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Out 2;
+     },
+    Bad
+     {Out 3;
+     };
+    Out 4;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [1,2,4];
+   }
+  
+
+=head2 IfEq($a, $b, %options)
 
 Execute then or else clause depending on whether two memory locations are equal.
 
      Parameter  Description
-  1  $cmp       Comparison
-  2  $a         First memory address
-  3  $b         Second memory address
-  4  %options   Then block
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+  
+    IfEq $a, $a, Then {Out "Eq"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfNe $a, $a, Then {Out "Ne"};
+    IfLe $a, $a, Then {Out "Le"};
+    IfLt $a, $a, Then {Out "Lt"};
+    IfGe $a, $a, Then {Out "Ge"};
+    IfGt $a, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Eq", "Le", "Ge"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+  
+    IfEq $a, $b, Then {Out "Eq"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfNe $a, $b, Then {Out "Ne"};
+    IfLe $a, $b, Then {Out "Le"};
+    IfLt $a, $b, Then {Out "Lt"};
+    IfGe $a, $b, Then {Out "Ge"};
+    IfGt $a, $b, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Le", "Lt"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+  
+    IfEq $b, $a, Then {Out "Eq"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfNe $b, $a, Then {Out "Ne"};
+    IfLe $b, $a, Then {Out "Le"};
+    IfLt $b, $a, Then {Out "Lt"};
+    IfGe $b, $a, Then {Out "Ge"};
+    IfGt $b, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+   }
+  
+
+=head2 IfFalse($a, %options)
+
+Execute then clause if the specified memory address is zero thus representing false.
+
+     Parameter  Description
+  1  $a         Memory address
+  2  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+  
+    IfFalse 1,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Then
+     {Out 1
+     },
+    Else
+     {Out 0
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [0];
+   }
+  
+
+=head2 IfGe($a, $b, %options)
+
+Execute then or else clause depending on whether two memory locations are greater than or equal.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $a, Then {Out "Eq"};
+    IfNe $a, $a, Then {Out "Ne"};
+    IfLe $a, $a, Then {Out "Le"};
+    IfLt $a, $a, Then {Out "Lt"};
+  
+    IfGe $a, $a, Then {Out "Ge"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfGt $a, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Eq", "Le", "Ge"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $b, Then {Out "Eq"};
+    IfNe $a, $b, Then {Out "Ne"};
+    IfLe $a, $b, Then {Out "Le"};
+    IfLt $a, $b, Then {Out "Lt"};
+  
+    IfGe $a, $b, Then {Out "Ge"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfGt $a, $b, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Le", "Lt"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $b, $a, Then {Out "Eq"};
+    IfNe $b, $a, Then {Out "Ne"};
+    IfLe $b, $a, Then {Out "Le"};
+    IfLt $b, $a, Then {Out "Lt"};
+  
+    IfGe $b, $a, Then {Out "Ge"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfGt $b, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+   }
+  
+
+=head2 IfGt($a, $b, %options)
+
+Execute then or else clause depending on whether two memory locations are greater than.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $a, Then {Out "Eq"};
+    IfNe $a, $a, Then {Out "Ne"};
+    IfLe $a, $a, Then {Out "Le"};
+    IfLt $a, $a, Then {Out "Lt"};
+    IfGe $a, $a, Then {Out "Ge"};
+  
+    IfGt $a, $a, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Eq", "Le", "Ge"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $b, Then {Out "Eq"};
+    IfNe $a, $b, Then {Out "Ne"};
+    IfLe $a, $b, Then {Out "Le"};
+    IfLt $a, $b, Then {Out "Lt"};
+    IfGe $a, $b, Then {Out "Ge"};
+  
+    IfGt $a, $b, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Le", "Lt"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $b, $a, Then {Out "Eq"};
+    IfNe $b, $a, Then {Out "Ne"};
+    IfLe $b, $a, Then {Out "Le"};
+    IfLt $b, $a, Then {Out "Lt"};
+    IfGe $b, $a, Then {Out "Ge"};
+  
+    IfGt $b, $a, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+   }
+  
+
+=head2 IfNe($a, $b, %options)
+
+Execute then or else clause depending on whether two memory locations are not equal.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $a, Then {Out "Eq"};
+  
+    IfNe $a, $a, Then {Out "Ne"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfLe $a, $a, Then {Out "Le"};
+    IfLt $a, $a, Then {Out "Lt"};
+    IfGe $a, $a, Then {Out "Ge"};
+    IfGt $a, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Eq", "Le", "Ge"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $b, Then {Out "Eq"};
+  
+    IfNe $a, $b, Then {Out "Ne"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfLe $a, $b, Then {Out "Le"};
+    IfLt $a, $b, Then {Out "Lt"};
+    IfGe $a, $b, Then {Out "Ge"};
+    IfGt $a, $b, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Le", "Lt"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $b, $a, Then {Out "Eq"};
+  
+    IfNe $b, $a, Then {Out "Ne"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfLe $b, $a, Then {Out "Le"};
+    IfLt $b, $a, Then {Out "Lt"};
+    IfGe $b, $a, Then {Out "Ge"};
+    IfGt $b, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+   }
+  
+
+=head2 IfLe($a, $b, %options)
+
+Execute then or else clause depending on whether two memory locations are less than or equal.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $a, Then {Out "Eq"};
+    IfNe $a, $a, Then {Out "Ne"};
+  
+    IfLe $a, $a, Then {Out "Le"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfLt $a, $a, Then {Out "Lt"};
+    IfGe $a, $a, Then {Out "Ge"};
+    IfGt $a, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Eq", "Le", "Ge"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $b, Then {Out "Eq"};
+    IfNe $a, $b, Then {Out "Ne"};
+  
+    IfLe $a, $b, Then {Out "Le"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfLt $a, $b, Then {Out "Lt"};
+    IfGe $a, $b, Then {Out "Ge"};
+    IfGt $a, $b, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Le", "Lt"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $b, $a, Then {Out "Eq"};
+    IfNe $b, $a, Then {Out "Ne"};
+  
+    IfLe $b, $a, Then {Out "Le"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfLt $b, $a, Then {Out "Lt"};
+    IfGe $b, $a, Then {Out "Ge"};
+    IfGt $b, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+   }
+  
+
+=head2 IfLt($a, $b, %options)
+
+Execute then or else clause depending on whether two memory locations are less than.
+
+     Parameter  Description
+  1  $a         First memory address
+  2  $b         Second memory address
+  3  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $a, Then {Out "Eq"};
+    IfNe $a, $a, Then {Out "Ne"};
+    IfLe $a, $a, Then {Out "Le"};
+  
+    IfLt $a, $a, Then {Out "Lt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfGe $a, $a, Then {Out "Ge"};
+    IfGt $a, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Eq", "Le", "Ge"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $a, $b, Then {Out "Eq"};
+    IfNe $a, $b, Then {Out "Ne"};
+    IfLe $a, $b, Then {Out "Le"};
+  
+    IfLt $a, $b, Then {Out "Lt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfGe $a, $b, Then {Out "Ge"};
+    IfGt $a, $b, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Le", "Lt"];
+   }
+  
+  if (1)                                                                                   
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    IfEq $b, $a, Then {Out "Eq"};
+    IfNe $b, $a, Then {Out "Ne"};
+    IfLe $b, $a, Then {Out "Le"};
+  
+    IfLt $b, $a, Then {Out "Lt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfGe $b, $a, Then {Out "Ge"};
+    IfGt $b, $a, Then {Out "Gt"};
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+   }
+  
+
+=head2 IfTrue($a, %options)
+
+Execute then clause if the specified memory address is not zero thus representing true.
+
+     Parameter  Description
+  1  $a         Memory address
+  2  %options   Then block
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    IfTrue 1,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Then
+     {Out 1
+     },
+    Else
+     {Out 0
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [1];
+   }
+  
+
+=head2 Inc($target)
+
+Increment the target.
+
+     Parameter  Description
+  1  $target    Target address
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Mov 3;
+  
+    Inc $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [4];
+   }
+  
+
+=head2 Jeq($target, $source, $source2)
+
+Jump to a target label if the first source field is equal to the second source field.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+  3  $source2
+
+B<Example:>
+
+
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    Mov [$a, 0, 'aaa'], $b;
+    Mov [$b, 0, 'bbb'], 99;
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+      my $c = Mov [$a, \0, 'aaa'];
+      my $d = Mov [$c, \0, 'bbb'];
+  
+      Jeq $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jne $next, $d, $d;
+      Jle $next, $d, $d;
+      Jlt $next, $d, $d;
+      Jge $next, $d, $d;
+      Jgt $next, $d, $d;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+
+=head2 JFalse($target, $source)
+
+Jump to a target label if the first source field is equal to zero.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Mov 1;
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+      JTrue $end, $a;
+      Out 1;
+     };
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+  
+      JFalse $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Out 2;
+     };
+    Mov $a, 0;
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+      JTrue $end, $a;
+      Out 3;
+     };
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+  
+      JFalse $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Out 4;
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2, 3];
+   }
+  
+
+=head2 Jge($target, $source, $source2)
+
+Jump to a target label if the first source field is greater than or equal to the second source field.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+  3  $source2
+
+B<Example:>
+
+
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    Mov [$a, 0, 'aaa'], $b;
+    Mov [$b, 0, 'bbb'], 99;
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+      my $c = Mov [$a, \0, 'aaa'];
+      my $d = Mov [$c, \0, 'bbb'];
+      Jeq $next, $d, $d;
+      Jne $next, $d, $d;
+      Jle $next, $d, $d;
+      Jlt $next, $d, $d;
+  
+      Jge $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jgt $next, $d, $d;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+
+=head2 Jgt($target, $source, $source2)
+
+Jump to a target label if the first source field is greater than the second source field.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+  3  $source2
+
+B<Example:>
+
+
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    Mov [$a, 0, 'aaa'], $b;
+    Mov [$b, 0, 'bbb'], 99;
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+      my $c = Mov [$a, \0, 'aaa'];
+      my $d = Mov [$c, \0, 'bbb'];
+      Jeq $next, $d, $d;
+      Jne $next, $d, $d;
+      Jle $next, $d, $d;
+      Jlt $next, $d, $d;
+      Jge $next, $d, $d;
+  
+      Jgt $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+
+=head2 Jle($target, $source, $source2)
+
+Jump to a target label if the first source field is less than or equal to the second source field.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+  3  $source2
+
+B<Example:>
+
+
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    Mov [$a, 0, 'aaa'], $b;
+    Mov [$b, 0, 'bbb'], 99;
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+      my $c = Mov [$a, \0, 'aaa'];
+      my $d = Mov [$c, \0, 'bbb'];
+      Jeq $next, $d, $d;
+      Jne $next, $d, $d;
+  
+      Jle $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jlt $next, $d, $d;
+      Jge $next, $d, $d;
+      Jgt $next, $d, $d;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+
+=head2 Jlt($target, $source, $source2)
+
+Jump to a target label if the first source field is less than the second source field.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+  3  $source2
+
+B<Example:>
+
+
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    Mov [$a, 0, 'aaa'], $b;
+    Mov [$b, 0, 'bbb'], 99;
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+      my $c = Mov [$a, \0, 'aaa'];
+      my $d = Mov [$c, \0, 'bbb'];
+      Jeq $next, $d, $d;
+      Jne $next, $d, $d;
+      Jle $next, $d, $d;
+  
+      Jlt $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jge $next, $d, $d;
+      Jgt $next, $d, $d;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+
+=head2 Jmp($target)
+
+Jump to a label.
+
+     Parameter  Description
+  1  $target    Target address
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    Jmp (my $a = label);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Out  1;
+  
+      Jmp (my $b = label);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    setLabel($a);
+      Out  2;
+    setLabel($b);
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2];
+   }
+  
+
+=head2 Jne($target, $source, $source2)
+
+Jump to a target label if the first source field is not equal to the second source field.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+  3  $source2
+
+B<Example:>
+
+
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    Mov [$a, 0, 'aaa'], $b;
+    Mov [$b, 0, 'bbb'], 99;
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+      my $c = Mov [$a, \0, 'aaa'];
+      my $d = Mov [$c, \0, 'bbb'];
+      Jeq $next, $d, $d;
+  
+      Jne $next, $d, $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jle $next, $d, $d;
+      Jlt $next, $d, $d;
+      Jge $next, $d, $d;
+      Jgt $next, $d, $d;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+
+=head2 JTrue($target, $source)
+
+Jump to a target label if the first source field is not equal to zero.
+
+     Parameter  Description
+  1  $target    Target label
+  2  $source    Source to test
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Mov 1;
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+  
+      JTrue $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Out 1;
+     };
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+      JFalse $end, $a;
+      Out 2;
+     };
+    Mov $a, 0;
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+  
+      JTrue $end, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Out 3;
+     };
+    Block
+     {my ($start, $good, $bad, $end) = @_;
+      JFalse $end, $a;
+      Out 4;
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2, 3];
+   }
+  
+
+=head2 LoadAddress()
+
+Load the address component of an address.
+
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "array";
+    my $b = Mov 2;
+    my $c = Mov 5;
+  
+    my $d = LoadAddress $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $f = LoadArea    [$a, \0, 'array'];
+  
+    Out $d;
+    Out $f;
+  
+    Mov [$a, \$b, 'array'], 22;
+    Mov [$a, \$c, 'array'], 33;
+    Mov [$f, \$d, 'array'], 44;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out,    [2,1];
+    is_deeply $e->memory, {1=>[undef, undef, 44, undef, undef, 33]};
+   }
+  
+
+=head2 LoadArea()
+
+Load the area component of an address.
+
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "array";
+    my $b = Mov 2;
+    my $c = Mov 5;
+    my $d = LoadAddress $c;
+  
+    my $f = LoadArea    [$a, \0, 'array'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Out $d;
+    Out $f;
+  
+    Mov [$a, \$b, 'array'], 22;
+    Mov [$a, \$c, 'array'], 33;
+    Mov [$f, \$d, 'array'], 44;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out,    [2,1];
+    is_deeply $e->memory, {1=>[undef, undef, 44, undef, undef, 33]};
+   }
+  
+
+=head2 Mov()
+
+Copy a constant or memory address to the target address.
+
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    my $a = Mov 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+  
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2];
+   }
+  
+   {Start 1;                                                                      
+  
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "aaa";
+  
+    Mov     [$a,  1, "aaa"],  11;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Mov  1, [$a, \1, "aaa"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out \1;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [11];
+   }
+  
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "alloc";
+  
+    my $b = Mov 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $c = Mov $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Mov [$a, 0, 'alloc'], $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Mov [$c, 1, 'alloc'], 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ok Execute(memory=>  { 1=>  bless([99, 2], "alloc") });
+   }
+  
+  if (1)                                                                            
+   {Start 1;
+    my $a = Array "aaa";
+    Dump "dddd";
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [
+    "dddd",
+    "-2=bless([], \"return\")",
+    "-1=bless([], \"params\")",
+    "0=bless([1], \"stackArea\")",
+    "1=bless([], \"aaa\")",
+    "Stack trace",
+    "    1     2 dump"];
+   }
+  
+  if (1)                                                                              
+   {Start 1;
+    my $a = Array "aaa";
+  
+    my $i = Mov 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $v = Mov 11;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ParamsPut 0, $a;
+    ParamsPut 1, $i;
+    ParamsPut 2, $v;
+    my $set = Procedure 'set', sub
+     {my $a = ParamsGet 0;
+      my $i = ParamsGet 1;
+      my $v = ParamsGet 2;
+  
+      Mov [$a, \$i, 'aaa'], $v;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Return;
+     };
+    Call $set;
+  
+    my $V = Mov [$a, \$i, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    AssertEq $v, $V;
+    Out [$a, \$i, 'aaa'];
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [11];
+   }
+  
+  if (1)                                                                            
+   {Start 1;
+    my $set = Procedure 'set', sub
+     {my $a = ParamsGet 0;
+      Out $a;
+     };
+    ParamsPut 0, 1;  Call $set;
+    ParamsPut 0, 2;  Call $set;
+    ParamsPut 0, 3;  Call $set;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [1..3];
+   }
+  
+  if (1)                                                                                 
+   {Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+  
+    Mov [$a, 0, 'aaa'], $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Mov [$b, 0, 'bbb'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+  
+      my $c = Mov [$a, \0, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+      my $d = Mov [$c, \0, 'bbb'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jeq $next, $d, $d;
+      Jne $next, $d, $d;
+      Jle $next, $d, $d;
+      Jlt $next, $d, $d;
+      Jge $next, $d, $d;
+      Jgt $next, $d, $d;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
+    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+   }
+  
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array 'aaa';
+  
+    my $b = Mov 2;                                                                # Location to move to in a  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    For
+     {my ($i, $check, $next, $end) = @_;
+  
+      Mov [$a, \$b, 'aaa'], 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Jeq $next, [$a, \$b, 'aaa'], 1;
+     } 3;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       19 instructions executed";
+    is_deeply $e->memory, {1=>  bless([undef, undef, 1], "aaa")};
+   }
+  
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "aaa";
+  
+      Mov [$a, 0, "aaa"], 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+      Mov [$a, 1, "aaa"], 22;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+      Mov [$a, 2, "aaa"], 333;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ArrayDump $a, "AAAA";
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->out, [
+    "AAAA",
+    "bless([1, 22, 333], \"aaa\")",
+    "Stack trace",
+    "    1     5 arrayDump"];
+   }
+  
+
+=head2 MoveLong($target, $source, $source2)
+
+Copy the number of elements specified by the second source operand from the location specified by the first source operand to the target operand.
+
+     Parameter  Description
+  1  $target    Target of move
+  2  $source    Source of move
+  3  $source2   Length of move
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {my $N = 10;
+    Start 1;
+    my $a = Array "aaa";
+    my $b = Array "bbb";
+    For
+     {my ($i, $Check, $Next, $End) = @_;
+      Mov [$a, \$i, "aaa"], $i;
+      my $j = Add $i, 100;
+      Mov [$b, \$i, "bbb"], $j;
+     } $N;
+  
+  
+    MoveLong [$b, \2, 'bbb'], [$a, \4, 'aaa'], 3;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->memory, {
+    1 => bless([0 .. 9], "aaa"),
+    2 => bless([100, 101, 4, 5, 6, 105 .. 109], "bbb")};
+   }
+  
+
+=head2 Not()
+
+Move and not.
+
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Mov 3;
+  
+    my $b = Not $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $c = Not $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    Out $b;
+    Out $c;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [3, "", 1];
+   }
+  
+
+=head2 Nop()
+
+Do nothing (but do it well!).
+
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    Nop;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ok Execute(out=>[]);
+   }
+  
+  if (1)                                                                             
+   {Start 1;
+    my $a = Array "aaa";
+      Mov [$a, 0, "aaa"], 1;
+      Mov [$a, 1, "aaa"], 22;
+      Mov [$a, 2, "aaa"], 333;
+  
+    my $n = ArraySize $a, "aaa";
+    Out "Array size:"; Out $n;
+    ArrayDump $a, "AAAA";
+  
+    ForArray
+     {my ($i, $e, $check, $next, $end) = @_;
+      Out $i; Out $e;
+     }  $a, "aaa";
+  
+  
+    Nop;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->memory, {1=>[1, 22, 333]};
+  
+    is_deeply $e->out, [ "Array size:", 3,
+  
+    "AAAA", "bless([1, 22, 333], \"aaa\")",
+  
+    "Stack trace",
+    "    1     8 arrayDump",
+  
+    0,   1,
+    1,  22,
+    2, 333];
+   }
+  
+
+=head2 Out($source)
+
+Write memory location contents to out.
+
+     Parameter  Description
+  1  $source    Either a scalar constant or memory address to output
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+  
+    Out "hello World";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["hello World"];
+   }
+  
+
+=head2 ParamsGet()
+
+Get a word from the parameters in the previous frame and store it in the current frame.
+
+
+B<Example:>
+
+
+  if (1)                                                                              
+   {Start 1;
+    my $a = Array "aaa";
+    my $i = Mov 1;
+    my $v = Mov 11;
+    ParamsPut 0, $a;
+    ParamsPut 1, $i;
+    ParamsPut 2, $v;
+    my $set = Procedure 'set', sub
+  
+     {my $a = ParamsGet 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+      my $i = ParamsGet 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+      my $v = ParamsGet 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Mov [$a, \$i, 'aaa'], $v;
+      Return;
+     };
+    Call $set;
+    my $V = Mov [$a, \$i, 'aaa'];
+    AssertEq $v, $V;
+    Out [$a, \$i, 'aaa'];
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [11];
+   }
+  
+
+=head2 ParamsPut($target, $source)
+
+Put a word into the parameters list to make it visible in a called procedure.
+
+     Parameter  Description
+  1  $target    Parameter number
+  2  $source    Address to fetch parameter from
+
+B<Example:>
+
+
+  if (1)                                                                              
+   {Start 1;
+    my $a = Array "aaa";
+    my $i = Mov 1;
+    my $v = Mov 11;
+  
+    ParamsPut 0, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ParamsPut 1, $i;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ParamsPut 2, $v;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $set = Procedure 'set', sub
+     {my $a = ParamsGet 0;
+      my $i = ParamsGet 1;
+      my $v = ParamsGet 2;
+      Mov [$a, \$i, 'aaa'], $v;
+      Return;
+     };
+    Call $set;
+    my $V = Mov [$a, \$i, 'aaa'];
+    AssertEq $v, $V;
+    Out [$a, \$i, 'aaa'];
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [11];
+   }
+  
+
+=head2 Pop(if (@_ == 0))
+
+Pop the memory area specified by the source operand into the memory address specified by the target operand.
+
+     Parameter     Description
+  1  if (@_ == 0)  Pop current stack frame into a local variable
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "aaa";
+    Push $a, 1;
+    Push $a, 2;
+  
+    my $c = Pop $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $d = Pop $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Out $c;
+    Out $d;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out,    [2, 1];
+    is_deeply $e->memory, { 1=>  []};
+   }
+  
+
+=head2 Procedure($name, $source)
+
+Define a procedure.
+
+     Parameter  Description
+  1  $name      Name of procedure
+  2  $source    Source code as a subroutine# $assembly->instruction(action=>"procedure"
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    my $add = Procedure 'add2', sub  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {my $a = ParamsGet 0;
+      my $b = Add $a, 2;
+      ReturnPut 0, $b;
+      Return;
+     };
+    ParamsPut 0, 2;
+    Call $add;
+    my $c = ReturnGet 0;
+    Out $c;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [4];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    for my $i(1..10)
+     {Out $i;
+     };
+    IfTrue 0,
+    Then
+     {Out 99;
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [1..10];
+   }
+  
+
+=head2 Push()
+
+Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand.
+
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $a = Array "aaa";
+  
+    Push $a, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Push $a, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $c = Pop $a;
+    my $d = Pop $a;
+  
+    Out $c;
+    Out $d;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out,    [2, 1];
+    is_deeply $e->memory, { 1=>  []};
+   }
+  
+
+=head2 Resize($target, $source)
+
+Resize the target area to the source size.
+
+     Parameter  Description
+  1  $target    Target address
+  2  $source    Source address
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array 'aaa';
+    Mov [$a, 0, 'aaa'], 1;
+    Mov [$a, 1, 'aaa'], 2;
+    Mov [$a, 2, 'aaa'], 3;
+  
+    Resize $a, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->memory, {1=>  [1, 2]};
+   }
+  
+
+=head2 Return()
+
+Return from a procedure via the call stack.
+
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    my $w = Procedure 'write', sub
+     {Out 'aaa';
+  
+      Return;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     };
+    Call $w;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["aaa"];
+   }
+  
+
+=head2 ReturnGet(if (@_ == 1))
+
+Get a word from the return area and save it.
+
+     Parameter     Description
+  1  if (@_ == 1)  Create a variable
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    my $w = Procedure 'write', sub
+     {ReturnPut 0, "ccc";
+      Return;
+     };
+    Call $w;
+  
+    ReturnGet \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out \0;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["ccc"];
+   }
+  
+
+=head2 ReturnPut($target, $source)
+
+Put a word into the return area.
+
+     Parameter  Description
+  1  $target    Offset in return area to write to
+  2  $source    Memory address whose contents are to be placed in the return area
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    my $w = Procedure 'write', sub
+  
+     {ReturnPut 0, "ccc";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Return;
+     };
+    Call $w;
+    ReturnGet \0, 0;
+    Out \0;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["ccc"];
+   }
+  
+
+=head2 ShiftDown(if (@_ == 1))
+
+Shift an element down one in an area.
+
+     Parameter     Description
+  1  if (@_ == 1)  Create a variable
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "array";
+    Mov [$a, 0, 'array'], 0;
+    Mov [$a, 1, 'array'], 99;
+    Mov [$a, 2, 'array'], 2;
+  
+  
+    my $b = ShiftDown [$a, \1, 'array'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $b;
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->memory, {1=>[0, 2]};
+    is_deeply $e->out,    [99];
+   }
+  
+
+=head2 ShiftLeft(my ($target, $source)
+
+Shift left within an element.
+
+     Parameter    Description
+  1  my ($target  Target to shift
+  2  $source      Amount to shift
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Mov 1;
+  
+    ShiftLeft $a, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2];
+   }
+  
+
+=head2 ShiftRight(my ($target, $source)
+
+Shift right with an element.
+
+     Parameter    Description
+  1  my ($target  Target to shift
+  2  $source      Amount to shift
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Mov 4;
+  
+    ShiftRight $a, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2];
+   }
+  
+
+=head2 ShiftUp($target, $source)
+
+Shift an element up one in an area.
+
+     Parameter  Description
+  1  $target    Target to shift
+  2  $source    Amount to shift
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "array";
+  
+    Mov [$a, 0, 'array'], 0;
+    Mov [$a, 1, 'array'], 1;
+    Mov [$a, 2, 'array'], 2;
+  
+    ShiftUp [$a, 1, 'array'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = Execute(suppressOutput=>1);
+  
+    is_deeply $e->memory, {1=>[0, 99, 1, 2]};
+   }
+  
+
+=head2 Start($version)
+
+Start the current assembly using the specified version of the Zero language.  At  the moment only version 1 works.
+
+     Parameter  Description
+  1  $version   Version desired - at the moment only 1
+
+B<Example:>
+
+
+  if (1)                                                                            
+  
+   {Start 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out "hello World";
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, ["hello World"];
+   }
+  
+
+=head2 Subtract($target, $s1, $s2)
+
+Subtract the second source operand value from the first source operand value and store the result in the target area.
+
+     Parameter  Description
+  1  $target    Target address
+  2  $s1        Source one
+  3  $s2        Source two
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    my $a = Subtract 4, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2];
+   }
+  
+
+=head2 Tally($source)
+
+Counts instructions when enabled.
+
+     Parameter  Description
+  1  $source    Tally instructions when true
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {my $N = 5;
+    Start 1;
+    For
+  
+     {Tally 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      my $a = Mov 1;
+  
+      Tally 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Inc $a;
+  
+      Tally 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     } $N;
+    my $e = Execute;
+  
+    is_deeply $e->tallyCount, 2 * $N;
+    is_deeply $e->tallyCounts, { 1 => {mov => $N}, 2 => {inc => $N}};
+   }
+  
+
+=head2 Then($t)
+
+Then block.
+
+     Parameter  Description
+  1  $t         Then block subroutine
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    Trace 1;
+    IfEq 1, 2,
+  
+    Then  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Mov 1, 1;
+      Mov 2, 1;
+     },
+    Else
+     {Mov 3, 3;
+      Mov 4, 4;
+     };
+    IfEq 2, 2,
+  
+    Then  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Mov 1, 1;
+      Mov 2, 1;
+     },
+    Else
+     {Mov 3, 3;
+      Mov 4, 4;
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply scalar($e->out->@*), 14;
+   }
+  
+
+=head2 Trace($source)
+
+Start or stop tracing.  Tracing prints each instruction executed and its effect on memeory.
+
+     Parameter  Description
+  1  $source    Trace setting
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+  
+    Trace 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    IfEq 1, 2,
+    Then
+     {Mov 1, 1;
+      Mov 2, 1;
+     },
+    Else
+     {Mov 3, 3;
+      Mov 4, 4;
+     };
+    IfEq 2, 2,
+    Then
+     {Mov 1, 1;
+      Mov 2, 1;
+     },
+    Else
+     {Mov 3, 3;
+      Mov 4, 4;
+     };
+    my $e = Execute(suppressOutput=>1);
+    is_deeply scalar($e->out->@*), 14;
+   }
+  
+
+=head2 TracePoints($source)
+
+Enable or disable trace points.  If trace points are enabled a stack trace is printed for each instructyion executed showing the call stack at the time the instruction was generated as well as the current stack frames.
+
+     Parameter  Description
+  1  $source    Trace points if true
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {my $N = 5;
+    Start 1;
+  
+    TracePoints 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    For
+     {my $a = Mov 1;
+      Inc $a;
+     } $N;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [
+  
+    "TracePoints: 1",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    "Trace",
+    "    1     6 tracePoint",
+    "Trace",
+    "    1     6 tracePoint",
+    "Trace",
+    "    1     6 tracePoint",
+    "Trace",
+    "    1     6 tracePoint",
+    "Trace",
+    "    1     6 tracePoint"];
+   }
+  
+
+=head2 Var($value)
+
+Create a variable initialized to the specified value.
+
+     Parameter  Description
+  1  $value     Value
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+  
+    my $a = Var 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    AssertEq $a, 1;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [];
+   }
+  
+
+=head2 Watch($target)
+
+Watches for changes to the specified memory location.
+
+     Parameter  Description
+  1  $target    Memory address to watch
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {Start 1;
+    my $a = Mov 1;
+    my $b = Mov 2;
+    my $c = Mov 3;
+  
+    Watch $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Mov $a, 4;
+    Mov $b, 5;
+    Mov $c, 6;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [
+    "Change at watched area: 0 (stackArea), address: 1",
+    "    1     6 mov",
+    "Current value: 2",
+    "New     value: 5",
+    "-2=bless([], \"return\")",
+    "-1=bless([], \"params\")",
+    "0=bless([4, 2, 3], \"stackArea\")"];
+   }
+  
+
+
+=head1 Private Methods
 
 =head2 Assert1($op, $a)
 
@@ -3204,12 +2889,64 @@ Assert operation.
   2  $a         First memory address
   3  $b         Second memory address
 
-=head2 Var($value)
+=head2 Ifx($cmp, $a, $b, %options)
 
-Create a variable initialized to the specified value.
+Execute then or else clause depending on whether two memory locations are equal.
 
      Parameter  Description
-  1  $value     Value
+  1  $cmp       Comparison
+  2  $a         First memory address
+  3  $b         Second memory address
+  4  %options   Then block
+
+=head2 Label($source)
+
+Create a label.
+
+     Parameter  Description
+  1  $source    Name of label
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    Mov 0, 1;
+    Jlt ((my $a = label), \0, 2);
+      Out  1;
+      Jmp (my $b = label);
+    setLabel($a);
+      Out  2;
+    setLabel($b);
+  
+    Jgt ((my $c = label), \0, 3);
+      Out  1;
+      Jmp (my $d = label);
+    setLabel($c);
+      Out  2;
+    setLabel($d);
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [2,1];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    Mov 0, 0;
+    my $a = setLabel;
+      Out \0;
+      Inc \0;
+    Jlt $a, \0, 10;
+    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->out, [0..9];
+   }
+  
+
+=head2 TracePoint(%options)
+
+Trace point - a point in the code where the flow of execution might change.
+
+     Parameter  Description
+  1  %options   Parameters
 
 
 =head1 Index
@@ -3223,47 +2960,47 @@ Create a variable initialized to the specified value.
 
 4 L<ArrayCountLess|/ArrayCountLess> - Count the number of elements in the array specified by the first source operand that are less than the element supplied by the second source operand and place the result in the target location.
 
-5 L<ArrayIndex|/ArrayIndex> - Find the 1 based index of the second source operand in the array referenced by the first source operand if it is present in the array else 0 into the target location.
+5 L<ArrayDump|/ArrayDump> - Dump an array.
 
-6 L<ArraySize|/ArraySize> - The current size of an array.
+6 L<ArrayIndex|/ArrayIndex> - Find the 1 based index of the second source operand in the array referenced by the first source operand if it is present in the array else 0 into the target location.
 
-7 L<Assert|/Assert> - Assert regardless.
+7 L<ArraySize|/ArraySize> - The current size of an array.
 
-8 L<Assert1|/Assert1> - Assert operation.
+8 L<Assert|/Assert> - Assert regardless.
 
-9 L<Assert2|/Assert2> - Assert operation.
+9 L<Assert1|/Assert1> - Assert operation.
 
-10 L<AssertEq|/AssertEq> - Assert two memory locations are equal.
+10 L<Assert2|/Assert2> - Assert operation.
 
-11 L<AssertFalse|/AssertFalse> - Assert false.
+11 L<AssertEq|/AssertEq> - Assert two memory locations are equal.
 
-12 L<AssertGe|/AssertGe> - Assert are greater than or equal.
+12 L<AssertFalse|/AssertFalse> - Assert false.
 
-13 L<AssertGt|/AssertGt> - Assert two memory locations are greater than.
+13 L<AssertGe|/AssertGe> - Assert are greater than or equal.
 
-14 L<AssertLe|/AssertLe> - Assert two memory locations are less than or equal.
+14 L<AssertGt|/AssertGt> - Assert two memory locations are greater than.
 
-15 L<AssertLt|/AssertLt> - Assert two memory locations are less than.
+15 L<AssertLe|/AssertLe> - Assert two memory locations are less than or equal.
 
-16 L<AssertNe|/AssertNe> - Assert two memory locations are not equal.
+16 L<AssertLt|/AssertLt> - Assert two memory locations are less than.
 
-17 L<AssertTrue|/AssertTrue> - Assert true.
+17 L<AssertNe|/AssertNe> - Assert two memory locations are not equal.
 
-18 L<Bad|/Bad> - A bad ending.
+18 L<AssertTrue|/AssertTrue> - Assert true.
 
-19 L<Block|/Block> - Block of code that can either be restarted or come to a good or a bad ending.
+19 L<Bad|/Bad> - A bad ending.
 
-20 L<Call|/Call> - Call the subroutine at the target address.
+20 L<Block|/Block> - Block of code that can either be restarted or come to a good or a bad ending.
 
-21 L<Clear|/Clear> - Clear the first bytes of an area.
+21 L<Call|/Call> - Call the subroutine at the target address.
 
-22 L<Confess|/Confess> - Confess.
+22 L<Clear|/Clear> - Clear the first bytes of an area.
 
-23 L<Dec|/Dec> - Decrement the target.
+23 L<Confess|/Confess> - Confess with a stack trace showing the location bioth in the emulated code and in the code that produced the emulated code.
 
-24 L<Dump|/Dump> - Dump memory.
+24 L<Dec|/Dec> - Decrement the target.
 
-25 L<DumpArray|/DumpArray> - Dump an array.
+25 L<Dump|/Dump> - Dump all the arrays currently in memory.
 
 26 L<Else|/Else> - Else block.
 
@@ -3279,7 +3016,7 @@ Create a variable initialized to the specified value.
 
 32 L<IfEq|/IfEq> - Execute then or else clause depending on whether two memory locations are equal.
 
-33 L<IfFalse|/IfFalse> - Execute then clause if the specified memory address is zero representing false.
+33 L<IfFalse|/IfFalse> - Execute then clause if the specified memory address is zero thus representing false.
 
 34 L<IfGe|/IfGe> - Execute then or else clause depending on whether two memory locations are greater than or equal.
 
@@ -3291,7 +3028,7 @@ Create a variable initialized to the specified value.
 
 38 L<IfNe|/IfNe> - Execute then or else clause depending on whether two memory locations are not equal.
 
-39 L<IfTrue|/IfTrue> - Execute then clause if the specified memory address is not zero representing true.
+39 L<IfTrue|/IfTrue> - Execute then clause if the specified memory address is not zero thus representing true.
 
 40 L<Ifx|/Ifx> - Execute then or else clause depending on whether two memory locations are equal.
 
@@ -3317,9 +3054,9 @@ Create a variable initialized to the specified value.
 
 51 L<Label|/Label> - Create a label.
 
-52 L<LeAddress|/LeAddress> - Load the address component.
+52 L<LoadAddress|/LoadAddress> - Load the address component of an address.
 
-53 L<LeArea|/LeArea> - Load the address component.
+53 L<LoadArea|/LoadArea> - Load the area component of an address.
 
 54 L<Mov|/Mov> - Copy a constant or memory address to the target address.
 
@@ -3329,7 +3066,7 @@ Create a variable initialized to the specified value.
 
 57 L<Not|/Not> - Move and not.
 
-58 L<Out|/Out> - Write memory contents to out.
+58 L<Out|/Out> - Write memory location contents to out.
 
 59 L<ParamsGet|/ParamsGet> - Get a word from the parameters in the previous frame and store it in the current frame.
 
@@ -3365,89 +3102,15 @@ Create a variable initialized to the specified value.
 
 75 L<Then|/Then> - Then block.
 
-76 L<Trace|/Trace> - Trace.
+76 L<Trace|/Trace> - Start or stop tracing.
 
 77 L<TracePoint|/TracePoint> - Trace point - a point in the code where the flow of execution might change.
 
-78 L<TracePoints|/TracePoints> - Enable trace points.
+78 L<TracePoints|/TracePoints> - Enable or disable trace points.
 
 79 L<Var|/Var> - Create a variable initialized to the specified value.
 
-80 L<Watch|/Watch> - Shift an element down one in an area.
-
-81 L<Zero::Emulator::Code::execute|/Zero::Emulator::Code::execute> - Execute a block of code.
-
-82 L<Zero::Emulator::Execution::address|/Zero::Emulator::Execution::address> - Record a reference to memory.
-
-83 L<Zero::Emulator::Execution::allocateSystemAreas|/Zero::Emulator::Execution::allocateSystemAreas> - Allocate system areas for a new stack frame.
-
-84 L<Zero::Emulator::Execution::allocMemory|/Zero::Emulator::Execution::allocMemory> - Create the name of a new memory area.
-
-85 L<Zero::Emulator::Execution::analyzeExecutionNotRead|/Zero::Emulator::Execution::analyzeExecutionNotRead> - Analyze execution results for variables never read.
-
-86 L<Zero::Emulator::Execution::analyzeExecutionResults|/Zero::Emulator::Execution::analyzeExecutionResults> - Analyze execution results.
-
-87 L<Zero::Emulator::Execution::analyzeExecutionResultsDoubleWrite|/Zero::Emulator::Execution::analyzeExecutionResultsDoubleWrite> - Analyze execution results - double writes.
-
-88 L<Zero::Emulator::Execution::analyzeExecutionResultsLeast|/Zero::Emulator::Execution::analyzeExecutionResultsLeast> - Analyze execution results for least used code.
-
-89 L<Zero::Emulator::Execution::analyzeExecutionResultsMost|/Zero::Emulator::Execution::analyzeExecutionResultsMost> - Analyze execution results for most used code.
-
-90 L<Zero::Emulator::Execution::areaContent|/Zero::Emulator::Execution::areaContent> - Content of an area containing a address in memory in the specified execution.
-
-91 L<Zero::Emulator::Execution::assert|/Zero::Emulator::Execution::assert> - Assert generically.
-
-92 L<Zero::Emulator::Execution::assert1|/Zero::Emulator::Execution::assert1> - Assert true or false.
-
-93 L<Zero::Emulator::Execution::assign|/Zero::Emulator::Execution::assign> - Assign - check for pointless assignments.
-
-94 L<Zero::Emulator::Execution::check|/Zero::Emulator::Execution::check> - Check that a user area access is valid.
-
-95 L<Zero::Emulator::Execution::checkArrayName|/Zero::Emulator::Execution::checkArrayName> - Check the name of an array.
-
-96 L<Zero::Emulator::Execution::countAreaElement|/Zero::Emulator::Execution::countAreaElement> - Count the number of elements in array that meet some specification.
-
-97 L<Zero::Emulator::Execution::createInitialStackEntry|/Zero::Emulator::Execution::createInitialStackEntry> - Create the initial stack frame.
-
-98 L<Zero::Emulator::Execution::currentInstruction|/Zero::Emulator::Execution::currentInstruction> - Locate current instruction.
-
-99 L<Zero::Emulator::Execution::dumpMemory|/Zero::Emulator::Execution::dumpMemory> - Dump memory.
-
-100 L<Zero::Emulator::Execution::formatTrace|/Zero::Emulator::Execution::formatTrace> - Describe last memory assignment.
-
-101 L<Zero::Emulator::Execution::freeSystemAreas|/Zero::Emulator::Execution::freeSystemAreas> - Free system areas for the specified stack frame.
-
-102 L<Zero::Emulator::Execution::get|/Zero::Emulator::Execution::get> - Get from memory.
-
-103 L<Zero::Emulator::Execution::getMemory|/Zero::Emulator::Execution::getMemory> - Get from memory.
-
-104 L<Zero::Emulator::Execution::jumpOp|/Zero::Emulator::Execution::jumpOp> - Jump to the target address if the tested memory area if the condition is matched.
-
-105 L<Zero::Emulator::Execution::left|/Zero::Emulator::Execution::left> - Address a memory address.
-
-106 L<Zero::Emulator::Execution::leftSuppress|/Zero::Emulator::Execution::leftSuppress> - Indicate that a memory address has been read.
-
-107 L<Zero::Emulator::Execution::locateAreaElement|/Zero::Emulator::Execution::locateAreaElement> - Locate an element in an array.
-
-108 L<Zero::Emulator::Execution::markAsRead|/Zero::Emulator::Execution::markAsRead> - Mark a memory address as having been read from.
-
-109 L<Zero::Emulator::Execution::notRead|/Zero::Emulator::Execution::notRead> - Record the unused memory locations in the current stack frame.
-
-110 L<Zero::Emulator::Execution::right|/Zero::Emulator::Execution::right> - Get a constant or a memory address.
-
-111 L<Zero::Emulator::Execution::rwRead|/Zero::Emulator::Execution::rwRead> - Observe read from memory.
-
-112 L<Zero::Emulator::Execution::rwWrite|/Zero::Emulator::Execution::rwWrite> - Observe write to memory.
-
-113 L<Zero::Emulator::Execution::set|/Zero::Emulator::Execution::set> - Set the value of an address at the specified address in memory in the current execution environment.
-
-114 L<Zero::Emulator::Execution::setMemoryType|/Zero::Emulator::Execution::setMemoryType> - Set the type of a memory area - a name that can be used to confirm the validity of reads and writes to that array represented by that area.
-
-115 L<Zero::Emulator::Execution::stackArea|/Zero::Emulator::Execution::stackArea> - Current stack frame.
-
-116 L<Zero::Emulator::Execution::stackTrace|/Zero::Emulator::Execution::stackTrace> - Create a stack trace.
-
-117 L<Zero::Emulator::Execution::stackTraceAndExit|/Zero::Emulator::Execution::stackTraceAndExit> - Create a stack trace and exit from the emulated program.
+80 L<Watch|/Watch> - Watches for changes to the specified memory location.
 
 =head1 Installation
 

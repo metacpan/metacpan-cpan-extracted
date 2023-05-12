@@ -1,5 +1,5 @@
 package String::Validator::Language;
-$String::Validator::Language::VERSION = '2.00';
+$String::Validator::Language::VERSION = '2.04';
 # ABSTRACT: Languages for String::Validator
 
 use 5.008;
@@ -18,7 +18,7 @@ String::Validator::Language - Languages for String::Validator
 
 =head1 VERSION
 
-version 2.00
+version 2.04
 
 =head1 SYNOPSIS
 

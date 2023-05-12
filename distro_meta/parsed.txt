@@ -85155,3 +85155,12 @@ D/DW/DWHEELER/URI-db-0.21.tar.gz
 A/AW/AWNCORP/Venus-2.80.tar.gz
 T/TI/TINITA/YAML-PP-0.036.tar.gz
 P/PR/PRBRENAN/Zero-Emulator-20230514.tar.gz
+P/PL/PLICEASE/Alien-Build-2.80.tar.gz
+G/GU/GUGOD/App-perlbrew-0.97.tar.gz
+I/IN/INGY/assign-0.0.10.tar.gz
+P/PE/PERLANCAR/Pod-Weaver-Plugin-Rinci-0.785.tar.gz
+B/BR/BRAINBUZ/String-Validator-2.04.tar.gz
+B/BR/BRAINBUZ/String-Validator-Language-2.04.tar.gz
+D/DE/DERIV/WebService-Async-Onfido-0.003.tar.gz
+I/IN/INGY/YAML-LibYAML-0.88.tar.gz
+P/PR/PRBRENAN/Zero-Emulator-20230515.tar.gz

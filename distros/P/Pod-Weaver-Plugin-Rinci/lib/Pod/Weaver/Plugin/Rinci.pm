@@ -3,6 +3,7 @@ package Pod::Weaver::Plugin::Rinci;
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
+#with 'Pod::Weaver::Role::ReplaceCommand'; # not ready
 with 'Pod::Weaver::Role::Section';
 
 use Perinci::Access::Perl;
@@ -10,9 +11,9 @@ use Perinci::To::POD;
 use Sub::Identify qw(sub_fullname);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2023-03-02'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Rinci'; # DIST
-our $VERSION = '0.784'; # VERSION
+our $VERSION = '0.785'; # VERSION
 
 our $pa = Perinci::Access::Perl->new;
 
@@ -41,17 +42,6 @@ has force_reload => (
 sub _process_module {
     my ($self, $document, $input) = @_;
 
-    my $use_require_hook_source_dzilbuild =
-        $self->use_require_hook_source_dzilbuild //
-        $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD} //
-        1;
-    my $force_reload =
-        $self->force_reload //
-        $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD} //
-        1;
-
-    require Require::Hook::Source::DzilBuild if $use_require_hook_source_dzilbuild;
-
     my $filename = $input->{filename};
     my ($file) = grep { $_->name eq $filename } @{ $input->{zilla}->files };
 
@@ -60,15 +50,40 @@ sub _process_module {
     my $package = $1;
     $package =~ s!/!::!g;
 
-    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC) if $use_require_hook_source_dzilbuild;
+    my $use_require_hook_source_dzilbuild =
+        $self->use_require_hook_source_dzilbuild //
+        $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD} //
+        1;
+    my $force_reload =
+        $self->force_reload //
+        $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD} //
+        $package =~ /^(Dist::Zilla|Pod::Weaver)::/ ? 0:1;
+
+    require Require::Hook::Source::DzilBuild if $use_require_hook_source_dzilbuild;
+
+    # always add 'lib' because this is what we normally always want
+    local @INC = ("lib", @INC);
 
     # force reload to get the recent version of module
     (my $package_pm = "$package.pm") =~ s!::!/!g;
     delete $INC{$package_pm} if $force_reload;
 
-    my $url = $package; $url =~ s!::!/!g; $url = "pl:/$url/";
-    my $res = $pa->request(meta => $url);
-    die "Can't meta $url: $res->[0] - $res->[1]" unless $res->[0] == 200;
+    my ($url, $res);
+    for my $attempt (1..2) {
+        # first attempt is with Require::Hook::Source::DzilBuild, second attempt
+        # without
+        next if $attempt == 1 && !$use_require_hook_source_dzilbuild;
+        $self->log_debug("Attempt loading $package ".($attempt == 1 ? "with Require::Hook::Source::DzilBuild" : "with normal \@INC"));
+        local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC) if $attempt == 1;
+
+        $url = $package; $url =~ s!::!/!g; $url = "pl:/$url/";
+        eval { $res = $pa->request(meta => $url) };
+        $self->log_debug("Loading failed: $@") if $@;
+        last if !$@ && $res->[0] == 200;
+    }
+
+    die "Failed loading $package after attempt(s)" unless $res->[0] == 200;
+
     my $meta = $res->[2];
     $res = $pa->request(child_metas => $url);
     die "Can't child_metas $url: $res->[0] - $res->[1]" unless $res->[0] == 200;
@@ -216,6 +231,11 @@ sub _process_script {
             });
     }
 
+    # not ready
+    #if ($res->[3]{'func.usage'}) {
+    #    $modified++ if $self->replace_command($document, 'head2', qr/usage/, $res->[3]{'func.usage'}, {ignore=>1});
+    #}
+
     if ($modified) {
         $self->log(["added POD sections from Rinci metadata for script '%s'", $input->{filename}]);
     }
@@ -226,13 +246,20 @@ sub weave_section {
 
     my $filename = $input->{filename};
 
-    if (defined $self->exclude_files) {
-        my $re = $self->exclude_files;
-        eval { $re = qr/$re/ };
-        $@ and die "Invalid regex in exclude_files: $re";
-        if ($filename =~ $re) {
-            $self->log_debug(["skipped file '%s' (matched exclude_files)", $filename]);
-            return;
+    {
+        my $re;
+        if (defined $self->exclude_files) {
+            $re = $self->exclude_files;
+        } elsif ($ENV{PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_FILES}) {
+            $re = $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_FILES};
+        }
+        if ($re) {
+            eval { $re = qr/$re/ };
+            $@ and die "Invalid regex in exclude_files: $re";
+            if ($filename =~ $re) {
+                $self->log_debug(["skipped file '%s' (matched exclude_files)", $filename]);
+                return;
+            }
         }
     }
 
@@ -275,7 +302,7 @@ Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.784 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2022-07-24.
+This document describes version 0.785 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2023-03-02.
 
 =head1 SYNOPSIS
 
@@ -419,6 +446,11 @@ Bool. Used to set the default for the C</force_reload> configuration option.
 String (regex pattern). Used to set the default value for the
 C</exclude_modules> configuration option.
 
+=head2 PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_FILES
+
+String (regex pattern). Used to set the default value for the
+C</exclude_files> configuration option.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver-Plugin-Rinci>.
@@ -454,13 +486,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

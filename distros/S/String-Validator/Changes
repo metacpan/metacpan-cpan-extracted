@@ -1,16 +1,18 @@
 Revision history for String-Validator
+
+2.04  May 11, 2023 fix test failures from changes to Number::Phone
 2.03  August 26, 2019 pod fix
 2.02  June 27, 2019
       Added a line of Documentation
-2.01    March 15, 2019 fix typo in dist.ini
-2.00	April 4, 2018
-1.00    August 16, 2014
+2.01  March 15, 2019 fix typo in dist.ini
+2.00  April 4, 2018
+1.00  August 16, 2014
 	Added String::Validator IP4 to dependencies.
-0.97	October 6, 2013
+0.97  October 6, 2013
 	Minor documentation change.
-0.90	January 15, 2012
-	Pre-release of String::Validator and String::Validator::Password.
-0.01    January 2012
+0.90  January 15, 2012
+  Pre-release of String::Validator and String::Validator::Password.
+0.01  January 2012
         Started Writing it.
 
 

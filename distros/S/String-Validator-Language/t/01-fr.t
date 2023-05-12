@@ -6,9 +6,6 @@ use String::Validator::Password 1.90;
 diag( "Testing String::Validator $String::Validator::VERSION, Perl $], $^X" );
 use_ok( String::Validator::Language::FR );
 use_ok( String::Validator::Common);
-# my $LANG = String::Validator::Lang::FR::new();
-use Data::Printer;
-# p $LANG;
 
 my $Validator = String::Validator::Password->new(
 		min_len => 6,

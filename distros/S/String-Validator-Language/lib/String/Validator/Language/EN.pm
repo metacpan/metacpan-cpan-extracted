@@ -1,5 +1,5 @@
 package String::Validator::Language::EN;
-$String::Validator::Language::EN::VERSION = '2.00';
+$String::Validator::Language::EN::VERSION = '2.04';
 sub new {
     return {
         common_strings_not_match => "Strings don\'t match.",
@@ -33,8 +33,7 @@ sub new {
             return
                 "Not a 10 digit Area-Number $D->{num1} .. $D->{num2} = $D->{len}.";
         },
-        phonenanp_badarea => 'Invalid Number, perhaps non-existent Area Code',
-
+        phonenanp_badarea => 'Invalid or unassigned Area Code. Area Codes Must be greater than 200 and all numbers containing 11 are reserved for Short Codes.',
     };
 }
 
@@ -52,7 +51,7 @@ String::Validator::Language::EN
 
 =head1 VERSION
 
-version 2.00
+version 2.04
 
 For Documentation of this and other String::Validator::Langauge Modules please see String::Validator::Langauge, String::Validator::Commond, and String::Validator.
 

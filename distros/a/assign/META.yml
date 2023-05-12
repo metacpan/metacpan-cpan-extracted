@@ -1,12 +1,12 @@
 ---
-abstract: 'Enable Destructuring Assignment Syntax in Perl'
+abstract: 'Destructuring Assignment Syntax for Perl'
 author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,13 +22,13 @@ requires:
   Filter::Simple: '0.95'
   PPI: '1.276'
   XXX: '0.38'
-  YAML::PP: '0.35'
+  YAML::PP: '0.036'
   perl: v5.16.0
 resources:
   bugtracker: https://github.com/ingydotnet/assign-pm/issues
   homepage: https://github.com/ingydotnet/assign-pm
   repository: https://github.com/ingydotnet/assign-pm.git
-version: 0.0.7
+version: 0.0.10
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

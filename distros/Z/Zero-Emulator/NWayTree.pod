@@ -4,7 +4,7 @@
 
 =head1 Name
 
-Zero::NWayTree - N-Way-Tree in Zero assembler language.
+Zero::NWayTree - N-Way-Tree written in the Zero assembler programming language.
 
 =for html
 <p><a href="https://github.com/philiprbrenan/zero"><img src="https://github.com/philiprbrenan/zero/workflows/Test/badge.svg"></a>
@@ -157,7 +157,7 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Constructor
 
-Create a new tree.
+Create a new N-Way tree.
 
 =head2 New($n)
 
@@ -269,10 +269,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -289,13 +289,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -330,7 +329,6 @@ B<Example:>
     not        => 180};
   
     #say STDERR printTreeKeys($e->memory); x;
-    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                   38                                                                                                    72
                                                                21                                                                                                       56                                                                                                 89
@@ -339,6 +337,7 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeData($e->memory), <<END;
                                                                                                                   76                                                                                                   144
                                                                42                                                                                                      112                                                                                                178
@@ -456,10 +455,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -476,13 +475,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -517,7 +515,6 @@ B<Example:>
     not        => 180};
   
     #say STDERR printTreeKeys($e->memory); x;
-    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                   38                                                                                                    72
                                                                21                                                                                                       56                                                                                                 89
@@ -526,6 +523,7 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeData($e->memory), <<END;
                                                                                                                   76                                                                                                   144
                                                                42                                                                                                      112                                                                                                178
@@ -599,10 +597,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -619,13 +617,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -660,7 +657,6 @@ B<Example:>
     not        => 180};
   
     #say STDERR printTreeKeys($e->memory); x;
-    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                   38                                                                                                    72
                                                                21                                                                                                       56                                                                                                 89
@@ -669,6 +665,7 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeData($e->memory), <<END;
                                                                                                                   76                                                                                                   144
                                                                42                                                                                                      112                                                                                                178
@@ -779,10 +776,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -799,13 +796,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
   
@@ -842,7 +838,6 @@ B<Example:>
     not        => 180};
   
     #say STDERR printTreeKeys($e->memory); x;
-    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                   38                                                                                                    72
                                                                21                                                                                                       56                                                                                                 89
@@ -851,6 +846,7 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeData($e->memory), <<END;
                                                                                                                   76                                                                                                   144
                                                                42                                                                                                      112                                                                                                178
@@ -864,7 +860,7 @@ B<Example:>
 
 =head1 Insert
 
-Create a new entry ina tree connecting a key to data.
+Create a new entry in a tree to connect a key to data.
 
 =head2 Insert($tree, $key, $data, %options)
 
@@ -1108,10 +1104,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -1128,13 +1124,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -1171,7 +1166,6 @@ B<Example:>
     not        => 180};
   
     #say STDERR printTreeKeys($e->memory); x;
-    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                   38                                                                                                    72
                                                                21                                                                                                       56                                                                                                 89
@@ -1180,6 +1174,7 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeData($e->memory), <<END;
                                                                                                                   76                                                                                                   144
                                                                42                                                                                                      112                                                                                                178
@@ -1255,10 +1250,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -1275,13 +1270,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -1318,7 +1312,6 @@ B<Example:>
   
     #say STDERR printTreeKeys($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    #say STDERR printTreeData($e->memory); x;
   
     is_deeply printTreeKeys($e->memory), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
@@ -1329,6 +1322,7 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+    #say STDERR printTreeData($e->memory); x;
     is_deeply printTreeData($e->memory), <<END;
                                                                                                                   76                                                                                                   144
                                                                42                                                                                                      112                                                                                                178
@@ -1400,10 +1394,10 @@ B<Example:>
     is_deeply $e->out, [1..$N];                                                   # Expected sequence
   
     #say STDERR dump $e->tallyCount;
-    is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
   
     #say STDERR dump $e->tallyTotal;
-    is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
   
     #say STDERR dump $e->tallyCounts->{1};
     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -1420,13 +1414,12 @@ B<Example:>
     jLt               => 565,
     jmp               => 878,
     jNe               => 908,
-    mov               => 7724,
+    mov               => 7619,
     moveLong          => 171,
     not               => 631,
     resize            => 161,
     shiftUp           => 300,
-    subtract          => 606,
-  };
+    subtract          => 501};
   
     #say STDERR dump $e->tallyCounts->{2};
     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -1461,9 +1454,6 @@ B<Example:>
     not        => 180};
   
     #say STDERR printTreeKeys($e->memory); x;
-  
-    #say STDERR printTreeData($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
     is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                   38                                                                                                    72
                                                                21                                                                                                       56                                                                                                 89
@@ -1472,6 +1462,9 @@ B<Example:>
     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
   END
   
+  
+    #say STDERR printTreeData($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   
     is_deeply printTreeData($e->memory), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
@@ -1521,6 +1514,27 @@ B<Example:>
     is_deeply $e->out, [1..$N];
    }
   
+
+
+=head1 Attributes
+
+
+The following is a list of all the attributes in this package.  A method coded
+with the same name in your package will over ride the method of the same name
+in this package and thus provide your value for the attribute in place of the
+default value supplied for this attribute by this package.
+
+=head2 Replaceable Attribute List
+
+
+x 
+
+
+=head2 x
+
+Stop if debugging.
+
+
 
 
 =head1 Index

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Enable Destructuring Assignment Syntax in Perl",
+   "abstract" : "Destructuring Assignment Syntax for Perl",
    "author" : [
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "Filter::Simple" : "0.95",
             "PPI" : "1.276",
             "XXX" : "0.38",
-            "YAML::PP" : "0.35",
+            "YAML::PP" : "0.036",
             "perl" : "v5.16.0"
          }
       }
@@ -54,7 +54,7 @@
          "web" : "https://github.com/ingydotnet/assign-pm"
       }
    },
-   "version" : "0.0.7",
+   "version" : "0.0.10",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

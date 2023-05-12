@@ -1,3 +1,13 @@
+0.785   2023-03-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Make this module fail less: 1) avoid force-reloading Dist::Zilla
+          & Pod::Weaver dists; 2) retry reloading without
+          Require::Hook::Source::DzilBuild when failed; 3) always add 'lib'
+          to @INC.
+
+        - Observe PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_FILES.
+
+
 0.784   2022-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - Observe PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES.

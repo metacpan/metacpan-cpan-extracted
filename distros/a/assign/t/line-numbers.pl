@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use assign -0;
+use assign::0;
 
 my [$a1, $b1] = [];
 

@@ -1,3 +1,4 @@
+.perltidyrc
 Build.PL
 CONTRIBUTING.md
 Changes
@@ -42,6 +43,7 @@ t/17.release-detail-cperl-local.t
 t/17.release-detail-cperl-remote.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
+t/19.find_similar_commands.t
 t/app-perlbrew-path-installation.t
 t/app-perlbrew-path.t
 t/bashrc_content.t
@@ -86,3 +88,4 @@ t/list_modules.t
 t/test.tar.gz
 t/test_helpers.pl
 t/unit-files-are-the-same.t
+t/util-find-similar-tokens.t

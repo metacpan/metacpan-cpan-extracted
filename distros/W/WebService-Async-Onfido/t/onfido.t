@@ -13,14 +13,15 @@ use FindBin qw($Bin);
 
 my $pid = fork();
 die "fork error " unless defined($pid);
+
 unless ($pid) {
     my $mock_server = "$Bin/../bin/mock_onfido.pl";
     open(STDOUT, '>/dev/null');
     open(STDERR, '>/dev/null');
-    exec('perl', $mock_server, 'daemon');
+    exec('perl', $mock_server);
 }
 
-sleep 1;
+sleep 3;
 my $loop = IO::Async::Loop->new;
 $loop->add(
     my $onfido = WebService::Async::Onfido->new(
@@ -28,7 +29,7 @@ $loop->add(
         base_uri => 'http://localhost:3000'
     ));
 
-#applicant create
+# applicant create
 my $app;
 lives_ok {
     $app = $onfido->applicant_create(
@@ -52,12 +53,12 @@ lives_ok {
 like($app->as_string, qr/^John Smith/, 'application string is correct');
 isa_ok($app, 'WebService::Async::Onfido::Applicant', 'object type is ok');
 
-#applicant_update
+# applicant_update
 lives_ok { $onfido->applicant_update(first_name => 'Jack', applicant_id => $app->id)->get; } "update applicant ok ";
 $app = $onfido->applicant_get(applicant_id => $app->id)->get;
 like($app->as_string, qr/^Jack Smith/, 'application string is correct');
 
-#applicant_list
+# applicant_list
 my $src;
 lives_ok { $src = $onfido->applicant_list; } "get applicant list ok ";
 isa_ok($src, 'Ryu::Source', 'the applicant list is a Ryu::Source');
@@ -69,7 +70,7 @@ lives_ok { $app2 = $onfido->applicant_get(applicant_id => $app->id)->get; } "get
 isa_ok($app2, 'WebService::Async::Onfido::Applicant', 'the applicant type is ok');
 is_deeply($app2, $app, 'get applicant result ok');
 
-#document upload
+# document upload
 my $doc;
 my $content = 'x' x 500;
 lives_ok {
@@ -162,7 +163,7 @@ isa_ok($src, 'Ryu::Source', 'the applicant list is a Ryu::Source');
 
 is_deeply($src->as_arrayref->get->[0], $check, 'the most recent check is the one we created just now');
 
-#get report
+# get report
 my ($report, $report2);
 lives_ok { $report = $check->reports->filter(name => 'document')->as_arrayref->get->[0] } "get report from check ok";
 isa_ok($report, 'WebService::Async::Onfido::Report');

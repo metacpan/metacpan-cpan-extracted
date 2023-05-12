@@ -1,5 +1,5 @@
 package String::Validator::Language::FR ;
-$String::Validator::Language::FR::VERSION = '2.00';
+$String::Validator::Language::FR::VERSION = '2.04';
 sub new {
 	return {
 	        common_strings_not_match => 'Les chaînes de caractères ne correspondent pas.',
@@ -36,7 +36,7 @@ String::Validator::Language::FR
 
 =head1 VERSION
 
-version 2.00
+version 2.04
 
 For Documentation of this and other String::Validator::Langauge Modules please see String::Validator::Langauge, String::Validator::Commond, and String::Validator.
 

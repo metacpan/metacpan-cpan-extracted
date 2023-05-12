@@ -1,3 +1,6 @@
+0.88 Fri May 12 05:28:05 AM PDT 2023
+ - REVERT "Turn off internal POK flag for number scalars"
+
 0.87 Thu May  4 09:37:26 PM CEST 2023
  - Turn off internal POK flag for number scalars
 

@@ -1,6 +1,6 @@
 use assign::Test;
 
-use assign -0;
+use assign::0;
 
 my $aref1 = [111, 222];
 my $href1 = {bar => 222, foo => 111};

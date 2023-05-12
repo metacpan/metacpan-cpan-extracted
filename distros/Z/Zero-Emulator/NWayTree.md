@@ -1,6 +1,6 @@
 # Name
 
-Zero::NWayTree - N-Way-Tree in Zero assembler language.
+Zero::NWayTree - N-Way-Tree written in the Zero assembler programming language.
 
 <div>
 
@@ -150,7 +150,7 @@ module.  For an alphabetic listing of all methods by name see [Index](#index).
 
 # Constructor
 
-Create a new tree.
+Create a new N-Way tree.
 
 ## New($n)
 
@@ -260,10 +260,10 @@ Get the number of keys in the tree..
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -280,13 +280,12 @@ Get the number of keys in the tree..
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
       is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -321,7 +320,6 @@ Get the number of keys in the tree..
       not        => 180};
     
       #say STDERR printTreeKeys($e->memory); x;
-      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                     38                                                                                                    72
                                                                  21                                                                                                       56                                                                                                 89
@@ -330,6 +328,7 @@ Get the number of keys in the tree..
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeData($e->memory), <<END;
                                                                                                                     76                                                                                                   144
                                                                  42                                                                                                      112                                                                                                178
@@ -445,10 +444,10 @@ Get data field from find results.
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -465,13 +464,12 @@ Get data field from find results.
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
       is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -506,7 +504,6 @@ Get data field from find results.
       not        => 180};
     
       #say STDERR printTreeKeys($e->memory); x;
-      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                     38                                                                                                    72
                                                                  21                                                                                                       56                                                                                                 89
@@ -515,6 +512,7 @@ Get data field from find results.
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeData($e->memory), <<END;
                                                                                                                     76                                                                                                   144
                                                                  42                                                                                                      112                                                                                                178
@@ -587,10 +585,10 @@ Get key field from find results.
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -607,13 +605,12 @@ Get key field from find results.
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
       is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -648,7 +645,6 @@ Get key field from find results.
       not        => 180};
     
       #say STDERR printTreeKeys($e->memory); x;
-      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                     38                                                                                                    72
                                                                  21                                                                                                       56                                                                                                 89
@@ -657,6 +653,7 @@ Get key field from find results.
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeData($e->memory), <<END;
                                                                                                                     76                                                                                                   144
                                                                  42                                                                                                      112                                                                                                178
@@ -766,10 +763,10 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -786,13 +783,12 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
     
@@ -829,7 +825,6 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
       not        => 180};
     
       #say STDERR printTreeKeys($e->memory); x;
-      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                     38                                                                                                    72
                                                                  21                                                                                                       56                                                                                                 89
@@ -838,6 +833,7 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeData($e->memory), <<END;
                                                                                                                     76                                                                                                   144
                                                                  42                                                                                                      112                                                                                                178
@@ -851,7 +847,7 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
 
 # Insert
 
-Create a new entry ina tree connecting a key to data.
+Create a new entry in a tree to connect a key to data.
 
 ## Insert($tree, $key, $data, %options)
 
@@ -1093,10 +1089,10 @@ Iterate over a tree.
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -1113,13 +1109,12 @@ Iterate over a tree.
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
       is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -1156,7 +1151,6 @@ Iterate over a tree.
       not        => 180};
     
       #say STDERR printTreeKeys($e->memory); x;
-      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                     38                                                                                                    72
                                                                  21                                                                                                       56                                                                                                 89
@@ -1165,6 +1159,7 @@ Iterate over a tree.
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeData($e->memory), <<END;
                                                                                                                     76                                                                                                   144
                                                                  42                                                                                                      112                                                                                                178
@@ -1239,10 +1234,10 @@ Print the keys held in a tree.
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -1259,13 +1254,12 @@ Print the keys held in a tree.
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
       is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -1302,7 +1296,6 @@ Print the keys held in a tree.
     
       #say STDERR printTreeKeys($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-      #say STDERR printTreeData($e->memory); x;
     
       is_deeply printTreeKeys($e->memory), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
@@ -1313,6 +1306,7 @@ Print the keys held in a tree.
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+      #say STDERR printTreeData($e->memory); x;
       is_deeply printTreeData($e->memory), <<END;
                                                                                                                     76                                                                                                   144
                                                                  42                                                                                                      112                                                                                                178
@@ -1383,10 +1377,10 @@ Print the data held in a tree.
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
       #say STDERR dump $e->tallyCount;
-      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+      is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
     
       #say STDERR dump $e->tallyTotal;
-      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+      is_deeply $e->tallyTotal, { 1 => 15456, 2 => 6294, 3 => 2752};
     
       #say STDERR dump $e->tallyCounts->{1};
       is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
@@ -1403,13 +1397,12 @@ Print the data held in a tree.
       jLt               => 565,
       jmp               => 878,
       jNe               => 908,
-      mov               => 7724,
+      mov               => 7619,
       moveLong          => 171,
       not               => 631,
       resize            => 161,
       shiftUp           => 300,
-      subtract          => 606,
-    };
+      subtract          => 501};
     
       #say STDERR dump $e->tallyCounts->{2};
       is_deeply $e->tallyCounts->{2}, {                                             # Find tally
@@ -1444,9 +1437,6 @@ Print the data held in a tree.
       not        => 180};
     
       #say STDERR printTreeKeys($e->memory); x;
-    
-      #say STDERR printTreeData($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
       is_deeply printTreeKeys($e->memory), <<END;
                                                                                                                     38                                                                                                    72
                                                                  21                                                                                                       56                                                                                                 89
@@ -1455,6 +1445,9 @@ Print the data held in a tree.
       1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
     END
     
+    
+      #say STDERR printTreeData($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     
       is_deeply printTreeData($e->memory), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
@@ -1503,6 +1496,21 @@ Create a random array.
       is_deeply $e->out, [1..$N];
      }
     
+
+# Attributes
+
+The following is a list of all the attributes in this package.  A method coded
+with the same name in your package will over ride the method of the same name
+in this package and thus provide your value for the attribute in place of the
+default value supplied for this attribute by this package.
+
+## Replaceable Attribute List
+
+x 
+
+## x
+
+Stop if debugging.
 
 # Index
 

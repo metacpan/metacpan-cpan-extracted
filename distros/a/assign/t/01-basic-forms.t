@@ -50,6 +50,8 @@ $c = $aref->[2];
 #line 2
 ...
 
+# Hash destructuring:
+
 test <<'...', "Unpack href into 'my' vars";
 my { $a, $b, $c } = $href;
 +++
