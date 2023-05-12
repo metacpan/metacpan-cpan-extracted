@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 # VERSION
 
-version 1.000012
+version 1.000013
 
 # SYNOPSIS
 

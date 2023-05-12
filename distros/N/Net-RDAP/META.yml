@@ -1,14 +1,14 @@
 ---
-abstract: unknown
+abstract: 'an interface to the Registration Data Access Protocol (RDAP).'
 author:
-  - unknown
+  - 'Gavin Brown <gavin.brown@fastmail.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -39,5 +39,8 @@ requires:
   URI: '0'
   XML::LibXML: '0'
   vCard: '0'
-version: 0.16
+resources:
+  bugtracker: https://github.com/gbxyz/perl-Net-RDAP/issues
+  repository: https://github.com/gbxyz/perl-Net-RDAP.git
+version: 0.18
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

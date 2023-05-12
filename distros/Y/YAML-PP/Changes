@@ -1,5 +1,10 @@
 Revision history for Perl module YAML::PP
 
+0.036 2023-05-10 17:09:48+02:00
+
+    - Add option -dumpcode to turn of dumping coderefs in YAML::PP::Schema::Perl
+    - ci updates
+
 0.035 2022-09-30 21:16:16+02:00
 
     - Fix parsing alias as mapping key

@@ -4,7 +4,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 # VERSION
 
-version v0.2.1
+version v0.3.1
 
 # SYNOPSIS
 
@@ -77,15 +77,19 @@ This does not validate the values.
 Note that if a directive allows `'unsafe-inline'` then a nonce may
 cancel out that value.
 
+## nonce\_seed\_size
+
+This is the size of the random seed data for the ["nonce"](#nonce). It can be an integer between 16 and 256.
+
 ## nonce
 
 This is the random nonce that is added to directives in ["nonces\_for"](#nonces_for).
 
 The nonce is a hex string based on a random 32-bit number, which is generated
-from [Math::Random::ISAAC](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AISAAC).  The RNG is seeded by `/dev/urandom`.
+from [Math::Random::ISAAC](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AISAAC).  The RNG is seeded by [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom).
 
-If you do not have `/dev/urandom` or you want to change how it is generated,
-you can override the `_build_nonce` method in a subclass.
+If you want to change how it is generated, you can override the `_build_nonce`
+method in a subclass.
 
 Note that you should never make an assumption about the format of the
 nonce, as the source may change in future versions.

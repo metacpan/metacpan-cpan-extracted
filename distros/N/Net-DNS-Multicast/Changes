@@ -1,6 +1,19 @@
 Revision history for Net::DNS::Multicast.
 
 
+**** 0.03  May 11, 2023
+
+	MDNS flag tests require Net::DNS 1.38.
+
+
+**** 0.02  May 10, 2023
+
+	t/00-pod.t lists non-existent directory.
+
+Feature rt.cpan.org #148274
+	Support MDNS unicast_response and cache_flush flags
+
+
 **** 0.01  May 5, 2023
 
 ---------------------------------------------------------------------------

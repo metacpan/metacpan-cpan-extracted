@@ -3,25 +3,54 @@ use warnings;
 use utf8;
 
 package Pod::Weaver::PluginBundle::Author::TABULO;
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 
 use Pod::Weaver 4;
 use Pod::Weaver::Config::Assembler;
 
 # Dependencies
-use Pod::Elemental::Transformer::List 0.102000 ();
-use Pod::Elemental::PerlMunger 0.200001        (); # replace with comment support
+use Pod::Elemental::Transformer::List 0.102000 ();  # - transform :list regions into =over/=back to save typing
+use Pod::Elemental::PerlMunger 0.200001        ();  # - replace with comment support
 
-use Pod::Weaver::Plugin::AppendPrepend ();
-use Pod::Weaver::Plugin::Include       ();
-use Pod::Weaver::Plugin::StopWords     ();
-use Pod::Weaver::Plugin::WikiDoc       ();
+use Pod::Weaver::Plugin::AppendPrepend ();          # - Merge append:FOO and prepend:FOO sections in POD
+use Pod::Weaver::Plugin::Include       ();          # - Support for including sections of Pod from other files
+use Pod::Weaver::Plugin::StopWords     ();          # - Dynamically add stopwords to your woven pod
+use Pod::Weaver::Plugin::WikiDoc       ();          # - allow wikidoc-format regions to be translated during dialect phase
 
-use Pod::Weaver::Section::Authors       ();
-use Pod::Weaver::Section::AllowOverride ();
-use Pod::Weaver::Section::ClassMopper   ();
-use Pod::Weaver::Section::Contributors 0.008 ();
-use Pod::Weaver::Section::Support 1.001      ();
+use Pod::Weaver::Section::Authors  ();              # - Add or replace an AUTHOR or AUTHORS section; similar to Pod::Weaver::Section::Authors
+use Pod::Weaver::Section::ClassMopper     ();       # - Use Class::MOP introspection to make a couple sections.
+use Pod::Weaver::Section::Collect       ();         # - a section that gathers up specific commands
+use Pod::Weaver::Section::Contributors 0.008 ();    # - a section listing contributors
+use Pod::Weaver::Section::ReplaceName   ();         # - Add or replace a NAME section with abstract.
+use Pod::Weaver::Section::SeeAlso       ();         # - add a SEE ALSO pod section
+use Pod::Weaver::Section::Support 1.001 ();         # - Add a SUPPORT section to your POD
+
+
+## Roles / Classes
+# use Pod::Weaver::Section::Requires ();            # - Add Pod::Weaver section with all used modules from package excluding listed ones
+# use Pod::Weaver::Section::Consumes ();            # - Add a list of roles to your POD.
+# use Pod::Weaver::Section::Extends ();             # - Add a list of parent classes to your POD.
+
+## Add or Replace BOILERPLATE
+# use Pod::Weaver::Section::ReplaceName();          # - Add or replace a NAME section with abstract.
+# use Pod::Weaver::Section::ReplaceAuthors ();      # - Add or replace an AUTHOR or AUTHORS section; similar to Pod::Weaver::Section::Authors
+# use Pod::Weaver::Section::ReplaceLegal();         # - Add or replace a COPYRIGHT AND LICENSE section.
+# use Pod::Weaver::Section::ReplaceVersion();       # - Add or replace a VERSION section.
+
+## Buildn se
+# use Pod::Weaver::Section::Collect::FromOther ();  # - Import sections from other POD
+# use Pod::Weaver::Section::CollectWithAutoDoc ();  # - Section to gather specific commands and add auto-generated documentation via Sub::Documentation.
+# use Pod::Weaver::Section::CollectWithIntro ();    # - Preface pod collections; allows one to attach a prefix paragraph to the collected section/node.
+# use Pod::Weaver::Section::CommentString ();       # - Add Pod::Weaver section with content extracted from comment with a keyword (like ABSTRACT for Name)
+# use Pod::Weaver::Section::Template ();            # - add pod section from a Text::Template template
+
+# use Pod::Weaver::Section::SourceGitHub();         #  - Add SOURCE pod section for a github repository
+# use Pod::Weaver::Section::WarrantyDisclaimer();   # - Add a standard DISCLAIMER OF WARRANTY section (for your Perl module)
+
+# use Sub::Documentation;
+# use Sub::Documentation::Attributes;
+
+
 
 
 sub _exp { Pod::Weaver::Config::Assembler->expand_package( $_[0] ) }
@@ -45,9 +74,9 @@ sub mvp_bundle_config {
         [ "WikiDoc",        _exp('-WikiDoc'),        {} ],
         [ "CorePrep",       _exp('@CorePrep'),       {} ],
 
-        [ "AppendPrepend", _exp('-AppendPrepend'), {} ], #  Merge append:FOO and prepend:FOO sections in POD
-        [ "Include",       _exp('-Include'),       {} ], # Support for including sections of Pod from other files
-        [ "StopWords",     _exp('-StopWords'),     {} ], # Dynamically add stopwords to your woven pod
+        [ "AppendPrepend", _exp('-AppendPrepend'), {} ], # - Merge append:FOO and prepend:FOO sections in POD
+        [ "Include",       _exp('-Include'),       {} ], # - Support for including sections of Pod from other files
+        [ "StopWords",     _exp('-StopWords'),     {} ], # - Dynamically add stopwords to your woven pod
     );
 
     push @plugins, ( [ 'List' => _exp('-Transformer'), { transformer => 'List' } ], [ 'Verbatim' => _exp('-Transformer'), { transformer => 'Verbatim' } ], );
@@ -57,26 +86,44 @@ sub mvp_bundle_config {
         @$_ ? $_ : ()
     } (
         # Sections
-        [ "Name",    _exp('Name'),    {} ],
-        [ "Version", _exp('Version'), {} ],
-        [ "Prelude", _exp('Region'),  { region_name => 'prelude' } ],
+        [ "Name",           _exp('ReplaceName'),    {} ],
+        [ "Version",        _exp('Version'), {} ],
+        [ "Prelude",        _exp('Region'),  { region_name => 'prelude' } ],
 
-        [ "Foreword",    _exp('Generic'), {} ],
-        [ "Synopsis",    _exp('Generic'), {} ],
-        [ "Description", _exp('Generic'), {} ],
-        [ "Usage",       _exp('Generic'), {} ],
-        [ "Overview",    _exp('Generic'), {} ],
-        [ "Stability",   _exp('Generic'), {} ],
+        [ "Foreword",       _exp('Generic'), {} ],
+        [ "Synopsis",       _exp('Generic'), {} ],
+        [ "Description",    _exp('Generic'), {} ],
+        [ "Usage",          _exp('Generic'), {} ],
+        [ "Overview",       _exp('Generic'), {} ],
+        [ "Stability",      _exp('Generic'), {} ],
 
         [ 'Requirements',         _exp('Collect'),     { command => 'requires' } ],
-        [ 'Attributes',           _exp('ClassMopper'), { no_tagline => 1, skip_methods=>1, skip_attributes => 0 } ],
-            ## Generates one or two sections (ATTRIBUTES / METHODS) from Class::MOP metadata. BUT... looks kinda horrible, like JavaDoc :-(
 
-        [ 'Attributes*',          _exp('Collect'),     { command => 'attr' } ],         # name != Attributes (since ClassMopper generates that)
-        [ 'Constructors',         _exp('Collect'),     { command => 'constructor' } ],
-        [ 'Methods',              _exp('Collect'),     { command => 'method' } ],       # name != Methods    (since ClassMopper generates that)
-        [ 'Functions',            _exp('Collect'),     { command => 'func' } ],
-        [ 'Types',                _exp('Collect'),     { command => 'type' } ],
+        ## ClassMopper generates one or two sections (ATTRIBUTES / METHODS) from Class::MOP metadata.
+        ## BUT... looks kinda horrible, like JavaDoc :-(
+        [ 'Attributes',           _exp('ClassMopper'), { no_tagline => 1, skip_methods=>1, skip_attributes => 0 } ],
+        [ 'Attributes*',          _exp('Collect'),     { command => 'attr'          } ], # name != Attributes (since ClassMopper generates that)
+        [ 'Attributes (Class)',   _exp('Collect'),     { command => 'cattr'         } ],
+        [ 'Attributes (Private)', _exp('Collect'),     { command => 'pattr'         } ],
+
+        [ 'Constructors',         _exp('Collect'),     { command => 'constructor'   } ],
+        [ 'Methods',              _exp('Collect'),     { command => 'method'        } ],
+        [ 'Methods (Class)',      _exp('Collect'),     { command => 'cmethod'       } ],
+        [ 'Methods (Object)',     _exp('Collect'),     { command => 'omethod'       } ],
+        [ 'Singletons',           _exp('Collect'),     { command => 'singleton'     } ],
+
+        [ 'Functions',            _exp('Collect'),     { command => 'func'          } ],
+
+        [ 'Commands',             _exp('Collect'),     { command => 'cmd'           } ],
+        [ 'Options',              _exp('Collect'),     { command => 'opt'           } ],
+        [ 'Tags',                 _exp('Collect'),     { command => 'tag'           } ],
+
+        [ 'Types',                _exp('Collect'),     { command => 'type'          } ],
+        [ 'Constants',            _exp('Collect'),     { command => 'const'         } ],
+        [ 'Variables',            _exp('Collect'),     { command => 'var'           } ],
+
+        [ 'Caveats',              _exp('Collect'),     { command => 'caveat'        } ],
+        [ 'See Also',             _exp('Collect'),     { command => 'see'           } ],
 
         [ "Leftovers" => _exp('Leftovers'), {} ],
         [ "postlude"  => _exp('Region'),    { region_name => 'postlude' } ],
@@ -116,7 +163,7 @@ Pod::Weaver::PluginBundle::Author::TABULO - TABULO's bundle for Pod::Weaver (pro
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =head1 FOREWORD
 

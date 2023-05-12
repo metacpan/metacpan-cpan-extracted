@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element.pm
-## Version v0.2.2
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/11/11
+## Modified 2023/05/07
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
         DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS 
         DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     );
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -54,6 +54,12 @@ sub init
     return( $self );
 }
 
+# Note: accessKey -> property
+sub accessKey : lvalue { return( shift->_set_get_property( 'accesskey', @_ ) ); }
+
+# Note: accessKeyLabel -> property
+sub accessKeyLabel : lvalue { return( shift->_set_get_property( 'accessKeyLabel', @_ ) ); }
+
 sub after
 {
     my $self = shift( @_ );
@@ -69,6 +75,8 @@ sub after
         $_->parent( $parent );
         $parent->children->splice( $pos + 1, 0, $_ );
         $pos++;
+        # Required, because $pos++ as the last execution in this anon sub somehow returns defined and false
+        return(1);
     });
     $parent->reset(1);
     return( $self );
@@ -93,6 +101,11 @@ sub append
 
 sub assignedSlot { return; }
 
+sub attachInternals { return; }
+
+# Note: attributeStyleMap -> property
+sub attributeStyleMap : lvalue { return( shift->_set_get_property( 'style', @_ ) ); }
+
 sub before
 {
     my $self = shift( @_ );
@@ -114,6 +127,8 @@ sub before
     return( $self );
 }
 
+sub blur { return; }
+
 # NOTE: HTML element property read-pnly
 sub childElementCount { return( $_[0]->children->grep(sub{ $_[0]->_isa( $_ => 'HTML::Object::DOM::Element' ) })->length ); }
 
@@ -133,43 +148,21 @@ sub classList
 }
 
 # NOTE: Property
-sub className : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub className : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
+        my $self = shift( @_ );
+        return( $self->new_scalar( $self->attr( 'class' ) ) );
+    },
+    set => sub
     {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-
-    if( $has_arg )
-    {
+        my $self = shift( @_ );
+        my $arg  = shift( @_ );
         $self->attr( class => $arg );
         $self->reset(1);
-        # We need to return something else than our object, or by virtue of perl's way of working
-        # we would return our object as coded below, and that object will be assigned the
-        # very value we will have passed in assignment !
-        if( $has_arg eq 'assign' )
-        {
-            my $dummy = 'dummy';
-            return( $dummy );
-        }
-        return( $self->new_scalar( $arg ) ) if( want( 'LVALUE' ) );
-        Want::rreturn( $self->new_scalar( $arg ) );
+        return( $self->new_scalar( $arg ) );
     }
-    return( $self->new_scalar( $self->attr( 'class' ) ) ) if( want( 'LVALUE' ) );
-    Want::rreturn( $self->new_scalar( $self->attr( 'class' ) ) );
-}
+}, @_ ) ); }
 
 sub clientHeight { return; }
 
@@ -178,6 +171,8 @@ sub clientLeft { return; }
 sub clientTop { return; }
 
 sub clientWidth { return; }
+
+sub click { return( shift->trigger( 'click' ) ); }
 
 # TODO: closest: expand the support for xpath
 sub closest
@@ -251,10 +246,10 @@ sub cmp
     }
 }
 
-# NOTE: Property
-sub contentEditable : lvalue { return( shift->_set_get_lvalue( 'contentEditable', @_ ) ); }
+# Note: contentEditable -> property
+sub contentEditable : lvalue { return( shift->_set_get_property( 'contentEditable', @_ ) ); }
 
-# NOTE: Property
+# NOTE: dataset -> property
 sub dataset
 {
     my $self = shift( @_ );
@@ -265,6 +260,15 @@ sub dataset
         return( $self->pass_error( HTML::Object::ElementDataMap->error ) );
     return( $self->{_data_map} = $map );
 }
+
+# Note: dir -> property
+sub dir : lvalue { return( shift->_set_get_property( 'dir', @_ ) ); }
+
+# Note: draggable -> property
+sub draggable : lvalue { return( shift->_set_get_property( { attribute => 'draggable', is_boolean => 1 }, @_ ) ); }
+
+# Note: enterKeyHint -> property
+sub enterKeyHint : lvalue { return( shift->_set_get_property( 'enterKeyHint', @_ ) ); }
 
 sub firstElementChild
 {
@@ -283,6 +287,8 @@ sub firstElementChild
     return( $self->new_null ) if( !defined( $elem ) );
     return( $elem );
 }
+
+sub focus { return; }
 
 sub getAttribute { return( shift->attributes->get( shift( @_ ) ) ); }
 
@@ -521,46 +527,34 @@ sub hasAttribute { return( shift->attributes->has( shift( @_ ) ) ); }
 
 sub hasAttributes { return( !shift->attributes->is_empty ); }
 
-sub innerHTML : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+# Note: hidden -> property
+sub hidden : lvalue { return( shift->_set_get_property( { attribute => 'hidden', is_boolean => 1 }, @_ ) ); }
+
+sub hidePopover { return; }
+
+# Note: inert -> property
+sub inert : lvalue { return( shift->_set_get_property( { attribute => 'inert', is_boolean => 1 }, @_ ) ); }
+
+sub innerHTML : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
+        my $self = shift( @_ );
+        # Create a new document, because we want to use the document object as_string function which produce a string of its children, and no need to reproduce it here
+        my $doc = $self->new_document;
+        $doc->children( $self->children );
+        return( $doc->as_string );
+    },
+    set => sub
     {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    # To empty it, it must be set to an empty string
-    if( $has_arg && defined( $arg ) )
-    {
-        my $this = $arg;
+        my $self = shift( @_ );
+        my $this = shift( @_ );
         my $children;
         if( !ref( $this ) ||
             ( ref( $this ) && overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
         {
             my $p = $self->new_parser;
-            my $res = $p->parse_data( "$this" ) || do
-            {
-                my $error = "Error while parsing html data provided: " . $p->error;
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
-            };
+            my $res = $p->parse_data( "$this" ) ||
+                die( "Error while parsing html data provided: " . $p->error );
             $children = $res->children;
         }
         # We are provided with an element, so we set it as our inner html
@@ -581,15 +575,7 @@ sub innerHTML : lvalue
         }
         else
         {
-            my $error = "I was expecting some html data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'.";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->error( $error ) );
+            die( "I was expecting some html data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
         }
         
         $children->foreach(sub
@@ -598,17 +584,54 @@ sub innerHTML : lvalue
         });
         $self->children( $children );
         $self->reset(1);
-        my $dummy = 'dummy';
-        return( $dummy ) if( $has_arg eq 'assign' );
+        return(1);
     }
-    else
+}, @_ ) ); }
+
+# Note: innerText -> property
+sub innerText : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
+        my $self = shift( @_ );
         # Create a new document, because we want to use the document object as_string function which produce a string of its children, and no need to reproduce it here
-        my $doc = $self->new_document;
-        $doc->children( $self->children );
-        return( $doc->as_string );
+        my $txt = $self->as_trimmed_text;
+        my $obj = $self->new_scalar( \$txt );
+        return( $obj );
+    },
+    set => sub
+    {
+        my $self = shift( @_ );
+        my $this = shift( @_ );
+        my $children;
+        # We are provided with an element, so we set it as our inner html
+        if( $self->_is_a( $this => 'HTML::Object::DOM::Text' ) )
+        {
+            $children = $self->new_array( $this );
+        }
+        elsif( !ref( $this ) ||
+               ( ref( $this ) && overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
+        {
+            $this =~ s,\n,<br />\n,gs;
+            my $txt = $self->new_text( value => $this ) || die( $self->error );
+            $children = $self->new_array( $txt );
+        }
+        else
+        {
+            die( "I was expecting some text data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
+        }
+        
+        $children->foreach(sub
+        {
+            $_->parent( $self );
+        });
+        $self->children( $children );
+        $self->reset(1);
+        return(1);
     }
-}
+}, @_ ) ); }
+
+# Note: inputMode -> property
+sub inputMode : lvalue { return( shift->_set_get_property( 'inputMode', @_ ) ); }
 
 sub insertAdjacentElement
 {
@@ -890,6 +913,9 @@ sub isProcessingInstructionNode { return( shift->tag CORE::eq '_pi' ? 1 : 0 ); }
 
 sub isTextNode { return( shift->tag CORE::eq '_text' ? 1 : 0 ); }
 
+# Note: lang  -> property
+sub lang : lvalue { return( shift->_set_get_property( 'lang', @_ ) ); }
+
 sub lastElementChild
 {
     my $self = shift( @_ );
@@ -1049,32 +1075,40 @@ sub nextElementSibling
     return( $self->new_null );
 }
 
+# Note: noModule -> property
+sub noModule : lvalue { return( shift->_set_get_property( { attribute => 'noModule', is_boolean => 1 }, @_ ) ); }
+
+# Note: nonce -> property
+sub nonce : lvalue { return( shift->_set_get_property( 'nonce', @_ ) ); }
+
+# Note: offsetHeight -> property
+sub offsetHeight : lvalue { return( shift->_set_get_property( 'offsetheight', @_ ) ); }
+
+# Note: offsetLeft -> property
+sub offsetLeft : lvalue { return( shift->_set_get_property( 'offsetleft', @_ ) ); }
+
+# Note: offsetParent -> property
+sub offsetParent { return( shift->parent( @_ ) ); }
+
+# Note: offsetTop -> property
+sub offsetTop : lvalue { return( shift->_set_get_property( 'offsettop', @_ ) ); }
+
+# Note: offsetWidth -> property
+sub offsetWidth : lvalue { return( shift->_set_get_property( 'offsetwidth', @_ ) ); }
+
 sub onerror : lvalue { return( shift->_set_get_code( '_error_handler', @_ ) ); }
 
 # Note: Property
-sub outerHTML : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub outerHTML : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
+        my $self = shift( @_ );
+        return( $self->as_string );
+    },
+    set => sub
     {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    # To empty it, it must be set to an empty string
-    if( $has_arg && defined( $arg ) )
-    {
-        my $this = $arg;
+        my $self = shift( @_ );
+        my $this = shift( @_ );
         my $children;
         my $pos;
         my $parent = $self->parent;
@@ -1104,8 +1138,7 @@ sub outerHTML : lvalue
                 {
                     $dummy = 0;
                 }
-                return( $dummy ) if( want( 'LVALUE' ) );
-                Want::rreturn( $dummy );
+                return( $dummy );
             }
             else
             {
@@ -1133,8 +1166,7 @@ sub outerHTML : lvalue
                 {
                     $dummy = 0;
                 }
-                return( $dummy ) if( want( 'LVALUE' ) );
-                Want::rreturn( $dummy );
+                return( $dummy );
             }
         }
         # We are provided with an element, so we set it as our inner html
@@ -1198,27 +1230,79 @@ sub outerHTML : lvalue
                     $dummy = 0;
                 }
             }
-            return( $dummy ) if( want( 'LVALUE' ) );
-            Want::rreturn( $dummy );
+            return( $dummy );
         }
         else
         {
-            my $error = "I was expecting some html data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'.";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->error( $error ) );
+            die( "I was expecting some html data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
         }
     }
-    else
+}, @_ ) ); }
+
+# Note: outerText -> property
+sub outerText : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        return( $self->as_string );
+        my $self = shift( @_ );
+        # Create a new document, because we want to use the document object as_string function which produce a string of its children, and no need to reproduce it here
+        my $txt = $self->as_trimmed_text;
+        my $obj = $self->new_scalar( \$txt );
+        return( $obj );
+    },
+    set => sub
+    {
+        my $self = shift( @_ );
+        my $this = shift( @_ );
+        my $element;
+        # We are provided with an element, so we set it as our inner html
+        if( $self->_is_a( $this => 'HTML::Object::DOM::Text' ) )
+        {
+            $element = $this->clone;
+        }
+        elsif( !ref( $this ) ||
+               ( ref( $this ) && overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
+        {
+            $this =~ s,\n,<br />\n,gs;
+            $element = $self->new_text( value => $this ) || die( $self->error );
+        }
+        else
+        {
+            die( "I was expecting some text data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
+        }
+        
+        my $parent = $self->parent;
+        my $pos = $parent->children->pos( $self );
+        if( !defined( $pos ) )
+        {
+            die( "Unable to find the current element among its parent's children." );
+        }
+        
+        $element->parent( $parent );
+        $parent->splice( $pos, 1, $element );
+        $self->parent( undef() );
+        $parent->reset(1);
+        my $dummy = 'dummy';
+        return( $dummy );
     }
-}
+}, @_ ) ); }
+
+# Note: popover  -> property
+sub popover : lvalue { return( shift->_set_get_callback({
+    get => sub
+    {
+        my $self = shift( @_ );
+        my $val = $self->_set_get_property( 'popover' );
+        return( $val ) if( defined( $val ) );
+        return( $self->root->_set_get_property( 'popover' ) );
+    },
+    set => sub
+    {
+        my $self = shift( @_ );
+        my $arg = shift( @_ );
+        $self->_set_get_property( 'popover', $arg );
+        return( $arg );
+    }
+}, @_ ) ); }
 
 sub prefix { return; }
 
@@ -1255,6 +1339,9 @@ sub previousElementSibling
     return( $self->new_null );
 }
 
+# Note: properties -> property experimental
+sub properties { return( shift->new_array ); }
+
 sub querySelector
 {
     my $self = shift( @_ );
@@ -1287,7 +1374,7 @@ sub querySelectorAll
     my $results = $self->new_array;
     foreach my $sel ( @sels )
     {
-        my $elems = $self->find( $sel, { root => '.' } ) ||
+        my $elems = $self->find( $sel, { root => './' } ) ||
             return( $self->pass_error({ class => 'HTML::Object::SyntaxError' }) );
         $results->push( $elems->list ) if( !$elems->is_empty );
     }
@@ -1479,39 +1566,15 @@ sub setAttributeNode
     return( $old );
 }
 
-sub setHTML : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+# setHTML is a mutator only
+sub setHTML : lvalue { return( shift->_set_get_callback({
+    set => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        my $this = $arg;
+        my $self = shift( @_ );
+        my $this = shift( @_ );
         if( !defined( $this ) || !CORE::length( $this ) )
         {
-            my $error = "No html provided.";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->error( $error ) );
+            die( "No html provided." );
         }
         
         my $children;
@@ -1538,29 +1601,11 @@ sub setHTML : lvalue
         {
             if( ref( $this ) && ( !$self->_is_object( $this ) || ( $self->_is_object( $this ) && !overload::Method( $this, '""' ) ) ) )
             {
-                my $error = "I was expecting some HTML data, but got '" . overload::StrVal( $this ) . "'";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
+                die( "I was expecting some HTML data, but got '" . overload::StrVal( $this ) . "'" );
             }
             my $p = $self->new_parser;
-            my $res = $p->parse_data( "$this" ) || do
-            {
-                my $error = "Error while parsing html data provided: " . $p->error;
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
-            };
+            my $res = $p->parse_data( "$this" ) ||
+                die( "Error while parsing html data provided: " . $p->error );
             $children = $res->children;
         }
         $children->foreach(sub
@@ -1570,9 +1615,14 @@ sub setHTML : lvalue
         $self->children( $children );
         return( $self );
     }
-}
+}, @_ ) ); }
 
 sub shadowRoot { return; }
+
+sub showPopover { return; }
+
+# Note: spellcheck -> property
+sub spellcheck : lvalue { return( shift->_set_get_property( { attribute => 'spellcheck', is_boolean => 1 }, @_ ) ); }
 
 sub string_value
 {
@@ -1588,10 +1638,16 @@ sub string_value
     }
 }
 
+# Note: style -> property
+sub style { return( shift->new_hash ); }
+
 # Note: property
 sub tabIndex : lvalue { return( shift->_set_get_property( 'tabindex', @_ ) ); }
 
 sub tagName { return( shift->getName ); }
+
+# Note: title -> property
+sub title : lvalue { return( shift->_set_get_property( 'title', @_ ) ); }
 
 sub to_number
 {
@@ -1633,7 +1689,12 @@ sub toggleAttribute
     return( $self->true );
 }
 
+sub togglePopover { return; }
+
 sub toString { return( shift->as_string ); }
+
+# Note: translate -> property
+sub translate : lvalue { return( shift->_set_get_property( { attribute => 'translate', is_boolean => 1 }, @_ ) ); }
 
 # Used by HTML::Object::DOM::Element::*
 sub _get_parent_form { return( shift->closest( 'form' ) ); }
@@ -1661,56 +1722,44 @@ sub _set_get_form_attribute : lvalue
 {
     my $self = shift( @_ );
     my $attr = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
 
-    my $form = $self->_get_parent_form;
-    if( !defined( $form ) )
-    {
-        return if( want( 'LVALUE' ) );
-        my $dummy = 'dummy';
-        Want::rreturn( $dummy );
-    }
-    my $code = $form->can( $attr );
-    if( !defined( $code ) )
-    {
-        my $error = "Form object has no method \"$attr\".";
-        if( $has_arg eq 'assign' )
+    return( $self->_set_get_callback({
+        get => sub
         {
-            $self->error( $error );
-            my $dummy = 'dummy';
-            return( $dummy );
-        }
-        return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-        Want::rreturn( $self->error( $error ) );
-    }
-    
-    if( $has_arg )
-    {
-        $code->( $form, $arg );
-        Want::lnoreturn if( $has_arg eq 'assign' );
-        return( $self );
-    }
-    else
-    {
-        my $rv = $code->( $form );
-        return( $rv ) if( want( 'LVALUE' ) );
-        Want::rreturn( $rv );
-    }
-    return;
+            my $form = $self->_get_parent_form;
+            if( !defined( $form ) )
+            {
+                return;
+            }
+            my $code = $form->can( $attr );
+            if( !defined( $code ) )
+            {
+                die( "Form object has no method \"$attr\"." );
+            }
+            
+            my $rv = $code->( $form );
+            return( $rv );
+        },
+        set => sub
+        {
+            my $arg = shift( @_ );
+            my $ctx = $_;
+            my $form = $self->_get_parent_form;
+            if( !defined( $form ) )
+            {
+                return;
+            }
+            my $code = $form->can( $attr );
+            if( !defined( $code ) )
+            {
+                die( "Form object has no method \"$attr\"." );
+            }
+            
+            $code->( $form, $arg );
+            return( $arg ) if( $ctx->{assign} );
+            return( $self );
+        },
+    }, @_ ) );
 }
 
 # _set_get_property has been moved up in HTML::Object::Element
@@ -1719,22 +1768,7 @@ sub _set_get_property : lvalue
 {
     my $self = shift( @_ );
     my $attr = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-
+    
     my $def = {};
     # If the $attr parameter is an hash reference, it is used to provide more information
     # such as whether this property is a boolean
@@ -1744,111 +1778,106 @@ sub _set_get_property : lvalue
         $attr = $def->{attribute};
     }
     $def->{is_boolean} //= 0;
-    if( $has_arg )
-    {
-        if( $def->{is_boolean} )
+    
+    return( $self->_set_get_callback({
+        get => sub
         {
-            # Any true value works, even in the web browser
-            if( $arg )
+            my $self = shift( @_ );
+            if( $def->{is_datetime} )
             {
-                # it is ok to set an empty value
-                $self->attr( $attr => '' );
+                my $val = $self->attr( $attr );
+                try
+                {
+                    my $dt = $self->_parse_timestamp( $val );
+                    return( $self->pass_error ) if( !defined( $dt ) );
+                    return( $dt );
+                }
+                catch( $e )
+                {
+                    return( $self->error( "Unable to parse datetime value \"$val\": $e" ) );
+                }
+            }
+            elsif( $def->{is_number} )
+            {
+                my $val = $self->attr( $attr );
+                return if( !$self->_is_number( $val ) );
+                if( $val =~ /^(\d{1,10})(?:\.\d+)?$/ )
+                {
+                    my $dt = $self->_parse_timestamp( $val );
+                    return( $dt ) if( ref( $dt ) );
+                }
+                return( $self->new_number( $val ) );
+            }
+            elsif( $def->{is_uri} )
+            {
+                my $val = $self->attr( $attr );
+                # We constantly get a new URI object, because the value of the href attribute may have been altered by other means
+                try
+                {
+                    return( $val ) if( $self->_is_a( $val => 'URI' ) );
+                    return if( !defined( $val ) );
+                    return( $val ) if( !CORE::length( "$val" ) );
+                    return( URI->new( "$val" ) );
+                }
+                catch( $e )
+                {
+                    return( $self->error( "Unable to create a URI object from \"$val\" (", overload::StrVal( $val ), "): $e" ) );
+                }
+            }
+            elsif( $def->{callback} && ref( $def->{callback} ) eq 'CODE' )
+            {
+                return( $def->{callback}->( $self, $attr ) );
+            }
+            return( $self->attr( $attr ) );
+        },
+        set => sub
+        {
+            my $self = shift( @_ );
+            my $arg = shift( @_ );
+            if( $def->{is_boolean} )
+            {
+                # Any true value works, even in the web browser
+                if( $arg )
+                {
+                    # it is ok to set an empty value
+                    $self->attr( $attr => '' );
+                }
+                else
+                {
+                    # Passing undef implies it will be removed. See HTML::Object::Element
+                    $self->attr( $attr => undef );
+                }
+            }
+            elsif( $def->{is_datetime} )
+            {
+                $self->attr( $attr => "$arg" );
+            }
+            # form target
+            elsif( $def->{is_uri} )
+            {
+                try
+                {
+                    my $uri = URI->new( $arg );
+                    $self->attr( $attr => $uri );
+                }
+                catch( $e )
+                {
+                    die( "Unable to create an URI with \"$arg\": $e" );
+                }
+            }
+            # Used for <option>
+            elsif( $def->{callback} && ref( $def->{callback} ) eq 'CODE' )
+            {
+                $def->{callback}->( $self, $attr => $arg );
             }
             else
             {
-                # Passing undef implies it will be removed. See HTML::Object::Element
-                $self->attr( $attr => undef );
+                $self->attr( $attr => $arg );
             }
+            $self->reset(1);
+            return( $arg );
         }
-        elsif( $def->{is_datetime} )
-        {
-            $self->attr( $attr => "$arg" );
-        }
-        # form target
-        elsif( $def->{is_uri} )
-        {
-            try
-            {
-                my $uri = URI->new( $arg );
-                $self->attr( $attr => $uri );
-            }
-            catch( $e )
-            {
-                my $error = "Unable to create an URI with \"$arg\": $e";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
-            }
-        }
-        # Used for <option>
-        elsif( $def->{callback} && ref( $def->{callback} ) eq 'CODE' )
-        {
-            $def->{callback}->( $self, $attr => $arg );
-        }
-        else
-        {
-            $self->attr( $attr => $arg );
-        }
-        $self->reset(1);
-        my $dummy = $arg;
-        return( $arg ) if( want( 'LVALUE' ) );
-        Want::rreturn( $arg );
-    }
-    else
-    {
-        if( $def->{is_datetime} )
-        {
-            my $val = $self->attr( $attr );
-            try
-            {
-                my $dt = $self->_parse_timestamp( $val );
-                return( $self->pass_error ) if( !defined( $dt ) );
-                return( $dt );
-            }
-            catch( $e )
-            {
-                return( $self->error( "Unable to parse datetime value \"$val\": $e" ) );
-            }
-        }
-        elsif( $def->{is_number} )
-        {
-            my $val = $self->attr( $attr );
-            return if( !$self->_is_number( $val ) );
-            if( $val =~ /^(\d{1,10})(?:\.\d+)?$/ )
-            {
-                my $dt = $self->_parse_timestamp( $val );
-                return( $dt ) if( ref( $dt ) );
-            }
-            return( $self->new_number( $val ) );
-        }
-        elsif( $def->{is_uri} )
-        {
-            my $val = $self->attr( $attr );
-            # We constantly get a new URI object, because the value of the href attribute may have been altered by other means
-            try
-            {
-                return( $val ) if( $self->_is_a( $val => 'URI' ) );
-                return if( !defined( $val ) );
-                return( $val ) if( !CORE::length( "$val" ) );
-                return( URI->new( "$val" ) );
-            }
-            catch( $e )
-            {
-                return( $self->error( "Unable to create a URI object from \"$val\" (", overload::StrVal( $val ), "): $e" ) );
-            }
-        }
-        elsif( $def->{callback} && ref( $def->{callback} ) eq 'CODE' )
-        {
-            return( $def->{callback}->( $self, $attr ) );
-        }
-        return( $self->attr( $attr ) ) if( want( 'LVALUE' ) );
-        Want::rreturn( $self->attr( $attr ) )
-    }
+    }, @_ ) );
 }
 
 # Used by HTML::Object::DOM::Element::Anchor and HTML::Object::DOM::Element::Area
@@ -1869,180 +1898,147 @@ sub _set_get_uri_property : lvalue
     search      => 'query',
     username    => 'userinfo',
     };
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
+    
+    return( $self->_set_get_callback({
+        get => sub
         {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-
-    if( $has_arg )
-    {
-        $self->{ $prop } = $arg;
-        if( ref( $uri ) )
+            my $self = shift( @_ );
+            # If there is an URI, we use it as a alue storage
+            # It is convenient and let the user modify it directly if he wants.
+            if( ref( $uri ) )
+            {
+                try
+                {
+                    my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
+                    my $code = $uri->can( $meth );
+                    # User trying to access URI method like host port, etc on a generic URI
+                    # which is ok for method like path, query, fragment
+                    # So we convert what would otherwise be an error into an undef returned, meaning no value
+                    if( !defined( $code ) )
+                    {
+                        if( $uri->isa( 'URI::_generic' ) )
+                        {
+                            return( $self->{ $prop } );
+                        }
+                        else
+                        {
+                            return( $self->error( "URI object has no method \"$meth\"." ) );
+                        }
+                    }
+                    my $val = $code->( $uri );
+                    # We assign the value from the URI method in case, the user would have modified the URI object directly
+                    # We need to stay synchronised.
+                    if( $prop eq 'username' || $prop eq 'password' )
+                    {
+                        if( defined( $val ) )
+                        {
+                            @$self{qw( username password )} = split( /:/, $val, 2 );
+                        }
+                        else
+                        {
+                            $self->{username} = undef;
+                            $self->{password} = undef;
+                        }
+                        return( $self->{ $prop } );
+                    }
+                    # We add back the colon, because URI stores the scheme without it, but our 'protocol' method returns the scheme with it.
+                    elsif( $prop eq 'protocol' )
+                    {
+                        $val .= ':' if( defined( $val ) );
+                    }
+                    elsif( $prop eq 'hash' )
+                    {
+                        substr( $val, 0, 0, '#' ) if( defined( $val ) );
+                    }
+                    elsif( $prop eq 'search' )
+                    {
+                        substr( $val, 0, 0, '?' ) if( defined( $val ) );
+                    }
+                    return( $self->{ $prop } = $val );
+                }
+                catch( $e )
+                {
+                    die( "Unable to get value for URI method \"${prop}\": $e" );
+                }
+            }
+            return( $self->{ $prop } );
+        },
+        set => sub
         {
-            my $uri_class = ref( $uri ); # URI::https or maybe URI::_generic ?
-            try
+            my $self = shift( @_ );
+            my $arg = shift( @_ );
+            $self->{ $prop } = $arg;
+            if( ref( $uri ) )
             {
-                if( $prop eq 'username' || $prop eq 'password' )
+                my $uri_class = ref( $uri ); # URI::https or maybe URI::_generic ?
+                try
                 {
-                    no warnings 'uninitialized';
-                    $arg = join( ':', @$self{ qw( username password ) } );
-                }
-                elsif( $prop eq 'protocol' )
-                {
-                    # Remove the trailing colon, because URI scheme method takes it without it
-                    $arg =~ s/\:$//;
-                }
-                elsif( $prop eq 'hash' )
-                {
-                    $arg =~ s/^\#//;
-                }
-                elsif( $prop eq 'search' )
-                {
-                    $arg =~ s/^\?//;
-                }
-                my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
-                my $code = $uri->can( $meth );
-                # User trying to access URI method like host port, etc on a generic URI
-                # which is ok for method like path, query, fragment
-                # So we convert what would otherwise be an error into an undef returned, meaning no value
-                if( !defined( $code ) )
-                {
-                    if( $uri->isa( 'URI::_generic' ) )
+                    if( $prop eq 'username' || $prop eq 'password' )
                     {
-                        my $dummy = $self->{ $prop };
-                        return( $dummy ) if( want( 'LVALUE' ) );
-                        Want::rreturn( $dummy );
+                        no warnings 'uninitialized';
+                        $arg = join( ':', @$self{ qw( username password ) } );
                     }
-                    else
+                    elsif( $prop eq 'protocol' )
                     {
-                        return( $self->error( "URI object has no method \"$meth\"." ) )
+                        # Remove the trailing colon, because URI scheme method takes it without it
+                        $arg =~ s/\:$//;
                     }
+                    elsif( $prop eq 'hash' )
+                    {
+                        $arg =~ s/^\#//;
+                    }
+                    elsif( $prop eq 'search' )
+                    {
+                        $arg =~ s/^\?//;
+                    }
+                    my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
+                    my $code = $uri->can( $meth );
+                    # User trying to access URI method like host port, etc on a generic URI
+                    # which is ok for method like path, query, fragment
+                    # So we convert what would otherwise be an error into an undef returned, meaning no value
+                    if( !defined( $code ) )
+                    {
+                        if( $uri->isa( 'URI::_generic' ) )
+                        {
+                            return( $self->{ $prop } );
+                        }
+                        else
+                        {
+                            return( $self->error( "URI object has no method \"$meth\"." ) );
+                        }
+                    }
+                    $code->( $uri, $arg );
+                    # If the URI object was generic and we switched it to a non-generic one by setting the schem
+                    # We also set other properties if we have them
+                    if( $prop eq 'protocol' && $uri_class eq 'URI::_generic' )
+                    {
+                        if( $self->{hostname} )
+                        {
+                            $uri->host_port( $self->{hostname} );
+                        }
+                        elsif( $self->{host} || $self->{port} )
+                        {
+                            $uri->host( $self->{host} ) if( $self->{host} );
+                            $uri->port( $self->{port} ) if( $self->{port} );
+                        }
+                        if( $self->{username} || $self->{password} )
+                        {
+                            $uri->userinfo( join( ':', @$self{qw( username password )} ) );
+                        }
+                    }
+                    $self->attr( href => $uri );
                 }
-                $code->( $uri, $arg );
-                # If the URI object was generic and we switched it to a non-generic one by setting the schem
-                # We also set other properties if we have them
-                if( $prop eq 'protocol' && $uri_class eq 'URI::_generic' )
+                catch( $e )
                 {
-                    if( $self->{hostname} )
-                    {
-                        $uri->host_port( $self->{hostname} );
-                    }
-                    elsif( $self->{host} || $self->{port} )
-                    {
-                        $uri->host( $self->{host} ) if( $self->{host} );
-                        $uri->port( $self->{port} ) if( $self->{port} );
-                    }
-                    if( $self->{username} || $self->{password} )
-                    {
-                        $uri->userinfo( join( ':', @$self{qw( username password )} ) );
-                    }
+                    die( "Unable to set value \"${arg}\" for URI method \"${prop}\": $e" );
                 }
-                $self->attr( href => $uri );
             }
-            catch( $e )
-            {
-                my $error = "Unable to set value \"${arg}\" for URI method \"${prop}\": $e";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
-            }
+            $self->reset(1);
+            $self->{ $prop } = $arg;
+            $self->attr( href => $uri );
+            return( $arg );
         }
-        $self->reset(1);
-        $self->{ $prop } = $arg;
-        $self->attr( href => $uri );
-        my $dummy = $arg;
-        return( $dummy ) if( want( 'LVALUE' ) );
-        Want::rreturn( $dummy );
-    }
-    else
-    {
-        # If there is an URI, we use it as a alue storage
-        # It is convenient and let the user modify it directly if he wants.
-        if( ref( $uri ) )
-        {
-            try
-            {
-                my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
-                my $code = $uri->can( $meth );
-                # User trying to access URI method like host port, etc on a generic URI
-                # which is ok for method like path, query, fragment
-                # So we convert what would otherwise be an error into an undef returned, meaning no value
-                if( !defined( $code ) )
-                {
-                    if( $uri->isa( 'URI::_generic' ) )
-                    {
-                        my $dummy = $self->{ $prop };
-                        return( $dummy ) if( want( 'LVALUE' ) );
-                        Want::rreturn( $dummy );
-                    }
-                    else
-                    {
-                        return( $self->error( "URI object has no method \"$meth\"." ) )
-                    }
-                }
-                my $val = $code->( $uri );
-                # We assign the value from the URI method in case, the user would have modified the URI object directly
-                # We need to stay synchronised.
-                if( $prop eq 'username' || $prop eq 'password' )
-                {
-                    if( defined( $val ) )
-                    {
-                        @$self{qw( username password )} = split( /:/, $val, 2 );
-                    }
-                    else
-                    {
-                        $self->{username} = undef;
-                        $self->{password} = undef;
-                    }
-                    return( $self->{ $prop } );
-                }
-                # We add back the colon, because URI stores the scheme without it, but our 'protocol' method returns the scheme with it.
-                elsif( $prop eq 'protocol' )
-                {
-                    $val .= ':' if( defined( $val ) );
-                }
-                elsif( $prop eq 'hash' )
-                {
-                    substr( $val, 0, 0, '#' ) if( defined( $val ) );
-                }
-                elsif( $prop eq 'search' )
-                {
-                    substr( $val, 0, 0, '?' ) if( defined( $val ) );
-                }
-                return( $self->{ $prop } = $val );
-            }
-            catch( $e )
-            {
-                my $error = "Unable to get value for URI method \"${prop}\": $e";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
-            }
-        }
-    }
-    return( $self->{ $prop } ) if( want( 'LVALUE' ) );
-    Want::rreturn( $self->{ $prop } );
+    }, @_ ) );
 }
 
 1;
@@ -2063,7 +2059,7 @@ HTML::Object::DOM::Element - HTML Object
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -2081,13 +2077,41 @@ This module inherits from L<HTML::Object::Node> and is extended by L<HTML::Objec
 
 All the following properties can be used as lvalue method as well as regular method. For example with L</baseURI>
 
+=head2 accessKey
+
+A string representing the access key assigned to the element.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/accessKey> for more information.
+
+=head2 accessKeyLabel
+
+    my $label = $element->accessKeyLabel;
+
+    my $btn = $document->getElementById("btn1");
+    my $shortcutLabel = $btn->accessKeyLabel || $btn->accessKey;
+    $btn->title .= " [" . uc( $shortcutLabel ) . "]";
+
+Read-only
+
+Returns a string containing the element's assigned access key.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/accessKeyLabel> for more information.
+
+=head2 attributeStyleMap
+
+Sets or gets the C<style> attribute.
+
+Normally, this is read-only, and represents a C<StylePropertyMap> representing the declarations of the element's style attribute.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attributeStyleMap> for more information.
+
+=head2 baseURI
+
     # Get the base uri, if any
     my $uri = $e->baseURI;
     $e->baseURI = 'https://example.org/some/where';
     # or
     $e->baseURI( 'https://example.org/some/where' );
-
-=head2 baseURI
 
 Read-only
 
@@ -2185,11 +2209,106 @@ Set or get the boolean value where true means the element is editable and a valu
 
     $e->contentEditable = 0; # turn off content editability
 
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/contentEditable> for more information.
+
 =head2 dataset
+
+    <div id="user" data-id="1234567890" data-user="carinaanand" data-date-of-birth>
+      Carina Anand
+    </div>
+
+    var $el = $document->getElementById('user');
+
+    # $el->id eq 'user';
+    # $el->dataset->id eq '1234567890';
+    # $el->dataset->user eq 'carinaanand';
+    # $el->dataset->dateOfBirth eq '';
+
+    # set a data attribute
+    $el->dataset->dateOfBirth = "1960-10-03";
+    # <div id="user" data-id="1234567890" data-user="carinaanand" data-date-of-birth="1960-10-03">Carina Anand</div>
 
 Read-only
 
 Returns an L<HTML::Object::ElementDataMap> object with which script can read and write the element's custom data attributes (data-*).
+
+The attribute name begins with data-. It can contain only letters, numbers, dashes (-), periods (.), colons (:), and underscores (_). Any ASCII capital letters (A to Z) are converted to lowercase.
+
+Name conversion
+
+dash-style to camelCase conversion
+
+A custom data attribute name is transformed to a key for the DOMStringMap entry by the following:
+
+=over 4
+
+=item 1. Lowercase all ASCII capital letters (A to Z);
+
+=item 2. Remove the prefix data- (including the dash);
+
+=item 3. For any dash (U+002D) followed by an ASCII lowercase letter a to z, remove the dash and uppercase the letter;
+
+=item 4. Other characters (including other dashes) are left unchanged.
+
+=back
+
+camelCase to dash-style conversion
+
+The opposite transformation, which maps a key to an attribute name, uses the following:
+
+=over 4
+
+=item 1. Restriction: Before transformation, a dash must not be immediately followed by an ASCII lowercase letter a to z;
+
+=item 2. Add the data- prefix;
+
+=item 3. Add a dash before any ASCII uppercase letter A to Z, then lowercase the letter;
+
+=item 4. Other characters are left unchanged.
+
+=back
+
+For example, a data-abc-def attribute corresponds to C<<$dataset->abcDef>>.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset> for more information.
+
+=head2 dir
+
+    my $parg = $document->getElementById("para1");
+    $parg->dir = "rtl";
+    # change the text direction on a paragraph identified as "para1"
+
+A string, reflecting the dir global attribute, representing the directionality of the element. Possible values are:
+
+=over 4
+
+=item * C<ltr>
+
+for left-to-right;
+
+=item * C<rtl>
+
+for right-to-left;
+
+=item * C<auto>
+
+for specifying that the direction of the element must be determined based on the contents of the element.
+
+=back
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dir> for more information.
+
+=head2 draggable
+
+A boolean value indicating if the element can be dragged.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/draggable> for more information.
+
+=head2 enterKeyHint
+
+A string defining what action label (or icon) to present for the enter key on virtual keyboards.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/enterKeyHint> for more information.
 
 =head2 firstChild
 
@@ -2204,6 +2323,12 @@ Read-only.
 It returns the first child element of this element.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild>
+
+=head2 hidden
+
+A string or boolean value reflecting the value of the element's hidden attribute.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidden> for more information.
 
 =head2 id
 
@@ -2224,6 +2349,24 @@ Set or get the element's content. This returns a string representing the markup 
 
 Se L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML>
 
+=head2 inert
+
+A boolean value indicating whether the user agent must act as though the given node is absent for the purposes of user interaction events, in-page text searches (C<find in page>), and text selection.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert> for more information.
+
+=head2 innerText
+
+Represents the rendered text content of a node and its descendants. As a getter, it approximates the text the user would get if they highlighted the contents of the element with the cursor and then copied it to the clipboard. This returns a L<string object|Module::Generic::Scalar>. As a setter, it replaces the content inside the selected element, with either a L<text object|HTML::Object::DOM::Text> or by a string converting any line breaks into C<<br />> elements.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerText> for more information.
+
+=head2 inputMode
+
+A string value reflecting the value of the element's inputmode attribute.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inputMode> for more information.
+
 =head2 isConnected
 
 Returns a boolean indicating whether or not the element is connected (directly or indirectly) to the context object, i.e. the L<Document object|HTML::Object::Document> in the case of the normal DOM.
@@ -2232,9 +2375,23 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 
 =head2 isContentEditable
 
+    <p id="firstParagraph">Uneditable Paragraph</p>
+    <p id="secondParagraph" contenteditable="true">Editable Paragraph</p>
+
+    my $firstParagraph = $document->getElementById("firstParagraph");
+    my $secondParagraph = $document->getElementById("secondParagraph");
+
 Read-only
 
 Returns a L<boolean value|HTML::Object::Boolean> indicating whether or not the content of the element can be edited. Use L<contentEditable> to change the value.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/isContentEditable> for more information.
+
+=head2 lang
+
+A string representing the language of an element's attributes, text, and element contents.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/lang> for more information.
 
 =head2 lastChild
 
@@ -2334,12 +2491,76 @@ For document, element or collection, this returns C<undef> and for attribute, te
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
 
+=head2 noModule
+
+A boolean value indicating whether an import script can be executed in user agents that support module scripts.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/noModule> for more information.
+
+=head2 nonce
+
+This returns nothing.
+
+Normally, under JavaScript, this would return the cryptographic number used once that is used by Content Security Policy to determine whether a given fetch will be allowed to proceed.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/nonce> for more information.
+
+=head2 offsetHeight
+
+Sets or gets the property C<offsetheight>.
+
+Normally, under JavaScript, this would be read-only and return a double containing the height of an element, relative to the layout.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight> for more information.
+
+=head2 offsetLeft
+
+Sets or gets the property C<offsetleft>.
+
+Normally, under JavaScript, this would be read-only and return a double, the distance from this element's left border to its offsetParent's left border.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft> for more information.
+
+=head2 offsetParent
+
+Sets or gets the property C<offsetparent>.
+
+Normally, under JavaScript, this would be read-only and return Element that is the element from which all offset calculations are currently computed.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent> for more information.
+
+=head2 offsetTop
+
+Sets or gets the property C<offsettop>.
+
+Normally, under JavaScript, this would be read-only and return a double, the distance from this element's top border to its offsetParent's top border.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop> for more information.
+
+=head2 offsetWidth
+
+Sets or gets the property C<offsetwidth>.
+
+Normally, under JavaScript, this would be read-only and return a double containing the width of an element, relative to the layout.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetWidth> for more information.
+
 =head2 outerHTML
 
 Returns a string representing the markup of the element including its content.
 When used as a setter, replaces the element with nodes parsed from the given string.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/outerHTML>
+
+=head2 outerText
+
+Represents the rendered text content of a node and its descendants.
+
+As a getter, it is the same as L</innerText> (it represents the rendered text content of an element and its descendants).
+
+As a setter, it replaces the selected node and its contents with the given value, converting any line breaks into C<<br />> elements. 
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/outerText> for more information.
 
 =head2 ownerDocument
 
@@ -2373,6 +2594,16 @@ Normally, under JavaScript, this would be a part that represents the part identi
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/outerHTML>
 
+=head2 popover
+
+Experimental
+
+Gets and sets an element's popover state via JavaScript (C<auto> or C<manual>), and can be used for feature detection. Reflects the value of the popover global HTML attribute.
+
+If no value are set, this will return the one of the HTML attribute.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/popover> for more information.
+
 =head2 prefix
 
 Read-only
@@ -2400,6 +2631,12 @@ This returns a element representing the previous element in the tree, or C<undef
 The previous node could also be a whitespace or a text. If you want to get the previous element and not just any node, use L<previousElementSibling|HTML::Object::DOM/previousElementSibling> instead.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling>
+
+=head2 properties
+
+This does nothing, but return an empty L<array object|Module::Generic::Array>
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/properties> for more information.
 
 =head2 scrollHeight
 
@@ -2453,6 +2690,20 @@ Normally, under JavaScript, this would return the open shadow root that is hoste
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/shadowRoot>
 
+=head2 spellcheck
+
+A boolean value that controls spell-checking. It is present on all HTML elements, though it doesn't have an effect on all of them.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/spellcheck> for more information.
+
+=head2 style
+
+This does nothing, but return a new empty L<hash object|Module::Generic::Hash>
+
+Normally, this would set or get A C<CSSStyleDeclaration> representing the declarations of the element's style attribute.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style> for more information.
+
 =head2 tabIndex
 
 The tabIndex property represents the tab order of the current element.
@@ -2497,6 +2748,18 @@ Example:
     # <div id="divA">This text is different!</div>
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent>
+
+=head2 title
+
+A string containing the text that appears in a popup box when mouse is over the element.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/title> for more information.
+
+=head2 translate
+
+A boolean value representing the translation.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/translate> for more information.
 
 =head1 METHODS
 
@@ -2568,6 +2831,14 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 
 =for assignedSlot
 
+=head2 attachInternals
+
+This does nothing.
+
+Normally, under JavaScript, this would set or return an C<ElementInternals> object, and enables a custom element to participate in HTML forms.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals> for more information.
+
 =head2 before
 
 Inserts a set of L<element|HTML::Object::Element> or HTML strings in the L<children|/children> list of the L<element|HTML::Object::Element>'s parent, just before the L<element|HTML::Object::Element>.
@@ -2585,6 +2856,20 @@ For example:
     # "<div><span></span><p></p></div>"
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/before>
+
+=head2 blur
+
+This does nothing.
+
+Normally, under JavaScript, this would remove keyboard focus from the currently focused element.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur> for more information.
+
+=head2 click
+
+Sends a mouse click event to the element.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click> for more information.
 
 =head2 cloneNode
 
@@ -2672,6 +2957,14 @@ See L<HTML::Object::EventTarget/dispatchEvent> for more information.
 =for even
 
 =for exists
+
+=head2 focus
+
+This does nothing.
+
+Normally, under JavaScript, this would make the element the current keyboard focus.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus> for more information.
 
 =head2 getAttribute
 
@@ -2886,6 +3179,16 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 =for hasClass
 
 =for hide
+
+=head2 hidePopover
+
+Experimental
+
+This does nothing.
+
+Normally, under JavaScript, this would hide a popover element by removing it from the top layer and styling it with display: none.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidePopover> for more information.
 
 =for html
 
@@ -3510,6 +3813,16 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Elem
 
 =for show
 
+=head2 showPopover
+
+Experimental
+
+This does nothing.
+
+Normally, under JavaScript, this would show a popover element by adding it to the top layer and removing display: none; from its styles.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/showPopover> for more information.
+
 =for string_value
 
 =for tagname
@@ -3542,6 +3855,16 @@ To toggle the C<disabled> attribute of an input field
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute>
 
 =for toggleClass
+
+=head2 togglePopover
+
+Experimental
+
+This does nothing.
+
+Normally, under JavaScript, this would toggle a popover element between the hidden and showing states.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/togglePopover> for more information.
 
 =head2 toString
 

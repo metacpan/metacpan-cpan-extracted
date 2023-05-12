@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.565';
+our $VERSION = '0.566';
 
 use 5.020;
 use strictures 2;
@@ -107,8 +107,7 @@ sub get_type ($value) {
   return int($value) == $value ? 'integer' : 'number'
     if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
-  croak sprintf('ambiguous type for %s',
-    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0, allow_bignum => 1, convert_blessed => 1)->encode($value));
+  return 'ambiguous type';
 }
 
 # compares two arbitrary data payloads for equality, as per
@@ -365,7 +364,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.565
+version 0.566
 
 =head1 SYNOPSIS
 

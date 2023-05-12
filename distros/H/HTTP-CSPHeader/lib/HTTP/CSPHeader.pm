@@ -6,17 +6,19 @@ use v5.14;
 
 use Moo;
 
+use Crypt::URandom 0.37 qw/ urandom_ub /;
 use Fcntl qw/ O_NONBLOCK O_RDONLY /;
 use List::Util 1.29 qw/ pairmap pairs /;
 use Math::Random::ISAAC;
-use Types::Standard qw/ ArrayRef is_ArrayRef Bool HashRef Str /;
+use Types::Common 2.000000 qw/ ArrayRef is_ArrayRef Bool HashRef IntRange Str /;
 
 # RECOMMEND PREREQ: Math::Random::ISAAC::XS
+# RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.1';
 
 
 has _base_policy => (
@@ -68,6 +70,13 @@ has nonces_for => (
 );
 
 
+has nonce_seed_size => (
+    is      => 'lazy',
+    isa     => IntRange[ 16, 256 ],
+    default => 16,
+);
+
+
 has nonce => (
     is       => 'lazy',
     isa      => Str,
@@ -79,10 +88,7 @@ sub _build_nonce {
     my ($self) = @_;
 
     state $rng = do {
-        sysopen( my $fh, '/dev/urandom', O_NONBLOCK | O_RDONLY ) or die $!;
-        sysread( $fh, my $data, 16 )                             or die $!;
-        close $fh;
-
+        my $data = urandom_ub( $self->nonce_seed_size );
         Math::Random::ISAAC->new( unpack( "C*", $data ) );
     };
 
@@ -164,7 +170,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -235,15 +241,19 @@ This does not validate the values.
 Note that if a directive allows C<'unsafe-inline'> then a nonce may
 cancel out that value.
 
+=head2 nonce_seed_size
+
+This is the size of the random seed data for the L</nonce>. It can be an integer between 16 and 256.
+
 =head2 nonce
 
 This is the random nonce that is added to directives in L</nonces_for>.
 
 The nonce is a hex string based on a random 32-bit number, which is generated
-from L<Math::Random::ISAAC>.  The RNG is seeded by F</dev/urandom>.
+from L<Math::Random::ISAAC>.  The RNG is seeded by L<Crypt::URandom>.
 
-If you do not have F</dev/urandom> or you want to change how it is generated,
-you can override the C<_build_nonce> method in a subclass.
+If you want to change how it is generated, you can override the C<_build_nonce>
+method in a subclass.
 
 Note that you should never make an assumption about the format of the
 nonce, as the source may change in future versions.

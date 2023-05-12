@@ -1,77 +1,88 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Spec {
+  version "0.080001";
   
   use File::Spec::Instance;
   
+  our $SINGLETON : File::Spec::Instance;
+  
+  INIT {
+    File::Spec::Instance->INIT;
+    $SINGLETON = File::Spec::Instance->new;
+  }
+  
   # Class Methods
   static method canonpath : string ($path : string) {
-    return File::Spec::Instance->new->canonpath($path);
+    return $SINGLETON->canonpath($path);
   }
   
   static method catdir : string ($directories : string[]) {
-    return File::Spec::Instance->new->catdir($directories);
+    return $SINGLETON->catdir($directories);
   }
   
   static method catfile : string ($directories : string[], $filename : string) {
-    return File::Spec::Instance->new->catfile($directories, $filename);
+    return $SINGLETON->catfile($directories, $filename);
   }
   
   static method curdir : string () {
-    return File::Spec::Instance->new->curdir;
+    return $SINGLETON->curdir;
   }
   
   static method devnull : string () {
-    return File::Spec::Instance->new->devnull;
+    return $SINGLETON->devnull;
   }
   
   static method rootdir : string () {
-    return File::Spec::Instance->new->rootdir;
+    return $SINGLETON->rootdir;
   }
   
   static method tmpdir : string () {
-    return File::Spec::Instance->new->tmpdir;
+    return $SINGLETON->tmpdir;
   }
   
   static method updir : string () {
-    return File::Spec::Instance->new->updir;
+    return $SINGLETON->updir;
   }
   
   static method no_upwards : string[] ($directories : string[]) {
-    return File::Spec::Instance->new->no_upwards($directories);
+    return $SINGLETON->no_upwards($directories);
   }
   
   static method file_name_is_absolute : int ($path : string) {
-    return File::Spec::Instance->new->file_name_is_absolute($path);
+    return $SINGLETON->file_name_is_absolute($path);
   }
   
   static method file_name_is_root : int ($path : string) {
-    return File::Spec::Instance->new->file_name_is_root($path);
+    return $SINGLETON->file_name_is_root($path);
   }
   
   static method path : string[] () {
-    return File::Spec::Instance->new->path;
+    return $SINGLETON->path;
   }
   
   static method join : string ($directories : string[], $filename : string) {
-    return File::Spec::Instance->new->join($directories, $filename);
+    return $SINGLETON->join($directories, $filename);
   }
   
   static method splitpath : string[] ($path : string, $no_file = 0 : int) {
-    return File::Spec::Instance->new->splitpath($path, $no_file);
+    return $SINGLETON->splitpath($path, $no_file);
   }
   
   static method splitdir : string[] ($path : string) {
-    return File::Spec::Instance->new->splitdir($path);
+    return $SINGLETON->splitdir($path);
   }
    
   static method catpath : string ($volume : string, $directory : string, $file : string) {
-    return File::Spec::Instance->new->catpath($volume, $directory, $file);
+    return $SINGLETON->catpath($volume, $directory, $file);
   }
   
   static method abs2rel : string ($path : string, $base = undef : string) {
-    return File::Spec::Instance->new->abs2rel($path, $base);
+    return $SINGLETON->abs2rel($path, $base);
   }
   
   static method rel2abs : string ($path : string, $base = undef : string) {
-    return File::Spec::Instance->new->rel2abs($path, $base);
+    return $SINGLETON->rel2abs($path, $base);
   }
 }

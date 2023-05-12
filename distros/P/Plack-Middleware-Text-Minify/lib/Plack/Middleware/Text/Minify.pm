@@ -2,9 +2,7 @@ package Plack::Middleware::Text::Minify;
 
 # ABSTRACT: remove HTML indentation on the fly
 
-use v5.9.3;
-
-use strict;
+use v5.14;
 use warnings;
 
 use parent qw/ Plack::Middleware /;
@@ -16,7 +14,7 @@ use Text::Minify::XS v0.6.2 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.3.3';
+our $VERSION = 'v0.4.0';
 
 sub call {
     my ($self, $env) = @_;
@@ -97,7 +95,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.3.3
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -145,10 +143,13 @@ By default, it will match against any "text/" MIME type.
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.9.3 or newer, which is the minimum
-version supported by L<Text::Minify::XS>.
+This module requires Perl v5.14 or newer.
 
 Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.9.3, please use one of the v0.3.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 =head1 KNOWN ISSUES
 

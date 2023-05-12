@@ -1,3 +1,13 @@
+0.04 2023-05-11T19:12:47+02:00
+ - Add LICENSE.bsd file.
+ - Fix author test requires.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Update to Module::Install 1.21.
+ - Update author name.
+ - Update author github name.
+ - Update copyright years.
+
 0.03 2015-09-24T00:23:10+02:00
  - Move author tests to xt/ directory.
  - Update Lego::Part to 0.03 version.

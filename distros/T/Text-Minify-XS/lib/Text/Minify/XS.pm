@@ -2,8 +2,7 @@ package Text::Minify::XS;
 
 # ABSTRACT: Remove indentation and trailing whitespace from multi-line text
 
-use v5.9.3;
-use strict;
+use v5.14;
 use warnings;
 
 use Exporter 5.57 qw( import );
@@ -11,7 +10,7 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.6.5';
+our $VERSION = 'v0.7.0';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -34,7 +33,7 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 =head1 VERSION
 
-version v0.6.5
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -101,6 +100,16 @@ Unlike the L</minify>, if the input string has the UTF-8 flag set, the
 resulting string will not.  You should ensure the string is properly
 encoded.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.7.0, this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.9.3, please use one of the v0.6.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 KNOWN ISSUES
 
 =head2 Malformed UTF-8
@@ -135,7 +144,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2022 by Robert Rothenberg.
+This software is Copyright (c) 2020-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

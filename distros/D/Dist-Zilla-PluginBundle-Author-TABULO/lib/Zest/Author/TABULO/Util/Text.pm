@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::Text;
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 
 use Exporter::Shiny qw( lines_utf8_from strip_comments);
 
@@ -58,7 +58,7 @@ Zest::Author::TABULO::Util::Text - DZIL-related utility functions used by TABULO
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =for Pod::Coverage lines_utf8_from strip_comments
 

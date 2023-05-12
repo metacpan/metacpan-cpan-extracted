@@ -1,3 +1,7 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Glob {
+  version "0.020001";
   native static method glob : string[] ($pattern : string);
 }

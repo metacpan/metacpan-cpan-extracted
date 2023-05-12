@@ -236,7 +236,7 @@ sub each
         local $_ = $v;
         # CORE::defined( $code->( $i, $v ) ) || CORE::last;
         my $rv = $code->( $i, $v );
-        CORE::last if( defined( $rv ) && $rv eq BREAK_LOOP );
+        CORE::last if( defined( $rv ) && CORE::length( $rv ) && ( $rv eq BREAK_LOOP || !$rv ) );
     }
     CORE::return( $self );
 }
@@ -324,7 +324,7 @@ sub for
     {
         local $_ = $self->[ $i ];
         my $rv = $code->( $i, $self->[ $i ] );
-        CORE::last if( CORE::defined( $rv ) && $rv eq BREAK_LOOP );
+        CORE::last if( CORE::defined( $rv ) && CORE::length( "$rv" ) && ( $rv eq BREAK_LOOP || !$rv ) );
         if( defined( my $ret = $self->return ) )
         {
             $rv = $ret;
@@ -351,12 +351,11 @@ sub foreach
     my $self = CORE::shift( @_ );
     my $code = CORE::shift( @_ );
     CORE::return if( ref( $code ) ne 'CODE' );
-    my $i;
     CORE::foreach my $v ( @$self )
     {
         local $_ = $v;
         my $rv = $code->( $v );
-        CORE::last if( CORE::defined( $rv ) && $rv eq BREAK_LOOP );
+        CORE::last if( CORE::defined( $rv ) && CORE::length( "$rv" ) && ( $rv eq BREAK_LOOP || !$rv ) );
         if( CORE::defined( my $ret = $self->return ) )
         {
             $rv = $ret;
@@ -367,10 +366,6 @@ sub foreach
             if( !CORE::defined( $$rv ) || !CORE::length( $$rv ) || $rv eq BREAK_LOOP )
             {
                 CORE::last;
-            }
-            elsif( $$rv =~ /^[\-\+]?\d+$/ )
-            {
-                $i += int( $$rv );
             }
         }
     }

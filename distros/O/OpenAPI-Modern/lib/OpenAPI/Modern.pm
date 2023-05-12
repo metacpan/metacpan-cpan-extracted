@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.041-5-g21b1f0a
+package OpenAPI::Modern; # git description: v0.042-6-gc919d86
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 use 5.020;
 use Moo;
@@ -30,6 +30,8 @@ use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 'InstanceOf';
 use constant { true => JSON::PP::true, false => JSON::PP::false };
+use Mojo::Message::Request;
+use Mojo::Message::Response;
 use namespace::clean;
 
 has openapi_document => (
@@ -200,8 +202,6 @@ sub validate_response ($self, $response, $options = {}) {
     annotations => [],
   };
 
-  $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
-
   try {
     my $path_ok = $self->find_path($options);
     $state->{errors} = delete $options->{errors};
@@ -216,6 +216,13 @@ sub validate_response ($self, $response, $options = {}) {
     $state->{effective_base_uri} = Mojo::URL->new->scheme('https')->host($options->{request}->headers->host)
       if $options->{request};
     $state->{schema_path} = jsonp('/paths', $path_template, $method);
+
+    $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
+
+    if (my $error = $response->error) {
+      ()= E($state, $response->error->{message});
+      return $self->_result($state, 1);
+    }
 
     my $response_name = first { exists $operation->{responses}{$_} }
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
@@ -275,6 +282,11 @@ sub find_path ($self, $options) {
     errors => $options->{errors} //= [],
     $options->{request} ? ( effective_base_uri => Mojo::URL->new->scheme('https')->host($options->{request}->headers->host) ) : (),
   };
+
+  if ($options->{request} and my $error = $options->{request}->error) {
+    ()= E({ %$state, data_path => '/request' }, $options->{request}->error->{message});
+    return $self->_result($state, 1);
+  }
 
   my ($method, $path_template);
 
@@ -685,13 +697,17 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.042
+version 0.043
 
 =head1 SYNOPSIS
 
+  use YAML::XS 0.87;
+  use OpenAPI::Modern;
+  local $YAML::XS::Boolean = 'JSON::PP';
+
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
+    openapi_schema => Load(<<'YAML'));
   openapi: 3.1.0
   info:
     title: Test API

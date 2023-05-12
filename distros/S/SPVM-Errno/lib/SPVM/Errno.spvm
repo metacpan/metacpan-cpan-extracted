@@ -1,4 +1,8 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Errno {
+  version "0.090001";
   native static method errno : int ();
   native static method set_errno : void ($errno : int);
 

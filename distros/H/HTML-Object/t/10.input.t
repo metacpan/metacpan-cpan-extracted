@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -13,6 +14,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM' );
     use_ok( 'HTML::Object::DOM::Element::Input' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::Element::Input' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::Element::Input', 'accept' );
 can_ok( 'HTML::Object::DOM::Element::Input', 'accept' );
@@ -133,11 +137,11 @@ subtest 'date' => sub
     is( $val, '2019-12-24', 'input->stepDown -> 2019-12-24' );
 
     # Checking when exceeding maximum
-    $rv = $input->stepUp(10);
+    my $rv = $input->stepUp(10);
     $val = $input->value;
     is( $val, '2019-12-24', 'input->stepUp beyond max -> unchanged' );
 
-    my $html = q{<input type="date" min="2019-12-25" step="1" />};
+    $html = q{<input type="date" min="2019-12-25" step="1" />};
     $p = HTML::Object::DOM->new;
     $doc = $p->parse_data( $html ) || BAIL_OUT( $p->error );
     $input = $doc->getElementsByTagName('input')->first;
@@ -171,11 +175,11 @@ subtest 'month' => sub
     is( $val, '2019-09', 'input->stepDown -> 2019-09' );
 
     # Checking when exceeding maximum
-    $rv = $input->stepUp(10);
+    my $rv = $input->stepUp(10);
     $val = $input->value;
     is( $val, '2019-09', 'input->stepUp beyond max -> unchanged' );
 
-    my $html = q{<input type="month" min="2019-12" step="3" />};
+    $html = q{<input type="month" min="2019-12" step="3" />};
     $p = HTML::Object::DOM->new;
     $doc = $p->parse_data( $html ) || BAIL_OUT( $p->error );
     $input = $doc->getElementsByTagName('input')->first;
@@ -223,7 +227,7 @@ subtest 'week' => sub
     $val = $input->value;
     is( $val, '2016-W34', 'input->stepDown below min -> unchanged' );
 
-    my $html = q{<input type="week" min="2019-W23" step="2" />};
+    $html = q{<input type="week" min="2019-W23" step="2" />};
     $p = HTML::Object::DOM->new;
     $doc = $p->parse_data( $html ) || BAIL_OUT( $p->error );
     $input = $doc->getElementsByTagName('input')->first;
@@ -263,7 +267,7 @@ subtest 'datetime-local' => sub
     $input->value = '2019-12-25T19:30';
     $val = $input->value;
     is( $val, '2019-12-25T19:30', 'input->value set to 2019-12-25T19:30' );
-    my $rv = $input->stepDown;
+    $rv = $input->stepDown;
     $val = $input->value;
     is( $val, '2019-12-25T19:29:50', 'input->stepDown -> 2019-12-25T19:29:50' );
     
@@ -271,7 +275,7 @@ subtest 'datetime-local' => sub
     $input->value = '2019-12-25T19';
     $val = $input->value;
     is( $val, '2019-12-25T19', 'input->value set to 2019-12-25T19' );
-    my $rv = $input->stepDown;
+    $rv = $input->stepDown;
     $val = $input->value;
     is( $val, '2019-12-25T18:59:50', 'input->stepDown -> 2019-12-25T18:59:50' );
     

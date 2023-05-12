@@ -7,7 +7,7 @@ use Carp                           qw(croak);
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 #======================================================================
 # ATTRIBUTES

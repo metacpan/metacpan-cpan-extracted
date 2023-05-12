@@ -30,7 +30,7 @@ do { my $x = {
                       'requires' => {
                                       'Exporter' => '5.57',
                                       'XSLoader' => '0',
-                                      'perl' => 'v5.9.3',
+                                      'perl' => 'v5.14.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

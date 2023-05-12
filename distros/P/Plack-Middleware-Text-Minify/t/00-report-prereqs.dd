@@ -31,8 +31,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Text::Minify::XS' => 'v0.6.2',
                                       'parent' => '0',
-                                      'perl' => 'v5.9.3',
-                                      'strict' => '0',
+                                      'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -53,6 +52,7 @@ do { my $x = {
                                    'Test::Differences' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
+                                   'strict' => '0',
                                    'utf8' => '0'
                                  }
                  }

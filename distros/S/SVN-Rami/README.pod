@@ -2,45 +2,11 @@
 
 SVN::Rami - Automates merging to multiple branches
 
-=head1 VERSION
-
-Version 0.1
-
-
-=cut
-
 =head1 SYNOPSIS
 
 Should be invoked from the command line:
 
-  perl -e "use SVN::Rami;" -c <version-number>
-
-This is version 0.1, still mainly a proof-of-concept.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 No publicly available subroutines at this time
-
-
-=cut
-
-=head2 function2
-
-
-=cut
-
-=head1 AUTHOR
-
-Dan Richter, C<< <dan.richter at trdpnt.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-svn-rami at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Rami>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+  rami -c <version-number>
 
 =head1 SUPPORT
 

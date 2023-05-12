@@ -6,7 +6,6 @@ META.yml
 Makefile.PL
 README
 README_how_to_report_bugs
-diff_t_common.bash
 dist.ini
 lib/Data/Dumper/Interp.pm
 t/00_compile.t

@@ -79,7 +79,7 @@ are processed.
 
 # MOTIATION
 
-Many templating systems are available, yet none use perl as the template
+Many templating systems are available, yet none use Perl as the template
 language? Perl already has a great text interpolation, so why not use it? 
 
 Lexical aliasing allows the input variables to be accessed directly by name
@@ -88,14 +88,14 @@ Lexical aliasing allows the input variables to be accessed directly by name
 `<%=name%>`)
 
 I like the idea of Jekyll's 'Front Matter', but think its potential is limited
-as it can only support variables and not code. With perl's flexible syntax
+as it can only support variables and not code. With Perl's flexible syntax
 introducing code is doable.
 
 # TUTORIAL
 
 ## Syntax Genesis
 
-We all know how to interpolate variables into a string in perl:
+We all know how to interpolate variables into a string in Perl:
 
 ```perl
     "This string $uses a $some{variables}"
@@ -139,10 +139,10 @@ removing the outer quoting operators:
     ]}
 ```
 
-A `Template::Plex` template is just perl! The above is the literal text you
+A `Template::Plex` template is just Perl! The above is the literal text you
 can save to a file and load as a template.
 
-Specifically, a `Template::Plex` template it is the subset of perl that's
+Specifically, a `Template::Plex` template it is the subset of Perl that's
 valid between double quotation operators. 
 
 ## Smart Meta Data and Code
@@ -186,11 +186,11 @@ them are accessible via class methods:
     my $result=$template->render;
 
     #Load a template from cache and render later
-    my $template=Template::Plex->cache(undef, $path, $vars, %options);
+    my $template=Template::Plex->cache($key, $path, $vars, %options);
     my $result=$template->render;
 
     #Load from cache and render now
-    my $result= Template::Plex->immediate(undef, $path,$vars,%options);     
+    my $result= Template::Plex->immediate($path, $vars, %options);  
 ```
 
 A `load` call returns a new template object each time, where a `cache` call
@@ -363,7 +363,7 @@ file is altered
 ## Filters
 
 Unlike other template system, there are no built in filters. However as
-`Template::Plex` templates are just perl you are free to use builtin string
+`Template::Plex` templates are just Perl you are free to use builtin string
 routines or import other modules in to your template.
 
 # API
@@ -392,7 +392,7 @@ file path or an existing file handle.
 From a top level user application, the class method must be used. From within a
 template, either the object method form or subroutine form can be used.
 
-If now variables or options are specified when loading a sub templates, the
+If no variables or options are specified when loading a sub templates, the
 variables and options from the calling templates are reused.
 
 Arguments to this function:
@@ -500,7 +500,7 @@ Arguments to this function:
         ```
 
         **NOTE:** in the case of a syntax error present in the template, the line
-        numbers maybe incorrect when block\_fix is active, as it effectivly removes a
+        numbers maybe incorrect when block\_fix is active, as it effectively removes a
         line from the source 
 
     - **no\_eof\_chomp**
@@ -547,7 +547,7 @@ Arguments to this function:
 
     - **inject**
 
-        An array ref of strings, representing perl code, to be injected into the
+        An array ref of strings, representing Perl code, to be injected into the
         template package. Intended to be utilised for subclasses to  inject small
         pieces of code which cannot be otherwise required/used.
 
@@ -573,53 +573,95 @@ Arguments to this function:
 ## `cache`
 
 ```perl
-    #Class method
-    Template::Plex->cache($key, $path, $vars, %options);
+      # Class method
+# 
+      Template::Plex->cache($key, $path, $vars, %options);
 
-    #Object method
-    $self->cache($key, $path, $vars, %options);
+      # Object method
+      $self->cache($key, $path, $vars, %options); 
 
-    #Subroutine
-    cache $key, $path, $vars, %options;
+      # Subroutine
+      cache $key, $path, $vars, %options;
+              #Force the current line/package/template as a key
 
-    #Use the current line/package/template as a key
+      cache undef, $path, $vars, $%opts;
 
-    cache undef, $path, $vars, $%opts;
+# v0.6.0 onwards also supports additional arguments forms
+
+# Implicit key, explicit variables and options
+#
+Template::Plex->cache($path, $vars, %options);
+      $self->cache($path, $vars, %options);
+      cache $path, $vars, %options;
+
+# Implicit key and implicit variables/options
+#
+      Template::Plex->cache($path);   
+      $self->cache($path);   
+      cache $path;   
 ```
 
-This is a wrapper around the `load` API, to improve performance of sub
-templates used in loops. The first argument is a key to identity the template
-when loaded.  Subsequent calls with the same key will return the already loaded
-template from active cache.
+This is a wrapper around the `load` API primarily  used to improve performance
+of sub templates used in loops. 
+
+**From v0.6.0:** If the number of arguments passed to the cache functions/method
+is 1, it is assumed to be a path and an implicit cache key is used and implicit
+reuse of variables and options is assumed.  If the number of arguments is
+larger than 1, **AND** the second argument is a hash ref of variables, then an
+implicit cache key is used and the first argument is expected to be a path.
+
+Otherwise an explicit cache key is expected as the first argument
+and the second argument is expected to be a path.
+
+Subsequent calls with the same key will return the already loaded template from
+active cache.
 
 If called from the top level user application, the cache is shared.
 Templates have their own cache storage to prevent cross collisions.
 
-If no key is provided, then information about the caller (including the line
-number, package and target template) is used generate one. This approach allows
-for a template which maybe rendered multiple times in a loop, to only be loaded
-once for example.
+If the explicit key provided is `undef` or an implicit key is used, then
+information about the caller (including the line number, package and target
+template) is used generate one. This approach allows for a template which maybe
+rendered multiple times in a loop, to only be loaded once for example.
+
+Returns the loaded or cached template
 
 ## `immediate`
 
 ```perl
-    #Class method
-    Template::Plex->immediate($key, $path, $vars, %options);
-    
-    #Object method
-    $self->immediate($key, $path, $vars, %options);
+      # Class method
+      Template::Plex->immediate($key, $path, $vars, %options);
+      
+      # Object method
+      $self->immediate($key, $path, $vars, %options);
+      # Subrutine
+      immediate $key, $path, $vars, %options;
 
-    #Subrutine
-    immediate $key, $path, $vars, %options;
+      #Use current line/package/template as key
+      immediate undef, $path, $vars, %options;
 
-    #Use current line/package/template as key
-    immediate undef, $path, $vars, %options;
+
+# v0.6.0 onwards also supports additional arguments forms
+
+# Implicit key, explicit variables and options
+      Template::Plex->immediate($path, $vars, %options);
+      $self->immediate($path, $vars, %options);
+      immediate $path, $vars, %options;
+
+# Implicit key and implicit variables/options
+#
+      Template::Plex->immediate($path);
+      $self->immediate($path);
+      immediate $key;
 ```
 
 Loads and renders a template immediately. Uses the same arguments as `cache`.
 Calls the `cache` API but also calls `render` on the returned template.
 
-Returns the result or the rendered template.
+**From v0.6.0:** Please refere to the `cache` api on details regarding argument
+handling
+
+Returns the result of the rendered loaded/cached template.
 
 ## `include`
 
@@ -635,13 +677,12 @@ prepared for execution.
 If `root` was included in the options to `load`, then it is prepended to
 `path` if defined.
 
-When a template is loaded by `load` the processing of this is
-subject to the `no_include` option. If `no_include` is specified, any
-template text that contains the `@{[include("path")}]` text will result in a
-syntax error
+When a template is loaded by `load` the processing of this is subject to the
+`no_include` option. If `no_include` is specified, any template text that
+contains the `@{[include("path")}]` text will result in a syntax error
 
 **NOTE:** in the case of a syntax error present in the template, the line
-numbers maybe incorrect if `include` is used, as it effectivly adds lines to
+numbers maybe incorrect if `include` is used, as it effectively adds lines to
 the template source.
 
 ## pl
@@ -660,7 +701,7 @@ A subroutine which executes a block just like the built in  `do`. However it
 always returns an empty string.
 
 Only usable in a template `@{[]}` construct, to execute arbitrary statements.
-However, as an empty string is returned, perl's interpolation won't inject
+However, as an empty string is returned, Perl's interpolation won't inject
 anything at that point in the template.
 
 If you DO want the last statement returned into the template, use the built in
@@ -696,7 +737,7 @@ If you DO want the last statement returned into the template, use the built in
 ```
 
 It is used to configure or setup meta data for a template and return
-immediately. It takes a single argument which is a perl block.
+immediately. It takes a single argument which is a Perl block.
 
 Only the first `init {...}` block in a template will be executed.
 
@@ -777,6 +818,33 @@ Appends to an inherited slot of name `name` with `$value`.
 ```
 
 Prepends to an inherited slot of name `name` with `$value`. 
+
+## fill\_var
+
+```perl
+@{[fill_var name=>$value]}
+```
+
+Sets the value of a package variable of `name` with `$value`. Useful for shared global
+variables accessible outside of template inheritance. Returns an empty string.
+
+## append\_var
+
+```perl
+@{[append_var name=>$value]}
+```
+
+Appends `$value` to an global package variable of name `name`. Returns an
+empty string.
+
+## prepend\_var
+
+```perl
+@{[prepend_var name=>$value]}
+```
+
+Prepends `$value` to an global package variable of name `name`. Returns an
+empty string.
 
 ## clear
 
@@ -889,7 +957,7 @@ the `%fields` variable and can both be used simultaneously in a template
 
 # SUB CLASSING
 
-Sub classing is as per the standard perl `use parent`. The object storage is
+Sub classing is as per the standard Perl `use parent`. The object storage is
 actually an array.  
 
 Package constants are defined for the indexes of the fields along with
@@ -1136,7 +1204,7 @@ render data being supplied as needed.
 
 # ISSUES 
 
-Enabling lexically scoped features (ie `use feature "say"`) is only in the
+Enabling lexically scoped features (i.e. `use feature "say"`) is only in the
 block it used in. Unfortunately that means that features enabled in an init
 block will not be active in subsequent blocks. The inject or use option would
 need to be utilised to achieve this currently.
@@ -1146,7 +1214,7 @@ templates and run general IO code, so in theory it would be possible to break
 up very large data templates and stream them to disk...
 
 This module uses `eval` to generate the code for rendering. This means that
-your template, being perl code, is being executed. If you do not know what is
+your template, being Perl code, is being executed. If you do not know what is
 in your templates, then maybe this module isn't for you.
 
 Aliasing means that the template has write access to variables outside of it.

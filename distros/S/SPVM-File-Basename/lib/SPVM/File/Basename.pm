@@ -1,6 +1,6 @@
 package SPVM::File::Basename;
 
-our $VERSION = "0.041";
+our $VERSION = "0.041001";
 
 1;
 

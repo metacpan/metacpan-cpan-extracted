@@ -88,7 +88,7 @@ use Error::Show;
 # No argument uses $@ as error
 #
 eval { exceptional_code };
-say STDERR Error::Show::context if $@;
+say STDERR context if $@;
 
 
 # or a single exception argument of your choosing
@@ -98,7 +98,7 @@ try {
   exceptional_code
 }
 catch($e) {
-  say STDERR Error::Show $e;
+  say STDERR context $e;
 }
 
 # Show context down a stack
@@ -109,7 +109,7 @@ try {
 
 }
 catch($e){
-  say STDERR Error::Show message=>$e, frames=>$e->frames
+  say STDERR context message=>$e, frames=>$e->frames
 }
 
 ```
@@ -140,10 +140,11 @@ A handful of options are available for basic configuration of how many lines of
 code to print before and after the error line, indenting of stack trace
 context, etc.
 
-From v0.2.0, added 'advanced string eval' support has been added for better
-context reporting of dynamically generated code.
+**From v0.3.0:** `context` subroutine is now exported by default. To prevent
+this, import with an empty list, ie `use Error::Show ()`.
 
-No symbols are exported and as such they must be accessed via the package name.
+`From v0.2.0:`, Added 'advanced string eval' support has been added for better
+context reporting of dynamically generated code.
 
 # USAGE
 
@@ -218,6 +219,12 @@ It provides a single subroutine for processing errors and exceptions.
 my $context=Error::Show::context;                     (1)
 my $context=Error::Show::context $error;              (2)
 my $context=Error::Show::context option_pairs, message=>$error_as_string, frames=>$stack frames (3)
+
+my $context=Error::Show::context undef;               (4)
+my $context=context undef;                            (5)
+
+my $context=Error::Show->context(...);                (6)
+
       
 ```
 
@@ -248,6 +255,17 @@ to process. No processing options can be supplied in this form. This is
 stringified for processing.
 
 In the third for (3), all options are provided as key value pairs. 
+
+**From v0.3.0:** In the forth form (4), an explicit single argument of `undef`,
+will generate call stack/frames internally and generate context information
+from it.
+
+The `context` subroutine (5) is exported by default, so does not need a fully
+qualified name
+
+`context` Can also be called with package arrow notation (6) ie
+`Error::Show->context(...)` if prefered, with the same arguemtn handling
+as the other forms.
 
 The expected types of data are as follows:
 

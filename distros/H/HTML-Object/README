@@ -27,16 +27,20 @@ SYNOPSIS
         use HTML::Object fatal_error => 1, try_catch => 1;
 
 VERSION
-        v0.1.4
+        v0.2.3
 
 DESCRIPTION
     This module is yet another HTML parser, manipulation and query
-    interface. It uses the C parser from HTML::Parser and has the unique
-    particularity that it does not try to decode the entire html document
-    tree only to re-encode it when printing out its data as string like so
-    many other html parsers out there do. Instead, it modifies only the
-    parts required. The rest is returned exactly as it was found in the
-    HTML. This is faster and safer.
+    interface, but probably the most comprehensive one. It uses the C parser
+    from HTML::Parser and has the unique particularity that it does not try
+    to decode the entire html document tree only to re-encode it when
+    printing out its data as string like so many other html parsers out
+    there do. Instead, it modifies only the parts required. The rest is
+    returned exactly as it was found in the HTML. This is faster and safer.
+
+    This module contains 144 modules to closely implement the HTML standard
+    as documented on Mozilla documentation
+    <https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API>.
 
     It uses an external json data dictionary file of html tags
     ("html_tags_dict.json").

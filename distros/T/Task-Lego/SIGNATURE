@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,43 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 88a0a32d95886d7cd378ce9fa18accee5acab364 Changes
-SHA1 375e7ac4aaa921c9623aeb970ee2fdca1eed502c Lego.pm
-SHA1 738eae64a6cc7371189fd97175ac2f7e776de6f5 MANIFEST
-SHA1 a325b65f8d85a9747c6e8c323f5aea3b6cc9647a META.yml
-SHA1 5830a4c1b920cedae24c8a15914f011892466801 Makefile.PL
-SHA1 66c0c63b64ea9da1afda1c9a100ca43b9c4dbc95 README
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 c81a3a0285399f5cbeb0e01fa835d2a20182ae61 t/Task-Lego/01-use.t
-SHA1 1233f87c82d9e6bccd773281baba4ae3d3aeaf67 t/Task-Lego/02-version.t
-SHA1 b18d366de9008c4b488827746853c1749e3721b8 xt/Task-Lego/01-pod_coverage.t
-SHA1 8fb266b560d87a3f5214b139c2b20f219a697896 xt/Task-Lego/02-pod.t
+SHA256 887cd640729672dcc0997e991db77732272a4a6b64d3334528b58ac03948f149 Changes
+SHA256 fad5814bf4d99be1be8aac462d0ade3dbbf8edbcb0a0d9e03378dc365bb74378 LICENSE.bsd
+SHA256 8b352ffd2a54bc88db39f3518cc95e6c26b2ef98b1fab7395347470436213684 Lego.pm
+SHA256 bc6899c6ea89f2816d1d1f23cc1f189b2cd4298269fd5adc83936dcd7134f9f8 MANIFEST
+SHA256 0b72892a829322366425046abd4ea5197c9166d9287268adfda1494562c0fab7 META.yml
+SHA256 54dd9c8ca505fe08196e870627e5b1093eedbb1f8428e3b4ff5c4e29cbc67834 Makefile.PL
+SHA256 d25018a9e63443ed5c69dbfb945c489feaf14e97632cab7da65575062cb72bf4 README
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 4326570a5ec546c97358e10732429e9c0ddcfd0f2f7f26d7ad2eb04c2faed709 t/Task-Lego/01-use.t
+SHA256 8b18612938a5adabd2a7deb1a2f08636c98e7f07fd5b2f253cab3ce77506b8fe t/Task-Lego/02-version.t
+SHA256 c23dacea17d406aaff9853a68877e76d9c4d9388f73258de65ed9f8abf6028a0 xt/Task-Lego/01-pod_coverage.t
+SHA256 2e102389ebea2844a8114fb7cdd23e5a82618cbf64b989479daf0b5baefd6941 xt/Task-Lego/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWAyZQAAoJEJe+XXKaIuTlrEwIAJluIY+RJIV0vcrpkbDoKqQs
-ejWcTe8SZ/56/ovplgH8DhBnhFEWb4jpmoNFkPmObEpiF7o8AlXcEhDikcGDH0eE
-cq6OxvULOVyvExwB2QGx5H2BBpmQEjrySU9ZIhU+3DyRuDBPT/UG8DoaC294UUcr
-0kR0wRLa6jTiAto33A3Qr0Tz55vESqOdSnoPfSM5y/O3IX1VXQrfFfSnaItr9cvh
-8CdDqdfuUp0S8HN79T9yq/Gm3rjfkw+d29pD7Dizp86zUEtt9CUStXrmzVT6v9dD
-5vCy/UA8hYrOo+8KUZGyXp6JdcU5xvDVeJaAW4T++DkM3R7UB3XredPpCHu+Gc4=
-=JbBB
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmRdIhEACgkQojV9Rpe/
+B8stmg/+ITf3WWmaerFo9hcFxEg5ZO5QbW+do625rK74bT44tq6lel5XPvkc669f
+UWu5sh7elyiPcmo1VVhOE3TIJwCuY02TbsRlLq3uHn9xaQ1mEpd6WGitfzHpnniu
+cvJEY2jckSb6lKKgjGPUAK9dPqINH+83gGerd0sTb1F7My+HnibD8hFI2fGfyE0a
+TMxqYdfP0dTf2Q9OsX4T/Vd/y9yIZvsZt9w6cUjS+8j4D6xrY8e+GpjeSHr9MALl
+Ssla1Aksz9c6uf8t2yOprveHl7/h18sv5GdqGYSv1sLGp4JvgGH4+Li5Y88VAS+K
+ZH+PlnwIXfDwKXgbplr7uqoKdeJ13YO/8pBonzR4+Mr77L8WW0PxTvo4auH1uIJ6
++nGKUJE1X9C5DgTxSisyKQgUu6UCGrQwEVUl/QpAqf7m+iqRsqaRUIQVuAG79U1H
+FUBk48U/vHOew7ISQZeKVVS4bwwcDt8eHQCt/E0NhK8UDJgrY93t7BZfRV1CEWNc
+BR/lWHlT5fI7axgRys3UEV5w+bSFa7IqQrRbip/2r6e348HD+470DOKv1Yp9SytI
+LXNYINLd59qt/S/4LPWwfC/rk+zgET+Lbd4JyvhivcGZ1BlBww096Df5/buNnzPy
+D031vmUhfGWk1h4HG8Z7wFJtzVqDprsCwcLDOhBq0x345gIkmZ8=
+=pa0P
 -----END PGP SIGNATURE-----

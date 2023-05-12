@@ -3,6 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use Scalar::Util ();
 };
@@ -13,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Document' ) || BAIL_OUT( "Cannot load HTML::Object::DOM::Document" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 my $test = <<EOT;
 <!DOCTYPE html>
@@ -59,7 +64,8 @@ EOT
 
 my $on_event_counter = {};
 my $parser  = HTML::Object::DOM->new(
-    onload => sub{
+    onload => sub
+    {
         my $evt = shift( @_ );
         isa_ok( $evt => 'HTML::Object::Event', 'onload event' );
         $on_event_counter->{onload}++;
@@ -68,7 +74,7 @@ my $parser  = HTML::Object::DOM->new(
     onreadystatechange => sub
     {
         my $evt = shift( @_ );
-        isa_ok( $evt => 'HTML::Object::Event', 'onload event' );
+        isa_ok( $evt => 'HTML::Object::Event', 'onreadystatechange event' );
         $on_event_counter->{ $evt->detail->{state} }++;
         diag( "readystatechange event received. State is now: '", $evt->detail->{state}, "'" ) if( $DEBUG );
         like( $evt->detail->{state}, qr/^(loading|interactive|complete)$/, 'readystatechange state' );

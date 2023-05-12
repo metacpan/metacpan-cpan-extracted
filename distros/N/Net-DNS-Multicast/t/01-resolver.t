@@ -21,9 +21,9 @@ ok( $resolver->string, '$resolver->string' );
 exit;
 
 
-package Net::DNS::Resolver;	## off-line dry test
-sub _create_tcp_socket {return}	## stub
-sub _create_udp_socket {return}	## stub
+package Net::DNS::Resolver;		## off-line dry test
+sub _create_tcp_socket {return}		## stub
+sub _create_udp_socket {return}		## stub
 
 __END__
 

@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -12,6 +13,9 @@ BEGIN
 {
     use_ok( 'HTML::Object::DOM', qw( :all ) ) || BAIL_OUT( 'Unable to load HTML::Object::DOM' );
 };
+
+use strict;
+use warnings;
 
 HTML::Object::DOM->import( ':all' );
 
@@ -85,10 +89,11 @@ for( my $i = 0; $i < scalar( @$constants ); $i += 2 )
 {
     my $const = $constants->[$i];
     my $value = $constants->[$i + 1];
-    ok( defined( &$const ), "constant $const defined" );
-    if( defined( &$const ) )
+    my $coderef = main->can( $const );
+    ok( defined( $coderef ), "constant $const defined" );
+    if( defined( $coderef ) )
     {
-        is( &$const, $value, "constant $const value" );
+        is( $coderef->(), $value, "constant $const value" );
     }
     else
     {

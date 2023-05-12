@@ -97,6 +97,7 @@ lib/Venus/Role/Unacceptable.pm
 lib/Venus/Role/Unpackable.pm
 lib/Venus/Role/Valuable.pm
 lib/Venus/Scalar.pm
+lib/Venus/Schema.pm
 lib/Venus/Search.pm
 lib/Venus/Space.pm
 lib/Venus/String.pm
@@ -184,6 +185,7 @@ t/Venus_Role_Unacceptable.t
 t/Venus_Role_Unpackable.t
 t/Venus_Role_Valuable.t
 t/Venus_Scalar.t
+t/Venus_Schema.t
 t/Venus_Search.t
 t/Venus_Space.t
 t/Venus_String.t

@@ -10,7 +10,7 @@ use Getopt::Std;
 use Net::HL7::Message;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -149,6 +149,8 @@ Returns exit code (0 as success, > 0 as error).
 
 =head1 EXAMPLE1
 
+=for comment filename=dump_hl7_message.pl
+
  use strict;
  use warnings;
 
@@ -208,6 +210,8 @@ Returns exit code (0 as success, > 0 as error).
  # OBR-7:20160403211012
 
 =head1 EXAMPLE2
+
+=for comment filename=dump_hl7_message_ansi.pl
 
  use strict;
  use warnings;
@@ -281,7 +285,7 @@ L<Term::ANSIColor> for color mode.
 
 =head1 REPOSITORY
 
-L<https://github.com/tu pinek/App-HL7-Dump>
+L<https://github.com/michal-josef-spacek/App-HL7-Dump>
 
 =head1 AUTHOR
 
@@ -291,12 +295,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2016-2022 Michal Josef Špaček
+© 2016-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

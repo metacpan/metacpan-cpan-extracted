@@ -1,5 +1,8 @@
 use utf8;
 
+use v5.14;
+use warnings;
+
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
     print qq{1..0 # SKIP these tests are for testing by the author\n};

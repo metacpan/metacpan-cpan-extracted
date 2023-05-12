@@ -11,8 +11,15 @@ base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Stashable';
 
+use overload (
+  '""' => sub{$_[0]->catch('error')->explain},
+  '~~' => sub{$_[0]->catch('error')->explain},
+  fallback => 1,
+);
+
 # ATTRIBUTES
 
+attr 'frame';
 attr 'name';
 attr 'message';
 attr 'package';
@@ -39,6 +46,14 @@ sub build_self {
 
 # METHODS
 
+sub as {
+  my ($self, $name) = @_;
+
+  $self->name($name);
+
+  return $self;
+}
+
 sub assertion {
   my ($self) = @_;
 
@@ -49,13 +64,27 @@ sub assertion {
   return $assert;
 }
 
+sub capture {
+  my ($self, @args) = @_;
+
+  my $frame = $self->frame;
+
+  $self->stash(captured => {
+    callframe => [caller($frame // 1)],
+    arguments => [@args],
+  });
+
+  return $self;
+}
+
 sub error {
   my ($self, $data) = @_;
 
   require Venus::Error;
 
+  my $frame = $self->frame;
   my $name = $self->name;
-  my $context = $self->context || (caller(1))[3];
+  my $context = $self->context || (caller($frame // 1))[3];
   my $package = $self->package || join('::', map ucfirst, (caller(0))[0], 'error');
   my $parent = $self->parent;
   my $message = $self->message;
@@ -97,6 +126,20 @@ sub error {
   goto $package->can('throw');
 }
 
+sub on {
+  my ($self, $name) = @_;
+
+  my $frame = $self->frame;
+
+  my $routine = (split(/::/, (caller($frame // 1))[3]))[-1];
+
+  undef $routine if $routine eq '__ANON__' || $routine eq '(eval)';
+
+  $self->name(join('.', 'on', grep defined, $routine, $name)) if $routine || $name;
+
+  return $self;
+}
+
 1;
 
 
@@ -135,6 +178,14 @@ objects).
 =head1 ATTRIBUTES
 
 This package has the following attributes:
+
+=cut
+
+=head2 frame
+
+  frame(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
 
 =cut
 
@@ -197,6 +248,30 @@ L<Venus::Role::Stashable>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 as
+
+  as(Str $name) (Throw)
+
+The as method sets a L</name> for the error and returns the invocant.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item as example 1
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->as('on.handler');
+
+  # bless({...}, 'Venus::Throw')
+
+=back
 
 =cut
 
@@ -362,6 +437,96 @@ I<Since C<0.01>>
 =back
 
 =cut
+
+=head2 on
+
+  on(Str $name) (Throw)
+
+The on method sets a L</name> for the error in the form of
+C<"on.$subroutine.$name"> or C<"on.$name"> (if outside of a subroutine) and
+returns the invocant.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item on example 1
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->on('handler');
+
+  # bless({...}, 'Venus::Throw')
+
+  # $throw->name;
+
+  # "on.handler"
+
+=back
+
+=over 4
+
+=item on example 2
+
+  # given: synopsis
+
+  package main;
+
+  sub execute {
+    $throw->on('handler');
+  }
+
+  $throw = execute();
+
+  # bless({...}, 'Venus::Throw')
+
+  # $throw->name;
+
+  # "on.execute.handler"
+
+=back
+
+=cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$throw";
+
+  # "Exception!"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $throw ~~ 'Exception!';
+
+  # 1
+
+=back
 
 =head1 AUTHORS
 

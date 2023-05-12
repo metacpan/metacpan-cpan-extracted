@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -14,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::TreeWalker' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::TreeWalker' );
     use_ok( 'HTML::Object::DOM::NodeFilter', ':all' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::NodeFilter' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::TreeWalker', 'currentNode' );
 can_ok( 'HTML::Object::DOM::TreeWalker', 'expandEntityReferences' );
@@ -103,7 +107,8 @@ while( my $e = $it->nextNode )
 
 # Now, going backward
 diag( "Now, going backward." ) if( $DEBUG );
-while( my $e = $it->previousNode )
+my $e;
+while( $e = $it->previousNode )
 {
     my $tag = $e->nodeName;
     my $class = $e->getAttribute( 'class' );

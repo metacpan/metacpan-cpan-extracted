@@ -29,6 +29,7 @@ WriteMakefile(
 		'Test::Differences'	=> 0.61,
         'Test::More'		=> 1.001014,
 		'Object::Tiny::RW'	=> 1.07,
+		'Algorithm::Diff'	=> 1.201,
 	},
 	'EXE_FILES'	   => [
 		'bin/macropp',

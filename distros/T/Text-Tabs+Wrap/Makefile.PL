@@ -3,7 +3,7 @@ use 5.006001; use strict; use warnings;
 use ExtUtils::MakeMaker;
 
 my $sc = q<https://github.com/ap/Text-Tabs>;
-my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Tabs>;
+my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Tabs%2BWrap>;
 
 WriteMakefile( 
 	'NAME'		=> 'Text::Wrap',

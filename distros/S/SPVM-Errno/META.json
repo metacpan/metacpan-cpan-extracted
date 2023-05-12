@@ -1,12 +1,12 @@
 {
-   "abstract" : "Error Number",
+   "abstract" : "Error Numbers",
    "author" : [
-      "USER_NAME<USER_MAIL>"
+      "Yuki Kimoto<kimoto.yuki>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9691"
+            "SPVM" : "0.976"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9691"
+            "SPVM" : "0.976"
          }
       },
       "test" : {
@@ -45,6 +45,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.090001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

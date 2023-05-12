@@ -10,7 +10,7 @@ our @CARP_NOT = ( __PACKAGE__ );
 use Path::Tiny;
 
 use vars qw( $VERSION $NAME_RE $COMMENT );
-$VERSION 	= '2.11'; 
+$VERSION 	= '2.12'; 
 
 BEGIN {
 	$NAME_RE 	= qr/ [^\s\[\|\]\#]+ /x;		# name cannot contain blanks [ | ] #
@@ -223,7 +223,7 @@ DESTROY {
 	my($self) = @_;
 	if (@{$self->context}) {
 		my $context = $self->_last_context;
-		$self->line_nr( $context->start_line_nr );
+		$self->line_nr( $context ? $context->start_line_nr : "unknown" );
 		$self->_error("Unbalanced open structure at end of file");
 	}
 }
@@ -785,6 +785,7 @@ sub _eval_expression {
 		elsif (! $ignore_errors) {
 			my $error = $@;
 			$error =~ s/ at \(eval.*//;
+                        $error =~ s/^Execution of .* aborted due to compilation errors.\n//m;
 			$self->_error("Eval error: $error");
 		}
 	}

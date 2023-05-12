@@ -3,6 +3,7 @@
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
 .github/workflows/windows-latest.yml.disable
 .gitignore
 Changes
@@ -16,6 +17,7 @@ lib/SPVM/File/Spec/Instance/Unix.pm
 lib/SPVM/File/Spec/Instance/Unix.spvm
 lib/SPVM/File/Spec/Instance/Win32.pm
 lib/SPVM/File/Spec/Instance/Win32.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

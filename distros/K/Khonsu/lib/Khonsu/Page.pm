@@ -5,8 +5,6 @@ use parent 'Khonsu::Ra';
 sub attributes {
 	my $a = shift;
 	return (
-		header => {$a->RW, $a->OBJ},
-		footer => {$a->RW, $a->OBJ},
 		page_size => {$a->RW, $a->REQ, $a->STR},
 		background => {$a->RW, $a->STR},
 		num => {$a->RW, $a->REQ, $a->NUM},

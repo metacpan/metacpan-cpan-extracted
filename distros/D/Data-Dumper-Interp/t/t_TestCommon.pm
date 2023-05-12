@@ -577,9 +577,13 @@ sub insert_loc_in_evalstr($) {
 sub timed_run(&$@) {
   my ($code, $maxcpusecs, @codeargs) = @_;
 
-  eval { require Time::HiRes };
-  my $getcpu = defined(eval{ &Time::HiRes::clock() })
-    ? \&Time::HiRes::clock : sub{ my @t = times; $t[0]+$t[1] };
+  my $getcpu = eval {do{ 
+    require Time::HiRes;
+    () = (&Time::HiRes::clock());
+    \&Time::HiRes::clock;
+  }} // sub{ my @t = times; $t[0]+$t[1] };
+  dprint("Note: $@") if $@;
+  $@ = ""; # avoid triggering "Eval error" in check();
 
   my $startclock = &$getcpu();
   my (@result, $result);

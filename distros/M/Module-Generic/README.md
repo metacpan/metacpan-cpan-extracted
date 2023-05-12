@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.29.0
+        v0.29.6
 
 DESCRIPTION
 ===========
@@ -1224,6 +1224,21 @@ Then :
 
 Which would return the http client error that has been passed along
 
+You can optionally provide an hash of parameters as the last argument,
+such as:
+
+        return( $self->pass_error( $obj->error, { class => 'My::Exception', code => 400 } ) );
+
+Supported options are:
+
+`class`
+
+:   The name of a class name to re-bless the error object provided.
+
+`code`
+
+:   The error code to set in the error object being passed.
+
 quiet
 -----
 
@@ -1455,6 +1470,50 @@ Those methods are designed to be called from the package inheriting from
 [Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module}
 to perform various function and speed up development.
 
+\_\_create\_class
+-----------------
+
+Provided with an object property name and an hash reference representing
+a dictionary and this will produce a dynamically created class/module.
+
+If a property *\_class* exists in the dictionary, it will be used as the
+class/package name, otherwise a name will be derived from the calling
+object class and the object property name. For example, in your module :
+
+        sub products { return( 'products', shift->_set_get_class(
+        {
+        name        => { type => 'scalar' },
+        customer    => { type => 'object', class => 'My::Customer' },
+        orders      => { type => 'array_as_object' },
+        active      => { type => 'boolean' },
+        created     => { type => 'datetime' },
+        metadata    => { type => 'hash' },
+        stock       => { type => 'number' },
+        url         => { type => 'uri' },
+        }, @_ ) ); }
+
+Then calling your module method **products** such as :
+
+        my $prod = $object->products({
+            name => 'Cool product',
+            customer => { first_name => 'John', last_name => 'Doe', email => 'john.doe@example.com' },
+            orders => [qw( 123 987 456 654 )],
+            active => 1,
+            metadata => { transaction_id => 123, api_call_id => 456 },
+            stock => 10,
+            uri => 'https://example.com/p/20'
+        });
+
+Using the resulting object `$prod`, we can access this dynamically
+created class/module such as :
+
+        printf( <<EOT, $prod->name, $prod->orders->length, $prod->customer->last_name,, $prod->url->path )
+        Product name: %s
+        No of orders: %d
+        Customer name: %s
+        Product page path: %s
+        EOT
+
 \_\_instantiate\_object
 -----------------------
 
@@ -1468,31 +1527,6 @@ sets an [\"error\"](#error){.perl-module}
 
 This is a support method used by
 [\"\_instantiate\_object\"](#instantiate_object){.perl-module}
-
-\_has\_base64
--------------
-
-Provided with a value and this returns an array reference containing 2
-code references: one for encoding and one for decoding.
-
-Value provided can be a simple true value, such as `1`, and then
-`_has_base64` will check if
-[Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module} and
-[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module} are
-installed on the system and will use in priority
-[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}
-
-The value provided can also be an array reference already containing 2
-code references, and in such case, that value is simply returned.
-Nothing more is done.
-
-Finally, the value provided can be a module class name. `_has_base64`
-knows only of
-[Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module} and
-[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}, so
-if you want to use any other one, arrange yourself to pass to
-`_has_base64` an array reference of 2 code references as explained
-above.
 
 \_instantiate\_object
 ---------------------
@@ -1511,9 +1545,20 @@ the value provided is an object that [\"can\" in
 UNIVERSAL](https://metacpan.org/pod/UNIVERSAL#can){.perl-module} perform
 the method specified, or false otherwise.
 
+You can also provide an array of method names to check instead of just a
+method name. In that case, all method names provided must be supported
+by the object otherwise it will return false.
+
 This makes it more convenient to write:
 
         if( $self->_can( $obj, 'some_method' ) )
+        {
+            # ...
+        }
+
+or
+
+        if( $self->_can( $obj, [qw(some_method other_method )] ) )
         {
             # ...
         }
@@ -1629,6 +1674,31 @@ object initiated with the following options set:
 
 :   This is set to 1 so this very method is not included in the frames
     stack
+
+\_has\_base64
+-------------
+
+Provided with a value and this returns an array reference containing 2
+code references: one for encoding and one for decoding.
+
+Value provided can be a simple true value, such as `1`, and then
+`_has_base64` will check if
+[Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module} and
+[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module} are
+installed on the system and will use in priority
+[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}
+
+The value provided can also be an array reference already containing 2
+code references, and in such case, that value is simply returned.
+Nothing more is done.
+
+Finally, the value provided can be a module class name. `_has_base64`
+knows only of
+[Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module} and
+[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}, so
+if you want to use any other one, arrange yourself to pass to
+`_has_base64` an array reference of 2 code references as explained
+above.
 
 \_implement\_freeze\_thaw
 -------------------------
@@ -2263,49 +2333,217 @@ For example:
 The value of the callback can be either a subroutine name or a code
 reference.
 
-\_\_create\_class
------------------
+\_set\_get\_callback
+--------------------
 
-Provided with an object property name and an hash reference representing
-a dictionary and this will produce a dynamically created class/module.
-
-If a property *\_class* exists in the dictionary, it will be used as the
-class/package name, otherwise a name will be derived from the calling
-object class and the object property name. For example, in your module :
-
-        sub products { return( 'products', shift->_set_get_class(
-        {
-        name        => { type => 'scalar' },
-        customer    => { type => 'object', class => 'My::Customer' },
-        orders      => { type => 'array_as_object' },
-        active      => { type => 'boolean' },
-        created     => { type => 'datetime' },
-        metadata    => { type => 'hash' },
-        stock       => { type => 'number' },
-        url         => { type => 'uri' },
+        sub name : lvalue { return( shift->_set_get_callback({
+            get => sub
+            {
+                my $self = shift( @_ );
+                # The context hash is available with $_
+                if( $_->{list} )
+                {
+                    return( @{$self->{name}} );
+                }
+                else
+                {
+                    return( $self->{name} );
+                }
+            },
+            set => sub
+            {
+                my $self = shift( @_ );
+                $self->message( 1, "Got here for 'name' in setter callback" );
+                return( $self->{name} = shift( @_ ) );
+            },
+            field => 'name'
         }, @_ ) ); }
 
-Then calling your module method **products** such as :
+Then, it can be called indifferently as:
 
-        my $prod = $object->products({
-            name => 'Cool product',
-            customer => { first_name => 'John', last_name => 'Doe', email => 'john.doe@example.com' },
-            orders => [qw( 123 987 456 654 )],
-            active => 1,
-            metadata => { transaction_id => 123, api_call_id => 456 },
-            stock => 10,
-            uri => 'https://example.com/p/20'
-        });
+        my $rv = $obj->name( 'John' );
+        # $rv is John
+        $rv = $obj->name;
+        # $rv is John
+        $obj->name = 'Peter';
+        $rv = $obj->name;
+        # $rv is Peter
 
-Using the resulting object `$prod`, we can access this dynamically
-created class/module such as :
+        $obj->colours( qw( orange blue ) );
+        my @colours = $obj->colours;
+        # returns a list of colours orange and blue
+        my $colour = $obj->colours;
+        # $colour is 'orange'
 
-        printf( <<EOT, $prod->name, $prod->orders->length, $prod->customer->last_name,, $prod->url->path )
-        Product name: %s
-        No of orders: %d
-        Customer name: %s
-        Product page path: %s
-        EOT
+Given an hash reference of parameters, and this support method will call
+the accessor `get` callback or mutator `set` callback depending on
+whether any arguments were provided.
+
+This support method supports `lvalue` methods as described in [\"Lvalue
+subroutines\" in
+perlfunc](https://metacpan.org/pod/perlfunc#Lvalue subroutines){.perl-module}
+
+It is similar as
+[Sentinel](https://metacpan.org/pod/Sentinel){.perl-module}, but on
+steroid, since it handles exception, and provides context, which is
+often critical.
+
+If a fatal exception occurs in a callback, it is trapped using
+[try-catch block](https://metacpan.org/pod/Nice::Try){.perl-module} and
+an [error
+object](https://metacpan.org/pod/Module::Generic::Exception){.perl-module}
+is set and `undef` is returned.
+
+However if an error occurs while operating in an `lvalue` assigned
+context, such as:
+
+        $obj->name = 'Peter';
+
+Then, to check if there was an error, you could do:
+
+        if( $obj->error )
+        {
+            # Do something here
+        }
+
+If the `fatal` option is set to true, then it would simply die instead.
+
+Supported options are:
+
+-   `fatal`
+
+    Boolean. If true, this will result in any exception becoming fatal
+    and thus die.
+
+-   `field`
+
+    The name of the object field for which this helper method is used.
+    This is optional.
+
+-   `get`
+
+    The accessor subroutine reference or anonymous subroutine that will
+    handle retrieving data.
+
+    This is a mandatory option and this support method will die if this
+    is not provided.
+
+    It will be passed the current object, and return whatever is
+    returned in list context, or in any other context, the first value
+    that this callback would return.
+
+    Also the special variable `$_` will be available and contain the
+    call context.
+
+-   `set`
+
+    The mutator subroutine reference or anonymous subroutine that will
+    handle storing data.
+
+    This is an optional option. This means you can set only an accessor
+    `get` callback without specifying a mutator `set` callback.
+
+    It will be passed the current object, and the list of arguments. If
+    the method is used as a regular method, as opposed to an lvalue
+    subroutine, then multiple arguments may be passed:
+
+            $obj->colours( qw( blue orange ) );
+
+    but, if used as an `lvalue` method, of course, only one argument
+    will be available:
+
+            $obj->name = 'John';
+
+    Also the special variable `$_` will be available and contain the
+    call context.
+
+    The value returned is passed back to the caller.
+
+The `context` provided with the special variable `$_` inside the
+callback may have the following properties:
+
+-   `assign`
+
+    This is true when the call context is an `lvalue` subroutine to
+    which a value is being assigned, such as:
+
+            $obj->name = 'John';
+
+-   `boolean`
+
+    This is true when the call context is a boolean, such as:
+
+            if( $obj->active )
+            {
+                # Do something
+            }
+
+-   `code`
+
+    This is true when the call context is a code reference, such as:
+
+            $obj->my_callback->();
+
+-   `count`
+
+    Contains the number of arguments expected by the caller. This is
+    especially interesting when in list context.
+
+-   `glob`
+
+    This is true when the call context is a glob.
+
+-   `hash`
+
+    This is true when the call context is an hash reference, such as:
+
+            $obj->meta({ client_id => 1234567 });
+            my $id = $obj->meta->{client_id};
+
+-   `list`
+
+    This is true when the call context is a list, such as:
+
+            my @colours = $obj->colours;
+
+-   `lvalue`
+
+    This is true when the call context is an `lvalue` subroutine, such
+    as:
+
+            $obj->name = 'John';
+
+-   `object`
+
+    This is true when the call context is an object, such as:
+
+            $obj->something->another_method();
+
+-   `refscalar`
+
+            my $name = ${$obj->name};
+
+-   `rvalue`
+
+    This is true when the call context is from the right-hand side.
+
+            my $name = $obj->name;
+
+-   `scalar`
+
+    This is true when the call context is a scalar:
+
+            my $name = $obj->name;
+            say $name; # John
+
+-   `void`
+
+    This is true when the call context is void, such as:
+
+            $obj->pointless();
+
+See also [Want](https://metacpan.org/pod/Want){.perl-module} for more on
+this context-rich information.
 
 \_set\_get\_class
 -----------------
@@ -2671,9 +2909,25 @@ call the value using
 \_set\_get\_object
 ------------------
 
+        sub myobject { return( shift->_set_get_object({ field => 'myobject', no_init => 1 }, My::Class, @_ ) ); }
+
+        sub myobject { return( shift->_set_get_object( 'myobject', My::Class, @_ ) ); }
+
 Provided with an object property name, a class/package name and some
 data and this will initiate a new object of the given class passing it
 the data.
+
+The property name can also be an hash reference that will be used to
+provide more granular settings:
+
+`field`
+
+:   The actual property name
+
+`no_init`
+
+:   Boolean that, when set, instruct to not instantiate a class object
+    if one is not instantiated yet.
 
 If you pass an undefined value, it will set the property as undefined,
 removing whatever was set before.
@@ -3129,7 +3383,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555acd7fd000)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5608019aecd0)"}\>
 
 COPYRIGHT & LICENSE
 ===================

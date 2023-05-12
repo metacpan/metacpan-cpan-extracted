@@ -1,3 +1,8 @@
+0.096   2023-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add POD link example to manpage.
+
+
 0.095   2020-03-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Add Synopsis in Perl::Examples::POD::Link.

@@ -37,26 +37,55 @@ sub init
 }
 
 # Note: property text
-sub text : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub text : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
+        my $self = shift( @_ );
+        if( !$self->{_title_text} || $self->_is_reset )
         {
-            $arg = shift( @_ );
-            $has_arg++;
+            # We set this boolean to true to indicate we have not yet looked into the text inside the <title></title>
+            # The HTML::Parser sets the title value to anything within <title></title> no matter if there are any tag embedded, so we need to parse it further, but only once, hence this boolean value
+            if( $self->{_initial_text} )
+            {
+                my $children = $self->children;
+                my $val;
+                $val = $self->as_text;
+                if( $self->looks_like_it_has_html( "$val" ) )
+                {
+                    my $p = $self->new_parser;
+                    my $doc = $p->parse_data( $val );
+                    my $kids = $doc->children;
+                    $_->parent( $self ) for( @$kids );
+                    $children->set( $kids );
+                }
+                else
+                {
+                }
+                CORE::delete( $self->{_initial_text} );
+            }
+    
+            my $result = $self->new_array;
+            # We purposively skip anything that is neither a space nor a text.
+            # This is what web browser do, notwithstanding any tag that may exist in the <title> tag
+            $self->children->foreach(sub
+            {
+                if( $self->_is_a( $_ => 'HTML::Object::DOM::Text' ) ||
+                    $self->_is_a( $_ => 'HTML::Object::DOM::Space' ) )
+                {
+                    my $v = $_->value;
+                    $result->push( "$v" );
+                }
+            });
+            $self->{_title_text} = $result->join( '' )->scalar;
+            $self->_remove_reset;
         }
-    }
-    if( $has_arg )
+        my $text = $self->{_title_text};
+        return( $text );
+    },
+    set => sub
     {
+        my $self = shift( @_ );
+        my $arg = shift( @_ );
         my $nodes = $self->_get_from_list_of_elements_or_html( $arg );
 #         for( my $i = 0; $i < scalar( @$nodes ); $i++ )
 #         {
@@ -64,13 +93,7 @@ sub text : lvalue
         
         if( !defined( $nodes ) )
         {
-            if( $has_arg eq 'assign' )
-            {
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->pass_error ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->pass_error );
+            return( $self->pass_error );
         }
         my $ok = 1;
         for( @$nodes )
@@ -83,65 +106,15 @@ sub text : lvalue
         }
         if( !$ok )
         {
-            my $error = 'Values provided for title text contains data other tan text or space. You can provide text, space including HTML::Object::DOM::Text and HTML::Object::DOM::Space objects';
-            if( $has_arg eq 'assign' )
-            {
-                my $dummy = '';
-                $self->error( $error );
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->error( $error ) );
+            return( $self->error( 'Values provided for title text contains data other tan text or space. You can provide text, space including HTML::Object::DOM::Text and HTML::Object::DOM::Space objects' ) );
         }
         $_->parent( $self ) for( @$nodes );
         my $children = $self->children;
         $children->set( $nodes );
         $self->reset(1);
-        my $dummy = 'dummy';
-        return( $dummy ) if( $has_arg eq 'assign' );
+        return(1);
     }
-    if( !$self->{_title_text} || $self->_is_reset )
-    {
-        # We set this boolean to true to indicate we have not yet looked into the text inside the <title></title>
-        # The HTML::Parser sets the title value to anything within <title></title> no matter if there are any tag embedded, so we need to parse it further, but only once, hence this boolean value
-        if( $self->{_initial_text} )
-        {
-            my $children = $self->children;
-            my $val;
-            $val = $self->as_text;
-            if( $self->looks_like_it_has_html( "$val" ) )
-            {
-                my $p = $self->new_parser;
-                my $doc = $p->parse_data( $val );
-                my $kids = $doc->children;
-                $_->parent( $self ) for( @$kids );
-                $children->set( $kids );
-            }
-            else
-            {
-            }
-            CORE::delete( $self->{_initial_text} );
-        }
-    
-        my $result = $self->new_array;
-        # We purposively skip anything that is neither a space nor a text.
-        # This is what web browser do, notwithstanding any tag that may exist in the <title> tag
-        $self->children->foreach(sub
-        {
-            if( $self->_is_a( $_ => 'HTML::Object::DOM::Text' ) ||
-                $self->_is_a( $_ => 'HTML::Object::DOM::Space' ) )
-            {
-                my $v = $_->value;
-                $result->push( "$v" );
-            }
-        });
-        $self->{_title_text} = $result->join( '' )->scalar;
-        $self->_remove_reset;
-    }
-    my $text = $self->{_title_text};
-    return( $text ) if( want( 'LVALUE' ) );
-    Want::rreturn( $text );
-}
+}, @_ ) ); }
 
 1;
 # NOTE: POD

@@ -5,7 +5,7 @@ use warnings;
 
 use App::HL7::Dump;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Run.
 exit App::HL7::Dump->new->run;
@@ -61,7 +61,7 @@ hl7dump - Script to dump hl7 file message.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-HL7-Dump>
+L<https://github.com/michal-josef-spacek/App-HL7-Dump>
 
 =head1 AUTHOR
 
@@ -71,12 +71,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2016-2022 Michal Josef Špaček
+© 2016-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

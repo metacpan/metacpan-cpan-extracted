@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.29.5
+## Version v0.29.6
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2023/02/25
+## Modified 2023/04/17
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.29.5';
+    our $VERSION     = 'v0.29.6';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -991,7 +991,7 @@ sub error
                 $r->warn( $o->as_string ) if( $should_display_warning );
             }
         }
-        elsif( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
+        elsif( $this->{fatal} || $args->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
         {
             # my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
             # die( $@ ? $o : $enc_str );
@@ -1030,6 +1030,12 @@ sub error
             }
         }
         
+        # When used inside an lvalue method
+        if( $args->{lvalue} && $args->{assign} )
+        {
+            my $dummy = 'dummy';
+            return( $dummy );
+        }
         # https://metacpan.org/pod/Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef
         # https://perlmonks.org/index.pl?node_id=741847
         # Because in list context this would create a lit with one element undef()
@@ -1040,11 +1046,15 @@ sub error
         # 2020-05-12: Added the no_return_null_object to instruct not to return a null object
         # This is especially needed when an error is called from TIEHASH that returns a special object.
         # A Null object would trigger a fatal perl segmentation fault
-        if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
+        elsif( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
             require Module::Generic::Null;
             my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1 });
             rreturn( $null );
+        }
+        elsif( $args->{lvalue} && want( 'RVALUE' ) )
+        {
+            rreturn;
         }
         return;
     }
@@ -1347,7 +1357,7 @@ sub message
         }
         else
         {
-            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : ( $_ // '' ), @$ref ) );
+            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} && !$opts->{no_exec} ) ? $_->() : ( $_ // '' ), @$ref ) );
         }
         # Reset it
         $this->{_msg_no_exec_sub} = 0;
@@ -1772,7 +1782,7 @@ sub noexec { $_[0]->{_msg_no_exec_sub} = 1; return( $_[0] ); }
 # $self->pass_error
 # $self->pass_error( 'Some error that will be passed to error()' );
 # $self->pass_error( $error_object );
-# $self->pass_error( $error_object, { class => 'Some::ExceptionClass' } );
+# $self->pass_error( $error_object, { class => 'Some::ExceptionClass', code => 400 } );
 # $self->pass_error({ class => 'Some::ExceptionClass' });
 sub pass_error
 {
@@ -1782,6 +1792,7 @@ sub pass_error
     my $opts = {};
     my $err;
     my $class;
+    my $code;
     no strict 'refs';
     if( scalar( @_ ) )
     {
@@ -1802,7 +1813,9 @@ sub pass_error
         }
     }
     # We set $class only if the hash provided is a one-element hash and not an error-defining hash
-    $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
+    # $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
+    $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
     
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
@@ -1817,6 +1830,7 @@ sub pass_error
         else
         {
             $err = ( defined( $class ) ? bless( $error => $class ) : $error );
+            $err->code( $code ) if( defined( $code ) );
         }
     }
     elsif( defined( $err ) && 
@@ -1826,6 +1840,7 @@ sub pass_error
            ) )
     {
         $this->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        $this->{error}->code( $code ) if( defined( $code ) );
         if( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
         {
             die( $this->{error} );
@@ -2228,7 +2243,18 @@ sub _can
     return if( !scalar( @_ ) );
     return if( !defined( $_[0] ) );
     return if( !Scalar::Util::blessed( $_[0] ) );
-    return( $_[0]->can( $_[1] ) );
+    if( $self->_is_array( $_[1] ) )
+    {
+        foreach my $meth ( @{$_[1]} )
+        {
+            return(0) unless( $_[0]->can( $meth ) );
+        }
+        return(1);
+    }
+    else
+    {
+        return( $_[0]->can( $_[1] ) );
+    }
 }
 
 sub _get_args_as_array
@@ -2375,6 +2401,17 @@ sub _is_a
     }
 }
 
+# UNIVERSAL::isa works for both array or array as objects
+# sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
+sub _is_array
+{
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'ARRAY' );
+}
+
 sub _is_class_loadable
 {
     my $self = shift( @_ );
@@ -2435,17 +2472,6 @@ sub _is_class_loaded
         # For inline package
         # return( scalar( keys( %{"${class}\::"} ) ) ? 1 : 0 );
     }
-}
-
-# UNIVERSAL::isa works for both array or array as objects
-# sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
-sub _is_array
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    my $type = Scalar::Util::reftype( $_[1] );
-    return(0) if( !defined( $type ) );
-    return( $type eq 'ARRAY' );
 }
 
 sub _is_code
@@ -2529,6 +2555,8 @@ sub _is_uuid
     return( $_[1] =~ /^[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12}$/ ? 1 : 0 );
 }
 
+sub _is_warnings_enabled { return( shift->_warnings_is_enabled( @_ ) ); }
+
 sub _load_class
 {
     my $self  = shift( @_ );
@@ -2571,6 +2599,8 @@ sub _load_classes
     }
     return( $self );
 }
+
+sub _lvalue : lvalue { return( shift->_set_get_callback( @_ ) ); }
 
 sub _obj2h
 {
@@ -3326,24 +3356,23 @@ sub _set_get_lvalue : lvalue
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        my( $a ) = want( 'ASSIGN' );
-        $data->{ $field } = $a;
-        # lnoreturn;
-        return( $data->{ $field } );
-    }
-    else
-    {
-        if( @_ )
+    return( $self->_set_get_callback({
+        get => sub
         {
+            my $self = shift( @_ );
+            return( $data->{ $field } );
+        },
+        set => sub
+        {
+            my $self = shift( @_ );
             @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-            $data->{ $field } = shift( @_ );
-        }
-        return( $data->{ $field } ) if( want( 'LVALUE' ) );
-        rreturn( $data->{ $field } );
-    }
-    return;
+            my $val  = shift( @_ );
+            $data->{ $field } = $val;
+            # lnoreturn;
+            return( $data->{ $field } );
+        },
+        field => $field,
+    }, @_ ) );
 }
 
 sub _set_get_number : lvalue
@@ -3541,6 +3570,16 @@ sub _set_get_object
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     no overloading;
+
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object" ) ) if( !length( $field // '' ) );
+    }
+    
+    # Parameters are provided to instantiate the object
     if( @_ )
     {
         if( scalar( @_ ) == 1 )
@@ -3589,6 +3628,10 @@ sub _set_get_object
                 $data->{ $field } = $o;
             }
         }
+        elsif( $def->{no_init} && !$data->{ $field } )
+        {
+            # We do nothing
+        }
         else
         {
             $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
@@ -3616,20 +3659,29 @@ sub _set_get_object
     # we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
-        $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-        my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+        if( $def->{no_init} )
         {
-            if( $class->can( 'error' ) )
+            require Module::Generic::Null;
+            my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
+            return( $null );
+        }
+        else
+        {
+            $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
+            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
             {
-                return( $self->pass_error( $class->error ) );
-            }
-            else
-            {
-                return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
-            }
-        };
-        $data->{ $field } = $o;
-        return( $o );
+                if( $class->can( 'error' ) )
+                {
+                    return( $self->pass_error( $class->error ) );
+                }
+                else
+                {
+                    return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
+                }
+            };
+            $data->{ $field } = $o;
+            return( $o );
+        }        
     }
     return( $data->{ $field } );
 }
@@ -3768,6 +3820,7 @@ sub _set_get_object_without_init
             }
             else
             {
+                # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
                 my $o = $self->_instantiate_object( $field, $class, @_ ) || do
                 {
                     if( $class->can( 'error' ) )
@@ -3784,6 +3837,7 @@ sub _set_get_object_without_init
         }
         else
         {
+            # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
             my $o = $self->_instantiate_object( $field, $class, @_ ) || do
             {
                 if( $class->can( 'error' ) )
@@ -6152,61 +6206,6 @@ sub _implement_freeze_thaw
     }
 }
 PERL
-    # NOTE: _lvalue()
-    _lvalue => <<'PERL',
-sub _lvalue : lvalue
-{
-    my $self = shift( @_ );
-    my $def  = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $arg = [ $arg ];
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = [@_];
-            $has_arg++;
-        }
-    }
-    
-    if( $has_arg && CORE::exists( $def->{set} ) && ref( $def->{set} ) eq 'CODE' )
-    {
-        my $code = $def->{set};
-        my $rv = $code->( $self, $arg );
-        if( !defined( $rv ) )
-        {
-            if( $has_arg eq 'assign' )
-            {
-                my $dummy = '';
-                return( $dummy );
-            }
-            return if( want( 'LVALUE' ) );
-            rreturn;
-        }
-        return( $rv ) if( want( 'LVALUE' ) );
-        rreturn( $rv );
-    }
-    else
-    {
-        if( CORE::exists( $def->{get} ) && ref( $def->{get} ) eq 'CODE' )
-        {
-            if( want( 'LVALUE' ) )
-            {
-                return( $def->{get}->( $self ) );
-            }
-            rreturn( $def->{get}->( $self ) );
-        }
-        # lnoreturn;
-        return;
-    }
-}
-PERL
     # NOTE: _parse_timestamp()
     _parse_timestamp => <<'PERL',
 # Ref:
@@ -6828,6 +6827,260 @@ sub _parse_timestamp
     }
 }
 PERL
+    # NOTE: _set_get_callback()
+    _set_get_callback => <<'PERL',
+sub _set_get_callback : lvalue
+{
+    my $self = shift( @_ );
+    my $def  = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my( $getter, $setter, $field ) = @$def{qw( get set field )};
+    if( defined( $getter ) )
+    {
+        die( "Getter code value provided is actually not a code reference." ) if( ref( $getter ) ne 'CODE' );
+    }
+    else
+    {
+        $getter = sub{};
+    }
+    
+    if( defined( $setter ) )
+    {
+        die( "Setter code value provided is actually not a code reference." ) if( ref( $setter ) ne 'CODE' );
+    }
+    else
+    {
+        $setter = sub{};
+    }
+    die( "Field value specified is empty." ) if( defined( $field ) && !CORE::length( "$field" ) );
+    my $context = {};
+    my $args;
+    my @rv;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        $args = [want( 'ASSIGN' )];
+        $context->{assign}++;
+        $context->{lvalue}++;
+    }
+    else
+    {
+        if( @_ )
+        {
+            $args = [@_];
+        }
+        
+        if( want( 'LVALUE' ) )
+        {
+            $context->{lvalue}++;
+        }
+        elsif( want( 'RVALUE' ) )
+        {
+            $context->{rvalue}++;
+        }
+        
+        my $expect = Want::want( 'LIST' )
+            ? 'LIST'
+            : Want::want( 'HASH' )
+                ? 'HASH'
+                : Want::want( 'ARRAY' )
+                    ? 'ARRAY'
+                    : Want::want( 'OBJECT' )
+                        ? 'OBJECT'
+                        : Want::want( 'CODE' )
+                            ? 'CODE'
+                            : Want::want( 'REFSCALAR' )
+                                ? 'REFSCALAR'
+                                : Want::want( 'BOOL' )
+                                    ? 'BOOLEAN'
+                                    : Want::want( 'GLOB' )
+                                        ? 'GLOB'
+                                        : Want::want( 'SCALAR' )
+                                            ? 'SCALAR'
+                                            : Want::want( 'VOID' )
+                                                ? 'VOID'
+                                                : '';
+        $context->{ lc( $expect ) }++ if( length( $expect ) );
+        $context->{count} = Want::want( 'COUNT' );
+    }
+    
+    if( scalar( @$args ) )
+    {
+        try
+        {
+            local $_ = $context;
+            if( $context->{list} )
+            {
+                @rv = $setter->( $self, @$args );
+            }
+            else
+            {
+                $rv[0] = $setter->( $self, @$args );
+            }
+        }
+        catch( $e )
+        {
+            $context->{error} = $e;
+        }
+        
+        if( !$context->{error} && 
+            !scalar( @rv ) && 
+            ( my $has_error = $self->error ) )
+        {
+            if( $context->{assign} )
+            {
+                $data->{__lvalue_error} = undef;
+                return( $data->{__lvalue_error} );
+            }
+            else
+            {
+                return( $self->pass_error );
+            }
+        }
+        elsif( $context->{error} )
+        {
+            if( $context->{assign} )
+            {
+                if( $def->{fatal} )
+                {
+                    $self->error( { message => $context->{error}, fatal => 1 } );
+                }
+                else
+                {
+                    $self->error( $context->{error} );
+                    # lnoreturn;
+                    $data->{__lvalue_error} = undef;
+                    return( $data->{__lvalue_error} );
+                }
+            }
+            else
+            {
+                rreturn( $self->error( $context->{error}, $context ) );
+            }
+            return;
+        }
+        else
+        {
+            if( $context->{assign} )
+            {
+                if( defined( $field ) )
+                {
+                    return( $data->{ $field } );
+                }
+                else
+                {
+                    return( $data->{__lvalue} = $rv[0] );
+                }
+            }
+            elsif( $context->{list} )
+            {
+                return( @rv );
+            }
+            elsif( $context->{lvalue} )
+            {
+                if( !$rv[0] && $context->{object} )
+                {
+                    require Module::Generic::Null;
+                    return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( $context->{lvalue} );
+                }
+                return( $rv[0] );
+            }
+            else
+            {
+                if( !$rv[0] && $context->{object} )
+                {
+                    require Module::Generic::Null;
+                    rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+                }
+                rreturn( $rv[0] );
+            }
+            return;
+        }
+    }
+    
+    try
+    {
+        local $_ = $context;
+        if( $context->{list} )
+        {
+            @rv = $getter->( $self );
+        }
+        else
+        {
+            $rv[0] = $getter->( $self );
+        }
+    }
+    catch( $e )
+    {
+        $context->{error} = $e;
+    }
+    
+    if( !$context->{error} && 
+        !scalar( @rv ) && 
+        ( my $has_error = $self->error ) )
+    {
+        if( $context->{rvalue} )
+        {
+            rreturn( $self->error( $context->{error} ) );
+        }
+        else
+        {
+            return( $self->error( $context->{error} ) );
+        }
+    }
+    elsif( $context->{error} )
+    {
+        if( $def->{fatal} )
+        {
+            $self->error({ message => $context->{error}, fatal => 1 });
+        }
+        elsif( $context->{rvalue} )
+        {
+            rreturn( $self->error( $context->{error} ) );
+        }
+        else
+        {
+            return( $self->error( $context->{error} ) );
+        }
+    }
+    else
+    {
+        if( $context->{rvalue} )
+        {
+            if( $context->{list} )
+            {
+                rreturn( @rv );
+            }
+            else
+            {
+                if( !$rv[0] && $context->{object} )
+                {
+                    require Module::Generic::Null;
+                    rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+                }
+                rreturn( $rv[0] );
+            }
+        }
+        else
+        {
+            if( $context->{list} )
+            {
+                return( @rv );
+            }
+            else
+            {
+                if( !$rv[0] && $context->{object} )
+                {
+                    require Module::Generic::Null;
+                    return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+                }
+                return( $rv[0] );
+            }
+        }
+    }
+    return;
+}
+PERL
     # NOTE: _set_get_datetime()
     _set_get_datetime => <<'PERL',
 sub _set_get_datetime : lvalue
@@ -7160,7 +7413,7 @@ sub VERBOSE
 }
 
 # NOTE:: AUTOLOAD
-AUTOLOAD
+sub AUTOLOAD : lvalue
 {
     my $self;
     $self = shift( @_ ) if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic' ) );
@@ -7488,7 +7741,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.29.5
+    v0.29.6
 
 =head1 DESCRIPTION
 
@@ -8308,6 +8561,24 @@ Then :
 
 Which would return the http client error that has been passed along
 
+You can optionally provide an hash of parameters as the last argument, such as:
+
+    return( $self->pass_error( $obj->error, { class => 'My::Exception', code => 400 } ) );
+
+Supported options are:
+
+=over 4
+
+=item C<class>
+
+The name of a class name to re-bless the error object provided.
+
+=item C<code>
+
+The error code to set in the error object being passed.
+
+=back
+
 =head2 quiet
 
 Set or get the object property I<quiet> to true or false. If this is true, no warning will be issued when L</"error"> is called.
@@ -8464,21 +8735,50 @@ not exist and could not be found in the current class.
 
 Those methods are designed to be called from the package inheriting from L<Module::Generic> to perform various function and speed up development.
 
+=head2 __create_class
+
+Provided with an object property name and an hash reference representing a dictionary and this will produce a dynamically created class/module.
+
+If a property I<_class> exists in the dictionary, it will be used as the class/package name, otherwise a name will be derived from the calling object class and the object property name. For example, in your module :
+
+    sub products { return( 'products', shift->_set_get_class(
+    {
+    name        => { type => 'scalar' },
+    customer    => { type => 'object', class => 'My::Customer' },
+    orders      => { type => 'array_as_object' },
+    active      => { type => 'boolean' },
+    created     => { type => 'datetime' },
+    metadata    => { type => 'hash' },
+    stock       => { type => 'number' },
+    url         => { type => 'uri' },
+    }, @_ ) ); }
+
+Then calling your module method B<products> such as :
+
+    my $prod = $object->products({
+        name => 'Cool product',
+        customer => { first_name => 'John', last_name => 'Doe', email => 'john.doe@example.com' },
+        orders => [qw( 123 987 456 654 )],
+        active => 1,
+        metadata => { transaction_id => 123, api_call_id => 456 },
+        stock => 10,
+        uri => 'https://example.com/p/20'
+    });
+
+Using the resulting object C<$prod>, we can access this dynamically created class/module such as :
+
+    printf( <<EOT, $prod->name, $prod->orders->length, $prod->customer->last_name,, $prod->url->path )
+    Product name: %s
+    No of orders: %d
+    Customer name: %s
+    Product page path: %s
+    EOT
+
 =head2 __instantiate_object
 
 Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using L<Class::Load/"load_class">. Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an L</"error">
 
 This is a support method used by L</"_instantiate_object">
-
-=head2 _has_base64
-
-Provided with a value and this returns an array reference containing 2 code references: one for encoding and one for decoding.
-
-Value provided can be a simple true value, such as C<1>, and then C<_has_base64> will check if L<Crypt::Misc> and L<MIME::Base64> are installed on the system and will use in priority L<MIME::Base64>
-
-The value provided can also be an array reference already containing 2 code references, and in such case, that value is simply returned. Nothing more is done.
-
-Finally, the value provided can be a module class name. C<_has_base64> knows only of L<Crypt::Misc> and L<MIME::Base64>, so if you want to use any other one, arrange yourself to pass to C<_has_base64> an array reference of 2 code references as explained above.
 
 =head2 _instantiate_object
 
@@ -8488,9 +8788,18 @@ This does the same thing as L</"__instantiate_object"> and the purpose is for th
 
 Provided with a value and a method name, and this will return true if the value provided is an object that L<UNIVERSAL/can> perform the method specified, or false otherwise.
 
+You can also provide an array of method names to check instead of just a method name. In that case, all method names provided must be supported by the object otherwise it will return false.
+
 This makes it more convenient to write:
 
     if( $self->_can( $obj, 'some_method' ) )
+    {
+        # ...
+    }
+
+or
+
+    if( $self->_can( $obj, [qw(some_method other_method )] ) )
     {
         # ...
     }
@@ -8587,6 +8896,16 @@ This will set an initial indent tab
 This is set to 1 so this very method is not included in the frames stack
 
 =back
+
+=head2 _has_base64
+
+Provided with a value and this returns an array reference containing 2 code references: one for encoding and one for decoding.
+
+Value provided can be a simple true value, such as C<1>, and then C<_has_base64> will check if L<Crypt::Misc> and L<MIME::Base64> are installed on the system and will use in priority L<MIME::Base64>
+
+The value provided can also be an array reference already containing 2 code references, and in such case, that value is simply returned. Nothing more is done.
+
+Finally, the value provided can be a module class name. C<_has_base64> knows only of L<Crypt::Misc> and L<MIME::Base64>, so if you want to use any other one, arrange yourself to pass to C<_has_base64> an array reference of 2 code references as explained above.
 
 =head2 _implement_freeze_thaw
 
@@ -8756,72 +9075,7 @@ If one of those classes failed to load, it will return immediately after setting
 
 This provides a generic L<lvalue|perlsub> method that can be used both in assign context or lvalue context.
 
-You only need to specify a setter and getter callback.
-
-This takes an hash reference having either of the following properties:
-
-=over 4
-
-=item I<get>
-
-A code reference that will be called, passing it the module object. It takes whatever value is returned and returns it to the caller.
-
-=item I<set>
-
-A code reference that will be called when values were provided either in assign or regular method context:
-
-    my $now = DateTime->now;
-    $o->datetime = $now;
-    # or
-    $o->datetime( $now );
-
-=back
-
-For example, in your module:
-
-    sub datetime : lvalue { return( shift->_lvalue({
-        set => sub
-        {
-            my( $self, $args ) = @_;
-            if( $self->_is_a( $args->[0] => 'DateTime' ) )
-            {
-                return( $self->{datetime} = shift( @$args ) );
-            }
-            else
-            {
-                return( $self->error( "Value provided is not a datetime." ) );
-            }
-        },
-        get => sub
-        {
-            my $self = shift( @_ );
-            my $dt = $self->{datetime};
-            return( $dt );
-        }
-    }, @_ ) ); }
-    # ^^^^
-    # Don't forget the @_ !
-
-Be mindful that even if the setter callback returns C<undef> in case of an error, perl does not permit C<undef> to be returned from an lvalue method, and besides the return value in assign context is useless anyway:
-
-    my $dt = $o->datetime = DateTime->now;
-
-If you want to check if assignment worked, you should opt to make error fatal and catch exceptions, such as:
-
-    $o->fatal(1);
-    try
-    {
-        $o->datetime = $not_a_datetime_object;
-    }
-    catch( $e )
-    {
-        die( "You provided a non DateTime object!: $e\n" );
-    }
-
-or you can check if an error was set:
-
-    $o->datetime = $not_a_datetime_object;
-    die( "Did not work: ", $o->error ) if( $o->error );
+As of version C<0.29.6>, this is an alias for L</_set_get_callback>, which provides more extensive features.
 
 =head2 _obj2h
 
@@ -9040,44 +9294,196 @@ For example:
 
 The value of the callback can be either a subroutine name or a code reference.
 
-=head2 __create_class
+=head2 _set_get_callback
 
-Provided with an object property name and an hash reference representing a dictionary and this will produce a dynamically created class/module.
-
-If a property I<_class> exists in the dictionary, it will be used as the class/package name, otherwise a name will be derived from the calling object class and the object property name. For example, in your module :
-
-    sub products { return( 'products', shift->_set_get_class(
-    {
-    name        => { type => 'scalar' },
-    customer    => { type => 'object', class => 'My::Customer' },
-    orders      => { type => 'array_as_object' },
-    active      => { type => 'boolean' },
-    created     => { type => 'datetime' },
-    metadata    => { type => 'hash' },
-    stock       => { type => 'number' },
-    url         => { type => 'uri' },
+    sub name : lvalue { return( shift->_set_get_callback({
+        get => sub
+        {
+            my $self = shift( @_ );
+            # The context hash is available with $_
+            if( $_->{list} )
+            {
+                return( @{$self->{name}} );
+            }
+            else
+            {
+                return( $self->{name} );
+            }
+        },
+        set => sub
+        {
+            my $self = shift( @_ );
+            $self->message( 1, "Got here for 'name' in setter callback" );
+            return( $self->{name} = shift( @_ ) );
+        },
+        field => 'name'
     }, @_ ) ); }
+    # ^^^^
+    # Don't forget the @_ !
 
-Then calling your module method B<products> such as :
+Then, it can be called indifferently as:
 
-    my $prod = $object->products({
-        name => 'Cool product',
-        customer => { first_name => 'John', last_name => 'Doe', email => 'john.doe@example.com' },
-        orders => [qw( 123 987 456 654 )],
-        active => 1,
-        metadata => { transaction_id => 123, api_call_id => 456 },
-        stock => 10,
-        uri => 'https://example.com/p/20'
-    });
+    my $rv = $obj->name( 'John' );
+    # $rv is John
+    $rv = $obj->name;
+    # $rv is John
+    $obj->name = 'Peter';
+    $rv = $obj->name;
+    # $rv is Peter
 
-Using the resulting object C<$prod>, we can access this dynamically created class/module such as :
+    $obj->colours( qw( orange blue ) );
+    my @colours = $obj->colours;
+    # returns a list of colours orange and blue
+    my $colour = $obj->colours;
+    # $colour is 'orange'
 
-    printf( <<EOT, $prod->name, $prod->orders->length, $prod->customer->last_name,, $prod->url->path )
-    Product name: %s
-    No of orders: %d
-    Customer name: %s
-    Product page path: %s
-    EOT
+Given an hash reference of parameters, and this support method will call the accessor C<get> callback or mutator C<set> callback depending on whether any arguments were provided.
+
+This support method supports C<lvalue> methods as described in L<perlfunc/"Lvalue subroutines">
+
+It is similar as L<Sentinel>, but on steroid, since it handles exception, and provides context, which is often critical.
+
+If a fatal exception occurs in a callback, it is trapped using L<try-catch block|Nice::Try> and an L<error object|Module::Generic::Exception> is set and C<undef> is returned.
+
+However if an error occurs while operating in an C<lvalue> assigned context, such as:
+
+    $obj->name = 'Peter';
+
+Then, to check if there was an error, you could do:
+
+    if( $obj->error )
+    {
+        # Do something here
+    }
+
+If the C<fatal> option is set to true, then it would simply die instead.
+
+Supported options are:
+
+=over 4
+
+=item * C<fatal>
+
+Boolean. If true, this will result in any exception becoming fatal and thus die.
+
+=item * C<field>
+
+The name of the object field for which this helper method is used. This is optional.
+
+=item * C<get>
+
+The accessor subroutine reference or anonymous subroutine that will handle retrieving data.
+
+This is a mandatory option and this support method will die if this is not provided.
+
+It will be passed the current object, and return whatever is returned in list context, or in any other context, the first value that this callback would return.
+
+Also the special variable C<$_> will be available and contain the call context.
+
+=item * C<set>
+
+The mutator subroutine reference or anonymous subroutine that will handle storing data.
+
+This is an optional option. This means you can set only an accessor C<get> callback without specifying a mutator C<set> callback.
+
+It will be passed the current object, and the list of arguments. If the method is used as a regular method, as opposed to an lvalue subroutine, then multiple arguments may be passed:
+
+    $obj->colours( qw( blue orange ) );
+
+but, if used as an C<lvalue> method, of course, only one argument will be available:
+
+    $obj->name = 'John';
+
+Also the special variable C<$_> will be available and contain the call context.
+
+The value returned is passed back to the caller.
+
+=back
+
+The C<context> provided with the special variable C<$_> inside the callback may have the following properties:
+
+=over 4
+
+=item * C<assign>
+
+This is true when the call context is an C<lvalue> subroutine to which a value is being assigned, such as:
+
+    $obj->name = 'John';
+
+=item * C<boolean>
+
+This is true when the call context is a boolean, such as:
+
+    if( $obj->active )
+    {
+        # Do something
+    }
+
+=item * C<code>
+
+This is true when the call context is a code reference, such as:
+
+    $obj->my_callback->();
+
+=item * C<count>
+
+Contains the number of arguments expected by the caller. This is especially interesting when in list context.
+
+=item * C<glob>
+
+This is true when the call context is a glob.
+
+=item * C<hash>
+
+This is true when the call context is an hash reference, such as:
+
+    $obj->meta({ client_id => 1234567 });
+    my $id = $obj->meta->{client_id};
+
+=item * C<list>
+
+This is true when the call context is a list, such as:
+
+    my @colours = $obj->colours;
+
+=item * C<lvalue>
+
+This is true when the call context is an C<lvalue> subroutine, such as:
+
+    $obj->name = 'John';
+
+=item * C<object>
+
+This is true when the call context is an object, such as:
+
+    $obj->something->another_method();
+
+=item * C<refscalar>
+
+    my $name = ${$obj->name};
+
+=item * C<rvalue>
+
+This is true when the call context is from the right-hand side.
+
+    my $name = $obj->name;
+
+=item * C<scalar>
+
+This is true when the call context is a scalar:
+
+    my $name = $obj->name;
+    say $name; # John
+
+=item * C<void>
+
+This is true when the call context is void, such as:
+
+    $obj->pointless();
+
+=back
+
+See also L<Want> for more on this context-rich information.
 
 =head2 _set_get_class
 
@@ -9353,7 +9759,25 @@ Provided with an object property name and a number or an object and this call th
 
 =head2 _set_get_object
 
+    sub myobject { return( shift->_set_get_object({ field => 'myobject', no_init => 1 }, My::Class, @_ ) ); }
+
+    sub myobject { return( shift->_set_get_object( 'myobject', My::Class, @_ ) ); }
+
 Provided with an object property name, a class/package name and some data and this will initiate a new object of the given class passing it the data.
+
+The property name can also be an hash reference that will be used to provide more granular settings:
+
+=over 4
+
+=item C<field>
+
+The actual property name
+
+=item C<no_init>
+
+Boolean that, when set, instruct to not instantiate a class object if one is not instantiated yet.
+
+=back
 
 If you pass an undefined value, it will set the property as undefined, removing whatever was set before.
 

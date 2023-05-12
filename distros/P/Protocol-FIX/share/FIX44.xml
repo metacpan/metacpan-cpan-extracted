@@ -781,6 +781,7 @@
   </message>
   <message name='MarketDataIncrementalRefresh' msgtype='X' msgcat='app'>
    <field name='MDReqID' required='N' />
+   <component name='Instrument' required='Y' />
    <component name='MDIncGrp' required='Y' />
    <field name='ApplQueueDepth' required='N' />
    <field name='ApplQueueResolution' required='N' />

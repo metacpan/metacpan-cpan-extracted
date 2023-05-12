@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Perl;
 
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 use Scalar::Util qw/ blessed reftype /;
 
@@ -19,13 +19,15 @@ my $qr_prefix;
 sub new {
     my ($class, %args) = @_;
     my $tags = $args{tags} || [];
-    my $loadcode = $args{loadcode};
-    $loadcode ||= 0;
+    my $loadcode = $args{loadcode} || 0;
+    my $dumpcode = $args{dumpcode};
+    $dumpcode = 1 unless defined $dumpcode;
     my $classes = $args{classes};
 
     my $self = bless {
         tags => $tags,
         loadcode => $loadcode,
+        dumpcode => $dumpcode,
         classes => $classes,
     }, $class;
 }
@@ -36,11 +38,13 @@ sub register {
 
     my $tags;
     my $loadcode = 0;
+    my $dumpcode = 1;
     my $classes;
     if (blessed($self)) {
         $tags = $self->{tags};
         @$tags = ('!perl') unless @$tags;
         $loadcode = $self->{loadcode};
+        $dumpcode = $self->{dumpcode};
         $classes = $self->{classes};
     }
     else {
@@ -52,6 +56,9 @@ sub register {
             }
             elsif ($option eq '+loadcode') {
                 $loadcode = 1;
+            }
+            elsif ($option eq '-dumpcode') {
+                $dumpcode = 0;
             }
         }
         $tags = [split m/\+/, $tagtype];
@@ -358,7 +365,7 @@ sub register {
         code => sub {
             my ($rep, $node) = @_;
             $node->{tag} = $perl_tag . "/code";
-            $node->{data} = $self->represent_code($node->{value});
+            $node->{data} = $dumpcode ? $self->represent_code($node->{value}) : '{ "DUMMY" }';
         },
     );
     $schema->add_representer(
@@ -423,7 +430,7 @@ sub register {
             }
 
             elsif ($node->{reftype} eq 'CODE') {
-                $node->{data} = $self->represent_code($node->{value});
+                $node->{data} = $dumpcode ? $self->represent_code($node->{value}) : '{ "DUMMY" }';
             }
             elsif ($node->{reftype} eq 'GLOB') {
                 $node->{data} = $self->represent_glob($node->{value});
@@ -878,6 +885,7 @@ YAML:
         tags => "!perl",
         classes => ['MyClass'],
         loadcode => 1,
+        dumpcode => 1,
     );
 
 The constructor recognizes the following options:
@@ -901,6 +909,12 @@ Accepts an array ref of class names
 =item loadcode
 
 Default: 0
+
+=item dumpcode
+
+Default: 1
+
+    my $yp = YAML::PP->new( schema => [qw/ + Perl -dumpcode /] );
 
 =back
 

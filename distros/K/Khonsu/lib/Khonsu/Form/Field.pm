@@ -24,7 +24,7 @@ sub add {
 		$file->pdf->xo_form()
 	);
 
-	$self->SUPER::add($file, pad => '_', %args);
+	$self->SUPER::add($file, %args);
 
 	my $annotate = $self->annotate(
 		$file->page->current->annotation
@@ -36,7 +36,7 @@ sub add {
 	$annotate->{Subtype} = PDFName('Widget');
 	$annotate->{P} = $file->page->current;
 	$args{position} ||= \@pps;
-	$self->configure(%args) if $self->can('configure');
+	$self->configure($file, %args) if $self->can('configure');
 	$self->set_rect($file, %args);
 	$file->form->add_to_fields($file, $self->annotate);
 	return $file;

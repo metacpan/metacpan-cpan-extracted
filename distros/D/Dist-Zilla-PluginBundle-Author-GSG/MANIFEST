@@ -10,12 +10,14 @@ README
 cpanfile
 dist.ini
 lib/Dist/Zilla/Plugin/Author/GSG.pm
+lib/Dist/Zilla/Plugin/Author/GSG/HasVersionTests.pm
 lib/Dist/Zilla/PluginBundle/Author/GSG.pm
 share/CONTRIBUTING.md
 share/Makefile.inc
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/Dist-Zilla-Plugin-Author-GSG-HasVersionTests.t
 t/Dist-Zilla-Plugin-Author-GSG.t
 t/Dist-Zilla-PluginBundle-Author-GSG.t
 t/author-pod-coverage.t

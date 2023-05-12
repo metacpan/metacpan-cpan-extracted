@@ -105,7 +105,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.2.3
+    v1.3.0
 
 =head1 DESCRIPTION
 
@@ -168,7 +168,7 @@ Returns the hash object as a regular hash reference. It copies all the keys and 
 
 =head2 as_json
 
-Returns a json representation of the hash
+Returns a json representation of the hash by calling L</json>
 
 =head2 as_string
 
@@ -266,7 +266,17 @@ Returns true if the hash object contains no data, or false otherwise.
 
 =head2 json
 
-This returns a L<JSON> representation of the hash. You can provided optionally an hash reference of parameters. Currently, only one parameter is supported: I<pretty>, which will make the json result more human readable. With it enabled, you would get something like this :
+This returns a L<JSON> representation of the hash. You can provided optionally an hash reference of parameters.
+
+All parameters supported by L</JSON> can be used here.
+
+For example:
+
+    my $json = $h->json({ pretty => 1, canonical => 1 });
+    # pretty only will trigger canonical to be true
+    my $json = $h->json({ pretty => 1 });
+
+This would yield something like:
 
     {
     "age" : 30,
@@ -278,6 +288,14 @@ This returns a L<JSON> representation of the hash. You can provided optionally a
 Otherwise, you would get a more terse result, such as :
 
     {"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}
+
+When pretty is enabled, it will automatically also enable C<canonical>, C<indent> and C<relaxed> unless those are explicitly specified:
+
+    my $json = $h->json({ pretty => 1, canonical => 0 });
+
+For simplicity, you can also use, as alias to C<canonical>, C<sort>, C<sorted>, C<order> or C<ordered>
+
+It returns the JSON encoded data as a L<scalar object|Module::Generic::Scalar>
 
 =head2 keys
 

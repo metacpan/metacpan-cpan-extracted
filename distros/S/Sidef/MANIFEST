@@ -22,8 +22,6 @@ lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Optimizer.pm
 lib/Sidef/Parser.pm
-lib/Sidef/Perl/Perl.pm
-lib/Sidef/Perl/Perl.pod
 lib/Sidef/Sys/Sig.pm
 lib/Sidef/Sys/Sig.pod
 lib/Sidef/Sys/Sys.pm
@@ -86,6 +84,8 @@ lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
 lib/Sidef/Types/Number/Quaternion.pm
 lib/Sidef/Types/Number/Quaternion.pod
+lib/Sidef/Types/Perl/Perl.pm
+lib/Sidef/Types/Perl/Perl.pod
 lib/Sidef/Types/Range/Range.pm
 lib/Sidef/Types/Range/Range.pod
 lib/Sidef/Types/Range/RangeNumber.pm
@@ -224,6 +224,9 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/strong_fermat_with_n_factors.sf'
 'scripts/Extended tests/strong_fermat_with_n_factors_to_base_n.sf'
 'scripts/Extended tests/sumdigits.pl'
+'scripts/Extended tests/tie_berkeley_db.sf'
+'scripts/Extended tests/tie_berkeley_db_recno.sf'
+'scripts/Extended tests/tie_gdbm_db.sf'
 scripts/fast_fourier_transform.sf
 scripts/faulhaber_s_formula.sf
 scripts/fibonacci_sequence.sf
@@ -233,6 +236,7 @@ scripts/functional_summation_of_fractions.sf
 scripts/Games/24_game.sf
 scripts/Games/24_game_solve.sf
 scripts/Games/24_game_solve_no_eval.sf
+scripts/Games/asciiplanes-player.sf
 scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
@@ -685,6 +689,7 @@ scripts/smart_word_wrap_simple.sf
 scripts/space_collisions.sf
 scripts/stern-brocot_sequence.sf
 scripts/symmetric_summation_of_fractions.sf
+scripts/Tests/almost_and_omega_primes.sf
 scripts/Tests/amb.sf
 scripts/Tests/amb_nested_loops.sf
 scripts/Tests/anonymous_recursion.sf
@@ -753,6 +758,7 @@ scripts/Tests/code_interpolation.sf
 scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
 scripts/Tests/composites.sf
+scripts/Tests/compress.sf
 scripts/Tests/congruence_of_powers_factorization.sf
 scripts/Tests/const_tests.sf
 scripts/Tests/constant_folding.sf
@@ -793,6 +799,7 @@ scripts/Tests/execute_system_command.sf
 scripts/Tests/expression_call.sf
 scripts/Tests/extended_builtin_class.sf
 scripts/Tests/extreme_floating_point_values.sf
+scripts/Tests/factorization_methods.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf
@@ -832,7 +839,6 @@ scripts/Tests/hash_sort.sf
 scripts/Tests/heap_s_algorithm_iter.sf
 scripts/Tests/heap_s_algorithm_rec.sf
 scripts/Tests/horner_s_rule.sf
-scripts/Tests/http_tiny.sf
 scripts/Tests/hypot.sf
 scripts/Tests/i_love_you.sf
 scripts/Tests/iban.sf
@@ -844,6 +850,7 @@ scripts/Tests/infix_methods.sf
 scripts/Tests/inherited_blocks.sf
 scripts/Tests/integer_division.sf
 scripts/Tests/integer_limits.sf
+scripts/Tests/integers_binary_encoding.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf
@@ -873,7 +880,6 @@ scripts/Tests/loops.sf
 scripts/Tests/lucas_sequences.sf
 scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lvalues.sf
-scripts/Tests/lwp_module.sf
 scripts/Tests/magic_vars.sf
 scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
@@ -885,7 +891,6 @@ scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/matrix_operations.sf
 scripts/Tests/median.sf
-scripts/Tests/memoize.sf
 scripts/Tests/merge_sort.sf
 scripts/Tests/merge_sort_2.sf
 scripts/Tests/metaprogramming_2.sf
@@ -1081,6 +1086,7 @@ scripts/Tests/unicode_whitespaces.sf
 scripts/Tests/url_encoding_decoding.sf
 scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
+scripts/Tests/variable_length_run_encoding.sf
 scripts/Tests/variable_references.sf
 scripts/Tests/vector.sf
 scripts/Tests/vigenere_cipher.sf
@@ -1103,14 +1109,14 @@ scripts/visualize_tree.sf
 scripts/walk_a_dir_recursively.sf
 scripts/WWW/deranged_anagrams.sf
 scripts/WWW/DNS_query.sf
+scripts/WWW/http_tiny.sf
+scripts/WWW/lwp_module.sf
 scripts/WWW/rc_rank_languages_by_popularity.sf
 scripts/WWW/socket.sf
 scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 scripts/zeta_2n.sf
-share/sidef/Memoize.sm
-share/sidef/ntheory.sm
 t/00-load.t
 t/01-number.t
 t/02-pow.t

@@ -1,6 +1,12 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.5.0 2023-05-05T16:41:48
+v0.5.1 2023-05-11T18:33:42
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #20: SM-4192 - Add a custom HasVersionTests Plugin (Andrew
+   Hewus Fresh)
+ - Add a custom HasVersionTests Plugin (Andrew Hewus Fresh)
+
+v0.5.0 2023-05-05T16:41:29
  - Update README (Andrew Hewus Fresh)
  - Pull request #19: SM-4192 - Add HasVersionTests (Andrew Hewus Fresh)
  - Add the HasVersionTests Plugin to our PluginBundle (Andrew Hewus Fresh)

@@ -9,6 +9,46 @@ package Sidef::Deparse::Perl {
     my %addr;
     my %top_add;
 
+    my %constant_number_cache;
+    my %constant_string_cache;
+
+    my %composite_constants = (
+        'Sidef::Types::Range::RangeNumber' => {
+                                               name   => 'RangeNum',
+                                               fields => [qw(from to step)],
+                                              },
+
+        'Sidef::Types::Range::RangeString' => {
+                                               name   => 'RangeStr',
+                                               fields => [qw(from to step)],
+                                              },
+
+        'Sidef::Types::Number::Gauss' => {
+                                          name   => 'Gauss',
+                                          fields => [qw(a b)],
+                                         },
+
+        'Sidef::Types::Number::Quadratic' => {
+                                              name   => 'Quadratic',
+                                              fields => [qw(a b w)],
+                                             },
+
+        'Sidef::Types::Number::Quaternion' => {
+                                               name   => 'Quaternion',
+                                               fields => [qw(a b c d)],
+                                              },
+
+        'Sidef::Types::Number::Fraction' => {
+                                             name   => 'Fraction',
+                                             fields => [qw(a b)],
+                                            },
+
+        'Sidef::Types::Number::Mod' => {
+                                        name   => 'Mod',
+                                        fields => [qw(n m)],
+                                       },
+                              );
+
     sub new {
         my (undef, %args) = @_;
 
@@ -40,7 +80,6 @@ package Sidef::Deparse::Perl {
             overload_methods => {
                                  '=='  => 'eq',
                                  '<=>' => 'cmp',
-                                 '~~'  => '~~',
                                 },
 
             data_types => {
@@ -75,6 +114,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Glob::SocketHandle    Sidef::Types::Glob::SocketHandle
                   Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
                   Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+                  Sidef::DataTypes::Perl::Perl            Sidef::Types::Perl::Perl
                   Sidef::DataTypes::Object::Object        Sidef::Object::Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
@@ -86,7 +126,6 @@ package Sidef::Deparse::Perl {
 
                   Sidef::Sys::Sig                         Sidef::Sys::Sig
                   Sidef::Sys::Sys                         Sidef::Sys::Sys
-                  Sidef::Perl::Perl                       Sidef::Perl::Perl
                   Sidef::Math::Math                       Sidef::Math::Math
 
                   Sidef::Time::Time                       Sidef::Time::Time
@@ -146,8 +185,11 @@ HEADER
             $opts{header} .= "local \$Sidef::Types::Number::Number::ROUND = $round;";
         }
 
-        %addr    = ();
-        %top_add = ();
+        undef %addr;
+        undef %top_add;
+
+        undef %constant_number_cache;
+        undef %constant_string_cache;
 
         bless \%opts, __PACKAGE__;
     }
@@ -155,10 +197,18 @@ HEADER
     sub make_constant {
         my ($self, $ref, $new_method, $name, %opt) = @_;
 
-        my $rel_name  = $name . join('_', map { refaddr(\$_) } @{$opt{args}});
+        my $rel_name  = $name . join('_', map { refaddr(\$_) } @{$opt{args}}) . CORE::int(CORE::rand(~0));
         my $full_name = $self->{environment_name} . '::' . $rel_name;
 
         if (not $self->{_has_constant}) {
+            $self->{_has_constant} = 1;
+            $self->{before} .= "use constant {";
+        }
+
+        if ($opt{new}) {
+            if ($self->{_has_constant}) {
+                $self->{before} .= '};';
+            }
             $self->{_has_constant} = 1;
             $self->{before} .= "use constant {";
         }
@@ -462,34 +512,98 @@ HEADER
     sub _dump_indices {
         my ($self, $array) = @_;
 
-        join(
-            ',',
-            grep { $_ ne '' } map {
-                ref($_) eq 'Sidef::Types::Number::Number'
-                  ? Sidef::Types::Number::Number::__numify__($$_)
-                  : ref($_)
-                  ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? Sidef::Types::Number::Number::__numify__($$_) '
-                     . ': do {my$sub=UNIVERSAL::can($_, "..."); '
-                     . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
-                     . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
-                  : $_
-            } @{$array}
-        );
+        my @indices;
+
+        foreach my $entry (@{$array}) {
+
+            # Optimization: when the index is just a number parsed as an expression
+            if (ref($entry) eq 'HASH' and exists($entry->{self}) and scalar(keys %$entry) == 1) {
+                my $obj = $entry->{self};
+                if (ref($obj) eq 'HASH' and scalar(keys %$obj) == 1 and !exists($obj->{self})) {
+                    foreach my $class (keys %$obj) {
+                        my $statements = $obj->{$class};
+                        scalar(@$statements) == 1 or next;
+                        $obj = $statements->[0];
+                        ref($obj) eq 'HASH'     or next;
+                        scalar(keys %$obj) == 1 or next;
+                        exists($obj->{self})    or next;
+                        $obj = $obj->{self};
+                        if (ref($obj) eq 'Sidef::Types::Number::Number') {
+                            $entry = $obj;
+                        }
+                    }
+                }
+            }
+
+            if (ref($entry) eq 'Sidef::Types::Number::Number') {
+                push @indices, (ref($$entry) ? CORE::int(Sidef::Types::Number::Number::__numify__($$entry)) : $$entry);
+            }
+            elsif (ref($entry)) {
+                my $str = $self->deparse_expr(ref($entry) eq 'HASH' ? $entry : {self => $entry});
+
+                if ($str ne '') {
+                    push @indices,
+                      (   '(map { ref($_) eq "Sidef::Types::Number::Number" ? '
+                        . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
+                        . ': do {my$sub=ref($_) && UNIVERSAL::can($_, "..."); '
+                        . '$sub ? $sub->($_) : CORE::int($_) } } '
+                        . $str
+                        . ')');
+                }
+            }
+            else {
+                push @indices, $entry;
+            }
+        }
+
+        join(',', @indices);
     }
 
     sub _dump_lookups {
         my ($self, $array) = @_;
 
-        join(
-            ',',
-            grep { $_ ne '' } map {
-                (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
-                  ? $self->_dump_string("$_")
-                  : ref($_) ?    ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" }'
-                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
-                  : qq{"\Q$_\E"}
-            } @{$array}
-        );
+        my @indices;
+
+        foreach my $entry (@{$array}) {
+
+            # Optimization: when the index is just a string or a number parsed as an expression
+            if (ref($entry) eq 'HASH' and exists($entry->{self}) and scalar(keys %$entry) == 1) {
+                my $obj = $entry->{self};
+                if (ref($obj) eq 'HASH' and scalar(keys %$obj) == 1 and !exists($obj->{self})) {
+                    foreach my $class (keys %$obj) {
+                        my $statements = $obj->{$class};
+                        scalar(@$statements) == 1 or next;
+                        $obj = $statements->[0];
+                        ref($obj) eq 'HASH'     or next;
+                        scalar(keys %$obj) == 1 or next;
+                        exists($obj->{self})    or next;
+                        $obj = $obj->{self};
+                        if (ref($obj) eq 'Sidef::Types::String::String' or ref($obj) eq 'Sidef::Types::Number::Number') {
+                            $entry = $obj;
+                        }
+                    }
+                }
+            }
+
+            if (ref($entry) eq 'Sidef::Types::String::String') {
+                push @indices, $self->_dump_string($$entry);
+            }
+            elsif (ref($entry) eq 'Sidef::Types::Number::Number') {
+                push @indices, $self->_dump_string("$entry");
+            }
+            elsif (ref($entry)) {
+                my $str = $self->deparse_expr(ref($entry) eq 'HASH' ? $entry : {self => $entry});
+
+                if ($str ne '') {
+                    push @indices, ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" } ' . $str . ')');
+                }
+            }
+            else {
+                push @indices, $self->_dump_string($entry);
+            }
+        }
+
+        join(',', @indices);
     }
 
     sub _dump_var_attr {
@@ -519,7 +633,8 @@ HEADER
                   . '}'
               } @vars
           )
-          . ']' . ','
+          . ']'
+          . ','
           . 'table=>{'
           . join(',', map { $self->_dump_string($vars[$_]{name}) . '=>' . $_ } 0 .. $#vars) . '}';
     }
@@ -641,7 +756,7 @@ HEADER
         my $refaddr = refaddr($obj);
 
         # Self obj
-        my $ref = ref($obj);
+        my $ref = ref($obj) || return '';
         if ($ref eq 'HASH') {
             $code = join(',', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
         }
@@ -1125,17 +1240,18 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $content) = $obj->_dump;
-
             if ($type eq 'int') {
-                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", args => ["'${content}'"], sub => 1);
+                $code = ($constant_number_cache{$content} //=
+                         $self->make_constant($ref, '_set_int', "Number", args => ["'${content}'"], sub => 1));
             }
             else {
-                $code =
-                  $self->make_constant($ref, '_set_str', "Number$refaddr", args => ["'${type}'", "'${content}'"], sub => 1);
+                $code = ($constant_number_cache{join(' ', $type, $content)} //=
+                         $self->make_constant($ref, '_set_str', "Number", args => ["'${type}'", "'${content}'"], sub => 1));
             }
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
-            $code = $self->make_constant($ref, 'new', "String$refaddr", args => [$self->_dump_string(${$obj})]);
+            $code = ($constant_string_cache{$$obj} //=
+                     $self->make_constant($ref, 'new', "String", args => [$self->_dump_string($$obj)]));
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
@@ -1151,7 +1267,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
-              $self->make_constant($ref, 'new', "Regex$refaddr",
+              $self->make_constant($ref, 'new', "Regex",
                  args => [$self->_dump_string("$obj->{raw}"), $self->_dump_string($obj->{flags} . ($obj->{global} ? 'g' : ''))]
               );
         }
@@ -1175,6 +1291,24 @@ HEADER
             $code .= '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
+
+            # TODO: add support for slurpy parameters.
+            # Example: while (expr) {|*arr| ... }
+
+#<<<
+            # Concept for the above TODO
+            # However, this does not localize variables correctly to the body of the `while` loop.
+            # For example: `scripts/Tests/dynamic_block_scoping.sf` will fail.
+            #~ my $arg;
+            #~ if (exists($obj->{block}{init_vars}) and @{$obj->{block}{init_vars}{vars}}) {
+                #~ local $obj->{block}{init_vars}{args} = $obj->{expr};
+                #~ $arg = $self->_dump_init_vars($obj->{block}{init_vars});
+            #~ }
+            #~ else {
+                #~ $arg = $self->deparse_args($obj->{expr});
+            #~ }
+#>>>
+
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
             my $arg  = $self->deparse_args($obj->{expr});
 
@@ -1278,7 +1412,7 @@ HEADER
 
             $code =
                 "if (\$continue) {my \$t = $arg;"
-              . "if (defined(\$given_value) ? defined(\$t) ? (\$given_value ~~ \$t) : 0 : 1) {"
+              . "if (defined(\$given_value) ? defined(\$t) ? Sidef::Object::Object::smartmatch(\$given_value, \$t) : 0 : 1) {"
               . "\$continue = 0; \@given_values = do"
               . $self->deparse_block_with_scope($obj->{block}) . "}};";
         }
@@ -1361,22 +1495,22 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDIN') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", args => ['\*STDIN']);
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN", args => ['\*STDIN']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDOUT') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT$refaddr", args => ['\*STDOUT']);
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT", args => ['\*STDOUT']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDERR') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR$refaddr", args => ['\*STDERR']);
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR", args => ['\*STDERR']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::ARGF') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF$refaddr", args => ['\*ARGV']);
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF", args => ['\*ARGV']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::DATA') {
             require Encode;
             my $data = $self->_dump_string(Encode::encode_utf8(${$obj->{data}}));
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new',
-                                         "DATA$refaddr", args => [qq{do{open my \$fh, '<:utf8', \\$data; \$fh}}]);
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle',
+                                         'new', "DATA", args => [qq{do{open my \$fh, '<:utf8', \\$data; \$fh}}]);
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};
@@ -1414,34 +1548,34 @@ HEADER
               $ref . '->new(' . join(',', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Null::Null') {
-            $code = $self->make_constant($ref, 'new', "Null$refaddr", args => []);
+            $code = $self->make_constant($ref, 'new', "Null", args => []);
         }
         elsif ($ref eq 'Sidef::Module::OO') {
-            $code = $self->make_constant($ref, '__NEW__', "MOD_OO$refaddr", args => [$self->_dump_string($obj->{module})]);
+            $code = $self->make_constant($ref, '__NEW__', "ModuleOO", args => [$self->_dump_string($obj->{module})]);
         }
         elsif ($ref eq 'Sidef::Module::Func') {
-            $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", args => [$self->_dump_string($obj->{module})]);
+            $code = $self->make_constant($ref, '__NEW__', "ModuleFunc", args => [$self->_dump_string($obj->{module})]);
         }
-        elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
+        elsif ($ref eq 'Sidef::Types::Perl::Perl') {
+            $code = $self->make_constant($ref, 'new', "PerlCode", args => [$self->_dump_string(${$obj})]);
+        }
+        elsif (exists($composite_constants{$ref})) {
+            my $data = $composite_constants{$ref};
             $code = $self->make_constant(
-                $ref, 'new',
-                "Range$refaddr",
-                args => [
-                    map {
-                        my ($type, $content) = $obj->{$_}->_dump;
-                        'Sidef::Types::Number::Number::_set_str(' . "'${type}', '${content}'" . ')'
-                    } ('from', 'to', 'step')
-                ]
-            );
+                                         $ref, 'new',
+                                         $data->{name},
+                                         new  => 1,
+                                         args => [map { $self->deparse_expr({self => $obj->{$_}}) } @{$data->{fields}}]
+                                        );
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
-            $code = $self->make_constant($ref, 'new', "Backtick$refaddr", args => [$self->_dump_string(${$obj})]);
+            $code = $self->make_constant($ref, 'new', "Backtick", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Types::Glob::File') {
-            $code = $self->make_constant($ref, 'new', "File$refaddr", args => [$self->_dump_string(${$obj})]);
+            $code = $self->make_constant($ref, 'new', "File", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Types::Glob::Dir') {
-            $code = $self->make_constant($ref, 'new', "Dir$refaddr", args => [$self->_dump_string(${$obj})]);
+            $code = $self->make_constant($ref, 'new', "Dir", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Meta::Module') {
             ## local $self->{depth} = -999_999_999;
@@ -1485,7 +1619,7 @@ HEADER
                   . qq~ or CORE::die((~
                   . (defined($args[2]) ? "do{$args[2]}" : "undef")
                   . qq~// ('$obj->{act}('.~
-                  . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
+                  . qq~join(', ',map{(ref(\$_) && UNIVERSAL::can(\$_,'dump')) ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
                   . qq~." failed at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
         }
@@ -1499,7 +1633,7 @@ HEADER
               . qq~(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))~;
         }
         elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
-            $code = $self->make_constant($ref, 'new', "Pipe$refaddr", args => [map { $self->_dump_string($_) } @{$obj}]);
+            $code = $self->make_constant($ref, 'new', "Pipe", args => [map { $self->_dump_string($_) } @{$obj}]);
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = '$Sidef::PARSER';
@@ -1517,6 +1651,12 @@ HEADER
                 1;
             };
             $code = "'" . $mod . "'";
+        }
+        elsif ($ref eq 'Sidef::Perl::Builtin') {
+            ## ok
+        }
+        else {
+            die "[PERL DEPARSER BUG] Unknown object of type <<$ref>>";
         }
 
         # Array and hash indices
@@ -1667,11 +1807,11 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
-                            'do{my$bool=do{'
+                            'do{my$bool=Sidef::Object::Object::smartmatch(do{'
                           . $code
-                          . '}~~do{'
+                          . '}, do{'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '};ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
+                          . '});ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!~' ? '->not' : '');
                         next;
                     }
@@ -1700,6 +1840,25 @@ HEADER
                         }
 
                         if ($method eq '-') {
+
+                            # Constant-folding: negate the literal number
+                            my $data = $call->{arg};
+                            if (scalar(@$data) == 1 and ref($data->[0]) eq 'HASH' and scalar(keys %{$data->[0]}) == 1) {
+                                $data = $data->[0];
+                                my ($class) = keys(%$data);
+                                $data = $data->{$class};
+                                if (ref($data) eq 'ARRAY' and scalar(@$data) == 1) {
+                                    $data = $data->[0];
+                                    if (ref($data) eq 'HASH' and scalar(keys %$data) == 1 and exists($data->{self})) {
+                                        $data = $data->{self};
+                                    }
+                                    if (ref($data) eq 'Sidef::Types::Number::Number') {
+                                        $code = $self->deparse_expr({self => $data->neg});
+                                        next;
+                                    }
+                                }
+                            }
+
                             $code = $self->deparse_args(@{$call->{arg}}) . '->neg';
                             next;
                         }
@@ -1714,8 +1873,8 @@ HEADER
                             $code =
                                 '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . ';my$sub=UNIVERSAL::can($obj, "to_a"); '
-                              . 'defined($sub) ? $sub->($obj) : bless([$obj], "Sidef::Types::Array::Array")})';
+                              . ';my$sub=ref($obj) && UNIVERSAL::can($obj, "to_a"); '
+                              . '$sub ? $sub->($obj) : bless([$obj], "Sidef::Types::Array::Array")})';
                             next;
                         }
 
@@ -1723,8 +1882,8 @@ HEADER
                             $code =
                                 '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . ';my$sub=UNIVERSAL::can($obj, "..."); '
-                              . 'defined($sub) ? $sub->($obj) : $obj })';
+                              . ';my$sub=ref($obj) && UNIVERSAL::can($obj, "..."); '
+                              . '$sub ? $sub->($obj) : $obj })';
                             next;
                         }
 

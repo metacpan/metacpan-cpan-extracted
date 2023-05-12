@@ -14,10 +14,12 @@ build_requires:
   File::Which: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test2::Bundle::Extended: '0'
   Test2::V0: '0'
   Test::Alien: '2.3901'
+  Test::DescribeMe: '0'
   Test::More: '0'
+  Test::Settings: '0'
+  Time::HiRes: '0'
   subs: '0'
 configure_requires:
   Alien::Build: '2.3901'
@@ -42,7 +44,7 @@ no_index:
 provides:
   Alien::XPA:
     file: lib/Alien/XPA.pm
-    version: v2.1.20.0
+    version: v2.1.20.4
 requires:
   Alien::Base: '0'
   Sort::Versions: '0'
@@ -53,7 +55,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA
   repository: https://gitlab.com/djerius/alien-xpa.git
-version: v2.1.20.0
+version: v2.1.20.4
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

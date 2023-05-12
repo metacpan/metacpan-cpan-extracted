@@ -290,17 +290,17 @@ package Sidef::Types::String::String {
 
     sub bin {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 2);
+        Sidef::Types::Number::Number->new($$self || '0', 2);
     }
 
     sub oct {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 8);
+        Sidef::Types::Number::Number->new($$self || '0', 8);
     }
 
     sub hex {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 16);
+        Sidef::Types::Number::Number->new($$self || '0', 16);
     }
 
     sub hexlify {
@@ -683,28 +683,28 @@ package Sidef::Types::String::String {
     }
 
     sub esub {
-        my ($self, $regex, $code) = @_;
+        my ($self, $regex, $block) = @_;
 
         my $search = _string_or_regex($regex);
 
-        if (ref($code) eq 'Sidef::Types::Block::Block') {
-            return $self->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
+        if (ref($block) eq 'Sidef::Types::Block::Block') {
+            return $self->new($$self =~ s{$search}{$block->run(_get_captures($$self))}er);
         }
 
-        $self->new($$self =~ s{$search}{"$code"}eer);
+        $self->new($$self =~ s{$search}{"$block"}eer);
     }
 
     sub gesub {
-        my ($self, $regex, $code) = @_;
+        my ($self, $regex, $block) = @_;
 
         my $search = _string_or_regex($regex);
 
-        if (ref($code) eq 'Sidef::Types::Block::Block') {
+        if (ref($block) eq 'Sidef::Types::Block::Block') {
             my $value = $$self;
-            return $self->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
+            return $self->new($value =~ s{$search}{$block->run(_get_captures($value))}ger);
         }
 
-        my $value = "$code";
+        my $value = "$block";
         $self->new($$self =~ s{$search}{$value}geer);
     }
 
@@ -742,7 +742,23 @@ package Sidef::Types::String::String {
 
     sub slices {
         my ($self, $n) = @_;
-        Sidef::Types::Array::Array->new([map { bless \$_ } unpack '(a' . CORE::int($n) . ')*', $$self]);
+        $n = CORE::int($n);
+        $n > 0 or return Sidef::Types::Array::Array->new;
+        Sidef::Types::Array::Array->new([map { bless \$_ } unpack('(a' . $n . ')*', $$self)]);
+    }
+
+    sub each_slice {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+        $n > 0 or return $self;
+
+        my $len = length($$self);
+        for (my $i = 0 ; $i < $len ; $i += $n) {
+            $block->run(bless \(my $str = CORE::substr($$self, $i, $n)));
+        }
+
+        $self;
     }
 
     sub split {
@@ -772,6 +788,15 @@ package Sidef::Types::String::String {
         $self->new(CORE::join('', sort(CORE::split(//, $$self))));
     }
 
+    sub unique {
+        my ($self) = @_;
+        my %seen;
+        $self->new(CORE::join('', grep { !$seen{$_}++ } CORE::split(//, $$self)));
+    }
+
+    *uniq     = \&unique;
+    *distinct = \&unique;
+
     sub format {
         my ($self) = @_;
         CORE::chomp(my $text = 'format __MY_FORMAT__ = ' . "\n" . $$self);
@@ -793,10 +818,10 @@ package Sidef::Types::String::String {
     }
 
     sub each_word {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $word (CORE::split(' ', $$self)) {
-            $code->run(bless \$word);
+            $block->run(bless \$word);
         }
 
         $self;
@@ -816,8 +841,8 @@ package Sidef::Types::String::String {
     sub integers {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                                        [map  { Sidef::Types::Number::Number->new($_)->int }
-                                         grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
+                                        [map  { Sidef::Types::Number::Number::_set_int($_) }
+                                         grep { /^-?[0-9]+\z/ } CORE::split(' ', $$self)
                                         ]
                                        );
     }
@@ -831,10 +856,10 @@ package Sidef::Types::String::String {
     }
 
     sub each_number {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $num (CORE::split(' ', $$self)) {
-            $code->run(Sidef::Types::Number::Number->new($num));
+            $block->run(Sidef::Types::Number::Number->new($num));
         }
 
         $self;
@@ -854,13 +879,13 @@ package Sidef::Types::String::String {
     }
 
     sub each_byte {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $string = $$self;
 
         require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
-            $code->run(Sidef::Types::Number::Number::_set_int(CORE::ord bytes::substr($string, $i, 1)));
+            $block->run(Sidef::Types::Number::Number::_set_int(CORE::ord bytes::substr($string, $i, 1)));
         }
 
         $self;
@@ -888,16 +913,29 @@ package Sidef::Types::String::String {
     }
 
     sub each_char {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $char (CORE::split(//, $$self)) {
-            $code->run(bless \$char);
+            $block->run(bless \$char);
         }
 
         $self;
     }
 
     *each = \&each_char;
+
+    sub each_kv {
+        my ($self, $block) = @_;
+
+        my @chars = CORE::split(//, $$self);
+
+        foreach my $i (0 .. $#chars) {
+            my $char = $chars[$i];
+            $block->run(Sidef::Types::Number::Number::_set_int($i), (bless \$char));
+        }
+
+        $self;
+    }
 
     sub graphemes {
         my ($self) = @_;
@@ -907,11 +945,11 @@ package Sidef::Types::String::String {
     *graphs = \&graphemes;
 
     sub each_grapheme {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $str = $$self;
         while ($str =~ /(\X)/g) {
-            $code->run(bless \(my $str = $1));
+            $block->run(bless \(my $str = $1));
         }
 
         $self;
@@ -925,10 +963,10 @@ package Sidef::Types::String::String {
     }
 
     sub each_line {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $line (CORE::split(/\R/, $$self)) {
-            $code->run(bless \$line);
+            $block->run(bless \$line);
         }
 
         $self;
@@ -945,17 +983,11 @@ package Sidef::Types::String::String {
     }
 
     sub open_r {
-        my ($self, @rest) = @_;
-        require Encode;
-        my $string = Encode::encode_utf8($$self);
-        Sidef::Types::Glob::File->new(\$string)->open_r(@rest);
-    }
-
-    sub open {
-        my ($self, @rest) = @_;
-        require Encode;
-        my $string = Encode::encode_utf8($$self);
-        Sidef::Types::Glob::File->new(\$string)->open(@rest);
+        my ($self, $mode) = @_;
+        $mode //= 'utf8';
+        my $str = $$self;
+        open(my $fh, "<:$mode", \$str) or return undef;
+        Sidef::Types::Glob::FileHandle->new($fh);
     }
 
     sub center {
@@ -1374,7 +1406,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Compress::RawDeflate;
         my $input = $$self;
         IO::Compress::RawDeflate::rawdeflate(\$input => \my $output)
-          or die "String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError";
+          or CORE::die("String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError");
         bless \$output;
     }
 
@@ -1383,7 +1415,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Uncompress::RawInflate;
         my $input = $$self;
         IO::Uncompress::RawInflate::rawinflate(\$input => \my $output)
-          or die "String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+          or CORE::die("String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError");
         bless \$output;
     }
 
@@ -1392,7 +1424,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Compress::Gzip;
         my $input = $$self;
         IO::Compress::Gzip::gzip(\$input => \my $output)
-          or die "String.gzip failed: $IO::Compress::Gzip::GzipError";
+          or CORE::die("String.gzip failed: $IO::Compress::Gzip::GzipError");
         bless \$output;
     }
 
@@ -1401,7 +1433,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Uncompress::Gunzip;
         my $input = $$self;
         IO::Uncompress::Gunzip::gunzip(\$input => \my $output)
-          or die "String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError";
+          or CORE::die("String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError");
         bless \$output;
     }
 
@@ -1643,7 +1675,7 @@ package Sidef::Types::String::String {
                     my $block = $char;
 
                     if ($string ne '') {
-                        $append_arg->(Encode::decode_utf8(Encode::encode_utf8($string)));
+                        $append_arg->($string);
                         $string = '';
                     }
                     $append_arg->($block);
@@ -1654,13 +1686,13 @@ package Sidef::Types::String::String {
             }
 
             if ($string ne '') {
-                $append_arg->(Encode::decode_utf8(Encode::encode_utf8($string)));
+                $append_arg->($string);
             }
 
             return $expr;
         }
 
-        $self->new(Encode::decode_utf8(Encode::encode_utf8(CORE::join('', @chars))));
+        $self->new(CORE::join('', @chars));
     }
 
     sub shift_left {

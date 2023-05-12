@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v0.5.0');
+use version; our $VERSION = version->declare('v0.6.0');
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -40,7 +40,7 @@ sub get_cache {
 
 #Returns a template loaded and intialised
 sub load {
-                my ($self, $path, $vars, %opts)=@_;
+    my ($self, $path, $vars, %opts)=@_;
 		my $template;
 		if(ref($self)){
 			Log::OK::TRACE and log_trace __PACKAGE__." instance load called for $path";
@@ -61,31 +61,76 @@ sub load {
 }
 
 #Returns a template which was already loaded can called from the callers position
+#
+#TODO: special case where the second argument is a hash ref or undef
+# This indicates no id was specified so use implicit cache entry
+# path must always be defined.
+# eg 
+#   cache undef, "path", .... ; #will use explicit cache key
+#   cache "path", {var};        #Use implicit cache key
+#   cache "path";               #Use implicit cache key
+#
+# This tidies up the common use case for cached templates
 sub cache {
-		my ($self, $id, $path, $vars, %opts)=@_;
+    my $self=shift;
+    my @args=@_;
+
+    if(@args ==1){
+        # Recalling implicit cache key with path only
+        unshift @args, undef;
+    }
+    elsif(defined($args[1]) and ref($args[1]) eq "HASH"){
+      # variables hash ref given, with implicit cache id
+      unshift @args, undef;
+    }
+    else{
+      # Expect explicit cache Id
+    }
+
+		my ($id, $path, $vars, %opts)=@args;
+
+    #my ($self, $id, $path, $vars, %opts)=@_;
 		Log::OK::TRACE and log_trace __PACKAGE__." cache: $path";
 		$id//=$path.join "", caller;	#Set if undefined
 		if(ref($self)){
 			$self->[cache_]{$id} and return $self->[cache_]{$id};
 
-			my $template=$self->load($path, $vars,%opts);
+			my $template=$self->load($path, $vars, %opts);
 			$self->[cache_]{$id}//=$template;
 		}
 		else{
 			$top_level_cache{$id} and return $top_level_cache{$id};
 
-			my $template=$self->load($path, $vars,%opts);
+			my $template=$self->load($path, $vars, %opts);
 			$top_level_cache{$id}//=$template;
-
 		}
 }
-sub immediate {
-		my ($self, $id, $path, $vars, @opts)=@_;
 
-		Log::OK::TRACE and log_trace __PACKAGE__." cache: $path";
+#TODO: add parameter checking as per cache
+sub immediate {
+		Log::OK::TRACE and log_trace __PACKAGE__." immediate!!";
+    
+    my $self=shift;
+    my @args=@_;
+    if(@args ==1){
+        # Recalling implicit cache key with path only
+        unshift @args, undef;
+    }
+    elsif(defined($args[1]) and ref($args[1]) eq "HASH"){
+      # variables hash ref given, with implicit cache id
+      unshift @args, undef;
+    }
+    else{
+      # Expect explicit cache Id
+    }
+
+		my ($id, $path, $vars, @opts)=@args;
+
+
+		Log::OK::TRACE and log_trace __PACKAGE__." immediate: $path";
 		$id//=$path.join "", caller;	#Set if undefined
 		
-		my $template=$self->cache($id, $path, $vars,@opts);
+		my $template=$self->cache($id, $path, $vars, @opts);
 		return $template->render if $template;
 		"";
 
@@ -181,7 +226,7 @@ sub slot {
 	my $output="";
 	
 	$data//=$default_value;
-	if($data->isa("Template::Plex")){
+	if(defined($data) and $data->isa("Template::Plex")){
 		#render template
 		if($slot_name eq "default"){
 			Log::OK::TRACE and log_trace __PACKAGE__.": copy default slot";

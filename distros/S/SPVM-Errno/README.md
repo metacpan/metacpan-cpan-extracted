@@ -1,7 +1,3 @@
 # SPVM::Errno
 
-SPVM::Errno is a SPVM module to manipulate system error numbers.
-
-# Document
-
-https://metacpan.org/pod/SPVM::Errno
+<a href="https://metacpan.org/pod/SPVM::Errno">SPVM::Errno - CPAN</a>

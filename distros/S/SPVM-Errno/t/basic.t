@@ -6,6 +6,9 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
+use SPVM 'Fn';
+use SPVM::Errno;
+
 use SPVM 'TestCase::Errno';
 
 use SPVM 'Errno';
@@ -446,5 +449,8 @@ errno_ok('WSAETIMEDOUT');
 errno_ok('WSAETOOMANYREFS');
 errno_ok('WSAEUSERS');
 errno_ok('WSAEWOULDBLOCK');
+
+# Version
+is($SPVM::Errno::VERSION, SPVM::Fn->get_version_string('Errno'));
 
 done_testing;

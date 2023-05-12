@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "an interface to the Registration Data Access Protocol (RDAP).",
    "author" : [
-      "unknown"
+      "Gavin Brown <gavin.brown@fastmail.uk>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "freebsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -57,6 +57,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.16,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gbxyz/perl-Net-RDAP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gbxyz/perl-Net-RDAP.git",
+         "web" : "https://github.com/gbxyz/perl-Net-RDAP"
+      }
+   },
+   "version" : 0.18,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -13,6 +14,9 @@ BEGIN
     use_ok( 'HTML::Object' ) || BAIL_OUT( 'Unable to load HTML::Object' );
     use_ok( 'HTML::Object::Element' ) || BAIL_OUT( 'Unable to load HTML::Object::Element' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::Element', 'address' );
 can_ok( 'HTML::Object::Element', 'all_attr' );

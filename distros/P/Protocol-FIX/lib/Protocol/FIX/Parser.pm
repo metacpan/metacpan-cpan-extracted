@@ -8,7 +8,7 @@ use Protocol::FIX qw/humanize/;
 use Protocol::FIX::TagsAccessor;
 use Protocol::FIX::MessageInstance;
 
-our $VERSION = '0.07';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 =head1 NAME
 

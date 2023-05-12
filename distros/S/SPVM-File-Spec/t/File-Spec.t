@@ -6,6 +6,9 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
+use SPVM 'Fn';
+use SPVM::File::Spec;
+
 use File::Spec;
 
 use SPVM 'File::Spec::Instance';
@@ -889,4 +892,6 @@ ok(SPVM::File::Spec->curdir, File::Spec->curdir);
   ok(SPVM::TestCase::File::Spec::Instance::Unix->abs2rel);
 }
 
+# Version
+is($SPVM::File::Spec::VERSION, SPVM::Fn->get_version_string('File::Spec'));
 done_testing;

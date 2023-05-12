@@ -10,14 +10,58 @@ use Venus::Role 'with';
 # METHODS
 
 sub throw {
-  my ($self, $name) = @_;
-
-  my $context = (caller(1))[3];
-  my $package = $name || join('::', map ucfirst, ref($self), 'error');
+  my ($self, $data) = @_;
 
   require Venus::Throw;
 
-  return Venus::Throw->new(package => $package, context => $context);
+  my $throw = Venus::Throw->new(context => (caller(1))[3])->do(
+    frame => 1,
+  );
+
+  if (ref $data ne 'HASH') {
+    return $throw->do(
+      'package', $data || join('::', map ucfirst, ref($self), 'error')
+    );
+  }
+
+  if (exists $data->{as}) {
+    $throw->as($data->{as});
+  }
+  if (exists $data->{capture}) {
+    $throw->capture(@{$data->{capture}});
+  }
+  if (exists $data->{context}) {
+    $throw->context($data->{context});
+  }
+  if (exists $data->{error}) {
+    $throw->error($data->{error});
+  }
+  if (exists $data->{frame}) {
+    $throw->frame($data->{frame});
+  }
+  if (exists $data->{message}) {
+    $throw->message($data->{message});
+  }
+  if (exists $data->{name}) {
+    $throw->name($data->{name});
+  }
+  if (exists $data->{package}) {
+    $throw->package($data->{package});
+  }
+  else {
+    $throw->package(join('::', map ucfirst, ref($self), 'error'));
+  }
+  if (exists $data->{parent}) {
+    $throw->parent($data->{parent});
+  }
+  if (exists $data->{stash}) {
+    $throw->stash($_, $data->{stash}->{$_}) for keys %{$data->{stash}};
+  }
+  if (exists $data->{on}) {
+    $throw->on($data->{on});
+  }
+
+  return $throw;
 }
 
 # EXPORTS
@@ -73,7 +117,7 @@ This package provides the following methods:
 
 =head2 throw
 
-  throw(Maybe[Str] $package) (Throw)
+  throw(Maybe[Str | HashRef] $data) (Throw)
 
 The throw method builds a L<Venus::Throw> object, which can raise errors
 (exceptions).
@@ -89,6 +133,44 @@ I<Since C<0.01>>
   my $example = Example->new;
 
   my $throw = $example->throw;
+
+  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=back
+
+=over 4
+
+=item throw example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $throw = $example->throw('Example::Error::Unknown');
+
+  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=back
+
+=over 4
+
+=item throw example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $throw = $example->throw({
+    name => 'on.example',
+    capture => [$example],
+    stash => {
+      time => time,
+    },
+  });
 
   # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
 

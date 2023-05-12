@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -12,6 +13,9 @@ BEGIN
 {
     use_ok( 'HTML::Object::XPath' );
 };
+
+use strict;
+use warnings;
 
 my $tree = init_tree();
 my $xp   = HTML::Object::XPath->new( debug => $DEBUG );

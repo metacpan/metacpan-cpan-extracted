@@ -1,30 +1,45 @@
 Revision history for Perl module HTML::Object
 
-v0.2.2 2022-11-11T19:49:40+0900
+v0.2.5 2023-05-11T21:10:17+0900
+    - Minor additional correction on extract_links in HTML::Object::Element
+
+v0.2.4 2023-05-11T20:07:32+0900
+    - Updated method extract_links in HTML::Object::Element
+
+v0.2.3 2022-11-12T14:07:25+0900
+    - Corrected find_by_tag_name() in HTML::Object::Element
+    - Added the properties accessKey, accessKeyLabel, isContentEditable, dir, draggable, enterKeyHint, hidden, inert, innerText, inputMode, popover, lang, noModule, nonce, offsetHeight, offsetLeft, offsetParent, offsetTop, offsetWidth, outerText, properties, spellcheck, style, title, translate to HTML::Object::DOM::Element
+    - Added the methods attachInternals(), blur(), click(), focus(), hidePopover(), showPopover(), togglePopover() HTML::Object::DOM::Element
+    - Updated the method documentElement() in HTML::Object::DOM::Document and improved body() and title()
+    - Updated the method querySelectorAll() in HTML::Object::DOM::Element
+    - Improved private method _set_get_property in HTML::Object::DOM::Element
+    - Improved method on in HTML::Object::EventTarget
+
+v0.2.2 2022-11-11T19:49:40Z +0900
     - Changed method add_end() in HTML::Object to use _warnings_is_enabled from Module::Generic
     - Updated value_as_number() in HTML::Object::XPath::Literal
     - Updated HTML::Object::EventTarget, HTML::Object::Element, HTML::Object::DOM::List, HTML::Object::DOM::Element to use concatenation instead of list with warnings::warn
 
-v0.2.1 2022-09-20T17:27:23+0900
+v0.2.1 2022-09-20T17:27:23Z +0900
     - Corrected some obscure issue with the module Want somehow not exporting its key subroutines
 
-v0.2.0 2022-09-18T14:42:31+0900
+v0.2.0 2022-09-18T14:42:31Z +0900
     - Improved all modules; moved to stricter coding
     - Corrected a few typos
 
-v0.1.4 2022-04-16T09:19:07+0900
+v0.1.4 2022-04-16T09:19:07Z +0900
     - Correction of a minor bug in method detach() in HTML::Object::Element
     - Corrected a minor bug in HTML::Object::DOM parse() method
 
-v0.1.3 2022-03-11T15:33:05+0900
+v0.1.3 2022-03-11T15:33:05Z +0900
     - Improved unit test and module version requirement
 
-v0.1.2 2022-01-22T15:47:53+0900
+v0.1.2 2022-01-22T15:47:53Z +0900
     - Documentation improvement for HTML::Object::XQuery
 
-v0.1.1 2022-01-18T16:45:55+0900
+v0.1.1 2022-01-18T16:45:55Z +0900
     - Documentation improvement
     - Correction of unit tests in 30.xquery.t
 
-v0.1.0 2022-01-16T21:10:18+0900
+v0.1.0 2022-01-16T21:10:18Z +0900
     - Initial release

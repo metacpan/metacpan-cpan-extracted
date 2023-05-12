@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Dumbbench;

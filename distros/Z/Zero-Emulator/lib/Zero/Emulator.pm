@@ -1,4 +1,4 @@
-#!/usr/bin/perl -Ilib
+#!/usr/bin/perl -I../lib/ -Ilib
 #-------------------------------------------------------------------------------
 # Assemble and execute code written in the Zero programming language.
 # Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2023
@@ -8,19 +8,19 @@
 # Count number of ways an if statement actually goes.
 use v5.30;
 package Zero::Emulator;
-our $VERSION = 20230513;                                                        # Version
+our $VERSION = 20230514;                                                        # Version
 use warnings FATAL=>qw(all);
 use strict;
-use Carp qw(cluck confess);
+use Carp qw(confess);
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
-eval "use Test::More tests=>78" unless caller;
+eval "use Test::More tests=>79" unless caller;
 
 makeDieConfess;
 
 my sub maximumInstructionsToExecute {1e6}                                       # Maximum number of subroutines to execute
 
-sub execute(%)                                                                  # Execute a block of code..
+sub execute(%)                                                                  # Execute a block of code.
  {my (%options) = @_;                                                           # Execution options
 
   my $exec=                 genHash("Zero::Emulator::Execution",                # Execution results
@@ -31,6 +31,7 @@ sub execute(%)                                                                  
     tally=>                 0,                                                  # Tally executed instructions in a bin of this name
     tallyCount=>            0,                                                  # Executed instructions tally count
     tallyCounts=>           {},                                                 # Executed instructions by name tally counts
+    tallyTotal=>            {},                                                 # Total instructions executed in each tally
     instructionPointer=>    0,                                                  # Current instruction
     memory=>                {},                                                 # Memory contents at the end of execution
     memoryType=>            {},                                                 # Memory contents at the end of execution
@@ -86,7 +87,7 @@ my sub stackFrame(%)                                                            
   );
  }
 
-sub Zero::Emulator::Code::instruction($%)                                       #P Create a new instruction..
+sub Zero::Emulator::Code::instruction($%)                                       #P Create a new instruction.
  {my ($block, %options) = @_;                                                   # Block of code descriptor, options
 
   my ($package, $fileName, $line) = caller($options{level} // 1);
@@ -118,7 +119,7 @@ sub Zero::Emulator::Code::instruction($%)                                       
    }
  }
 
-sub Zero::Emulator::Code::Instruction::contextString($$$)                       #P Stack trace back for this instruction..
+sub Zero::Emulator::Code::Instruction::contextString($$$)                       #P Stack trace back for this instruction.
  {my ($i, $exec, $title) = @_;                                                  # Instruction, execution environment, title
   @_ == 3 or confess "Three parameters";
   my @s;
@@ -131,7 +132,7 @@ sub Zero::Emulator::Code::Instruction::contextString($$$)                       
   @s
  }
 
-sub AreaStructure($@)                                                           # Describe a data structure mapping a memory area..
+sub AreaStructure($@)                                                           # Describe a data structure mapping a memory area.
  {my ($structureName, @names) = @_;                                             # Structure name, fields names
 
   my $d = genHash("Zero::Emulator::AreaStructure",                              # Description of a data structure mapping a memory area
@@ -149,12 +150,12 @@ my sub isScalar($)                                                              
   ! ref $value;
  }
 
-sub Zero::Emulator::AreaStructure::count($)                                     #P Add a field to a data structure..
+sub Zero::Emulator::AreaStructure::count($)                                     #P Add a field to a data structure.
  {my ($d) = @_;                                                                 # Area structure
   scalar $d->fieldOrder->@*
  }
 
-sub Zero::Emulator::AreaStructure::name($$)                                     #P Add a field to a data structure..
+sub Zero::Emulator::AreaStructure::name($$)                                     #P Add a field to a data structure.
  {my ($d, $name) = @_;                                                          # Parameters
   @_ == 2 or confess "Two parameters";
   if (!defined $d->fieldNames->{$name})
@@ -176,7 +177,7 @@ my sub procedure($%)                                                            
   );
  }
 
-sub Zero::Emulator::AreaStructure::registers($)                                 #P Create one or more temporary variables. Need to reuse registers no longer in use..
+sub Zero::Emulator::AreaStructure::registers($)                                 #P Create one or more temporary variables. Need to reuse registers no longer in use.
  {my ($d, $count) = @_;                                                         # Parameters
   @_ == 1 or confess "One parameter";
   if (!defined($count))
@@ -187,21 +188,21 @@ sub Zero::Emulator::AreaStructure::registers($)                                 
   map {__SUB__->($d)} 1..$count;                                                # Array of temporaries
  }
 
-sub Zero::Emulator::AreaStructure::offset($$)                                   #P Offset of a field in a data structure..
+sub Zero::Emulator::AreaStructure::offset($$)                                   #P Offset of a field in a data structure.
  {my ($d, $name) = @_;                                                          # Parameters
   @_ == 2 or confess "Two parameters";
   if (defined(my $n = $d->fieldNames->{$name})){return $n}
   confess "No such name: '$name' in structure: ".$d->structureName;
  }
 
-sub Zero::Emulator::AreaStructure::address($$)                                  #P Address of a field in a data structure..
+sub Zero::Emulator::AreaStructure::address($$)                                  #P Address of a field in a data structure.
  {my ($d, $name) = @_;                                                          # Parameters
   @_ == 2 or confess "Two parameters";
   if (defined(my $n = $d->fieldNames->{$name})){return \$n}
   confess "No such name: '$name' in structure: ".$d->structureName;
  }
 
-sub Zero::Emulator::Procedure::registers($)                                     #P Allocate a register within a procedure..
+sub Zero::Emulator::Procedure::registers($)                                     #P Allocate a register within a procedure.
  {my ($procedure) = @_;                                                         # Procedure description
   @_ == 1 or confess "One parameter";
   $procedure->variables->registers();
@@ -261,7 +262,7 @@ my sub RefLeft($)                                                               
    }
  }
 
-sub Zero::Emulator::Reference::print($)                                         #P Print the value of an address..
+sub Zero::Emulator::Reference::print($)                                         #P Print the value of an address.
  {my ($ref) = @_;                                                               # Reference specification
   @_ == 1 or confess "One parameter";
   my $a  = dump($ref->area);
@@ -270,7 +271,7 @@ sub Zero::Emulator::Reference::print($)                                         
   say STDERR $s;
  }
 
-sub Zero::Emulator::Address::print($$)                                          #P Print the value of an address in the current execution..
+sub Zero::Emulator::Address::print($$)                                          #P Print the value of an address in the current execution.
  {my ($address, $exec) = @_;                                                    # Address specification
   @_ == 2 or confess "Two parameters";
   my $e  = $exec;
@@ -283,7 +284,7 @@ sub Zero::Emulator::Address::print($$)                                          
      $s .= "address: $l";
  }
 
-sub Zero::Emulator::Address::get($$)                                            #P Get the value of the specified address in memory in the specified execution environment..
+sub Zero::Emulator::Address::get($$)                                            #P Get the value of the specified address in memory in the specified execution environment.
  {my ($address, $exec) = @_;                                                    # Address specification
   @_ == 2 or confess "Two parameters";
   my $e = $exec;
@@ -293,7 +294,7 @@ sub Zero::Emulator::Address::get($$)                                            
   $$m{$a}[$l];
  }
 
-sub Zero::Emulator::Address::at($$)                                             #P Reference to the specified address in memory of current execution environment..
+sub Zero::Emulator::Address::at($$)                                             #P Reference to the specified address in memory of current execution environment.
  {my ($address, $exec) = @_;                                                    # Address specification
   @_ == 2 or confess "Two parameters";
   my $e = $exec;
@@ -303,7 +304,7 @@ sub Zero::Emulator::Address::at($$)                                             
   \$$m{$a}[$l]
  }
 
-sub Zero::Emulator::Procedure::call($)                                          #P Call a procedure.  Arguments are supplied by the L<ParamsPut> and L<ParamsGet> commands, return values are supplied by the L<ReturnPut> and L<ReturnGet> commands..
+sub Zero::Emulator::Procedure::call($)                                          #P Call a procedure.  Arguments are supplied by the L<ParamsPut> and L<ParamsGet> commands, return values are supplied by the L<ReturnPut> and L<ReturnGet> commands.
  {my ($procedure) = @_;                                                         # Procedure description
   @_ == 1 or confess "One parameter";
   Zero::Emulator::Call($procedure->target);
@@ -351,7 +352,6 @@ sub Zero::Emulator::Code::assemble($%)                                          
  }
 
 #D1 Execution
-#D2 Analysis
 
 sub Zero::Emulator::Execution::areaContent($$)                                  #P Content of an area containing a address in memory in the specified execution.
  {my ($exec, $address) = @_;                                                    # Execution environment, address specification
@@ -493,8 +493,6 @@ sub Zero::Emulator::Execution::analyzeExecutionResults($%)                      
   join "\n", @r;
  }
 
-#D2 Memory                                                                      # Access memory
-
 sub Zero::Emulator::Execution::check($$$)                                       #P Check that a user area access is valid.
  {my ($exec, $area, $name) = @_;                                                # Execution environment, area, expected area name
   @_ == 3 or confess "Three parameters";
@@ -544,8 +542,6 @@ sub Zero::Emulator::Execution::set($$$)                                         
   $$m{$a}[$l] = $value;
  }
 
-#D2 Execution                                                                   # Execute assembly code in the emulator
-
 sub Zero::Emulator::Execution::stackArea($)                                     #P Current stack frame.
  {my ($exec) = @_;                                                              # Execution environment
   $exec->calls->[-1]->stackArea;                                                # Stack area
@@ -587,7 +583,7 @@ sub Zero::Emulator::Execution::stackTraceAndExit($$%)                           
   push $exec->out->@*, @t;
   my $t = join "\n", @t;
 
-  if (!defined $exec->suppressOutput)
+  if (!$exec->suppressOutput)
    {confess $t if $options{confess};
     say STDERR $t;
    }
@@ -1264,6 +1260,18 @@ sub Zero::Emulator::Code::execute($%)                                           
       $exec->assign($t, $s);
      },
 
+    moveLong=> sub                                                              # Copy the number of elements specified by the second source operand from the location specified by the first source operand to the target operand
+     {my $i = $exec->currentInstruction;
+      my $s = $exec->left ($i->source);                                         # Source
+      my $l = $exec->right($i->source2);                                        # Length
+      my $t = $exec->left($i->target);                                          # Target
+      for my $j(0..$l-1)
+       {my $S = RefRight [$s->area, \($s->address+$j), $s->name];
+        my $T = RefLeft  [$t->area,   $t->address+$j,  $t->name];
+        $exec->assign($exec->left($T), $exec->right($S));
+       }
+     },
+
     not=> sub                                                                   # Not in place
      {my $i = $exec->currentInstruction;
       my $s = $exec->right($i->source);
@@ -1420,6 +1428,7 @@ sub Zero::Emulator::Code::execute($%)                                           
       if ($a !~ m(\A(assert.*|label|tally|trace(Points?)?)\Z))                  # Omit instructions that are not tally-able
        {if (my $t = $exec->tally)                                               # Tally instruction counts
          {$exec->tallyCount++;
+          $exec->tallyTotal->{$t}++;
           $exec->tallyCounts->{$t}{$a}++;
          }
         $exec->counts->{$a}++; $exec->count++;                                  # Execution instruction counts
@@ -1493,21 +1502,21 @@ my sub xTarget($)                                                               
   (q(target), RefLeft $t)
  }
 
-sub Start($)                                                                    # Start the current assembly using the specified version of the Zero language.  At  the moment only version 1 works..
+sub Start($)                                                                    # Start the current assembly using the specified version of the Zero language.  At  the moment only version 1 works.
  {my ($version) = @_;                                                           # Version desired - at the moment only 1
   $version == 1 or confess "Version 1 is currently the only version available\n";
   $allocs = $allocsStacked = 0;
   $assembly = Code;                                                             # The current assembly
  }
 
-sub Add($$;$)                                                                   # Add the source locations together and store in the result in the target area.
+sub Add($$;$)                                                                   # Add the source locations together and store the result in the target area.
  {my ($target, $s1, $s2) = @_ == 2 ? (&Var(), @_) : @_;                         # Target address, source one, source two
   $assembly->instruction(action=>"add", xTarget($target),
     xSource($s1), xSource2($s2));
   $target
  }
 
-sub Subtract($$;$)                                                              # Subtract the second source address from the first and store in the result in the target area.
+sub Subtract($$;$)                                                              # Subtract the second source operand value from the first source operand value and store the result in the target area.
  {my ($target, $s1, $s2) = @_ == 2 ? (&Var(), @_) : @_;                         # Target address, source one, source two
   $assembly->instruction(action=>"subtract", xTarget($target),
     xSource($s1), xSource2($s2));
@@ -1675,12 +1684,12 @@ sub JTrue($$)                                                                   
   $assembly->instruction(action=>"jTrue", xTarget($target), xSource($source));
  }
 
-sub Label($)                                                                    # Create a label..
+sub Label($)                                                                    # Create a label.
  {my ($source) = @_;                                                            # Name of label
   $assembly->instruction(action=>"label", xSource($source));
  }
 
-sub Clear($)                                                                    # Clear the first bytes of an area.  The area is specified by the first element of the address, the number of locations to clear is specified by the second element of the target address..
+sub Clear($)                                                                    # Clear the first bytes of an area.  The area is specified by the first element of the address, the number of locations to clear is specified by the second element of the target address.
  {my ($target) = @_;                                                            # Target address, source address
   $assembly->instruction(action=>"clear", xTarget($target));
  }
@@ -1735,6 +1744,12 @@ sub Mov($;$) {                                                                  
   else
    {confess "One or two parameters required for mov";
    }
+ }
+
+sub MoveLong($$$)                                                               # Copy the number of elements specified by the second source operand from the location specified by the first source operand to the target operand.
+ {my ($target, $source, $source2) = @_;                                         # Target of move, source of move, length of move
+  $assembly->instruction(action=>"moveLong", xTarget($target),
+    xSource($source), xSource2($source2));
  }
 
 sub Not($) {                                                                    # Move and not.
@@ -1860,7 +1875,7 @@ sub Pop(;$$) {                                                                  
    }
  }
 
-sub Push($;$) {                                                                 # Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand..
+sub Push($;$) {                                                                 # Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand.
   if (@_ == 1)
    {my ($source) = @_;                                                          # Push a value onto the current stack frame
     $assembly->instruction(action=>"push", xSource($source));
@@ -1937,7 +1952,7 @@ sub Else(&)                                                                     
   (else=>  $e)
  }
 
-sub Ifx($$$%)                                                                   #P Execute then or else clause depending on whether two memory locations are equal..
+sub Ifx($$$%)                                                                   #P Execute then or else clause depending on whether two memory locations are equal.
  {my ($cmp, $a, $b, %options) = @_;                                             # Comparison, first memory address, second memory address, then block, else block
   confess "Then required" unless $options{then};
   if ($options{else})
@@ -1970,32 +1985,32 @@ sub IfTrue($%)                                                                  
   Ifx(\&Jeq, $a, 0, %options);
  }
 
-sub IfEq($$%)                                                                   # Execute then or else clause depending on whether two memory locations are equal..
+sub IfEq($$%)                                                                   # Execute then or else clause depending on whether two memory locations are equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address, then block, else block
   Ifx(\&Jne, $a, $b, %options);
  }
 
-sub IfNe($$%)                                                                   # Execute then or else clause depending on whether two memory locations are not equal..
+sub IfNe($$%)                                                                   # Execute then or else clause depending on whether two memory locations are not equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address, then block, else block
   Ifx(\&Jeq, $a, $b, %options);
  }
 
-sub IfLt($$%)                                                                   # Execute then or else clause depending on whether two memory locations are less than..
+sub IfLt($$%)                                                                   # Execute then or else clause depending on whether two memory locations are less than.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address, then block, else block
   Ifx(\&Jge, $a, $b, %options);
  }
 
-sub IfLe($$%)                                                                   # Execute then or else clause depending on whether two memory locations are less than or equal..
+sub IfLe($$%)                                                                   # Execute then or else clause depending on whether two memory locations are less than or equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address, then block, else block
   Ifx(\&Jgt, $a, $b, %options);
  }
 
-sub IfGt($$%)                                                                   # Execute then or else clause depending on whether two memory locations are greater than..
+sub IfGt($$%)                                                                   # Execute then or else clause depending on whether two memory locations are greater than.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address, then block, else block
   Ifx(\&Jle, $a, $b, %options);
  }
 
-sub IfGe($$%)                                                                   # Execute then or else clause depending on whether two memory locations are greater than or equal..
+sub IfGe($$%)                                                                   # Execute then or else clause depending on whether two memory locations are greater than or equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address, then block, else block
   Ifx(\&Jlt, $a, $b, %options);
  }
@@ -2016,32 +2031,32 @@ sub Assert(%)                                                                   
   $assembly->instruction(action=>"assert");
  }
 
-sub AssertEq($$%)                                                               # Assert two memory locations are equal..
+sub AssertEq($$%)                                                               # Assert two memory locations are equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address
   Assert2("Eq", $a, $b);
  }
 
-sub AssertNe($$%)                                                               # Assert two memory locations are not equal..
+sub AssertNe($$%)                                                               # Assert two memory locations are not equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address
   Assert2("Ne", $a, $b);
  }
 
-sub AssertLt($$%)                                                               # Assert two memory locations are less than..
+sub AssertLt($$%)                                                               # Assert two memory locations are less than.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address
   Assert2("Lt", $a, $b);
  }
 
-sub AssertLe($$%)                                                               # Assert two memory locations are less than or equal..
+sub AssertLe($$%)                                                               # Assert two memory locations are less than or equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address
   Assert2("Le", $a, $b);
  }
 
-sub AssertGt($$%)                                                               # Assert two memory locations are greater than..
+sub AssertGt($$%)                                                               # Assert two memory locations are greater than.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address
   Assert2("Gt", $a, $b);
  }
 
-sub AssertGe($$%)                                                               # Assert are greater than or equal..
+sub AssertGe($$%)                                                               # Assert are greater than or equal.
  {my ($a, $b, %options) = @_;                                                   # First memory address, second memory address
   Assert2("Ge", $a, $b);
  }
@@ -2193,7 +2208,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA         = qw(Exporter);
 @EXPORT      = qw();
-@EXPORT_OK   = qw(Add AreaStructure Array ArrayIndex ArrayCountLess ArrayCountGreater Assert AssertEq AssertGe AssertGt AssertLe AssertLt AssertNe Bad Block Call Clear Confess Dec Dump DumpArray Else Execute For ForArray Free Good IfEq IfFalse IfGe IfGt IfLe IfLt IfNe IfTrue Ifx Inc Jeq Jge Jgt Jle Jlt Jmp Jne JTrue JFalse Label Mov Nop Not Out ParamsGet ParamsPut Pop Procedure Push Resize Return ReturnGet ReturnPut ShiftDown ShiftLeft ShiftRight ShiftUp Start Subtract Tally Then Trace TracePoints Var Watch);
+@EXPORT_OK   = qw(Add AreaStructure Array ArrayIndex ArrayCountLess ArrayCountGreater Assert AssertEq AssertGe AssertGt AssertLe AssertLt AssertNe Bad Block Call Clear Confess Dec Dump DumpArray Else Execute For ForArray Free Good IfEq IfFalse IfGe IfGt IfLe IfLt IfNe IfTrue Ifx Inc Jeq Jge Jgt Jle Jlt Jmp Jne JTrue JFalse Label Mov MoveLong Nop Not Out ParamsGet ParamsPut Pop Procedure Push Resize Return ReturnGet ReturnPut ShiftDown ShiftLeft ShiftRight ShiftUp Start Subtract Tally Then Trace TracePoints Var Watch);
 #say STDERR '@EXPORT_OK   = qw(', (join ' ', sort @EXPORT_OK), ')'; exit;
 %EXPORT_TAGS = (all=>[@EXPORT, @EXPORT_OK]);
 
@@ -2205,7 +2220,7 @@ eval {goto latest};
 sub is_deeply;
 sub ok($;$);
 
-#D1 Tests
+# Tests
 
 if (1)                                                                          # Address dereferencing
  {my $e = execute->createInitialStackEntry->setMemoryType(1, 'aaa');
@@ -2221,10 +2236,10 @@ if (1)                                                                          
   is_deeply $e->left (RefLeft  [1, \\2,  'aaa']), {address=>1, area=>1, name=>"aaa"};
  }
 
-#D1 Examples
+# Examples
 
 #latest:;
-if (1)                                                                          #TOut #TStart #TExecute
+if (1)                                                                          ##Out ##Start ##Execute
  {Start 1;
   Out "hello World";
   my $e = Execute(suppressOutput=>1);
@@ -2232,14 +2247,14 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TNop
+if (1)                                                                          ##Nop
  {Start 1;
   Nop;
   ok Execute(out=>[]);
  }
 
 #latest:;
-if (1)                                                                          #TMov
+if (1)                                                                          ##Mov
  {Start 1;
   my $a = Mov 2;
   Out $a;
@@ -2250,7 +2265,7 @@ if (1)                                                                          
 
 #latest:;
 if (1)
- {Start 1;                                                                      #TMov
+ {Start 1;                                                                      ##Mov
   my $a = Mov  3;
   my $b = Mov  $$a;
   my $c = Mov  \$b;
@@ -2260,7 +2275,7 @@ if (1)
  }
 
 #latest:;
-if (1)                                                                          #TAdd
+if (1)                                                                          ##Add
  {Start 1;
   my $a = Add 3, 2;
   Out  $a;
@@ -2269,7 +2284,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAdd #TSubtract
+if (1)                                                                          ##Add ##Subtract
  {Start 1;
   my $a = Subtract 4, 2;
   Out $a;
@@ -2278,7 +2293,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TDec
+if (1)                                                                          ##Dec
  {Start 1;
   my $a = Mov 3;
   Dec $a;
@@ -2288,7 +2303,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TInc
+if (1)                                                                          ##Inc
  {Start 1;
   my $a = Mov 3;
   Inc $a;
@@ -2298,7 +2313,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TNot
+if (1)                                                                          ##Not
  {Start 1;
   my $a = Mov 3;
   my $b = Not $a;
@@ -2311,7 +2326,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TShiftLeft
+if (1)                                                                          ##ShiftLeft
  {Start 1;
   my $a = Mov 1;
   ShiftLeft $a, $a;
@@ -2321,7 +2336,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TShiftRight
+if (1)                                                                          ##ShiftRight
  {Start 1;
   my $a = Mov 4;
   ShiftRight $a, 1;
@@ -2331,7 +2346,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TJmp
+if (1)                                                                          ##Jmp
  {Start 1;
   Jmp (my $a = label);
     Out  1;
@@ -2344,7 +2359,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TJLt #TLabel
+if (1)                                                                          ##JLt ##Label
  {Start 1;
   Mov 0, 1;
   Jlt ((my $a = label), \0, 2);
@@ -2365,7 +2380,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TLabel
+if (1)                                                                          ##Label
  {Start 1;
   Mov 0, 0;
   my $a = setLabel;
@@ -2377,7 +2392,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TMov
+if (1)                                                                          ##Mov
  {Start 1;
   my $a = Array "aaa";
   Mov     [$a,  1, "aaa"],  11;
@@ -2388,7 +2403,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TCall #TReturn
+if (1)                                                                          ##Call ##Return
  {Start 1;
   my $w = Procedure 'write', sub
    {Out 'aaa';
@@ -2400,7 +2415,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TCall
+if (1)                                                                          ##Call
  {Start 1;
   my $w = Procedure 'write', sub
    {my $a = ParamsGet 0;
@@ -2414,7 +2429,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TCall #TReturnPut #TReturnGet
+if (1)                                                                          ##Call ##ReturnPut ##ReturnGet
  {Start 1;
   my $w = Procedure 'write', sub
    {ReturnPut 0, "ccc";
@@ -2428,7 +2443,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TProcedure
+if (1)                                                                          ##Procedure
  {Start 1;
   my $add = Procedure 'add2', sub
    {my $a = ParamsGet 0;
@@ -2445,7 +2460,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TConfess
+if (1)                                                                          ##Confess
  {Start 1;
   my $c = Procedure 'confess', sub
    {Confess;
@@ -2456,7 +2471,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TPush #TPop
+if (1)                                                                          ##Push ##Pop
  {Start 1;
   my $a = Array "aaa";
   Push $a, 1;
@@ -2472,7 +2487,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TMov
+if (1)                                                                          ##Alloc ##Mov
  {Start 1;
   my $a = Array "alloc";
   my $b = Mov 99;
@@ -2483,7 +2498,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TFree
+if (1)                                                                          ##Free
  {Start 1;
   my $a = Array "node";
   Free $a, "aaa";
@@ -2496,7 +2511,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TFree #TDump
+if (1)                                                                          ##Free ##Dump
  {Start 1;
   my $a = Array "node";
   Out $a;
@@ -2533,7 +2548,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TIfEq  #TIfNe  #TIfLt #TIfLe  #TIfGt  #TIfGe
+if (1)                                                                          ##IfEq  ##IfNe  ##IfLt ##IfLe  ##IfGt  ##IfGe
  {Start 1;
   my $a = Mov 1;
   my $b = Mov 2;
@@ -2548,7 +2563,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TIfEq  #TIfNe  #TIfLt #TIfLe  #TIfGt  #TIfGe
+if (1)                                                                          ##IfEq  ##IfNe  ##IfLt ##IfLe  ##IfGt  ##IfGe
  {Start 1;
   my $a = Mov 1;
   my $b = Mov 2;
@@ -2563,7 +2578,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TIfEq  #TIfNe  #TIfLt #TIfLe  #TIfGt  #TIfGe
+if (1)                                                                          ##IfEq  ##IfNe  ##IfLt ##IfLe  ##IfGt  ##IfGe
  {Start 1;
   my $a = Mov 1;
   my $b = Mov 2;
@@ -2578,7 +2593,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TIfTrue
+if (1)                                                                          ##IfTrue
  {Start 1;
   IfTrue 1,
   Then
@@ -2592,7 +2607,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TIfFalse #TTrue #TFalse
+if (1)                                                                          ##IfFalse ##True ##False
  {Start 1;
   IfFalse 1,
   Then
@@ -2606,7 +2621,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TForLoop
+if (1)                                                                          ##ForLoop
  {Start 1;
   For
    {my ($i) = @_;
@@ -2617,7 +2632,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TForLoop
+if (1)                                                                          ##ForLoop
  {Start 1;
   For
    {my ($i) = @_;
@@ -2628,7 +2643,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TForLoop
+if (1)                                                                          ##ForLoop
  {Start 1;
   For
    {my ($i) = @_;
@@ -2639,7 +2654,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssert
+if (1)                                                                          ##Assert
  {Start 1;
   Assert;
   my $e = Execute(suppressOutput=>1);
@@ -2647,7 +2662,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertEq
+if (1)                                                                          ##AssertEq
  {Start 1;
   Mov 0, 1;
   AssertEq \0, 2;
@@ -2656,7 +2671,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertNe
+if (1)                                                                          ##AssertNe
  {Start 1;
   Mov 0, 1;
   AssertNe \0, 1;
@@ -2665,7 +2680,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertLt
+if (1)                                                                          ##AssertLt
  {Start 1;
   Mov 0, 1;
   AssertLt \0, 0;
@@ -2674,7 +2689,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertLe
+if (1)                                                                          ##AssertLe
  {Start 1;
   Mov 0, 1;
   AssertLe \0, 0;
@@ -2683,7 +2698,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertGt
+if (1)                                                                          ##AssertGt
  {Start 1;
   Mov 0, 1;
   AssertGt \0, 2;
@@ -2692,7 +2707,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertGe
+if (1)                                                                          ##AssertGe
  {Start 1;
   Mov 0, 1;
   AssertGe \0, 2;
@@ -2701,7 +2716,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertTrue
+if (1)                                                                          ##AssertTrue
  {Start 1;
   AssertFalse 0;
   AssertTrue  0;
@@ -2714,7 +2729,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAssertFalse
+if (1)                                                                          ##AssertFalse
  {Start 1;
   AssertTrue  1;
   AssertFalse 1;
@@ -2739,7 +2754,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TMov #TCall
+if (1)                                                                          ##Alloc ##Mov ##Call
  {Start 1;
   my $a = Array "aaa";
   Dump "dddd";
@@ -2756,7 +2771,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TMov #TCall #TParamsPut #TParamsGet
+if (1)                                                                          ##Alloc ##Mov ##Call ##ParamsPut ##ParamsGet
  {Start 1;
   my $a = Array "aaa";
   my $i = Mov 1;
@@ -2780,7 +2795,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TClear
+if (1)                                                                          ##Alloc ##Clear
  {Start 1;
   my $a = Array "aaa";
   Clear [$a, 10, 'aaa'];
@@ -2789,7 +2804,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TBlock #TGood #TBad
+if (1)                                                                          ##Block ##Good ##Bad
  {Start 1;
   Block
    {my ($start, $good, $bad, $end) = @_;
@@ -2808,7 +2823,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TBlock
+if (1)                                                                          ##Block
  {Start 1;
   Block
    {my ($start, $good, $bad, $end) = @_;
@@ -2827,7 +2842,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TProcedure
+if (1)                                                                          ##Procedure
  {Start 1;
   for my $i(1..10)
    {Out $i;
@@ -2871,7 +2886,7 @@ if (0)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TMov #TCall
+if (1)                                                                          ##Alloc ##Mov ##Call
  {Start 1;
   my $set = Procedure 'set', sub
    {my $a = ParamsGet 0;
@@ -2894,7 +2909,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TLeArea #TLeAddress
+if (1)                                                                          ##LeArea ##LeAddress
  {Start 1;
   my $a = Array "array";
   my $b = Mov 2;
@@ -2912,7 +2927,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TShiftUp
+if (1)                                                                          ##ShiftUp
  {Start 1;
   my $a = Array "array";
   Mov [$a, 0, 'array'], 0;
@@ -2924,7 +2939,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TShiftDown
+if (1)                                                                          ##ShiftDown
  {Start 1;
   my $a = Array "array";
   Mov [$a, 0, 'array'], 0;
@@ -2938,7 +2953,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TMov #TJeq #TJne #TJle #TJlt #TJge #TJgt
+if (1)                                                                          ##Alloc ##Mov ##Jeq ##Jne ##Jle ##Jlt ##Jge ##Jgt
  {Start 1;
   my $a = Array "aaa";
   my $b = Array "bbb";
@@ -2961,7 +2976,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TJTrue #TJFalse
+if (1)                                                                          ##JTrue ##JFalse
  {Start 1;
   my $a = Mov 1;
   Block
@@ -2990,7 +3005,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TAlloc #TMov
+if (1)                                                                          ##Alloc ##Mov
  {Start 1;
   my $a = Array 'aaa';
   my $b = Mov 2;                                                                # Location to move to in a
@@ -3005,7 +3020,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TResize
+if (1)                                                                          ##Resize
  {Start 1;
   my $a = Array 'aaa';
   Mov [$a, 0, 'aaa'], 1;
@@ -3017,7 +3032,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TTrace #TThen #TElse
+if (1)                                                                          ##Trace ##Then ##Else
  {Start 1;
   Trace 1;
   IfEq 1, 2,
@@ -3043,7 +3058,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TWatch
+if (1)                                                                          ##Watch
  {Start 1;
   my $a = Mov 1;
   my $b = Mov 2;
@@ -3066,49 +3081,40 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TArraySize #TForArray #TArray
+if (1)                                                                          ##ArraySize ##ForArray ##Array ##Nop
  {Start 1;
   my $a = Array "aaa";
     Mov [$a, 0, "aaa"], 1;
     Mov [$a, 1, "aaa"], 22;
     Mov [$a, 2, "aaa"], 333;
   my $n = ArraySize $a, "aaa";
-  Out $n;
+  DumpArray $a, "AAAA";
 
   ForArray
    {my ($i, $e, $check, $next, $end) = @_;
-    IfGt $i, 1,
-    Then
-     {Trace 1;
-     };
     Out $i; Out $e;
    }  $a, "aaa";
 
   Nop;
   my $e = Execute(suppressOutput=>1);
+
   is_deeply $e->memory, {1=>[1, 22, 333]};
 
   is_deeply $e->out,
- [3, 0, 1, 1, 22,
-  "Trace: 1",
-  "  37    14     1         trace                      \n",
-  "  38    15     3         label                      \n",
+[ "AAAA",
+  "bless([1, 22, 333], \"aaa\")",
+  "Stack trace",
+  "    1     6 dumpArray",
+  0,
+  1,
+  1,
+  22,
   2,
-  "  39    16     3           out                      \n",
-  333,
-  "  40    17     3           out                      \n",
-  "  41    18     3         label                      \n",
-  "  42    19     3           inc  [0, 3, stackArea] = 3 was 2\n",
-  "  43    20     3           jmp                      \n",
-  "  44     9     4         label                      \n",
-  "  45    10     4           jGe                      \n",
-  "  46    21     1         label                      \n",
-  "  47    22     1           nop                      \n",
-];
+  333];
  }
 
 #latest:;
-if (1)                                                                          #TDumpArray #TMov
+if (1)                                                                          ##DumpArray ##Mov
  {Start 1;
   my $a = Array "aaa";
     Mov [$a, 0, "aaa"], 1;
@@ -3125,13 +3131,37 @@ if (1)                                                                          
 ];
  }
 
+#latest:;
+if (1)                                                                          ##MoveLong
+ {my $N = 10;
+  Start 1;
+  my $a = Array "aaa";
+  my $b = Array "bbb";
+  For
+   {my ($i, $Check, $Next, $End) = @_;
+    Mov [$a, \$i, "aaa"], $i;
+    my $j = Add $i, 100;
+    Mov [$b, \$i, "bbb"], $j;
+   } $N;
+
+  MoveLong [$b, \2, 'bbb'], [$a, \4, 'aaa'], 3;
+
+  my $e = Execute(suppressOutput=>1);
+
+  is_deeply $e->memory,
+{
+  1 => bless([0 .. 9], "aaa"),
+  2 => bless([100, 101, 4, 5, 6, 105 .. 109], "bbb"),
+};
+ }
+
 
 #      0     1     2
 #     10    20    30
 # 5=0   15=1  25=2  35=3
 
 #latest:;
-if (1)                                                                          #TArrayIndex #TArrayCountLess #TArrayCountGreater
+if (1)                                                                          ##ArrayIndex ##ArrayCountLess ##ArrayCountGreater
  {Start 1;
   my $a = Array "aaa";
   Mov [$a, 0, "aaa"], 10;
@@ -3158,7 +3188,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TTally #TFor
+if (1)                                                                          ##Tally ##For
  {my $N = 5;
   Start 1;
   For
@@ -3175,7 +3205,7 @@ if (1)                                                                          
  }
 
 #latest:;
-if (1)                                                                          #TTracePoints
+if (1)                                                                          ##TracePoints
  {my $N = 5;
   Start 1;
   TracePoints 1;

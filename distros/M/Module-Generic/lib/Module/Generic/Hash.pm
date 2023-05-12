@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.2.3
+## Version v1.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/12
+## Modified 2023/05/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         'ge'     => sub { _obj_comp( @_, 'ge') },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.2.3';
+    our( $VERSION ) = 'v1.3.0';
 };
 
 use strict;
@@ -158,15 +158,52 @@ sub json
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     $self->_tie_object->enable(0);
     my $data = $self->{data};
-    my $json;
-    if( $opts->{pretty} )
+    # $opts->{utf8} = 1 if( !CORE::exists( $opts->{utf8} ) );
+    if( CORE::exists( $opts->{order} ) )
     {
-        $json = JSON->new->pretty->utf8->indent(1)->relaxed(1)->canonical(1)->allow_nonref->encode( $data );
+        $opts->{canonical} = CORE::delete( $opts->{order} );
     }
-    else
+    elsif( CORE::exists( $opts->{ordered} ) )
     {
-        $json = JSON->new->utf8->canonical(1)->allow_nonref->encode( $data );
+        $opts->{canonical} = CORE::delete( $opts->{ordered} );
     }
+    elsif( CORE::exists( $opts->{sort} ) )
+    {
+        $opts->{canonical} = CORE::delete( $opts->{sort} );
+    }
+    elsif( CORE::exists( $opts->{sorted} ) )
+    {
+        $opts->{canonical} = CORE::delete( $opts->{sorted} );
+    }
+
+    if( !CORE::exists( $opts->{canonical} ) && $opts->{pretty} )
+    {
+        $opts->{canonical} = 1;
+    }
+    if( !CORE::exists( $opts->{indent} ) && $opts->{pretty} )
+    {
+        $opts->{indent} = 1;
+    }
+    if( !CORE::exists( $opts->{relaxed} ) && $opts->{pretty} )
+    {
+        $opts->{relaxed} = 1;
+    }
+    my $j = JSON->new->allow_nonref;
+    my @keys = qw(
+        ascii latin1 utf8 pretty indent space_before space_after relaxed 
+        canonical allow_nonref allow_unknown allow_blessed convert_blessed allow_tags 
+        boolean_values filter_json_object filter_json_single_key_object max_depth max_size
+    );
+    foreach my $k ( @keys )
+    {
+        next unless( CORE::exists( $opts->{ $k } ) );
+        my $code = $j->can( $k );
+        if( defined( $code ) )
+        {
+            $code->( $j, $opts->{ $k } );
+        }
+    }
+    my $json = $j->encode( $data );
     $self->_tie_object->enable(1);
     return( Module::Generic::Scalar->new( $json ) );
 }

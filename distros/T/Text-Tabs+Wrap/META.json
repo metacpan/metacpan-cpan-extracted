@@ -39,7 +39,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Tabs"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Tabs%2BWrap"
       },
       "repository" : {
          "type" : "git",
@@ -47,6 +47,6 @@
          "web" : "https://github.com/ap/Text-Tabs"
       }
    },
-   "version" : "2023.0509",
+   "version" : "2023.0511",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

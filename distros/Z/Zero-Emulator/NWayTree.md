@@ -10,71 +10,140 @@ Zero::NWayTree - N-Way-Tree in Zero assembler language.
 # Synopsis
 
 Create a tree, load it from an array of random numbers, then print out the
-results:
+results. Show the number of instructions executed in the process.  The
+challenge, should you wish to acceopt it, is to reduce these instruction counts
+to the minimum possible while still passing all the tests.
 
-    my $W = 3; my $N = 107; my @r = randomArray $N;
+    {my $W = 3; my $N = 107; my @r = randomArray $N;
 
-    Start 1;
-    my $t = New($W);                                                              # Create tree at expected location in memory
+     Start 1;
+     my $t = New($W);                                                              # Create tree at expected location in memory
 
-    my $a = Array "aaa";
-    for my $I(1..$N)                                                              # Load array
-     {my $i = $I-1;
-      Mov [$a, $i, "aaa"], $r[$i];
-     }
+     my $a = Array "aaa";
+     for my $I(1..$N)                                                              # Load array
+      {my $i = $I-1;
+       Mov [$a, $i, "aaa"], $r[$i];
+      }
 
-    ForArray                                                                      # Create tree
-     {my ($i, $k) = @_;
-      my $n = Keys($t);
-      AssertEq $n, $i;                                                            # Check tree size
-      my $K = Add $k, $k;
-      Tally 1;
-      Insert($t, $k, $K);                                                         # Insert a new node
-      Tally 0;
-     } $a, q(aaa);
+     my $f = FindResult_new;
 
-    Iterate                                                                       # Iterate tree
-     {my ($find) = @_;                                                            # Find result
-      my $k = FindResult_key($find);
-      Out $k;
-      my $f = Find($t, $k);                                                       # Find
-      my $d = FindResult_data($f);
-      my $K = Add $k, $k;
-      AssertEq $K, $d;                                                            # Check result
-     } $t;
+     ForArray                                                                      # Create tree
+      {my ($i, $k) = @_;
+       my $n = Keys($t);
+       AssertEq $n, $i;                                                            # Check tree size
+       my $K = Add $k, $k;
+       Tally 1;
+       Insert($t, $k, $K,                                                          # Insert a new node
+         findResult=>          $f,
+         maximumNumberOfKeys=> $W,
+         splitPoint=>          int($W/2),
+         rightStart=>          int($W/2)+1,
+       );
+       Tally 0;
+      } $a, q(aaa);
 
-    my $e = Execute(suppressOutput=>1);
+     Iterate                                                                       # Iterate tree
+      {my ($find) = @_;                                                            # Find result
+       my $k = FindResult_key($find);
+       Out $k;
+       Tally 2;
+       my $f = Find($t, $k, findResult=>$f);                                       # Find
+       Tally 0;
+       my $d = FindResult_data($f);
+       my $K = Add $k, $k;
+       AssertEq $K, $d;                                                            # Check result
+      } $t;
 
-    is_deeply $e->out, [1..$N];                                                   # Expected sequence
+     Tally 3;
+     Iterate {} $t;                                                                # Iterate tree
+     Tally 0;
 
-    is_deeply $e->tallyCount,  26177;                                             # Insertion instruction counts
-    is_deeply $e->tallyCounts->{1}, {
-    add        => 860,
-    array      => 607,
-    call       => 107,
-    free       => 360,
-    inc        => 1044,
-    jEq        => 631,
-    jGe        => 1667,
-    jLe        => 461,
-    jLt        => 565,
-    jmp        => 1436,
-    jNe        => 1095,
-    mov        => 12328,
-    not        => 695,
-    paramsGet  => 321,
-    paramsPut  => 321,
-    resize     => 12,
-    return     => 107,
-    shiftRight => 68,
-    shiftUp    => 300,
-    subtract   => 641,
-    tracePoint => 2551,
-  };
+     my $e = Execute(suppressOutput=>1);
+
+     is_deeply $e->out, [1..$N];                                                   # Expected sequence
+
+     #say STDERR dump $e->tallyCount;
+     is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+
+     #say STDERR dump $e->tallyTotal;
+     is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+
+     #say STDERR dump $e->tallyCounts->{1};
+     is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+     add               => 159,
+     array             => 247,
+     arrayCountGreater => 2,
+     arrayCountLess    => 262,
+     arrayIndex        => 293,
+     dec               => 30,
+     inc               => 726,
+     jEq               => 894,
+     jGe               => 648,
+     jLe               => 461,
+     jLt               => 565,
+     jmp               => 878,
+     jNe               => 908,
+     mov               => 7724,
+     moveLong          => 171,
+     not               => 631,
+     resize            => 161,
+     shiftUp           => 300,
+     subtract          => 606,
+   };
+
+     #say STDERR dump $e->tallyCounts->{2};
+     is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+     add => 137,
+     arrayCountLess => 223,
+     arrayIndex => 330,
+     inc => 360,
+     jEq => 690,
+     jGe => 467,
+     jLe => 467,
+     jmp => 604,
+     jNe => 107,
+     mov => 1975,
+     not => 360,
+     subtract => 574};
+
+     #say STDERR dump $e->tallyCounts->{3};
+     is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+     add        => 107,
+     array      => 1,
+     arrayIndex => 72,
+     dec        => 72,
+     free       => 1,
+     inc        => 162,
+     jEq        => 260,
+     jFalse     => 28,
+     jGe        => 316,
+     jmp        => 252,
+     jNe        => 117,
+     jTrue      => 73,
+     mov        => 1111,
+     not        => 180};
+
+     #say STDERR printTreeKeys($e->memory); x;
+     #say STDERR printTreeData($e->memory); x;
+     is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                   38                                                                                                    72
+                                                                21                                                                                                       56                                                                                                 89
+                               10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+           3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+     1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+   END
+
+     is_deeply printTreeData($e->memory), <<END;
+                                                                                                                   76                                                                                                   144
+                                                                42                                                                                                      112                                                                                                178
+                               20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+           6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+     2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+   END
 
 # Description
 
-Version 20230513.
+Version 20230514.
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see [Index](#index).
@@ -102,7 +171,7 @@ Create a variable referring to a new tree descriptor.
       is_deeply $e->memory, { 1 => bless([0, 0, 3, 0], "Tree") };
      }
     
-    if (1)                                                                            
+    if (1)                                                                             
      {my $W = 3; my $N = 66;
     
       Start 1;
@@ -110,41 +179,23 @@ Create a variable referring to a new tree descriptor.
       my $t = New($W);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     
-      for my $i(1..$N)
-       {Insert($t, $i, my $d = $i+$i);
-        for my $j(1..$i)
-         {AssertEq $j+$j, FindResult_data(Find($t, $j));
-         }
-        AssertNe FindResult_found, FindResult_cmp(Find($t, 0));
-        AssertNe FindResult_found, FindResult_cmp(Find($t, $i+1));
-       }
+      For
+       {my ($i, $check, $next, $end) = @_;                                          # Insert
+        my $d = Add $i, $i;
+    
+        Insert($t, $i, $d);
+       } $N;
+    
+      For                                                                           # Find each prior element
+       {my ($j, $check, $next, $end) = @_;
+        my $d = Add $j, $j;
+        AssertEq $d, FindResult_data(Find($t, $j));
+       } $N;
+      AssertNe FindResult_found, FindResult_cmp(Find($t, -1));                      # Should not be present
+      AssertNe FindResult_found, FindResult_cmp(Find($t, $N));
     
       my $e = Execute(suppressOutput=>1);
-      is_deeply $e->out, [];
-     }
-    
-    if (1)                                                                            
-     {my $W = 3; my $N = 66; my @r = randomArray $N;
-    
-      Start 1;
-    
-      my $t = New($W);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-    
-      for my $i(1..$N)
-       {my $k = $r[$i-1]; my $d = $k*2;
-        Insert($t, $k, $d);
-        AssertEq $d, FindResult_data(Find($t, $k));
-       }
-    
-      my $e = Execute(suppressOutput=>1);
-      is_deeply printTreeKeys($e->memory), <<END;
-                                                                                            30
-                                         13                                                                                           44                               55
-                        7                                     20             25                                  37                                     50                               61
-         2     4              9    11          15    17                23          27                33    35          39    41                47             52                58             63    65
-      1     3     5  6     8    10    12    14    16    18 19    21 22    24    26    28 29    31 32    34    36    38    40    42 43    45 46    48 49    51    53 54    56 57    59 60    62    64    66
-    END
+      is_deeply $e->out, [];                                                        # No asserts
      }
     
 
@@ -157,7 +208,7 @@ Get the number of keys in the tree..
 
 **Example:**
 
-    if (1)                                                                              
+    if (1)                                                                                
      {my $W = 3; my $N = 107; my @r = randomArray $N;
     
       Start 1;
@@ -168,6 +219,8 @@ Get the number of keys in the tree..
        {my $i = $I-1;
         Mov [$a, $i, "aaa"], $r[$i];
        }
+    
+      my $f = FindResult_new;
     
       ForArray                                                                      # Create tree
        {my ($i, $k) = @_;
@@ -177,7 +230,12 @@ Get the number of keys in the tree..
         AssertEq $n, $i;                                                            # Check tree size
         my $K = Add $k, $k;
         Tally 1;
-        Insert($t, $k, $K);                                                         # Insert a new node
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
         Tally 0;
        } $a, q(aaa);
     
@@ -185,58 +243,157 @@ Get the number of keys in the tree..
        {my ($find) = @_;                                                            # Find result
         my $k = FindResult_key($find);
         Out $k;
-        my $f = Find($t, $k);                                                       # Find
+        Tally 2;
+        my $f = Find($t, $k, findResult=>$f);                                       # Find
+        Tally 0;
         my $d = FindResult_data($f);
         my $K = Add $k, $k;
         AssertEq $K, $d;                                                            # Check result
        } $t;
     
+      Tally 3;
+      Iterate {} $t;                                                                # Iterate tree
+      Tally 0;
+    
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
-      is_deeply $e->tallyCount,  23612;                                             # Insertion instruction counts
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
     
-      #say STDERR "AAAA
-  ", dump($e->tallyCounts->{1});
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
     
-      is_deeply $e->tallyCounts->{1}, {
-      add => 860,
-      array => 607,
-      arrayIndex => 7,
-      call => 107,
-      dec => 7,
-      free => 360,
-      inc => 1044,
-      jEq => 631,
-      jGe => 1660,
-      jLe => 461,
-      jLt => 565,
-      jmp => 1436,
-      jNe => 1088,
-      mov => 12314,
-      not => 695,
-      paramsGet => 321,
-      paramsPut => 321,
-      resize => 12,
-      return => 107,
-      shiftRight => 68,
-      shiftUp => 300,
-      subtract => 641,
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
     };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+      #say STDERR printTreeKeys($e->memory); x;
+      #say STDERR printTreeData($e->memory); x;
+      is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+      is_deeply printTreeData($e->memory), <<END;
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
      }
     
 
-## FindResult\_key($f)
+# Find
 
-Get key from find result..
+Find a key in a tree.
+
+## FindResult\_cmp($f)
+
+Get comparison from find result.
 
        Parameter  Description
     1  $f         Find result
 
 **Example:**
 
-    if (1)                                                                              
+    if (1)                                                                             
+     {my $W = 3; my $N = 66;
+    
+      Start 1;
+      my $t = New($W);
+    
+      For
+       {my ($i, $check, $next, $end) = @_;                                          # Insert
+        my $d = Add $i, $i;
+    
+        Insert($t, $i, $d);
+       } $N;
+    
+      For                                                                           # Find each prior element
+       {my ($j, $check, $next, $end) = @_;
+        my $d = Add $j, $j;
+        AssertEq $d, FindResult_data(Find($t, $j));
+       } $N;
+    
+      AssertNe FindResult_found, FindResult_cmp(Find($t, -1));                      # Should not be present  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    
+      AssertNe FindResult_found, FindResult_cmp(Find($t, $N));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    
+      my $e = Execute(suppressOutput=>1);
+      is_deeply $e->out, [];                                                        # No asserts
+     }
+    
+
+## FindResult\_data($f)
+
+Get data field from find results.
+
+       Parameter  Description
+    1  $f         Find result
+
+**Example:**
+
+    if (1)                                                                                
      {my $W = 3; my $N = 107; my @r = randomArray $N;
     
       Start 1;
@@ -248,13 +405,162 @@ Get key from find result..
         Mov [$a, $i, "aaa"], $r[$i];
        }
     
+      my $f = FindResult_new;
+    
       ForArray                                                                      # Create tree
        {my ($i, $k) = @_;
         my $n = Keys($t);
         AssertEq $n, $i;                                                            # Check tree size
         my $K = Add $k, $k;
         Tally 1;
-        Insert($t, $k, $K);                                                         # Insert a new node
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
+        Tally 0;
+       } $a, q(aaa);
+    
+      Iterate                                                                       # Iterate tree
+       {my ($find) = @_;                                                            # Find result
+        my $k = FindResult_key($find);
+        Out $k;
+        Tally 2;
+        my $f = Find($t, $k, findResult=>$f);                                       # Find
+        Tally 0;
+    
+        my $d = FindResult_data($f);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+        my $K = Add $k, $k;
+        AssertEq $K, $d;                                                            # Check result
+       } $t;
+    
+      Tally 3;
+      Iterate {} $t;                                                                # Iterate tree
+      Tally 0;
+    
+      my $e = Execute(suppressOutput=>1);
+    
+      is_deeply $e->out, [1..$N];                                                   # Expected sequence
+    
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
+    };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+      #say STDERR printTreeKeys($e->memory); x;
+      #say STDERR printTreeData($e->memory); x;
+      is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+      is_deeply printTreeData($e->memory), <<END;
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
+     }
+    
+
+## FindResult\_key($f)
+
+Get key field from find results.
+
+       Parameter  Description
+    1  $f         Find result
+
+**Example:**
+
+    if (1)                                                                                
+     {my $W = 3; my $N = 107; my @r = randomArray $N;
+    
+      Start 1;
+      my $t = New($W);                                                              # Create tree at expected location in memory
+    
+      my $a = Array "aaa";
+      for my $I(1..$N)                                                              # Load array
+       {my $i = $I-1;
+        Mov [$a, $i, "aaa"], $r[$i];
+       }
+    
+      my $f = FindResult_new;
+    
+      ForArray                                                                      # Create tree
+       {my ($i, $k) = @_;
+        my $n = Keys($t);
+        AssertEq $n, $i;                                                            # Check tree size
+        my $K = Add $k, $k;
+        Tally 1;
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
         Tally 0;
        } $a, q(aaa);
     
@@ -264,155 +570,103 @@ Get key from find result..
         my $k = FindResult_key($find);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
         Out $k;
-        my $f = Find($t, $k);                                                       # Find
+        Tally 2;
+        my $f = Find($t, $k, findResult=>$f);                                       # Find
+        Tally 0;
         my $d = FindResult_data($f);
         my $K = Add $k, $k;
         AssertEq $K, $d;                                                            # Check result
        } $t;
     
-      my $e = Execute(suppressOutput=>1);
-    
-      is_deeply $e->out, [1..$N];                                                   # Expected sequence
-    
-      is_deeply $e->tallyCount,  23612;                                             # Insertion instruction counts
-    
-      #say STDERR "AAAA
-  ", dump($e->tallyCounts->{1});
-    
-      is_deeply $e->tallyCounts->{1}, {
-      add => 860,
-      array => 607,
-      arrayIndex => 7,
-      call => 107,
-      dec => 7,
-      free => 360,
-      inc => 1044,
-      jEq => 631,
-      jGe => 1660,
-      jLe => 461,
-      jLt => 565,
-      jmp => 1436,
-      jNe => 1088,
-      mov => 12314,
-      not => 695,
-      paramsGet => 321,
-      paramsPut => 321,
-      resize => 12,
-      return => 107,
-      shiftRight => 68,
-      shiftUp => 300,
-      subtract => 641,
-    };
-     }
-    
-
-## FindResult\_cmp($f)
-
-Get comparison from find result..
-
-       Parameter  Description
-    1  $f         Find result
-
-**Example:**
-
-    if (1)                                                                           
-     {Start 1;
-      my $f = FindResult_new(1, 2, 3, 4);
-      my $n = FindResult_node($f);
-      my $k = FindResult_key($f);
-    
-      my $c = FindResult_cmp($f);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-      my $i = FindResult_index($f);
-      Out $_ for $n, $c, $k, $i;
-      my $e = Execute(suppressOutput=>1);
-      is_deeply $e->out,    [1, 3, 2, 4];
-      is_deeply $e->memory, {1=>[1, 3, 2, 4]};
-     }
-    
-
-## FindResult\_data($f)
-
-Get data field from find results..
-
-       Parameter  Description
-    1  $f         Find result
-
-**Example:**
-
-    if (1)                                                                              
-     {my $W = 3; my $N = 107; my @r = randomArray $N;
-    
-      Start 1;
-      my $t = New($W);                                                              # Create tree at expected location in memory
-    
-      my $a = Array "aaa";
-      for my $I(1..$N)                                                              # Load array
-       {my $i = $I-1;
-        Mov [$a, $i, "aaa"], $r[$i];
-       }
-    
-      ForArray                                                                      # Create tree
-       {my ($i, $k) = @_;
-        my $n = Keys($t);
-        AssertEq $n, $i;                                                            # Check tree size
-        my $K = Add $k, $k;
-        Tally 1;
-        Insert($t, $k, $K);                                                         # Insert a new node
-        Tally 0;
-       } $a, q(aaa);
-    
-      Iterate                                                                       # Iterate tree
-       {my ($find) = @_;                                                            # Find result
-        my $k = FindResult_key($find);
-        Out $k;
-        my $f = Find($t, $k);                                                       # Find
-    
-        my $d = FindResult_data($f);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-        my $K = Add $k, $k;
-        AssertEq $K, $d;                                                            # Check result
-       } $t;
+      Tally 3;
+      Iterate {} $t;                                                                # Iterate tree
+      Tally 0;
     
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
-      is_deeply $e->tallyCount,  23612;                                             # Insertion instruction counts
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
     
-      #say STDERR "AAAA
-  ", dump($e->tallyCounts->{1});
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
     
-      is_deeply $e->tallyCounts->{1}, {
-      add => 860,
-      array => 607,
-      arrayIndex => 7,
-      call => 107,
-      dec => 7,
-      free => 360,
-      inc => 1044,
-      jEq => 631,
-      jGe => 1660,
-      jLe => 461,
-      jLt => 565,
-      jmp => 1436,
-      jNe => 1088,
-      mov => 12314,
-      not => 695,
-      paramsGet => 321,
-      paramsPut => 321,
-      resize => 12,
-      return => 107,
-      shiftRight => 68,
-      shiftUp => 300,
-      subtract => 641,
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
     };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+      #say STDERR printTreeKeys($e->memory); x;
+      #say STDERR printTreeData($e->memory); x;
+      is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+      is_deeply printTreeData($e->memory), <<END;
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
      }
     
-
-# Find
-
-Find a key in a tree.
 
 ## Find($tree, $key, %options)
 
@@ -425,56 +679,40 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
 
 **Example:**
 
-    if (1)                                                                            
+    if (1)                                                                             
      {my $W = 3; my $N = 66;
     
       Start 1;
       my $t = New($W);
     
-      for my $i(1..$N)
-       {Insert($t, $i, my $d = $i+$i);
-        for my $j(1..$i)
+      For
+       {my ($i, $check, $next, $end) = @_;                                          # Insert
+        my $d = Add $i, $i;
     
-         {AssertEq $j+$j, FindResult_data(Find($t, $j));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-         }
+        Insert($t, $i, $d);
+       } $N;
     
-        AssertNe FindResult_found, FindResult_cmp(Find($t, 0));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    
+      For                                                                           # Find each prior element  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+       {my ($j, $check, $next, $end) = @_;
+        my $d = Add $j, $j;
+    
+        AssertEq $d, FindResult_data(Find($t, $j));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+       } $N;
+    
+      AssertNe FindResult_found, FindResult_cmp(Find($t, -1));                      # Should not be present  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     
-        AssertNe FindResult_found, FindResult_cmp(Find($t, $i+1));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+      AssertNe FindResult_found, FindResult_cmp(Find($t, $N));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-       }
     
       my $e = Execute(suppressOutput=>1);
-      is_deeply $e->out, [];
+      is_deeply $e->out, [];                                                        # No asserts
      }
     
-    if (1)                                                                            
-     {my $W = 3; my $N = 66; my @r = randomArray $N;
-    
-      Start 1;
-      my $t = New($W);
-    
-      for my $i(1..$N)
-       {my $k = $r[$i-1]; my $d = $k*2;
-        Insert($t, $k, $d);
-    
-        AssertEq $d, FindResult_data(Find($t, $k));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-       }
-    
-      my $e = Execute(suppressOutput=>1);
-      is_deeply printTreeKeys($e->memory), <<END;
-                                                                                            30
-                                         13                                                                                           44                               55
-                        7                                     20             25                                  37                                     50                               61
-         2     4              9    11          15    17                23          27                33    35          39    41                47             52                58             63    65
-      1     3     5  6     8    10    12    14    16    18 19    21 22    24    26    28 29    31 32    34    36    38    40    42 43    45 46    48 49    51    53 54    56 57    59 60    62    64    66
-    END
-     }
-    
-    if (1)                                                                              
+    if (1)                                                                                
      {my $W = 3; my $N = 107; my @r = randomArray $N;
     
       Start 1;
@@ -486,13 +724,20 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
         Mov [$a, $i, "aaa"], $r[$i];
        }
     
+      my $f = FindResult_new;
+    
       ForArray                                                                      # Create tree
        {my ($i, $k) = @_;
         my $n = Keys($t);
         AssertEq $n, $i;                                                            # Check tree size
         my $K = Add $k, $k;
         Tally 1;
-        Insert($t, $k, $K);                                                         # Insert a new node
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
         Tally 0;
        } $a, q(aaa);
     
@@ -502,47 +747,105 @@ Find a key in a tree returning a [FindResult](https://metacpan.org/pod/FindResul
 
         my $k = FindResult_key($find);
         Out $k;
+        Tally 2;
     
-        my $f = Find($t, $k);                                                       # Find  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+        my $f = Find($t, $k, findResult=>$f);                                       # Find  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+        Tally 0;
         my $d = FindResult_data($f);
         my $K = Add $k, $k;
         AssertEq $K, $d;                                                            # Check result
        } $t;
     
+      Tally 3;
+      Iterate {} $t;                                                                # Iterate tree
+      Tally 0;
+    
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
-      is_deeply $e->tallyCount,  23612;                                             # Insertion instruction counts
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
     
-      #say STDERR "AAAA
-  ", dump($e->tallyCounts->{1});
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
     
-      is_deeply $e->tallyCounts->{1}, {
-      add => 860,
-      array => 607,
-      arrayIndex => 7,
-      call => 107,
-      dec => 7,
-      free => 360,
-      inc => 1044,
-      jEq => 631,
-      jGe => 1660,
-      jLe => 461,
-      jLt => 565,
-      jmp => 1436,
-      jNe => 1088,
-      mov => 12314,
-      not => 695,
-      paramsGet => 321,
-      paramsPut => 321,
-      resize => 12,
-      return => 107,
-      shiftRight => 68,
-      shiftUp => 300,
-      subtract => 641,
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
     };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+    
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+      #say STDERR printTreeKeys($e->memory); x;
+      #say STDERR printTreeData($e->memory); x;
+      is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+      is_deeply printTreeData($e->memory), <<END;
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
      }
     
 
@@ -581,10 +884,10 @@ Insert a key and its associated data into a tree.
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->memory, {
-      1 => bless([1, 1, 3, 2], "Tree"),
-      2 => bless([1, 1, 0, 1, 3, 4, 0], "Node"),
-      3 => bless([1], "Keys"),
-      4 => bless([11], "Data")};
+      1 => bless([1, 1, 3, 3], "Tree"),
+      3 => bless([1, 1, 0, 1, 4, 5, 0], "Node"),
+      4 => bless([1], "Keys"),
+      5 => bless([11], "Data")};
      }
     
     if (1)                                                                          
@@ -599,10 +902,10 @@ Insert a key and its associated data into a tree.
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->memory, {
-      1 => bless([2, 1, 3, 2], "Tree"),
-      2 => bless([2, 1, 0, 1, 3, 4, 0], "Node"),
-      3 => bless([1, 2], "Keys"),
-      4 => bless([11, 22], "Data")};
+      1 => bless([2, 1, 3, 3], "Tree"),
+      3 => bless([2, 1, 0, 1, 4, 5, 0], "Node"),
+      4 => bless([1, 2], "Keys"),
+      5 => bless([11, 22], "Data")};
      }
     
     if (1)                                                                          
@@ -614,10 +917,10 @@ Insert a key and its associated data into a tree.
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->memory, {
-      1 => bless([3, 1, 3, 2], "Tree"),
-      2 => bless([3, 1, 0, 1, 3, 4, 0], "Node"),
-      3 => bless([1, 2, 3], "Keys"),
-      4 => bless([11, 22, 33], "Data")}
+      1 => bless([3, 1, 3, 3], "Tree"),
+      3 => bless([3, 1, 0, 1, 4, 5, 0], "Node"),
+      4 => bless([1, 2, 3], "Keys"),
+      5 => bless([11, 22, 33], "Data")};
      }
     
     if (1)                                                                          
@@ -629,18 +932,17 @@ Insert a key and its associated data into a tree.
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->memory, {
-      1  => bless([4, 3, 3, 2], "Tree"),
-      2  => bless([1, 1, 0, 1, 3, 4, 11], "Node"),
-      3  => bless([2], "Keys"),
-      4  => bless([22], "Data"),
-      5  => bless([1, 2, 2, 1, 6, 7, 0], "Node"),
-      6  => bless([1], "Keys"),
-      7  => bless([11], "Data"),
-      8  => bless([2, 3, 2, 1, 9, 10, 0], "Node"),
-      9  => bless([3, 4], "Keys"),
-      10 => bless([33, 44], "Data"),
-      11 => bless([5, 8], "Down"),
-    };
+      1  => bless([4, 3, 3, 3], "Tree"),
+      3  => bless([1, 1, 0, 1, 4, 5, 15], "Node"),
+      4  => bless([2], "Keys"),
+      5  => bless([22], "Data"),
+      9  => bless([1, 2, 3, 1, 10, 11, 0], "Node"),
+      10 => bless([1], "Keys"),
+      11 => bless([11], "Data"),
+      12 => bless([2, 3, 3, 1, 13, 14, 0], "Node"),
+      13 => bless([3, 4], "Keys"),
+      14 => bless([33, 44], "Data"),
+      15 => bless([9, 12], "Down")};
      }
     
     if (1)                                                                          
@@ -651,22 +953,21 @@ Insert a key and its associated data into a tree.
 
     
       my $e = Execute(suppressOutput=>1);
-    
       is_deeply $e->memory, {
-      1  => bless([5, 5, 3, 2], "Tree"),
-      2  => bless([2, 1, 0, 1, 3, 4, 11], "Node"),
-      3  => bless([2, 4], "Keys"),
-      4  => bless([22, 44], "Data"),
-      5  => bless([1, 2, 2, 1, 6, 7, 0], "Node"),
-      6  => bless([1], "Keys"),
-      7  => bless([11], "Data"),
-      11 => bless([5, 14, 17], "Down"),
-      14 => bless([1, 4, 2, 1, 15, 16, 0], "Node"),
-      15 => bless([3], "Keys"),
-      16 => bless([33], "Data"),
-      17 => bless([1, 5, 2, 1, 18, 19, 0], "Node"),
+      1  => bless([5, 4, 3, 3], "Tree"),
+      3  => bless([2, 1, 0, 1, 4, 5, 15], "Node"),
+      4  => bless([2, 4], "Keys"),
+      5  => bless([22, 44], "Data"),
+      9  => bless([1, 2, 3, 1, 10, 11, 0], "Node"),
+      10 => bless([1], "Keys"),
+      11 => bless([11], "Data"),
+      12 => bless([1, 3, 3, 1, 13, 14, 0], "Node"),
+      13 => bless([3], "Keys"),
+      14 => bless([33], "Data"),
+      15 => bless([9, 12, 17], "Down"),
+      17 => bless([1, 4, 3, 1, 18, 19, 0], "Node"),
       18 => bless([5], "Keys"),
-      19 => bless([55], "Data")}
+      19 => bless([55], "Data")};
      }
     
     if (1)                                                                          
@@ -678,65 +979,49 @@ Insert a key and its associated data into a tree.
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->memory, {
-      1  => bless([6, 5, 3, 2], "Tree"),
-      2  => bless([2, 1, 0, 1, 3, 4, 11], "Node"),
-      3  => bless([2, 4], "Keys"),
-      4  => bless([22, 44], "Data"),
-      5  => bless([1, 2, 2, 1, 6, 7, 0], "Node"),
-      6  => bless([1], "Keys"),
-      7  => bless([11], "Data"),
-      11 => bless([5, 14, 17], "Down"),
-      14 => bless([1, 4, 2, 1, 15, 16, 0], "Node"),
-      15 => bless([3], "Keys"),
-      16 => bless([33], "Data"),
-      17 => bless([2, 5, 2, 1, 18, 19, 0], "Node"),
+      1  => bless([6, 4, 3, 3], "Tree"),
+      3  => bless([2, 1, 0, 1, 4, 5, 15], "Node"),
+      4  => bless([2, 4], "Keys"),
+      5  => bless([22, 44], "Data"),
+      9  => bless([1, 2, 3, 1, 10, 11, 0], "Node"),
+      10 => bless([1], "Keys"),
+      11 => bless([11], "Data"),
+      12 => bless([1, 3, 3, 1, 13, 14, 0], "Node"),
+      13 => bless([3], "Keys"),
+      14 => bless([33], "Data"),
+      15 => bless([9, 12, 17], "Down"),
+      17 => bless([2, 4, 3, 1, 18, 19, 0], "Node"),
       18 => bless([5, 6], "Keys"),
       19 => bless([55, 66], "Data")};
      }
     
-    if (1)                                                                            
+    if (1)                                                                             
      {my $W = 3; my $N = 66;
     
       Start 1;
       my $t = New($W);
     
-      for my $i(1..$N)
+      For
     
-       {Insert($t, $i, my $d = $i+$i);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+       {my ($i, $check, $next, $end) = @_;                                          # Insert  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-        for my $j(1..$i)
-         {AssertEq $j+$j, FindResult_data(Find($t, $j));
-         }
-        AssertNe FindResult_found, FindResult_cmp(Find($t, 0));
-        AssertNe FindResult_found, FindResult_cmp(Find($t, $i+1));
-       }
+        my $d = Add $i, $i;
+    
+    
+        Insert($t, $i, $d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+       } $N;
+    
+      For                                                                           # Find each prior element
+       {my ($j, $check, $next, $end) = @_;
+        my $d = Add $j, $j;
+        AssertEq $d, FindResult_data(Find($t, $j));
+       } $N;
+      AssertNe FindResult_found, FindResult_cmp(Find($t, -1));                      # Should not be present
+      AssertNe FindResult_found, FindResult_cmp(Find($t, $N));
     
       my $e = Execute(suppressOutput=>1);
-      is_deeply $e->out, [];
-     }
-    
-    if (1)                                                                            
-     {my $W = 3; my $N = 66; my @r = randomArray $N;
-    
-      Start 1;
-      my $t = New($W);
-    
-      for my $i(1..$N)
-       {my $k = $r[$i-1]; my $d = $k*2;
-    
-        Insert($t, $k, $d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-        AssertEq $d, FindResult_data(Find($t, $k));
-       }
-    
-      my $e = Execute(suppressOutput=>1);
-      is_deeply printTreeKeys($e->memory), <<END;
-                                                                                            30
-                                         13                                                                                           44                               55
-                        7                                     20             25                                  37                                     50                               61
-         2     4              9    11          15    17                23          27                33    35          39    41                47             52                58             63    65
-      1     3     5  6     8    10    12    14    16    18 19    21 22    24    26    28 29    31 32    34    36    38    40    42 43    45 46    48 49    51    53 54    56 57    59 60    62    64    66
-    END
+      is_deeply $e->out, [];                                                        # No asserts
      }
     
 
@@ -754,7 +1039,7 @@ Iterate over a tree.
 
 **Example:**
 
-    if (1)                                                                              
+    if (1)                                                                                
      {my $W = 3; my $N = 107; my @r = randomArray $N;
     
       Start 1;
@@ -766,13 +1051,20 @@ Iterate over a tree.
         Mov [$a, $i, "aaa"], $r[$i];
        }
     
+      my $f = FindResult_new;
+    
       ForArray                                                                      # Create tree
        {my ($i, $k) = @_;
         my $n = Keys($t);
         AssertEq $n, $i;                                                            # Check tree size
         my $K = Add $k, $k;
         Tally 1;
-        Insert($t, $k, $K);                                                         # Insert a new node
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
         Tally 0;
        } $a, q(aaa);
     
@@ -782,45 +1074,105 @@ Iterate over a tree.
        {my ($find) = @_;                                                            # Find result
         my $k = FindResult_key($find);
         Out $k;
-        my $f = Find($t, $k);                                                       # Find
+        Tally 2;
+        my $f = Find($t, $k, findResult=>$f);                                       # Find
+        Tally 0;
         my $d = FindResult_data($f);
         my $K = Add $k, $k;
         AssertEq $K, $d;                                                            # Check result
        } $t;
     
+      Tally 3;
+    
+      Iterate {} $t;                                                                # Iterate tree  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      Tally 0;
+    
       my $e = Execute(suppressOutput=>1);
     
       is_deeply $e->out, [1..$N];                                                   # Expected sequence
     
-      is_deeply $e->tallyCount,  23612;                                             # Insertion instruction counts
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
     
-      #say STDERR "AAAA
-  ", dump($e->tallyCounts->{1});
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
     
-      is_deeply $e->tallyCounts->{1}, {
-      add => 860,
-      array => 607,
-      arrayIndex => 7,
-      call => 107,
-      dec => 7,
-      free => 360,
-      inc => 1044,
-      jEq => 631,
-      jGe => 1660,
-      jLe => 461,
-      jLt => 565,
-      jmp => 1436,
-      jNe => 1088,
-      mov => 12314,
-      not => 695,
-      paramsGet => 321,
-      paramsPut => 321,
-      resize => 12,
-      return => 107,
-      shiftRight => 68,
-      shiftUp => 300,
-      subtract => 641,
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
     };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+    
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+      #say STDERR printTreeKeys($e->memory); x;
+      #say STDERR printTreeData($e->memory); x;
+      is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+      is_deeply printTreeData($e->memory), <<END;
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
      }
     
 
@@ -837,21 +1189,138 @@ Print the keys held in a tree.
 
 **Example:**
 
-    if (1)                                                                           
-     {my $W = 7; my $N = 165; my @r = randomArray $N;
+    if (1)                                                                                
+     {my $W = 3; my $N = 107; my @r = randomArray $N;
     
       Start 1;
-      my $t = New($W);
+      my $t = New($W);                                                              # Create tree at expected location in memory
     
-      for my $i(0..$N-1)
-       {Insert($t, $r[$i], $r[$i]);
+      my $a = Array "aaa";
+      for my $I(1..$N)                                                              # Load array
+       {my $i = $I-1;
+        Mov [$a, $i, "aaa"], $r[$i];
        }
+    
+      my $f = FindResult_new;
+    
+      ForArray                                                                      # Create tree
+       {my ($i, $k) = @_;
+        my $n = Keys($t);
+        AssertEq $n, $i;                                                            # Check tree size
+        my $K = Add $k, $k;
+        Tally 1;
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
+        Tally 0;
+       } $a, q(aaa);
+    
+      Iterate                                                                       # Iterate tree
+       {my ($find) = @_;                                                            # Find result
+        my $k = FindResult_key($find);
+        Out $k;
+        Tally 2;
+        my $f = Find($t, $k, findResult=>$f);                                       # Find
+        Tally 0;
+        my $d = FindResult_data($f);
+        my $K = Add $k, $k;
+        AssertEq $K, $d;                                                            # Check result
+       } $t;
+    
+      Tally 3;
+      Iterate {} $t;                                                                # Iterate tree
+      Tally 0;
     
       my $e = Execute(suppressOutput=>1);
     
-      is_deeply printTreeKeys($e->memory),  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+      is_deeply $e->out, [1..$N];                                                   # Expected sequence
+    
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
+    };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+    
+      #say STDERR printTreeKeys($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-                printTreeData($e->memory);
+      #say STDERR printTreeData($e->memory); x;
+    
+      is_deeply printTreeKeys($e->memory), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+      is_deeply printTreeData($e->memory), <<END;
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
      }
     
 
@@ -864,21 +1333,138 @@ Print the data held in a tree.
 
 **Example:**
 
-    if (1)                                                                           
-     {my $W = 7; my $N = 165; my @r = randomArray $N;
+    if (1)                                                                                
+     {my $W = 3; my $N = 107; my @r = randomArray $N;
     
       Start 1;
-      my $t = New($W);
+      my $t = New($W);                                                              # Create tree at expected location in memory
     
-      for my $i(0..$N-1)
-       {Insert($t, $r[$i], $r[$i]);
+      my $a = Array "aaa";
+      for my $I(1..$N)                                                              # Load array
+       {my $i = $I-1;
+        Mov [$a, $i, "aaa"], $r[$i];
        }
     
-      my $e = Execute(suppressOutput=>1);
-      is_deeply printTreeKeys($e->memory),
+      my $f = FindResult_new;
     
-                printTreeData($e->memory);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+      ForArray                                                                      # Create tree
+       {my ($i, $k) = @_;
+        my $n = Keys($t);
+        AssertEq $n, $i;                                                            # Check tree size
+        my $K = Add $k, $k;
+        Tally 1;
+        Insert($t, $k, $K,                                                          # Insert a new node
+          findResult=>          $f,
+          maximumNumberOfKeys=> $W,
+          splitPoint=>          int($W/2),
+          rightStart=>          int($W/2)+1,
+        );
+        Tally 0;
+       } $a, q(aaa);
+    
+      Iterate                                                                       # Iterate tree
+       {my ($find) = @_;                                                            # Find result
+        my $k = FindResult_key($find);
+        Out $k;
+        Tally 2;
+        my $f = Find($t, $k, findResult=>$f);                                       # Find
+        Tally 0;
+        my $d = FindResult_data($f);
+        my $K = Add $k, $k;
+        AssertEq $K, $d;                                                            # Check result
+       } $t;
+    
+      Tally 3;
+      Iterate {} $t;                                                                # Iterate tree
+      Tally 0;
+    
+      my $e = Execute(suppressOutput=>1);
+    
+      is_deeply $e->out, [1..$N];                                                   # Expected sequence
+    
+      #say STDERR dump $e->tallyCount;
+      is_deeply $e->tallyCount,  24712;                                             # Insertion instruction counts
+    
+      #say STDERR dump $e->tallyTotal;
+      is_deeply $e->tallyTotal, { 1 => 15666, 2 => 6294, 3 => 2752};
+    
+      #say STDERR dump $e->tallyCounts->{1};
+      is_deeply $e->tallyCounts->{1}, {                                             # Insert tally
+      add               => 159,
+      array             => 247,
+      arrayCountGreater => 2,
+      arrayCountLess    => 262,
+      arrayIndex        => 293,
+      dec               => 30,
+      inc               => 726,
+      jEq               => 894,
+      jGe               => 648,
+      jLe               => 461,
+      jLt               => 565,
+      jmp               => 878,
+      jNe               => 908,
+      mov               => 7724,
+      moveLong          => 171,
+      not               => 631,
+      resize            => 161,
+      shiftUp           => 300,
+      subtract          => 606,
+    };
+    
+      #say STDERR dump $e->tallyCounts->{2};
+      is_deeply $e->tallyCounts->{2}, {                                             # Find tally
+      add => 137,
+      arrayCountLess => 223,
+      arrayIndex => 330,
+      inc => 360,
+      jEq => 690,
+      jGe => 467,
+      jLe => 467,
+      jmp => 604,
+      jNe => 107,
+      mov => 1975,
+      not => 360,
+      subtract => 574};
+    
+      #say STDERR dump $e->tallyCounts->{3};
+      is_deeply $e->tallyCounts->{3}, {                                             # Iterate tally
+      add        => 107,
+      array      => 1,
+      arrayIndex => 72,
+      dec        => 72,
+      free       => 1,
+      inc        => 162,
+      jEq        => 260,
+      jFalse     => 28,
+      jGe        => 316,
+      jmp        => 252,
+      jNe        => 117,
+      jTrue      => 73,
+      mov        => 1111,
+      not        => 180};
+    
+      #say STDERR printTreeKeys($e->memory); x;
+    
+      #say STDERR printTreeData($e->memory); x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+      is_deeply printTreeKeys($e->memory), <<END;
+                                                                                                                    38                                                                                                    72
+                                                                 21                                                                                                       56                                                                                                 89
+                                10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
+            3        6     8             13          17    19          23       26             31             36          40    42             47    49             54          58    60    62             67    69                75                81             86             91             96            101         105
+      1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
+    END
+    
+    
+      is_deeply printTreeData($e->memory), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+                                                                                                                    76                                                                                                   144
+                                                                 42                                                                                                      112                                                                                                178
+                                20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206
+            6       12    16             26          34    38          46       52             62             72          80    84             94    98            108         116   120   124            134   138               150               162            172            182            192            202         210
+      2  4     8 10    14    18    22 24    28    32    36    40    44    48 50    54    58 60    64    68 70    74    78    82    86 88    92    96   100102   106   110   114   118   122   126128   132   136   140142   146148   152154   158160   164   168170   174176   180   184186   190   194   198200   204   208   212214
+    END
+    
      }
     
 
@@ -926,7 +1512,7 @@ Create a random array.
 
 3 [FindResult\_data](#findresult_data) - Get data field from find results.
 
-4 [FindResult\_key](#findresult_key) - Get key from find result.
+4 [FindResult\_key](#findresult_key) - Get key field from find results.
 
 5 [Insert](#insert) - Insert a key and its associated data into a tree.
 

@@ -48,6 +48,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Glob::SocketHandle    SocketHandle
                   Sidef::DataTypes::Glob::Dir             Dir
                   Sidef::DataTypes::Glob::File            File
+                  Sidef::DataTypes::Perl::Perl            Perl
                   Sidef::DataTypes::Object::Object        Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Object::Lazy          Lazy
@@ -68,7 +69,6 @@ package Sidef::Deparse::Sidef {
                   Sidef::Types::Block::Break              break
                   Sidef::Types::Block::Continue           continue
 
-                  Sidef::Perl::Perl                       Perl
                   Sidef::Time::Time                       Time
                   Sidef::Time::Date                       Date
                   Sidef::Sys::Sig                         Sig
@@ -78,7 +78,7 @@ package Sidef::Deparse::Sidef {
             },
             %args,
         );
-        %addr = ();    # reset the `addr` hash
+        undef(%addr);    # reset the %addr hash
         bless \%opts, __PACKAGE__;
     }
 
@@ -170,9 +170,13 @@ package Sidef::Deparse::Sidef {
         my ($type, $str) = $num->_dump;
 
         state $table = {
-                        '@inf@'  => q{Inf},
-                        '-@inf@' => q{Inf.neg},
-                        '@nan@'  => q{NaN},
+            '@inf@'  => q{Inf},
+            '-@inf@' => q{Inf->neg()},
+            '@nan@'  => q{NaN},
+
+            'inf'  => q{Inf},
+            '-inf' => q{Inf->neg()},
+            'nan'  => q{NaN},
                        };
 
         state $special_values = {
@@ -189,11 +193,8 @@ package Sidef::Deparse::Sidef {
         }
 
         $table->{lc($str)} // do {
-            if ($str eq 'Inf' or $str eq 'Inf.neg' or $str eq 'NaN') {
-                $str;
-            }
-            elsif ($type eq 'float') {
-                "$str.float";
+            if ($type eq 'float') {
+                $str . 'f';
             }
             elsif (index($str, '/') != -1) {
                 "Number(\"$str\")";
@@ -485,7 +486,7 @@ package Sidef::Deparse::Sidef {
               . $self->deparse_args($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Module::OO') {
-            $code = '%s' . $self->_dump_string($obj->{module});
+            $code = '%O' . $self->_dump_string($obj->{module});
         }
         elsif ($ref eq 'Sidef::Module::Func') {
             $code = '%S' . $self->_dump_string($obj->{module});
@@ -530,7 +531,8 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
             $code =
-                'for' . '('
+                'for'
+              . '('
               . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')'
               . $self->deparse_bare_block($obj->{block}{code});
         }
@@ -556,7 +558,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
-            $code = $obj->{name};
+            $code = $obj->{dump} // $obj->{name};
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = $obj->dump->get_value;
@@ -645,6 +647,35 @@ package Sidef::Deparse::Sidef {
                         }
                     }
                     else {
+
+                        state $unary_methods = {
+                                                '-' => 'neg',
+                                                '+' => undef,
+                                               };
+
+                        if ($ref eq 'Sidef::Operator::Unary' and $code eq '' and exists($unary_methods->{$method})) {
+
+                            # Constant-folding: negate the literal number
+                            my $data = $call->{arg};
+                            if (scalar(@$data) == 1 and ref($data->[0]) eq 'HASH' and scalar(keys %{$data->[0]}) == 1) {
+                                $data = $data->[0];
+                                my ($class) = keys(%$data);
+                                $data = $data->{$class};
+                                if (ref($data) eq 'ARRAY' and scalar(@$data) == 1) {
+                                    $data = $data->[0];
+                                    if (ref($data) eq 'HASH' and scalar(keys %$data) == 1 and exists($data->{self})) {
+                                        $data = $data->{self};
+                                    }
+                                    if (ref($data) eq 'Sidef::Types::Number::Number') {
+                                        my $unary_method = $unary_methods->{$method};
+                                        $code = $self->deparse_expr(
+                                                            {self => (defined($unary_method) ? $data->$unary_method : $data)});
+                                        next;
+                                    }
+                                }
+                            }
+                        }
+
                         if ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Operator::Unary') {
                             $code .= $method;
                         }

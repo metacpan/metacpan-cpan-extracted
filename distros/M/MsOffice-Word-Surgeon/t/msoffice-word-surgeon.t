@@ -25,7 +25,6 @@ like $plain_text, qr/1st/, "found 1st";
 like $plain_text, qr/2nd/, "found 2nd";
 like $plain_text, qr/paragraph\ncontains a soft line break/, "soft line break";
 
-# $surgeon->all_parts_do(cleanup_XML => (no_caps => 1));
 $surgeon->document->cleanup_XML(no_caps => 1);
 
 

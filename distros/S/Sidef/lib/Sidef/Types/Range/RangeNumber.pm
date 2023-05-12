@@ -385,6 +385,41 @@ package Sidef::Types::Range::RangeNumber {
                             predicate  => sub { $_[0]->is_squarefree },
                            },
                            {
+                            each_name  => 'each_cubefree',
+                            arr_name   => 'cubefree',
+                            count_name => 'cubefree_count',
+                            sum_name   => 'cubefree_sum',
+                            predicate  => sub { $_[0]->is_cubefree },
+                           },
+                           {
+                            each_name  => 'each_squareful',
+                            arr_name   => 'squareful',
+                            count_name => 'squareful_count',
+                            sum_name   => 'squareful_sum',
+                            predicate  => sub { $_[0]->is_squareful },
+                           },
+                           {
+                            each_name  => 'each_cubeful',
+                            arr_name   => 'cubeful',
+                            count_name => 'cubeful_count',
+                            sum_name   => 'cubeful_sum',
+                            predicate  => sub { $_[0]->is_cubeful },
+                           },
+                           {
+                            each_name  => 'each_non_squarefree',
+                            arr_name   => 'non_squarefree',
+                            count_name => 'non_squarefree_count',
+                            sum_name   => 'non_squarefree_sum',
+                            predicate  => sub { $_[0]->is_non_squarefree },
+                           },
+                           {
+                            each_name  => 'each_non_cubefree',
+                            arr_name   => 'non_cubefree',
+                            count_name => 'non_cubefree_count',
+                            sum_name   => 'non_cubefree_sum',
+                            predicate  => sub { $_[0]->is_non_cubefree },
+                           },
+                           {
                             each_name  => 'each_semiprime',
                             arr_name   => 'semiprimes',
                             count_name => 'semiprime_count',
@@ -400,6 +435,7 @@ package Sidef::Types::Range::RangeNumber {
                             each_name  => 'each_composite',
                             arr_name   => 'composites',
                             count_name => 'composite_count',
+                            sum_name   => 'composite_sum',
                             predicate  => sub { $_[0]->is_composite },
                            },
                            {
@@ -552,12 +588,25 @@ package Sidef::Types::Range::RangeNumber {
                  arr_name   => 'powerful',
                  each_name  => 'each_powerful',
                  count_name => 'powerful_count',
+                 sum_name   => 'powerful_sum',
                  predicate  => sub {
                      my ($k) = @_;
                      sub { $_[0]->is_powerful($k) };
                  },
                 },
                 {
+                 arr_name   => 'non_powerfree',
+                 each_name  => 'each_non_powerfree',
+                 count_name => 'non_powerfree_count',
+                 sum_name   => 'non_powerfree_sum',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_non_powerfree($k) };
+                 },
+                },
+                {
+                 arr_name   => 'powerfree',
+                 each_name  => 'each_powerfree',
                  count_name => 'powerfree_count',
                  sum_name   => 'powerfree_sum',
                  predicate  => sub {

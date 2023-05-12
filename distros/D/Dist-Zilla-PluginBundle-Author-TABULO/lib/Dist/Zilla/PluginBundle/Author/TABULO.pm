@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::TABULO;
 ### ex: set ft=perl noai ts=4 sw=4:
 
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 
 use 5.026; # Indented HEREDOC.
 use Data::Printer qw(p np);
@@ -952,7 +952,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =head1 SYNOPSIS
 

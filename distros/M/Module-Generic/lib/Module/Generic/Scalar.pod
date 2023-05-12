@@ -144,7 +144,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.3.3
+    v1.3.4
 
 =head1 DESCRIPTION
 
@@ -439,7 +439,7 @@ This returns the length of the string, as a L<Module::Generic::Number> object.
 
 =head2 like
 
-Provided with a string or a regular express and this return the value of the regular expression evaluation against the object string.
+Provided with a string or a regular expression and this returns the value of the regular expression evaluation against the object string.
 
     my $s = "I disapprove of what you say, but I will defend to the death your right to say it";
     print( "Matches? ", $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ) ? 'yes' : 'no', "\n" ); # print yes
@@ -459,6 +459,8 @@ or
         # Do something
     }
 
+Regular expression can also be one from L<Regexp::Common>
+
 See also L</match> and L</replace>
 
 =head2 lower
@@ -474,6 +476,8 @@ It takes an optional argument that can be an alternative string to remove at the
     $s->ltrim( qr/[[:blank:]\h]+/ ); # Remove all kind of leading whitespaces
 
 It returns the object itself for chaining.
+
+Regular expression can also be one from L<Regexp::Common>
 
 See also L</rtrim>
 
@@ -500,6 +504,8 @@ or
         my $first_match = $rv->capture->first;
         # Do something
     }
+
+Regular expression can also be one from L<Regexp::Common>
 
 See also L</like> and L</replace>
 
@@ -586,6 +592,8 @@ or
         # Do something
     }
 
+Regular expression can also be one from L<Regexp::Common>
+
 See also L</like> and L</match>
 
 =head2 reset
@@ -621,6 +629,8 @@ It takes an optional argument that can be an alternative string to remove at the
 
 It returns the object itself for chaining.
 
+Regular expression can also be one from L<Regexp::Common>
+
 See also L</ltrim>
 
 =head2 scalar
@@ -646,6 +656,8 @@ Because C</\n/> is not passed as an argument, i.e. it results in no argument bei
     my $a = $s->split( qr/\n/ );
 
 It will warn you if no argument was provided.
+
+Regular expression can also be one from L<Regexp::Common>
 
 =head2 sprintf
 

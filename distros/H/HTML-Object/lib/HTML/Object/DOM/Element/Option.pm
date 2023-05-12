@@ -79,8 +79,7 @@ sub label : lvalue { return( shift->_lvalue({
     set => sub
     {
         my $self = shift( @_ );
-        my $ref = shift( @_ );
-        my $val = shift( @$ref );
+        my $val = shift( @_ );
         # User passed undef, so we remove all text from the option
         if( !defined( $val ) )
         {

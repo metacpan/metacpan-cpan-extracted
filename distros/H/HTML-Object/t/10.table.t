@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -14,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Element::Table' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::Element::Table' );
     use_ok( 'HTML::Object::DOM::Element::TableCaption' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::Element::TableCaption' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::Element::Table', 'caption' );
 can_ok( 'HTML::Object::DOM::Element::Table', 'createCaption' );
@@ -125,7 +129,7 @@ subtest 'row' => sub
     $size = $cells->length;
     is( $size, 4, 'insertCell' );
     my $cells2 = $row->cells;
-    is( $addr2, $addr, 'cells collection' );
+    is( $cells2, $cells, 'cells collection' );
     is( $cells->length, $cells2->length, 'cells->length comparison; same object' );
     is( $cell->cellIndex, 3, 'cellIndex' );
     my $cell3 = $cells->index(2);

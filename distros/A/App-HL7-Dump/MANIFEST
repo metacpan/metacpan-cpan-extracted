@@ -1,8 +1,8 @@
 bin/hl7dump
 Changes
 Dump.pm
-examples/ex1.pl
-examples/ex2.pl
+examples/dump_hl7_message.pl
+examples/dump_hl7_message_ansi.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

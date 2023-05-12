@@ -4,36 +4,17 @@ use 5.024000;
 use strict;
 use warnings;
 use feature "say";
-use Carp;
-use POSIX;  #For _exit;
-use IPC::Open3;
-use Symbol 'gensym'; # vivify a separate handle for STDERR
-use Scalar::Util qw<blessed>;
-
-#use Exporter qw<import>;
-use base "Exporter";
 
 
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} });
+our $VERSION = 'v0.3.0';
 
-our @EXPORT = qw();
-
-
-our $VERSION = 'v0.2.1';
 use constant DEBUG=>undef;
 use enum ("PACKAGE=0",qw<FILENAME LINE SUBROUTINE 
   HASARGS WANTARRAY EVALTEXT IS_REQUIRE HINTS BITMASK 
   HINT_HASH MESSAGE SEQUENCE CODE_LINES>);
 
 
-################################
-# my $buffer="";               #
-# open THITHER  ,">",\$buffer; #
-################################
 
 #
 # A list of top level file paths or scalar refs to check for syntax errors
@@ -48,14 +29,23 @@ sub import {
   my @options=@_;
 
 
-  # We don't export anything. Return when we are used withing code
-  # Continue if caller has no line number, meaning from the CLI
+  # Only have one sub to export and we only export it if the caller has a line
+  # number. Otherise we are being invoked from the CLI
   #
-  return if($caller[LINE]);
+  if($caller[LINE]){
+    no strict "refs";
+    my $name=$caller[0]."::context";
+    *{$name}=\&{"context"};
+    return; 
+  }
 
   # 
   # CLI Options include 
   #
+
+  require POSIX;  #For _exit;
+  require IPC::Open3;
+  require Symbol;
   my %options;
 
   my $clean=grep /clean/i, @options;
@@ -118,7 +108,7 @@ sub import {
     my $pid;
     my $result;
     eval {
-      $pid=open3(my $chld_in, my $chld_out, my $chld_err = gensym, @cmd);
+      $pid=IPC::Open3::open3(my $chld_in, my $chld_out, my $chld_err = Symbol::gensym(), @cmd);
       $result=<$chld_err>;
       close $chld_in;
       close $chld_out;
@@ -138,7 +128,6 @@ sub import {
   my $code=$?>255? (0xFF & ~$?): $?;
 
   my $runnable=$?==0;
-  #say "SYNTAX RUNNABLE: $runnable";
 
   my $status=context(splain=>$splain, clean=>$clean, error=>$result )."\n";
 
@@ -385,7 +374,6 @@ sub _context{
 
 
 
-
   #$opts{start_mark};#//=qr|.*|;	#regex which matches the start of the code 
 	$opts{pre_lines}//=5;		  #Number of lines to show before target line
 	$opts{post_lines}//=5;		#Number of lines to show after target line
@@ -400,7 +388,6 @@ sub _context{
   if(defined($error) and ref($error) eq ""){
     #A string error. A normal string die/warn or compile time errors/warnings
     $info_ref=process_string_error %opts, $error;
-    #say "infor ref ".join ", ", $info_ref;
   }
   else{
     #Some kind of object, converted into line and file hash
@@ -425,6 +412,7 @@ sub _context{
 #
 my $msg= "Trace must be a ref to array of  {file=>.., line=>..} pairs";
 sub context{
+  shift if(defined $_[0] and $_[0] eq __PACKAGE__);
   my %opts;
   my $out;
   if(@_==0){
@@ -436,9 +424,23 @@ sub context{
   else {
     %opts=@_;
   }
-
   if($opts{frames}){
     $opts{error}=delete $opts{frames};
+  }
+
+  # For the special case of error undefined, we assume we want to dump the current location/context
+  #
+  unless(defined $opts{error}){
+    my $i=0;
+
+    #build call frames
+    my @frame;
+    my @stack;
+
+    while(@frame=caller($i++)){
+       push @stack, [@frame];
+    }
+    $opts{error}=\@stack;
   }
   
   # Convert from supported exceptions classes to internal format
@@ -446,7 +448,8 @@ sub context{
   my $ref=ref $opts{error};
   my $dstf="Devel::StackTrace::Frame";
 
-  if((blessed($opts{error})//"") eq $dstf){
+  require Scalar::Util;
+  if((Scalar::Util::blessed($opts{error})//"") eq $dstf){
     # Single DSTF stack frame. Convert to an array
     $opts{error}=[$opts{error}];
   }
@@ -462,7 +465,7 @@ sub context{
     $opts{error}=[map { [$_->@*] } $opts{error}->@* ];
     
   }
-  elsif($ref eq "ARRAY" and blessed($opts{error}[0]) eq $dstf){
+  elsif($ref eq "ARRAY" and Scalar::Util::blessed($opts{error}[0]) eq $dstf){
     #Array of DSTF object
   }
   else {
@@ -486,7 +489,7 @@ sub context{
     my $i=0;  #Sequence number
     for my $e ($opts{error}->@*) {
 
-      if((blessed($e)//"") eq "Devel::StackTrace::Frame"){
+      if((Scalar::Util::blessed($e)//"") eq "Devel::StackTrace::Frame"){
         #Convert to an array
         my @a;
         $a[PACKAGE]=$e->package;
@@ -526,22 +529,23 @@ sub context{
 
   }
   else {
-    #say "NOT AN ARRAY: ". join ", ", %opts;
-
     $out=_context %opts;
   }
   $out;
 }
 
+
+
 my ($chld_in, $chld_out, $chld_err);
 my @cmd="splain";
 my $pid;
+
 sub splain {
   my $out;
   #Attempt to open splain process if it isn't already
   unless($pid){
     eval{
-      $pid= open3($chld_in, $chld_out, $chld_err = gensym, @cmd);
+      $pid= IPC::Open3::open3($chld_in, $chld_out, $chld_err = Symbol::gensym(), @cmd);
       #$chld_in->autoflush(1);
 
     };

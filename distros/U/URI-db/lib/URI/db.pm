@@ -13,7 +13,7 @@ use strict;
 use 5.008001;
 use base 'URI::Nested';
 use URI::_db;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub prefix       { 'db' }
 sub nested_class { 'URI::_db' }
@@ -334,7 +334,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2013-2016 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2013-2023 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::Dzil;
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 
 use Data::OptList;
 use Text::Trim;
@@ -79,7 +79,7 @@ Zest::Author::TABULO::Util::Dzil - DZIL-related utility functions used by TABULO
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =for Pod::Coverage grok_plugin grok_plugins
 

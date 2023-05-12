@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.3.3
+## Version v1.3.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/12
+## Modified 2023/03/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
     );
     $DEBUG = 0;
     $ERRORS = {};
-    our $VERSION = 'v1.3.3';
+    our $VERSION = 'v1.3.4';
 };
 
 use strict;
@@ -395,7 +395,7 @@ sub like
     my @rv = ();
     no warnings 'uninitialized';
     $str = CORE::defined( $str ) 
-        ? ref( $str ) eq 'Regexp'
+        ? ( ref( $str ) eq 'Regexp' || ref( $str ) eq 'Regexp::Common' )
             ? $str
             : qr/(?:\Q$str\E)+/
         : qr/[[:blank:]\r\n]*/;
@@ -424,7 +424,7 @@ sub ltrim
     my $str = shift( @_ );
     no warnings 'uninitialized';
     $str = CORE::defined( $str ) 
-        ? ref( $str ) eq 'Regexp'
+        ? ( ref( $str ) eq 'Regexp' || ref( $str ) eq 'Regexp::Common' )
             ? $str
             : qr/(?:\Q$str\E)+/
         : qr/[[:blank:]\r\n]*/;
@@ -439,7 +439,7 @@ sub match
     my @rv = ();
     no warnings 'uninitialized';
     $re = CORE::defined( $re ) 
-        ? ref( $re ) eq 'Regexp'
+        ? ( ref( $re ) eq 'Regexp' || ref( $re ) eq 'Regexp::Common' )
             ? $re
             : qr/(?:\Q$re\E)+/
         : $re;
@@ -582,7 +582,7 @@ sub replace
     my @matches = ();
     my @rv = ();
     $re = CORE::defined( $re ) 
-        ? ref( $re ) eq 'Regexp'
+        ? ( ref( $re ) eq 'Regexp' || ref( $re ) eq 'Regexp::Common' )
             ? $re
             : qr/(?:\Q$re\E)+/
         : $re;
@@ -621,7 +621,7 @@ sub rtrim
     my $self = shift( @_ );
     my $str = shift( @_ );
     $str = CORE::defined( $str ) 
-        ? ref( $str ) eq 'Regexp'
+        ? ( ref( $str ) eq 'Regexp' || ref( $str ) eq 'Regexp::Common' )
             ? $str
             : qr/(?:\Q$str\E)+/
         : qr/[[:blank:]\r\n]*/;
@@ -670,7 +670,7 @@ sub split
         # NOTE: As per perlfunc: "If omitted, PATTERN defaults to a single space, " ", triggering the previously described *awk* emulation."
         $expr = ' ';
     }
-    unless( ref( $expr ) eq 'Regexp' )
+    unless( ref( $expr ) eq 'Regexp' || ref( $expr ) eq 'Regexp::Common' )
     {
         if( ref( $expr ) )
         {

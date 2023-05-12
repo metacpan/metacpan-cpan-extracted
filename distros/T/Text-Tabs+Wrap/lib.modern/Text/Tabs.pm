@@ -6,7 +6,7 @@ BEGIN { require Exporter; *import = \&Exporter::import }
 
 our @EXPORT = qw( expand unexpand $tabstop );
 
-our $VERSION = '2023.0509';
+our $VERSION = '2023.0511';
 our $SUBVERSION = 'modern'; # back-compat vestige
 
 our $tabstop = 8;

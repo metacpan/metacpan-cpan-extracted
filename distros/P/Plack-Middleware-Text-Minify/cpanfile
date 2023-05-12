@@ -5,8 +5,7 @@ requires "Plack::Middleware" => "0";
 requires "Ref::Util" => "0";
 requires "Text::Minify::XS" => "v0.6.2";
 requires "parent" => "0";
-requires "perl" => "v5.9.3";
-requires "strict" => "0";
+requires "perl" => "v5.14.0";
 requires "warnings" => "0";
 recommends "Ref::Util::XS" => "0";
 
@@ -23,6 +22,7 @@ on 'test' => sub {
   requires "Test::Differences" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
+  requires "strict" => "0";
   requires "utf8" => "0";
 };
 

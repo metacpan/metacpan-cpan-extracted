@@ -1,3 +1,12 @@
+2.12	2023-05-11
+
+	Bug Fixes
+	* #69 Can't call method "start_line_nr" on an undefined value
+	  Thank you @demerphq
+	* #68 Failed test at t/fix_046.t line 17
+	  Thank you @demerphq
+	* #67 Can't locate Algorithm/Diff.pm in @INC
+
 2.11	2015-09-13
 
 	Bug Fixes

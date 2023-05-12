@@ -3,6 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
 };
 
@@ -14,6 +16,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Text' ) || BAIL_OUT( "Cannot load HTML::Object::DOM::Text" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::CharacterData', 'after' );
 can_ok( 'HTML::Object::DOM::CharacterData', 'appendData' );
@@ -49,7 +54,9 @@ my $doc = $parser->parse_data( $test_data ) || BAIL_OUT( $parser->error );
 my $comment = $doc->body->childNodes->[1];
 diag( "Comment found is '$comment'" ) if( $DEBUG );
 isa_ok( $comment => 'HTML::Object::DOM::Comment' );
+is( $comment->data, q{ This is an html comment !}, 'comment data' );
 my $output = $doc->getElementById('Result');
+diag( "Assigning comment text to output." ) if( $DEBUG );
 $output->value = $comment->data;
 # output content would now be: This is an html comment !
 is( $output->as_text, q{ This is an html comment !}, 'data' );

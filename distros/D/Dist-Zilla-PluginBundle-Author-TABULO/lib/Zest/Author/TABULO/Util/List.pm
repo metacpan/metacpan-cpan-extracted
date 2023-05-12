@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::List;
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 
 use List::Util qw(uniq);
 use Exporter::Shiny qw(
@@ -41,7 +41,7 @@ Zest::Author::TABULO::Util::List - Utility functions used by TABULO's authoring 
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =for Pod::Coverage flat sort_flat  uniq_flat  uniq_sort_flat
 

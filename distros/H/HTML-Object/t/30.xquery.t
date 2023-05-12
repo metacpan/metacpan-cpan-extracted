@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib qw( ./lib ./dev );
+    use vars qw( $DEBUG );
     use Test::More;
     use Module::Generic::File qw( file );
     use Scalar::Util ();
@@ -16,6 +17,9 @@ BEGIN
     use_ok( 'HTML::Object::XQuery' ) || BAIL_OUT( "Cannot load HTML::Object::XQuery" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 $HTML::Object::FATAL_ERROR = 0;
 
@@ -84,7 +88,7 @@ EOT
     $dom->debug( $DEBUG );
     my $elem = $( "div" )->css( "border", "2px solid red" )->add( "p" )->css( "background", "yellow" );
 
-    $expect = <<EOT;
+    my $expect = <<EOT;
         <div style="border: 2px solid red; background: yellow;"></div>
         <div style="border: 2px solid red; background: yellow;"></div>
         <div style="border: 2px solid red; background: yellow;"></div>

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Document.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/09/20
+## Modified 2023/05/07
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use HTML::Object::ErrorEvent;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -95,51 +95,59 @@ sub as_string
     return( $a->join( '' ) );
 }
 
-sub body : lvalue
-{
-    my $self = shift( @_ );
-    my $html = $self->documentElement ||
-        return( $self->error( "Unable to find a top HTML tag" ) );
-    if( @_ )
+sub body : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        my $e = shift( @_ );
-        return( $self->error( "Element provided to set as new body element is not a HTML::Object::Element object." ) ) if( !$self->_is_a( $e, 'HTML::Object::Element' ) );
+        my $self = shift( @_ );
+        my $html = $self->documentElement ||
+            die( "Unable to find a top HTML tag" );
+        my $children = $html->children;
         my $body;
-        $html->children->for(sub
+        foreach( @$children )
         {
-            my( $pos, $child ) = @_;
+            if( $_->tag eq 'body' )
+            {
+                $body = $_;
+                # End loop
+                last;
+            }
+        }
+        # $body may be undef, and that's ok. A Module::Generic::Null object will be returned instead
+        return( $body );
+    },
+    set => sub
+    {
+        my $self = shift( @_ );
+        my $e = shift( @_ );
+        my $html = $self->documentElement ||
+            die( "Unable to find a top HTML tag" );
+        my $children = $html->children;
+        if( !$self->_is_a( $e, 'HTML::Object::Element' ) )
+        {
+            die( "Element provided to set as new body element is not a HTML::Object::Element object." );
+        }
+    
+        my $body;
+        for( my $pos = 0; $pos < scalar( @$children ); $pos++ )
+        {
+            my $child = $children->[$pos];
             if( $child->tag eq 'body' )
             {
                 $body = $child;
-                $html->children->offset( $pos, 1, $e );
+                $children->offset( $pos, 1, $e );
                 # End loop
-                return;
+                last;
             }
-        });
-        
+        }
+    
         # No body was found, amazingly enough; add it now
         if( !defined( $body ) )
         {
-            $html->children->push( $e );
+            $children->push( $e );
         }
         return( $e );
     }
-    else
-    {
-        my $body;
-        $html->children->for(sub
-        {
-            my( $pos, $child ) = @_;
-            if( $child->tag eq 'body' )
-            {
-                $body = $child;
-                # End loop
-                return;
-            }
-        });
-        return( $body );
-    }
-}
+}, @_ ) ); }
 
 sub captureEvents { return( shift->defaultView->captureEvents( @_ ) ); }
 
@@ -401,14 +409,20 @@ sub documentElement : lvalue
     }
     my $html;
     # It should be the first one, but let's not assume anything
-    $self->children->foreach(sub
+    my $children = $self->children;
+    foreach( @$children )
     {
         if( $_->tag eq 'html' )
         {
             $html = $_;
-            return;
+            last;
         }
-    });
+    }
+    if( !$html && Want::want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+    }
     return( $html );
 }
 
@@ -538,7 +552,13 @@ sub head : lvalue
 {
     my $self = shift( @_ );
     my $results = $self->find( 'head' ) || return( $self->pass_error );
-    return( $results->first );
+    my $head = $results->first;
+    if( !$head && want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+    }
+    return( $head );
 }
 
 # Note: property hidden read-only
@@ -575,11 +595,7 @@ sub importNode { return( shift->adoptNode( @_ ) ); }
 
 # Note: method lastElementChild is inherited from HTML::Object::DOM::Element
 
-sub lastModified : lvalue
-{
-    my $self = shift( @_ );
-    return( $self->_set_get_datetime( '_last_modified' ) );
-}
+sub lastModified : lvalue { return( shift->_set_get_datetime( '_last_modified' ) ); }
 
 # Note: property links read-only
 sub links : lvalue
@@ -805,42 +821,26 @@ sub styleSheets : lvalue
 # Note: property timeline read-only
 sub timeline : lvalue { return; }
 
-sub title : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub title : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
+        my $self = shift( @_ );
+        my $results = $self->find( 'title' ) || die( $self->error );
+        return if( $results->is_empty );
+        return( $results->first->text );
+    },
+    set => sub
     {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    my $results = $self->find( 'title' ) || return( $self->pass_error );
-    if( $has_arg )
-    {
+        my $self = shift( @_ );
+        my $arg  = shift( @_ );
+        my $results = $self->find( 'title' ) || die( $self->error );
         my $e;
         if( $results->is_empty )
         {
-            my $head_results = $self->find( 'head' ) || return( $self->pass_error );
+            my $head_results = $self->find( 'head' ) || die( $self->error );
             if( $head_results->is_empty )
             {
-                my $error = "Could not find the <head> tag to set as parent of the missing <title>. Something is seriously wrong.";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                Want::rreturn( $self->error( $error ) );
+                die( "Could not find the <head> tag to set as parent of the missing <title>. Something is seriously wrong." );
             }
             my $head = $head_results->first;
             $e = $self->createElement( 'title' );
@@ -852,31 +852,10 @@ sub title : lvalue
         {
             $e = $results->first;
         }
-    
-        if( $has_arg eq 'assign' )
-        {
-            $e->text = $arg;
-            my $dummy = 'dummy';
-            return( $dummy );
-        }
-        return( $e->text( $arg ) ) if( want( 'LVALUE' ) );
-        Want::rreturn;
-    }
-    else
-    {
-        if( $results->is_empty )
-        {
-            if( $has_arg eq 'assign' )
-            {
-                my $dummy = '';
-                return( $dummy );
-            }
-            return( '' ) if( want( 'LVALUE' ) );
-            Want::rreturn;
-        }
-        return( $results->first->text );
-    }
-}
+        
+        return( $e->text( $arg ) );
+    },
+}, @_ ) ); }
 
 sub URL : lvalue { return( shift->_set_get_uri( 'uri', @_ ) ); }
 
@@ -996,8 +975,7 @@ sub _set_get_on_signal : lvalue
             if( $has_arg eq 'assign' )
             {
                 $self->error({ message => $error, class => 'HTML::Object::TypeError' });
-                my $dummy = 'dummy';
-                return( $dummy );
+                return( $self->{__lvalue_error} = undef );
             }
             return( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) ) if( want( 'LVALUE' ) );
             Want::rreturn( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) );
@@ -1043,7 +1021,7 @@ HTML::Object::DOM::Document - HTML Object DOM Document Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

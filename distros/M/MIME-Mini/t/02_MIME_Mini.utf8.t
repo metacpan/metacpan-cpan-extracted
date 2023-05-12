@@ -20,7 +20,7 @@ sub rfc822date { strftime '%a, %d %b %Y %H:%M:%S +0000', gmtime shift }
 my $rfc822date_re = '\w+,\s{1,2}\d{1,2} \w+ \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}';
 my $mboxdate_re = '\w+ \w+\s{1,2}\d{1,2}\s{1,2}\d{1,2}:\d{2}:\d{2} \d{4}';
 sub writefile { open my $fh, '>', $_[0] or return; print $fh $_[1]; close $fh; }
-#sub readfile { local $/; open my $fh, '<', shift or return ''; return <$fh>; }
+sub readfile { local $/; open my $fh, '<', shift or return ''; return <$fh>; }
 my $boundary_re = '("[^"]+"|\S+)';
 my $display_enc = (defined $ENV{LANG} && $ENV{LANG} =~ /^.+\.(.+)$/) ? $1 : 'UTF-8';
 
@@ -459,7 +459,7 @@ From: from
 Date: $rfc822date_re
 MIME-Version: 1\.0
 Message-ID: <[^>]+>
-Content-Disposition: inline; filename=fname; size=16;
+Content-Disposition: inline; filename=fname; size=1[67];
  creation-date=\"$rfc822date_re\";
  modification-date=\"$rfc822date_re\";
  read-date=\"$rfc822date_re\"
@@ -746,7 +746,16 @@ sub test_filter
 	close $ifh;
 	close $ofh;
 
-	is `diff -u "$gfname" "$ofname"`, '', $desc;
+	my $pathsep = ($ENV{PATH} =~ /;/) ? ';' : ':';
+	if (scalar(grep { -x "$_/diff" } split /$pathsep/, $ENV{PATH})) # Windows has no diff
+	{
+		is `diff -u "$gfname" "$ofname" | grep -v 'No differences encountered'`, '', $desc; # Solaris diff is wierd
+	}
+	else
+	{
+		is readfile($ofname), readfile($gfname), $desc;
+	}
+
 	unlink $ofname if -f $gfname; # Keep the outfile if there's no goodfile yet
 	use File::Copy; move $ofname, $gfname if -f $ofname; # Define it as good (first time)
 }

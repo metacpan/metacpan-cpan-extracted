@@ -5,7 +5,7 @@ use utf8;
 
 package Pod::Wordlist::Author::TABULO;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 our $DEBUG   = 0;
 
 use Lingua::EN::Inflect 'PL';
@@ -183,7 +183,7 @@ Pod::Wordlist::Author::TABULO - Add words for spell checking POD à la TABULO
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =head1 SYNOPSIS
 

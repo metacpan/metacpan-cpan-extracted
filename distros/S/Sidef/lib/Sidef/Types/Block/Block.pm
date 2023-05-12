@@ -276,9 +276,9 @@ package Sidef::Types::Block::Block {
           . join(
             ', ',
             map {
-                    ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump
-                  : ref($_)                                        ? Sidef::normalize_type(ref($_))
-                  : defined($_)                                    ? Sidef::normalize_type($_)
+                    ref($_) && UNIVERSAL::can($_, 'dump') ? $_->dump
+                  : ref($_)                               ? Sidef::normalize_type(ref($_))
+                  : defined($_)                           ? Sidef::normalize_type($_)
                   : 'nil'
               } @args
           )
@@ -351,7 +351,7 @@ package Sidef::Types::Block::Block {
                 local *UNIVERSAL::AUTOLOAD = $ref;
                 if (defined($a) || defined($b)) { push @args, $a, $b }
                 elsif (defined($_)) { unshift @args, $_ }
-                $self->call(map { Sidef::Perl::Perl->to_sidef($_) } @args);
+                $self->call(map { Sidef::Types::Perl::Perl->to_sidef($_) } @args);
             };
         }
     }
@@ -531,13 +531,13 @@ package Sidef::Types::Block::Block {
 
             $obj // last;
 
-            my $sub = UNIVERSAL::can($obj, 'iter') // do {
-                my $arr = eval { $obj->to_a };
+            my $sub = (ref($obj) && UNIVERSAL::can($obj, 'iter')) || do {
+                my $arr = eval { ref($obj) ? $obj->to_a : Sidef::Types::Array::Array->new($obj) };
                 ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : ();
             };
 
             my $break;
-            my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
+            my $iter = $sub ? $sub->($obj) : $obj->iter;
 
             while (1) {
                 $break = 1;
@@ -551,6 +551,15 @@ package Sidef::Types::Block::Block {
         }
 
         return 1;
+    }
+
+    sub time {
+        my ($self) = @_;
+        require Time::HiRes;
+        my $t0 = [Time::HiRes::gettimeofday()];
+        $self->run;
+        my $elapsed = Time::HiRes::tv_interval($t0);
+        Sidef::Types::Number::Number->new($elapsed);
     }
 
     sub for {
@@ -696,6 +705,30 @@ package Sidef::Types::Block::Block {
 
     {
         no strict 'refs';
+
+        foreach my $name (qw(bsearch bsearch_le bsearch_ge bsearch_inverse)) {
+
+            *{__PACKAGE__ . '::' . $name} = sub {
+                my ($self, $x, $y) = @_;
+
+                my $from = $x // Sidef::Types::Number::Number::ZERO;
+                my $upto = $y // $from->inc->mul(Sidef::Types::Number::Number::TWO);
+
+                while (1) {
+                    my $k = $from->$name($upto, $self);
+
+                    if (defined($k) and $k->is_between($from, $upto)) {
+                        return $k;
+                    }
+
+                    $from = $upto->inc;
+                    $upto = $from->add($from);
+                }
+
+                return Sidef::Types::Number::Number::MONE;
+            };
+        }
+
         *{__PACKAGE__ . '::' . '*'}  = \&repeat;
         *{__PACKAGE__ . '::' . '<<'} = \&for;
         *{__PACKAGE__ . '::' . '>>'} = \&map;

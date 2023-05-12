@@ -5,8 +5,12 @@ use strict;
 use warnings;
 
 use File::Basename;
+use File::Path qw(make_path remove_tree);
 #use File::Spec;  # Will use later for Windows file names.
 #use Path::Class; # Will use later for Windows file names.
+
+# TODO: clearly define the words "version", "revision", "branch". (Maybe "version" isn't the right word to use.)
+# TODO: sanitize version names: they should contain only \w and hyphen.
 
 
 =head1 NAME
@@ -15,24 +19,26 @@ SVN::Rami - Automates merging to multiple branches
 
 =head1 VERSION
 
-Version 0.1
+Version 0.20
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.20';
 
 
 =head1 SYNOPSIS
 
+Used by F<script/rami>. This is not (yet) a stand-alone module.
+
 Should be invoked from the command line:
 
-  perl -e "use SVN::Rami;" -c <version-number>
-
-This is version 0.1, still mainly a proof-of-concept.
+  rami -c <version-number>
 
 =head1 SUBROUTINES/METHODS
 
-=head2 No publicly available subroutines at this time
+There are currently no publicly available methods because
+this module is only intended to be used by the script "rami",
+as explained above.
 
 =cut
 
@@ -58,13 +64,6 @@ sub load_csv_as_map {
 	# Hack: the first two items are column headings.
 	(undef, undef, my @result) = @contents;
 	return @result;
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
 }
 
 =head1 AUTHOR
@@ -120,29 +119,6 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 
-shift;   # HACK: currently the first argument is always -c
-my $source_revision = shift;
-if ( ! $source_revision ) {
-	print "Usage: $0 -c <revision_number>\n";
-	exit 1;
-}
-
-
-my $commit_message_file = 'c:\dev\430\message.txt';
-
-my $repo = 'default';  # TODO: support more than one repo.
-my $rami_home = glob("~/.rami/repo/$repo");  # TODO: use File::HomeDir
-my $conf_dir = "$rami_home/conf";
-
-die "Expected directory $conf_dir\n" unless -d $conf_dir;
-
-my %branch_to_path_on_filesystem = load_csv_as_map("$conf_dir/paths.csv");
-
-# We need the list of branches to be in order.
-my @branch_to_url_array = load_csv_as_map("$conf_dir/urls.csv");
-my %branch_to_url = @branch_to_url_array;
-my @branches = grep( !/^http/, @branch_to_url_array);  # HACK: remove URLs, leaving only versions, IN ORDER!
-
 #
 # This utility function simply dumps data to a file.
 # Example: write_file('foo.txt', 'Hello world') creates a file
@@ -197,67 +173,127 @@ sub find_revision {
 	return ();
 }
 
-my %revision_details = find_revision($source_revision, %branch_to_url);
-if ( ! %revision_details ) {
-	die "Unable to find revision $source_revision\n";
-}
 
-my $source_branch = $revision_details{'branch'};
-# The revision comment. We will later append something like "merge r 123 from 2.2.2"
-my $base_commit_message = $revision_details{'commit_message'};
-$base_commit_message =~ s/(\r\n\R\s)+$//g;   # Remove trailing whitespace/newlines.
+#=head2 rami_main
+#
+#The main module. Currently takes one argument,
+#which is the SVN revision which shoulde be merged.
+#
+#=cut
+
+# HACK: define these as essentially global for now.
+our $repo = 'default';  # TODO: support more than one repo.
+our $rami_home_dir = glob("~/.rami/repo/$repo");  # TODO: use File::HomeDir
+our $conf_dir = "$rami_home_dir/conf";
+our $temp_dir = "$rami_home_dir/temp";
+our $commit_message_file = "$temp_dir/message.txt";
+our $url_csv_file = "$conf_dir/paths.csv";
+
+sub rami_main {
+	my $source_revision = shift;
+	
+	my $conf_dir = $SVN::Rami::conf_dir;
+	my $commit_message_file = $SVN::Rami::commit_message_file;
+	my $url_csv_file = $SVN::Rami::url_csv_file;
+	
+	#print "### $commit_message_file\n";
+
+	die "Expected directory $conf_dir\n" unless -d $conf_dir;
+
+	my %branch_to_path_on_filesystem = load_csv_as_map($url_csv_file);
+
+	# We need the list of branches to be in order.
+	my @branch_to_url_array = load_csv_as_map("$conf_dir/urls.csv");
+	my %branch_to_url = @branch_to_url_array;
+	my @branches = grep( !/^http/, @branch_to_url_array);  # HACK: remove URLs, leaving only versions, IN ORDER!
+
+	my %revision_details = find_revision($source_revision, %branch_to_url);
+	if ( ! %revision_details ) {
+		die "Unable to find revision $source_revision\n";
+	}
+
+	my $source_branch = $revision_details{'branch'};
+	# The revision comment. We will later append something like "merge r 123 from 2.2.2"
+	my $base_commit_message = $revision_details{'commit_message'};
+	$base_commit_message =~ s/(\r\n\R\s)+$//g;   # Remove trailing whitespace/newlines.
 
 
-my $found_branch = 0;   # Will be true when we loop to the source branch.
-#my $previous_branch = '';
-foreach my $target_branch (@branches) {
-	if ($target_branch eq $source_branch) {
-		$found_branch = 1;
-		# Perhaps instead of if-else we could use "redo", which is similar to Java's "continue"
-	} elsif ( $found_branch ) { # If we found the branch last time...
-		print "------------------------ Merging r $source_revision from $source_branch to $target_branch\n";
-		my $source_url = $branch_to_url{$source_branch};
-		my $working_dir = $branch_to_path_on_filesystem{$target_branch};
+	my $found_branch = 0;   # Will be true when we loop to the source branch.
+	#my $previous_branch = '';
+	foreach my $target_branch (@branches) {
+		if ($target_branch eq $source_branch) {
+			$found_branch = 1;
+			# Perhaps instead of if-else we could use "redo", which is similar to Java's "continue"
+		} elsif ( $found_branch ) { # If we found the branch last time...
+			print "------------------------ Merging r $source_revision from $source_branch to $target_branch\n";
+			my $source_url = $branch_to_url{$source_branch};
+			my $working_dir = $branch_to_path_on_filesystem{$target_branch};
 
-		# Get our working directory to the correct revision.
-		chdir($working_dir);
-		system("svn revert -R ."); # or die "Failed to revert $working_dir";
-		system("svn up"); # or die "Failed to update $working_dir";
+			# Get our working directory to the correct revision.
+			chdir($working_dir);
+			system("svn revert -R ."); # or die "Failed to revert $working_dir";
+			system("svn up"); # or die "Failed to update $working_dir";
 
-		# Write the commit message to a file.
-		my $commit_message = "$base_commit_message (merge r $source_revision from $source_branch)";
-		write_file($commit_message_file, $commit_message);
+			# Write the commit message to a file.
+			my $commit_message = "$base_commit_message (merge r $source_revision from $source_branch)";
+			write_file($commit_message_file, $commit_message);
 
-		my $merge_command = "svn merge --accept postpone -c $source_revision $source_url .";
-		print "$merge_command\n";
-		my $output_from_merge = `$merge_command`;
-		print "$output_from_merge\n";
-		if ($output_from_merge =~ /Summary of conflicts/) { # If there were merge conflicts
-			print "Failed to merge r $source_revision from $source_branch to $target_branch.\n";
-			print "Merge conflicts in $working_dir\n";
-			die;
-		}
+			my $merge_command = "svn merge --accept postpone -c $source_revision $source_url .";
+			print "$merge_command\n";
+			my $output_from_merge = `$merge_command`;
+			print "$output_from_merge\n";
+			if ($output_from_merge =~ /Summary of conflicts/) { # If there were merge conflicts
+				print "Failed to merge r $source_revision from $source_branch to $target_branch.\n";
+				print "Merge conflicts in $working_dir\n";
+				die;
+			}
 
-		my $commit_command = "svn commit --file $commit_message_file";
-		print "$commit_command\n";
-		my $output_from_commit = `$commit_command`;
-		my $target_revision;
-		print "$output_from_commit\n";
-		if ($output_from_commit =~ /Committed revision (\d+)\./) {
-			$target_revision = $1;
+			my $commit_command = "svn commit --file $commit_message_file";
+			print "$commit_command\n";
+			my $output_from_commit = `$commit_command`;
+			my $target_revision;
+			print "$output_from_commit\n";
+			if ($output_from_commit =~ /Committed revision (\d+)\./) {
+				$target_revision = $1;
+			} else {
+				die "Failed to commit r $source_revision from $source_branch to $target_branch.\n";
+			}
+
+			$source_branch = $target_branch;
+			$source_revision = $target_revision;
 		} else {
-			die "Failed to commit r $source_revision from $source_branch to $target_branch.\n";
+			print "Skipping branch $target_branch because we don't need to merge it.\n";
 		}
+	}
 
-		$source_branch = $target_branch;
-		$source_revision = $target_revision;
-	} else {
-		print "Skipping branch $target_branch because we don't need to merge it.\n";
+	if ( ! $found_branch ) {
+		die "Unrecognized branch $source_branch\n";
 	}
 }
 
-if ( ! $found_branch ) {
-	die "Unrecognized branch $source_branch\n";
+#=head2 load_config_from_SVN_url
+#
+#Secondary function: initializes based on a configuration
+#file which is loaded from SVN.
+#Takes one argument, which is the name of the config file.
+#
+#=cut
+
+sub load_config_from_SVN_url {
+	my $svn_url = shift;  # URL of our config file in SVN.
+	my $rami_home_dir = $SVN::Rami::rami_home_dir;
+	my $conf_dir = $SVN::Rami::conf_dir;
+	my $temp_dir = $SVN::Rami::temp_dir;
+
+	# TODO: don't wipe out the old configuration until we know that the new configuration exists.
+	
+	remove_tree $rami_home_dir if -d $rami_home_dir;
+	make_path $conf_dir, $temp_dir;
+	
+	my $export_command = "svn export --force $svn_url $conf_dir";
+	print "$export_command\n";
+	my $result_of_export = `$export_command`;
+	die "Failed to load configuration from SVN\n" unless ($result_of_export =~ m/Export complete/);
 }
 
 

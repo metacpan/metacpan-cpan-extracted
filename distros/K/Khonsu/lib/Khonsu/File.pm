@@ -38,7 +38,6 @@ sub attributes {
 		page_args => {$a->RW, $a->DHR},
 		page_offset => {$a->RW, $a->NUM, default => sub { 0 }},
 		onsave_cbs => {$a->RW, $a->DAR},
-		page_offset => {$a->RW, $a->NUM},
 		$a->LINE,
 		$a->BOX,
 		$a->CIRCLE,
@@ -57,6 +56,7 @@ sub attributes {
 		$a->FORM,
 		$a->INPUT,
 		$a->SELECT,
+		$a->CHECKBOX
 	);
 }
 
@@ -234,6 +234,12 @@ sub add_input {
 sub add_select {
 	my ($self, %args) = @_;
 	$self->select->add($self, %args);
+	return $self;
+}
+
+sub add_checkbox {
+	my ($self, %args) = @_;
+	$self->checkbox->add($self, %args);
 	return $self;
 }
 

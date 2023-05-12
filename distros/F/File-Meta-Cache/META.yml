@@ -20,9 +20,9 @@ no_index:
 requires:
   Log::OK: '0'
   Log::ger: '0'
-  Object::Pad: '0'
+  Object::Pad: '0.78'
   enum: '0'
 resources:
   repository: git://github.com/drclaw1394/perl-file-meta-cache.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -416,6 +416,27 @@ sub random {
   return @$data[rand($#{$data}+1)];
 }
 
+sub range {
+  my ($self, @args) = @_;
+
+  return $self->slice(@args) if @args > 1;
+
+  my ($note) = @args;
+
+  return $self->slice if !defined $note;
+
+  my ($f, $l) = split /:/, $note, 2;
+
+  $l = $f if !defined $l;
+
+  my $data = $self->get;
+
+  $f = 0 if !defined $f || $f eq '';
+  $l = $#$data if !defined $l || $l eq '';
+
+  return $self->slice((0+$f)..(0+$l));
+}
+
 sub reverse {
   my ($self) = @_;
 
@@ -3147,6 +3168,143 @@ I<Since C<0.01>>
   # my $random = $array->random;
 
   # 1
+
+=back
+
+=cut
+
+=head2 range
+
+  range(Int | Str @args) (ArrayRef)
+
+The range method accepts a I<"range expression"> and returns the result of
+calling the L</slice> method with the computed range.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item range example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range;
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range(0);
+
+  # [1]
+
+=back
+
+=over 4
+
+=item range example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:');
+
+  # [1..9]
+
+=back
+
+=over 4
+
+=item range example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range(':4');
+
+  # [1..5]
+
+=back
+
+=over 4
+
+=item range example 5
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('8:');
+
+  # [9]
+
+=back
+
+=over 4
+
+=item range example 6
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('4:');
+
+  # [5..9]
+
+=back
+
+=over 4
+
+=item range example 7
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:2');
+
+  # [1..3]
+
+=back
+
+=over 4
+
+=item range example 8
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('2:4');
+
+  # [3..5]
+
+=back
+
+=over 4
+
+=item range example 9
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range(0..3);
+
+  # [1..4]
 
 =back
 

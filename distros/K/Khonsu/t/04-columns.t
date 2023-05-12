@@ -53,6 +53,12 @@ my $khonsu = Khonsu->new(
 		},
 		h1 => {
 			font => { colour => '#0EE' }
+		},
+		input => {
+			pad => '_'
+		},
+		select => {
+			pad => '_'
 		}
 	}
 );
@@ -111,6 +117,11 @@ $khonsu->add_input(
 $khonsu->add_select(
 	text => 'Colour:',
 	options => [qw/red yellow green/]
+);
+
+$khonsu->add_checkbox(
+	text => 'Checkbox:',
+	width => 15 
 );
 
 $khonsu->save();

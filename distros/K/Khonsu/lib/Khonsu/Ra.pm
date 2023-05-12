@@ -26,6 +26,7 @@ use Khonsu::Image;
 use Khonsu::Form;
 use Khonsu::Form::Field::Input;
 use Khonsu::Form::Field::Select;
+use Khonsu::Form::Field::Checkbox;
 
 use Khonsu::TOC;
 
@@ -101,6 +102,9 @@ use constant INPUT => (
 );
 use constant SELECT => (
 	select => {is => 'rw', isa => Object, default => sub { Khonsu::Form::Field::Select->new() }}
+);
+use constant CHECKBOX => (
+	checkbox => {is => 'rw', isa => Object, default => sub { Khonsu::Form::Field::Checkbox->new() }}
 );
 sub new {
 	my ($pkg, %params) = @_;
@@ -188,6 +192,8 @@ sub AUTOLOAD {
 	if ( $_[0]->{attributes}->{$key} ) {
 		$_[0]->{attributes}->{$key}->(@_);
 	} else {
+use Data::Dumper;
+warn Dumper [caller()];
 		die "illegal use of AUTOLOAD $classname -> $key -";
 	}
 }

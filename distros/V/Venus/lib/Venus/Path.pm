@@ -117,6 +117,16 @@ sub explain {
   return $self->get;
 }
 
+sub extension {
+  my ($self, $name) = @_;
+
+  my $basename = $self->basename;
+
+  return ($basename =~ /\.?.+\.([^\.]+)$/)[0] || undef if !$name;
+
+  return $self->sibling(join '.', $basename, $name);
+}
+
 sub find {
   my ($self, $expr) = @_;
 
@@ -890,6 +900,82 @@ I<Since C<0.01>>
   my $explain = $path->explain;
 
   # t/data/planets
+
+=back
+
+=cut
+
+=head2 extension
+
+  extension(Str $name) (Str | Path)
+
+The extension method returns a new path object using the extension name
+provided. If no argument is provided this method returns the extension for the
+path represented by the invocant, otherwise returns undefined.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item extension example 1
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/Venus_Path.t');
+
+  my $extension = $path->extension;
+
+  # "t"
+
+=back
+
+=over 4
+
+=item extension example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data/mercury');
+
+  my $extension = $path->extension('txt');
+
+  # bless({ value => "t/data/mercury.txt"}, "Venus::Path")
+
+=back
+
+=over 4
+
+=item extension example 3
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data');
+
+  my $extension = $path->extension;
+
+  # undef
+
+=back
+
+=over 4
+
+=item extension example 4
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data');
+
+  my $extension = $path->extension('txt');
+
+  # bless({ value => "t/data.txt"}, "Venus::Path")
 
 =back
 

@@ -10,7 +10,7 @@ use Getopt::Long ;
 use Text::MacroScript ;
 
 use vars qw( $VERSION ) ; 
-$VERSION = '2.11';
+$VERSION = '2.12';
 
 my %Opt ;
 

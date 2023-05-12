@@ -24,9 +24,9 @@ package Sidef::Module::OO {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my @args = (
-                   @arg
-                   ? (map { ref($_) eq __PACKAGE__ ? $_->{module} : index(ref($_), 'Sidef::') == 0 ? $_->get_value : $_ } @arg)
-                   : ()
+               @arg
+               ? (map { (ref($_) eq __PACKAGE__) ? $_->{module} : (index(ref($_), 'Sidef::') == 0) ? $_->get_value : $_ } @arg)
+               : ()
         );
 
         my $multi_values = wantarray;
@@ -38,7 +38,7 @@ package Sidef::Module::OO {
 
         $multi_values // return;
 
-        @results = map { Sidef::Perl::Perl->to_sidef($_) } @results;
+        @results = map { Sidef::Types::Perl::Perl->to_sidef($_) } @results;
 
         if (@results > 1) {
             return ($multi_values ? @results : Sidef::Types::Array::Array->new(\@results));

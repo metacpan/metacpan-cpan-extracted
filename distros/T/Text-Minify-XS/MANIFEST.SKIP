@@ -104,6 +104,7 @@ Text-Minify-XS-.*\.tar\.gz
 \.mailmap$
 perltidy\.(LOG|ERR)
 fatlib/
+^\.mite$
 cpanfile\.snapshot$
 local/
 XS\.(bs|c|o)$

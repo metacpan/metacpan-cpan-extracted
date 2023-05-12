@@ -96,7 +96,7 @@ package Sidef::Parser {
                      | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
                      | Sig\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sig') })
                      | Sys\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sys') })
-                     | Perl\b                         (?{ state $x = bless({}, 'Sidef::Perl::Perl') })
+                     | Perl\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Perl::Perl') })
                      | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
                      | Date\b                         (?{ state $x = Sidef::Time::Date->new })
@@ -121,8 +121,8 @@ package Sidef::Parser {
                      | \$;                            (?{ state $x = bless({name => '$;'}, 'Sidef::Variable::Magic') })
                      | \$,                            (?{ state $x = bless({name => '$,'}, 'Sidef::Variable::Magic') })
                      | \$\^O\b                        (?{ state $x = bless({name => '$^O'}, 'Sidef::Variable::Magic') })
-                     | \$\^PERL\b                     (?{ state $x = bless({name => '$^X'}, 'Sidef::Variable::Magic') })
-                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0'}, 'Sidef::Variable::Magic') })
+                     | \$\^PERL\b                     (?{ state $x = bless({name => '$^X', dump => '$^PERL'}, 'Sidef::Variable::Magic') })
+                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0', dump => '$^SIDEF'}, 'Sidef::Variable::Magic') })
                      | \$\)                           (?{ state $x = bless({name => '$)'}, 'Sidef::Variable::Magic') })
                      | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
                      | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
@@ -189,6 +189,10 @@ package Sidef::Parser {
                 # Symbols
                 | %[Os]\b.                                                 (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
                 | %S\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::Func)] })
+
+                # Arbitrary Perl code
+                | %perl\b.                                                 (?{ [qw(0 new Sidef::Types::Perl::Perl)] })
+                | %Perl\b.                                                 (?{ [qw(1 new Sidef::Types::Perl::Perl)] })
              )
             }xs,
             built_in_classes => {
@@ -1102,6 +1106,17 @@ package Sidef::Parser {
                     $method     = 'new';
                 }
 
+                if ($package eq 'Sidef::Module::Func' or $package eq 'Sidef::Module::OO') {
+                    if ($string !~ /^$self->{var_name_re}\z/) {
+                        $self->fatal_error(
+                                           code   => $_,
+                                           pos    => (pos($_) - length($string) - 1),
+                                           error  => "invalid symbol declaration",
+                                           reason => "expected a variable-like name",
+                                          );
+                    }
+                }
+
                 my $obj = (
                     $double_quoted
                     ? do {
@@ -1111,8 +1126,8 @@ package Sidef::Parser {
                     : $package->$method($string =~ s{\\\\}{\\}gr)
                 );
 
-                # Special case for backticks (add method 'run')
-                if ($package eq 'Sidef::Types::Glob::Backtick') {
+                # Special case for backticks and Perl code (add method 'run')
+                if ($package eq 'Sidef::Types::Glob::Backtick' or $package eq 'Sidef::Types::Perl::Perl') {
                     my $struct =
                         $double_quoted && ref($obj) eq 'HASH'
                       ? $obj
@@ -1159,7 +1174,7 @@ package Sidef::Parser {
                 my @array;
                 my $obj = $self->parse_array(code => $opt{code});
 
-                if (ref $obj->{$self->{class}} eq 'ARRAY') {
+                if (ref($obj->{$self->{class}}) eq 'ARRAY') {
                     push @array, @{$obj->{$self->{class}}};
                 }
 
@@ -1447,7 +1462,7 @@ package Sidef::Parser {
                                         error => q{expected one or more variable names after <enum>},
                                        );
 
-                my $value = Sidef::Types::Number::Number->new(-1);
+                my $value = Sidef::Types::Number::Number::_set_int(-1);
 
                 foreach my $var (@{$vars}) {
                     my $name = $var->{name};
@@ -2195,7 +2210,7 @@ package Sidef::Parser {
             # Super-script power
             if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
                 my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
-                return Sidef::Types::Number::Number->new($num);
+                return Sidef::Types::Number::Number::_set_int($num);
             }
 
             # Binary, hexadecimal and octal numbers
@@ -2211,7 +2226,7 @@ package Sidef::Parser {
             }
 
             # Integer or float number
-            if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
+            if (/\G((?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
                 my $num = $1 =~ tr/_//dr;
 
                 if (/\Gi\b/gc) {    # imaginary
@@ -2221,7 +2236,11 @@ package Sidef::Parser {
                     return Sidef::Types::Number::Number::_set_str('float', $num);
                 }
 
-                return Sidef::Types::Number::Number->new($num);
+                return (
+                        $num =~ /^-?[0-9]+\z/
+                        ? Sidef::Types::Number::Number::_set_int($num)
+                        : Sidef::Types::Number::Number->new($num)
+                       );
             }
 
             # Prefix `...`

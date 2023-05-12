@@ -14,9 +14,10 @@ requires 'Dist::Zilla::Role::LicenseProvider';
 
 requires 'Dist::Zilla::Plugin::Test::Compile', '2.055';
 requires 'Dist::Zilla::Plugin::Test::ReportPrereqs';
-requires 'Dist::Zilla::Plugin::HasVersionTests';
-
 requires 'Dist::Zilla::Plugin::StaticInstall';
+requires 'Test::HasVersion';
+
+requires 'Dist::Zilla::Plugin::InlineFiles';
 
 # Fails to set a version due to to a misplaced check fixed in 0.20
 requires 'Dist::Zilla::Plugin::OurPkgVersion', '0.20';

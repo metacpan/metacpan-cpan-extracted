@@ -428,6 +428,8 @@ To exit the loop, return L</break>, for example:
         print( "ok, this one\n" );
     });
 
+Or you could also return a non-empty false value such as C<0>
+
 =head2 eighth
 
 Returns the corresponding value at the offset position 7 in the array by calling L</get_null>.
@@ -557,7 +559,7 @@ C<$_> is made available and contains the value of C<$val>
 
 It returns the object itself so this can be chained.
 
-To exit the loop, call L</break>. You can even return the value returned by calling L</break>. for example:
+To exit the loop, call L</break> or return a defined, but false value such as C<0> or an empty string. You can even return the value returned by calling L</break>. for example:
 
     $a->for(sub
     {
@@ -580,7 +582,7 @@ Or you can use L</return>
         }
     });
 
-In version on or anterior to v1.5.4 you could exit the loop by just returning C<undef>, but since there are unfortunate opportunities for implicit C<undef> being returned, this led to some issues and now it is required to return false, but defined.
+In version on or anterior to v1.5.4 you could exit the loop by just returning C<undef>, but since there are unfortunate opportunities for implicit C<undef> being returned, this led to some issues and now it is required to return false, but defined and not empty, such as C<0>.
 
 If you wanted to affect the current offset position relative to the current counter value, you can return a scalar reference containing an integer. For example:
 
@@ -634,7 +636,7 @@ Instead use L</for>. See example provided there on how to do it.
 
 C<$_> is made available and contains the value of C<$val>
 
-To exit the loop, call L</break>. You can even return the value returned by calling L</break>. for example:
+To exit the loop, call L</break> or return a defined non-empty, but false value such as C<0>. You can even return the value returned by calling L</break>. for example:
 
     $a->foreach(sub
     {
@@ -643,7 +645,7 @@ To exit the loop, call L</break>. You can even return the value returned by call
         print( "ok, this one\n" );
     });
 
-In version on or anterior to v1.5.4 you could exit the loop by just returning C<undef>, but since there are unfortunate opportunities for implicit C<undef> being returned, this led to some issues and now it is required to return false, but defined.
+In version on or anterior to v1.5.4 you could exit the loop by just returning C<undef>, but since there are unfortunate opportunities for implicit C<undef> being returned, this led to some issues and now it is required to return false, but defined and non-empty such as C<0>. An empty string would not work.
 
 =head2 fourth
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::ShareDir;
-our $VERSION = '1.000012';
+our $VERSION = '1.000013';
 
 use Path::Tiny;
 use File::ShareDir ();
@@ -69,7 +69,7 @@ Zest::Author::TABULO::Util::ShareDir - DZIL-related utility functions used by TA
 
 =head1 VERSION
 
-version 1.000012
+version 1.000013
 
 =for Pod::Coverage dist_file dist_dir
 

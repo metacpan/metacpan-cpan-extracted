@@ -1,16 +1,16 @@
 package SPVM::File::Glob;
 
-our $VERSION = '0.01';
+our $VERSION = "0.020001";
 
 1;
 
 =head1 Name
 
-SPVM::File::Glob - The glob Function
+SPVM::File::Glob - The BSD glob Porting
 
 =head1 Description
 
-C<SPVM::File::Glob> is the C<File::Glob> class in L<SPVM> language. This class has the glob method.
+The File::Glob class of L<SPVM> has a method that is a port of the BSD glob function.
 
 =head1 Usage
 
@@ -38,8 +38,6 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+MIT License

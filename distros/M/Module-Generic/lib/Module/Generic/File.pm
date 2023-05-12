@@ -4534,7 +4534,7 @@ Shorthand for L</copy>
 
 This uses L<Crypt::Digest::MD5> to perform a md5 checksum as an hex value and returns it.
 
-It requires this module L<Crypt::Digest::MD5> to be installed, and also the file to be a plain text file and not a directory, other this sets and L<error|Module::Generic/error> and return C<undef>
+It requires this module L<Crypt::Digest::MD5> to be installed, and also the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
 
 On success, this returns a md5 hex digest of the underlying file.
 
@@ -4542,7 +4542,7 @@ On success, this returns a md5 hex digest of the underlying file.
 
 This uses L<Crypt::Digest::SHA256> to perform a sha256 checksum as an hex value and returns it.
 
-It requires this module L<Crypt::Digest::SHA256> to be installed, and also the file to be a plain text file and not a directory, other this sets and L<error|Module::Generic/error> and return C<undef>
+It requires this module L<Crypt::Digest::SHA256> to be installed, and also the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
 
 On success, this returns a md5 hex digest of the underlying file.
 
@@ -4550,7 +4550,7 @@ On success, this returns a md5 hex digest of the underlying file.
 
 This uses L<Crypt::Digest::SHA512> to perform a sha512 checksum as an hex value and returns it.
 
-It requires this module L<Crypt::Digest::SHA512> to be installed, and also the file to be a plain text file and not a directory, other this sets and L<error|Module::Generic/error> and return C<undef>
+It requires this module L<Crypt::Digest::SHA512> to be installed, and also the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
 
 On success, this returns a md5 hex digest of the underlying file.
 
@@ -4693,7 +4693,7 @@ This is an alias for L</filename>
 
 Assuming the current object represents an existing directory, this takes an optional hash or hash reference of options followed by a code reference. This is used as a callback with the module L<File::Find/find>
 
-The callback can be provided with the I<callback> option.
+The callback can also be provided with the I<callback> option.
 
 It returns whatever L<File::Find/find> returns or undef and sets an exception object if an error occurred.
 

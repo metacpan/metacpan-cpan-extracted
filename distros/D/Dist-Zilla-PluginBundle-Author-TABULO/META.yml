@@ -52,22 +52,22 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::TABULO:
     file: lib/Dist/Zilla/MintingProfile/Author/TABULO.pm
-    version: '1.000012'
+    version: '1.000013'
   Dist::Zilla::PluginBundle::Author::TABULO:
     file: lib/Dist/Zilla/PluginBundle/Author/TABULO.pm
-    version: '1.000012'
+    version: '1.000013'
   Pod::Weaver::PluginBundle::Author::TABULO:
     file: lib/Pod/Weaver/PluginBundle/Author/TABULO.pm
-    version: '1.000012'
+    version: '1.000013'
   Pod::Wordlist::Author::TABULO:
     file: lib/Pod/Wordlist/Author/TABULO.pm
-    version: '1.000012'
+    version: '1.000013'
   Zest::Author::TABULO::Util::List:
     file: lib/Zest/Author/TABULO/Util/List.pm
-    version: '1.000012'
+    version: '1.000013'
   Zest::Author::TABULO::Util::Mayhap:
     file: lib/Zest/Author/TABULO/Util/Mayhap.pm
-    version: '1.000012'
+    version: '1.000013'
 requires:
   Class::Tiny: '0'
   Data::OptList: '0'
@@ -162,10 +162,12 @@ requires:
   Pod::Weaver::Plugin::Include: '0'
   Pod::Weaver::Plugin::StopWords: '0'
   Pod::Weaver::Plugin::WikiDoc: '0'
-  Pod::Weaver::Section::AllowOverride: '0'
   Pod::Weaver::Section::Authors: '0'
   Pod::Weaver::Section::ClassMopper: '0'
+  Pod::Weaver::Section::Collect: '0'
   Pod::Weaver::Section::Contributors: '0.008'
+  Pod::Weaver::Section::ReplaceName: '0'
+  Pod::Weaver::Section::SeeAlso: '0'
   Pod::Weaver::Section::Support: '1.001'
   Pod::Wordlist: '0'
   Text::Trim: '0'
@@ -179,7 +181,7 @@ resources:
   bugtracker: https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO/issues
   homepage: https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO
   repository: https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO.git
-version: '1.000012'
+version: '1.000013'
 x_authority: cpan:TABULO
 x_contributors:
   - 'Tabulo <dev-git.perl@tabulo.net>'

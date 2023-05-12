@@ -1,3 +1,7 @@
+0.481001 2023-05-10
+  [Prerequirement Changes]
+    * SPVM 0.976+ is required.
+    * SPVM::Resource::SocketUtil 1.001+ is required.
 0.481 2023-05-09
   [Incompatible Changes]
     * The definition of the defined method in the Sys::OS class is changed.

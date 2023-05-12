@@ -8,7 +8,7 @@ use Protocol::FIX;
 use mro;
 use parent qw/Protocol::FIX::BaseComposite/;
 
-our $VERSION = '0.07';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 =head1 NAME
 

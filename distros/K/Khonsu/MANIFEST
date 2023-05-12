@@ -5,6 +5,7 @@ lib/Khonsu/File.pm
 lib/Khonsu/Font.pm
 lib/Khonsu/Form.pm
 lib/Khonsu/Form/Field.pm
+lib/Khonsu/Form/Field/Checkbox.pm
 lib/Khonsu/Form/Field/Input.pm
 lib/Khonsu/Form/Field/Select.pm
 lib/Khonsu/Image.pm

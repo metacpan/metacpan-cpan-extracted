@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.5
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2022/11/11
+## Modified 2023/05/11
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.5';
 };
 
 use strict;
@@ -620,6 +620,7 @@ sub extract_links
     my $has_expectation = scalar( keys( %$wants ) );
     my $a = $self->new_array;
     my $crawl;
+    my $seen = {};
     $crawl = sub
     {
         my $kids = shift( @_ );
@@ -627,22 +628,37 @@ sub extract_links
         {
             my $e = shift( @_ );
             my $def;
-            $def = $HTML::Object::LINK_ELEMENTS->{ $e->tag } if( exists( $HTML::Object::LINK_ELEMENTS->{ $e->tag } ) );
-            return(1) if( !defined( $def ) );
-            return(1) if( $has_expectation && !exists( $wants->{ $e->tag } ) );
-            foreach my $attr ( @$def )
+            my $tag = $e->tag;
+            $def = $HTML::Object::LINK_ELEMENTS->{ "$tag" } if( exists( $HTML::Object::LINK_ELEMENTS->{ "$tag" } ) );
+            # return(1) if( !defined( $def ) );
+            # return(1) if( $has_expectation && !exists( $wants->{ "$tag" } ) );
+            if( defined( $def ) && 
+                (
+                    !$has_expectation || 
+                    ( $has_expectation && !exists( $wants->{ "$tag" } ) )
+                ) )
             {
-                my $val;
-                if( $e->attributes->exists( $attr ) && length( $val = $e->attributes->get( $attr ) ) )
+                foreach my $attr ( @$def )
                 {
-                    $a->push( $self->new_hash({
-                        attribute => $attr,
-                        element   => $e,
-                        tag       => $e->tag,
-                        value     => $val,
-                    }) );
+                    my $val;
+                    if( $e->attributes->exists( $attr ) && length( $val = $e->attributes->get( $attr ) ) )
+                    {
+                        $a->push( $self->new_hash({
+                            attribute => $attr,
+                            element   => $e,
+                            tag       => $tag,
+                            value     => $val,
+                        }) );
+                    }
                 }
             }
+            my $addr = Scalar::Util::refaddr( $e );
+            if( ++$seen->{ $addr } > 1 )
+            {
+                return(1);
+            }
+            $crawl->( $e->children );
+            return(1);
         });
     };
     $crawl->( $self->children );
@@ -696,7 +712,8 @@ sub find_by_tag_name
         $elems->foreach(sub
         {
             my $e = shift( @_ );
-            return( 1 ) if( $e->class ne 'HTML::Object::Element' );
+            # return(1) if( $e->class ne 'HTML::Object::Element' );
+            return(1) if( !$self->_is_a( $e => 'HTML::Object::Element' ) );
             $a->push( $e ) if( exists( $tags->{ $e->tag } ) );
             $crawl->( $e->children ) if( $e->children->length > 0 );
         });
@@ -1294,7 +1311,7 @@ sub same_as
 sub set_checksum
 {
     my $self = shift( @_ );
-    my $tag  = $self->tag;
+    my $tag  = $self->_tag;
     my $a = $self->new_array( [$tag] );
     $self->attributes_sequence->foreach(sub
     {
@@ -1508,13 +1525,14 @@ sub _get_from_list_of_elements_or_html
 sub _get_md5_hash
 {
     my $self = shift( @_ );
+    my $data = shift( @_ );
+    return( $self->error( "No data was provided to compute a md5 hash." ) ) if( !defined( $data ) || !length( "$data" ) );
     try
     {
-        return( Digest::MD5::md5_hex( Encode::encode( 'utf8', shift( @_ ), Encode::FB_CROAK ) ) );
+        return( Digest::MD5::md5_hex( Encode::encode( 'utf8', $data, Encode::FB_CROAK ) ) );
     }
     catch( $e )
     {
-        warnings::warn( "An error occurred while calculating the md5 hash for tag \"" . $self->tag . "\": $e\n" ) if( warnings::enabled() );
         return( $self->error( "An error occurred while calculating the md5 hash for tag \"", $self->tag, "\": $e" ) );
     }
 }
@@ -1526,57 +1544,36 @@ sub _is_reset { return( CORE::length( shift->{_reset} ) ); }
 sub _remove_reset { return( CORE::delete( shift->{_reset} ) ); }
 
 # Method shared with HTML::Object::XQuery
-sub _set_get_id : lvalue
-{
-    my $self = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub _set_get_id : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
+        my $self = shift( @_ );
+        my $id = $self->new_scalar( $self->attributes->get( 'id' ) );
+        return( $id );
+    },
+    set => sub
     {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    
-    if( $has_arg )
-    {
-        my $id = $arg;
+        my $self = shift( @_ );
+        my $id = shift( @_ );
         if( !defined( $id ) || !CORE::length( $id ) )
         {
-            my $dummy = \0;
             if( $self->attributes->exists( 'id' ) )
             {
                 $self->attributes->delete( 'id' );
                 $self->attributes_sequence->remove( 'id' );
                 $self->reset(1);
-                $dummy = \1;
+                return(1);
             }
-            return( $dummy ) if( want( 'LVALUE' ) );
-            Want::rreturn( $dummy );
+            return(0);
         }
         else
         {
             $self->attributes->set( id => $id );
             $self->reset(1);
-            my $dummy = \1;
-            return( $dummy ) if( want( 'LVALUE' ) );
-            Want::rreturn( $dummy );
+            return(1);
         }
     }
-    else
-    {
-        my $id = $self->new_scalar( $self->attributes->get( 'id' ) );
-        return( $id ) if( want( 'LVALUE' ) );
-        Want::rreturn( $id );
-    }
-}
+}, @_ ) ); }
 
 sub _same_as
 {
@@ -1610,6 +1607,9 @@ sub _set_get_internal_attribute_callback
     return;
 }
 
+# A private method for internal use when the tag method has been overriden for example as it is the case in HTML::Object::XQuery
+sub _tag { return( shift->reset(@_)->_set_get_scalar_as_object( 'tag', @_ ) ); }
+
 1;
 # NOTE: POD
 __END__
@@ -1627,7 +1627,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.5
 
 =head1 DESCRIPTION
 
@@ -1863,19 +1863,42 @@ Actually, I am not sure this should be here, and rather it should be in L<HTML::
 
 =head2 extract_links
 
-Returns an L<array object|Module::Generic::Array> containing L<hash objects|Module::Generic::Hash>, for each attribute of an element containing a link, with the following properties:
+Returns links found by traversing the element and all of its children and looking for attributes (like C<href> in an C<<a>> element, or C<src> in an C<<img>> element) whose values represent links.
+
+You may specify that you want to extract links from just some kinds of elements (instead of the default, which is to extract links from all the kinds of elements known to have attributes whose values represent links). For instance, if you want to extract links from only C<<a>> and C<<img>> elements, you could code it like this:
+
+    my $links = $elem->extract_links( qw( a img ) ) ||
+        die( $elem->error );
+    foreach( @$links )
+    {
+        say "Hey, there is a ", $_->{tag}, " that links to ", $_->{value}, "in its ", $_->{attribute}, " attribute, at ", $_->{element}->address;
+    }
+
+The dictionary definition hash reference of all tags and their attributes containing potential links is available as C<$HTML::Object::LINK_ELEMENTS>
+
+This method returns an L<array object|Module::Generic::Array> containing L<hash objects|Module::Generic::Hash>, for each attribute of an element containing a link, with the following properties:
 
 =over 4
 
-=item I<attribute>
+=item * C<attribute>
 
-=item I<element>
+The attribute containing the link
 
-=item I<tag>
+=item * C<element>
 
-=item I<value>
+The L<element object|HTML::Object::Element>
+
+=item * C<tag>
+
+The element tag name.
+
+=item * C<value>
+
+The attribute value, which would typically contain the link value.
 
 =back
+
+Nota bene: this method has been implemented to provide similar API as L<HTML::Element> and the 2 first paragraphs of this method description are taken from this module.
 
 =head2 find_by_attribute
 
@@ -1989,6 +2012,8 @@ This is used when you are looking for an element with a particular attribute nam
     my $list = $e->look_down( id => 'hello' );
 
 This will look for any element whose attribute C<id> has a value of C<hello>
+
+If you want to search for an attribute that does B<not> exist, set the attribute value being searched to C<undef>
 
 To search for a tag, use the special attribute C<_tag>. For example:
 

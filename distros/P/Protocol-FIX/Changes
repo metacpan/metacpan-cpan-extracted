@@ -1,8 +1,13 @@
+0.08      2023-05-10 10:43:06+00:00 UTC
+
+0.08      2023-05-01 08:53:22+00:00 UTC
+    - Update: Add "Instrument" component to MarketDataIncrementalRefresh message schema
+
 0.07      2022-11-13 06:51:43+00:00 UTC
     - Bugfix: Repetitive group not returning correct number of symbols
-
+    
 0.06      2021-04-19 15:37:10+00:00 UTC
-    - No change
+    - Bugfix: Repetitive group not returning correct number of symbols
 
 0.05      2021-03-05 09:11:09+00:00 UTC
     - Bugfix: Not able to parse repetitive group
@@ -16,7 +21,7 @@
     - Bugfix: relax tag length check
     - Bugfix: parse messages, defined in protocol extension
 
-0.02  2017-03-21 14:24:26+00:00 UTC
+0.02
     - Reddit's feedback: add DESCRIPTION and NAME sections into POD
 
 0.01      2017-03-15 11:10:40+00:00 UTC

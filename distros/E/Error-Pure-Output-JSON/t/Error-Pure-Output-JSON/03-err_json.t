@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Output::JSON qw(err_json);
 use Test::More 'tests' => 3;
 use Test::NoWarnings;

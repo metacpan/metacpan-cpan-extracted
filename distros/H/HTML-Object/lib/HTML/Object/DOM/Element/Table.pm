@@ -500,99 +500,75 @@ sub _set_get_section : lvalue
     my $self = shift( @_ );
     my $tag  = shift( @_ );
     my $class = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
+
+    return( $self->_set_get_callback({
+        get => sub
         {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        my $new = $arg;
-        if( !$self->_is_a( $new => $class ) || $new->tag ne $tag )
+            my $self = shift( @_ );
+            my $list = $self->_get_tsection_collection( $tag );
+            return( $list->first );
+        },
+        set => sub
         {
-            my $error = "New ${tag} object provided is not an ${class} object";
-            if( $has_arg eq 'assign' )
+            my $self = shift( @_ );
+            my $new = shift( @_ );
+            if( !$self->_is_a( $new => $class ) || $new->tag ne $tag )
             {
-                $self->error({ message => $error, class => 'HTML::Object::HierarchyRequestError' });
-                my $dummy = $error;
-                return( $dummy );
+                return( $self->error({ message => "New ${tag} object provided is not an ${class} object", class => 'HTML::Object::HierarchyRequestError' }) );
             }
-            return( $self->error({ message => $error, class => 'HTML::Object::HierarchyRequestError' }) ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->error({ message => $error, class => 'HTML::Object::HierarchyRequestError' }) );
-        }
-        $new->detach;
-        my( $old, $pos );
-        my $children = $self->children;
-        my $len = $children->length;
-        for( my $i = 0; $i < $len; $i++ )
-        {
-            my $e = $children->[$i];
-            my $e_tag = $e->tag;
-            if( $e_tag eq $tag )
+            $new->detach;
+            my( $old, $pos );
+            my $children = $self->children;
+            my $len = $children->length;
+            for( my $i = 0; $i < $len; $i++ )
             {
-                $old = $e;
-                $pos = $i;
-                last;
+                my $e = $children->[$i];
+                my $e_tag = $e->tag;
+                if( $e_tag eq $tag )
+                {
+                    $old = $e;
+                    $pos = $i;
+                    last;
+                }
+                # Find out the default position we would insert the new element if there is no previous ($old) element
+                elsif( !defined( $pos ) &&
+                       (
+                        ( $tag eq 'thead' && $e_tag ne 'caption' && $e_tag ne 'colgroup' ) ||
+                        ( $tag eq 'tfoot' && $e_tag ne 'caption' && $e_tag ne 'colgroup' && $e_tag ne 'thead' )
+                       ) )
+                {
+                    $pos = $i;
+                }
             }
-            # Find out the default position we would insert the new element if there is no previous ($old) element
-            elsif( !defined( $pos ) &&
-                   (
-                    ( $tag eq 'thead' && $e_tag ne 'caption' && $e_tag ne 'colgroup' ) ||
-                    ( $tag eq 'tfoot' && $e_tag ne 'caption' && $e_tag ne 'colgroup' && $e_tag ne 'thead' )
-                   ) )
-            {
-                $pos = $i;
-            }
-        }
         
-        if( !defined( $pos ) )
-        {
-            if( $tag eq 'caption' )
+            if( !defined( $pos ) )
             {
-                $pos = 0;
+                if( $tag eq 'caption' )
+                {
+                    $pos = 0;
+                }
+                # For thead, or tfoot, put them as the last element
+                else
+                {
+                    $pos = $len;
+                }
             }
-            # For thead, or tfoot, put them as the last element
+        
+            $self->reset(1);
+            $self->_reset_table( $tag );
+            $new->parent( $self );
+            if( defined( $old ) )
+            {
+                $children->splice( $pos, 1, $new );
+                return( $old );
+            }
             else
             {
-                $pos = $len;
+                $children->splice( $pos, 0, $new );
+                return;
             }
-        }
-        
-        $self->reset(1);
-        $self->_reset_table( $tag );
-        $new->parent( $self );
-        if( defined( $old ) )
-        {
-            $children->splice( $pos, 1, $new );
-            my $dummy = '';
-            return( $dummy ) if( $has_arg eq 'assign' );
-            return( $old ) if( want( 'LVALUE' ) );
-            Want::rreturn( $old );
-        }
-        else
-        {
-            $children->splice( $pos, 0, $new );
-            my $dummy = '';
-            return( $dummy ) if( $has_arg eq 'assign' );
-            return if( want( 'LVALUE' ) );
-            Want::rreturn;
-        }
-    }
-    else
-    {
-        my $list = $self->_get_tsection_collection( $tag );
-        return( $list->first );
-    }
+        },
+    }, @_ ) );
 }
 
 1;

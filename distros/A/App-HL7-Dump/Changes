@@ -1,3 +1,10 @@
+0.07 2023-05-11T18:20:29+02:00
+ - Add better example names.
+ - Fix repository author name.
+ - Fix test on Windows.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.06 2022-01-10T09:56:22+01:00
  - Fix test dependencies.
 

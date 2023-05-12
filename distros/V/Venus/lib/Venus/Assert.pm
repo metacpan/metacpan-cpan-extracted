@@ -504,6 +504,12 @@ sub regexp {
   return $self;
 }
 
+sub render {
+  my ($self, $into, $data) = @_;
+
+  return _type_render($into, $data);
+}
+
 sub routines {
   my ($self, @data) = @_;
 
@@ -660,6 +666,8 @@ sub yesno {
   return $self;
 }
 
+# ROUTINES
+
 sub _type_parse {
   my @items = _type_parse_pipes(@_);
 
@@ -695,6 +703,11 @@ sub _type_parse_nested {
   @items = ($expr =~ /^(\w+)\s*\[\s*(.*)\s*\]+$/g);
 
   @items = map _type_parse_lists($_), @items;
+
+  @items = map +(
+    $_ =~ qr/^@{[_type_subexpr_type_2()]},.*$/ ? _type_parse_lists($_) : $_
+  ),
+  @items;
 
   @items = map {s/^["']+|["']+$//gr} @items;
 
@@ -855,6 +868,23 @@ sub _type_regexp_groups {
 
 sub _type_regexp_joined {
   join(_type_subexpr_delimiter(), @_)
+}
+
+sub _type_render {
+  my ($into, $data) = @_;
+
+  if (ref $data eq 'HASH') {
+    $data = join ', ', map +(qq("$_"), _type_render($into, $$data{$_})),
+      sort keys %{$data};
+    $data = "$into\[$data\]";
+  }
+
+  if (ref $data eq 'ARRAY') {
+    $data = join ', ', map +(/^\w+$/ ? qq("$_") : $_), @{$data};
+    $data = "$into\[$data\]";
+  }
+
+  return $data;
 }
 
 sub _type_subexpr_delimiter {
@@ -2773,6 +2803,92 @@ I<Since C<1.40>>
   # $assert->check(qr//);
 
   # true
+
+=back
+
+=cut
+
+=head2 render
+
+  render(Str $into, Str $expression) (Str)
+
+The render method builds and returns a type expressions suitable for providing
+to L</expression> based on the data provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item render example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render;
+
+  # undef
+
+=back
+
+=over 4
+
+=item render example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render(undef, 'string');
+
+  # "string"
+
+=back
+
+=over 4
+
+=item render example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('routines', ['say', 'say_pretty']);
+
+  # 'routines["say", "say_pretty"]'
+
+=back
+
+=over 4
+
+=item render example 4
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('hashkeys', {id => 'number', name => 'string'});
+
+  # 'hashkeys["id", number, "name", string]'
+
+=back
+
+=over 4
+
+=item render example 5
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('hashkeys', {
+    id => 'number',
+    profile => {
+      level => 'string',
+    },
+  });
+
+  # 'hashkeys["id", number, "profile", hashkeys["level", string]]'
 
 =back
 

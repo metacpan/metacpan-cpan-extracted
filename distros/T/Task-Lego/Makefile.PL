@@ -1,15 +1,15 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Install the Lego modules.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.08;
+test_requires 'Test::More' => 0;
+test_requires 'Test::NoWarnings' => 0;
 author_requires 'Test::Pod' => 0;
 author_requires 'Test::Pod::Coverage' => 0;
 license 'bsd';
@@ -21,14 +21,13 @@ requires 'Lego::Ldraw' => '0.5.8';
 requires 'Lego::Part' => '0.03';
 requires 'Lego::Part::Image' => '0.05';
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Task-Lego';
-resources 'homepage' => 'https://github.com/tupinek/Task-Lego';
-resources 'repository' => 'git://github.com/tupinek/Task-Lego';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Task-Lego/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Task-Lego';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Task-Lego';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

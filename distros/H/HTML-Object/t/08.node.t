@@ -3,6 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
 };
 
@@ -12,6 +14,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Node' ) || BAIL_OUT( "Cannot load HTML::Object::DOM::Node" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 my $test = <<EOT;
 <!DOCTYPE html>

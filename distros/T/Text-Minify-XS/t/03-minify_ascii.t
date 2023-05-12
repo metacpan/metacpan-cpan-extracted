@@ -1,5 +1,8 @@
 use utf8;
 
+use v5.14;
+use warnings;
+
 use Test::More 1.302183;
 
 use Encode qw/ encode /;

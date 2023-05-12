@@ -100,7 +100,7 @@ sub get {
 sub parse {
   my ($self, $extras) = @_;
 
-  return $self->parsed if %{$self->parsed};
+  return $self if %{$self->parsed};
 
   my $value = $self->value;
   my $specs = $self->specs;
@@ -148,6 +148,15 @@ sub name {
   }
 
   return undef;
+}
+
+sub reparse {
+  my ($self, $specs, $extras) = @_;
+
+  $self->parsed({});
+  $self->specs($specs || []) if defined $specs;
+
+  return $self->parse($extras || []);
 }
 
 sub set {
@@ -475,7 +484,7 @@ I<Since C<0.01>>
 
   my $parse = $opts->parse;
 
-  # { help => 1, resource => "users" }
+  # bless({...}, 'Venus::Opts')
 
 =back
 
@@ -487,7 +496,42 @@ I<Since C<0.01>>
 
   my $parse = $opts->parse(['bundling']);
 
-  # { help => 1, resource => "users" }
+  # bless({...}, 'Venus::Opts')
+
+=back
+
+=cut
+
+=head2 reparse
+
+  reparse(ArrayRef $specs, ArrayRef $args) (Opts)
+
+The reparse method resets the parser, calls the L</parse> method and returns
+the result.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item reparse example 1
+
+  # given: synopsis;
+
+  my $reparse = $opts->reparse(['resource|r=s']);
+
+  # bless({...}, 'Venus::Opts')
+
+=back
+
+=over 4
+
+=item reparse example 2
+
+  # given: synopsis;
+
+  my $reparse = $opts->reparse(['resource|r=s'], ['bundling']);
+
+  # bless({...}, 'Venus::Opts')
 
 =back
 

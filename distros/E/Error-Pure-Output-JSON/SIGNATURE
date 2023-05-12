@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,41 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 41995e37ac445d4954acdb0436bf07b6d6731f2a Changes
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
-SHA1 848a0bfdb10048b822cf9f991e50bad6ebe8c1d3 MANIFEST
-SHA1 dc65d5427440e009877292c90b2083e1f247d076 META.yml
-SHA1 9cb26101be303110ed36252c01ac8eff2ee7fd9d Makefile.PL
-SHA1 7c236760bd4ddf0717a9a51b2cce6f05c2c9b715 README
-SHA1 426de096d4e6c3b3a40558ab419cde649c62de2a examples/ex1.pl
-SHA1 8d9de5ee12ba026ac784fd0a20adb28bfee1c146 examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 660eb61c83446431df7e388395989abd759e8bca lib/Error/Pure/Output/JSON.pm
-SHA1 03f28246abacd07dffabf84ac6945489b4b101f4 t/Error-Pure-Output-JSON/01-use.t
-SHA1 52f3b26b9dbdf8ff01af1eb10d59d63ec018c5a7 t/Error-Pure-Output-JSON/02-version.t
-SHA1 6d51748cac0de77365bdced167bc43167a441002 t/Error-Pure-Output-JSON/03-err_json.t
-SHA1 f5a460894fe66b6cfa2c539c4cc42adf8b96d805 xt/Error-Pure-Output-JSON/01-pod_coverage.t
-SHA1 d4af87bc21360e097fbc5341d435d7ebaf3e0f3f xt/Error-Pure-Output-JSON/02-pod.t
+SHA256 7955b9d3c8bb407b2d476ee46cc9c174fb80b273108c9fb5acff793914cc3549 Changes
+SHA256 16e519f1cbc291b44fcc60e62249456c7f5432e29ad17f3ac82faf65b624cff4 LICENSE
+SHA256 7f2faecd2d450472774dff1d0d0362cd9876bb5bb493eb8002192a88848a3653 MANIFEST
+SHA256 3844419e219cde0dfa9a20c57fd590e439658c4ad58ac4f4df3f3fdf79e0d81f META.yml
+SHA256 cbbd86cd2e1ffecc9403a8a792c177c87c2322550f29e6d56d231685d81a0816 Makefile.PL
+SHA256 05b4f62e61d950cec1544566af42e79629ed983a14ffb8ce0babdf6708a98fce README
+SHA256 72ff08fb050965ae0f3637b533a5b6c3f6316279e405c669c492d4af76d9c6a6 examples/err_json.pl
+SHA256 6ad90a0c62dc3f460b82b72603f264495d161dafbfe6c77e5ccce6c9ca7b313f examples/err_json_pretty_print.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 242bc1b9b4c1c083b917b14371a8e8fab93598ca3a89f140c0a1e175a44018db lib/Error/Pure/Output/JSON.pm
+SHA256 b9d9d0b9a81511b6c0ba951882dcd92257dcb6940b983c0f30ad6d5e1f116bc8 t/Error-Pure-Output-JSON/01-use.t
+SHA256 e0b9ab0f9e05d5ef0f30e246e56df6aa3602d8ced0de2aff696a4ebf39f4f16d t/Error-Pure-Output-JSON/02-version.t
+SHA256 fea1355c0081886acb1e4b73bf02983aec050e5b6701d0575b16c62799c395ec t/Error-Pure-Output-JSON/03-err_json.t
+SHA256 dac913b76b24e75b42dd1d844cdc60ebd7a40ec69e816c3b36a4e8b388e86bc7 xt/Error-Pure-Output-JSON/01-pod_coverage.t
+SHA256 83805ea2b40ae832f976eb1531f698975c65c35dd50089598b7d1ca8dd824aed xt/Error-Pure-Output-JSON/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJV+Wj7AAoJEJe+XXKaIuTlJmoIAI4ZFAOQNPSoB1pvgv8azSqJ
-I1U0rMAR27rbYUX8omBhjZ6csC+KHL9ftCK6dp9cu8lClFfjQHGGTzZilwKC1UPe
-tqhu82heFkzd5Mo0oCooCAvji8oG+6+HN5ADhvzO1vXlNIi0TlpX6R+TIuocgdyE
-sPe4W/CeyX2lIOemY3NQ3BLgXkMYy593Dl0IWZ60I+JQPrnFQ2fpzHgqXXD7b/pG
-MhScegRUgaAF+phB8A6HxkCjwSK4kWUC8qdN5hHsjsqXtQYKmRCgeizTuh2vmotL
-krmQPoSh2XaYNwHR/GEQ66Pf6p3x7mkIYW5sc4CAawjWN/gg++D30OCWOu+v/To=
-=5ElL
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmRdJaAACgkQojV9Rpe/
+B8vcEw//VvkajnxGM2QBjpfAQposzylLJI+fSWPFkG0+Vd1i7yAP+aN0m63iWjNO
+AGj9sfSB7B0dG9Y7xT4FXa38WOh36h7fQlgNQK7Y3EheuyM3+dkcXB4esHchG2m6
+z0mKLmkdGR8WTJYIGsldoa7Iw680zCi9K+H6Xg92UJYpgayZQWAHma3fzZr5JKdS
+H331NGx9bqaEauX1DHsI2q/9YhAPs6ismlpCpWhLFCOkFYUh7iSWgW8LM2W2FGzL
+zBlfpI42HY0M8s5n/zZlTxFE5zan85ajm+SnS3ay6sUMLirNYlZ7afIq2m8kOGE+
+jfWgULWJ96ZTmK1zaUk7+q7RXIxBEKLCpXHWXrmf5wkdbYqkNKXgY4PzbtjTa0in
+HdYbtURaQrYxiiZqATbyxMSJZ/NKxLL2VP4tIYmOlB41OUf82zKz4rYftk2EOKs5
+rcfcsQuwBqQCQ/wDMCkTK6UGcnh6Fl3UJ9uAKa1bxeEMhiRt4t1J03hLKxcf7RUp
+YdERhfQLIFFtd0wycuUzKRMFLIMDJk2OGcFyxfp1UjiUWOHkKvHuL27Vpgm9p5bl
+e3tAgAR4cHxOHbmXfW5IbZ2vTbV2I8skufl1ho7bccWIe8MYGc+XPVbSR8Qwb8sx
+V4TAb+IOtc+Tdj33drmlKqqtsr41jRdflGE1JandV0XFQt7A74w=
+=9+36
 -----END PGP SIGNATURE-----

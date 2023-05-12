@@ -1,11 +1,10 @@
 package Template::Plex::Internal;
 use strict;
 use warnings;
-use Error::Show;
 
 use Template::Plex;
 
-use List::Util qw<min max>;
+#use List::Util qw<min max>;
 
 #use Symbol qw<delete_package>;
 use Carp qw<carp croak>;
@@ -13,9 +12,8 @@ use Carp qw<carp croak>;
 use feature qw<state refaliasing>;
 no warnings "experimental";
 
-#use File::Basename qw<dirname basename>;
 use File::Spec::Functions qw<catfile>;
-use File::Basename qw<dirname>;
+#use File::Basename qw<dirname>;
 use Exporter 'import';
 
 
@@ -104,6 +102,29 @@ $out.='
 		$self->prepend_slot(@_);
 	}
 
+  sub fill_var{
+    my $name=shift;
+    no strict "refs";
+    $$name=shift;
+    "";
+  }
+
+  sub append_var{
+    my $name=shift;
+    no strict "refs";
+    $$name .= shift;
+    "";
+
+  }
+  sub prepend_var{
+    my $name=shift;
+    no strict "refs";
+    $$name = shift . $$name;
+    "";
+
+  }
+
+
 	sub inherit {
 		$self->inherit(@_);
 	}
@@ -113,8 +134,20 @@ $out.='
 	}
 
 	sub cache {
+    my @args=@_;
+    if(@args ==1){
+        # Recalling implicit cache key with path only
+        unshift @args, undef;
+    }
+    elsif(defined($args[1]) and ref($args[1]) eq "HASH"){
+      # variables hash ref given, with implicit cache id
+      unshift @args, undef;
+    }
+    else{
+      # Expect explicit cache Id
+    }
 
-		my ($id, $path, $var, @opts)=@_;
+		my ($id, $path, $var, @opts)=@args;
 		#we want to cache based on the caller
 		$id=$path.join "", caller;
 		#unshift @_, $id;
@@ -122,7 +155,19 @@ $out.='
 	}
 
 	sub immediate {
-		my ($id, $path, $var, @opts)=@_;
+    my @args=@_;
+    if(@args ==1){
+        # Recalling implicit cache key with path only
+        unshift @args, undef;
+    }
+    elsif(defined($args[1]) and ref($args[1]) eq "HASH"){
+      # variables hash ref given, with implicit cache id
+      unshift @args, undef;
+    }
+    else{
+      # Expect explicit cache Id
+    }
+		my ($id, $path, $var, @opts)=@args;
 		#we want to cache based on the caller
 		$id=$path.join "", caller;
 		my $template=$self->cache($id, $path,$var, @opts);
@@ -176,53 +221,20 @@ sub _prepare_template{
 	my $prog=&Template::Plex::Internal::bootstrap;
  	my $ref=eval $prog;
 	if($@ and !$ref){
-
-    #####################################################
-    # use feature ":all";                               #
-    # say "START OF TEMPLATE=====";                     #
-    # my$i=0;                                           #
-    # say join "\n", map { $i++. $_} split /\n/, $prog; #
-    # say "END OF TEMPLATE=====";                       #
-    # say $@;                                           #
-    #####################################################
-    my $context=Error::Show::context error=>$@, program=>$prog,
+    my $e=$@; #Save the error as require will nuke it
+    require Error::Show;
+    my $context=Error::Show::context(error=>$e, program=>$prog,
       start_mark=>'##__START',
       end_mark=>'##__END',
       start_offset=>2,
       end_offset=>5,
       limit=>1
-      ;
+    );
     # Replace the sudo filename with the file name if we have one 
     my $filename=$meta{file};
     $context=~s/(\(eval \d+\))/$filename/g;
     # Rethrow the exception, translated context line numbers
 		die $context;
-
-                #########################################################################################
-                # my $error=$@;                                                                         #
-                #                                                                                       #
-                # my $line=1;                                                                           #
-                # my $start;                                                                            #
-                # #my @lines=map { $start= $line if /##__START/;$line++ . $_."\n"; } split "\n", $prog; #
-                # my @lines=map { $start = $line if /##__START/; $line++;$_."\n" } split "\n", $prog;   #
-                # $start+=2;                                                                            #
-                # my @error_lines;                                                                      #
-                #                                                                                       #
-                # $error=~s/line (\d+)/do{push @error_lines, $1;"line ".($1-$start)}/eg;                #
-                # $error=~s/\(eval (\d+)\)/"(".$opts{file}.")"/eg;                                      #
-                #                                                                                       #
-                # my $min=min @error_lines;                                                             #
-                # my $max=$min;#max @error_lines;                                                       #
-                # #print  "max: $max\n";                                                                #
-                # $min-=5; $min=$start if $min<$start;                                                  #
-                # $max+=5; $max=$#lines-7 if $max>($#lines-7);                                          #
-                # my $counter=$min-$start+1;                                                            #
-                # my $out=$error;                                                                       #
-                # for ($min..$max){                                                                     #
-                #         $out.=$counter++."  ".$lines[$_];                                             #
-                # }                                                                                     #
-                # croak $out;                                                                           #
-                #########################################################################################
 	}
 	$plex->[Template::Plex::sub_]=$ref;
 	$plex;
@@ -259,16 +271,8 @@ sub _subst_inject {
 sub _block_fix {
 	#remove any new line immediately after a ]} pair
 	\my $buffer=\(shift);
-	#$buffer=~s/^\]\}$/]}/gms;
 	
 	$buffer=~s/^(\s*\@\{\[.*?\]\})\n/$1/gms;
-        ##############################################
-        # while($buffer=~s/^\]\}\n/]}/gs){           #
-        # }                                          #
-        # while($buffer=~s/^(@\{\[.*?\]\})\n/$1/gs){ #
-        # }                                          #
-        ##############################################
-
 }
 
 sub _comment_strip {
@@ -282,7 +286,6 @@ sub _init_fix{
 	#Look for an init block
 	#unless($buffer=~/\@\[\{\s*init\s*\{
 	unless($buffer=~$Init){
-		#carp __PACKAGE__." no init block detected. Adding dummy";
 		$buffer="\@{[init{}]}".$buffer;
 	}
 }
@@ -352,6 +355,7 @@ sub new{
 	_block_fix($data) unless $options{no_block_fix};
 	_init_fix($data) unless $options{no_init_fix};
   _comment_strip($data) if $options{use_comments};
+
 	if($args){
 		#Only call this from top level call
 		#Returns the render sub

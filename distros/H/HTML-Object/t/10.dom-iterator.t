@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -14,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::NodeIterator' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::NodeIterator' );
     use_ok( 'HTML::Object::DOM::NodeFilter', ':all' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::NodeFilter' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::NodeIterator', 'detach' );
 can_ok( 'HTML::Object::DOM::NodeIterator', 'expandEntityReferences' );

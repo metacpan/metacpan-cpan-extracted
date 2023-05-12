@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.3
+## Version v1.3.4
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2023/01/13
+## Modified 2023/05/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.3';
+    our $VERSION = 'v1.3.4';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -767,7 +767,7 @@ if( CORE::defined( \$Nice::Try::WANTARRAY ) && !\$Nice::Try::THREADED && !( !COR
                             ? 'CODE'
                             : Want::want( 'REFSCALAR' )
                                 ? 'REFSCALAR'
-                                : Want::want( 'BOOLEAN' )
+                                : Want::want( 'BOOL' )
                                     ? 'BOOLEAN'
                                     : Want::want( 'GLOB' )
                                         ? 'GLOB'
@@ -822,7 +822,7 @@ EOT
             }
             elsif( \$Nice::Try::WANT eq 'VOID' )
             {
-                \$Nice::Try::VOID[0] = &\$Nice::Try::TRY;
+                \@Nice::Try::VOID = &\$Nice::Try::TRY;
             }
             elsif( \$Nice::Try::WANT eq 'SCALAR' )
             {
@@ -1033,7 +1033,7 @@ EOT
                     }
                     elsif( \$Nice::Try::WANT eq 'VOID' )
                     {
-                        \$Nice::Try::VOID[0] = \&\$Nice::Try::CATCH;
+                        \@Nice::Try::VOID = \&\$Nice::Try::CATCH;
                     }
                     elsif( \$Nice::Try::WANT eq 'SCALAR' )
                     {
@@ -1293,6 +1293,10 @@ if( ( CORE::defined( \$Nice::Try::WANTARRAY ) || ( defined( \$Nice::Try::BREAK )
             CORE::return( \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL : \$Nice::Try::RETVAL[0] );
         }
     }
+}
+elsif( scalar( \@Nice::Try::VOID ) && ( !Scalar::Util::blessed( \$Nice::Try::VOID[0] ) || ( Scalar::Util::blessed( \$Nice::Try::VOID[0] ) && !\$Nice::Try::VOID[0]->isa( 'Nice::Try::SENTINEL' ) ) ) )
+{
+    CORE::return( scalar( \@Nice::Try::VOID ) > 1 ? \@Nice::Try::VOID : \$Nice::Try::VOID[0] );
 }
 EOT
         $last_return_block =~ s/\n/ /gs unless( $self->{debug_code} );
@@ -1853,7 +1857,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.3
+    v1.3.4
 
 =head1 DESCRIPTION
 

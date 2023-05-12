@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -13,6 +14,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM' );
     use_ok( 'HTML::Object::DOM::Text' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::Text' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::Text', 'assignedSlot' );
 can_ok( 'HTML::Object::DOM::Text', 'getAttributes' );
@@ -45,7 +49,7 @@ my $html = <<EOT;
 EOT
 my $p = HTML::Object::DOM->new;
 my $doc = $p->parse_data( $html ) || BAIl_OUT( $p->error );
-my $p = $doc->getElementsByTagName('p')->first;
+$p = $doc->getElementsByTagName('p')->first;
 # Get contents of <p> as a text node
 my $foobar = $p->firstChild;
 isa_ok( $foobar, 'HTML::Object::DOM::Text' );

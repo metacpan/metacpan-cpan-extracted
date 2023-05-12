@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use DateTime;
     use File::Spec;
@@ -27,6 +28,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM' );
     use_ok( 'HTML::Object::DOM::File' ) || BAIL_OUT( 'Unable to load HTML::Object::DOM::File' );
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::File', 'lastModified' );
 can_ok( 'HTML::Object::DOM::File', 'lastModifiedDate' );

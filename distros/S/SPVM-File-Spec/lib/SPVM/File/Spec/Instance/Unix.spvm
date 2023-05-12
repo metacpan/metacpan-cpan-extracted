@@ -1,9 +1,37 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Spec::Instance::Unix extends File::Spec::Instance {
   use Regex;
   use StringList;
   use Cwd;
   use Sys;
   use Sys::FileTest;
+  
+  our $RE_canonpath1 : Regex;
+  our $RE_canonpath2 : Regex;
+  our $RE_canonpath3 : Regex;
+  our $RE_canonpath4 : Regex;
+  our $RE_canonpath5 : Regex;
+  our $RE_canonpath6 : Regex;
+  our $RE_no_upwards : Regex;
+  our $RE_file_name_is_absolute1 : Regex;
+  our $RE_file_name_is_root1 : Regex;
+  our $RE_splitpath1 : Regex;
+  
+  INIT {
+    Regex->INIT;
+    $RE_canonpath1 = Regex->new("/{2,}");
+    $RE_canonpath2 = Regex->new("(?:/\.)+(?:/|\z)");
+    $RE_canonpath3 = Regex->new("^(?:\./)+", "s");
+    $RE_canonpath4 = Regex->new("^/(?:\.\./)+");
+    $RE_canonpath5 = Regex->new("^/\.\.$");
+    $RE_canonpath6 = Regex->new("/\z");
+    $RE_no_upwards = Regex->new("^\.{1,2}\z", "s");
+    $RE_file_name_is_absolute1 = Regex->new("^/", "s");
+    $RE_file_name_is_root1 = Regex->new("^/\z", "s");
+    $RE_splitpath1 = Regex->new("^((?:.*/(?:\.\.?\z)?)?)([^/]*)", "s");
+  }
   
   # Class Methods
   static method new : File::Spec::Instance::Unix () {
@@ -29,37 +57,37 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   method updir : string () {
     return "..";
   }
-
+  
   method canonpath : string ($path : string) {
     unless ($path) {
       die "The \$path must be defined";
     }
     
     # xx////xx  -> xx/xx
-    $path = Regex->new("/{2,}")->replace_g($path, "/");
+    $path = $RE_canonpath1->replace_g($path, "/");
     
     # xx/././xx -> xx/xx
-    $path = Regex->new("(?:/\.)+(?:/|\z)")->replace_g($path, "/");
+    $path = $RE_canonpath2->replace_g($path, "/");
     
     # ./xx      -> xx
     unless ($path eq "./") {
-      $path = Regex->new("^(?:\./)+", "s")->replace_g($path, "");
+      $path = $RE_canonpath3->replace_g($path, "");
     }
     
     # /../../xx -> xx
-    $path = Regex->new("^/(?:\.\./)+")->replace($path, "/");
+    $path = $RE_canonpath4->replace($path, "/");
     
     # /..       -> /
-    $path = Regex->new("^/\.\.$")->replace($path, "/");
+    $path = $RE_canonpath5->replace($path, "/");
     
     # xx/       -> xx
     unless ($path eq "/") {
-      $path = Regex->new("/\z")->replace($path, "");
+      $path = $RE_canonpath6->replace($path, "");
     }
     
     return $path;
   }
-
+  
   method catdir : string ($dir_parts : string[]) {
     
     unless ($dir_parts) {
@@ -108,9 +136,8 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   method no_upwards : string[] ($dir_parts : string[]) {
     my $no_upwards_list = StringList->new;
     
-    my $re = Regex->new("^\.{1,2}\z", "s");
     for my $dir_part (@$dir_parts) {
-      unless ($re->match($dir_part)) {
+      unless ($RE_no_upwards->match($dir_part)) {
         $no_upwards_list->push($dir_part);
       }
     }
@@ -121,18 +148,16 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   }
   
   method file_name_is_absolute : int ($path : string) {
-    my $re = Regex->new("^/", "s");
     my $is_abs = 0;
-    if ($re->match($path)) {
+    if ($RE_file_name_is_absolute1->match($path)) {
       $is_abs = 1;
     }
     return $is_abs;
   }
   
   method file_name_is_root : int ($path : string) {
-    my $re = Regex->new("^/\z", "s");
     my $is_root = 0;
-    if ($re->match($path)) {
+    if ($RE_file_name_is_root1->match($path)) {
       $is_root = 1;
     }
     return $is_root;
@@ -178,10 +203,9 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
       $directory = $path;
     }
     else {
-      my $re = Regex->new("^((?:.*/(?:\.\.?\z)?)?)([^/]*)", "s");
-      if ($re->match($path)) {
-        $directory = $re->cap1;
-        $file      = $re->cap2;
+      if (my $match = $RE_splitpath1->match($path)) {
+        $directory = $match->cap1;
+        $file      = $match->cap2;
       }
     }
     

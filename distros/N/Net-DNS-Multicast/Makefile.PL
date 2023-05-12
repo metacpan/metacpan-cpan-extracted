@@ -34,7 +34,10 @@ my %metadata = (
 		} );
 
 
-my %prerequisite = ( 'Net::DNS' => 1.38, );
+my %prerequisite = (
+	'Net::DNS' => 1.38,
+	'Exporter' => 5.56,
+	);
 
 
 my %optional = ();

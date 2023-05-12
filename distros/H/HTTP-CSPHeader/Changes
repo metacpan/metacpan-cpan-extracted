@@ -1,5 +1,20 @@
 Revision history for HTTP-CSPHeader
 
+v0.3.1    2023-05-11 10:48:19+01:00 Europe/London
+  [Bug Fixes]
+  - Rebuild distribution with fixed SIGNATURE.
+
+v0.3.0    2023-05-10 16:39:08+01:00 Europe/London
+  [Enhancments]
+  - Use Crypt::URandom to seed the RNG.
+
+  - Add nonce_seed_size attribute to alter the seed size.
+
+  - Recommend prerequisite Ref::Util::XS.
+
+  [Other]
+  - Use Types::Common over Types::Standard.
+
 v0.2.1    2023-01-11 14:43:34+00:00 Europe/London
   No Changes from v0.2.0.
 

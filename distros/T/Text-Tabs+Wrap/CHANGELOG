@@ -1,4 +1,12 @@
 
+= 2023/05/11
+
+Fixed bugtracker link
+
+= 2023/05/10
+
+Fix for a warning introduced in Text::Wrap in post-5.6 perls
+
 = 2023/05/09
 
 Minimum Perl version raised to 5.6.1 to reflect the existing situation

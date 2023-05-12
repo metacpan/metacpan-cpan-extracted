@@ -15,9 +15,9 @@ use strict;
 # Constructor method. Expects a hashref as an argument.
 #
 sub new {
-	my ($package, $args) = @_;
-	my %self = %{$args};
-	return bless(\%self, $package);
+    my ($package, $args) = @_;
+    my %self = %{$args};
+    return bless(\%self, $package);
 }
 
 #
@@ -28,41 +28,17 @@ sub new {
 # This should not be used directly.
 #
 sub objects {
-	my ($self, $class, $ref) = @_;
+    my ($self, $class, $ref) = @_;
 
-	my @list;
+    my @list;
 
-	if (defined($ref) && 'ARRAY' eq ref($ref)) {
-		foreach my $item (@{$ref}) {
+    if (defined($ref) && 'ARRAY' eq ref($ref)) {
+        foreach my $item (@{$ref}) {
+            push(@list, $class->new($item));
+        }
+    }
 
-			my $object = $class->new($item);
-
-			# new object doesn't have a "self" link, but we might be able to create one:
-			if ($class =~ /^Net::RDAP::Object/) {
-				if (!$object->self) {
-					my $base = $self->self->href;
-					if ($base) {
-						my ($type, $handle);
-						if ($class =~ /^Net::RDAP::Object::Domain$/)		{ $type = 'domain'	; $handle = $object->name		}
-						elsif ($class =~ /^Net::RDAP::Object::Nameserver$/)	{ $type = 'nameserver'	; $handle = $object->name		}
-						elsif ($class =~ /^Net::RDAP::Object::Entity$/)		{ $type = 'entity'	; $handle = $object->handle		}
-						elsif ($class =~ /^Net::RDAP::Object::IPNetwork$/)	{ $type = 'ip'		; $handle = $object->range->prefix	}
-						elsif ($class =~ /^Net::RDAP::Object::Autnum$/)		{ $type = 'autnum'	; $handle = $object->start		}
-
-						push(@{$object->{'links'}}, {
-							'rel' => 'self',
-							'type' => 'application/rdap+json',
-							'href' => URI->new_abs(sprintf('../%s/%s', $type, $handle), $base)->as_string,
-						});
-					}
-				}
-			}
-
-			push(@list, $object);
-		}
-	}
-
-	return @list;
+    return @list;
 }
 
 =pod
@@ -80,7 +56,7 @@ modules extend it.
 
 =head2 Links
 
-	@links = $object->links;
+    @links = $object->links;
 
 Returns a (potentially empty) array of L<Net::RDAP::Link> objects.
 
@@ -92,7 +68,7 @@ sub links { $_[0]->objects('Net::RDAP::Link', $_[0]->{'links'}) }
 
 =head2 "Self" Link
 
-	$self = $object->self;
+    $self = $object->self;
 
 Returns a L<Net::RDAP::Link> object corresponding to the C<self>
 link of this object (if one is available).

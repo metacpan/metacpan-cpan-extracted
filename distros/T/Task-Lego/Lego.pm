@@ -1,11 +1,9 @@
 package Task::Lego;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 1;
 
@@ -59,21 +57,22 @@ Lego part image class for lugnet.com.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Lego>
+L<https://github.com/michal-josef-spacek/Task-Lego>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- BSD 2-Clause License
+© 2015-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

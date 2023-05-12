@@ -1,0 +1,105 @@
+Revision history for Perl module Nice::Try.
+
+v1.3.4 2023-05-06T08:06:15+0900
+    - Corrected a bug whereby Nice::Try would not return in void context when required to do so.
+    - Corrected a bug where want was called with BOOLEAN instead of BOOL
+
+v1.3.3 2023-01-13T15:01:04+0900
+    - Fixed block 'finally' not called when dying in 'catch' block
+
+v1.3.2 2023-01-13T08:01:50+0900
+    - Correcting a mishandling of return in try-catch block
+
+v1.3.1 2022-07-28T19:49:44+0900
+    - Correcting a minor bug occurring when using a for loop with next inside a try-catch statement
+
+v1.3.0 2022-04-19T19:09:29+0900
+    - Now use PPI::XS to further speed up processing of perl code
+    - Better declaration of global variables
+
+v1.2.0 2022-03-27T17:26:17+0900
+    - Corrected bug #4 and added method implement()
+
+v1.1.4 2022-03-10T11:22:42+0900
+    - Corrected an issue with here-doc and improving speed a little bit
+
+v1.1.3 2021-10-31T20:22:23+0900
+    - Turn off rich context aware with Want when running in a modperl Apache handler
+    - Turn off rich context aware when package is overloaded, because Want triggers overloading and it would lead to a segmentation fault within a method handling an overloaded operation.
+
+1.1.2 2021-06-18T20:18:33+0900
+    - Corrected a bug that led to stringification of overloaded exception
+
+1.1.1 2021-06-08T05:53:45+0900
+    - Corrected a syntax warning in handling the loop control words
+
+1.1.0 2021-06-06T18:40:53+0900
+    - Added granular exception class catching
+
+1.0.7 2021-06-06T08:42:32+0900
+    - Corrected an issue with loop control clashing with context.
+    - Improved handling of context and returned value when using do { try {} catch {} }
+
+1.0.6 2021-06-05T12:09:43+0900
+    - Corrected defective test unit 021_forks.t
+
+1.0.5 2021-06-05T06:36:18+0900
+    - Fixes for issues #2 and #3 thanks to Smylers
+
+1.0.4 2021-06-04T12:01:18+0900
+    - Added detection of forks (threads emulation that works better than threads itself)'
+
+1.0.3 2021-05-20T22:51:47+0900
+    - Added the option of deactivating the use of Want with 'dont_want'
+    - Added detection of threaded environment and dectivation of Want'
+
+1.0.2 2021-05-19T09:42:32+0900
+    - Corrected a minor bug when value is returned in boolean context
+
+1.0.1 2021-05-17T23:29:23+0900
+    - Corrected a small bug in caller adjustment
+
+1.0.0 2021-05-14T22:59:08+0900
+    - Improved call context management using Want to properly handle contexts such as object, glob, code, hash ref, array ref, scalar ref and boolean
+    - caller correctly report caller's information.
+
+0.2.1 2021-05-12T18:23:36+0900
+    - Correction of oversight when enclosing block is called in list context
+
+0.2.0 2021-05-12T05:27:07+0900
+    - Added support for next, last and redo inside try-catch block
+
+0.1.11 2021-03-26T09:27:22+0900
+    - Implemented 2 bug fixes courtesy of Tilmann Haeberle: 1) on inheritance of exception class and 2) on fall through i.e. an exception is not caught and is not bubbling up
+
+0.1.10 2021-02-11T16:07:50+0900
+    - Corrected perl minimum version requirement
+
+0.1.9 2021-02-09T20:27:15+0900
+    - Updated to use whitespace regular expression more friendly with older versions of perl
+
+0.1.8 2021-02-06T10:56:05+0900
+    - Improved try-catch block return value management by taking under account caller context outside of the try-catch block since often try-catch is used in void context but their enclosing subroutine is not
+    - Corrected a bug in tr-catch return value when try-catch block returned a reference
+
+0.1.7 2020-12-30T08:12:00+0900
+    - Minor improvement by checking the blessed state of an internal return value.
+
+0.1.6 2020-11-08T15:48:58+0900
+    - Correcting a bug in adding back insignificant elements in between try-catch blocks
+
+0.1.5 2020-09-13T22:00:15+0900
+    - Corrected processing error when 2 or more consecutive try-catch blocks were found
+
+0.1.4 2020-05-25T16:42:45+0900
+    - Corrected a bug in the handling of here-docs. Calling PPI serialize instead of content
+
+v0.1.3 2020-05-21T17:04:51+0900
+    - Requires perl v5.16.0 that implemented some improvements on eval
+
+v0.1.2 2020-05-20T23:20:53+0900
+
+v0.1.1 2020-05-20T17:45:14+0900
+
+v0.1.0 2020-05-18T17:14:00+0900
+    - original version; created by ExtUtils::ModuleMaker 0.63

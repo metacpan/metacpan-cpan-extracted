@@ -2,7 +2,9 @@
 BEGIN
 {
     use strict;
+    use warnings;
     use lib './lib';
+    use vars qw( $DEBUG @modules );
     use Test::More qw( no_plan );
     use File::Find;
     our @modules;
@@ -18,6 +20,9 @@ BEGIN
     }, qw( ./lib ) );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 BEGIN
 {

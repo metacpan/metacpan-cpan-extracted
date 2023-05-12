@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.016;
 
-    our $VERSION = '23.03';
+    our $VERSION = '23.05';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -117,7 +117,7 @@ package Sidef {
         if (not -d $self->{sidef_config_dir}) {
             require File::Path;
             eval { File::Path::make_path($self->{sidef_config_dir}) }
-              or warn "[WARNING] Can't create directory <<$self->{sidef_config_dir}>>: $!";
+              ## or warn "[WARNING] Can't create directory <<$self->{sidef_config_dir}>>: $!";
         }
 
         return $self->{sidef_config_dir};

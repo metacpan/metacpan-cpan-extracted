@@ -67,7 +67,17 @@ sub date {
     my $str = shift->{'eventDate'};
     $str =~ s/(T\d{2}:\d{2}:\d{2})\.\d{1,3}(\+)/$1$2/;
 
-    return DateTime::Format::ISO8601->parse_datetime($str);
+    my $date;
+    eval {
+        $date = DateTime::Format::ISO8601->parse_datetime($str || '1970-01-01T00:00:00.0Z');
+    };
+    if ($@) {
+        return DateTime::Format::ISO8601->parse_datetime('1970-01-01T00:00:00.0Z');
+
+    } else {
+        return $date;
+
+    }
 }
 
 =pod

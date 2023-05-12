@@ -1,3 +1,6 @@
+use v5.14;
+use warnings;
+
 use Test::More 1.302183;
 use Test::Exception 0.41;
 use Test::Warnings qw/ warning /;

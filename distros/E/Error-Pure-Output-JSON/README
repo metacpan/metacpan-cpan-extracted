@@ -17,11 +17,9 @@ VARIABLES
              Default value is 0.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Output::JSON qw(err_json);
 
      # Fictional error structure.
@@ -55,11 +53,9 @@ EXAMPLE1
      # {"msg":["FOO","KEY","VALUE"],"stack":[{"sub":"err","prog":"script.pl","args":"(2)","class":"main","line":1},{"sub":"eval {...}","prog":"script.pl","args":"","class":"main","line":20}]}
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Output::JSON qw(err_json);
 
      # Set pretty output.
@@ -128,17 +124,18 @@ SEE ALSO
         Output subroutines for Error::Pure.
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure-Output-JSON>
+    <https://github.com/michal-josef-spacek/Error-Pure-Output-JSON>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.10
+    0.11
 

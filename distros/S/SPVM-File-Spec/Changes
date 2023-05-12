@@ -1,3 +1,15 @@
+0.080001 2023-05-10
+  [Changes]
+    * Only internal changes are done.
+0.080 2023-05-10
+  [Prerequirement Changes]
+    SPVM 0.976+ is required.
+    SPVM::Sys 0.481+ is required.
+    SPVM::Regex 0.241002+ is required.
+  [License Change]
+    * The license is changed to MIT License.
+  [New Features]
+    * The version string can be got.
 0.07 2023-03-15
   [Prerequirement Changes]
     * SPVM::Sys 0.43+ is needed.

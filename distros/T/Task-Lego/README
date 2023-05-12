@@ -28,17 +28,18 @@ SEE ALSO
         Lego part image class for lugnet.com.
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Lego>
+    <https://github.com/michal-josef-spacek/Task-Lego>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

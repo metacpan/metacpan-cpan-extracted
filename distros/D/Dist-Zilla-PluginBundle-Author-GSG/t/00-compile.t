@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dist/Zilla/Plugin/Author/GSG.pm',
+    'Dist/Zilla/Plugin/Author/GSG/HasVersionTests.pm',
     'Dist/Zilla/PluginBundle/Author/GSG.pm'
 );
 

@@ -1,85 +1,116 @@
 Revision history for Alien-XPA
 
+v2.1.20.4 2023-05-10 23:16:14-04:00 America/New_York
+
+  [TEST]
+
+    * only output diagnostics for automated testing
+
+    * reduce interval between checking for connection to the test
+      program, but increase total wait time
+
+v2.1.20.3 2023-05-03 21:28:39-04:00 America/New_York (TRIAL RELEASE)
+
+  [TEST]
+
+    * switch to local sockets to see if that helps with CPAN testers
+      which successfully compile but can't see xpamb
+
+v2.1.20.2 2023-05-03 20:03:53-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * fix incoreect return type and incorrect passing of pointers in test code
+
+v2.1.20.1 2023-05-02 14:15:57-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+    * xpa's config.log is now copied into src dir so tests can find
+      it. some already can, which is so weird.
+
 v2.1.20.0 2023-04-18 15:11:19-04:00 America/New_York
 
   [BUILD]
 
-   * xpa source code is now bundled; Alien package version now tracks
-     the xpa source code.
+    * xpa source code is now bundled; Alien package version now tracks
+      the xpa source code.
 
 0.10      2020-11-06 10:25:13-05:00 America/New_York (TRIAL RELEASE)
 
   [BUILD]
-   * attempt to diagnose CPAN Testers build failures:
-     add more diagnostics
+
+    * attempt to diagnose CPAN Testers build failures:
+      add more diagnostics
 
 0.09      2020-11-06 01:05:26-05:00 America/New_York
 
   [BUILD]
-   * attempt to diagnose CPAN Testers build failures:
-     add more diagnostics
+
+    * attempt to diagnose CPAN Testers build failures:
+      add more diagnostics
 
 0.08      2020-11-03 16:35:56-05:00 America/New_York (TRIAL RELEASE)
 
   [BUILD]
 
-   * attempt to diagnose CPAN Testers build failures:
-     require ExtUtils::MakeMaker 7.50
+    * attempt to diagnose CPAN Testers build failures:
+      require ExtUtils::MakeMaker 7.50
 
 0.07      2020-11-02 09:14:46-05:00 America/New_York (TRIAL RELEASE)
 
   [TEST]
 
-   * broke Windows test
+    * broke Windows test
 
 0.06      2020-11-01 18:52:59-05:00 America/New_York
 
   [BUILD]
 
-   * distribution fix; no functional changes
+    * distribution fix; no functional changes
 
 
 0.05      2020-11-01 12:13:04-05:00 America/New_York
 
   [ENHANCEMENT]
 
-   *  Use the latest version of the XPA distribution. It rarely changes and is very stable.
+    *  Use the latest version of the XPA distribution. It rarely changes and is very stable.
 
   [TEST FIX]
 
-   * be more careful when destroying server
+    * be more careful when destroying server
 
 
 0.04      2017-05-25 14:16:11-04:00 America/New_York (TRIAL RELEASE)
 
   [TEST FIX]
 
-   * t/alien.t: Win32 process creation flags were incorrectly specified.
+    * t/alien.t: Win32 process creation flags were incorrectly specified.
 
 
 0.03      2017-05-25 13:09:17-04:00 America/New_York (TRIAL RELEASE)
 
   [BUILD]
 
-   * incomplete Makefile.PL was released in 0.02, causing build
-     failures on Win32
+    * incomplete Makefile.PL was released in 0.02, causing build
+      failures on Win32
 
 0.02      2017-05-11 17:15:20-04:00 America/New_York (TRIAL RELEASE)
 
   [BUG FIXES]
 
-   * Win32 specific code to handle test processes
-    (chorny@cpan.org: RT#121653, https://github.com/djerius/Alien-XPA/pull/1)
+    * Win32 specific code to handle test processes
+     (chorny@cpan.org: RT#121653, https://github.com/djerius/Alien-XPA/pull/1)
 
-   * more proper *NIX handling of test processes
+    * more proper *NIX handling of test processes
 
-   * force -fPIC option in XPA build static library build can be linked
+    * force -fPIC option in XPA build static library build can be linked
      into dynamic Perl module
 
-   * increase the timeout for contacting the XPA name server from
-     150ms to 1000ms (Eric Mandel <eric@cfa.harvard.edu> )
+    * increase the timeout for contacting the XPA name server from
+       150ms to 1000ms (Eric Mandel <eric@cfa.harvard.edu> )
 
 
 0.01      2017-05-11 17:15:20-04:00 America/New_York
 
-  * Initial release upon an unsuspecting world
+    * Initial release upon an unsuspecting world

@@ -69,7 +69,7 @@
    "provides" : {
       "MIME::Mini" : {
          "file" : "lib/MIME/Mini.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
@@ -77,13 +77,14 @@
       "bugtracker" : {
          "web" : "https://github.com/rafmod/MIME-Mini/issues"
       },
+      "homepage" : "https://metacpan.org/dist/MIME-Mini",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/rafmod/MIME-Mini.git",
          "web" : "https://github.com/rafmod/MIME-Mini"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

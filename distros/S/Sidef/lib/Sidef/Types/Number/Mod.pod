@@ -227,6 +227,14 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 abs
+
+    x.abs
+
+Returns the
+
+=cut
+
 =head2 chebyshevt
 
     x.chebyshevt(n)
@@ -488,5 +496,7 @@ Returns the
     x.znorder
 
 Returns the
+
+Aliases: I<multiplicative_order>
 
 =cut

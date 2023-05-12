@@ -1,18 +1,16 @@
 package SPVM::File::Spec;
 
-our $VERSION = '0.07';
+our $VERSION = "0.080001";
 
 1;
 
 =head1 Name
 
-SPVM::File::Spec - Portably Perform Operations on File Names
+SPVM::File::Spec - Performing Operations on File Names Portably
 
 =head1 Description
 
-C<SPVM::File::Spec> is the L<SPVM>'s C<File::Spec> class.
-
-This module is designed to support operations commonly performed on file specifications
+The File::Spec class of L<SPVM> has methods to perform operations on file names portably.
 
 =head1 Usage
 
@@ -134,8 +132,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 

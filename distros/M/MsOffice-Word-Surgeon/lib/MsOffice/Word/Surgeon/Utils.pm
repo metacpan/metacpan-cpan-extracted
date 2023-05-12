@@ -5,7 +5,7 @@ use warnings;
 use Exporter  qw/import/;
 our @EXPORT = qw/maybe_preserve_spaces is_at_run_level/;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 sub maybe_preserve_spaces {
   my ($txt) = @_;

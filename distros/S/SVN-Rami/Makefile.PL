@@ -10,15 +10,16 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/SVN/Rami.pm',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.10.1',
+    EXE_FILES        => ['script/rami'],
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => '7.38',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
+        'Test::More' => '1.302169',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+		'File::Basename'      => '2.85',
+		'File::Path'          => '2.16'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'SVN-Rami-*' },

@@ -1,4 +1,35 @@
 Revision history for Perl extension Error::Show.
+
+v0.3.0 2023-05-09
+  [new features]
+  - calling context sub with an explicit single undef value (ie
+    Error::Show::context undef) internally captures a stack trace/frame stack
+    which is used for generating context. Aids in debugging when you just want
+    to know how the context a subrotine was called in a non error state.
+
+
+  [improvments]
+
+  - Reduced memory usage. The IPC::Open3 and Symbol modules are not loaded
+    unless they are actually required for CLI usage. Saves approx 25% on memory
+    usage otherwise. Scalar::Util is only loaded for in program usage (for
+    blessed subroutine). 
+  - context subroutine is now callable via -> notation if prefered
+  - the context subrotine symbol in now exported by defualt (when called from
+    code). Previous behaviour can be achieved by explicitly importing the empty
+    list
+  - Removed unused importing/exporter code
+ 
+  [fixes]
+  - Fixed type in synopsis example
+
+  [pod]
+  - Documented changes to importing
+  - Documented internal frame capture
+
+  [tests]
+  - added simple test for internal frame capture
+
 v0.2.1 2023-03-10
   [fixes]
   - Stack trace arrays are now copied to prevent unwanted action at a distance

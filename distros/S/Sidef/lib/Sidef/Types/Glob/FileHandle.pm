@@ -31,6 +31,18 @@ package Sidef::Types::Glob::FileHandle {
 
     *file = \&parent;
 
+    sub new_buf {
+        my ($self, $mode) = @_;
+        $mode //= 'utf8';
+        my $str = "";
+        open(my $fh, "+<:$mode", \$str) or return undef;
+        my $str_obj = bless(\$str, 'Sidef::Types::String::String');
+        my $fh_obj  = __PACKAGE__->new($fh, $str_obj);
+        wantarray ? ($fh_obj, $str_obj) : $fh_obj;
+    }
+
+    *new_buffer = \&new_buf;
+
     sub is_on_tty {
         (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -112,11 +124,11 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $var_ref, $length, $offset) = @_;
 
         my $chunk = "$$var_ref";
-        my $size = Sidef::Types::Number::Number->new(
-                                                     defined($offset)
-                                                     ? CORE::read($self->{fh}, $chunk, $length, $offset)
-                                                     : CORE::read($self->{fh}, $chunk, $length)
-                                                    );
+        my $size = Sidef::Types::Number::Number::_set_int(
+                                                          defined($offset)
+                                                          ? CORE::read($self->{fh}, $chunk, $length, $offset)
+                                                          : CORE::read($self->{fh}, $chunk, $length)
+                                                         );
 
         $$var_ref = Sidef::Types::String::String->new($chunk);
 
@@ -127,11 +139,11 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $var_ref, $length, $offset) = @_;
 
         my $chunk = "$$var_ref";
-        my $size = Sidef::Types::Number::Number->new(
-                                                     defined($offset)
-                                                     ? CORE::sysread($self->{fh}, $chunk, $length, $offset)
-                                                     : CORE::sysread($self->{fh}, $chunk, $length)
-                                                    );
+        my $size = Sidef::Types::Number::Number::_set_int(
+                                                          defined($offset)
+                                                          ? CORE::sysread($self->{fh}, $chunk, $length, $offset)
+                                                          : CORE::sysread($self->{fh}, $chunk, $length)
+                                                         );
 
         $$var_ref = Sidef::Types::String::String->new($chunk);
 
@@ -281,7 +293,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub tell {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::tell($self->{fh}));
+        Sidef::Types::Number::Number::_set_int(CORE::tell($self->{fh}));
     }
 
     sub seek {
@@ -300,7 +312,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub fileno {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::fileno($self->{fh}));
+        Sidef::Types::Number::Number::_set_int(CORE::fileno($self->{fh}));
     }
 
     sub lock {
@@ -365,8 +377,8 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     sub write_from {
-        my ($self, $string) = @_;
-        CORE::print {$self->{fh}} $string;
+        my ($self, @args) = @_;
+        CORE::print {$self->{fh}} @args;
         $self;
     }
 

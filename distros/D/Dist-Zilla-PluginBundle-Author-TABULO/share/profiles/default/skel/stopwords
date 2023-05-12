@@ -18,9 +18,19 @@ vcs
 wikidoc
 
 ## stopwords -- technical / POD
-attr    # attributes
-cattr   # class attributes
-pattr   # private attributes
+attr      # attributes
+cattr     # class attributes
+pattr     # private attributes
+
+cmethod   # class method
+omethod   # object method
+
+cmd       # command
+opt       # option
+singleton # singleton
+tag       # tag
+var       # variable
+
 
 ## stopwords -- technical / Odd
 MAXWORDLENGTH

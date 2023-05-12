@@ -1,3 +1,10 @@
+0.317   2023-02-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Add hint in Synopsis to see Complete::Getopt::Long.
+
+
 0.316   2021-08-24  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

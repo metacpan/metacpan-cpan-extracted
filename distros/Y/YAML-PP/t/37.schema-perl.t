@@ -4,10 +4,22 @@ use warnings;
 use Test::More;
 use FindBin '$Bin';
 use Data::Dumper;
-use Test::Deep;
 use Scalar::Util ();
 use YAML::PP;
 use YAML::PP::Perl;
+
+my $test_deep;
+BEGIN {
+    eval "use Test::Deep qw/ cmp_deeply /";
+    unless ($@) {
+      $test_deep = 1;
+    }
+}
+unless ($test_deep) {
+    plan skip_all => "No Test::Deep available";
+    exit;
+}
+
 my $tests = require "$Bin/../examples/schema-perl.pm";
 
 my $perl_no_objects = YAML::PP::Schema::Perl->new(
@@ -47,6 +59,9 @@ my $yp_perl_one_two = YAML::PP::Perl->new(
 );
 my $yp_perl_two_one = YAML::PP::Perl->new(
     schema => [qw/ JSON Perl tags=!!perl+!perl /],
+);
+my $yp_no_dumpcode = YAML::PP::Perl->new(
+    schema => [qw/ + Perl -dumpcode /],
 );
 
 my @tests = sort keys %$tests;
@@ -334,6 +349,19 @@ EOM
             cmp_ok($blessed, 'eq', '', "Data $i not blessed");
         }
     }
+};
+
+subtest no_dumpcode => sub {
+    my $code1 = sub { 23 };
+    my $code2 = sub { 23 };
+    my $data = { foo => bless ($code1, "Foo"), bar => $code2 };
+    my $yaml = $yp_no_dumpcode->dump_string($data);
+    my $exp = <<'EOM';
+---
+bar: !perl/code '{ "DUMMY" }'
+foo: !perl/code:Foo '{ "DUMMY" }'
+EOM
+    is $yaml, $exp, "Use -loadcode";
 };
 
 done_testing;

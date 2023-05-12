@@ -1,3 +1,7 @@
+1.000013                2023-05-09 22:28:43+00:00 UTC TABULO
+
+   - Improve the [Pod::Weaver::PluginBundle], by adding several "Collect[ed]" sections and plugins
+
 1.000012                2023-04-18 01:11:58+00:00 UTC TABULO
 
     [REVISION]

@@ -1,10 +1,7 @@
-/*
- * Public domain, 2008, Todd C. Miller <Todd.Miller@courtesan.com>
- *
- * $OpenBSD: charclass.h,v 1.1 2008/10/01 23:04:13 millert Exp $
- */
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
 
-/* OPENBSD ORIGINAL: lib/libc/gen/charclass.h */
+// This code is originally copied from the File::Glob module of Perl.
 
 /*
  * POSIX character class support for fnmatch() and glob().

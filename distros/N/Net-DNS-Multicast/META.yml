@@ -24,7 +24,8 @@ no_index:
     - inc
 recommends: {}
 requires:
+  Exporter: '5.56'
   Net::DNS: '1.38'
   perl: '5.008009'
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

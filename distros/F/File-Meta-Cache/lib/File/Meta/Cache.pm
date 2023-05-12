@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package File::Meta::Cache;
-our $VERSION="v0.1.0";
+our $VERSION="v0.1.1";
 # Default Opening Mode
 use Fcntl qw(O_RDONLY);
 use enum qw<key_ fd_ fh_ stat_ valid_ user_>;

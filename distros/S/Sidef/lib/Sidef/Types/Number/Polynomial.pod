@@ -263,6 +263,14 @@ Returns the
 
 =cut
 
+=head2 exponents
+
+    x.exponents
+
+Returns the
+
+=cut
+
 =head2 float
 
     x.float
@@ -367,16 +375,6 @@ Returns the
 
 =cut
 
-=head2 keys
-
-    x.keys
-
-Returns the
-
-Aliases: I<exponents>
-
-=cut
-
 =head2 lcm
 
     x.lcm(y)
@@ -408,6 +406,14 @@ Returns the
 Returns the
 
 Aliases: I<call>
+
+=cut
+
+=head2 newton_method
+
+    f.newton_method(x, df)
+
+Returns the
 
 =cut
 
@@ -458,6 +464,14 @@ Returns the
 Returns the
 
 Aliases: I<real>
+
+=cut
+
+=head2 roots
+
+    f.roots
+
+Returns the
 
 =cut
 

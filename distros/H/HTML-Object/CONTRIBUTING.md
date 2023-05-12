@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/HTML-Object-v0.2.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/HTML-Object-v0.2.4/README.md)
 
 ## Author
 

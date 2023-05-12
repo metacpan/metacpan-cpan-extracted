@@ -523,6 +523,14 @@ Aliases: I<each_grapheme>
 
 =cut
 
+=head2 each_kv
+
+    self.each_kv(block)
+
+Returns the
+
+=cut
+
 =head2 each_line
 
     self.each_line {|line| ... }
@@ -538,6 +546,14 @@ Iterates through each line in the string and applies a given block of code to ea
 Iterates through each word, converted to a number, in the string and applies a given block of code to each number.
 
 Aliases: I<each_number>
+
+=cut
+
+=head2 each_slice
+
+    self.each_slice(n, block)
+
+Returns the
 
 =cut
 
@@ -593,7 +609,7 @@ Aliases: I<quotemeta>
 
 =head2 esub
 
-    self.esub(regex, code)
+    self.esub(regex, block)
 
 Returns the
 
@@ -707,7 +723,7 @@ Aliases: I<slice>
 
 =head2 gesub
 
-    self.gesub(regex, code)
+    self.gesub(regex, block)
 
 Returns the
 
@@ -1161,17 +1177,9 @@ Returns the
 
 =cut
 
-=head2 open
-
-    self.open(*rest)
-
-Returns the
-
-=cut
-
 =head2 open_r
 
-    self.open_r(*rest)
+    self.open_r(mode)
 
 Returns the
 
@@ -1472,6 +1480,16 @@ Aliases: I<upper>, I<upcase>
     str.unescape
 
 Removes backslash escapes from a string. The reverse of the C<str.escape> method.
+
+=cut
+
+=head2 uniq
+
+    self.uniq
+
+Returns the
+
+Aliases: I<unique>, I<distinct>
 
 =cut
 

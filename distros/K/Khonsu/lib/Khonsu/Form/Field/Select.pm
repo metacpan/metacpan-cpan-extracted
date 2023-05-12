@@ -6,7 +6,7 @@ use PDF::API2::Basic::PDF::Literal;
 use PDF::API2::Basic::PDF::Utils;
 
 sub configure {
-	my ($self, %args) = @_;
+	my ($self, $file, %args) = @_;
 	$self->annotate->{V} = do {
 		my $s = PDFStr('');
 		$s->{' isutf'} = PDFBool(1);

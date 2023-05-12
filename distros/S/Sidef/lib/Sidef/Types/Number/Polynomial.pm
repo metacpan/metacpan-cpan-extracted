@@ -49,15 +49,14 @@ package Sidef::Types::Number::Polynomial {
 
         my %poly;
 
-        while (@args) {
-            my ($key, $value) = splice(@args, 0, 2);
+        my %pairs = @args;
+        foreach my $key (CORE::keys(%pairs)) {
 
-            $key //= 0;
-            $value // next;
+            my $value = $pairs{$key} // next;
             $value = Sidef::Types::Number::Number->new($value) if !UNIVERSAL::isa($value, 'Sidef::Types::Number::Number');
 
             unless ($value->is_zero) {
-                $poly{"$key"} = $value;
+                $poly{$key} = $value;
             }
         }
 
@@ -224,12 +223,10 @@ package Sidef::Types::Number::Polynomial {
                   map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
     }
 
-    sub keys {
+    sub exponents {
         my ($x) = @_;
         Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } sort { $a <=> $b } CORE::keys(%$x));
     }
-
-    *exponents = \&keys;
 
     sub coeff {
         my ($x, $key) = @_;
@@ -243,6 +240,96 @@ package Sidef::Types::Number::Polynomial {
                                 sort { $a <=> $b } CORE::keys(%$x)
                                ]
         );
+    }
+
+    sub newton_method {
+        my ($f, $x, $df) = @_;
+
+        $x  //= Sidef::Types::Number::Number->i;
+        $df //= $f->derivative;
+
+        for (0 .. CORE::int($Sidef::Types::Number::Number::PREC)) {
+            my $fx = $f->eval($x);
+            if ($fx->approx_eq(Sidef::Types::Number::Number::ZERO)) {
+                return $x;
+            }
+            my $dfx = $df->eval($x);
+            $x = $x->sub($fx->div($dfx));
+        }
+
+        return $x;
+    }
+
+    sub roots {
+        my ($f) = @_;
+
+        my $degree         = $f->degree;
+        my @roots_of_unity = @{$degree->roots_of_unity};
+
+        @roots_of_unity || return Sidef::Types::Array::Array->new;
+
+        my $df = $f->derivative;
+
+        my $prec     = Sidef::Types::Number::Number::_set_int(-((CORE::int($Sidef::Types::Number::Number::PREC) >> 2) - 1));
+        my $prec_min = Sidef::Types::Number::Number::_set_int(-(CORE::int($Sidef::Types::Number::Number::PREC) >> 3));
+
+        my %seen;
+        my @polygonal_roots;
+
+        foreach my $root (@roots_of_unity) {
+            my $solution = $f->newton_method($root, $df);
+            if (defined($solution)) {
+                my $key = join('', $solution->round($prec));
+                if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
+                    push @polygonal_roots, $solution;
+                    $seen{$key} = 1;
+                }
+            }
+        }
+
+        $degree = CORE::int($degree);
+
+        # TODO: find a more efficient approach for inputs like:
+        #       x = Poly(1); roots(5*x**4 + 11*x**2 + 100)
+        #       x = Poly(1); roots(5*x**4 + 9*x**3 + 11*x**2 + 100)
+        #       x = Poly(1); roots(12*x**4 + 11*x**2 + 4171)
+        if (scalar(@polygonal_roots) != $degree) {
+
+            my @transformations = (
+                                   sub { $_[0]->i },
+                                   sub { $_[0]->exp },
+                                   sub { $_[0]->neg },
+                                   sub { $_[0]->sqr->dec },
+                                   sub { $_[0]->sqr->inc },
+                                   sub { $_[0]->sqrt },
+                                   sub { $_[0]->conj },
+                                   sub { $_[0]->neg },
+                                  );
+
+            while (@transformations) {
+
+                my $transform = CORE::shift(@transformations);
+                @roots_of_unity = map { $transform->($_) } @roots_of_unity;
+
+                foreach my $root (@roots_of_unity) {
+                    my $solution = $f->newton_method($root, $df);
+                    if (defined($solution)) {
+
+                        my $key = join('', $solution->round($prec));
+                        if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
+                            push @polygonal_roots, $solution;
+                            $seen{$key} = 1;
+                        }
+
+                        last if (scalar(@polygonal_roots) == $degree);
+                    }
+                }
+
+                last if (scalar(@polygonal_roots) == $degree);
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@polygonal_roots);
     }
 
     sub binomial {

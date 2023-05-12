@@ -369,10 +369,14 @@ This package provides the following methods:
 
 =head2 render
 
+  render(Str $template, HashRef $variables) (Str)
+
 The render method processes the template by replacing the tokens and control
 structurs with the appropriate replacements and returns the result. B<Note:>
 The rendering process expects variables to be hashrefs and sets (arrayrefs) of
 hashrefs.
+
+I<Since C<0.01>>
 
 =over 4
 

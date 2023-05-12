@@ -1,5 +1,19 @@
 Revision history for Text-Minify-XS:
 
+v0.7.0    2023-05-10 08:59:46+01:00 Europe/London
+  [Incompatible Changes]
+  - Upgraded the minimum Perl version to v5.14.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Documented support policy for older Perls.
+
+  [Other]
+  - Updated MANIFEST.SKIP rules.
+
+  - Include generated Makefile.PL in the git repository so that this can be built without using Dist::Zilla.
+
 v0.6.5    2022-06-29 17:19:12+01:00 Europe/London
   [Documentation]
   - Fix typo in Changes.

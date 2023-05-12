@@ -1,23 +1,38 @@
 package Sidef::Optimizer {
 
+    use utf8;
     use 5.016;
     use Scalar::Util qw(refaddr);
 
     use constant {
-                  STRING      => 'Sidef::Types::String::String',
-                  NUMBER      => 'Sidef::Types::Number::Number',
-                  REGEX       => 'Sidef::Types::Regex::Regex',
-                  BOOL        => 'Sidef::Types::Bool::Bool',
-                  ARRAY       => 'Sidef::Types::Array::Array',
-                  RANGENUM    => 'Sidef::Types::Range::RangeNumber',
-                  DIR_DT      => 'Sidef::DataTypes::Glob::Dir',
-                  FILE_DT     => 'Sidef::DataTypes::Glob::File',
-                  NUMBER_DT   => 'Sidef::DataTypes::Number::Number',
-                  STRING_DT   => 'Sidef::DataTypes::String::String',
-                  COMPLEX_DT  => 'Sidef::DataTypes::Number::Complex',
-                  REGEX_DT    => 'Sidef::DataTypes::Regex::Regex',
-                  RANGENUM_DT => 'Sidef::DataTypes::Range::RangeNumber',
-                  BACKTICK_DT => 'Sidef::DataTypes::Glob::Backtick',
+                  STRING        => 'Sidef::Types::String::String',
+                  NUMBER        => 'Sidef::Types::Number::Number',
+                  MOD           => 'Sidef::Types::Number::Mod',
+                  GAUSS         => 'Sidef::Types::Number::Gauss',
+                  FRACTION      => 'Sidef::Types::Number::Fraction',
+                  QUADRATIC     => 'Sidef::Types::Number::Quadratic',
+                  QUATERNION    => 'Sidef::Types::Number::Quaternion',
+                  REGEX         => 'Sidef::Types::Regex::Regex',
+                  BOOL          => 'Sidef::Types::Bool::Bool',
+                  ARRAY         => 'Sidef::Types::Array::Array',
+                  RANGENUM      => 'Sidef::Types::Range::RangeNumber',
+                  RANGESTR      => 'Sidef::Types::Range::RangeString',
+                  DIR_DT        => 'Sidef::DataTypes::Glob::Dir',
+                  FILE_DT       => 'Sidef::DataTypes::Glob::File',
+                  PIPE_DT       => 'Sidef::DataTypes::Glob::Pipe',
+                  NUMBER_DT     => 'Sidef::DataTypes::Number::Number',
+                  STRING_DT     => 'Sidef::DataTypes::String::String',
+                  COMPLEX_DT    => 'Sidef::DataTypes::Number::Complex',
+                  REGEX_DT      => 'Sidef::DataTypes::Regex::Regex',
+                  GAUSS_DT      => 'Sidef::DataTypes::Number::Gauss',
+                  MOD_DT        => 'Sidef::DataTypes::Number::Mod',
+                  FRACTION_DT   => 'Sidef::DataTypes::Number::Fraction',
+                  QUADRATIC_DT  => 'Sidef::DataTypes::Number::Quadratic',
+                  QUATERNION_DT => 'Sidef::DataTypes::Number::Quaternion',
+                  RANGENUM_DT   => 'Sidef::DataTypes::Range::RangeNumber',
+                  RANGESTR_DT   => 'Sidef::DataTypes::Range::RangeString',
+                  BACKTICK_DT   => 'Sidef::DataTypes::Glob::Backtick',
+                  PERL_DT       => 'Sidef::DataTypes::Perl::Perl',
                  };
 
     my %dt_table = (
@@ -33,6 +48,11 @@ package Sidef::Optimizer {
           Sidef::DataTypes::String::String        Sidef::Types::String::String
           Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
           Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
+          Sidef::DataTypes::Number::Fraction      Sidef::Types::Number::Fraction
+          Sidef::DataTypes::Number::Gauss         Sidef::Types::Number::Gauss
+          Sidef::DataTypes::Number::Mod           Sidef::Types::Number::Mod
+          Sidef::DataTypes::Number::Quadratic     Sidef::Types::Number::Quadratic
+          Sidef::DataTypes::Number::Quaternion    Sidef::Types::Number::Quaternion
           Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
           Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
           Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
@@ -40,6 +60,7 @@ package Sidef::Optimizer {
           Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
           Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
           Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+          Sidef::DataTypes::Perl::Perl            Sidef::Types::Perl::Perl
           )
     );
 
@@ -51,7 +72,7 @@ package Sidef::Optimizer {
             my $module = ($cache{$package} //= (($package =~ s{::}{/}gr) . '.pm'));
             exists($INC{$module}) || require($module);
             map {
-                $cache{$package, $_} //= do {
+                $cache{join(' ', $package, $_)} //= do {
                     defined(my $method = UNIVERSAL::can($package, $_))
                       or die "[ERROR] Invalid method $package: $_";
                     $method;
@@ -70,7 +91,7 @@ package Sidef::Optimizer {
             exists($INC{$module}) || require($module);
 
             map {
-                $cache{$type, $_} //= do {
+                $cache{join(' ', $type, $_)} //= do {
                     defined(my $method = UNIVERSAL::can($package, $_))
                       or die "[ERROR] Invalid method $package: $_";
                     $method;
@@ -83,20 +104,21 @@ package Sidef::Optimizer {
         [@_];
     }
 
-    # It's probably easier to use a Cartesian product here,
-    # but for our purposes, it's good enough. At least for now.
     sub build_tree {
         my (@data) = @_;
+
+        require Algorithm::Loops;
 
         my %tree;
         foreach my $node (@data) {
             my $ref = ($tree{$node->[0]} //= {});
             $ref = $ref->{$#{$node->[1]}} //= {};
             my $orig = $ref;
-            foreach my $arg (@{$node->[1]}) {
-                my $ref2 = $ref;
-                foreach my $key (@{$arg}) {
-                    $ref = $ref2->{$key} //= {};
+            my $iter = Algorithm::Loops::NestedLoops($node->[1]);
+            while (my @list = $iter->()) {
+                $ref = $orig;
+                foreach my $key (@list) {
+                    $ref = $ref->{$key} //= {};
                 }
             }
         }
@@ -180,6 +202,7 @@ package Sidef::Optimizer {
                       clear
                       sort
                       split
+                      range
 
                       is_empty
                       is_palindrome
@@ -264,10 +287,244 @@ package Sidef::Optimizer {
                       )
                 )
             ),
+        ),
 
+        (MOD) => build_tree(
+
+            # Mod.method()
+            (
+                map { [$_, []] } methods(
+                    MOD, qw(
+                      abs dump fib lucas inv
+                      is_inf is_mone is_nan
+                      is_neg is_ninf is_one
+                      is_pos is_real is_zero
+                      lift neg norm pretty
+                      re sqr sqrt to_s znorder
+                      not chinese factorial
+                      inc dec eval
+                      )
+                )
+            ),
+
+            # Mod.method(Mod | Number)
+            (
+                map { [$_, [table(MOD, NUMBER)]] } methods(
+                    MOD, qw(
+                      + - / * %
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval ChebyshevT ChebyshevU cyclotomic
+                      )
+                )
+            ),
+
+            # Mod.method(Number)
+            (
+                map { [$_, [table(MOD, NUMBER)]] } methods(
+                    MOD, qw(
+                      << >> **
+                      ChebyshevT ChebyshevU cyclotomic
+                      )
+                )
+            ),
+
+            # Mod.method(Mod)
+            (
+                map { [$_, [table(MOD)]] } methods(
+                    MOD, qw(
+                      chinese
+                      )
+                )
+            ),
+
+            # Mod.method(Number, Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    MOD, qw(
+                      LucasU LucasV
+                      )
+                )
+            ),
+        ),
+
+        (FRACTION) => build_tree(
+
+            # Fraction.method()
+            (
+                map { [$_, []] } methods(
+                    FRACTION, qw(
+                      nu de abs ceil floor trunc dump
+                      float inv inc dec
+                      is_mone is_nan is_one
+                      is_real is_zero lift neg
+                      parts pretty round eval
+                      sgn sqr to_s to_n not
+                      )
+                )
+            ),
+
+            # Fraction.method(Fraction | Number)
+            (
+                map { [$_, [table(FRACTION, NUMBER)]] } methods(
+                    FRACTION, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod round
+                      )
+                )
+            ),
+
+            # Fraction.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    FRACTION, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
+        (GAUSS) => build_tree(
+
+            # Gauss.method()
+            (
+                map { [$_, []] } methods(
+                    GAUSS, qw(
+                      a b abs ceil conj dump
+                      float floor i iabs inv inc dec
+                      is_imag is_mone is_one is_prime
+                      is_real is_zero lift neg
+                      norm parts pretty round
+                      sgn sqr to_c to_s not eval
+                      )
+                )
+            ),
+
+            # Gauss.method(Gauss | Number)
+            (
+                map { [$_, [table(GAUSS, NUMBER)]] } methods(
+                    GAUSS, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      gcd gcd_norm eval
+                      invmod is_coprime round
+                      )
+                )
+            ),
+
+            # Gauss.method(Number, Gauss | Number)
+            (
+                map { [$_, [table(NUMBER), table(GAUSS, NUMBER)]] } methods(
+                    GAUSS, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
+        (QUADRATIC) => build_tree(
+
+            # Quadratic.method()
+            (
+                map { [$_, []] } methods(
+                    QUADRATIC, qw(
+                      a b abs ceil conj dump
+                      float floor inv inc dec not
+                      is_mone is_one is_zero eval
+                      lift neg norm order parts
+                      pretty round sgn sqr to_c to_s
+                      )
+                )
+            ),
+
+            # Quadratic.method(Quadratic | Number)
+            (
+                map { [$_, [table(QUADRATIC, NUMBER)]] } methods(
+                    QUADRATIC, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod is_coprime round
+                      )
+                )
+            ),
+
+            # Quadratic.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    QUADRATIC, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
+        (QUATERNION) => build_tree(
+
+            # Quaternion.method()
+            (
+                map { [$_, []] } methods(
+                    QUATERNION, qw(
+                      a b c d abs ceil conj dump
+                      float floor inv inc dec not
+                      is_mone is_one is_zero
+                      lift neg norm parts
+                      pretty round sgn sqr to_c to_s
+                      to_gauss eval
+                      )
+                )
+            ),
+
+            # Quaternion.method(Quaternion | Number)
+            (
+                map { [$_, [table(QUATERNION, NUMBER)]] } methods(
+                    QUATERNION, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod is_coprime round
+                      )
+                )
+            ),
+
+            # Quaternion.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    QUATERNION, qw(
+                      powmod
+                      )
+                )
+            ),
         ),
 
         (NUMBER) => build_tree(
+
+            # Number.method(Number)
+            (
+                map { [$_, [table(MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } methods(
+                    NUMBER, qw(
+                      + - * /
+                      )
+                )
+            ),
 
             # Number.method(Number)
             (
@@ -317,7 +574,7 @@ package Sidef::Optimizer {
             (
                 map { [$_, []] } methods(
                     NUMBER, qw(
-                      inc dec not
+                      inc dec not range
 
                       factorial
                       subfactorial
@@ -327,7 +584,7 @@ package Sidef::Optimizer {
                       lnhyperfactorial
                       sqrt isqrt
                       abs int rat float complex
-                      norm conj sqr
+                      norm conj sqr cube
 
                       zeta
                       eta
@@ -435,6 +692,7 @@ package Sidef::Optimizer {
                       ilog10
 
                       isqrt
+                      icbrt
 
                       numerator
                       denominator
@@ -448,6 +706,7 @@ package Sidef::Optimizer {
                       as_frac
 
                       dump
+                      eval
                       commify
                       )
                 )
@@ -603,8 +862,31 @@ package Sidef::Optimizer {
                 map { [$_, []] } methods(
                     RANGENUM, qw(
                       first last reverse
-                      min max step
-                      sum length
+                      min max step flip
+                      sum length neg
+                      )
+                )
+            ),
+        ),
+
+        (RANGESTR) => build_tree(
+
+            # RangeStr.method(Number)
+            (
+                map { [$_, [table(NUMBER)]] } methods(
+                    RANGESTR, qw(
+                      by add sub mul div
+                      )
+                )
+            ),
+
+            # RangeStr.method()
+            (
+                map { [$_, []] } methods(
+                    RANGESTR, qw(
+                      first last reverse
+                      min max step flip
+                      length neg
                       )
                 )
             ),
@@ -635,6 +917,7 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING, NUMBER)]] } dtypes(
                     NUMBER_DT, qw(
                       new
+                      call
                       )
                 )
             ),
@@ -644,6 +927,7 @@ package Sidef::Optimizer {
                 map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
                     NUMBER_DT, qw(
                       new
+                      call
                       )
                 )
             ),
@@ -653,6 +937,7 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING), table(NUMBER)]] } dtypes(
                     NUMBER_DT, qw(
                       new
+                      call
                       )
                 )
             ),
@@ -665,6 +950,7 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING, NUMBER)]] } dtypes(
                     STRING_DT, qw(
                       new
+                      call
                       )
                 )
             ),
@@ -677,6 +963,17 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING)]] } dtypes(
                     REGEX_DT, qw(
                       new
+                      call
+                      )
+                )
+            ),
+
+            # Regex.method(STRING, STRING)
+            (
+                map { [$_, [table(STRING), table(STRING)]] } dtypes(
+                    REGEX_DT, qw(
+                      new
+                      call
                       )
                 )
             ),
@@ -689,6 +986,46 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING)]] } dtypes(
                     FILE_DT, qw(
                       new
+                      call
+                      )
+                )
+            ),
+        ),
+
+        (PIPE_DT) => build_tree(
+
+            # Pipe.method(STRING)
+            (
+                map { [$_, [table(STRING)]] } dtypes(
+                    PIPE_DT, qw(
+                      new
+                      call
+                      )
+                )
+            ),
+        ),
+
+        (BACKTICK_DT) => build_tree(
+
+            # Backtick.method(STRING)
+            (
+                map { [$_, [table(STRING)]] } dtypes(
+                    BACKTICK_DT, qw(
+                      new
+                      call
+                      )
+                )
+            ),
+        ),
+
+        (PERL_DT) => build_tree(
+
+            # Perl.method(STRING)
+            (
+                map { [$_, [table(STRING)]] } dtypes(
+                    PERL_DT, qw(
+                      new
+                      call
                       )
                 )
             ),
@@ -701,6 +1038,118 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING)]] } dtypes(
                     DIR_DT, qw(
                       new
+                      call
+                      )
+                )
+            ),
+        ),
+
+        (GAUSS_DT) => build_tree(
+
+            # Gauss.method(NUMBER)
+            (
+                map { [$_, [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } dtypes(
+                    GAUSS_DT, qw(
+                      new call
+                      )
+                )
+            ),
+
+            # Gauss.method(NUMBER, NUMBER)
+            (
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
+                    GAUSS_DT, qw(
+                      new call
+                      )
+                )
+            ),
+        ),
+
+        (MOD_DT) => build_tree(
+
+            # Mod.method(NUMBER, NUMBER)
+            (
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
+                    MOD_DT, qw(
+                      new call
+                      )
+                )
+            ),
+        ),
+
+        (FRACTION_DT) => build_tree(
+
+            # Fraction.method(NUMBER)
+            (
+                map { [$_, [table(NUMBER)]] } dtypes(
+                    FRACTION_DT, qw(
+                      new call
+                      )
+                )
+            ),
+
+            # Fraction.method(NUMBER, NUMBER)
+            (
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
+                    FRACTION_DT, qw(
+                      new call
+                      )
+                )
+            ),
+        ),
+
+        (QUADRATIC_DT) => build_tree(
+
+            # Quadratic.method(NUMBER, NUMBER, NUMBER)
+            (
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER)
+                     ]
+                    ]
+                } dtypes(
+                    QUADRATIC_DT, qw(
+                      new call
+                      )
+                )
+            ),
+        ),
+
+        (QUATERNION_DT) => build_tree(
+
+            # Quaternion.method(NUMBER, NUMBER, NUMBER, NUMBER)
+            (
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
+                    QUATERNION_DT, qw(
+                      new call
                       )
                 )
             ),
@@ -712,7 +1161,7 @@ package Sidef::Optimizer {
             (
                 map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
                     RANGENUM_DT, qw(
-                      new
+                      new call
                       )
                 )
             ),
@@ -721,6 +1170,45 @@ package Sidef::Optimizer {
             (
                 map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] } dtypes(
                     RANGENUM_DT, qw(
+                      new call
+                      )
+                )
+            ),
+        ),
+
+        (RANGESTR_DT) => build_tree(
+
+            # RangeStr.method(STRING, STRING)
+            (
+                map { [$_, [table(STRING), table(STRING)]] } dtypes(
+                    RANGESTR_DT, qw(
+                      call
+                      )
+                )
+            ),
+
+            # RangeStr.method(NUMBER, NUMBER)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
+                    RANGESTR_DT, qw(
+                      new
+                      )
+                )
+            ),
+
+            # RangeStr.method(STRING, STRING, NUMBER)
+            (
+                map { [$_, [table(STRING), table(STRING), table(NUMBER)]] } dtypes(
+                    RANGESTR_DT, qw(
+                      call
+                      )
+                )
+            ),
+
+            # RangeStr.method(NUMBER, NUMBER, NUMBER)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] } dtypes(
+                    RANGESTR_DT, qw(
                       new
                       )
                 )
@@ -738,6 +1226,7 @@ package Sidef::Optimizer {
                       pi
                       phi
                       new
+                      call
                       )
                 )
             ),
@@ -746,7 +1235,7 @@ package Sidef::Optimizer {
             (
                 map { [$_, [table(STRING, NUMBER)]] } dtypes(
                     COMPLEX_DT, qw(
-                      new
+                      new call
                       )
                 )
             ),
@@ -755,19 +1244,7 @@ package Sidef::Optimizer {
             (
                 map { [$_, [table(STRING, NUMBER), table(STRING, NUMBER)]] } dtypes(
                     COMPLEX_DT, qw(
-                      new
-                      )
-                )
-            ),
-        ),
-
-        (BACKTICK_DT) => build_tree(
-
-            # Backtick.method(STRING)
-            (
-                map { [$_, [table(STRING)]] } dtypes(
-                    BACKTICK_DT, qw(
-                      new
+                      new call
                       )
                 )
             ),
@@ -778,7 +1255,7 @@ package Sidef::Optimizer {
 
     sub new {
         my (undef, %opts) = @_;
-        %addr = ();
+        undef(%addr);    # reset the %addr hash
         bless \%opts, __PACKAGE__;
     }
 
@@ -811,13 +1288,13 @@ package Sidef::Optimizer {
                 or $ref eq 'Sidef::Variable::Const'
                 or $ref eq 'Sidef::Variable::Define'
                )
-               and exists($obj->{expr})
+               and exists($obj->{value})
           ) {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }
             else {
-                $obj->{expr} = {$self->optimize($obj->{expr})};
+                $obj->{value} = {$self->optimize($obj->{value})};
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
@@ -834,6 +1311,7 @@ package Sidef::Optimizer {
                or $ref eq 'Sidef::Types::Block::Do'
                or $ref eq 'Sidef::Types::Block::Loop'
                or $ref eq 'Sidef::Types::Block::Given'
+               or $ref eq 'Sidef::Types::Block::Gather'
                or $ref eq 'Sidef::Types::Block::When'
                or $ref eq 'Sidef::Types::Block::Case'
                or $ref eq 'Sidef::Types::Block::Default') {
@@ -921,6 +1399,9 @@ package Sidef::Optimizer {
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             $obj->{expr} = {$self->optimize($obj->{expr})};
         }
+        elsif ($ref eq 'Sidef::Types::Block::Take') {
+            $obj->{expr} = {$self->optimize($obj->{expr})};
+        }
         elsif ($ref eq 'Sidef::Meta::Assert') {
             $obj->{arg} = {$self->optimize($obj->{arg})};
         }
@@ -968,6 +1449,7 @@ package Sidef::Optimizer {
             my $ref_obj = ref($obj->{self});
 
             foreach my $i (0 .. $#{$expr->{call}}) {
+
                 my $call = $expr->{call}[$i];
 
                 # Method call
@@ -983,6 +1465,10 @@ package Sidef::Optimizer {
                         }
                     }
 
+                    if (ref($obj) ne 'HASH') {
+                        $obj = {self => $obj};
+                    }
+
                     $obj->{call}[$i] = {method => $method};
                 }
                 elsif (exists $call->{keyword}) {
@@ -991,12 +1477,42 @@ package Sidef::Optimizer {
 
                 # Method arguments
                 if (exists $call->{arg}) {
-                    foreach my $j (0 .. $#{$call->{arg}}) {
-                        my $arg = $call->{arg}[$j];
-                        push @{$obj->{call}[$i]{arg}},
-                            ref($arg) eq 'HASH' ? {$self->optimize($arg)}
-                          : ref($arg)           ? $self->optimize_expr({self => $arg})
-                          :                       $arg;
+
+                    state $unary_methods = {
+                                            '-' => 'neg',
+                                            '√' => 'sqrt',
+                                            '~' => 'not',
+                                            '^' => 'range',
+                                            '+' => undef,
+                                           };
+
+                    my $unary_optimized = 0;
+
+                    if (    defined($ref_obj)
+                        and $ref_obj eq 'Sidef::Operator::Unary'
+                        and exists($unary_methods->{$method})
+                        and scalar(@{$call->{arg}}) == 1) {
+                        my $arg = $call->{arg}[0];
+                        my $opt_obj = $self->optimize_expr(
+                                 {
+                                  self => $arg,
+                                  (defined($unary_methods->{$method}) ? (call => [{method => $unary_methods->{$method}}]) : ())
+                                 }
+                        );
+                        if (($method eq '+') ? (ref($opt_obj) ne 'HASH') : 1) {
+                            $obj             = $opt_obj;
+                            $unary_optimized = 1;
+                        }
+                    }
+
+                    if (!$unary_optimized) {
+                        foreach my $j (0 .. $#{$call->{arg}}) {
+                            my $arg = $call->{arg}[$j];
+                            push @{$obj->{call}[$i]{arg}},
+                                ref($arg) eq 'HASH' ? {$self->optimize($arg)}
+                              : ref($arg)           ? $self->optimize_expr({self => $arg})
+                              :                       $arg;
+                        }
                     }
                 }
 
@@ -1019,7 +1535,7 @@ package Sidef::Optimizer {
                     and exists($rules{$ref_obj})
                     and ref($method) eq '') {
 
-                    my $code = ($cache{$ref_obj, $method} //= UNIVERSAL::can($ref_obj, $method));
+                    my $code = ($cache{join(' ', $ref_obj, $method)} //= UNIVERSAL::can($ref_obj, $method));
 
                     if (defined $code) {
                         my $obj_call = $obj->{call}[$i];
@@ -1029,14 +1545,12 @@ package Sidef::Optimizer {
                             $ref = $ref->{$code};
 
                             my @args = (
-                                  exists($obj_call->{arg})
-                                ? ref($obj_call->{arg}[0]) eq 'HASH'
-                                      ? do {
-                                          @{(values(%{$obj_call->{arg}[0]}))[0]};
-                                      }
-                                      : $obj_call->{arg}[0]
-                                : ()
-                            );
+                                          exists($obj_call->{arg})
+                                        ? ref($obj_call->{arg}[0]) eq 'HASH'
+                                              ? @{(values(%{$obj_call->{arg}[0]}))[0]}
+                                              : $obj_call->{arg}[0]
+                                        : ()
+                                       );
 
                             if (exists $ref->{$#args}) {
                                 $ref = $ref->{$#args};

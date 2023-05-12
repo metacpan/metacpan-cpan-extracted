@@ -16,8 +16,6 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Alien::Base' => '0',
-                                      'Alien::Build' => '2.3901',
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::AlienBuild' => '0',
                                       'Dist::Zilla::Plugin::AutoPrereqs' => '0',
@@ -111,10 +109,12 @@ do { my $x = {
                                    'File::Which' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test2::Bundle::Extended' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Alien' => '2.3901',
+                                   'Test::DescribeMe' => '0',
                                    'Test::More' => '0',
+                                   'Test::Settings' => '0',
+                                   'Time::HiRes' => '0',
                                    'subs' => '0'
                                  }
                  }

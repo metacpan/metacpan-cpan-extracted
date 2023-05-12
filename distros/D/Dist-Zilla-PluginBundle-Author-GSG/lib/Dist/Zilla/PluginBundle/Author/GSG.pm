@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.5.0'; # VERSION
+our $VERSION = 'v0.5.1'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -128,7 +128,7 @@ sub configure {
         } ) ],
 
         'Test::ReportPrereqs',
-        'HasVersionTests',
+        'Author::GSG::HasVersionTests',
         'PodSyntaxTests',
         'PodCoverageTests',
     );
@@ -285,7 +285,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.1
 
 =head1 SYNOPSIS
 
@@ -388,7 +388,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     ; test_compile_switch
 
     [Test::ReportPrereqs]
-    [HasVersionTests]
+    [Author::GSG::HasVersionTests]
     [PodSyntaxTests]
     [PodCoverageTests]
 

@@ -4,8 +4,9 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG $MODULES_EXISTS );
     use Test::More;
-	unless( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} )
+	unless( ( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} ) && -e( './dev' ) )
 	{
 		plan(skip_all => 'These tests are for author or release candidate testing');
 	}
@@ -49,6 +50,7 @@ my $dict_file = file( './lib/HTML/html_tags_dict.json' );
 my $dict_data = $dict_file->load_utf8;
 my $repo = $j->decode( $dict_data );
 my $dict = $repo->{dict};
+our $log;
 
 our $mod_elements_base_dir = $base_dir->child( './lib/HTML/Object/DOM/Element' );
 my $mod_shared = $mod_elements_base_dir->child( 'Shared.pm' );
@@ -200,7 +202,7 @@ sub fetch_class
     my $url = $opts->{uri};
 
     my $cache_file = $cache_dir->child( "$class.html" );
-    our $log = $cache_dir->child( 'mozilla_doc_log_${class}.txt' );
+    $log = $cache_dir->child( 'mozilla_doc_log_${class}.txt' );
     my $json_file = $cache_dir->child( "$class.json" );
     
     my $mod_file = $mod_elements_base_dir->child( "${class}.pm" );
@@ -214,7 +216,8 @@ sub fetch_class
         {
             $json = $j->decode( $json_data );
             $json_file->close;
-            local $crawl = sub
+            my $crawl;
+            $crawl = sub
             {
                 my $ref = shift( @_ );
                 foreach my $this ( keys( %$ref ) )
@@ -342,6 +345,7 @@ sub fetch_class
     }
     
     my $methods = {};
+    my( $dts, $dds );
     my $meth_title = $art->getElementById( 'methods' );
     if( !$meth_title )
     {
@@ -1189,7 +1193,7 @@ sub _check_cache_http
     catch( $e )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
-        warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+        warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );
     }
     if( $last_mod )
     {

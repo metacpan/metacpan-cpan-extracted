@@ -3,6 +3,8 @@ BEGIN
 {
     #use strict;
     #use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use Scalar::Util ();
 };
@@ -14,6 +16,9 @@ BEGIN
     use_ok( 'HTML::Object::XQuery' ) || BAIL_OUT( "Cannot load HTML::Object::XQuery" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 $HTML::Object::FATAL_ERROR = 0;
 # $self->add( $selector );

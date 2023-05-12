@@ -55,4 +55,9 @@ ok $context ne "", "Explicit Error variable";
 $context=Error::Show::context error=>$@;
 ok $context ne "", "KV Error variable";
 
+# Test internal frame capture and default import
+$context=context undef;
+ok $context =~ /59=> \$context=context undef;/, "Internal frame capture";
+
+
 done_testing;

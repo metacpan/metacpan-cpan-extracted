@@ -2,10 +2,15 @@ Changes
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Crypt/URandom.pm
 t/00.load.t
+t/boilerplate.t
 t/pod.t
 t/rand.t
 t/export.t
+t/core_read.t
+t/core_sysopen.t
+t/manifest.t
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

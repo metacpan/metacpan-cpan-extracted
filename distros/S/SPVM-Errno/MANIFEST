@@ -7,10 +7,9 @@
 Changes
 lib/SPVM/Errno.c
 lib/SPVM/Errno.config
-lib/SPVM/Errno.native/include/.gitkeep
-lib/SPVM/Errno.native/src/.gitkeep
 lib/SPVM/Errno.pm
 lib/SPVM/Errno.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

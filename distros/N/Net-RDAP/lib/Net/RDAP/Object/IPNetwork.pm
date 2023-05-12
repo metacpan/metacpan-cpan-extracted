@@ -51,7 +51,7 @@ network.
 	$parentHandle = $network->parentHandle;
 
 Returns a string containing an RIR-unique identifier of the parent
-network of this network registration
+network of this network registration.
 
 =cut
 
@@ -82,6 +82,27 @@ sub range {
 	);
 
 	return Net::IP->new($str);
+}
+
+=pod
+
+    @cidrs = $network->cidrs;
+
+Returns an array of L<Net::IP> objects representing the CIDR
+prefix(es) for this network registration (see
+L<https://bitbucket.org/nroecg/nro-rdap-cidr/src/master/nro-rdap-cidr.txt).
+
+=cut
+
+sub cidrs {
+    my $self = shift;
+    my @cidrs;
+    if (defined($self->{'cidr0_cidrs'})) {
+        foreach my $cidr (@{$self->{'cidr0_cidrs'}}) {
+            push(@cidrs, Net::IP->new(sprintf('%s/%u', $cidr->{'v4prefix'} || $cidr->{'v6prefix'}, $cidr->{'length'})));
+        }
+    }
+    return @cidrs;
 }
 
 =pod

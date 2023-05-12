@@ -6,13 +6,11 @@ package SPVM::File::Spec::Instance::Win32;
 
 =head1 Name
 
-SPVM::File::Spec::Instance::Win32 - An implementation class of File::Spec::Instance for Windows.
+SPVM::File::Spec::Instance::Win32 - Implementation of File::Spec::Instance for Windows
 
 =head1 Description
 
-C<SPVM::File::Spec::Instance::Win32> is the L<SPVM>'s C<File::Spec::Instance::Win32> class.
-
-An implementation class of the L<File::Spec::Instance|SPVM::SPVM::File::Spec::Instance> for Windows.
+The File::Spec::Instance::Win32 class of L<SPVM> is an implementation of L<File::Spec::Instance|SPVM::File::Spec::Instance> for Windows.
 
 =head1 Usage
 
@@ -93,8 +91,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 

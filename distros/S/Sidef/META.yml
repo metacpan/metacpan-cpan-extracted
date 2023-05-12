@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '23.03'
+    version: '23.05'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -42,8 +42,6 @@ provides:
     file: lib/Sidef/Optimizer.pm
   Sidef::Parser:
     file: lib/Sidef/Parser.pm
-  Sidef::Perl::Perl:
-    file: lib/Sidef/Perl/Perl.pm
   Sidef::Sys::Sig:
     file: lib/Sidef/Sys/Sig.pm
   Sidef::Sys::Sys:
@@ -106,6 +104,8 @@ provides:
     file: lib/Sidef/Types/Number/Quadratic.pm
   Sidef::Types::Number::Quaternion:
     file: lib/Sidef/Types/Number/Quaternion.pm
+  Sidef::Types::Perl::Perl:
+    file: lib/Sidef/Types/Perl/Perl.pm
   Sidef::Types::Range::Range:
     file: lib/Sidef/Types/Range/Range.pm
   Sidef::Types::Range::RangeNumber:
@@ -168,5 +168,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '23.03'
+version: '23.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

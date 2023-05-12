@@ -3,6 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use URI;
 };
@@ -13,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Element::Anchor' ) || BAIL_OUT( "Cannot load HTML::Object::DOM::Element::Anchor" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 can_ok( 'HTML::Object::DOM::Element::Anchor', 'hash' );
 can_ok( 'HTML::Object::DOM::Element::Anchor', 'host' );

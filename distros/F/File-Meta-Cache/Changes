@@ -1,4 +1,8 @@
 Revision history for Perl extension File::Meta::Cache.
+v0.1.1 2023-05-10
+  [bug fixes]
+  - Added minimum Object::Pad version of 0.78 in Makefile.PL instead of any
+    version
 
 v0.1.0 2023-02-23 
 	- original version; created by h2xs 1.23 with options

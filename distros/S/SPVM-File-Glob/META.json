@@ -1,12 +1,12 @@
 {
-   "abstract" : "The glob Function",
+   "abstract" : "The BSD glob Porting",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9691"
+            "SPVM" : "0.976"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9691"
+            "SPVM" : "0.976"
          }
       },
       "test" : {
@@ -47,6 +47,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Glob"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.020001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

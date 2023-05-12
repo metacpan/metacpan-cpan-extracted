@@ -1,7 +1,9 @@
 #! perl
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test::Alien;
+use Test::Settings ':all';
+use Time::HiRes 'time';
 
 use Alien::XPA;
 use Action::Retry 'retry';
@@ -11,56 +13,73 @@ use Child 'child';
 sub run { MyRun->new( @_ ) }
 
 # so we can catch segv's
-plan( 5 );
+plan( 5 + ( want_smoke ? 3 : 0 ) );
 
 # this modifies @PATH appropriately
 alien_ok 'Alien::XPA';
 
+if ( want_smoke ) {
+    my $ok = !!1;
+    for my $exe ( qw( xpaaccess xpamb xpaset ) ) {
+        $ok &&= ok( defined( which( $exe ) ), "found $exe" );
+    }
+    if ( !$ok ) {
+        diag join "\n", '', 'PATH = ', split /[:;]/, $ENV{PATH};
+        bail_out;
+    }
 
-diag "PATH = $ENV{PATH}";
-diag( which( $_ ) or bail_out( "can't find $_" ) ) for qw( xpaaccess xpamb xpaset );
+}
 
-my $run = run_ok( [ 'xpaaccess', '--version' ] );
-$run->exit_is( 0 )
-  or bail_out( "can't run xpaaccess. must stop now:\n" . $run->dump );
-my $version = $run->out;
+my $version = do {
+    my $run = run_ok( [ 'xpaaccess', '--version' ] );
+    $run->exit_is( 0 )
+      or bail_out( "can't run xpaaccess. must stop now:\n" . $run->stringify );
+    $run->out;
+};
 
 # just in case there's one running, remove it.
 remove_xpamb();
 
-our $child;
+my $child;
+
+## no critic (Variables::RequireLocalizedPunctuationVars)
 
 if ( $^O eq 'MSWin32' ) {
     require Win32::Process;
     use subs qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
+    $ENV{XPA_METHOD} = 'localhost';
     Win32::Process::Create( $child, which( 'xpamb' ),
-        "xpamb", 0, Win32::Process::NORMAL_PRIORITY_CLASS | Win32::Process::CREATE_NO_WINDOW, "." )
+        'xpamb', 0, Win32::Process::NORMAL_PRIORITY_CLASS | Win32::Process::CREATE_NO_WINDOW, q{.} )
       || die $^E;
+
 }
 else {
+    $ENV{XPA_METHOD} = 'local';
     $child = child { exec {'xpamb'} 'xpamb' };
 }
 
-my $xpamb_is_running;
-retry {
+my $TSTART = time;
+diag( 'waiting to contact launched xpamb' );
+bail_out( sprintf( 'unable to access launched xpamb after %f seconds', time - $TSTART ) )
+  unless
+  retry {    ## no critic (ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions)
     my $run = run( 'xpaaccess', 'XPAMB:*' );
-    $xpamb_is_running = $run->exit == 1;
     if ( $run->exit != 0 && $run->exit != 1 ) {
         diag $run->dump;
-        bail_out( "error running xpaacces" );
+        bail_out( 'error running xpaacces' );
     }
-    die unless $xpamb_is_running;
-};
+    $run->exit == 1 || die;
+}            # try every 0.25 seconds for 15 seconds. Try to be nice to CPAN testers.
+strategy => { Constant => { sleep_time => 250, max_retries_number => 15_000 / 250 } };
+diag( sprintf( 'accessed launched xpamb after %f seconds', time - $TSTART ) );
 
-bail_out( "unable to access launched xpamb" )
-  unless $xpamb_is_running;
 
-my $xs = do { local $/; <DATA> };
+my $xs = do { local $/ = undef; <DATA> };
 xs_ok { xs => $xs, verbose => 1 }, with_subtest {
     my ( $module ) = @_;
-    ok $module->connected, "connected to xpamb";
+    ok $module->connected, 'connected to xpamb';
     $version = $module->version;
-    is( $module->version, $version, "library version same as command line version" );
+    is( $module->version, $version, 'library version same as command line version' );
 };
 
 sub remove_xpamb {
@@ -75,7 +94,7 @@ sub remove_xpamb {
         return unless $xpamb_is_running;
 
         $run              = run( 'xpaset', qw [ -p xpamb -exit ] );
-        $xpamb_is_running = $run->err =~ qr[XPA\$ERROR no 'xpaset' access points];
+        $xpamb_is_running = $run->err =~ q/XPA[$]ERROR no 'xpaset' access points/;
 
         die if $xpamb_is_running;
     };
@@ -83,7 +102,7 @@ sub remove_xpamb {
     # be firm if necessary
     if ( $xpamb_is_running && defined $child ) {
 
-        diag( "force remove our xpamb" );
+        diag( 'force remove our xpamb' );
 
         retry {
 
@@ -103,10 +122,10 @@ sub remove_xpamb {
             }
 
             die;
-        }
+        };
     }
 
-    bail_out( "unable to remove xpamb" )
+    bail_out( 'unable to remove xpamb' )
       if $xpamb_is_running;
 }
 
@@ -134,12 +153,12 @@ sub remove_xpamb {
 
     sub out    { $_[0]->{out} }
     sub err    { $_[0]->{err} }
-    sub exit   { $_[0]->{exit} }
+    sub exit   { $_[0]->{exit} }                  ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     sub core   { $_[0]->{core} }
     sub signal { $_[0]->{signal} }
-    sub cmd    { join ' ', @{ $_[0]->{cmd} } }
+    sub cmd    { join q{ }, @{ $_[0]->{cmd} } }
 
-    sub dump {
+    sub stringify {
         sprintf "cmd: %s\nexit: %d\ncore; %s\nsignal: %s\nstdout: %s\nstderr: %s\n",
           $_[0]->cmd,
           $_[0]->exit,
@@ -161,7 +180,7 @@ __DATA__
 #include "XSUB.h"
 #include <xpa.h>
 
-const char *
+int
 connected(const char *class)
 {
     char *names[1];
@@ -172,8 +191,8 @@ connected(const char *class)
                  "XPAMB:*",
                  NULL,
                  "g",
-                 &names,
-                 &messages,
+                 names,
+                 messages,
                  1 );
 
     if ( found && names[0] && strcmp( names[0], "XPAMB:xpamb" ) ) found = 1;

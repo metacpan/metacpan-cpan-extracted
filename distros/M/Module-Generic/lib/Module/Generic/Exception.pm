@@ -141,7 +141,7 @@ sub init
         # I do not want to alter the original hash reference, which may adversely affect the calling code if they depend on its content for further execution for example.
         my $copy = {};
         %$copy = %$args;
-        CORE::delete( @$copy{ qw( message code type retry_after skip_frames ) } );
+        CORE::delete( @$copy{ qw( message code type retry_after skip_frames file line subroutine ) } );
         # print( STDERR __PACKAGE__, "::init() Following non-standard keys to set up: '", join( "', '", sort( keys( %$copy ) ) ), "'\n" );
         # Do we have some non-standard parameters?
         foreach my $p ( keys( %$copy ) )

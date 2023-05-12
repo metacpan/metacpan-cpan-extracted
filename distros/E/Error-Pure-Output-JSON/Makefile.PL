@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Output JSON subroutines for Error::Pure.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.05;
 author_requires 'Test::Pod' => 0;
@@ -20,14 +19,13 @@ requires 'Exporter' => 0;
 requires 'JSON' => '2.50';
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Error-Pure-Output-JSON';
-resources 'homepage' => 'https://github.com/tupinek/Error-Pure-Output-JSON';
-resources 'repository' => 'git://github.com/tupinek/Error-Pure-Output-JSON';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Error-Pure-Output-JSON/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Error-Pure-Output-JSON';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Error-Pure-Output-JSON';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.10';
+version '0.11';
 
 # Run.
 WriteAll();

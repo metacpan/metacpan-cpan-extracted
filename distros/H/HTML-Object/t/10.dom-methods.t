@@ -3,6 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
 };
 
@@ -13,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Root' ) || BAIL_OUT( "Cannot load HTML::Object::DOM::Root" );
     use_ok( 'HTML::Object::DOM::Text' ) || BAIL_OUT( "Cannot load HTML::Object::DOM::Text" );
 };
+
+use strict;
+use warnings;
 
 subtest 'element methods' => sub
 {

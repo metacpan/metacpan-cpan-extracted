@@ -3,6 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -13,6 +15,9 @@ BEGIN
     use_ok( 'HTML::Object::DOM::Node' ) || BAIL_OUT( "Unable to load HTML::Object::DOM::Node" );
     use_ok( 'HTML::Object::Event', ':phase' ) || BAIL_OUT( "Unable to load HTML::Object::Event" );
 };
+
+use strict;
+use warnings;
 
 my $parser = HTML::Object::DOM->new;
 my $html = <<EOT;

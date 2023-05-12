@@ -204,22 +204,46 @@ sub appendNodes
 
 # Note: Property
 # Example: <base href="https://www.example.com/">
-sub baseURI
-{
-    my $self = shift( @_ );
-    my $root = $self->root;
-    return( $self->new_null ) if( !$root );
-    return( $self->new_null ) if( !$root->can( 'uri' ) );
-    return( $root->uri ) if( $root->uri );
-    my $nodes = $self->find( 'base' );
-    return( $self->new_null ) if( $nodes->is_empty );
-    my $node = $nodes->first;
-    return( $self->new_null ) if( !$node );
-    return( $self->new_null ) if( !$node->attributes->has( 'href' ) );
-    my $uri = $node->attributes->get( 'href' );
-    return( $self->new_null ) if( !defined( $uri ) || !CORE::length( "$uri" ) );
-    return( $self->_set_get_uri( 'uri', $uri ) );
-}
+sub baseURI : lvalue { return( shift->_set_get_callback({
+    get => sub
+    {
+        my $self = shift( @_ );
+        my $root = $self->root;
+        return( $self->new_null ) if( !$root );
+        return( $self->new_null ) if( !$root->can( 'uri' ) );
+        return( $root->uri ) if( $root->uri );
+        my $nodes = $self->find( 'base' );
+        return( $self->new_null ) if( $nodes->is_empty );
+        my $node = $nodes->first;
+        return( $self->new_null ) if( !$node );
+        return( $self->new_null ) if( !$node->attributes->has( 'href' ) );
+        my $uri = $node->attributes->get( 'href' );
+        return( $self->new_null ) if( !defined( $uri ) || !CORE::length( "$uri" ) );
+        return( $self->_set_get_uri( 'uri', $uri ) );
+    },
+    set => sub
+    {
+        my $self = shift( @_ );
+        my $uri  = shift( @_ );
+        my $root = $self->root;
+        return( $self->new_null ) if( !$root );
+        my $nodes = $root->find( 'base' );
+        my $base;
+        if( $nodes->is_empty )
+        {
+            $base = $root->createElement( 'base' ) || return( $self->error( $root->pass_error ) );
+            my $head = $root->find( 'head' )->first ||
+                return( $self->error( "No base uri can be set, because there is no head element in this document." ) );
+            $head->appendChild( $base );
+        }
+        else
+        {
+            $base = $nodes->first;
+        }
+        $base->href( $uri ) || return( $self->error( $base->pass_error ) );
+        return( $uri );
+    },
+}, @_ ) ); }
 
 sub childNodes { return( shift->children ); }
 
@@ -1184,28 +1208,26 @@ sub replaceChild
     return( $old );
 }
 
-sub textContent : lvalue
-{
-    my $self = shift( @_ );
-    return if( $self->isa( 'HTML::Object::DOM::Document' ) );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub textContent : lvalue { return( shift->_set_get_callback({
+    get => sub
     {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
+        my $self = shift( @_ );
+        return if( $self->isa( 'HTML::Object::DOM::Document' ) );
+        unless( $self->isa( 'HTML::Object::DOM::Comment' ) ||
+                $self->isa( 'HTML::Object::DOM::Text' ) ||
+                $self->isa( 'HTML::Object::DOM::Element' ) )
         {
-            $arg = shift( @_ );
-            $has_arg++;
+            return;
         }
-    }
-    
-    if( $has_arg )
+        my $str = $self->as_text;
+        return( $str );
+    },
+    set => sub
     {
+        my $self = shift( @_ );
+        my $ctx = $_;
+        my $arg = shift( @_ );
+        return if( $self->isa( 'HTML::Object::DOM::Document' ) );
         my $dummy;
         if( $self->isa( 'HTML::Object::DOM::Comment' ) ||
             $self->isa( 'HTML::Object::DOM::Text' ) ||
@@ -1226,20 +1248,8 @@ sub textContent : lvalue
             return( $dummy );
         }
         return( $dummy );
-    }
-    else
-    {
-        unless( $self->isa( 'HTML::Object::DOM::Comment' ) ||
-                $self->isa( 'HTML::Object::DOM::Text' ) ||
-                $self->isa( 'HTML::Object::DOM::Element' ) )
-        {
-            return;
-        }
-        my $str = $self->as_text;
-        return( $str ) if( want( 'LVALUE' ) );
-        Want::rreturn( $str );
-    }
-}
+    },
+}, @_ ) ); }
 
 sub trigger
 {
@@ -1399,7 +1409,7 @@ All the following properties can be used as lvalue method as well as regular met
 
 =head2 baseURI
 
-Read-only
+Normally this is read-only, but in this api, you can set an URI.
 
 This returns an L<URI> object representing the base URL of the document containing the Node, if any.
 

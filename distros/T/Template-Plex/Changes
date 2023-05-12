@@ -1,11 +1,33 @@
 Revision history for Perl extension Template::Plex.
 
+v0.6.0 2023-05-09
+
+  [new features]
+    - cache and immediate subroutines now also supports a single argument call.
+      Makes using cached and immediate templates much nicer in loops with
+      implicit linking to current template variables.
+    - added fill_var, append_var and prepend_var to set, append and prepend
+      package variables. All return empty strings
+
+  [improvements]
+    - Error::Show is now only required when an error is to be shown, saving on
+      memory otherwise
+    - Removed unused imported modules, reducing wasted memory
+    - Fixed spelling mistakes in changes file
+
+  [bug fixes]
+    - a slot in a parent template with no default value doesn't die now
+
+  [pod]
+    - Documented changes to immediate and cache routines
+    - Documented *_var routines
+
 v0.5.0
   [new features]
   - added append_slot
   - added prepend_slot
-  - "cheat comments", which allows line starting with a perl comment to be
-    ignored. "use_comments" must be sepecified in options hash to enable
+  - "cheat comments", which allows line starting with a Perl comment to be
+    ignored. "use_comments" must be specified in options hash to enable
 
   [changes]
   - Now using Error::Show for error context instead of internal code
@@ -17,19 +39,19 @@ v0.5.0
   - Added information about line error numbers in regards to block_fix and include
 
   [other]
-  - Reformated Changes file
+  - Reformatted Changes file
 
 
 v0.4.3   2022-06-28
 	- Fixed failing tests... again..
-	- Improved error reporting context on template sytax error (reduced line count)
+	- Improved error reporting context on template syntax error (reduced line count)
 	- Added 'inject' option when loading a template
 	- Briefly documented 'use' and 'inject' options when loading templates
 
 
 0.4.2	2022-06-23
 	- Removed usage of perl-5.36 features isa  and multi-element for loops
-	- Reverted min perl version back to 5.24 for better compatability
+	- Reverted min perl version back to 5.24 for better compatibility
 	- Checked dependencies also work with perl 5.24
 	- Removed other non used features
 
@@ -40,7 +62,7 @@ v0.4.3   2022-06-28
 	- Template inheritance and slotting
 	- Requires Perl 5.36 (for isa)
 	- User subclassing is now possible
-	- Removed redundant code in in peparing templates
+	- Removed redundant code in in preparing templates
 	- Sub classes can access metadata (options) and arguments( variables) via
    	  accessor methods meta and args
 	- The current template is stored in a lexical variable $self
@@ -57,7 +79,7 @@ v0.4.3   2022-06-28
 	  instead of a reference
 	- Block fix no longer kills multiple newlines after a directive close
 	- die is  called on template compilation error. (=> try/catch)
-	- Error message include a summary of the error location and tempalte name
+	- Error message include a summary of the error location and template name
 	- plx and plex function depreciated
 	- Class methods load/cache/immediate for loading templates
 

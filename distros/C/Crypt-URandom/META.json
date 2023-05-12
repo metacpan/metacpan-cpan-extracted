@@ -4,13 +4,13 @@
       "David Dick <ddick@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-URandom",
    "no_index" : {
@@ -34,11 +34,28 @@
          "requires" : {
             "Carp" : "0",
             "English" : "0",
+            "Exporter" : "0",
             "FileHandle" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.36"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/david-dick/crypt-urandom/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/david-dick/crypt-urandom",
+         "web" : "https://github.com/david-dick/crypt-urandom"
+      }
+   },
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

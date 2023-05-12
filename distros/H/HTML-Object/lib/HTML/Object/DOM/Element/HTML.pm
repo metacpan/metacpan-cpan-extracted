@@ -18,6 +18,7 @@ BEGIN
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
+    use HTML::Object::DOM::Element::Shared qw( :anchor );
     our $VERSION = 'v0.2.0';
 };
 

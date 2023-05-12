@@ -15,7 +15,6 @@ use OpenAPI::Modern;
 use JSON::Schema::Modern::Utilities 'jsonp';
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use constant { true => JSON::PP::true, false => JSON::PP::false };
-use YAML::PP 0.005;
 
 use lib 't/lib';
 use Helper;
@@ -29,7 +28,32 @@ info:
 YAML
 
 my $doc_uri = Mojo::URL->new('https://example.com/api');
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
+
+subtest 'bad conversion to Mojo::Message::Request' => sub {
+  my $req = HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]);
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => yaml(<<YAML));
+$openapi_preamble
+paths: {}
+YAML
+
+  cmp_deeply(
+    (my $result = $openapi->validate_request($req))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri->clone->to_string,
+          error => 'Bad request start-line',
+        },
+      ],
+    },
+    'invalid request object is detected early',
+  );
+};
 
 my $type_index = 0;
 
@@ -40,7 +64,7 @@ note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 subtest 'validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -87,7 +111,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo/{foo_id}:
@@ -118,7 +142,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo/{foo_id}:
@@ -170,7 +194,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo/{foo_id}/bar/{bar_id}:
@@ -226,7 +250,7 @@ YAML
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => do {
-      YAML::PP->new( boolean => 'JSON::PP' )->load_string(<<YAML);
+      yaml(<<YAML);
 $openapi_preamble
 paths:
   /foo/{foo_id}:
@@ -257,7 +281,7 @@ subtest 'validation errors in requests' => sub {
   my $request = request('POST', 'http://example.com/foo');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -272,7 +296,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -300,7 +324,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -328,7 +352,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 components:
   parameters:
@@ -360,7 +384,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -392,7 +416,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 components:
   parameters:
@@ -579,7 +603,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -652,7 +676,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -729,7 +753,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -757,7 +781,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1061,7 +1085,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1094,7 +1118,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1117,7 +1141,7 @@ subtest 'document errors' => sub {
   my $request = request('GET', 'http://example.com/foo?alpha=1');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 components:
   parameters:
@@ -1152,7 +1176,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 components:
   parameters:
@@ -1189,7 +1213,7 @@ YAML
 subtest 'type handling of values for evaluation' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo/{foo_id}:
@@ -1259,7 +1283,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo/{foo_id}:
@@ -1351,7 +1375,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1413,7 +1437,7 @@ subtest 'max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15),
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 components:
   parameters:
@@ -1450,7 +1474,7 @@ subtest 'unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new,
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1516,7 +1540,7 @@ subtest 'readOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new,
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1567,7 +1591,7 @@ subtest 'no bodies in GET or HEAD requests without requestBody' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new,
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo:
@@ -1626,7 +1650,7 @@ subtest 'custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new,
-    openapi_schema => $yamlpp->load_string(<<YAML));
+    openapi_schema => yaml(<<YAML));
 $openapi_preamble
 paths:
   /foo/{foo_id}:

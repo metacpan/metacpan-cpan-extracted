@@ -1,0 +1,4 @@
+The TODO list for Rami
+
+Add file CONTRIBUTING or CONTRIBUTING.md
+Have the script checkout its configuration from SVN.

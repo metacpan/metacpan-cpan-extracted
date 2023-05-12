@@ -28,7 +28,7 @@ EXAMPLE
      hl7dump -h
 
 REPOSITORY
-    <https://github.com/tupinek/App-HL7-Dump>
+    <https://github.com/michal-josef-spacek/App-HL7-Dump>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -36,10 +36,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2016-2022 Michal Josef Špaček
+    © 2016-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

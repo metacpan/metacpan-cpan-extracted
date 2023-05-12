@@ -416,6 +416,8 @@ package Sidef::Types::Range::Range {
     sub to_array {
         my ($self) = @_;
 
+        ref($self) || return Sidef::Types::Array::Array->new($self);
+
         my @array;
         my $iter = $self->iter;
 
@@ -438,6 +440,8 @@ package Sidef::Types::Range::Range {
 
     sub to_list {
         my ($self) = @_;
+
+        ref($self) or return;
 
         my @array;
         my $iter = $self->iter;
@@ -642,6 +646,11 @@ package Sidef::Types::Range::Range {
     sub div {
         my ($self, $arg) = @_;
         $self->new($self->{from}->div($arg), $self->{to}->div($arg), $self->{step});
+    }
+
+    sub neg {
+        my ($self) = @_;
+        $self->new($self->{from}->neg, $self->{to}, $self->{step});
     }
 
     sub eq {

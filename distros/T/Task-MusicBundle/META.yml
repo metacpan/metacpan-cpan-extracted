@@ -20,6 +20,7 @@ name: Task-MusicBundle
 requires:
   App::MusicTools: '0'
   Csound: '0'
+  Data::Dataset::ChordProgressions: '0'
   Guitar::Scale: '0'
   MIDI: '0'
   MIDI::Bassline::Walk: '0'
@@ -71,7 +72,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Task-MusicBundle
   repository: https://github.com/ology/Task-MusicBundle.git
-version: '0.1913'
+version: '0.1914'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

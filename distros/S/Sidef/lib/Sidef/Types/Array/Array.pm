@@ -3772,8 +3772,9 @@ package Sidef::Types::Array::Array {
     sub getopt {
         my ($self, %opts) = @_;
 
-        state $x = require Getopt::Long;
+        @$self or return Sidef::Types::Array::Array->new;
 
+        state $x = require Getopt::Long;
         Getopt::Long::Configure('no_ignore_case');
 
         my @argv = map { "$_" } @$self;
@@ -3882,7 +3883,7 @@ package Sidef::Types::Array::Array {
     *to_h = \&to_hash;
 
     sub to_a {
-        $_[0];
+        ref($_[0]) ? $_[0] : __PACKAGE__->new($_[0]);
     }
 
     *to_array = \&to_a;

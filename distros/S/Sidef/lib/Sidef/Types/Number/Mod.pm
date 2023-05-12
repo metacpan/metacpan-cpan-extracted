@@ -158,6 +158,11 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new($x->{n}->neg, $x->{m});
     }
 
+    sub abs {
+        my ($x) = @_;
+        $x->{n}->abs;
+    }
+
     sub inv {
         my ($x) = @_;
         __PACKAGE__->new($x->{n}->invmod($x->{m}), $x->{m});
@@ -215,6 +220,8 @@ package Sidef::Types::Number::Mod {
         my ($x) = @_;
         $x->{n}->znorder($x->{m});
     }
+
+    *multiplicative_order = \&znorder;
 
     sub pow {
         my ($x, $y) = @_;

@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-our $VERSION = '0.1913';
+our $VERSION = '0.1914';
 
 1;
 
@@ -25,7 +25,7 @@ Task::MusicBundle - MIDI and music creation modules
 
 =head1 VERSION
 
-version 0.1913
+version 0.1914
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,8 @@ B<Music is older than agriculture>.
 L<App::MusicTools>
 
 L<Csound>
+
+L<Data-Dataset-ChordProgressions>
 
 L<Guitar::Scale>
 

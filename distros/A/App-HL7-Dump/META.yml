@@ -3,6 +3,7 @@ abstract: 'Distribution for hl7dump script.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
   File::Spec::Functions: 0
@@ -13,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,8 +37,8 @@ requires:
   Perl6::Slurp: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://github.com/tupinek/App-HL7-Dump/issues
-  homepage: https://github.com/tupinek/App-HL7-Dump
+  bugtracker: https://github.com/michal-josef-spacek/App-HL7-Dump/issues
+  homepage: https://github.com/michal-josef-spacek/App-HL7-Dump
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/App-HL7-Dump
-version: '0.06'
+  repository: git://github.com/michal-josef-spacek/App-HL7-Dump
+version: '0.07'

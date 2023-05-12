@@ -1,11 +1,9 @@
 package Error::Pure::Output::JSON;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use JSON;
 use Readonly;
 
@@ -15,8 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(err_json);
 # Global variables.
 our $PRETTY = 0;
 
-# Version.
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # JSON print of backtrace.
 sub err_json {
@@ -73,11 +70,11 @@ Error::Pure::Output::JSON - Output JSON subroutines for Error::Pure.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=err_json.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::JSON qw(err_json);
 
  # Fictional error structure.
@@ -112,11 +109,11 @@ Error::Pure::Output::JSON - Output JSON subroutines for Error::Pure.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=err_json_pretty_print.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::JSON qw(err_json);
 
  # Set pretty output.
@@ -196,21 +193,22 @@ Output subroutines for Error::Pure.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-Output-JSON>
+L<https://github.com/michal-josef-spacek/Error-Pure-Output-JSON>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2023
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

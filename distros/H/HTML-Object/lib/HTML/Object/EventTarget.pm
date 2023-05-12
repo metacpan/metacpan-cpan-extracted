@@ -301,75 +301,29 @@ sub on : lvalue
 {
     my $self = shift( @_ );
     my $event = shift( @_ );
-    # Argument provided is a code reference
-    my $has_arg = 0;
-    my $arg;
-    if( Want::want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = Want::want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-
-    if( !defined( $event ) || !CORE::length( $event ) )
-    {
-        my $error = "No event provided to set event handler.";
-        if( $has_arg eq 'assign' )
-        {
-            $self->error( $error );
-            my $dummy = 'dummy';
-            return( $dummy );
-        }
-        return( $self->error( $error ) ) if( Want::want( 'LVALUE' ) );
-        Want::rreturn( $self->error( $error ) );
-    }
     
-    if( $has_arg )
-    {
-        if( ref( $arg ) ne 'CODE' )
+    return( $self->_set_get_callback({
+        get => sub
         {
-            my $error = "Value provided is not a code reference.";
-            if( $has_arg eq 'assign' )
+            my $self = shift( @_ );
+            return( $self->error( "No event provided to set event handler." ) ) if( !defined( $event ) || !CORE::length( $event ) );
+            my $listeners = $self->getEventListeners( $event ) || return;
+            return( $listeners->first );
+        },
+        set => sub
+        {
+            my $self = shift( @_ );
+            my $arg = shift( @_ );
+            return( $self->error( "No event provided to set event handler." ) ) if( !defined( $event ) || !CORE::length( $event ) );
+            # Argument provided is a code reference
+            if( ref( $arg ) ne 'CODE' )
             {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
+                return( $self->error( "Value provided is not a code reference." ) );
             }
-            return( $self->error( $error ) ) if( Want::want( 'LVALUE' ) );
-            Want::rreturn( $self->error( $error ) );
+            my $eh = $self->addEventListener( $event => $arg ) || return( $self->pass_error );
+            return( $eh );
         }
-        my $eh = $self->addEventListener( $event => $arg ) || do
-        {
-            if( $has_arg eq 'assign' )
-            {
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->pass_error ) if( Want::want( 'LVALUE' ) );
-            Want::rreturn( $self->pass_error );
-        };
-        return( $eh ) if( Want::want( 'LVALUE' ) );
-        Want::rreturn( $eh );
-    }
-    my $listeners = $self->getEventListeners( $event ) || do
-    {
-        if( $has_arg eq 'assign' )
-        {
-            my $dummy = 'dummy';
-            return( $dummy );
-        }
-        return if( Want::want( 'LVALUE' ) );
-        Want::rreturn;
-    };
-    return( $listeners->first ) if( Want::want( 'LVALUE' ) );
-    Want::rreturn( $listeners->first );
+    }, @_ ) );
 }
 
 sub removeEventListener

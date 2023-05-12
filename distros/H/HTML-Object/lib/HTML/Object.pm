@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.5
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2022/11/11
+## Modified 2023/05/11
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.5';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -862,11 +862,13 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.5
 
 =head1 DESCRIPTION
 
-This module is yet another HTML parser, manipulation and query interface. It uses the C parser from L<HTML::Parser> and has the unique particularity that it does not try to decode the entire html document tree only to re-encode it when printing out its data as string like so many other html parsers out there do. Instead, it modifies only the parts required. The rest is returned exactly as it was found in the HTML. This is faster and safer.
+This module is yet another HTML parser, manipulation and query interface, but probably the most comprehensive one. It uses the C parser from L<HTML::Parser> and has the unique particularity that it does not try to decode the entire html document tree only to re-encode it when printing out its data as string like so many other html parsers out there do. Instead, it modifies only the parts required. The rest is returned exactly as it was found in the HTML. This is faster and safer.
+
+This module contains 144 modules to closely implement the HTML standard as documented on L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API>.
 
 It uses an external json data dictionary file of html tags (C<html_tags_dict.json>).
 

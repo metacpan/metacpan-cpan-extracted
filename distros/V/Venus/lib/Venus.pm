@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.55';
+our $VERSION = '2.80';
 
 # AUTHORITY
 
@@ -24,7 +24,9 @@ sub import {
 
   my %exports = (
     args => 1,
+    array => 1,
     assert => 1,
+    bool => 1,
     box => 1,
     call => 1,
     cast => 1,
@@ -32,25 +34,50 @@ sub import {
     caught => 1,
     chain => 1,
     check => 1,
+    cli => 1,
+    code => 1,
+    config => 1,
     cop => 1,
+    data => 1,
     date => 1,
     error => 1,
     false => 1,
     fault => 1,
+    float => 1,
     gather => 1,
+    hash => 1,
     json => 1,
     load => 1,
     log => 1,
     make => 1,
     match => 1,
     merge => 1,
+    meta => 1,
+    name => 1,
+    number => 1,
+    opts => 1,
+    path => 1,
     perl => 1,
+    process => 1,
+    proto => 1,
     raise => 1,
+    random => 1,
+    regexp => 1,
+    replace => 1,
     roll => 1,
+    search => 1,
     space => 1,
+    schema => 1,
+    string => 1,
+    template => 1,
+    test => 1,
     then => 1,
+    throw => 1,
     true => 1,
+    try => 1,
+    type => 1,
     unpack => 1,
+    vars => 1,
     venus => 1,
     work => 1,
     wrap => 1,
@@ -79,6 +106,18 @@ sub args (@) {
     : (@args % 2 ? {@args, undef} : {@args}));
 }
 
+sub array ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Array;
+
+  if (!$code) {
+    return Venus::Array->new($data);
+  }
+
+  return Venus::Array->new($data)->$code(@args);
+}
+
 sub assert ($$) {
   my ($data, $expr) = @_;
 
@@ -87,6 +126,14 @@ sub assert ($$) {
   my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
 
   return $assert->validate($data);
+}
+
+sub bool (;$) {
+  my ($data) = @_;
+
+  require Venus::Boolean;
+
+  return Venus::Boolean->new($data);
 }
 
 sub box ($) {
@@ -193,6 +240,40 @@ sub check ($$) {
   return Venus::Assert->new->expression($expr)->check($data);
 }
 
+sub cli (;$) {
+  my ($data) = @_;
+
+  require Venus::Cli;
+
+  my $cli = Venus::Cli->new($data || [@ARGV]);
+
+  return $cli;
+}
+
+sub code ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Code;
+
+  if (!$code) {
+    return Venus::Code->new($data);
+  }
+
+  return Venus::Code->new($data)->$code(@args);
+}
+
+sub config ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Config;
+
+  if (!$code) {
+    return Venus::Config->new($data);
+  }
+
+  return Venus::Config->new($data)->$code(@args);
+}
+
 sub cop (@) {
   my ($data, @args) = @_;
 
@@ -205,16 +286,28 @@ sub cop (@) {
   return space("$data")->cop(@args);
 }
 
-sub date (;$@) {
-  my ($code, @args) = @_;
+sub data ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Data;
+
+  if (!$code) {
+    return Venus::Data->new($data);
+  }
+
+  return Venus::Data->new($data)->$code(@args);
+}
+
+sub date ($;$@) {
+  my ($data, $code, @args) = @_;
 
   require Venus::Date;
 
   if (!$code) {
-    return Venus::Date->new;
+    return Venus::Date->new($data);
   }
 
-  return Venus::Date->new->$code(@args);
+  return Venus::Date->new($data)->$code(@args);
 }
 
 sub error (;$) {
@@ -243,6 +336,18 @@ sub fault (;$) {
   return Venus::Fault->new($data)->throw;
 }
 
+sub float ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Float;
+
+  if (!$code) {
+    return Venus::Float->new($data);
+  }
+
+  return Venus::Float->new($data)->$code(@args);
+}
+
 sub gather ($;&) {
   my ($data, $code) = @_;
 
@@ -259,6 +364,18 @@ sub gather ($;&) {
   $match->data($returned) if ref $returned eq 'HASH';
 
   return $match->result;
+}
+
+sub hash ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Hash;
+
+  if (!$code) {
+    return Venus::Hash->new($data);
+  }
+
+  return Venus::Hash->new($data)->$code(@args);
 }
 
 sub json (;$$) {
@@ -328,6 +445,66 @@ sub merge (@) {
   return Venus::Hash->new({})->merge(@args);
 }
 
+sub meta ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Meta;
+
+  if (!$code) {
+    return Venus::Meta->new(name => $data);
+  }
+
+  return Venus::Meta->new(name => $data)->$code(@args);
+}
+
+sub name ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Name;
+
+  if (!$code) {
+    return Venus::Name->new($data);
+  }
+
+  return Venus::Name->new($data)->$code(@args);
+}
+
+sub number ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Number;
+
+  if (!$code) {
+    return Venus::Number->new($data);
+  }
+
+  return Venus::Number->new($data)->$code(@args);
+}
+
+sub opts ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Opts;
+
+  if (!$code) {
+    return Venus::Opts->new($data);
+  }
+
+  return Venus::Opts->new($data)->$code(@args);
+}
+
+sub path ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Path;
+
+  if (!$code) {
+    return Venus::Path->new($data);
+  }
+
+  return Venus::Path->new($data)->$code(@args);
+}
+
 sub perl (;$$) {
   my ($code, $data) = @_;
 
@@ -348,6 +525,30 @@ sub perl (;$$) {
   return fault(qq(Invalid "perl" action "$code"));
 }
 
+sub process (;$@) {
+  my ($code, @args) = @_;
+
+  require Venus::Process;
+
+  if (!$code) {
+    return Venus::Process->new;
+  }
+
+  return Venus::Process->new->$code(@args);
+}
+
+sub proto ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Prototype;
+
+  if (!$code) {
+    return Venus::Prototype->new($data);
+  }
+
+  return Venus::Prototype->new($data)->$code(@args);
+}
+
 sub raise ($;$) {
   my ($self, $data) = @_;
 
@@ -363,22 +564,192 @@ sub raise ($;$) {
   return Venus::Throw->new(package => $self, parent => $parent)->error($data);
 }
 
+sub random (;$@) {
+  my ($code, @args) = @_;
+
+  require Venus::Random;
+
+  state $random = Venus::Random->new;
+
+  if (!$code) {
+    return $random;
+  }
+
+  return $random->$code(@args);
+}
+
+sub regexp ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Regexp;
+
+  if (!$code) {
+    return Venus::Regexp->new($data);
+  }
+
+  return Venus::Regexp->new($data)->$code(@args);
+}
+
+sub replace ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  my @keys = qw(
+    string
+    regexp
+    substr
+  );
+
+  my @data = (ref $data eq 'ARRAY' ? (map +(shift(@keys), $_), @{$data}) : $data);
+
+  require Venus::Replace;
+
+  if (!$code) {
+    return Venus::Replace->new(@data);
+  }
+
+  return Venus::Replace->new(@data)->$code(@args);
+}
+
 sub roll (@) {
 
   return (@_[1,0,2..$#_]);
 }
 
-sub space ($) {
-  my ($data) = @_;
+sub schema ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Schema;
+
+  if (!$code) {
+    return Venus::Schema->new($data);
+  }
+
+  return Venus::Schema->new($data)->$code(@args);
+}
+
+sub search ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  my @keys = qw(
+    string
+    regexp
+  );
+
+  my @data = (ref $data eq 'ARRAY' ? (map +(shift(@keys), $_), @{$data}) : $data);
+
+  require Venus::Search;
+
+  if (!$code) {
+    return Venus::Search->new(@data);
+  }
+
+  return Venus::Search->new(@data)->$code(@args);
+}
+
+sub space ($;$@) {
+  my ($data, $code, @args) = @_;
 
   require Venus::Space;
 
-  return Venus::Space->new($data);
+  if (!$code) {
+    return Venus::Space->new($data);
+  }
+
+  return Venus::Space->new($data)->$code(@args);
+}
+
+sub string ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::String;
+
+  if (!$code) {
+    return Venus::String->new($data);
+  }
+
+  return Venus::String->new($data)->$code(@args);
+}
+
+sub template ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Template;
+
+  if (!$code) {
+    return Venus::Template->new($data);
+  }
+
+  return Venus::Template->new($data)->$code(@args);
+}
+
+sub test ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Test;
+
+  if (!$code) {
+    return Venus::Test->new($data);
+  }
+
+  return Venus::Test->new($data)->$code(@args);
 }
 
 sub then (@) {
 
   return ($_[0], call(@_));
+}
+
+sub throw ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Throw;
+
+  my $throw = Venus::Throw->new(context => (caller(1))[3])->do(
+    frame => 1,
+  );
+
+  if (ref $data ne 'HASH') {
+    $throw->package($data) if $data;
+  }
+  else {
+    if (exists $data->{as}) {
+      $throw->as($data->{as});
+    }
+    if (exists $data->{capture}) {
+      $throw->capture(@{$data->{capture}});
+    }
+    if (exists $data->{context}) {
+      $throw->context($data->{context});
+    }
+    if (exists $data->{error}) {
+      $throw->error($data->{error});
+    }
+    if (exists $data->{frame}) {
+      $throw->frame($data->{frame});
+    }
+    if (exists $data->{message}) {
+      $throw->message($data->{message});
+    }
+    if (exists $data->{name}) {
+      $throw->name($data->{name});
+    }
+    if (exists $data->{package}) {
+      $throw->package($data->{package});
+    }
+    if (exists $data->{parent}) {
+      $throw->parent($data->{parent});
+    }
+    if (exists $data->{stash}) {
+      $throw->stash($_, $data->{stash}->{$_}) for keys %{$data->{stash}};
+    }
+    if (exists $data->{on}) {
+      $throw->on($data->{on});
+    }
+  }
+
+  return $throw if !$code;
+
+  return $throw->$code(@args);
 }
 
 sub true () {
@@ -388,12 +759,48 @@ sub true () {
   return Venus::True->value;
 }
 
+sub try ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Try;
+
+  if (!$code) {
+    return Venus::Try->new($data);
+  }
+
+  return Venus::Try->new($data)->$code(@args);
+}
+
+sub type ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Type;
+
+  if (!$code) {
+    return Venus::Type->new($data);
+  }
+
+  return Venus::Type->new($data)->$code(@args);
+}
+
 sub unpack (@) {
   my (@args) = @_;
 
   require Venus::Unpack;
 
   return Venus::Unpack->new->do('args', @args)->all;
+}
+
+sub vars ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Vars;
+
+  if (!$code) {
+    return Venus::Vars->new($data);
+  }
+
+  return Venus::Vars->new($data)->$code(@args);
 }
 
 sub venus ($;@) {
@@ -463,7 +870,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-2.55
+2.80
 
 =cut
 
@@ -663,6 +1070,45 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 array
+
+  array(ArrayRef | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The array function builds and returns a L<Venus::Array> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item array example 1
+
+  package main;
+
+  use Venus 'array';
+
+  my $array = array [];
+
+  # bless({...}, 'Venus::Array')
+
+=back
+
+=over 4
+
+=item array example 2
+
+  package main;
+
+  use Venus 'array';
+
+  my $array = array [1..4], 'push', 5..9;
+
+  # [1..9]
+
+=back
+
+=cut
+
 =head2 assert
 
   assert(Any $data, Str $expr) (Any)
@@ -697,6 +1143,44 @@ I<Since C<2.40>>
   my $assert = assert(1234567890, 'float');
 
   # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=cut
+
+=head2 bool
+
+  bool(Any $value) (Boolean)
+
+The bool function builds and returns a L<Venus::Boolean> object.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item bool example 1
+
+  package main;
+
+  use Venus 'bool';
+
+  my $bool = bool;
+
+  # bless({value => 0}, 'Venus::Boolean')
+
+=back
+
+=over 4
+
+=item bool example 2
+
+  package main;
+
+  use Venus 'bool';
+
+  my $bool = bool 1_000;
+
+  # bless({value => 1}, 'Venus::Boolean')
 
 =back
 
@@ -1197,6 +1681,126 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 cli
+
+  cli(ArrayRef $args) (Cli)
+
+The cli function builds and returns a L<Venus::Cli> object.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item cli example 1
+
+  package main;
+
+  use Venus 'cli';
+
+  my $cli = cli;
+
+  # bless({...}, 'Venus::Cli')
+
+=back
+
+=over 4
+
+=item cli example 2
+
+  package main;
+
+  use Venus 'cli';
+
+  my $cli = cli ['--help'];
+
+  # bless({...}, 'Venus::Cli')
+
+  # $cli->set('opt', 'help', {})->opt('help');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 code
+
+  code(CodeRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The code function builds and returns a L<Venus::Code> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item code example 1
+
+  package main;
+
+  use Venus 'code';
+
+  my $code = code sub {};
+
+  # bless({...}, 'Venus::Code')
+
+=back
+
+=over 4
+
+=item code example 2
+
+  package main;
+
+  use Venus 'code';
+
+  my $code = code sub {[1, @_]}, 'curry', 2,3,4;
+
+  # sub {...}
+
+=back
+
+=cut
+
+=head2 config
+
+  config(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The config function builds and returns a L<Venus::Config> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item config example 1
+
+  package main;
+
+  use Venus 'config';
+
+  my $config = config {};
+
+  # bless({...}, 'Venus::Config')
+
+=back
+
+=over 4
+
+=item config example 2
+
+  package main;
+
+  use Venus 'config';
+
+  my $config = config {}, 'from_perl', '{"data"=>1}';
+
+  # bless({...}, 'Venus::Config')
+
+=back
+
+=cut
+
 =head2 cop
 
   cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
@@ -1238,9 +1842,48 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 data
+
+  data(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The data function builds and returns a L<Venus::Data> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item data example 1
+
+  package main;
+
+  use Venus 'data';
+
+  my $data = data 't/data/sections';
+
+  # bless({...}, 'Venus::Data')
+
+=back
+
+=over 4
+
+=item data example 2
+
+  package main;
+
+  use Venus 'data';
+
+  my $data = data 't/data/sections', 'string', undef, 'name';
+
+  # "Example #1\nExample #2"
+
+=back
+
+=cut
+
 =head2 date
 
-  date(Str | CodeRef $code, Any @args) (Date)
+  date(Int $value, Str | CodeRef $code, Any @args) (Any)
 
 The date function builds and returns a L<Venus::Date> object, or dispatches to
 the coderef or method provided.
@@ -1255,7 +1898,7 @@ I<Since C<2.40>>
 
   use Venus 'date';
 
-  my $date = date 'string';
+  my $date = date time, 'string';
 
   # '0000-00-00T00:00:00Z'
 
@@ -1269,7 +1912,7 @@ I<Since C<2.40>>
 
   use Venus 'date';
 
-  my $date = date 'reset', 570672000;
+  my $date = date time, 'reset', 570672000;
 
   # bless({...}, 'Venus::Date')
 
@@ -1287,7 +1930,7 @@ I<Since C<2.40>>
 
   use Venus 'date';
 
-  my $date = date;
+  my $date = date time;
 
   # bless({...}, 'Venus::Date')
 
@@ -1414,6 +2057,45 @@ I<Since C<1.80>>
 
 =cut
 
+=head2 float
+
+  float(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The float function builds and returns a L<Venus::Float> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item float example 1
+
+  package main;
+
+  use Venus 'float';
+
+  my $float = float 1.23;
+
+  # bless({...}, 'Venus::Float')
+
+=back
+
+=over 4
+
+=item float example 2
+
+  package main;
+
+  use Venus 'float';
+
+  my $float = float 1.23, 'int';
+
+  # 1
+
+=back
+
+=cut
+
 =head2 gather
 
   gather(Any $value, CodeRef $callback) (Any)
@@ -1512,6 +2194,45 @@ I<Since C<2.50>>
   };
 
   # ['a -> A', 'b -> B']
+
+=back
+
+=cut
+
+=head2 hash
+
+  hash(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The hash function builds and returns a L<Venus::Hash> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item hash example 1
+
+  package main;
+
+  use Venus 'hash';
+
+  my $hash = hash {1..4};
+
+  # bless({...}, 'Venus::Hash')
+
+=back
+
+=over 4
+
+=item hash example 2
+
+  package main;
+
+  use Venus 'hash';
+
+  my $hash = hash {1..8}, 'pairs';
+
+  # [[1, 2], [3, 4], [5, 6], [7, 8]]
 
 =back
 
@@ -1838,6 +2559,205 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 meta
+
+  meta(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The meta function builds and returns a L<Venus::Meta> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item meta example 1
+
+  package main;
+
+  use Venus 'meta';
+
+  my $meta = meta 'Venus';
+
+  # bless({...}, 'Venus::Meta')
+
+=back
+
+=over 4
+
+=item meta example 2
+
+  package main;
+
+  use Venus 'meta';
+
+  my $result = meta 'Venus', 'sub', 'meta';
+
+  # 1
+
+=back
+
+=cut
+
+=head2 name
+
+  name(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The name function builds and returns a L<Venus::Name> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item name example 1
+
+  package main;
+
+  use Venus 'name';
+
+  my $name = name 'Foo/Bar';
+
+  # bless({...}, 'Venus::Name')
+
+=back
+
+=over 4
+
+=item name example 2
+
+  package main;
+
+  use Venus 'name';
+
+  my $name = name 'Foo/Bar', 'package';
+
+  # "Foo::Bar"
+
+=back
+
+=cut
+
+=head2 number
+
+  number(Num $value, Str | CodeRef $code, Any @args) (Any)
+
+The number function builds and returns a L<Venus::Number> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item number example 1
+
+  package main;
+
+  use Venus 'number';
+
+  my $number = number 1_000;
+
+  # bless({...}, 'Venus::Number')
+
+=back
+
+=over 4
+
+=item number example 2
+
+  package main;
+
+  use Venus 'number';
+
+  my $number = number 1_000, 'prepend', 1;
+
+  # 11_000
+
+=back
+
+=cut
+
+=head2 opts
+
+  opts(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The opts function builds and returns a L<Venus::Opts> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item opts example 1
+
+  package main;
+
+  use Venus 'opts';
+
+  my $opts = opts ['--resource', 'users'];
+
+  # bless({...}, 'Venus::Opts')
+
+=back
+
+=over 4
+
+=item opts example 2
+
+  package main;
+
+  use Venus 'opts';
+
+  my $opts = opts ['--resource', 'users'], 'reparse', ['resource|r=s', 'help|h'];
+
+  # bless({...}, 'Venus::Opts')
+
+  # my $resource = $opts->get('resource');
+
+  # "users"
+
+=back
+
+=cut
+
+=head2 path
+
+  path(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The path function builds and returns a L<Venus::Path> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item path example 1
+
+  package main;
+
+  use Venus 'path';
+
+  my $path = path 't/data/planets';
+
+  # bless({...}, 'Venus::Path')
+
+=back
+
+=over 4
+
+=item path example 2
+
+  package main;
+
+  use Venus 'path';
+
+  my $path = path 't/data/planets', 'absolute';
+
+  # bless({...}, 'Venus::Path')
+
+=back
+
+=cut
+
 =head2 perl
 
   perl(Str $call, Any $data) (Any)
@@ -1906,6 +2826,89 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 process
+
+  process(Str | CodeRef $code, Any @args) (Any)
+
+The process function builds and returns a L<Venus::Process> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item process example 1
+
+  package main;
+
+  use Venus 'process';
+
+  my $process = process;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item process example 2
+
+  package main;
+
+  use Venus 'process';
+
+  my $process = process 'do', 'alarm', 10;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 proto
+
+  proto(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The proto function builds and returns a L<Venus::Prototype> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item proto example 1
+
+  package main;
+
+  use Venus 'proto';
+
+  my $proto = proto {
+    '$counter' => 0,
+  };
+
+  # bless({...}, 'Venus::Prototype')
+
+=back
+
+=over 4
+
+=item proto example 2
+
+  package main;
+
+  use Venus 'proto';
+
+  my $proto = proto { '$counter' => 0 }, 'apply', {
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  };
+
+  # bless({...}, 'Venus::Prototype')
+
+=back
+
+=cut
+
 =head2 raise
 
   raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -1962,6 +2965,127 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 random
+
+  random(Str | CodeRef $code, Any @args) (Any)
+
+The random function builds and returns a L<Venus::Random> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item random example 1
+
+  package main;
+
+  use Venus 'random';
+
+  my $random = random;
+
+  # bless({...}, 'Venus::Random')
+
+=back
+
+=over 4
+
+=item random example 2
+
+  package main;
+
+  use Venus 'random';
+
+  my $random = random 'collect', 10, 'letter';
+
+  # "ryKUPbJHYT"
+
+=back
+
+=cut
+
+=head2 regexp
+
+  regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The regexp function builds and returns a L<Venus::Regexp> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item regexp example 1
+
+  package main;
+
+  use Venus 'regexp';
+
+  my $regexp = regexp '[0-9]';
+
+  # bless({...}, 'Venus::Regexp')
+
+=back
+
+=over 4
+
+=item regexp example 2
+
+  package main;
+
+  use Venus 'regexp';
+
+  my $replace = regexp '[0-9]', 'replace', 'ID 12345', '0', 'g';
+
+  # bless({...}, 'Venus::Replace')
+
+  # $replace->get;
+
+  # "ID 00000"
+
+=back
+
+=cut
+
+=head2 replace
+
+  replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The replace function builds and returns a L<Venus::Replace> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item replace example 1
+
+  package main;
+
+  use Venus 'replace';
+
+  my $replace = replace ['hello world', 'world', 'universe'];
+
+  # bless({...}, 'Venus::Replace')
+
+=back
+
+=over 4
+
+=item replace example 2
+
+  package main;
+
+  use Venus 'replace';
+
+  my $replace = replace ['hello world', 'world', 'universe'], 'get';
+
+  # "hello universe"
+
+=back
+
+=cut
+
 =head2 roll
 
   roll(Str $name, Any @args) (Any)
@@ -2003,6 +3127,84 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 schema
+
+  schema(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The schema function builds and returns a L<Venus::Schema> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item schema example 1
+
+  package main;
+
+  use Venus 'schema';
+
+  my $schema = schema { name => 'string' };
+
+  # bless({...}, "Venus::Schema")
+
+=back
+
+=over 4
+
+=item schema example 2
+
+  package main;
+
+  use Venus 'schema';
+
+  my $result = schema { name => 'string' }, 'validate', { name => 'example' };
+
+  # { name => 'example' }
+
+=back
+
+=cut
+
+=head2 search
+
+  search(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The search function builds and returns a L<Venus::Search> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item search example 1
+
+  package main;
+
+  use Venus 'search';
+
+  my $search = search ['hello world', 'world'];
+
+  # bless({...}, 'Venus::Search')
+
+=back
+
+=over 4
+
+=item search example 2
+
+  package main;
+
+  use Venus 'search';
+
+  my $search = search ['hello world', 'world'], 'count';
+
+  # 1
+
+=back
+
+=cut
+
 =head2 space
 
   space(Any $name) (Space)
@@ -2022,6 +3224,125 @@ I<Since C<2.32>>
   my $space = space 'Venus::Scalar';
 
   # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+=back
+
+=cut
+
+=head2 string
+
+  string(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The string function builds and returns a L<Venus::String> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item string example 1
+
+  package main;
+
+  use Venus 'string';
+
+  my $string = string 'hello world';
+
+  # bless({...}, 'Venus::String')
+
+=back
+
+=over 4
+
+=item string example 2
+
+  package main;
+
+  use Venus 'string';
+
+  my $string = string 'hello world', 'camelcase';
+
+  # "helloWorld"
+
+=back
+
+=cut
+
+=head2 template
+
+  template(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The template function builds and returns a L<Venus::Template> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item template example 1
+
+  package main;
+
+  use Venus 'template';
+
+  my $template = template 'Hi {{name}}';
+
+  # bless({...}, 'Venus::Template')
+
+=back
+
+=over 4
+
+=item template example 2
+
+  package main;
+
+  use Venus 'template';
+
+  my $template = template 'Hi {{name}}', 'render', undef, {
+    name => 'stranger',
+  };
+
+  # "Hi stranger"
+
+=back
+
+=cut
+
+=head2 test
+
+  test(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+The test function builds and returns a L<Venus::Test> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item test example 1
+
+  package main;
+
+  use Venus 'test';
+
+  my $test = test 't/Venus.t';
+
+  # bless({...}, 'Venus::Test')
+
+=back
+
+=over 4
+
+=item test example 2
+
+  package main;
+
+  use Venus 'test';
+
+  my $test = test 't/Venus.t', 'for', 'synopsis';
+
+  # bless({...}, 'Venus::Test')
 
 =back
 
@@ -2047,6 +3368,66 @@ I<Since C<2.32>>
   my @list = then('Digest::SHA', 'sha1_hex');
 
   # ("Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709")
+
+=back
+
+=cut
+
+=head2 throw
+
+  throw(Str | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The throw function builds and returns a L<Venus::Throw> object, or dispatches
+to the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item throw example 1
+
+  package main;
+
+  use Venus 'throw';
+
+  my $throw = throw 'Example::Error';
+
+  # bless({...}, 'Venus::Throw')
+
+=back
+
+=over 4
+
+=item throw example 2
+
+  package main;
+
+  use Venus 'throw';
+
+  my $throw = throw 'Example::Error', 'catch', 'error';
+
+  # bless({...}, 'Example::Error')
+
+=back
+
+=over 4
+
+=item throw example 3
+
+  package main;
+
+  use Venus 'throw';
+
+  my $throw = throw {
+    name => 'on.execute',
+    package => 'Example::Error',
+    capture => ['...'],
+    stash => {
+      time => time,
+    },
+  };
+
+  # bless({...}, 'Venus::Throw')
 
 =back
 
@@ -2086,6 +3467,114 @@ I<Since C<0.01>>
   my $false = !true;
 
   # 0
+
+=back
+
+=cut
+
+=head2 try
+
+  try(Any $data, Str | CodeRef $code, Any @args) (Any)
+
+The try function builds and returns a L<Venus::Try> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item try example 1
+
+  package main;
+
+  use Venus 'try';
+
+  my $try = try sub {};
+
+  # bless({...}, 'Venus::Try')
+
+  # my $result = $try->result;
+
+  # ()
+
+=back
+
+=over 4
+
+=item try example 2
+
+  package main;
+
+  use Venus 'try';
+
+  my $try = try sub { die };
+
+  # bless({...}, 'Venus::Try')
+
+  # my $result = $try->result;
+
+  # Exception! (isa Venus::Error)
+
+=back
+
+=over 4
+
+=item try example 3
+
+  package main;
+
+  use Venus 'try';
+
+  my $try = try sub { die }, 'maybe';
+
+  # bless({...}, 'Venus::Try')
+
+  # my $result = $try->result;
+
+  # undef
+
+=back
+
+=cut
+
+=head2 type
+
+  type(Any $data, Str | CodeRef $code, Any @args) (Any)
+
+The type function builds and returns a L<Venus::Type> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item type example 1
+
+  package main;
+
+  use Venus 'type';
+
+  my $type = type [1..4];
+
+  # bless({...}, 'Venus::Type')
+
+  # $type->deduce;
+
+  # bless({...}, 'Venus::Array')
+
+=back
+
+=over 4
+
+=item type example 2
+
+  package main;
+
+  use Venus 'type';
+
+  my $type = type [1..4], 'deduce';
+
+  # bless({...}, 'Venus::Array')
 
 =back
 
@@ -2140,6 +3629,45 @@ I<Since C<2.40>>
   # $unpack->check('float');
 
   # true
+
+=back
+
+=cut
+
+=head2 vars
+
+  vars(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The vars function builds and returns a L<Venus::Vars> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item vars example 1
+
+  package main;
+
+  use Venus 'vars';
+
+  my $vars = vars {};
+
+  # bless({...}, 'Venus::Vars')
+
+=back
+
+=over 4
+
+=item vars example 2
+
+  package main;
+
+  use Venus 'vars';
+
+  my $path = vars {}, 'exists', 'path';
+
+  # "..."
 
 =back
 

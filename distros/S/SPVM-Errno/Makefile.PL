@@ -15,16 +15,16 @@ if ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.9691',
+  'SPVM' => '0.976',
 );
 WriteMakefile(
   NAME              => 'SPVM::Errno',
   VERSION_FROM      => 'lib/SPVM/Errno.pm',
   PREREQ_PM         => {}, # e.g., Module::Name => 1.1
-  LICENSE           => 'perl_5',
+  LICENSE           => 'mit',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Errno.pm',
-     AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
+     AUTHOR         => 'Yuki Kimoto<kimoto.yuki>') : ()),
   test => {TESTS => 't/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {

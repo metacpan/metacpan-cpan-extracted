@@ -17,7 +17,6 @@ sub configure {
 	$self->annotate->{DV} = $self->annotate->{V};
 
 	$self->annotate->{Ff} = PDFNum(393216);
-
 }
 
 

@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "App::MusicTools" => 0,
     "Csound" => 0,
+    "Data::Dataset::ChordProgressions" => 0,
     "Guitar::Scale" => 0,
     "MIDI" => 0,
     "MIDI::Bassline::Walk" => 0,
@@ -74,7 +75,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1913",
+  "VERSION" => "0.1914",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,6 +85,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "App::MusicTools" => 0,
   "Csound" => 0,
+  "Data::Dataset::ChordProgressions" => 0,
   "File::Spec" => 0,
   "Guitar::Scale" => 0,
   "IO::Handle" => 0,

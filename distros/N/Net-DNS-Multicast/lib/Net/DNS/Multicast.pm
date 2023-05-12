@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 use Net::DNS qw(:DEFAULT);
-use base qw(Exporter Net::DNS);
+use base     qw(Exporter Net::DNS);
 
 our @EXPORT = @Net::DNS::EXPORT;
 
@@ -19,13 +19,13 @@ Net::DNS::Multicast - Multicast extension to Net::DNS
 
     use Net::DNS::Multicast;
     my $resolver = Net::DNS::Resolver->new();
-    my $response = $resolver( 'host.local.', 'A' );
+    my $response = $resolver( 'host.local.', 'AAAA' );
 
 =head1 DESCRIPTION
 
 Net::DNS::Multicast is installed as an extension to an existing Net::DNS
 installation providing packages to support simple IP multicast queries
-as specified in RFC6762(5.1).
+as described in RFC6762(5.1).
 
 The multicast feature is made available by replacing Net::DNS by
 Net::DNS::Multicast in the use declaration.
@@ -36,70 +36,72 @@ configured nameservers.
 
 =cut
 
-require Net::DNS::Question;
 
-package Net::DNS::Question;
+{
 
-sub unicast_response {
+	package Net::DNS::Resolver;	## Add methods to (otherwise empty) package
+
+	my $NAME_REGEX = q/\.(local|254\.169\.in-addr\.arpa|[89AB]\.E\.F\.ip6\.arpa)$/;
+
+	sub send {
+		my ( $self, @argument ) = @_;
+		my $packet = $self->_make_query_packet(@argument);
+		my ($q) = $packet->question;
+
+		if ( $q->qname =~ /$NAME_REGEX/oi ) {
+			local $packet->{status} = 0;
+			local @{$self}{qw(nameservers nameserver4 nameserver6 port retrans)};
+			$self->_reset_errorstring;
+			$self->nameservers( @{$self->{multicast_group}} );
+			$self->port( $self->{multicast_port} );
+			$self->retrans(3);
+			return $self->_send_udp( $packet, $packet->data );
+		}
+
+		return $self->SUPER::send($packet);
+	}
+
+	sub bgsend {
+		my ( $self, @argument ) = @_;
+		my $packet = $self->_make_query_packet(@argument);
+		my ($q) = $packet->question;
+
+		if ( $q->qname =~ /$NAME_REGEX/oi ) {
+			local $packet->{status} = 0;
+			local @{$self}{qw(nameservers nameserver4 nameserver6 port)};
+			$self->_reset_errorstring;
+			$self->nameservers( @{$self->{multicast_group}} );
+			$self->port( $self->{multicast_port} );
+			return $self->_bgsend_udp( $packet, $packet->data );
+		}
+
+		return $self->SUPER::bgsend($packet);
+	}
+
+	sub string {
+		my $self = shift;
+		return join( '', $self->SUPER::string, <<END );
+;; multicast_group	@{$self->{multicast_group}}
+;; multicast_ port	$self->{multicast_port}
+END
+	}
+
+	my $defaults = __PACKAGE__->_defaults;
+	$defaults->{multicast_group} = [qw(FF02::FB 224.0.0.251)];
+	$defaults->{multicast_port}  = 5353;
+}
+
+
+sub Net::DNS::Question::unicast_response {
 	my ( $self, @value ) = @_;				# uncoverable pod
 	for (@value) { $self->{qclass} |= ( $_ << 15 ) }
 	return $self->{qclass} >> 15;
 }
 
-
-require Net::DNS::Resolver;
-
-package Net::DNS::Resolver;
-
-my $defaults = __PACKAGE__->_defaults;
-$defaults->{multicast_group} = [qw(FF02::FB 224.0.0.251)];
-$defaults->{multicast_port}  = 5353;
-
-my $NAME_REGEX = q/\.(local|254\.169\.in-addr\.arpa|[89ab]\.e\.f\.ip6\.arpa)$/;
-
-sub string {
-	my $self = shift;
-	return join( '', $self->SUPER::string, <<END );
-;; multicast_group	@{$self->{multicast_group}}
-;; multicast_ port	$self->{multicast_port}
-END
-}
-
-sub send {
-	my ( $self, @argument ) = @_;
-	my $packet = $self->_make_query_packet(@argument);
-	my ($q) = $packet->question;
-
-	if ( $q->qname =~ /$NAME_REGEX/oi ) {
-		local $packet->{status} = 0;
-		local @{$self}{qw(nameservers nameserver4 nameserver6 port retrans)};
-		$self->_reset_errorstring;
-		$self->nameservers( @{$self->{multicast_group}} );
-		$self->port( $self->{multicast_port} );
-		$self->retrans(3);
-		$q->unicast_response(1);
-		return $self->_send_udp( $packet, $packet->data );
-	}
-
-	return $self->SUPER::send($packet);
-}
-
-sub bgsend {
-	my ( $self, @argument ) = @_;
-	my $packet = $self->_make_query_packet(@argument);
-	my ($q) = $packet->question;
-
-	if ( $q->qname =~ /$NAME_REGEX/oi ) {
-		local $packet->{status} = 0;
-		local @{$self}{qw(nameservers nameserver4 nameserver6 port)};
-		$self->_reset_errorstring;
-		$self->nameservers( @{$self->{multicast_group}} );
-		$self->port( $self->{multicast_port} );
-		$q->unicast_response(1);
-		return $self->_bgsend_udp( $packet, $packet->data );
-	}
-
-	return $self->SUPER::bgsend($packet);
+sub Net::DNS::RR::cache_flush {
+	my ( $self, @value ) = @_;				# uncoverable pod
+	for (@value) { $self->{class} |= ( $_ << 15 ) }
+	return $self->{class} >> 15;
 }
 
 

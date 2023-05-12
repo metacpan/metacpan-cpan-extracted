@@ -22,8 +22,8 @@ use feature 'lexical_subs';
 no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
-our $VERSION = '5.018'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-05-08'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '5.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-05-10'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;

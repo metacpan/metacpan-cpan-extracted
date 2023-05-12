@@ -18,7 +18,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 
 #======================================================================
@@ -176,6 +176,7 @@ sub _on_new_contents {
 
   $self->clear_runs;
   $self->{contents_has_changed} = 1;
+  $self->{was_cleaned_up}       = 0;
 }
 
 #======================================================================
