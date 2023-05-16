@@ -12,6 +12,7 @@ SIGNATURE
 bin/si_www
 dist.ini
 doap.ttl
+examples/database-schema.sql
 examples/si_www.conf
 lib/Story/Interact/WWW.pm
 share/public/js/si_www.js

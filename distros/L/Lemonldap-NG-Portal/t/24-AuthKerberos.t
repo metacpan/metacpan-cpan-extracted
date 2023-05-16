@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use IO::String;
 use strict;
@@ -15,7 +16,8 @@ SKIP: {
         skip 'GSSAPI not found';
     }
     subtest "Get Negotiate header (no JS)" => sub {
-        my $client = LLNG::Manager::Test->new( {
+        my $client = LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel       => $debug,
                     useSafeJail    => 1,
@@ -36,7 +38,8 @@ SKIP: {
 
     subtest "Ajax flow" => sub {
         &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-        my $client = LLNG::Manager::Test->new( {
+        my $client = LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel       => $debug,
                     useSafeJail    => 1,
@@ -137,7 +140,8 @@ SKIP: {
 
     subtest "Test krbAllowedDomains / wrong domain" => sub {
         &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-        my $client = LLNG::Manager::Test->new( {
+        my $client = LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel          => $debug,
                     useSafeJail       => 1,
@@ -166,7 +170,8 @@ SKIP: {
 
     subtest "Test krbAllowedDomains / correct domain" => sub {
         &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-        my $client = LLNG::Manager::Test->new( {
+        my $client = LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel          => $debug,
                     useSafeJail       => 1,

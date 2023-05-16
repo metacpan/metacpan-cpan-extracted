@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -81,7 +82,8 @@ done_testing();
 
 sub op {
     my (%conf) = @_;
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'op.com',

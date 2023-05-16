@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.17",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
@@ -63,11 +63,11 @@
    "provides" : {
       "Perl::Build" : {
          "file" : "lib/Perl/Build.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       },
       "Perl::Build::Built" : {
          "file" : "lib/Perl/Build/Built.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/tokuhirom/Perl-Build"
       }
    },
-   "version" : "1.33",
+   "version" : "1.34",
    "x_contributors" : [
       "Akihiro Uchida <uchida@ike-dyn.ritsumei.ac.jp>",
       "AnaTofuZ <anatofuz@gmail.com>",
@@ -110,9 +110,10 @@
       "Tatsuhiko Miyagawa <miyagawa@gmail.com>",
       "Tony <zearin@gonk.net>",
       "Ville Skyttä <ville.skytta@iki.fi>",
+      "Vladimir Varlamov <bes.internal@gmail.com>",
       "hagihala <hagihala@hatena.ne.jp>",
       "moznion <moznion@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.08",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

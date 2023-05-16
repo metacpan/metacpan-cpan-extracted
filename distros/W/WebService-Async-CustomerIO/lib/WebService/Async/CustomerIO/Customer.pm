@@ -15,7 +15,7 @@ WebService::Async::CustomerIO::Customer - Class for working with customer.
 
 use Carp qw();
 
-our $VERSION = '0.001';    ## VERSION
+our $VERSION = '0.002';    ## VERSION
 
 =head2 new
 

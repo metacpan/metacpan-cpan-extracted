@@ -3,7 +3,7 @@ use Lemonldap::NG::Common::JWT qw(getAccessTokenSessionId);
 
 use strict;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.16.2';
 
 sub retrieveSession {
     my ( $class, $req, $id ) = @_;
@@ -65,7 +65,7 @@ sub retrieveSession {
         return $data;
     }
     else {
-        $class->logger->info("Session $offlineId can't be retrieved");
+        $class->logger->info("Session $offlineId can not be retrieved");
         $class->logger->info( $session->error );
 
         return 0;
@@ -79,9 +79,9 @@ sub fetchId {
     my $authorization = $req->{env}->{HTTP_AUTHORIZATION};
 
     if ( $authorization
-        and ( ($access_token) = ( $authorization =~ /^Bearer (.+)$/i ) ) )
+        and ( $access_token = ( $authorization =~ /^Bearer (.+)$/i )[0] ) )
     {
-        $class->logger->debug( 'Found OAuth2 access token ' . $access_token );
+        $class->logger->debug( "Found OAuth2 Access Token ($access_token)" );
     }
     else {
         return $class->Lemonldap::NG::Handler::Main::fetchId($req);
@@ -160,7 +160,7 @@ sub getOIDCInfos {
         }
 
         my $ttl = $class->tsv->{timeout} - time + $oidcSession->data->{_utime};
-        $class->logger->debug( "Session TTL = " . $ttl );
+        $class->logger->debug( "Session TTL = $ttl" );
 
         if ( time - $oidcSession->data->{_utime} > $class->tsv->{timeout} ) {
             $class->logger->info("Access Token session $id expired");
@@ -170,7 +170,7 @@ sub getOIDCInfos {
         $infos = { %{ $oidcSession->data } };
     }
     else {
-        $class->logger->info("OIDC Session $id can't be retrieved");
+        $class->logger->info("OIDC session $id can not be retrieved");
         $class->logger->info( $oidcSession->error );
     }
 

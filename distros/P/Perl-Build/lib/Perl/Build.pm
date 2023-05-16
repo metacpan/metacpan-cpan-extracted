@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 
 use 5.008001;
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 use Carp ();
 use File::Basename;
@@ -380,7 +380,7 @@ Perl::Build - perl builder
     );
 
     # install perl from tar ball
-    my $result = Perl::Build->install_from_cpan(
+    my $result = Perl::Build->install_from_tarball(
         'path/to/perl-5.16.2.tar.gz' => (
             dst_path          => '/path/to/perl-5.16.2/',
             configure_options => ['-des'],

@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Yaml;
-$File::Sticker::Writer::Yaml::VERSION = '1.0603';
+$File::Sticker::Writer::Yaml::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Writer::Yaml - write and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,7 @@ File must be plain text and end with '.yml'
 Howwever, if the file DOES NOT EXIST, it CAN be WRITTEN TO, so return true then as well.
 This is the only case where the file doesn't need to exist beforehand.
 Note that if the file exists and is a directory, then it is not an allowed file!
+If the file exists and is empty, that's okay too.
 
 =cut
 
@@ -67,20 +68,31 @@ sub allowed_file {
     my $file = shift;
     say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
 
+    if ($file !~ /\.yml$/)
+    {
+        say STDERR "$file does not end with .yml" if $self->{verbose} > 2;
+        return 0;
+    }
     if (-d $file)
     {
         return 0;
     }
-    if (!-f $file)
+    if (! -r $file)
     {
+        say STDERR "$file does not exist, but that's okay" if $self->{verbose} > 2;
+        return 1;
+    }
+    # Perhaps the file exists and is empty
+    if (-z $file)
+    {
+        say STDERR "$file is empty, but that's okay" if $self->{verbose} > 2;
         return 1;
     }
 
     my $ft = $self->{file_magic}->info_from_filename($file);
     # For some unfathomable reason, not every YAML file is recognised as text/plain
     # so just check for text
-    if ($ft->{mime_type} =~ m{^text/}
-            and $file =~ /\.yml$/)
+    if ($ft->{mime_type} =~ m{^text/})
     {
         return 1;
     }

@@ -45,7 +45,7 @@ my $str = '{
 }
 ';
 is( $h->as_string, $str, 'Hash as string' );
-is( $h->as_json, '{"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}', 'as_json' );
+is( $h->as_json( order => 1 ), '{"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}', 'as_json' );
 # No, that was a dumb idea
 # is( "$h", $str, 'Hash stringified' );
 my $json = '{
@@ -57,7 +57,7 @@ my $json = '{
 ';
 is( $h->json({ pretty => 1 }), $json, 'Hash as json' );
 # Terse version
-is( $h->json(), '{"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}', 'Hash as terse json' );
+is( $h->json( order => 1 ), '{"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}', 'Hash as terse json' );
 $h->{role} = 'customer';
 ok( $h->defined( 'role' ), 'Defined' );
 my $old = $h->delete( 'role' );

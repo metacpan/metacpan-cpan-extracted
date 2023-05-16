@@ -1,5 +1,14 @@
 Revision history for Types-Const:
 
+v0.5.0    2023-05-15 19:22:59+01:00 Europe/London
+  [Incompatible Changes]
+  - Upgraded the minimum Perl version to v5.14.
+
+  [Documentation]
+  - Documented support policy for older Perls.
+
+  - Split KNOWN ISSUES section from BUGS and SOURCE.
+
 v0.4.2    2022-09-03 09:37:03+01:00 Europe/London
   [Documentation]
   - Updated copyright year.

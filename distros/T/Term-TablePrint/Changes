@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.161   2023-05-16
+        - Option color: reset to normal at the end of a table field.
+
 0.160   2023-04-30
         - binary_filter: use unmodified string.
 

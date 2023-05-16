@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -96,7 +97,7 @@ SKIP: {
         ),
         'Unauth SP request'
     );
-    my ( $url, $query ) = expectRedirection( $res,
+    ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
@@ -118,7 +119,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -164,7 +166,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
@@ -218,7 +221,8 @@ sub sp {
 }
 
 sub unknownsp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'unknownsp.com',

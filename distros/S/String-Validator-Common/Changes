@@ -1,8 +1,9 @@
 Revision history for String-Validator-Common
 
+2.04    2023-05-11 Improve Phone::NANP bad area code message.
 2.00	2018-04-04 Release of 2.0
 1.90	2018-03-22 language and custom_messages override messages.
-1.01    2014-08-17 More POD editing, fixed test that was failing on older Perls.        
+1.01    2014-08-17 More POD editing, fixed test that was failing on older Perls.
 1.00    2014-08-16 POD improvements and version bump to 1.00.
 0.97	2012-04-14 Added lowercase versions of methods.
 0.96    Corrected some typos in documentation and other trivial changes.

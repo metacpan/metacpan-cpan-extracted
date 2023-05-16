@@ -25,7 +25,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Tidyp" : "0",
+            "Alien::TidyHTML5" : "0",
             "File::Path" : "0",
             "MooseX::ConfigFromFile" : "0",
             "Test::More" : "0",
@@ -46,12 +46,13 @@
             "XML::OPML::SimpleGen" : "0"
          },
          "requires" : {
+            "Alien::TidyHTML5" : "0",
             "DateTime" : "0",
             "DateTime::Duration" : "0",
             "DateTime::Format::Strptime" : "0",
             "Encode" : "0",
             "HTML::Scrubber" : "0",
-            "HTML::Tidy" : "0",
+            "HTML::T5" : "0",
             "List::Util" : "0",
             "Moose" : "0",
             "MooseX::ConfigFromFile" : "0",
@@ -69,7 +70,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v3.0.0"
+         "version" : "v3.0.2"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -123,6 +124,6 @@
          "web" : "https://github.com/davorg/perlanet"
       }
    },
-   "version" : "v3.0.0",
+   "version" : "v3.0.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

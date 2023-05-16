@@ -1,9 +1,12 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
 
 require 't/test-lib.pm';
 my $maintests = 21;
+
+no warnings 'once';
 
 SKIP: {
     eval {
@@ -16,7 +19,8 @@ SKIP: {
     }
     require Lemonldap::NG::Common::TOTP;
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                   => 'error',
                 totp2fSelfRegistration     => 1,

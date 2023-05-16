@@ -4,7 +4,7 @@
       "John Karr <brainbuz@brainbuz.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.027, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -29,8 +29,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Number::Phone" : "0",
-            "String::Validator::Common" : "1.90",
+            "Number::Phone" : "3.9001",
+            "String::Validator::Common" : "2.01",
             "base" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -56,7 +56,9 @@
          "web" : "https://github.com/brainbuz/String-Validator"
       }
    },
-   "version" : "2.00",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+   "version" : "2.04",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "GPL-3.0-only"
 }
 

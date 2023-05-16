@@ -3,6 +3,16 @@ Upstream-Name: Story-Interact-WWW
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Story-Interact-WWW
 
+Files: INSTALL
+ LICENSE
+ examples/database-schema.sql
+ examples/si_www.conf
+ share/public/js/si_www.js
+ share/templates/index.html.ep
+ share/templates/story.html.ep
+Copyright: Unknown
+License: Unknown
+
 Files: Changes
  META.json
  META.yml
@@ -11,15 +21,6 @@ Files: Changes
  doap.ttl
 Copyright: Copyright 2023 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: INSTALL
- LICENSE
- examples/si_www.conf
- share/public/js/si_www.js
- share/templates/index.html.ep
- share/templates/story.html.ep
-Copyright: Unknown
-License: Unknown
 
 Files: README
  lib/Story/Interact/WWW.pm

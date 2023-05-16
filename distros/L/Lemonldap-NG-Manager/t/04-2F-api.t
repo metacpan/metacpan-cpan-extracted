@@ -1,5 +1,6 @@
 # Test 2F API
 
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -17,7 +18,8 @@ sub newSession {
     my ( $uid, $ip, $kind, $sfaDevices ) = splice @_;
     my $tmp;
     ok(
-        $tmp = Lemonldap::NG::Common::Session->new( {
+        $tmp = Lemonldap::NG::Common::Session->new(
+            {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
                     Directory      => 't/sessions',
@@ -32,7 +34,8 @@ sub newSession {
     );
     count(1);
     ok(
-        $tmp->update( {
+        $tmp->update(
+            {
                 ipAddr        => $ip,
                 _whatToTrace  => $uid,
                 uid           => $uid,
@@ -215,7 +218,8 @@ newSession( 'msmith', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'msmith', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # dwho
-$sfaDevices = [ {
+$sfaDevices = [
+    {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -247,7 +251,8 @@ newSession( 'dwho', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'dwho', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # rtyler
-$sfaDevices = [ {
+$sfaDevices = [
+    {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -271,7 +276,8 @@ newSession( 'rtyler', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'rtyler', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # davros
-$sfaDevices = [ {
+$sfaDevices = [
+    {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -289,7 +295,8 @@ newSession( 'davros', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'davros', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # tof
-$sfaDevices = [ {
+$sfaDevices = [
+    {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",

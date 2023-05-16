@@ -59,7 +59,7 @@
             "JSON::XS" : "4.03",
             "List::Util" : "1.56",
             "Module::Metadata" : "1.000037",
-            "Nice::Try" : "v1.2.0",
+            "Nice::Try" : "v1.3.4",
             "POSIX" : "1.53_01",
             "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.50",
@@ -107,6 +107,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.29.6",
+   "version" : "v0.30.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

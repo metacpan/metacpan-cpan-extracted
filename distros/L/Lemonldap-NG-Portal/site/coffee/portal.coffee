@@ -231,10 +231,18 @@ getCookie = (cname) ->
 			return c
 	return ''
 
-setCookie = (name, value, samesite, exdays) ->
-	d = new Date()
-	d.setTime d.getTime() + exdays*86400000
-	document.cookie = "#{name}=#{value}; expires=#{d.toUTCString()}; path=/; SameSite=#{samesite}"
+setCookie = (name, value, exdays) ->
+	samesite = datas['sameSite']
+	secure = datas['cookieSecure']
+	cookiestring = "#{name}=#{value}; path=/; SameSite=#{samesite}"
+	if exdays
+		d = new Date()
+		d.setTime d.getTime() + exdays*86400000
+		cookiestring += "; expires=#{d.toUTCString()}"
+	if secure
+		cookiestring += "; Secure"
+	document.cookie = cookiestring
+
 
 # Initialization
 datas = {}
@@ -372,11 +380,11 @@ $(window).on 'load', () ->
 		console.log 'Selected lang ->', queryLang
 		if setCookieLang
 			console.log 'Set cookie lang ->', queryLang
-			setCookie 'llnglanguage', queryLang, datas['sameSite']
+			setCookie 'llnglanguage', queryLang, 3650
 		translatePage(queryLang)
 	else
 		console.log 'Selected lang ->', lang
-		setCookie 'llnglanguage', lang, datas['sameSite']
+	#	setCookie 'llnglanguage', lang, 3650 (Fix #2899)
 		translatePage(lang)
 
 	# Build language icons
@@ -386,7 +394,7 @@ $(window).on 'load', () ->
 	$('#languages').html langdiv
 	$('.langicon').on 'click', () ->
 		lang = $(this).attr 'title'
-		setCookie 'llnglanguage', lang, datas['sameSite']
+		setCookie 'llnglanguage', lang, 3650
 		translatePage lang
 
 	isAlphaNumeric = (chr) ->

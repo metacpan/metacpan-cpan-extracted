@@ -1,10 +1,11 @@
 #!/usr/bin/perl
+# *** DO NOT USE Test2 FEATURES becuase this is a sub-script ***
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
 use t_TestCommon  # Test::More etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug checkeq_literal expect1 check 
+            bug mycheckeq_literal expect1 mycheck 
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -14,6 +15,7 @@ use t_SSUtils;
 use Capture::Tiny qw/capture_merged tee_merged/;
 
 use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
+use Test::Deep::NoTest qw/eq_deeply/;
 
 ##########################################################################
 package Other {
@@ -291,11 +293,11 @@ sub check_both($) {
   my $letters = shift;  # current column ordering
   croak "Expected $num_cols columns" unless length($letters) == $num_cols;
 
-  my %oldoptions = options();
-  my $saved_options = options(verbose => 0);
-  die "Should be a boolean, not object" if ref($saved_options);
-  die "Wrong old value" unless !!$saved_options == !!$oldoptions{verbose};
-  scope_guard { options(verbose => $saved_options) };
+  my %oldoptions  = options();
+  my %oldoptions2 = options(verbose => 0);
+  eq_deeply(\%oldoptions, \%oldoptions2)
+    or die "MISMATCH: ", dvis('%oldoptions\n%oldoptions2');
+  scope_guard { options(verbose => $oldoptions2{verbose}) };
 
   check_titles $letters;
   apply {
@@ -363,28 +365,39 @@ options silent => $silent, verbose => $verbose, debug => $debug;
       bug(dvis 'FETCHED unexpected value: $k $orig{$k} $opts{$k}')
         unless !!$orig{$k} == !!$opts{$k};
     }
-    bug unless !!$opts{$key} == !!$old;
+    bug() unless !!$opts{$key} == !!$old;
     my $new = !$old;
-    # Suppress log messages so this test does not break "silent is really silent" tests
-    # N.B. this is a *nested* Capture when run under t/60_all.t
-    my ($outerr, $result) = capture_merged {
+
+    # To suppress log messages to not break 'silent is really silent' tests,
+    # this used to use a nested capture_merged { ... };  However some wierd
+    # crashes occurred with Perl 5.18.0; not sure why but control seemed
+    # to spontaneously jump to exit from previously-exited subs.
+    #
+    # Now I'm manually saving & restoring STDERR.
+    open my $saved_STDERR, ">&STDERR" or die "dupERR: $!";
+    use File::Spec ();
+    open STDERR, ">", File::Spec->devnull() or die "reopenErr: $!";
+    eval {
         options($key => $new);
-        { my %nopts = options(); bug unless !!$nopts{$key} == !!$new; }
+        { my %nopts = options(); bug() unless !!$nopts{$key} == !!$new; }
         options($key => $old);
-        { my %nopts = options(); bug unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
+        { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
         $s->options($key => $new);
-        { my %nopts = options(); bug unless $nopts{$key} eq $new; }
+        { my %nopts = options(); bug() unless $nopts{$key} eq $new; }
         $s->options($key => $old);
-        { my %nopts = options(); bug unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
+        { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
     
         # There was a bug where $sheet->options() used current sheet instead of $sheet
         # (and died if there was no current sheet)
         { package Baloney; my %nopts = $s->options; 
           main::bug unless main::u($nopts{$key}) eq main::u($old) && main::u($nopts{$key}) ne $new; 
         }
-        42
     };
-    bug "Someting went wrong:\n$outerr" unless $result == 42;
+    my $err = $@;
+    open STDERR, ">&", $saved_STDERR or die "dup back: $!";
+    close $saved_STDERR;
+    bug "Someting went wrong:\n$err\n" if $err;
+
     for my $k (@keys) {
       bug("{$k} disturbed by TESTING $key!")
         unless !!$orig{$k} == !!$opts{$k};
@@ -1091,5 +1104,6 @@ EOF
   die "apply broken after sort" unless arrays_eq \@Bs, [000, 888, 159];
 }
 
+say "Done." unless $silent;
 exit 0;
 

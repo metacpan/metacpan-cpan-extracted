@@ -1,3 +1,5 @@
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Lemonldap-NG-Manager.t'
 
@@ -23,7 +25,8 @@ my $sessionOptions = {
     LockDirectory => $dir,
 };
 
-my $session = Lemonldap::NG::Common::Session->new( {
+my $session = Lemonldap::NG::Common::Session->new(
+    {
         storageModule        => $sessionModule,
         storageModuleOptions => $sessionOptions,
         kind                 => "TEST",
@@ -42,7 +45,8 @@ use_ok('Lemonldap::NG::Common::Apache::Session::Generate::SHA256');
 $sessionOptions->{generateModule} =
   "Lemonldap::NG::Common::Apache::Session::Generate::SHA256";
 
-my $session2 = Lemonldap::NG::Common::Session->new( {
+my $session2 = Lemonldap::NG::Common::Session->new(
+    {
         storageModule        => $sessionModule,
         storageModuleOptions => $sessionOptions,
         kind                 => "TEST",

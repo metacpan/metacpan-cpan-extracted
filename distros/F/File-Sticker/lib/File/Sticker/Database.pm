@@ -1,12 +1,12 @@
 package File::Sticker::Database;
-$File::Sticker::Database::VERSION = '1.0603';
+$File::Sticker::Database::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Database - write info to database
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -26,6 +26,7 @@ nomenclature.
 use common::sense;
 use Carp;
 use DBI;
+use DBD::SQLite::Constants qw(:file_open);
 use Search::Query;
 use Path::Tiny;
 use YAML::Any;
@@ -50,6 +51,7 @@ Create a new object, setting global values for the object.
         wanted_fields=>\%wanted_fields,
         field_order=>\@field_order,
         primary_table=>$primary_table,
+        space_sep=>$space_sep,
     );
 
 =cut
@@ -78,7 +80,11 @@ sub do_connect ($) {
     my $database = $self->{dbname};
     if ($database)
     {
-        my $dbh = DBI->connect("dbi:SQLite:dbname=$database", "", "");
+        my $dbh = DBI->connect("dbi:SQLite:dbname=$database", undef, undef,
+            {sqlite_open_flags => ($self->{readonly}
+                    ? SQLITE_OPEN_READONLY
+                    : SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
+            });
         if (!$dbh)
         {
             die "Can't connect to $database: $DBI::errstr";
@@ -97,6 +103,9 @@ sub do_connect ($) {
 
 Create the tables for the database.
 Give them all prefixes so that multiple setups can use the same database.
+
+If the database is readonly, this does not create tables,
+but it does set up configuration information, so it should still be called.
 
 =cut
 sub create_tables ($) {
@@ -135,67 +144,72 @@ sub create_tables ($) {
 
     my $primary_table = $self->{primary_table};
 
-    my $q = "CREATE TABLE IF NOT EXISTS $primary_table (fileid INTEGER PRIMARY KEY, file TEXT NOT NULL UNIQUE, "
-    . join(", ", @field_defs) .");";
-    my $ret = $dbh->do($q);
-    if (!$ret)
+    # Only create tables is this is not readonly.
+    if (!$self->{readonly})
     {
-        croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
-    }
-    foreach my $multi (@multi_fields)
-    {
-        my $deep_table = $self->_deep_table_name(${multi});
-        $q = "CREATE TABLE IF NOT EXISTS ${deep_table} (fileid INTEGER NOT NULL, ${multi}, FOREIGN KEY(fileid) REFERENCES ${primary_table}(fileid));";
-        $ret = $dbh->do($q);
+        my $q = "CREATE TABLE IF NOT EXISTS $primary_table (fileid INTEGER PRIMARY KEY, file TEXT NOT NULL UNIQUE, "
+        . join(", ", @field_defs) .");";
+        my $ret = $dbh->do($q);
         if (!$ret)
         {
             croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
         }
-        $q = "CREATE UNIQUE INDEX IF NOT EXISTS ${deep_table}_index ON ${deep_table} (fileid, ${multi})";
-        $ret = $dbh->do($q);
-        if (!$ret)
+        foreach my $multi (@multi_fields)
         {
-            croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
-        }
-    }
-
-    # ----------------------------------------------------------
-    # Create the "info" table
-    # This has the same as the primary_table, plus a faceted_tags field
-    # which combines the taggable information into one big collection
-    # of faceted tags.
-    # The taggable_fields hash contains the field names, and the prefix
-    # for the field, if one is desired.
-    # ----------------------------------------------------------
-    if ($self->{taggable_fields})
-    {
-        $q = "CREATE VIEW IF NOT EXISTS ${primary_table}_info AS SELECT fileid, file, ";
-        $q .= join(', ', @fieldnames);
-        # create the faceted_tags field
-        $q .= ", replace(";
-        my @tagdefs = ();
-        foreach my $fn (sort keys %{$self->{taggable_fields}})
-        {
-            my $prefix = $self->{taggable_fields}->{$fn};
-            if ($self->{wanted_fields}->{$fn} =~ /multi/i)
+            my $deep_table = $self->_deep_table_name(${multi});
+            $q = "CREATE TABLE IF NOT EXISTS ${deep_table} (fileid INTEGER NOT NULL, ${multi}, FOREIGN KEY(fileid) REFERENCES ${primary_table}(fileid));";
+            $ret = $dbh->do($q);
+            if (!$ret)
             {
-                push @tagdefs, " ifnull('|$prefix' || replace($fn, '|', '|$prefix'), '')";
+                croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
             }
-            else # single-valued
+            $q = "CREATE UNIQUE INDEX IF NOT EXISTS ${deep_table}_index ON ${deep_table} (fileid, ${multi})";
+            $ret = $dbh->do($q);
+            if (!$ret)
             {
-                push @tagdefs, " ifnull('|$prefix' || $fn, '')";
+                croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
             }
         }
-        $q .= join(' || ', @tagdefs);
-        $q .= ', " ", "-") ';
 
-        $q .= " AS faceted_tags ";
-        $q .= " FROM $primary_table;";
-
-        $ret = $dbh->do($q);
-        if (!$ret)
+        # ----------------------------------------------------------
+        # Create the "info" table
+        # This has the same as the primary_table, plus a faceted_tags field
+        # which combines the taggable information into one big collection
+        # of faceted tags.
+        # The taggable_fields hash contains the field names, and the prefix
+        # for the field, if one is desired.
+        # ----------------------------------------------------------
+        my $space_sep = ($self->{space_sep} ? $self->{space_sep} : '-');
+        if ($self->{taggable_fields})
         {
-            croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
+            $q = "CREATE VIEW IF NOT EXISTS ${primary_table}_info AS SELECT fileid, file, ";
+            $q .= join(', ', @fieldnames);
+            # create the faceted_tags field
+            $q .= ", replace(";
+            my @tagdefs = ();
+            foreach my $fn (sort keys %{$self->{taggable_fields}})
+            {
+                my $prefix = $self->{taggable_fields}->{$fn};
+                if ($self->{wanted_fields}->{$fn} =~ /multi/i)
+                {
+                    push @tagdefs, " ifnull('|$prefix' || replace($fn, '|', '|$prefix'), '')";
+                }
+                else # single-valued
+                {
+                    push @tagdefs, " ifnull('|$prefix' || $fn, '')";
+                }
+            }
+            $q .= join(' || ', @tagdefs);
+            $q .= sprintf(', " ", "%s") ', $space_sep);
+
+            $q .= " AS faceted_tags ";
+            $q .= " FROM $primary_table;";
+
+            $ret = $dbh->do($q);
+            if (!$ret)
+            {
+                croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
+            }
         }
     }
 
@@ -274,7 +288,7 @@ sub get_file_id ($$) {
     my $dbh = $self->do_connect();
 
     my $fullname = $filename;
-    if (-f $filename)
+    if (-r $filename)
     {
         $fullname = path($filename)->realpath->stringify;
     }
@@ -391,63 +405,61 @@ sub get_all_tags {
     # Process the multi_fields first,
     # since they have to be read from the deep_* tables
     my %mt_fields = ();
-    my @tags = ();
+    my %tags_hash = ();
+    my $space_sep = ($self->{space_sep} ? $self->{space_sep} : '-');
     foreach my $t (@{$self->{multi_fields}})
     {
-        $mt_fields{$t} = 1; # remember this has been processed
-        say STDERR "MT=$t" if $self->{verbose} > 1;
-        my $deep_table = $self->_deep_table_name($t);
-        my $these_tags = $self->_do_one_col_query("SELECT DISTINCT replace($t, ' ', '-') FROM ${deep_table} ORDER BY $t;");
         # Only count as a tag if it is in taggable_fields
         if (exists $self->{taggable_fields}->{$t})
         {
-            if ($self->{taggable_fields}->{$t}) # has a field-specific prefix
+            my $deep_table = $self->_deep_table_name($t);
+            # In a readonly database, deep tables might not exist,
+            # so check for table existance before querying
+            if (!$self->{readonly} or $self->_table_exists($deep_table))
             {
-                my $pr = $self->{taggable_fields}->{$t};
-                my @prefixed_tags = map { "${pr}$_" } @{$these_tags};
-                push @tags, @prefixed_tags;
+                $mt_fields{$t} = 1; # yes, we got a table, mark as processed
+                say STDERR "MT=$t" if $self->{verbose} > 1;
+                my $these_tags = $self->_do_one_col_query("SELECT DISTINCT replace($t, ' ', '${space_sep}') FROM ${deep_table} ORDER BY $t;");
+                my @prefixed_tags = $self->_add_tag_prefixes($t, $these_tags);
+                $tags_hash{$_}++ for (@prefixed_tags);
             }
-            elsif ($self->{tagprefix}) # simple prefix for all tags
+            else # is a multi-tag, but does not have a deep table
             {
-                my @prefixed_tags = map { "${t}-$_" } @{$these_tags};
-                push @tags, @prefixed_tags;
-            }
-            else
-            {
-                push @tags, @{$these_tags};
+                $mt_fields{$t} = 2;
             }
         }
     }
-    say STDERR "MT tags:", Dump(@tags) if $self->{verbose} > 1;
 
     # Now process the taggable_fields which are not multi_fields.
+    # (And the multi-fields that don't have deep tables)
     # These have to be looked up in the primary table.
     my $primary_table = $self->{primary_table};
     foreach my $t (keys %{$self->{taggable_fields}})
     {
-        say STDERR "TT=$t" if $self->{verbose} > 1;
-        if (!$mt_fields{$t}) # not a multi-field
+        if (!$mt_fields{$t}) # has not been processed as a multi-field
         {
-            my $these_tags = $self->_do_one_col_query("SELECT DISTINCT replace($t, ' ', '-') FROM ${primary_table} ORDER BY $t;");
-            if (exists $self->{taggable_fields}->{$t} and $self->{taggable_fields}->{$t}) # has a prefix
+            say STDERR "TT=$t" if $self->{verbose} > 1;
+            my $these_tags = $self->_do_one_col_query("SELECT DISTINCT replace($t, ' ', '${space_sep}') FROM ${primary_table};");
+            my @prefixed_tags = $self->_add_tag_prefixes($t, $these_tags);
+            $tags_hash{$_}++ for (@prefixed_tags);
+        }
+        elsif ($mt_fields{$t} == 2) # multi-field without deep table
+        {
+            say STDERR "MT=$t" if $self->{verbose} > 1;
+            # Is a multi-tag field, but does not have a deep table to look at
+            # Will have to look at the primary table AND split each result
+            my $these_multi_tags = $self->_do_one_col_query("SELECT DISTINCT replace($t, ' ', '${space_sep}') FROM ${primary_table};");
+            foreach my $mt (@{$these_multi_tags})
             {
-                my $pr = $self->{taggable_fields}->{$t};
-                my @prefixed_tags = map { "${pr}$_" } @{$these_tags};
-                push @tags, @prefixed_tags;
-            }
-            elsif ($self->{tagprefix}) # simple prefix
-            {
-                my @prefixed_tags = map { "${t}-$_" } @{$these_tags};
-                push @tags, @prefixed_tags;
-            }
-            else
-            {
-                push @tags, @{$these_tags};
+                my @these_split_tags = split(/[,|]/, $mt);
+                my @prefixed_tags = $self->_add_tag_prefixes($t, \@these_split_tags);
+                $tags_hash{$_}++ for (@prefixed_tags);
             }
         }
     }
-    @tags = sort @tags;
+    say STDERR "Tags hash:", Dump(\%tags_hash) if $self->{verbose} > 1;
 
+    my @tags = sort keys %tags_hash;
     say STDERR "Sorted tags:", Dump(@tags) if $self->{verbose} > 1;
 
     return \@tags;
@@ -665,7 +677,7 @@ sub add_meta_to_db {
     # This is faster than REPLACE because it doesn't need
     # to rebuild indexes.
     my $fullname = $filename;
-    if (-f $filename)
+    if (-r $filename)
     {
         $fullname = path($filename)->realpath->stringify;
     }
@@ -782,6 +794,64 @@ sub _deep_table_name {
     return $self->{primary_table} . '_deep_' . $field;
 } # _deep_table_name
 
+=head2 _table_exists
+
+Checks if a given table exists.
+This can be relevant with a readonly database where
+tables are not guaranteed to have been created.
+
+=cut
+sub _table_exists {
+    my $self = shift;
+    my $table = shift;
+    say STDERR whoami(), ' ', $table if $self->{verbose} > 2;
+
+    my $dbh = $self->{dbh};
+    my $type = "'TABLE','VIEW'";
+    my $sth = $dbh->table_info(undef, undef, $table, $type);
+
+    my $table_does_exist = 0;
+    my $found_table = '';
+    my @row;
+    while (@row = $sth->fetchrow_array)
+    {
+        say STDERR sprintf('found a table: %s (%s)', $row[2], $row[3])
+            if $self->{verbose} > 2;
+        $found_table = $row[2];
+        $table_does_exist = 1;
+    }
+    return $table_does_exist;
+} # _table_exists
+
+=head2 _add_tag_prefixes
+
+Add prefixes to the given array of tags.
+
+    my @pref_tags = $self->_add_tag_prefixes($field, \@values);
+
+=cut
+sub _add_tag_prefixes {
+    my $self = shift;
+    my $field = shift;
+    my $values = shift;
+
+    my @prefixed_tags = ();
+    if ($self->{taggable_fields}->{$field}) # has a field-specific prefix
+    {
+        my $pr = $self->{taggable_fields}->{$field};
+        @prefixed_tags = map { "${pr}$_" } @{$values};
+    }
+    elsif ($self->{tagprefix}) # simple prefix for all tags
+    {
+        @prefixed_tags = map { "${field}-$_" } @{$values};
+    }
+    else # no prefix needed
+    {
+        @prefixed_tags = @{$values};
+    }
+    return @prefixed_tags;
+} # _add_tag_prefixes
+
 =head2 _do_one_col_query
 
 Do a SELECT query, and return the first column of results.
@@ -821,7 +891,6 @@ sub _do_one_col_query {
     return \@results;
 
 } # _do_one_col_query
-
 
 =head2 _prepare
 

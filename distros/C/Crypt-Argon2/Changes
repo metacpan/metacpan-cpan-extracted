@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.018     2023-05-15 19:59:20+02:00 Europe/Amsterdam
+          - Fix documentation markup failures
+
 0.017     2023-04-07 16:21:47+02:00 Europe/Amsterdam
           - Add argon2_pass and argon2_raw
           - Add argon2_types

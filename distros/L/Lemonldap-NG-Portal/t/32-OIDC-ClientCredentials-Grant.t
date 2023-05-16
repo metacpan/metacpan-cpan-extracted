@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -15,7 +16,8 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $op = LLNG::Manager::Test->new( {
+my $op = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                        => $debug,
             domain                          => 'op.com',
@@ -103,14 +105,16 @@ my $res;
 # Resource Owner Password Credentials Grant
 # Access Token Request
 # https://tools.ietf.org/html/rfc6749#section-4.3
-my $badquery = buildForm( {
+my $badquery = buildForm(
+    {
         client_id  => 'rpid2',
         grant_type => 'client_credentials',
         scope      => 'openid profile email',
     }
 );
 
-my $badquery2 = buildForm( {
+my $badquery2 = buildForm(
+    {
         client_id     => 'rpid',
         client_secret => 'rpsecret',
         grant_type    => 'client_credentials',
@@ -118,14 +122,16 @@ my $badquery2 = buildForm( {
     }
 );
 
-my $badquery3 = buildForm( {
+my $badquery3 = buildForm(
+    {
         client_id     => 'scopelessrp',
         client_secret => 'rpsecret',
         grant_type    => 'client_credentials',
     }
 );
 
-my $goodquery = buildForm( {
+my $goodquery = buildForm(
+    {
         client_id     => 'rpid',
         client_secret => 'rpsecret',
         grant_type    => 'client_credentials',

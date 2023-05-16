@@ -8,9 +8,9 @@ use Complete::Util qw(hashify_answer);
 use Complete::File qw(complete_file);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-25'; # DATE
+our $DATE = '2023-03-01'; # DATE
 our $DIST = 'Perinci-Sub-XCompletion'; # DIST
-our $VERSION = '0.103'; # VERSION
+our $VERSION = '0.104'; # VERSION
 
 our %SPEC;
 
@@ -43,7 +43,7 @@ Perinci::Sub::XCompletion::filename - Generate completion for filename
 
 =head1 VERSION
 
-This document describes version 0.103 of Perinci::Sub::XCompletion::filename (from Perl distribution Perinci-Sub-XCompletion), released on 2022-11-25.
+This document describes version 0.104 of Perinci::Sub::XCompletion::filename (from Perl distribution Perinci-Sub-XCompletion), released on 2023-03-01.
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ L<Rinci> L<function metadata|Rinci::function>:
 
 Only complete with C<*.srt> and C<*.SRT> files:
 
- 'x.completion' => ['filename' => {file_ext_filter => qr/\.srt$/i}],
+ 'x.completion' => ['filename' => {file_ext_filter => qr/^srt$/i}],
 
 =head1 DESCRIPTION
 
@@ -118,7 +118,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

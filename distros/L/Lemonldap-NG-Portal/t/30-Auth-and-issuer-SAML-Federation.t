@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -41,7 +42,8 @@ SKIP: {
             $res = $sp->_get(
                 '/',
                 accept => 'text/html',
-                query  => buildForm( {
+                query  => buildForm(
+                    {
                         idp =>
                           'https://auth.centrale-marseille.fr/idp/shibboleth'
                     }
@@ -58,7 +60,8 @@ SKIP: {
     subtest "Responding to a federated SP" => sub {
         switch ('issuer');
         my $res;
-        my $query = buildForm( {
+        my $query = buildForm(
+            {
                 user     => 'french',
                 password => 'french',
             }
@@ -75,7 +78,8 @@ SKIP: {
                 '/saml/singleSignOn',
                 accept => 'text/html',
                 cookie => "lemonldap=$id",
-                query  => buildForm( {
+                query  => buildForm(
+                    {
                         IDPInitiated => 1,
                         sp           => "https://www.numistral.fr/shibboleth"
                     }
@@ -99,7 +103,8 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",
@@ -148,7 +153,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use IO::String;
 use strict;
@@ -11,7 +12,8 @@ SKIP: {
     if ($@) {
         skip 'Image::Magick not found', $maintests;
     }
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel              => 'error',
                 useSafeJail           => 1,

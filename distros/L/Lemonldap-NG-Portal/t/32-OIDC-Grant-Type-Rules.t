@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -41,7 +42,8 @@ done_testing( count() );
 
 sub try_access_token_client {
     my ( $portal, $rp ) = @_;
-    my $query = buildForm( {
+    my $query = buildForm(
+        {
             client_id     => $rp,
             client_secret => $rp,
             grant_type    => 'client_credentials',
@@ -62,7 +64,8 @@ sub try_access_token_client {
 sub try_access_token_password {
     my ( $portal, $rp ) = @_;
     ## Get Access Token with Password Grant
-    my $query = buildForm( {
+    my $query = buildForm(
+        {
             client_id     => $rp,
             client_secret => $rp,
             grant_type    => 'password',
@@ -105,7 +108,8 @@ sub try_access_token_code {
 }
 
 sub portal {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                           => $debug,
                 domain                             => 'op.com',

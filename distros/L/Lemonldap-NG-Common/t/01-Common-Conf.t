@@ -1,3 +1,5 @@
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Lemonldap-NG-Manager.t'
 
@@ -17,7 +19,8 @@ my $h;
 my $inifile     = "lemonldap-ng.ini";
 my $confsection = "configuration";
 
-ok( (
+ok(
+    (
         Lemonldap::NG::Common::Conf->new( type => 'bad' ) == 0
           and $Lemonldap::NG::Common::Conf::msg =~
           /Error: failed to load Lemonldap::NG::Common::Conf::Backends::bad/
@@ -27,7 +30,8 @@ ok( (
 
 $h = bless {}, 'Lemonldap::NG::Common::Conf';
 
-ok( (
+ok(
+    (
         %$h = ( %$h, %{ $h->getLocalConf( $confsection, $inifile, 0 ) } )
           and exists $h->{localStorage}
     ),

@@ -21,7 +21,7 @@ my $build = new Module::Build(
         'version' => 0,
     },
     script_files => [
-        'mkdir_heute',
+        'bin/mkdir_heute',
     ],
 );
 $build->create_build_script;

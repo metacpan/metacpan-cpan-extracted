@@ -17,7 +17,7 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.64';
+our $VERSION = '1.66';
 
 sub new {
 	my ($class, %args) = @_;
@@ -35,6 +35,7 @@ sub new {
 		channels  => {}, # open rpcswitch channels
 		methods   => {}, # defined worker methods
 		announced => {}, # announced worker methods
+		msglimit  => 999999, # max netstring size
 	}, $class;
 	if (ref($self->{sock}) eq 'IO::Socket::SSL') {
 		$self->{auth_method} = 'clientcert' unless exists $self->{auth_method};
@@ -53,6 +54,11 @@ sub rpc_error {
 sub rpc_send {
 	my ($self, $msg) = @_;
 	my $s = $self->{sock};
+	my $len = length($s);
+	if ($self->{msglimit} && ($len > $self->{msglimit})) {
+		warn "rpc_send msglimit exceeded: $len > $self->{msglimit}";
+		return;
+	}
 	$msg->{jsonrpc} = '2.0';
 	my $str = to_json($msg, {canonical => 1, %{$self->{json_utf8}}});
 	$self->{trace_cb}->('SND', $msg) if $self->{trace_cb};
@@ -411,6 +417,7 @@ sub _worker_child_get {
 			if (exists $msg->{params}{$sessioncache->{session_persist_user}}) {
 				my $user = $msg->{params}{$sessioncache->{session_persist_user}};
 				if (my $child = $sessioncache->session_get_per_user($user, $msg->{id}, $msg->{rpcswitch}{vci})) {
+					delete $child->{session}; # reused session will be added after session_resp
 					return $child;
 				}
 			}
@@ -428,14 +435,17 @@ sub _worker_childs_dequeue_and_run {
 		my $rpcswitch_resp = rpcswitch_resp($msg->{rpcswitch});
 
 		my $child = eval { $self->_worker_child_get($msg) };
-		unless ($@) {
-			$self->{async}->job_add($child, $msg->{id}, {rpcswitch => $rpcswitch_resp});
-			eval { $self->_worker_child_write($child, $msg) };
-		}
 		if ($@) {
 			$self->rpc_send({id => $id, result => ['RES_ERROR', $@], rpcswitch => $rpcswitch_resp});
 		} else {
-			$self->rpc_send({id => $id, result => ['RES_WAIT', $id], rpcswitch => $rpcswitch_resp});
+			eval { $self->_worker_child_write($child, $msg) };
+			if ($@) {
+				$self->rpc_send({id => $id, result => ['RES_ERROR', $@], rpcswitch => $rpcswitch_resp});
+				$self->{async}->child_finish($child, 'error');
+			} else {
+				$self->rpc_send({id => $id, result => ['RES_WAIT', $id], rpcswitch => $rpcswitch_resp});
+				$self->{async}->job_add($child, $msg->{id}, {rpcswitch => $rpcswitch_resp});
+			}
 		}
 	}
 	return;
@@ -457,6 +467,12 @@ sub _worker_child_read_and_finish {
 			$self->{async}->child_finish($child, 'error');
 		} else {
 			$res = $self->rpc_send({method => 'rpcswitch.result', params => $params, rpcswitch => $child->{rpcswitch}});
+			unless ($res) {
+				my $err = "result msg limit exceeded: " . length($b);
+				$res = $self->rpc_send({method => 'rpcswitch.result', params => ['RES_ERROR', $child->{id}, $err], rpcswitch => $child->{rpcswitch}});
+				$self->{async}->child_finish($child, 'error');
+				return $res;
+			}
 
 			if (my $sessioncache = $self->{sessioncache}) {
 				if (my $set_session = $self->is_session_resp($params)) {
@@ -497,7 +513,7 @@ sub _worker_sessions_expire {
 	return unless $self->{sessioncache};
 
 	# If a job for the expired session is active, the session
-	# will be dropped when sesseion_put() is called after the
+	# will be dropped when session_put() is called after the
 	# job completed.
 	#
 	while (my $child = $self->{sessioncache}->expired_dequeue()) {

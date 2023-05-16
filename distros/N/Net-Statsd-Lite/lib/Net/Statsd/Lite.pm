@@ -2,7 +2,7 @@ package Net::Statsd::Lite;
 
 # ABSTRACT: A lightweight StatsD client that supports multimetric packets
 
-use v5.10;
+use v5.14;
 
 use Moo 1.000000;
 
@@ -13,16 +13,16 @@ use Ref::Util qw/ is_plain_hashref /;
 use Scalar::Util qw/ refaddr /;
 use Sub::Quote qw/ quote_sub /;
 use Sub::Util 1.40 qw/ set_subname /;
-use Types::Common::Numeric 1.004000 qw/ IntRange NumRange PositiveInt PositiveOrZeroInt PositiveOrZeroNum /;
-use Types::Common::String qw/ NonEmptySimpleStr SimpleStr /;
-use Types::Standard qw/ Bool Enum InstanceOf Int StrMatch /;
+use Types::Common 2.000000 qw/ Bool Enum InstanceOf Int IntRange NonEmptySimpleStr
+  NumRange PositiveInt PositiveOrZeroInt PositiveOrZeroNum SimpleStr StrMatch
+  /;
 
 use namespace::autoclean;
 
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.6.3';
+our $VERSION = 'v0.7.0';
 
 
 has host => (
@@ -227,7 +227,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.6.3
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -458,6 +458,16 @@ tagging can be added using something like
       $self->$next( $suffix, $metric, $value, $opts );
   };
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.7.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.6.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 This module was forked from L<Net::Statsd::Tiny>.
@@ -505,7 +515,7 @@ Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

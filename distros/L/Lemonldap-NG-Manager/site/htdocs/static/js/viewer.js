@@ -334,7 +334,7 @@ This file contains:
         $scope.waiting = true;
         console.log("Trying to get key " + node.cnodes);
         uri = encodeURI(node.cnodes);
-        $http.get("" + window.confPrefix + $scope.currentCfg.cfgNum + "/" + uri).then(function(response) {
+        $http.get("" + window.viewPrefix + $scope.currentCfg.cfgNum + "/" + uri).then(function(response) {
           var a, data, l, len;
           data = response.data;
           if (!data) {
@@ -452,7 +452,7 @@ This file contains:
             } else {
               console.log("Trying to get title " + node.title);
             }
-            $http.get("" + window.confPrefix + $scope.currentCfg.cfgNum + "/" + (node.get ? uri : node.title)).then(function(response) {
+            $http.get("" + window.viewPrefix + $scope.currentCfg.cfgNum + "/" + (node.get ? uri : node.title)).then(function(response) {
               var data;
               data = response.data;
               if ((data.value === null || (data.error && data.error.match(/setDefault$/))) && node['default'] !== null) {

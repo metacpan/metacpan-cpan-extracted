@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -82,8 +83,8 @@ SKIP: {
         $server->add_provider_from_buffer( 2,
             samlIDPMetaDataXML( "idp", $method ) );
 
-        my $login  = Lasso::Login->new($server);
-        my $method = $saml->getHttpMethod($method);
+        my $login = Lasso::Login->new($server);
+        $method = $saml->getHttpMethod($method);
         $login->init_authn_request("http://auth.idp.com/saml/metadata");
         $login->msg_relayState('{"url": "http://test/%22"}');
         $login->build_authn_request_msg();
@@ -95,7 +96,8 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

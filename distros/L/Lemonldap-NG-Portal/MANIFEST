@@ -669,6 +669,7 @@ t/35-My-session.t
 t/35-REST-auth-password-server.t
 t/35-REST-config-backend.t
 t/35-REST-export-password.t
+t/35-REST-sessions-with-AuthBasic-handler-with-2FA.t
 t/35-REST-sessions-with-AuthBasic-handler.t
 t/35-REST-sessions-with-REST-server.t
 t/35-SOAP-config-backend.t
@@ -708,6 +709,7 @@ t/40-Notifications-XML-DBI.t
 t/40-Notifications-XML-File.t
 t/40-Notifications-XML-Server.t
 t/41-Captcha-old-api.t
+t/41-Captcha-with-LDAP.t
 t/41-Captcha.t
 t/41-Token-with-global-storage.t
 t/41-Token.t

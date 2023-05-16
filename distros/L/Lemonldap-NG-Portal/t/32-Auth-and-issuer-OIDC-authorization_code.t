@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -412,7 +413,8 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -467,7 +469,8 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
@@ -488,14 +491,15 @@ sub rp {
                     op => {
                         oidcOPMetaDataOptionsCheckJWTSignature => 1,
                         oidcOPMetaDataOptionsJWKSTimeout       => 0,
-                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
+                        oidcOPMetaDataOptionsAcrValues => "loa-32 customacr-1",
+                        oidcOPMetaDataOptionsClientSecret => "rpsecret",
                         oidcOPMetaDataOptionsScope => "openid profile email",
                         oidcOPMetaDataOptionsStoreIDToken     => 0,
                         oidcOPMetaDataOptionsMaxAge           => 30,
                         oidcOPMetaDataOptionsDisplay          => "",
                         oidcOPMetaDataOptionsClientID         => "rpid",
                         oidcOPMetaDataOptionsStoreIDToken     => 1,
-                        oidcOPMetaDataOptionsUseNonce     => 1,
+                        oidcOPMetaDataOptionsUseNonce         => 1,
                         oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.op.com/.well-known/openid-configuration"
                     }

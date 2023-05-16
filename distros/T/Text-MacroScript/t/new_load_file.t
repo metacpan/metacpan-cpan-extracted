@@ -14,7 +14,8 @@ my $test1 = "test1~";
 my $test2 = "test2~";
 my $test3 = "test3~";
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 t_spew($test1, norm_nl(<<'END'));
 Test text with hello

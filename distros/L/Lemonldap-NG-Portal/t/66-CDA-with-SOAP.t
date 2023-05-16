@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -55,7 +56,8 @@ SKIP: {
     $client = register(
         'portal',
         sub {
-            LLNG::Manager::Test->new( {
+            LLNG::Manager::Test->new(
+                {
                     ini => {
                         logLevel          => $debug,
                         useSafeJail       => 1,
@@ -106,7 +108,8 @@ SKIP: {
     $app = register(
         'app',
         sub {
-            Lemonldap::NG::Handler::Server->run( {
+            Lemonldap::NG::Handler::Server->run(
+                {
                     %{ $client->ini },
                     globalStorage =>
                       'Lemonldap::NG::Common::Apache::Session::SOAP',
@@ -119,7 +122,8 @@ SKIP: {
     );
 
     ok(
-        $res = $app->( {
+        $res = $app->(
+            {
                 'HTTP_ACCEPT'          => 'text/html',
                 'SCRIPT_NAME'          => '/',
                 'SERVER_NAME'          => '127.0.0.1',
@@ -145,7 +149,8 @@ SKIP: {
     my $cid = expectCookie($res);
 
     ok(
-        $res = $app->( {
+        $res = $app->(
+            {
                 'HTTP_ACCEPT'          => 'text/html',
                 'SCRIPT_NAME'          => '/',
                 'SERVER_NAME'          => '127.0.0.1',

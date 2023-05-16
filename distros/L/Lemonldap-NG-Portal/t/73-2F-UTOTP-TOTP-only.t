@@ -1,9 +1,12 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
 
 require 't/test-lib.pm';
 my $maintests = 16;
+
+no warnings 'once';
 
 SKIP: {
     eval { require Convert::Base32; require Crypt::U2F::Server::Simple; };
@@ -12,7 +15,8 @@ SKIP: {
     }
     require Lemonldap::NG::Common::TOTP;
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => 'error',
                 utotp2fActivation      => 1,

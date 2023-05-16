@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -15,7 +16,8 @@ SKIP: {
         skip 'Image::Magick not found', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel       => 'error',
                 portalMainLogo => 'common/logos/logo_llng_old.png',

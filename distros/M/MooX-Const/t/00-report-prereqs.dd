@@ -43,6 +43,7 @@ do { my $x = {
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900',
+                                     'Moo' => '2.004000',
                                      'MooX::TypeTiny' => '0',
                                      'Moose' => '0'
                                    },

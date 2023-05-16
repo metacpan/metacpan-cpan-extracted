@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -13,7 +14,8 @@ SKIP: {
     if ($@) {
         skip 'Auth::Yubikey_WebClient not found', 0;
     }
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                      => 'error',
                 yubikey2fActivation           => 1,
@@ -38,7 +40,9 @@ SKIP: {
     $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{dwho}->{yubikey} =
       "ccccccdddwho";
     $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{dwho}->{_2fDevices} =
-      to_json( [ {
+      to_json(
+        [
+            {
                 "_yubikey" => "zzzzzzzzdwho",
                 "epoch"    => "1548016213",
                 "name"     => "MyYubikey",
@@ -49,7 +53,9 @@ SKIP: {
 
     # rtyler only has a registered yubikey
     $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{rtyler}->{_2fDevices} =
-      to_json( [ {
+      to_json(
+        [
+            {
                 "_yubikey" => "ccccccrtyler",
                 "epoch"    => "1548016213",
                 "name"     => "MyYubikey",

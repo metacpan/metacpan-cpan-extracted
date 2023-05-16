@@ -14,24 +14,25 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 10;
+plan tests => 11;
 
 use Net::DNS::Multicast;
 
 
 my $question = Net::DNS::Question->new( 'example.local.', 'AAAA' );
 is( $question->qclass,		    'IN', 'default qclass' );
-is( $question->unicast_response(),  0,	  'read MDNS unicast_response flag' );
+is( $question->unicast_response,    0,	  'MDNS unicast_response flag false' );
 is( $question->unicast_response(1), 1,	  'set MDNS unicast_response flag' );
-is( $question->unicast_response(),  1,	  'MDNS unicast_response flag set' );
 is( $question->qclass,		    'IN', 'unchanged qclass' );
+is( $question->unicast_response,    1,	  'MDNS unicast_response flag true' );
 
-my $rr = Net::DNS::RR->new('example.local IN AAAA ::1');
-is( $rr->class,		 'IN', 'default RRclass' );
-is( $rr->cache_flush(),	 0,    'read MDNS cache_flush flag' );
-is( $rr->cache_flush(1), 1,    'set MDNS cache_flush flag' );
-is( $rr->cache_flush(),	 1,    'MDNS cache_flush flag set' );
+my $rr = Net::DNS::RR->new('example.local AAAA ::1');
+is( $rr->class,		 'IN', 'implicit RRclass' );
+is( $rr->cache_flush,	 0,    'MDNS cache_flush flag false' );
 is( $rr->class,		 'IN', 'unchanged RRclass' );
+is( $rr->cache_flush(1), 1,    'set MDNS cache_flush flag' );
+is( $rr->class,		 'IN', 'unchanged RRclass' );
+is( $rr->cache_flush,	 1,    'MDNS cache_flush flag true' );
 
 exit;
 

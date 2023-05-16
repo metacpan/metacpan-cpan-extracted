@@ -4,6 +4,7 @@ use Moose::Role;
 use Catalyst::Utils;
 use CatalystX::RequestModel::Utils::InvalidContentType;
 use String::CamelCase;
+use Carp;
 
 requires 'attributes', 'execute';
 
@@ -36,12 +37,17 @@ sub _default_body_prefix_namespace {
 
 sub _default_body_model {
   my ($self, $controller, $ctx) = @_;
+  return $self->_default_body_model_for_action($controller, $ctx, $self);
+}
+
+sub _default_body_model_for_action {
+  my ($self, $controller, $ctx, $action) = @_;
   return $controller->default_body_model($self, $ctx) if $controller->can('default_body_model');
 
   my $prefix = $self->_default_body_prefix_namespace($controller, $ctx);
   $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
 
-  my $action_namepart = String::CamelCase::camelize($self->reverse);
+  my $action_namepart = String::CamelCase::camelize($action->reverse);
   $action_namepart =~s/\//::/g;
   
   my $postfix = $self->_default_body_postfix($controller, $ctx);
@@ -51,11 +57,12 @@ sub _default_body_model {
   return $model_component_name;
 }
 
+
 sub _process_body_model {
   my ($self, $controller, $ctx, $model) = @_;
   return $model unless $model =~m/^~/;
 
-  $model =~s/^~//;
+  $model =~s/^~(::)?//;
 
   my $prefix = $self->_default_body_prefix_namespace($controller, $ctx);
   $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
@@ -85,12 +92,17 @@ sub _default_query_prefix_namespace {
 
 sub _default_query_model {
   my ($self, $controller, $ctx) = @_;
+  return $self->_default_query_model_for_action($controller, $ctx, $self);
+}
+
+sub _default_query_model_for_action {
+  my ($self, $controller, $ctx, $action) = @_;
   return $controller->default_query_model($self, $ctx) if $controller->can('default_query_model');
 
   my $prefix = $self->_default_query_prefix_namespace($controller, $ctx);
   $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
 
-  my $action_namepart = String::CamelCase::camelize($self->reverse);
+  my $action_namepart = String::CamelCase::camelize($action->reverse);
   $action_namepart =~s/\//::/g;
   
   my $postfix = $self->_default_query_postfix($controller, $ctx);
@@ -100,11 +112,12 @@ sub _default_query_model {
   return $model_component_name;
 }
 
+
 sub _process_query_model {
   my ($self, $controller, $ctx, $model) = @_;
   return $model unless $model =~m/^~/;
 
-  $model =~s/^~//;
+  $model =~s/^~(::)?//;
 
   my $prefix = $self->_default_query_prefix_namespace($controller, $ctx);
   $prefix .= '::' if length($prefix) && $prefix !~m/::$/;
@@ -122,7 +135,9 @@ sub _get_request_model {
   my ($self, $controller, $ctx) = @_;
   return unless exists $self->attributes->{RequestModel} ||
     exists $self->attributes->{QueryModel} || 
-    exists $self->attributes->{BodyModel};
+    exists $self->attributes->{BodyModel} ||
+    exists $self->attributes->{QueryModelFor} ||
+    exists $self->attributes->{BodyModelFor};
 
   my @models = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
      map {split ',', $_||'' }  # Allow RequestModel(Model1,Model2)
@@ -138,18 +153,27 @@ sub _get_request_model {
     } @models;
   }
 
+  if(my ($action_name) = @{$self->attributes->{BodyModelFor}||[]}) {
+    my $action = $controller->action_for($action_name) || croak "There is no action for '$action_name'";
+    my $model = $self->_default_body_model_for_action($controller, $ctx, $action);
+    @models = ($model);
+  }
+
   # Allow GET to hijack form encoded
   $request_content_type = "application/x-www-form-urlencoded"
     if (($ctx->req->method eq 'GET') && !$request_content_type);
 
   my (@matching_models) = grep {
-    (lc($_->content_type) eq lc($request_content_type)) || ($_->get_content_in eq 'query')
+    my $model = $_;
+    my @model_ct = $model->content_type;
+    grep { lc($_) eq lc($request_content_type) || ($model->get_content_in eq 'query') } @model_ct;
   } map {
     $self->_build_request_model_instance($controller, $ctx, $_)
   } @models;
 
-  if(exists($self->attributes->{RequestModel}) || exists($self->attributes->{BodyModel})) {
+  if(exists($self->attributes->{RequestModel}) ||exists($self->attributes->{BodyModelFor}) || exists($self->attributes->{BodyModel})) {
     my ($content_type, @params) = $ctx->req->content_type; # handle "multipart/form-data; boundary=xYzZY"
+    $ctx->log->warn("No matching models for content type '$content_type'") unless @matching_models;
     return CatalystX::RequestModel::Utils::InvalidContentType->throw(ct=>$content_type) unless @matching_models;
   }
 
@@ -163,6 +187,12 @@ sub _get_request_model {
     @qmodels = map {
       $self->_process_query_model($controller, $ctx, $_);
     } @qmodels;
+  }
+
+  if(my ($action_name) = @{$self->attributes->{QueryModelFor}||[]}) {
+    my $action = $controller->action_for($action_name) || croak "There is no action for '$action_name'";
+    my $qmodel = $self->_default_query_model_for_action($controller, $ctx, $action);
+    @qmodels = ($qmodel);
   }
 
   # Loop over all the found models.  Create each one and then filter by request
@@ -181,7 +211,7 @@ sub _get_request_model {
 sub _build_request_model_instance {
   my ($self, $controller, $ctx, $request_model_class) = @_;
   my $request_model_instance = $ctx->model($request_model_class)
-    || die "Request Model '$request_model_class' doesn't exist";
+    || croak "Request Model '$request_model_class' doesn't exist";
   return $request_model_instance;
 }
 
@@ -307,7 +337,9 @@ the model name.  For example, if you have the following controller:
 
     sub root :Chained(/root) PathPart('account') CaptureArgs(0)  { }
 
-      sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(~RequestBody) {
+      ## You can use either ~ or ~:: to indicate 'under the current namespace'.
+
+      sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(~::RequestBody) {
         my ($self, $c, $request_model) = @_;
         ## Do something with the $request_model
       }
@@ -346,6 +378,11 @@ Example of an action with more than one request model, which will be matched bas
 
 Also, if more than one model matches, you'll get an instance of each matching model.
 
+You can also leave the C<BodyModel> value empty; if you do so it use a default model based on the action private name.
+For example if the private name is C</posts/user_comments> we will look for a model package name C<MyApp::Model::Posts::UserCommentsBody>.
+Please see L</ATTRITBUTE VALUE DEFAULTS> for more on configurating and controlling how this works.
+
+
 =head2 QueryModel
 
 Should be the name of a L<Catalyst::Model> subclass that does L<CatalystX::QueryModel::DoesQueryModel>.  You may 
@@ -365,6 +402,17 @@ in the action method declaration.  This is due to a limitation in how Catalyst c
 (we can't know the order of dissimilar attributes since this information is stored in a hash, not an array, and
 L<Catalyst> allows a controller to inherit attributes from a base class, or from a role or even from configutation).
 However the order of QueryModels and RequestModels independently are preserved.
+
+You can also leave the C<QueryModel> value empty; if you do so it use a default model based on the action private name.
+For example if the private name is C</posts/user_comments> we will look for a model package name C<MyApp::Model::Posts::UserCommentsQuery>.
+Please see L</ATTRITBUTE VALUE DEFAULTS> for more on configurating and controlling how this works.
+
+=head2 BodyModelFor
+
+=head2 QueryModelFor
+
+Use the default models for a different action in the same controller.  Useful for example if you have a lot of
+basic CRUD style controllers where the create and update actions need the same parameters.
 
 =head1 AUTHOR
 

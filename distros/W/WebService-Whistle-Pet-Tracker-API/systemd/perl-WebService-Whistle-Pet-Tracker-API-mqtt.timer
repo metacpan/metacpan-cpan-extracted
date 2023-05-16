@@ -1,0 +1,11 @@
+[Unit]
+Description=perl-WebService-Whistle-Pet-Tracker-API-mqtt.timer
+Requires=perl-WebService-Whistle-Pet-Tracker-API-mqtt.service
+
+[Timer]
+Unit=perl-WebService-Whistle-Pet-Tracker-API-mqtt.service
+OnBootSec=5min
+OnUnitActiveSec=60min
+
+[Install]
+WantedBy=timers.target

@@ -3,6 +3,25 @@ package Lingy::Reader;
 
 use Lingy::Common;
 
+my $tokenize_re = qr/
+    (?:                     # Ignore:
+        \#\!.* |                # hashbang line
+        [\s,] |                 # whitespace, commas,
+        ;.*                     # comments
+    )*
+    (                       # Capture all these tokens:
+        ~@ |                    # Unquote-splice token
+        [\[\]{}()'`~^@] |       # Single character tokens
+        \#?                     # Possibly a regex
+        "(?:                    # Quoted string
+            \\. |                   # Escaped char
+            [^\\"]                  # Any other char
+        )*"? |                      # Match if missing ending quote
+                                # Other tokens
+        [^\s\[\]\{\}\(\)\'\"\`\,\;]*
+    )
+/xo;
+
 sub new {
     my $class = shift;
     bless {
@@ -11,8 +30,16 @@ sub new {
     }, $class;
 }
 
+sub tokenize {
+    [
+        grep length,
+        $_[0] =~ /$tokenize_re/g
+    ];
+}
+
 sub read_str {
-    my ($self, $str) = @_;
+    my ($self, $str, $repl) = @_;
+    local $self->{repl} = $repl;
     my $tokens = $self->{tokens} = tokenize($str);
     my @forms;
     while (@$tokens) {
@@ -22,28 +49,6 @@ sub read_str {
         }
     }
     return @forms;
-}
-
-sub tokenize {
-    [
-        grep length,
-        $_[0] =~ /
-            (?:                     # Ignore:
-                [\s,] |                 # whitespace, commas,
-                ;.*                     # comments
-            )*
-            (                       # Capture all these tokens:
-                ~@ |                    # Unquote-splice token
-                [\[\]{}()'`~^@] |       # Single character tokens
-                "(?:                    # Quoted string
-                    \\. |                   # Escaped char
-                    [^\\"]                  # Any other char
-                )*"? |                      # Match if missing ending quote
-                                        # Other tokens
-                [^\s\[\]\{\}\(\)\'\"\`\,\;]*
-            )
-        /xog
-    ];
 }
 
 sub read_form {
@@ -61,19 +66,34 @@ sub read_form {
     $self->read_scalar;
 }
 
+sub read_more {
+    my ($self) = @_;
+    if ($self->{repl}) {
+        my $line = Lingy::ReadLine::readline(1);
+        if (defined $line) {
+            push @{$self->{tokens}}, @{tokenize($line)};
+            return 1;
+        }
+    }
+    return;
+}
+
 sub read_list {
     my ($self, $type, $end) = @_;
     my $tokens = $self->{tokens};
     shift @$tokens;
     my $list = $type->new([]);
-    while (@$tokens > 0) {
-        if ($tokens->[0] eq $end) {
-            shift @$tokens;
-            return $list;
+    while (1) {
+        while (@$tokens) {
+            if ($tokens->[0] eq $end) {
+                shift @$tokens;
+                return $list;
+            }
+            push @$list, $self->read_form;
         }
-        push @$list, $self->read_form;
+        $self->read_more and next;
+        err "Reached end of input in 'read_list'";
     }
-    err "Reached end of input in 'read_list'";
 }
 
 sub read_hash_map {
@@ -81,17 +101,22 @@ sub read_hash_map {
     my $tokens = $self->{tokens};
     shift @$tokens;
     my $pairs = [];
-    while (@$tokens > 0) {
-        if ($tokens->[0] eq $end) {
-            shift @$tokens;
-            return $type->new($pairs);
+    while (1) {
+        while (@$tokens > 0) {
+            if ($tokens->[0] eq $end) {
+                shift @$tokens;
+                err "Map literal must contain an even number of forms"
+                    if @$pairs % 2;
+                return $type->new($pairs);
+            }
+            push @$pairs, $self->read_form;
         }
-        push @$pairs, $self->read_form, $self->read_form;
+        $self->read_more and next;
+        err "Reached end of input in 'read_hash_map'";
     }
-    err "Reached end of input in 'read_hash_map'";
 }
 
-my $string_re = qr/"((?:\\.|[^\\"])*)"/;
+my $string_re = qr/#?"((?:\\.|[^\\"])*)"/;
 my $unescape = {
     'n' => "\n",
     't' => "\t",
@@ -102,31 +127,56 @@ sub read_scalar {
     my ($self) = @_;
     my $scalar = local $_ = shift @{$self->{tokens}};
 
-    if (/^"/) {
-        s/^$string_re$/$1/ or
-            err "Reached end of input looking for '\"'";
-        s/\\([nt\"\\])/$unescape->{$1}/ge;
-        return string($_);
+    while (/^#?"/) {
+        if (/^$string_re$/) {
+            my $is_regex = /^#/;
+            s/^$string_re$/$1/;
+            s/\\([nt\"\\])/$unescape->{$1}/ge;
+            return $is_regex ? regex($_) : string($_);
+        }
+        if ($self->{repl}) {
+            my $line = Lingy::ReadLine::readline(1);
+            if (defined $line) {
+                $_ .= "\n$line";
+                next;
+            }
+        }
+        err "Reached end of input looking for '\"'";
     }
     return true if $_ eq 'true';
     return false if $_ eq 'false';
+    return keyword($_) if /^:/;
     return nil if $_ eq 'nil';
     return number($_) if /^-?\d+$/;
-    return keyword($_) if /^:/;
     return char($_) if /^\\/;
+    err "Unmatched delimiter: '$_'" if /^[\)\]\}]$/;
     return $self->read_symbol($_);
 }
 
 # Defined separately to allow subclassing:
 sub read_symbol {
     my ($self, $symbol) = @_;
+    if (my $ids = $self->{autogensym}) {
+        if ($symbol =~ m{^([^/]+)#$}) {
+            my $id = $ids->{$1} //= Lingy::Lang::RT::nextID();
+            $symbol =~ s/#$/__${id}__auto__/;
+        }
+    }
     symbol($symbol);
 }
 
 sub read_quote {
     my ($self, $quote) = @_;
     shift @{$self->{tokens}};
-    return list([symbol($quote), $self->read_form]);
+    my $form;
+    if ($quote eq 'quasiquote') {
+        $self->{autogensym} = {};
+        $form = $self->read_form;
+        delete $self->{autogensym};
+    } else {
+        $form = $self->read_form;
+    }
+    return list([symbol($quote), $form]);
 }
 
 sub with_meta {

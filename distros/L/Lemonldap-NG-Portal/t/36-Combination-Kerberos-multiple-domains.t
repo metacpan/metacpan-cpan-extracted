@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -28,7 +29,8 @@ SKIP: {
         "INSERT INTO users_dom1 VALUES ('hford','harrison','Harrison Ford')");
     $dbh->do("INSERT INTO users_dom2 VALUES ('hford','henry','Henry Ford')");
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,
@@ -189,7 +191,7 @@ SKIP: {
             ),
             'Post form'
         );
-        my ( $host, $tmp, $query ) =
+        ( $host, $tmp, $query ) =
           expectForm( $res, '#', undef, 'user', 'password' );
         $query =~ s/user=/user=hford/;
         $query =~ s/password=/password=harrison/;
@@ -222,7 +224,7 @@ SKIP: {
             ),
             'Post form'
         );
-        my ( $host, $tmp, $query ) =
+        ( $host, $tmp, $query ) =
           expectForm( $res, '#', undef, 'user', 'password' );
         $query =~ s/user=/user=hford/;
         $query =~ s/password=/password=henry/;

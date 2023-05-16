@@ -4,11 +4,11 @@ author:
   - 'Allison Randal <allison@perl.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test: '1.25'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,6 @@ requires:
   File::Spec: '0'
   Pod::Escapes: '1.04'
   Symbol: '0'
-  Test::More: '0'
   Text::Wrap: '98.112902'
   if: '0'
   integer: '0'
@@ -40,6 +39,6 @@ resources:
   bugtracker: https://github.com/perl-pod/pod-simple/issues
   homepage: https://metacpan.org/pod/Pod::Simple
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/perl-pod/pod-simple.git
-version: '3.43'
+  repository: https://github.com/perl-pod/pod-simple.git
+version: '3.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use Net::DNS qw(:DEFAULT);
 use base     qw(Exporter Net::DNS);
@@ -37,71 +37,71 @@ configured nameservers.
 =cut
 
 
-{
+## Insert methods into (otherwise empty) Net::DNS::Resolver package
 
-	package Net::DNS::Resolver;	## Add methods to (otherwise empty) package
+my $defaults = Net::DNS::Resolver->_defaults;
+$defaults->{multicast_group} = [qw(FF02::FB 224.0.0.251)];
+$defaults->{multicast_port}  = 5353;
 
-	my $NAME_REGEX = q/\.(local|254\.169\.in-addr\.arpa|[89AB]\.E\.F\.ip6\.arpa)$/;
+my $NAME_REGEX = q/\.(local|254\.169\.in-addr\.arpa|[89AB]\.E\.F\.ip6\.arpa)$/;
 
-	sub send {
-		my ( $self, @argument ) = @_;
-		my $packet = $self->_make_query_packet(@argument);
-		my ($q) = $packet->question;
+sub Net::DNS::Resolver::send {
+	my ( $self, @argument ) = @_;
+	my $packet = $self->_make_query_packet(@argument);
+	my ($q) = $packet->question;
 
-		if ( $q->qname =~ /$NAME_REGEX/oi ) {
-			local $packet->{status} = 0;
-			local @{$self}{qw(nameservers nameserver4 nameserver6 port retrans)};
-			$self->_reset_errorstring;
-			$self->nameservers( @{$self->{multicast_group}} );
-			$self->port( $self->{multicast_port} );
-			$self->retrans(3);
-			return $self->_send_udp( $packet, $packet->data );
-		}
-
-		return $self->SUPER::send($packet);
+	if ( $q->qname =~ /$NAME_REGEX/oi ) {
+		local $packet->{status} = 0;
+		local @{$self}{qw(nameservers nameserver4 nameserver6 port retrans)};
+		$self->_reset_errorstring;
+		$self->nameservers( @{$self->{multicast_group}} );
+		$self->port( $self->{multicast_port} );
+		$self->retrans(3);
+		return $self->_send_udp( $packet, $packet->data );
 	}
 
-	sub bgsend {
-		my ( $self, @argument ) = @_;
-		my $packet = $self->_make_query_packet(@argument);
-		my ($q) = $packet->question;
+	return Net::DNS::Resolver::Base::send( $self, $packet );
+}
 
-		if ( $q->qname =~ /$NAME_REGEX/oi ) {
-			local $packet->{status} = 0;
-			local @{$self}{qw(nameservers nameserver4 nameserver6 port)};
-			$self->_reset_errorstring;
-			$self->nameservers( @{$self->{multicast_group}} );
-			$self->port( $self->{multicast_port} );
-			return $self->_bgsend_udp( $packet, $packet->data );
-		}
+sub Net::DNS::Resolver::bgsend {
+	my ( $self, @argument ) = @_;
+	my $packet = $self->_make_query_packet(@argument);
+	my ($q) = $packet->question;
 
-		return $self->SUPER::bgsend($packet);
+	if ( $q->qname =~ /$NAME_REGEX/oi ) {
+		local $packet->{status} = 0;
+		local @{$self}{qw(nameservers nameserver4 nameserver6 port)};
+		$self->_reset_errorstring;
+		$self->nameservers( @{$self->{multicast_group}} );
+		$self->port( $self->{multicast_port} );
+		return $self->_bgsend_udp( $packet, $packet->data );
 	}
 
-	sub string {
-		my $self = shift;
-		return join( '', $self->SUPER::string, <<END );
+	return Net::DNS::Resolver::Base::bgsend( $self, $packet );
+}
+
+sub Net::DNS::Resolver::string {
+	my $self = shift;
+	return join( '', Net::DNS::Resolver::Base::string($self), <<END );
 ;; multicast_group	@{$self->{multicast_group}}
 ;; multicast_ port	$self->{multicast_port}
 END
-	}
-
-	my $defaults = __PACKAGE__->_defaults;
-	$defaults->{multicast_group} = [qw(FF02::FB 224.0.0.251)];
-	$defaults->{multicast_port}  = 5353;
 }
 
 
+## Add access methods for M-DNS flags
+
 sub Net::DNS::Question::unicast_response {
-	my ( $self, @value ) = @_;				# uncoverable pod
-	for (@value) { $self->{qclass} |= ( $_ << 15 ) }
-	return $self->{qclass} >> 15;
+	my ( $self, $value ) = @_;				# uncoverable pod
+	$self->{qclass} |= 0x8000 if $value;			# set only
+	return $self->{qclass} >> 15;				# always defined
 }
 
 sub Net::DNS::RR::cache_flush {
-	my ( $self, @value ) = @_;				# uncoverable pod
-	for (@value) { $self->{class} |= ( $_ << 15 ) }
-	return $self->{class} >> 15;
+	my ( $self, $value ) = @_;				# uncoverable pod
+	my $class = $self->{class} || 1;			# IN implicit
+	$self->{class} = $class |= 0x8000 if $value;		# set only
+	return $class >> 15;
 }
 
 

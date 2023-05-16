@@ -29,6 +29,20 @@ ok my $body_parameters = [
 }
 
 {
+  ok my $res = request POST '/root/test22', $body_parameters;
+  ok my $data = eval $res->content;
+  is $data->{username}, 'jjn';
+  is $data->{password}, 'abc123';  
+}
+
+{
+  ok my $res = request POST '/root/test222', $body_parameters;
+  ok my $data = eval $res->content;
+  is $data->{username}, 'jjn';
+  is $data->{password}, 'abc123';  
+}
+
+{
   ok my $res = request GET '/root/test3?username=jjn;password=abc123';
   ok my $data = eval $res->content;
   is $data->{username}, 'jjn';
@@ -41,5 +55,20 @@ ok my $body_parameters = [
   is $data->{username}, 'jjn';
   is $data->{password}, 'abc123';  
 }
+
+{
+  ok my $res = request GET '/root/test44?username=jjn;password=abc123';
+  ok my $data = eval $res->content;
+  is $data->{username}, 'jjn';
+  is $data->{password}, 'abc123';  
+}
+
+{
+  ok my $res = request GET '/root/test444?username=jjn;password=abc123';
+  ok my $data = eval $res->content;
+  is $data->{username}, 'jjn';
+  is $data->{password}, 'abc123';  
+}
+
 
 done_testing;

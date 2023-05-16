@@ -1,3 +1,10 @@
+0.104   2023-03-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [xcompletion filename] [doc] Fix example in Synopsis.
+
+
 0.103   2022-11-25  Released-By: PERLANCAR; Urgency: medium
 
         - Split perl_* and riap_* xcompletion modules to separate dists, to

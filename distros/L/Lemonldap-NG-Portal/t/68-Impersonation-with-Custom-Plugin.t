@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -7,7 +8,8 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_BADCREDENTIALS);
 require 't/test-lib.pm';
 
 my $res;
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel          => 'error',
             passwordDB        => 'Demo',

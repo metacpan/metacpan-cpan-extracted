@@ -1,5 +1,17 @@
 Revision history for Net-Statsd-Lite
 
+v0.7.0    2023-05-13 13:15:15+01:00 Europe/London
+  [Incompatible Changes]
+  - Bumped minimum version of Perl to v5.14.
+
+  [Enhancements]
+  - Simplified type imports.
+
+  [Documentation]
+  - Documented support policy for older Perls.
+
+  - Bumped copyright year.
+
 v0.6.3    2022-09-02 14:31:47+01:00 Europe/London
   [Documentation]
   - Bumped copyright year.

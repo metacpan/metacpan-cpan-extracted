@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Capture::Tiny qw(capture_stderr capture_stdout);
 use IO::Scalar;
-use Test::More tests => 13;
+use Test::More tests => 17;
 use D64::Disk::Dir;
 use D64::Disk::Image qw(:all);
 use File::Temp qw(tmpnam);
@@ -16,7 +16,7 @@ BEGIN { use_ok('D64::Disk::Dir::Entry', qw(:all)) };
 sub create_test_image {
     my $filename = tmpnam() . '.d64';
     my $d64 = D64::Disk::Image->create_image($filename, D64);
-    my $rawname = $d64->rawname_from_name(' djgruby/oxyron ');
+    my $rawname = $d64->rawname_from_name('dj gruby / triad');
     my $rawid = $d64->rawname_from_name('10');
     my $numstatus = $d64->format($rawname, $rawid);
     # Write file named "1" with contents "abcde":
@@ -75,8 +75,38 @@ free_test_image($d64, $filename);
 #########################
 {
 my ($d64, $entryObj, $filename) = create_test_image();
+$entryObj->set_type(T_DEL);
+my $type = $entryObj->get_type();
+is($type, 'del', 'set_type - setting the actual filetype');
+free_test_image($d64, $filename);
+}
+#########################
+{
+my ($d64, $entryObj, $filename) = create_test_image();
+eval { $entryObj->set_type(0xfe); };
+like($@, qr/An illegal file type:/, 'set_type - detecting an attempt to set a illegal filetype');
+free_test_image($d64, $filename);
+}
+#########################
+{
+my ($d64, $entryObj, $filename) = create_test_image();
 my $closed = $entryObj->get_closed();
 cmp_ok($closed, '==', 1, 'get_closed - getting "Closed" flag');
+free_test_image($d64, $filename);
+}
+#########################
+{
+my ($d64, $entryObj, $filename) = create_test_image();
+$entryObj->set_closed(0);
+my $closed = $entryObj->get_closed();
+cmp_ok($closed, '==', 0, 'set_closed - resetting "Closed" flag');
+free_test_image($d64, $filename);
+}
+#########################
+{
+my ($d64, $entryObj, $filename) = create_test_image();
+eval { $entryObj->set_closed(2); };
+like($@, qr/An illegal closed flag/, 'set_closed - detecting an attempt to pass an illegal closed flag');
 free_test_image($d64, $filename);
 }
 #########################

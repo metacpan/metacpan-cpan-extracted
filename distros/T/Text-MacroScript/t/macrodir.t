@@ -13,7 +13,8 @@ use Test::Differences;
 use Test::More;
 
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 my $MACRODIR  = "$^X -I../../blib/lib ../../bin/macrodir";
 my @PRONOUNS  = ("my", "your", "his", "her");
@@ -22,8 +23,9 @@ my $TARGET = "../target";
 
 #------------------------------------------------------------------------------
 # make directory and run tests
-my $ROOT = path("test~");
+my $ROOT = path("testdir~");
 my $src = path($ROOT, "src");
+$src->remove_tree;
 $src->mkpath;
 path($src, "2")->mkpath;
 chdir($src);

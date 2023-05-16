@@ -28,5 +28,5 @@ requires:
   perl: '5.010'
 resources:
   repository: git://github.com/pauloscustodio/Text-MacroScript.git
-version: '2.12'
+version: '2.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -61,7 +62,8 @@ my $bad_file4 = q%{
   }
 }%;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                            => 'error',
             authentication                      => 'Demo',
@@ -328,7 +330,7 @@ ok( $res = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
 ok( $res->{ALERTE} eq 'alert-danger', 'alert-danger found' )
   or print STDERR Dumper($res);
-ok( $res->{FILE} eq '', 'No file found' )
+ok( !defined $res->{FILE}, 'No file found' )
   or print STDERR Dumper($res);
 ok( $res->{MSG} eq 'PE104', 'PE104 found' )
   or print STDERR Dumper($res);
@@ -353,7 +355,7 @@ ok( $res->{ALERTE} eq 'alert-warning', 'alert-warning found' )
   or print STDERR Dumper($res);
 ok( $res->{TOKEN} =~ /^\d{10}_\d+$/, 'Token found' )
   or print STDERR Dumper($res);
-ok( $res->{FILE} eq '', 'No file found' )
+ok( !defined $res->{FILE}, 'No file found' )
   or print STDERR Dumper($res);
 ok( $res->{MSG} eq 'PE82', 'PE82 found' )
   or print STDERR Dumper($res);

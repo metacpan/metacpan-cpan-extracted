@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use IO::Scalar;
 use Test::Exception;
-use Test::More tests => 5;
+use Test::More tests => 7;
 ########################################
 our $class;
 BEGIN {
@@ -30,6 +30,15 @@ sub get_item {
 {
     my $sh = new IO::Scalar;
     my $item = get_item();
+    $item->print(fh => $sh, verbose => 1);
+    my $print_out = ${$sh->sref};
+    chomp $print_out;
+    is($print_out, '1    "test"             prg  17  0', 'verbosely print out valid directory item in ASCII mode');
+}
+########################################
+{
+    my $sh = new IO::Scalar;
+    my $item = get_item();
     $item->type($T_REL);
     $item->closed(0);
     $item->locked(1);
@@ -40,6 +49,21 @@ sub get_item {
     my $print_out = ${$sh->sref};
     chomp $print_out;
     is($print_out, '160  "newfile newfile" *rel<', 'print out modified directory item in ASCII mode');
+}
+########################################
+{
+    my $sh = new IO::Scalar;
+    my $item = get_item();
+    $item->type($T_REL);
+    $item->closed(0);
+    $item->locked(1);
+    my $name = chr(0x4e) . chr(0x45) . chr(0x57) . chr(0x46) . chr(0x49) . chr(0x4c) . chr(0x45) . chr(0x20) . chr(0x4e) . chr(0x45) . chr(0x57) . chr(0x46) . chr(0x49) . chr(0x4c) . chr(0x45);
+    $item->name($name);
+    $item->size(160);
+    $item->print(fh => $sh, verbose => 1);
+    my $print_out = ${$sh->sref};
+    chomp $print_out;
+    is($print_out, '160  "newfile newfile" *rel< 17  0', 'verbosely print out modified directory item in ASCII mode');
 }
 ########################################
 {

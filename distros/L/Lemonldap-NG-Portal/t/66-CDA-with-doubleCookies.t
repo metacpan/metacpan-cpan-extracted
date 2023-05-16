@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -11,7 +12,8 @@ require 't/test-lib.pm';
 my $res;
 
 # Portal
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel      => 'error',
             useSafeJail   => 1,
@@ -107,7 +109,8 @@ sub validateCda {
     my $port       = ( $scheme eq 'https' ? 443         : 80 );
     my $res;
     ok(
-        $res = $app->( {
+        $res = $app->(
+            {
                 'HTTP_ACCEPT'          => 'text/html',
                 'SCRIPT_NAME'          => '/',
                 'SERVER_NAME'          => '127.0.0.1',
@@ -135,7 +138,8 @@ sub validateCda {
     my $cid = expectCookie( $res, $cookiename );
 
     ok(
-        $res = $app->( {
+        $res = $app->(
+            {
                 'HTTP_ACCEPT'          => 'text/html',
                 'SCRIPT_NAME'          => '/',
                 'SERVER_NAME'          => '127.0.0.1',

@@ -3,8 +3,8 @@ NAME
     x.{,element_,index_}completion attributes
 
 VERSION
-    This document describes version 0.103 of Perinci::Sub::XCompletion (from
-    Perl distribution Perinci-Sub-XCompletion), released on 2022-11-25.
+    This document describes version 0.104 of Perinci::Sub::XCompletion (from
+    Perl distribution Perinci-Sub-XCompletion), released on 2023-03-01.
 
 SYNOPSIS
     In Rinci metadata:
@@ -63,8 +63,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2019, 2017, 2016, 2015 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2019, 2017, 2016, 2015 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

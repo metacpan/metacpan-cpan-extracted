@@ -21,11 +21,25 @@ BEGIN
 use strict;
 use warnings;
 
-my $o = MyObject->new( name => 'id', value => 'hello', type => 'attribute' );
+my $o = MyObject->new(
+    name => 'id',
+    total => 12,
+    type => 'attribute',
+    user_id => '63d36776-c34e-49ad-8d51-02c8abbee3b2',
+    value => 'hello',
+    version => 'v1.2.3',
+);
 isa_ok( $o, 'MyObject', 'new' );
 my $hash = $o->as_hash;
 diag( "as_hash results in: ", $o->dump( $hash ) ) if( $DEBUG );
-is_deeply( $hash, { name => 'id', value => 'hello', type => 'attribute' } );
+is_deeply( $hash, {
+    name => 'id',
+    total => 12,
+    type => 'attribute',
+    user_id => '63d36776-c34e-49ad-8d51-02c8abbee3b2',
+    value => 'hello',
+    version => 'v1.2.3',
+});
 if( $DEBUG )
 {
     foreach my $e ( sort( keys( %MyObject:: ) ) )
@@ -57,7 +71,10 @@ is( $ex->message, 'Mince !' );
 try
 {
     $o->fatal(1);
-    $o->error( "Oh no!" );
+    $o->error({ message => "Oh no!" });
+#     $o->error("Oh no!");
+#     my $ex = $o->error;
+#     die( $ex );
     fail( "Should not have gotten here." );
 }
 catch( MyException $e )
@@ -67,6 +84,7 @@ catch( MyException $e )
 }
 catch( $e )
 {
+    diag( "\$e is '$e' (", overload::StrVal( $e ), "). Is it undef ? ", ( defined( $e ) ? 'no' : 'yes' ) );
     fail( "Should not have gotten here." );
 }
 
@@ -92,6 +110,7 @@ is( $o->setget, 'Jack', '_set_get' );
 $o->setget_assign = 'John';
 is( $o->setget_assign, 'John', '_set_get_lvalue' );
 
+# NOTE: Arrays
 $o->array( qw( Jack John Paul ) );
 $a = $o->array;
 is( ref( $a ), 'ARRAY', '_set_get_array' );
@@ -117,6 +136,7 @@ isa_ok( $a2, 'Module::Generic::Array', '_set_get_array_as_object as lvalue' );
 is( $a2->length, 4, 'array object size' );
 is( $a2->last, 'Raphaël' );
 
+# NOTE: Code
 $o->callback = sub{1};
 my $cb = $o->callback;
 is( ref( $cb ), 'CODE', '_set_get_code' );
@@ -126,6 +146,7 @@ is( ref( $cb ), 'CODE', '_set_get_code' );
 my $cbv = $o->callback->();
 is( $cbv, 2, '_set_get_code exec value' );
 
+# NOTE: DateTime
 my $now = time();
 $o->created = 'now';
 my $dt = $o->created;
@@ -152,6 +173,7 @@ SKIP:
     }
 };
 
+# NOTE: File
 $o->file = "./some/file.txt";
 my $f2 = $o->file;
 diag( "\$f2 is '", overload::StrVal( $f2 ), "'" ) if( $DEBUG );                             
@@ -160,6 +182,7 @@ $o->file( "./some/other.txt" );
 my $f3 = $o->file;
 isa_ok( $f3, 'Module::Generic::File', '_set_get_file' );
 
+# NOTE: Hash
 $o->hash = { name => 'John', type => 'human' };
 $hash = $o->hash;
 is( ref( $hash ), 'HASH', '_set_get_hash as lvalue' );
@@ -173,6 +196,7 @@ $hash = $o->hash;
 is( ref( $hash ), 'HASH', '_set_get_hash' );
 is_deeply( $hash, { age => 30, location => 'Houston' }, '_set_get_hash value' );
 
+# NOTE: Lvalue scalar
 $o->id = 100;
 my $id = $o->id;
 is( $id, 100, '_set_get_scalar as lvalue' );
@@ -180,6 +204,7 @@ $o->id( 'hello' );
 $id = $o->id;
 is( $id, 'hello', '_set_get_scalar' );
 
+# NOTE: IP
 $o->ip = '127.0.0.1';
 my $ip = $o->ip;
 is( $ip, '127.0.0.1', '_set_get_ip' );
@@ -202,6 +227,7 @@ SKIP:
     diag( "Error is: ", $o->error ) if( $DEBUG );
 };
 
+# NOTE: Hash
 $o->metadata = { trans_id => 12345, client_id => 67890 };
 my $hash2 = $o->metadata;
 isa_ok( $hash2, 'Module::Generic::Hash', '_set_get_hash_as_mix_object' );
@@ -218,6 +244,7 @@ $hash2 = $o->metadata;
 isa_ok( $hash2, 'Module::Generic::Hash', '_set_get_hash_as_mix_object' );
 is_deeply( $hash2, { ts => $ts, token => 7654321 } );
 
+# NOTE: URI
 $o->uri = 'https://example.org';
 my $u = $o->uri;
 isa_ok( $u, 'URI', '_set_get_uri as lvalue' );
@@ -228,6 +255,7 @@ $u = $o->uri();
 isa_ok( $u, 'URI', '_set_get_uri' );
 is( $u, 'https://www.example.org', '_set_get_uri value' );
 
+# NOTE: scalar
 $o->type( 'transaction' );
 my $t = $o->type;
 isa_ok( $t, 'Module::Generic::Scalar', '_set_get_scalar_as_object' );
@@ -243,6 +271,7 @@ $v = $o->value;
 isa_ok( $v, 'Module::Generic::Scalar', '_set_get_scalar_as_object' );
 is( $v, 'pending', '_set_get_scalar_as_object value' );
 
+# NOTE: DateTime
 $dt = $o->datetime;
 is( $dt, undef, 'lvalue->get -> undef' );
 # $o->debug(4);
@@ -282,6 +311,84 @@ isnt( $now3, $now );
 # diag( "Is ", overload::StrVal( $now ), " same as ", overload::StrVal( $now3 ) );
 # ok( $now3 ne $now );
 
+# NOTE: Glob
+subtest "glob" => sub
+{
+    require Module::Generic::File::IO;
+    my $io = Module::Generic::File::IO->new;
+    my $rv = $o->io( $io );
+    isa_ok( $rv => 'Module::Generic::File::IO', 'glob returned from assignment' );
+    $rv = $o->io;
+    isa_ok( $rv => 'Module::Generic::File::IO', 'glob returned with accessor' );
+    my $io2 = Module::Generic::File::IO->new;
+    $o->io = $io2;
+    my $rv2 = $o->io;
+    is( $rv2, $io2, 'new glob set via lvalue assignment' );
+    # diag( "$rv is not $rv2" );
+    isnt( $rv, $rv2, 'new glob set' );
+    isa_ok( $rv => 'Module::Generic::File::IO', 'glob set with lvalue' );
+    $o->io( 'bad io' );
+    $rv = $o->io;
+    is( $rv, $io2, 'glob remains unchanged after bad assignment' );
+};
+
+# NOTE: Number
+subtest "number" => sub
+{
+    my $rv = $o->total;
+    isa_ok( $rv => 'Module::Generic::Number', 'number object' );
+    is( "$rv", 12, 'number value is 12' );
+    $o->total(20);
+    $rv = $o->total;
+    is( $rv, 20, 'number assigned' );
+    $o->total = 30;
+    $rv = $o->total;
+    is( $rv, 30, 'number assigned via lvalue' );
+    $o->total('not a number');
+    $rv = $o->total;
+    is( $rv, 30, 'number remains unchanged after bad assignment' );
+    my $ex = $o->error;
+    ok( $ex, 'error set' );
+    # diag( "Error message is: ", $ex->message );
+    like( $ex, qr/Invalid number/, 'bad number exception' );
+};
+
+# NOTE: uuid
+subtest "uuid" => sub
+{
+    my $user_id = $o->user_id;
+    is( $user_id, '63d36776-c34e-49ad-8d51-02c8abbee3b2', 'retrieve uuid' );
+    $o->user_id = '18e55141-dedc-4bca-9729-ccf91e57d6b4';
+    my $rv = $o->user_id;
+    is( $rv, '18e55141-dedc-4bca-9729-ccf91e57d6b4', 'assigning uuid with lvalue' );
+    my $rv2 = $o->user_id( '585b2f57-b6af-4619-8068-69672ecc407a' );
+    is( $rv2, '585b2f57-b6af-4619-8068-69672ecc407a', 'assigning uuid' );
+    my $rv3 = $o->user_id;
+    is( $rv3, '585b2f57-b6af-4619-8068-69672ecc407a', 'accessing uuid' );
+    $o->user_id = 'not an uuid';
+    my $rv4 = $o->user_id;
+    is( $rv4, '585b2f57-b6af-4619-8068-69672ecc407a', 'assigning bad uuid keeps value unchanged' );
+    my $ex = $o->error;
+    like( $ex->message, qr/not a valid uuid/, 'bad uuid exception' );
+};
+
+# NOTE: version
+subtest "version" => sub
+{
+    my $vers = $o->version;
+    isa_ok( $vers, 'version' );
+    is( $vers, 'v1.2.3', 'retrieve version number' );
+    $o->version = 'v2.3.4';
+    my $rv = $o->version;
+    isa_ok( $rv, 'version' );
+    is( $rv, 'v2.3.4', 'version set with lvalue assignment' );
+    $o->version( '3.4' );
+    $rv = $o->version;
+    isa_ok( $rv, 'version' );
+    is( $rv, '3.4', 'version set with regular mutator' );
+};
+
+# NOTE: Serialisation
 subtest "serialisation" => sub
 {
     my $test = { name => 'John', age => 22, location => 'Somewhere' };
@@ -504,10 +611,10 @@ sub created : lvalue { return( shift->_set_get_datetime( 'created', @_ ) ); }
 sub datetime : lvalue { return( shift->_lvalue({
     set => sub
     {
-        my( $self, $args ) = @_;
-        if( $self->_is_a( $args->[0] => 'DateTime' ) )
+        my( $self, @args ) = @_;
+        if( $self->_is_a( $args[0] => 'DateTime' ) )
         {
-            return( $self->{datetime} = shift( @$args ) );
+            return( $self->{datetime} = shift( @args ) );
         }
         else
         {
@@ -528,6 +635,8 @@ sub hash : lvalue { return( shift->_set_get_hash( 'hash', @_ ) ); }
 
 sub id : lvalue { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
+sub io : lvalue { return( shift->_set_get_glob( 'io', @_ ) ); }
+
 sub ip : lvalue { return( shift->_set_get_ip( 'ip', @_ ) ); }
 
 sub metadata : lvalue { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
@@ -540,9 +649,15 @@ sub setget_assign : lvalue { return( shift->_set_get_lvalue( 'setget', @_ ) ); }
 
 sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
 
+sub total : lvalue { return( shift->_set_get_number( 'total', @_ ) ); }
+
 sub uri : lvalue { return( shift->_set_get_uri( 'uri', @_ ) ); }
 
+sub user_id : lvalue { return( shift->_set_get_uuid( 'user_id', @_ ) ); }
+
 sub value : lvalue { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
+
+sub version : lvalue { return( shift->_set_get_version( 'version', @_ ) ); }
 
 package MyException;
 BEGIN

@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -131,7 +132,8 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",
@@ -204,7 +206,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",

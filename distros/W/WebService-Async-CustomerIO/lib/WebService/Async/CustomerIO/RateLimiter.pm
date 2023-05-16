@@ -9,7 +9,7 @@ use mro;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.001';    ## VERSION
+our $VERSION = '0.002';    ## VERSION
 
 =head1 NAME
 WebService::Async::CustomerIO::RateLimitter - This class provide possibility to limit amount

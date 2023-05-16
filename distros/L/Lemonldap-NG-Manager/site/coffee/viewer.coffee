@@ -260,7 +260,7 @@ llapp.controller 'TreeCtrl', [
 			$scope.waiting = true
 			console.log "Trying to get key #{node.cnodes}"
 			uri = encodeURI node.cnodes
-			$http.get("#{window.confPrefix}#{$scope.currentCfg.cfgNum}/#{uri}").then (response) ->
+			$http.get("#{window.viewPrefix}#{$scope.currentCfg.cfgNum}/#{uri}").then (response) ->
 				data = response.data
 				# Manage datas errors
 				if not data
@@ -368,7 +368,7 @@ llapp.controller 'TreeCtrl', [
 						uri = encodeURI node.get
 					else
 						console.log "Trying to get title #{node.title}"
-					$http.get("#{window.confPrefix}#{$scope.currentCfg.cfgNum}/#{if node.get then uri else node.title}").then (response) ->
+					$http.get("#{window.viewPrefix}#{$scope.currentCfg.cfgNum}/#{if node.get then uri else node.title}").then (response) ->
 						# Set default value if response is null or if asked by server
 						data = response.data
 						if (data.value == null or (data.error and data.error.match /setDefault$/ ) ) and node['default'] != null

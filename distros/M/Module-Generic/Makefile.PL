@@ -49,7 +49,7 @@ WriteMakefile(
         'List::Util'    => '1.56',
         'Module::Metadata' => '1.000037',
         # 'Number::Format' => '1.75',
-        'Nice::Try'     => 'v1.2.0',
+        'Nice::Try'     => 'v1.3.4',
         'POSIX'         => '1.53_01',
         'Regexp::Common'=> '2017060201',
         'Scalar::Util'  => '1.50',

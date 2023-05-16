@@ -1,0 +1,11 @@
+[Unit]
+Description=perl-WebService-Whistle-Pet-Tracker-API-mqtt
+Requires=network-online.target
+Wants=perl-WebService-Whistle-Pet-Tracker-API-mqtt.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/perl /usr/bin/perl-WebService-Whistle-Pet-Tracker-API-mqtt.pl
+
+[Install]
+WantedBy=multi-user.target

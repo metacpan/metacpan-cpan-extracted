@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use IO::String;
 use strict;
@@ -16,7 +17,8 @@ SKIP: {
     my $res;
     use_ok('Lemonldap::NG::Common::FormEncode');
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel       => 'error',
                 authentication => 'GPG',

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -15,6 +16,7 @@ use Digest::SHA;
 # Hook hash function into all new DBI connections
 {
     my $old_connect = \&DBI::connect;
+    no warnings 'redefine';
     *DBI::connect = sub {
         my $connection = $old_connect->(@_) or return;
 
@@ -62,7 +64,8 @@ SKIP: {
     $dbh->do(
 "INSERT INTO users VALUES ('dwho','\$6\$Y8KTt/guov37XOCO\$DdI67zOAFX4RfqJthruv9g2IJ7xzo5AuMaBcETfV5cgncvSoDycdvmEwbsQykOCJ45mzH65Q1fM/4UDJ/6Y/J1','Doctor who')"
     );
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,

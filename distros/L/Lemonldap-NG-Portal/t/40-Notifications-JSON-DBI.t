@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -97,7 +98,8 @@ q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,
 ]'
     );
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,
@@ -204,7 +206,7 @@ q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,
       or print STDERR "$@\n" . Dumper($res);
     ok( $json->{result} == 2, ' Result is 2' )
       or explain( $json, "result => 2" );
-    ok( $json->{MSG} == 'myNotifications', ' MSG is myNotifications' )
+    ok( $json->{MSG} eq 'myNotifications', ' MSG is myNotifications' )
       or explain( $json, "result => 2" );
     ok( $json->{NOTIFICATIONS}->[0]->{reference} =~ /testref2?/,
         ' Notification 1 found' )

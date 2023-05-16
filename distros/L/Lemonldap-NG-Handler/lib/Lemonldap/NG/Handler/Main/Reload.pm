@@ -5,6 +5,7 @@ our $VERSION = '2.0.15';
 package Lemonldap::NG::Handler::Main;
 
 use strict;
+use Digest::SHA qw(sha256_hex);
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use Lemonldap::NG::Common::Crypto;
 use Lemonldap::NG::Common::Safelib;            #link protected safe Safe object
@@ -218,6 +219,7 @@ sub defaultValuesInit {
       );
 
     $class->tsv->{cipher} = Lemonldap::NG::Common::Crypto->new( $conf->{key} );
+    $class->tsv->{keyH}   = sha256_hex( $conf->{key} );
 
     foreach my $opt (qw(https port maintenance)) {
 

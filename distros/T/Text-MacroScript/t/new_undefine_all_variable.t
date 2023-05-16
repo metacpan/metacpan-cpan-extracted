@@ -6,10 +6,12 @@
 use strict;
 use warnings;
 use Test::More;
+use Path::Tiny;
 
 my $ms;
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 sub _define {
 	$ms->define_variable('A', 1); 

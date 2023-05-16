@@ -1,5 +1,10 @@
 Revision history for Perl extension RPC::Switch::Client::Tiny.
 
+1.66  2022-11-07
+	- added msglimit param to avoid 'netstring too big' worker exit
+	- invalidate per_user session to remove childs without session from session cache
+	- don't add job if child pipe is broken
+
 1.64  2022-10-21
 	- fixed memory leak in session expire list
 

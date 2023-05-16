@@ -6,13 +6,13 @@ sticker - sticks tags onto files, populates a database with file meta-data
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
     sticker --help | --manpage | --version | --settings { schema | all | I<name> }
 
-    sticker [--verbose] [--disable I<module> ] I<other options>
+    sticker [--verbose] [ --readonly ] [--disable I<module> ] I<other options>
 
     sticker [--derive] --add I<string>=I<string> file [file ...]
     sticker --delete I<string> file [file ...]
@@ -99,6 +99,10 @@ Query the database for the list of files matching the given tag(s).
 =item --quiet
 
 Make the output quiet (no output).
+
+=item --readonly
+
+Disable database update, only enable queries.
 
 =item --removed
 
@@ -353,11 +357,13 @@ sub process_args () {
                'removed|rm',
                'missing',
                'overlooked',
+               'readonly!',
                'update',
                'db_info|dinfo',
                'file_info|finfo',
                'has_data',
                'tags',
+               'space_sep=s',
                'settings=s',
                'derive!',
                'extract!',
@@ -454,36 +460,50 @@ sub do_stuff {
 
             if ($opts->{removed})
             {
-                $sticker->delete_file_from_db($file);
+                if ($opts->{readonly})
+                {
+                    say STDERR "Database $opts->{dbname} is READ ONLY";
+                }
+                else
+                {
+                    $sticker->delete_file_from_db($file);
+                }
             }
             elsif ($opts->{add} or $opts->{delete})
             {
-                if ($opts->{add})
+                if ($opts->{readonly})
                 {
-                    print STDERR Dump($opts->{add}) if $opts->{verbose} > 1;
-                    foreach my $fn (keys %{$opts->{add}})
+                    say STDERR "Database $opts->{dbname} is READ ONLY";
+                }
+                else
+                {
+                    if ($opts->{add})
                     {
-                        $sticker->add_field_to_file(
-                            filename => $file,
-                            field => $fn,
-                            value => $opts->{add}->{$fn});
-                        if ($opts->{verbose})
+                        print STDERR Dump($opts->{add}) if $opts->{verbose} > 1;
+                        foreach my $fn (keys %{$opts->{add}})
                         {
-                            print_meta($opts,sticker=>$sticker,filename=>$file);
+                            $sticker->add_field_to_file(
+                                filename => $file,
+                                field => $fn,
+                                value => $opts->{add}->{$fn});
+                            if ($opts->{verbose})
+                            {
+                                print_meta($opts,sticker=>$sticker,filename=>$file);
+                            }
+                        }
+                    }
+                    if ($opts->{delete})
+                    {
+                        foreach my $fn (@{$opts->{delete}})
+                        {
+                            $sticker->delete_field_from_file(
+                                filename => $file,
+                                field => $fn);
                         }
                     }
                 }
-                if ($opts->{delete})
-                {
-                    foreach my $fn (@{$opts->{delete}})
-                    {
-                        $sticker->delete_field_from_file(
-                            filename => $file,
-                            field => $fn);
-                    }
-                }
             }
-            elsif ($opts->{extract})
+            elsif ($opts->{extract}) # extract data from the current file
             {
                 meta_from_file($opts,sticker=>$sticker,filename=>$file,from_file=>$file);
                 if ($opts->{verbose})
@@ -491,7 +511,7 @@ sub do_stuff {
                     print_meta($opts,sticker=>$sticker,filename=>$file);
                 }
             }
-            elsif ($opts->{from_file})
+            elsif ($opts->{from_file}) # extract data from the given file
             {
                 meta_from_file($opts,sticker=>$sticker,filename=>$file,from_file=>$opts->{from_file});
                 if ($opts->{verbose})
@@ -533,7 +553,14 @@ sub do_stuff {
     # if we are updating, do it after we have made any other changes
     if ($opts->{update})
     {
-        $sticker->update_db(@ARGV);
+        if ($opts->{readonly})
+        {
+            say STDERR "Database $opts->{dbname} is READ ONLY";
+        }
+        else
+        {
+            $sticker->update_db(@ARGV);
+        }
     }
 
 } # do_stuff
@@ -554,6 +581,8 @@ MAIN: {
         derive=>$opts->{derive},
         tagfield=>$opts->{tagfield},
         tagprefix=>$opts->{tagprefix},
+        space_sep=>$opts->{space_sep},
+        readonly=>$opts->{readonly},
         verbose=>$opts->{verbose},
         quiet=>$opts->{quiet},
     );

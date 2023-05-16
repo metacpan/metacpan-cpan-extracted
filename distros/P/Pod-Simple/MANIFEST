@@ -35,7 +35,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/00about.t
-t/20_skip.t
 t/ac_d.t
 t/accept01.t
 t/accept05.t
@@ -213,5 +212,6 @@ t/xhtml05.t
 t/xhtml10.t
 t/xhtml15.t
 t/xhtml20.t
+t/xhtml25.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

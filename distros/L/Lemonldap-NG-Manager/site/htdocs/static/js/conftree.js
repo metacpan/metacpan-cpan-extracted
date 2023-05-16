@@ -377,6 +377,7 @@ function templates(tpl,key) {
             "type" : "longtext"
          }
       ],
+      "help" : "authopenidconnect.html#options",
       "id" : "oidcOPMetaDataOptions",
       "title" : "oidcOPMetaDataOptions"
    },
@@ -411,6 +412,7 @@ function templates(tpl,key) {
             "type" : "int"
          }
       ],
+      "help" : "authopenidconnect.html#display",
       "id" : "oidcOPMetaDataOptionsDisplayParams",
       "title" : "oidcOPMetaDataOptionsDisplayParams",
       "type" : "simpleInputContainer"
@@ -817,6 +819,7 @@ function templates(tpl,key) {
             "title" : "oidcRPMetaDataOptionsIcon"
          }
       ],
+      "help" : "idpopenidconnect.html#display",
       "id" : "oidcRPMetaDataOptionsDisplay",
       "title" : "oidcRPMetaDataOptionsDisplay",
       "type" : "simpleInputContainer"
@@ -868,6 +871,7 @@ function templates(tpl,key) {
             "title" : "samlIDPMetaDataOptionsUserAttribute"
          }
       ],
+      "help" : "authsaml.html#session",
       "id" : "samlIDPMetaDataOptionsSession",
       "title" : "samlIDPMetaDataOptionsSession",
       "type" : "simpleInputContainer"
@@ -932,6 +936,7 @@ function templates(tpl,key) {
             "type" : "bool"
          }
       ],
+      "help" : "authsaml.html#signature",
       "id" : "samlIDPMetaDataOptionsSignature",
       "title" : "samlIDPMetaDataOptionsSignature",
       "type" : "simpleInputContainer"
@@ -989,6 +994,7 @@ function templates(tpl,key) {
             "type" : "select"
          }
       ],
+      "help" : "authsaml.html#binding",
       "id" : "samlIDPMetaDataOptionsBinding",
       "title" : "samlIDPMetaDataOptionsBinding",
       "type" : "simpleInputContainer"
@@ -1031,6 +1037,7 @@ function templates(tpl,key) {
             "type" : "bool"
          }
       ],
+      "help" : "authsaml.html#security",
       "id" : "samlIDPMetaDataOptionsSecurity",
       "title" : "samlIDPMetaDataOptionsSecurity",
       "type" : "simpleInputContainer"
@@ -1198,6 +1205,7 @@ function templates(tpl,key) {
             "type" : "int"
          }
       ],
+      "help" : "authsaml.html#display",
       "id" : "samlIDPMetaDataOptionsDisplay",
       "title" : "samlIDPMetaDataOptionsDisplay",
       "type" : "simpleInputContainer"

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -16,7 +17,8 @@ SKIP: {
     }
     require Lemonldap::NG::Common::TOTP;
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => 'error',
                 checkUser              => 1,
@@ -240,14 +242,14 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $r->is_success, ' Good challenge value' )
       or diag( $r->error_message );
 
-    my $registrationData = JSON::to_json( {
+    my $registrationData = JSON::to_json(
+        {
             clientData       => $r->client_data,
             errorCode        => 0,
             registrationData => $r->registration_data,
             version          => "U2F_V2"
         }
     );
-    ( $host, $url, $query );
     $query = Lemonldap::NG::Common::FormEncode::build_urlencoded(
         registration => $registrationData,
         challenge    => $res->[2]->[0],
@@ -356,7 +358,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         $data->{registeredKeys}->[0]->{keyHandle} );
     ok( $r->is_success, ' Good challenge value' )
       or diag( $r->error_message );
-    my $sign = JSON::to_json( {
+    my $sign = JSON::to_json(
+        {
             errorCode     => 0,
             signatureData => $r->signature_data,
             clientData    => $r->client_data,
@@ -463,14 +466,14 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $r->is_success, ' Good challenge value' )
       or diag( $r->error_message );
 
-    $registrationData = JSON::to_json( {
+    $registrationData = JSON::to_json(
+        {
             clientData       => $r->client_data,
             errorCode        => 0,
             registrationData => $r->registration_data,
             version          => "U2F_V2"
         }
     );
-    ( $host, $url, $query );
     $query = Lemonldap::NG::Common::FormEncode::build_urlencoded(
         registration => $registrationData,
         challenge    => $res->[2]->[0],

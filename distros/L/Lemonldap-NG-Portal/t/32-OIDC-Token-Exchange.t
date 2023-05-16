@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -15,7 +16,8 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $portal = LLNG::Manager::Test->new( {
+my $portal = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                        => $debug,
             domain                          => 'op.com',
@@ -67,8 +69,6 @@ my $portal = LLNG::Manager::Test->new( {
         }
     }
 );
-my $res;
-
 my $id = login( $portal, 'dwho' );
 
 my $code = codeAuthorize(
@@ -86,12 +86,12 @@ my $res = codeGrant( $portal, 'rpid', $code, 'http://test' );
 $res = expectJSON($res);
 
 # Unhandled token exchange request
-my $res = tokenExchange( $portal, 'rpid', xxx => "zzz" );
+$res = tokenExchange( $portal, 'rpid', xxx => "zzz" );
 expectReject( $res, 400, 'invalid_request' );
 
 # handled token exchange request
-my $res = tokenExchange( $portal, 'rpid', testtokenexchange => 1 );
-my $j   = expectJSON($res);
+$res = tokenExchange( $portal, 'rpid', testtokenexchange => 1 );
+my $j = expectJSON($res);
 is( $j->{result}, 1, "Request was handled by hook" );
 
 clean_sessions();

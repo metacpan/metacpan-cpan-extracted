@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.017';
+$Crypt::Argon2::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -125,20 +125,26 @@ This verifies that the C<$password> matches C<$encoded>. All parameters and the 
 This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2_pass>, but returns the binary tag instead of a formatted string.
 
 =head2 argon2id_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-=func argon2i_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-=func argon2d_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+=head2 argon2i_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+=head2 argon2d_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
 
 This function processes the C<$password> much like C<argon2_pass> does, but the C<$type> argument is set like the function name.
 
 =head2 argon2id_verify($encoded, $password)
-=func argon2i_verify($encoded, $password)
-=func argon2d_verify($encoded, $password)
+
+=head2 argon2i_verify($encoded, $password)
+
+=head2 argon2d_verify($encoded, $password)
 
 This verifies that the C<$password> matches C<$encoded> and the given type. All parameters and the tag value are extracted from C<$encoded>, so no further arguments are necessary.
 
 =head2 argon2id_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-=func argon2i_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-=func argon2d_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+=head2 argon2i_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+=head2 argon2d_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
 
 This function processes the C<$password> much like C<argon2_raw> does, but the C<$type> argument is set like the function name.
 

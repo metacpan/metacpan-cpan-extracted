@@ -1,5 +1,11 @@
 Revision history for Perl extension CheckDigits.
 
+v1.0.2 Sun May 14 09:40:21 CEST 2023
+	- repair building of MANIFEST
+	- add test for POD in script 'mkdir_heute'
+	- repair POD in script
+	- add test for POD coverage
+
 v1.0.1 Sun Dec 19 18:38:08 CET 2021
 	- move on GitHub
 	- clean up repository

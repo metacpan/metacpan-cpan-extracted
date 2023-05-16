@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -18,7 +19,7 @@ my ( $op, $res );
 ok( $op = op(), 'OP portal' );
 
 my $idpId = login( $op, "french" );
-my $res   = authorize(
+$res = authorize(
     $op, $idpId,
     {
         response_type => "code",
@@ -50,7 +51,8 @@ clean_sessions();
 done_testing();
 
 sub op {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',

@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.6.1
+version v0.6.2
 
 # SYNOPSIS
 
@@ -100,6 +100,8 @@ It does not work with [Mouse](https://metacpan.org/pod/Mouse). Pull requests are
 # SUPPORT FOR OLDER PERL VERSIONS
 
 Since v0.6.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 If you need this module on Perl v5.10, please use one of the v0.5.x
 versions of this module.  Significant bug or security fixes may be

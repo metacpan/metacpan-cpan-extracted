@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use IO::String;
 use URI;
@@ -11,7 +12,8 @@ sub testUserTokenSSLAuth {
     my %params = @_;
     my $choice = $params{'choice'};
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel    => 'error',
                 useSafeJail => 1,
@@ -107,7 +109,8 @@ m%<script type="application/init">\s*\{"sslHost":"https://authssl.example.com/au
 sub testLegacyAjaxSSL {
     my %params = @_;
     my $choice = $params{'choice'};
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel    => 'error',
                 useSafeJail => 1,
@@ -205,7 +208,8 @@ subtest
 
 subtest 'Regular SSL Auth' => sub {
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,
@@ -242,7 +246,8 @@ sub testSSLVarIf {
 
 subtest 'SSLVarIf mechanism' => sub {
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,

@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -37,7 +38,8 @@ SKIP: {
 
     use_ok('Lemonldap::NG::Portal::CDC');
     ok(
-        $cdc = LLNG::Manager::Test->new( {
+        $cdc = LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel                     => 'error',
                     samlCommonDomainCookieDomain => 'cdc.com',
@@ -205,7 +207,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                         => $debug,
                 domain                           => 'idp.com',
@@ -254,7 +257,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                         => $debug,
                 domain                           => 'sp.com',

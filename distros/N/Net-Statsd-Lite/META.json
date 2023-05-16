@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "client",
       "StatsD",
@@ -57,11 +57,9 @@
             "Scalar::Util" : "0",
             "Sub::Quote" : "0",
             "Sub::Util" : "1.40",
-            "Types::Common::Numeric" : "1.004000",
-            "Types::Common::String" : "0",
-            "Types::Standard" : "0",
+            "Types::Common" : "2.000000",
             "namespace::autoclean" : "0",
-            "perl" : "v5.10.0",
+            "perl" : "v5.14.0",
             "strict" : "0"
          }
       },
@@ -94,7 +92,7 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.6.3"
+         "version" : "v0.7.0"
       }
    },
    "release_status" : "stable",
@@ -109,14 +107,14 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.7.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Michael R. Davis <mrdvt@cpan.org>",
       "Toby Inkster <tobyink@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

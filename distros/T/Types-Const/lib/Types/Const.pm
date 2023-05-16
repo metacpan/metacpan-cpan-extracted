@@ -1,8 +1,6 @@
 package Types::Const;
 
-use v5.10;
-
-use strict;
+use v5.14;
 use warnings;
 
 # ABSTRACT: Types that coerce references to read-only
@@ -25,7 +23,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.5.0';
 
 
 declare Const,
@@ -119,7 +117,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.4.2
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -157,18 +155,6 @@ It supports coercions to read-only.
 
 This was added in v0.3.0.
 
-=head1 SEE ALSO
-
-L<Const::Fast>
-
-L<Type::Tiny>
-
-L<Types::Standard>
-
-L<Types::ReadOnly>
-
-L<MooX::Const>
-
 =head1 KNOWN ISSUES
 
 =head2 Side-effects of read-only data structures
@@ -200,7 +186,29 @@ once. (Since it is read-only, there is no need to re-check it.)
 There may be an issue with regexp references. See
 L<RT#127635|https://rt.cpan.org/Ticket/Display.html?id=127635>.
 
-=head2 Bug reports and feature requests
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.5.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.4.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
+=head1 SEE ALSO
+
+L<Const::Fast>
+
+L<Type::Tiny>
+
+L<Types::Standard>
+
+L<Types::ReadOnly>
+
+L<MooX::Const>
+
+=head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Types-Const/issues>
@@ -226,7 +234,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

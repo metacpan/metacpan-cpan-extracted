@@ -46,14 +46,16 @@
     </TMPL_IF>
 
     <div class= "row ">
-
+    <TMPL_IF NAME="DISPLAY">
       <!-- Groups Card 1 -->
       <div class ="col-6 col-sm-12 col-md-6 p-0">
         <div class="card h-100">
-          <div class="card-title text-center bg-light text-dark"><b><span trspan="groups_sso">SSO GROUPS</span></b></div>
-          <TMPL_LOOP NAME="GROUPS">
-          <div class="card-text text-left ml-2"><TMPL_VAR NAME="value"></div>
-          </TMPL_LOOP>
+          <TMPL_IF NAME="GROUPS">
+            <div class="card-title text-center bg-light text-dark"><b><span trspan="groups_sso">SSO GROUPS</span></b></div>
+            <TMPL_LOOP NAME="GROUPS">
+            <div class="card-text text-left ml-2"><TMPL_VAR NAME="value"></div>
+            </TMPL_LOOP>
+          </TMPL_IF>
         </div>
       </div>
 
@@ -153,7 +155,7 @@
           </TMPL_IF>
         </div>
       </div>
-
+    </TMPL_IF>
     </div>
 
     <div class="buttons">

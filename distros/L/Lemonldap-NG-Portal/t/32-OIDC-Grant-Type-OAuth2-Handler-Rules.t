@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -49,7 +50,8 @@ done_testing( count() );
 
 sub handler_req {
     my ( $handler, $url, $access_token ) = @_;
-    return $handler->( {
+    return $handler->(
+        {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => $url,
             'SERVER_NAME'          => '127.0.0.1',
@@ -72,7 +74,8 @@ sub handler_req {
 
 sub get_access_token_client {
     my ($portal) = @_;
-    my $query = buildForm( {
+    my $query = buildForm(
+        {
             client_id     => 'rpid',
             client_secret => 'rpid',
             grant_type    => 'client_credentials',
@@ -95,7 +98,8 @@ sub get_access_token_client {
 sub get_access_token_password {
     my ($portal) = @_;
     ## Get Access Token with Password Grant
-    my $query = buildForm( {
+    my $query = buildForm(
+        {
             client_id     => 'rpid',
             client_secret => 'rpid',
             grant_type    => 'password',
@@ -139,7 +143,8 @@ sub get_access_token_code {
 }
 
 sub portal {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                           => $debug,
                 domain                             => 'op.com',

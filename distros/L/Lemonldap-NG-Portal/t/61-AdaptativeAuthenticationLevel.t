@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -19,7 +20,12 @@ my $client = LLNG::Manager::Test->new( {
                 '$uid eq "msmith"' => '=5',
             },
             restSessionServer => 1,
-            exportedAttr      => '+ mail uid _session_id'
+            exportedVars      => {
+                uid => 'uid',
+            },
+            macros => {
+                authLevel => '"Macro_$authenticationLevel"'
+            }
         }
     }
 );
@@ -47,8 +53,8 @@ $json = expectJSON($res);
 
 ok( $json->{uid} eq 'dwho', 'uid found' ) or explain( $json, "uid='dwho'" );
 ok( $json->{authenticationLevel} == 3, 'Authentication level upgraded' );
-ok( scalar keys %$json == 10,          'Ten exported attributes found' )
-  or explain( $json, 'Ten exported attributes' );
+ok( scalar keys %$json == 10, 'Ten exported attributes found' )
+  or explain( scalar keys %$json, Dumper $json );
 count(3);
 
 ok( $client->logout($id), 'Logout' );

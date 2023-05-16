@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Exif;
-$File::Sticker::Reader::Exif::VERSION = '1.0603';
+$File::Sticker::Reader::Exif::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Reader::Exif - read and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -135,9 +135,12 @@ sub read_meta {
     # There are multiple fields which could be used as a file "description".
     # Check through them until you find a non-empty one.
     my $description = '';
-    foreach my $field (qw(Description Caption-Abstract Comment ImageDescription))
+    foreach my $field (qw(Caption-Abstract Comment UserComment ImageDescription Description))
     {
-        if (exists $info->{$field} and $info->{$field} and !$description)
+        if (exists $info->{$field}
+                and $info->{$field}
+                and $info->{$field} !~ /^---/ # YAML - not a description!
+                and !$description)
         {
             $description = $info->{$field};
             $description =~ s/\n$//; # remove trailing newlines
@@ -241,11 +244,61 @@ Title
 
     # -------------------------------------------------
     # Freeform Fields
-    # These are stored as YAML data in the UserComment field.
+    # These are stored as YAML data in the XMP:Description field.
+    # They used to be stored in the ImageDescription field then
+    # the UserComment field, so they need to be checked too.
     # -------------------------------------------------
-    if (exists $info->{UserComment} and $info->{UserComment})
+    if (exists $info->{Description}
+            and $info->{Description}
+            and $info->{Description} =~ /^---/)
     {
-        say STDERR "UserComment=", $info->{UserComment} if $self->{verbose} > 2;
+        say STDERR sprintf("Description='%s'", $info->{Description}) if $self->{verbose} > 2;
+        my $data;
+        eval {$data = Load($info->{Description});};
+        if ($@)
+        {
+            warn __PACKAGE__, " Load of YAML data failed: $@";
+        }
+        elsif (!$data)
+        {
+            warn __PACKAGE__, " no legal YAML" if $self->{verbose} > 2;
+        }
+        else # okay
+        {
+            foreach my $field (sort keys %{$data})
+            {
+                $meta{$field} = $data->{$field};
+            }
+        }
+    }
+    elsif (exists $info->{ImageDescription}
+            and $info->{ImageDescription}
+            and $info->{ImageDescription} =~ /^---/)
+    {
+        say STDERR sprintf("ImageDescription='%s'", $info->{ImageDescription}) if $self->{verbose} > 2;
+        my $data;
+        eval {$data = Load($info->{ImageDescription});};
+        if ($@)
+        {
+            warn __PACKAGE__, " Load of YAML data failed: $@";
+        }
+        elsif (!$data)
+        {
+            warn __PACKAGE__, " no legal YAML" if $self->{verbose} > 2;
+        }
+        else # okay
+        {
+            foreach my $field (sort keys %{$data})
+            {
+                $meta{$field} = $data->{$field};
+            }
+        }
+    }
+    elsif (exists $info->{UserComment}
+            and $info->{UserComment}
+            and $info->{UserComment} =~ /^---/)
+    {
+        say STDERR sprintf("UserComment='%s'", $info->{UserComment}) if $self->{verbose} > 2;
         my $data;
         eval {$data = Load($info->{UserComment});};
         if ($@)
@@ -286,7 +339,7 @@ sub _get_the_real_file {
     {
         my $cover_file = ($self->{cover_file} ? $self->{cover_file} : 'cover.jpg');
         $cover_file = File::Spec->catfile($filename, $cover_file);
-        if (-f $cover_file)
+        if (-r $cover_file)
         {
             $filename = $cover_file;
         }

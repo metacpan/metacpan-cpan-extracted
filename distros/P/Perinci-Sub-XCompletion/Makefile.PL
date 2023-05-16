@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Perinci::Sub::XCompletion",
   "PREREQ_PM" => {
     "Complete::File" => "0.440",
-    "Complete::Util" => "0.608",
+    "Complete::Util" => "0.616",
     "strict" => 0,
     "warnings" => 0
   },
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.103",
+  "VERSION" => "0.104",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::File" => "0.440",
-  "Complete::Util" => "0.608",
+  "Complete::Util" => "0.616",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

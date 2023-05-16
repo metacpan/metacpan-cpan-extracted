@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ BEGIN {
 
 my $level = 'error';
 my $res;
-my $client1 = LLNG::Manager::Test->new( {
+my $client1 = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -18,7 +20,8 @@ my $client1 = LLNG::Manager::Test->new( {
         }
     }
 );
-my $client2 = LLNG::Manager::Test->new( {
+my $client2 = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -27,7 +30,8 @@ my $client2 = LLNG::Manager::Test->new( {
         }
     }
 );
-my $client3 = LLNG::Manager::Test->new( {
+my $client3 = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -36,7 +40,8 @@ my $client3 = LLNG::Manager::Test->new( {
         }
     }
 );
-my $client4 = LLNG::Manager::Test->new( {
+my $client4 = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -48,7 +53,8 @@ my $client4 = LLNG::Manager::Test->new( {
     }
 );
 
-my $client5 = LLNG::Manager::Test->new( {
+my $client5 = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -95,8 +101,9 @@ sub testGetParam {
     }
     else {
         ok(
-            $res->[2]->[0] =
-              !m%<input type="hidden" name="skin" value="bootstrap" />%,
+            !defined $res->[2]->[0]
+              || $res->[2]->[0] !~
+              m%<input type="hidden" name="skin" value="bootstrap" />%,
             '"skin=bootstrap" input not found'
         ) or explain( $res->[2]->[0], '"skin=bootstrap" found' );
     }

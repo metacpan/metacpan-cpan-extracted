@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -147,7 +148,8 @@ my $id_token_payload = id_token_payload( $prms{id_token} );
 is( $id_token_payload->{acr}, "customacr-1", "Check ACR value" );
 ok( ( grep { $_ eq "rpid" } @{ $id_token_payload->{aud} } ),
     'Check that clientid is in audience' );
-ok( (
+ok(
+    (
         grep { $_ eq "http://my.extra.audience/test" }
           @{ $id_token_payload->{aud} }
     ),
@@ -217,7 +219,8 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -268,7 +271,8 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

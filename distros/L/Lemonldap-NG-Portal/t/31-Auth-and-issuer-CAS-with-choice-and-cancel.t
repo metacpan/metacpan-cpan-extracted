@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;    # skip_all => 'CAS is in rebuild';
 use strict;
@@ -144,7 +145,8 @@ count($maintests);
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 skipRenewConfirmation => 1,
                 logLevel              => $debug,
@@ -165,7 +167,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel          => $debug,
                 domain            => 'sp.com',

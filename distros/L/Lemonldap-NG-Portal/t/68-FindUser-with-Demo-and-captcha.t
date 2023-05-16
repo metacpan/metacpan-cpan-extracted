@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -15,7 +16,8 @@ SKIP: {
     if ($@) {
         skip 'Image::Magick not found', $maintests;
     }
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                    => 'error',
                 authentication              => 'Demo',

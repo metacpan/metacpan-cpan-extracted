@@ -4,11 +4,6 @@ LICENSE
 MANIFEST.SKIP
 META.json
 README.md
-author/Dockerfile
-author/README.md
-author/Vagrantfile
-author/cpanfile.snapshot
-author/fatpack.pl
 cpanfile
 lib/Perl/Build.pm
 lib/Perl/Build/Built.pm
@@ -18,7 +13,5 @@ t/00_compile.t
 t/01_perl_build_built.t
 t/02_perl_release.t
 t/regression/056_issue.t
-xt/02_perlcritic.t
-xt/live/01_available.t
 META.yml
 MANIFEST

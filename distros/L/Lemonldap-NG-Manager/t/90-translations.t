@@ -1,5 +1,6 @@
 # Verify that languages translation cover all `trspan`
 
+use warnings;
 use Test::More;
 use JSON;
 use strict;

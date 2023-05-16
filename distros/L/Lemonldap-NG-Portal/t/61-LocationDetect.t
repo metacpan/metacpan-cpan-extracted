@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -24,7 +25,7 @@ SKIP: {
                 locationDetectGeoIpDatabase  => 't/geoip/test.mmdb',
                 locationDetectGeoIpLanguages => 'en, fr',
                 restSessionServer            => 1,
-                exportedAttr => '+ mail uid _session_id _location_detect_env'
+                exportedAttr => '+ mail , uid _location_detect_env'
             }
         }
     );

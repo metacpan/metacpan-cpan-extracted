@@ -133,7 +133,7 @@ sub init
     }
     else
     {
-        # print( STDERR __PACKAGE__, "::init() Got here with args: ", Data::Dumper::Concise::Dumper( $args ), "\n" );
+        # print( STDERR __PACKAGE__, "::init() Got here with args: ", Module::Generic->dump( $args ), "\n" );
         $self->{message} = $args->{message} || '';
         $self->{code} = $args->{code} if( exists( $args->{code} ) );
         $self->{type} = $args->{type} if( exists( $args->{type} ) );

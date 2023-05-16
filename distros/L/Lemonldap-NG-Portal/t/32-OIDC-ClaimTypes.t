@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -8,7 +9,8 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                        => 'error',
             useSafeJail                     => 1,
@@ -73,7 +75,8 @@ for my $test ( @{$tests} ) {
     my @args   = @{ $test->[0] };
     my $expect = $test->[1];
     is( to_json( { key => $oidc->_formatValue( @args, "key", "foo" ) } ),
-        $expect, "_formatvalue(" . join( ', ', map { "'$_'" } @args ) . ")" );
+        $expect, "_formatvalue(" . join( ', ', map { "'$_'" } @args ) . ")" )
+      if defined $args[0];
 }
 
 done_testing();

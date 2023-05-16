@@ -13,7 +13,8 @@ use Test::More;
 my($cmd,$out,$err,$res,$test1,$test2);
 
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 my $macropp = "$^X -Iblib/lib bin/macropp";
 

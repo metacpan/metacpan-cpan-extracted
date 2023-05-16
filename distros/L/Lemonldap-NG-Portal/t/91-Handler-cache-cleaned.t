@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ require 't/smtp.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel         => 'error',
             mail2fActivation => '$uid eq "msmith"',
@@ -44,7 +46,8 @@ expectAuthenticatedAs( $res, 'dwho' );
 count(1);
 
 # Start logging in as msmith
-my $s = buildForm( {
+my $s = buildForm(
+    {
         user     => 'msmith',
         password => 'msmith',
     }

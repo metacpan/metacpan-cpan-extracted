@@ -1301,10 +1301,6 @@
         "type": "simpleInputContainer"
       }, {
         "_nodes": [{
-          "default": "http://auth.example.com/resetpwd",
-          "id": "mailUrl",
-          "title": "mailUrl"
-        }, {
           "default": "[A-Z]{3}[a-z]{5}.\\d{2}",
           "id": "randomPasswordRegexp",
           "title": "randomPasswordRegexp"

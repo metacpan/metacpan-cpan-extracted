@@ -4,6 +4,7 @@
 use Test::More;
 use Data::Dumper;
 use strict;
+use warnings;
 
 my $formDir = 'site/htdocs/static/forms';
 

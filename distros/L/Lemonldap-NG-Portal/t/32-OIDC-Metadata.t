@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -17,7 +18,8 @@ my $debug = 'error';
 
 sub getop {
     my ($options) = @_;
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => merge {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',

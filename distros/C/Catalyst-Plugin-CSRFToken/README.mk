@@ -63,14 +63,90 @@ via the `check_csrf_token` method as in the example given above.
 
 This Plugin adds the following methods
 
-## csrf\_token
+## random\_token
+
+This just returns base64 random string that is cryptographically secure and is generically
+useful for anytime you just need a random token.   Default length is 48 but please note 
+that the actual base64 length will be longer.  
+
+## csrf\_token ($session, $token\_secret)
 
 Generates a token for the current request path and user session and returns this string
-in a form suitable to put into an HTML form hidden field value.
+in a form suitable to put into an HTML form hidden field value.  Accepts the following 
+positional arguments:
+
+- $session
+
+    This is a string of data which is somehow linked to the current user session.   The default
+    is to call the method 'default\_csrf\_session\_id' which currently just returns the value of
+    '$c->sessionid'.  You can pass something here if you want a tigher scope (for example you
+    want a token that is scoped to both the current user id and a given URL path).
+
+- $token\_secret
+
+    Default is whatever you set the configuration value 'default\_secret' to.
 
 ## check\_csrf\_token
 
-Return true or false depending on if the current request has a token which is valid.
+Return true or false depending on if the current request has a token which is valid.  Accepts the
+following arguments in the form of a hash:
+
+- csrf\_token
+
+    The token to check.   Default behavior is to invoke method `find_csrf_token_in_request` which
+    looks in the HTTP request header and body parameters for the token.  Set this to validate a
+    specific token.
+
+- session
+
+    This is a string of data which is somehow linked to the current user session.   The default
+    is to call the method 'default\_csrf\_session\_id' which currently just returns the value of
+    '$c->sessionid'.  You can pass something here if you want a tigher scope (for example you
+    want a token that is scoped to both the current user id and a given URL path).
+
+    It should match whatever you passed to `csrf_token` for the request token you are trying to validate.
+
+- token\_secret
+
+    Default is whatever you set the configuration value 'default\_secret' to.  Allows you to specify a
+    custom secret (it should match whatever you passed to `csrf_token`).
+
+- max\_age
+
+    Defaults to whatever you set configuration value &lt;max\_age>.  A value in seconds that measures how
+    long a token is considered 'not expired'.  I recommend setting this to as short a value as is 
+    reasonable for your users to linger on a form page.
+
+Example:
+
+    $c->check_csrf_token(max_age=>(60*10)); # Don't accept a token that is older than 10 minutes.
+
+**NOTE**: If the token 
+
+## invalid\_csrf\_token
+
+Returns true if the token is invalid.  This is just the inverse of 'check\_csrf\_token' and
+it accepts the same arguments.
+
+## last\_checked\_csrf\_token\_expired
+
+Return true if the last checked token was considered expired based on the arguments used to
+check it.  Useful if you are writing custom checking code that wants to return a different
+error if the token was well formed but just too old.   Throws an exception if you haven't
+actually checked a token.
+
+## single\_use\_csrf\_token
+
+Creates a token that is saved in the session.  Unlike 'csrf\_token' this token is not crytographically
+signed so intead its saved in the user session and can only be used once.   You might prefer
+this approach for classic HTML forms while the other approach could be better for API applications
+where you don't want the overhead of a user session (or where you'd like the client to be able to
+open multiply connections at once.
+
+## check\_single\_use\_csrf\_token
+
+Checks a single\_use\_csrf\_token.   Accepts the token to check but defaults to getting it from
+the request if not provided.
 
 # CONFIGURATION
 

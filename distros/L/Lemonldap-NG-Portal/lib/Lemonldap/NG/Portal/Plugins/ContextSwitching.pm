@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.16.1';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -37,6 +37,16 @@ has ott => (
 has rule                  => ( is => 'rw', default => sub { 0 } );
 has idRule                => ( is => 'rw', default => sub { 1 } );
 has unrestrictedUsersRule => ( is => 'rw', default => sub { 0 } );
+
+# Prefixed sessions id attribute
+has prefixedSId => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = $_[0];
+        return $self->conf->{contextSwitchingPrefix} . '_session_id';
+    }
+);
 
 sub init {
     my ($self) = @_;
@@ -76,9 +86,7 @@ sub init {
 sub display {
     my ( $self, $req ) = @_;
     my ( $realSession, $realSessionId );
-    if ( $realSessionId =
-        $req->userData->{"$self->{conf}->{contextSwitchingPrefix}_session_id"} )
-    {
+    if ( $realSessionId = $req->userData->{ $self->prefixedSId } ) {
         unless ( $realSession = $self->p->getApacheSession($realSessionId) ) {
             $self->userLogger->info(
                 "ContextSwitching: session $realSessionId expired");
@@ -88,17 +96,14 @@ sub display {
 
     # Check access rules
     unless ( $self->rule->( $req, $req->userData )
-        || $req->userData->{
-            "$self->{conf}->{contextSwitchingPrefix}_session_id"} )
+        || $req->userData->{ $self->prefixedSId } )
     {
         $self->userLogger->warn('ContextSwitching service NOT authorized');
         return $self->p->do( $req,
             [ sub { PE_IMPERSONATION_SERVICE_NOT_ALLOWED } ] );
     }
 
-    if (
-        $req->userData->{"$self->{conf}->{contextSwitchingPrefix}_session_id"} )
-    {
+    if ( $req->userData->{ $self->prefixedSId } ) {
         $self->logger->debug('Request to stop ContextSwitching');
         if ( $self->conf->{contextSwitchingStopWithLogout} ) {
             $self->userLogger->notice("Stop ContextSwitching for $req->{user}");
@@ -232,8 +237,7 @@ sub _switchContext {
         $raz = 1;
     }
 
-    $req->sessionInfo->{"$self->{conf}->{contextSwitchingPrefix}_session_id"} =
-      $realSessionId;
+    $req->sessionInfo->{ $self->prefixedSId } = $realSessionId;
 
     return $self->_abortImpersonation( $req, $spoofId, $realId, 1 ) if $raz;
 
@@ -258,9 +262,8 @@ sub _switchContext {
 
 sub _abortImpersonation {
     my ( $self, $req, $spoofId, $realId, $abort ) = @_;
-    my $type = $abort ? 'sessionInfo' : 'userData';
-    my $realSessionId =
-      $req->{$type}->{"$self->{conf}->{contextSwitchingPrefix}_session_id"};
+    my $type          = $abort ? 'sessionInfo' : 'userData';
+    my $realSessionId = $req->{$type}->{ $self->prefixedSId };
     my $session;
     unless ( $session = $self->p->getApacheSession($realSessionId) ) {
         $self->userLogger->info("Session $session expired");
@@ -290,8 +293,7 @@ sub _abortImpersonation {
     $req->urldc( $self->conf->{portal} );
     $req->id($realSessionId);
     $self->p->buildCookie($req);
-    delete $req->{$type}
-      ->{"$self->{conf}->{contextSwitchingPrefix}_session_id"};
+    delete $req->{$type}->{ $self->prefixedSId };
 
     return $req;
 }
@@ -299,7 +301,7 @@ sub _abortImpersonation {
 sub displayLink {
     my ( $self, $req ) = @_;
     return 'OFF'
-      if $req->userData->{"$self->{conf}->{contextSwitchingPrefix}_session_id"};
+      if $req->userData->{ $self->prefixedSId };
     return 'ON' if $self->rule->( $req, $req->userData );
 }
 

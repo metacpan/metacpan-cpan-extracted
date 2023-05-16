@@ -6,12 +6,12 @@
 # Pod documentation is below (use perldoc to view)
 
 use strict; use warnings FATAL => 'all'; use utf8;
-use feature qw(say state lexical_subs);
+use feature qw(say state lexical_subs current_sub);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit;
-our $VERSION = '3.008'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-30'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-05-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # TODO FIXME: Integrate with Spreadsheet::Read and provide a formatting API
 #
@@ -487,7 +487,7 @@ sub _fmt_colx(;$$) {
       if (ref $_) {
         push @items, $$_; # \"string" means insert "string" literally
       } else {
-        additem($_, $hash{$_}//oops);
+        additem($_, $hash{$_}//oops(dvis '$_ $specs\n$hash'));
         delete $hash{$_} // oops;
       }
     }
@@ -563,6 +563,7 @@ sub new_sheet(@) {
 
   my ($userpkg, $fn, $lno, $subname) = @{ __filter_frame(__usercall_info()) };
 
+  my $pkgmsg = $opts{package} ? " [for pkg $userpkg]" : "";
   $userpkg = delete $opts{package} if exists $opts{package};
   croak "Invalid 'package' ",u($userpkg),"\n"
     unless defined($userpkg) && $userpkg =~ /^[a-zA-Z][:\w]*$/a;
@@ -572,7 +573,7 @@ sub new_sheet(@) {
   my $sheet = __silent_new(\%opts);
 
   if ($$sheet->{verbose}) {
-    __logmethret([$opthash,@_], $sheet);
+    __logmethret([$opthash,@_], [\(fmt_sheet($sheet), \$pkgmsg)])
   }
 
   $pkg2currsheet{$userpkg} = $sheet
@@ -636,6 +637,7 @@ sub logmsg(@) {
       ($sheet, $rx) = @{ shift @_ };
     }
   }
+  my $msgstr = join("", grep{defined} @_);
   if (! defined $sheet) {
     $sheet = $pkg2currsheet{scalar(caller)};
   }
@@ -655,10 +657,14 @@ sub logmsg(@) {
       push @prefix, "Row ".($rx+1)." " if defined($rx);
     }
     my $pfxgen = $sheet->attributes->{logmsg_pfx_gen} // \&_default_pfx_gen;
-    push @prefix, (&$pfxgen($sheet, $rx)), "): ";
+    push @prefix, &$pfxgen($sheet, $rx), "): ";
   }
-  my $suffix = (@_ > 0 && $_[-1] =~ /\n\z/s ? "" : "\n");
-  return join "", grep{defined} @prefix, @_, $suffix;
+  my $suffix = ($msgstr =~ /\n\z/s ? "" : "\n");
+  # If the message string starts with newlines, put them before the prefix
+  if ($msgstr =~ s/\A(\n+)([^\n])/$2/s) {
+    unshift @prefix, $1;
+  }
+  return join "", grep{defined} @prefix, $msgstr, $suffix;
 }
 
 #####################################################################
@@ -782,7 +788,7 @@ sub __self { # a new empty sheet is created if necessary
     my ($frame, $args) = __usercall_info();
 
     my ($userpkg, $fn, $lno, $subname) = @{ __filter_frame($frame) };
-    $opts{data_source} = "(Created implicitly by $subname at ${fn}:$lno)";
+    $opts{data_source} = "(Created implicitly by '$subname' at ${fn}:$lno)";
     
     my $self = $pkg2currsheet{$userpkg} = __silent_new(\%opts);
     $self
@@ -985,7 +991,7 @@ sub new { # Strictly OO, this does not affect caller's "current sheet".
       attributes       => delete $opts{attributes} // {},
       linenums         => delete $opts{linenums} // [],
       meta_info        => delete $opts{meta_info} // [], ##### ???? obsolete ???
-      data_source      => delete $opts{data_source} // "(none)",
+      data_source      => delete $opts{data_source}, # // "(none)",
       num_cols         => delete $opts{num_cols}, # possibly undef
 
       # %colx maps titles, aliases (automatic and user-defined), and
@@ -1026,7 +1032,8 @@ sub new { # Strictly OO, this does not affect caller's "current sheet".
   # Validate data, default num_cols, pad rows, etc.
   $self->_rows_replaced();
 
-  $self->_logmethretifv([$opthash,@_], $self);
+  __logmethret([$opthash,@_], [\fmt_sheet($self)])
+    if $$self->{verbose};
 
   $self
 }#new
@@ -1094,7 +1101,7 @@ sub _rows_replaced {  # completely new or replaced rows, linenums, etc.
     # many columns to create.
     $hash->{num_cols} //= 0;
   }
-  oops unless $hash->{data_source};
+  #oops unless $hash->{data_source};
   croak "#linenums ($#$linenums) != #rows ($#$rows)\n",
         dvis '$hash->{linenums}\n$hash->{rows}'
     unless @$linenums == @$rows;
@@ -1187,13 +1194,38 @@ sub _tie_col_vars {
         # So we must insist that the entire glob does not exist.
         no strict 'refs';
         if (exists ${$p.'::'}{$ident}) {
-          croak <<EOF ;
-'$ident' clashes with an existing variable in package $p .
-    Note: This check occurs when tie_column_vars was called with option :safe,
+          my $msg = <<EOF ;
+'$ident' clashes with an existing variable in package '$p' .
+    This is dis-allowed when tie_column_vars was called with option :safe,
     in this case at ${file}:${lno} .  In this situation you can not
     explicitly declare the tied variables, and they must be tied and
     imported before the compiler sees them.
+
+    Note: The clash may not be with a scalar, but something else 
+    named '${ident}' in the same package (array, hash, sub, filehandle, 
+    etc.) Unfortunately it is not possible to distinguish a non-existent
+    scalar from a declared scalar containing an undef value
+    (see *foo{SCALAR} in 'man perlref').  
+    Therefore, to be safe, nothing with the name '${ident}' may pre-exist.
 EOF
+          if (defined(my $val = ${"${p}::${ident}"})) {
+            $msg .= "\n  Found existing non-undef scalar \$${p}::${ident} = ".vis($val)."\n";
+          }
+          if (defined(my $code = \&{"${p}::${ident}"})) {
+            $msg .= "\n  Found existing sub ${p}::${ident} = ".Data::Dumper->new([$code])->Terse(1)->Indent(0)->Deparse(1)->Dump()."\n";
+          }
+          if ($debug && eval{ require Devel::Symdump; }) {
+            my $obj = Devel::Symdump->new($p);
+            $msg .= "\nPackage $p contains:\n";
+            for my $things (qw/scalars arrays hashes functions 
+                               filehandles dirhandles ios unknowns
+                              packages/) {
+              my @names = sort grep{$_ ne ""} 
+                               map{ s/^${p}::(?:.*::)*//r } $obj->$things();
+              $msg .= "   $things :".avis(@names)."\n" if @names;
+            }
+          }
+          croak "\n$msg\n";
         }
       }
     }
@@ -1283,7 +1315,8 @@ sub tie_column_vars(;@) {
   my $r = $self->_tie_col_vars($pkg, $parms, @varnames);
 
   my $pfx = ($r == __TCV_REDUNDANT ? "[ALL REDUNDANT] " : "");
-  $self->_logmethifv(\$pfx,\__fmt_uqarraywithqw(keys %tokens, @varnames), \" in package $pkg");
+  $self->_logmethifv([\$pfx, \__fmt_uqarraywithqw(keys %tokens, @varnames), 
+                      \" in package $pkg"]);
 }#tie_column_vars
 
 #
@@ -1296,7 +1329,7 @@ sub colx_desc() { ${&__selfmustonly}->{colx_desc} }
 sub data_source(;$) {
   my $self = &__selfmust;
   if (@_ == 0) { # 'get' request
-    $self->_logmethretifv([], $$self->{data_source});
+    $self->_logmethretifv([], [$$self->{data_source}]);
     return $$self->{data_source}
   }
   $self->_logmethifv(@_);
@@ -1324,9 +1357,11 @@ sub input_encoding() {
 
 # See below for title_rx()
 sub title_row() {
-  my $self = &__selfmust;
-  my $title_rx = $self->title_rx(@_);
-  defined($title_rx) ? $$self->{rows}->[$title_rx] : undef
+  my $self = &__selfmustonly;
+  my $title_rx = $$self->{title_rx};
+  my $r = defined($title_rx) ? $$self->{rows}->[$title_rx] : undef;
+  $self->_logmethretifv([], [$r]);
+  $r
 }
 sub rx() { ${ &__selfmustonly }->{current_rx} }
 sub crow() {
@@ -1426,74 +1461,91 @@ sub __validate_sheet_arg($) {
 
 my $trunclen = 200;
 sub fmt_sheet($) {
-  my $sheet = __validate_sheet_arg( shift ) // return("undef");
+  my $sheet = shift;
+  return "undef" unless defined($sheet);
+  #oops unless ref($sheet) ne "" && $sheet->isa(__PACKAGE__);
   local $$sheet->{verbose} = 0;
-  my $s = $sheet->sheetname() || $sheet->data_source() || "(unk)";
-  #if (length($s) > $trunclen) { $s = "...".substr($s,-($trunclen-3)) }
-  if (length($s) > $trunclen) { $s = substr($s,($trunclen-3))."..." }
-  #sprintf("0x%x (%s)", refaddr($sheet), $s);
-  sprintf("%s (%s)", $sheet, $s);
+  my $r = $sheet->sheetname() || $sheet->data_source() || addrvis($sheet)."(no data_source)";
+  if (length($r) > $trunclen) { $r = substr($r,($trunclen-3))."..." }
+  $r
 }
 
-# __methretmsg([ITEMS...])
-# __methretmsg([ITEMS...], RETVAL)
-# __methretmsg([ITEMS...], [RETVALS...])
+# __calldesc([ITEMS...], undef,        optOBJECT)  # no return value
+# __calldesc([ITEMS...], [RETVALS...], optOBJECT)
 #
-# Returns a message string relating to the current function or method call:
+# Compose a message string about the current function or method call:
 #
-#   ">[callers_file:callers_lno] calledsubname ITEMS\n"
+#   ">[callers_file:callers_lno] <OBJaddr> calledsubname ITEMS\n"
 # or
-#   ">[callers_file:callers_lno] calledsubname ITEMS -> RETURNVALS\n"
+#   ">[callers_file:callers_lno] <OBJaddr> calledsubname ITEMS -> RETVALS\n"
 #
-# with ITEMS and RETURNVALS formatted by fmt_list, with \n unconditionally 
-# appended to the overall result.
+# <OBJaddr> is shown only once in a sequence of calls with the same value.
 #
-# Special case: The first ITEM is ignored if it is a ref to an empty hash;
-#   This assumes the first ITEM is from __opthash and prevents showing {}
+# ITEMS and RETURNVALS are formatted by fmt_list, so may contain embedded
+# \"annotations" etc.   \n is unconditionally appended to the overall result.
+#
+# ITEMS Special case: The first ITEM is ignored if it is a ref to an empty 
+#   hash; this assumes it came from __opthash and prevents showing {}
 #   when the user actually did not pass any {OPTARGS} argument.  
 #
-sub __methretmsg($;$) {
-  my $items = $_[0];
-  oops unless ref($items) eq "ARRAY";
-  my $showitems =
-    (ref($items->[0]) eq "HASH" && !(keys %{$items->[0]}))
-       ? [@$items[1..$#$items]] : $items;
+sub __calldesc($;$$) {
+  my ($items_arg, $retvals, $object) = @_;
+  oops unless ref($items_arg) eq "ARRAY";
+
+  my $items =
+    (ref($items_arg->[0]) eq "HASH" && !(keys %{$items_arg->[0]}))
+      ? [@$items_arg[1..$#$items_arg]] : $items_arg;
 
   my ($fn, $lno, $subname) = __fn_ln_methname();
   my $msg = ">[$fn:$lno] $subname";
-  $msg .= " " if @$showitems;
-  if (@_ > 1) {
-    my $retvals = to_aref($_[1]);
-    oops unless @$retvals;
-    $msg .= @$showitems == 0 ? "()" : fmt_list(@$showitems);
-    oops "terminal newline in final log item" if $msg =~ /\n"?\z/s;
+
+  state $prev_objaddr = 0;
+  if (defined $object) {
+    if (refaddr($object) != $prev_objaddr) {
+      #$msg .= " <".addrvis(refaddr($object)).">";
+      $msg .= " <".fmt_sheet($object).">";
+      $prev_objaddr = refaddr($object);
+    }
+  } else {
+    $prev_objaddr = 0;
+  }
+
+  $msg .= " ".fmt_list(@$items) if @$items;
+  if (defined $retvals) {
+    oops unless ref($retvals) eq "ARRAY";
+    oops "terminal newline in last item" if $msg =~ /\n"?\z/s;
+    $msg .= "()" if @$items == 0;
     $msg .= " -> ";
     $msg .= fmt_list(@$retvals);
-  } else {
-    $msg .= fmt_list(@$showitems);
   }
   oops "terminal newline should not be included" if $msg =~ /\n"?\z/s;
   $msg."\n"
 }
-sub __logmethret($$) {
-  print STDERR &__methretmsg;
-}
 
 sub _methretmsg {
+  oops if @_ > 3; # (self, items, retvals)
   my $self = shift;
+  my ($items, $retvals) = @_;
+
   # Prepend additional ">"s according to {cmd_nesting}
-  my $extraprefix = ">" x ($$self->{cmd_nesting});
-  $extraprefix . &__methretmsg(@_);
+  my $pfx = ">" x ($$self->{cmd_nesting});
+
+  $pfx . &__calldesc($items, $retvals, $self);
 }
 
-sub _logmethret { # returns $self for chaining
-  my $self = shift;
-  print STDERR $self->_methretmsg(@_);
-  $self
+sub _logmethret {
+  print STDERR &_methretmsg;
+  $_[0]  # return self for chaining
 }
 sub _logmethretifv {
+  oops if @_ > 3; # (self, items, retvals)
   return unless ${$_[0]}->{verbose};
   goto &_logmethret;
+}
+
+sub __logmethret($$) {
+  # FIXME: Should this prefix with ">" also?
+  print STDERR &__calldesc
 }
 
 #-----------------------------------------------
@@ -1502,17 +1554,17 @@ sub _methmsg(@) {
   my $self = shift;
   $self->_methretmsg(\@_);
 }
-sub _logmeth(@) { 
+sub _logmeth(@) {   # takes linearized args
   my $self = shift;
   print STDERR $self->_methretmsg(\@_);
   $self
 }
-sub _logmethifv {
+sub _logmethifv {  # takes linearized args
   return unless ${$_[0]}->{verbose};
   goto &_logmeth;
 }
 sub __logmeth(@) { 
-  print STDERR __methretmsg(\@_);
+  __logmethret(\@_,undef);
 }
 #-----------------------------------------------
 
@@ -1758,7 +1810,8 @@ sub _specs2cxdesclist {
         croak "\n--- Title Row (rx $title_rx) ---\n",
                vis($title_row),"\n-----------------\n",
                "Regex $spec\n",
-               "does not match any of the titles (see above) in '$$self->{data_source}'\n"
+               "does not match any of the titles (see above) in '",
+               fmt_sheet($self),"'\n"
         # N.B. check for "does not match" in alias()
       }
       next
@@ -1925,7 +1978,7 @@ sub title_rx(;$@) {
     croak '{OPTARGS} passed to title_rx with no operator (get request?)'
       if %$opthash;
     $rx = $$self->{title_rx};
-    $self->_logmethretifv([], $rx);
+    $self->_logmethretifv([], [$rx]);
   } else {
     # N.B. undef arg means there are no titles
     $rx = shift;
@@ -1943,7 +1996,7 @@ sub title_rx(;$@) {
       }
     }
     $$self->{title_rx} = $rx;
-    $self->_logmethretifv([$opthash_arg, @orig_args], $rx);
+    $self->_logmethretifv([$opthash_arg, @orig_args], [$rx]);
     $self->_rebuild_colx($notie);
   }
   $rx;
@@ -2017,7 +2070,7 @@ sub _autodetect_title_rx {
         my @shortlist = grep{ $_->[0] >= $first_cx && $_->[0] <= $last_cx }
                         @list;
         if (@shortlist == 0) {
-          push @nd_reasons, ivis 'rx $rx: Matched \'$spec\' but in unacceptable cx '.avisl(map{$_->[0]} @list);
+          push @nd_reasons, ivis 'rx $rx: Matched \'$spec\' but in unacceptable cx '.alvis(map{$_->[0]} @list);
           next RX
         }
         if (! grep{ $_->[1] =~ /title/i } @shortlist) {
@@ -2045,7 +2098,7 @@ sub _autodetect_title_rx {
     if (@nd_reasons == 0) {
       push @nd_reasons, ivis '(BUG?) No rows checked! num_cols=$num_cols rows=$$self->{rows}'.dvis '\n##($min_rx $max_rx $first_cx $last_cx)' ;
     }
-    croak("In ",qsh($$self->{data_source})," ...\n",
+    croak("In ",qsh(fmt_sheet($self))," ...\n",
           "  Auto-detect of title_rx with options ",vis($opthash),
           dvis ' @required_specs\n',
           " failed because:\n   ", join("\n   ",@nd_reasons),
@@ -2058,7 +2111,7 @@ sub first_data_rx(;$) {
   my $self = &__self;
   my $first_data_rx = $$self->{first_data_rx};
   if (@_ == 0) { # 'get' request
-    $self->_logmethretifv([], $first_data_rx);
+    $self->_logmethretifv([], [$first_data_rx]);
     return $first_data_rx;
   }
   my $rx = __validate_nonnegi_or_undef( shift() );
@@ -2072,7 +2125,7 @@ sub last_data_rx(;$) {
   my $self = &__self;
   my $last_data_rx = $$self->{last_data_rx};
   if (@_ == 0) { # 'get' request
-    $self->_logmethretifv([], $last_data_rx);
+    $self->_logmethretifv([], [$last_data_rx]);
     return $last_data_rx;
   }
   my $rx = __validate_nonnegi_or_undef( shift() );
@@ -2170,6 +2223,8 @@ sub sort_rows(&) {
                  // (defined($title_rx) ? $title_rx+1 : 0);
   $last_rx  //= $last_data_rx // $#$rows;
 
+  $self->_logmethifv(\"(sorting rx ${first_rx}..${last_rx})");
+
   oops unless defined($first_rx);
   oops unless defined($last_rx);
   my $pkg = caller;
@@ -2214,10 +2269,9 @@ sub delete_col($) { goto &delete_cols; }
 # Used by new() and options()
 sub _set_verbose_debug_silent(@) {
   my $self = shift;
-  my $oldval;
   foreach (pairs @_) {
     my ($key, $val) = @$_;
-    $oldval = $$self->{$key};
+    my $oldval = $$self->{$key};
     next 
       unless !!$oldval != !!$val;
     if ($key eq "silent") {
@@ -2245,29 +2299,27 @@ sub _set_verbose_debug_silent(@) {
     else { croak "options: Unknown option key '$key'\n"; }
     $$self->{$key} = $val;
   }
-  $oldval 
 }
 
 # Get or set option(s).
 # New settings may be in an {OPTIONS} hash and/or linear args.
-# With _no_ arguments, returns a list of key => value pairs.
+# Always returns the old options (key => value pairs).
 sub options(@) {
-  my $self = &__self_ifexists;
+  my $self = &__self; # auto-create sheet if necessary
+  my @old = map{ exists($$self->{$_}) ? ($_ => $$self->{$_}) : () }
+               qw/verbose debug silent/;
+  
+  my %eff_args;
   if (@_ == 0) {
-    $self //= &__selfmust; # 'retrieve' is valid only if object exists
-    my @result;
-    foreach my $key (qw/verbose debug silent/) {
-      push(@result, $key, $$self->{$key}) if exists $$self->{$key};
-    }
     croak "(list) returned but called in scalar or void context"
       unless wantarray;
-    return @result;
+  } else {
+    my $opthash = &__opthash; # shift off 1st arg iff it is a hashref
+    %eff_args = (%$opthash, &__validate_pairs);
+    $self->_set_verbose_debug_silent(%eff_args);
   }
-  my $opthash = &__opthash; # shift off 1st arg iff it is a hashref
-  my @eff_args = (%$opthash, &__validate_pairs);
-  my $oldval = $self->_set_verbose_debug_silent(@eff_args);
-  $self->_logmethretifv([\__fmt_pairlist(@eff_args)], $oldval);
-  $oldval
+  $self->_logmethretifv([\__fmt_pairlist(%eff_args)], [\hvis(@old)]);
+  @old;
 }
 
 sub _colspecs_to_cxs_ckunique {
@@ -2507,6 +2559,7 @@ sub transpose() {
     $$self->{saved_linenums} = [ @$linenums ];
     @$linenums = ("?") x scalar @$rows;
   }
+  $$self->{data_source} //= "";
   $$self->{data_source} .= " transposed";
 
   $self->_rows_replaced;
@@ -2765,7 +2818,7 @@ sub write_csv(*;@) {
       #removed above... Text::CSV::known_attributes(),
       qw/verbose silent debug/,
     );
-    croak "Unrecognized OPTION(s): ",avislq(keys %notok) if %notok;
+    croak "Unrecognized OPTION(s): ",alvisq(keys %notok) if %notok;
   }
 
   $opts->{iolayers} //= $$self->{iolayers} // "";
@@ -2791,7 +2844,7 @@ sub write_csv(*;@) {
     $fh = $dest;
   } else {
     $self->_logmethifv($opts, \($dest." $opts->{iolayers} ("
-                             .scalar(@$rows)." rows, $num_cols columns)"));
+                               .scalar(@$rows)." rows, $num_cols columns)"));
     croak "Output path suffix must be *.csv, not\n  ",qsh($dest),"\n"
       if $dest =~ /\.([a-z]*)$/ && lc($1) ne "csv";
     open $fh,">$dest" or croak "$dest: $!\n";
@@ -2890,7 +2943,7 @@ sub write_spreadsheet(*;@) {
   my ($self, $opts, $outpath) = &__self_opthash_1arg;
   my $colx = $$self->{colx};
 
-  $self->_logmethifv($opts, $outpath);
+  $self->_logmethifv([$opts, $outpath]);
 
   # {col_formats} may be [list of formats in column order]
   #   or { COLSPEC => fmt, ..., __DEFAULT__ => fmt }
@@ -3005,15 +3058,17 @@ sub sheet(;$$) {
     }
 
     __logmeth($opthash,
-             \(" ".fmt_sheet($new)),
-             \(u($curr) eq u($new)
-               ? " [no change]" : " [previous: ".fmt_sheet($curr)."]"),
-             \$pkgmsg)
+              \(" ".fmt_sheet($new)),
+              \(u($curr) eq u($new)
+                ? " [no change]" 
+                : " [previous: ".fmt_sheet($curr)."]"),
+              \$pkgmsg
+             )
       if $verbose;
 
     $pkg2currsheet{$pkg} = $new;
   } else {
-    __logmethret([$opthash], \(fmt_sheet($curr).$pkgmsg))
+    __logmethret([$opthash], [\(fmt_sheet($curr), \$pkgmsg)])
       if $verbose;
   }
   $curr
@@ -3027,7 +3082,11 @@ use parent 'Tie::Array';
 use Carp;
 #our @CARP_NOT = qw(Tie::Indirect Tie::Indirect::Array
 #                   Tie::Indirect::Hash Tie::Indirect::Scalar);
-use Data::Dumper::Interp;
+use Data::Dumper::Interp qw/visnew
+                    vis  viso  avis  alvis  ivis  dvis  hvis  hlvis
+                    visq visoq avisq alvisq ivisq dvisq hvisq hlvisq
+                    addrvis rvis rvisq u quotekey qsh qshlist qshpath/;
+
 use Scalar::Util qw(looks_like_number weaken);
 sub oops(@) { goto &Spreadsheet::Edit::oops }
 
@@ -3282,8 +3341,8 @@ Spreadsheet::Edit - Slice and dice spreadsheets, optionally using tied variables
         ["Joe Smith",  "123 Main St",     "Boston", "CA",    "12345"],
         ["Mary Jones", "999 Olive Drive", "Fenton", "OH",    "67890"],
       ],
-      title_rx => 1
       ;
+  $s3=>title_rx(1);
   ...
 
 =head1 OO SYNOPSIS
@@ -4026,7 +4085,7 @@ Otherwise the first argument is not special and is simply
 the first message string.
 
 The details of formatting the sheet may be customized with a call-back
-given by a {logmsg_pfx_gen} attribute.  See comments
+given by a C<{logmsg_pfx_gen}> attribute.  See comments
 in the source for how this works.
 
 =head1 STANDARD SHEET VARIABLES
@@ -4240,12 +4299,13 @@ L<Spreadsheet::Edit::Preload>
 Some vestigial support for formats remains from an earlier implementation,
 but this support is likely to be entirely replaced at some point.
 
-Spreadsheets are currently read using the external programs C<gnumeric>
-or C<unoconv> to convert to a temporary CSV file.
-C<unoconv> has a bug where reading will fail if Open/Libre Office
-is currently running, even on an unrelated document.
-This may be fixed in the future by using Spreadsheet::Read instead,
-although it uses modules based on Twig which are quite slow.
+Reading a spreadsheet (but not csv) may fail if I<Libre Office> 
+or I<Open Office> are currently running for any purpose; this seems to be
+a bug or limitation where batch-mode operations share the same profile as
+interactive sessions.   In any case, I<ssconvert> (gnumeric) will be used
+if it is installed, and does not have this limitation.
+In the future Spreadsheet::Read might be used instead of external programs,
+although it uses Twig and is quite a bit slower.
 
 =head1 THREAD SAFETY
 
@@ -4257,7 +4317,9 @@ Unknown, and probably not worth the trouble to find out.
 
 =item Add format-processing support.
 
-=item Add "column-major" views, to access a whole column as an array.
+=item Add "column-major" views. 
+
+This would allow accessing a whole column as an array.
 Perhaps C<@cols> and C<%cols> would be sets of column arrays
 (@cols indexed by column index, %cols indexed by any COLSPEC).
 And C<tie_column_vars '@NAME'> would tie user array variables to columns.

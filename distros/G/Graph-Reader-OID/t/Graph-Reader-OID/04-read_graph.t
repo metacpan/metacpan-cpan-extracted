@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use Graph::Reader::OID;
 use Test::More 'tests' => 16;

@@ -1,10 +1,10 @@
 package String::Validator::Phone::NANP;
-$String::Validator::Phone::NANP::VERSION = '2.00';
+$String::Validator::Phone::NANP::VERSION = '2.04';
 use 5.008;
 use strict;
 use warnings;
-use String::Validator::Common 1.90;
-use Number::Phone ;
+use String::Validator::Common 2.01;
+use Number::Phone 3.9001;
 
 # ABSTRACT: Validate North American Phone Numbers
 
@@ -70,6 +70,16 @@ sub _Init  {
 		$self->{ $_ } = '' ; }
     } ;
 
+sub _AreaOK {
+  my $self = shift;
+  my $ac = shift;
+  if ( $ac =~ /\d11/ or $ac < 200 ) {
+    $self->IncreaseErr(
+        $self->{messages}{phonenanp_badarea} );
+    return 0;
+  } else { return 1 }
+}
+
 sub Check {
     my ( $self, $string1, $string2 ) = @_ ;
     if ( $self->Start( $string1, $string2 ) ) {
@@ -82,6 +92,7 @@ sub Check {
     ( $self->{ areacode }, $self->{ exchange }, $self->{ local } ) =
             split /\-/, $self->{ string };
     $self->{ international } = '1-' . $self->{ string } ;
+    $self->_AreaOK( $self->{ areacode });
     my $Phone = Number::Phone->new( $self->{ international } ) ;
     unless ( $Phone ) {
         $self->IncreaseErr( $self->{messages}{phonenanp_badarea} ) }
@@ -138,7 +149,7 @@ String::Validator::Phone::NANP - Validate North American Phone Numbers
 
 =head1 VERSION
 
-version 2.00
+version 2.04
 
 =head1 SYNOPSIS
 

@@ -2,11 +2,9 @@ package Lemonldap::NG::Portal::Plugins::AdaptativeAuthenticationLevel;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_OK
-);
+use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.16.1';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -37,9 +35,9 @@ sub init {
 sub adaptAuthenticationLevel {
     my ( $self, $sub, $req ) = @_;
 
-    my $userid = $req->sessionInfo->{ $self->conf->{whatToTrace} };
+    my $userid = $req->sessionInfo->{ $self->conf->{whatToTrace} }
+      || $req->sessionInfo->{uid};
     $self->logger->debug("Check adaptative authentication rules for $userid");
-
     my $authenticationLevel = $req->sessionInfo->{authenticationLevel};
     $self->logger->debug(
         "Current authentication level for $userid is $authenticationLevel");

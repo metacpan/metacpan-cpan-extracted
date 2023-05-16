@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '1.0603';
+$File::Sticker::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -157,6 +157,8 @@ sub new {
             taggable_fields=>$self->{taggable_fields},
             topdir=>$self->{topdir},
             tagfield=>$self->{tagfield},
+            space_sep=>$self->{space_sep},
+            readonly=>$self->{readonly},
             verbose=>$self->{verbose},
         );
         $self->{db}->do_connect();
@@ -398,7 +400,7 @@ sub missing_files {
     foreach my $file (@files)
     {
         say STDERR "checking $file" if $self->{verbose} > 2;
-        if (!-f $file and !-d $file)
+        if (!-r $file and !-d $file)
         {
             push @missing_files, $file;
         }
@@ -532,7 +534,7 @@ sub derive_values {
     my $meta = $args{meta};
 
     my $fp = path($filename);
-    if (-f $filename)
+    if (-r $filename)
     {
         $meta->{file} = $fp->realpath->stringify;
     }
@@ -599,7 +601,7 @@ sub derive_values {
             $meta->{"section${id}"} = $bits[$i];
         }
     }
-    if (-f $filename)
+    if (-r $filename)
     {
         my $stat = $fp->stat;
         $meta->{filesize} = $stat->size;

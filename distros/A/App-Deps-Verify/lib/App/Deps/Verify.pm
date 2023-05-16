@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.12.1';
+$App::Deps::Verify::VERSION = '0.12.2';
 use strict;
 use warnings;
 use autodie;
@@ -8,8 +8,8 @@ use 5.014;
 use Moo;
 
 use File::Which qw/ which /;
-use YAML::XS qw/ LoadFile /;
-use Path::Tiny qw/ path /;
+use YAML::XS    qw/ LoadFile /;
+use Path::Tiny  qw/ path /;
 
 sub _load_yamls
 {
@@ -388,7 +388,7 @@ App::Deps::Verify - app and API to verify the presence of dependencies (Perl 5 
 
 =head1 VERSION
 
-version 0.12.1
+version 0.12.2
 
 =head1 SYNOPSIS
 
@@ -398,6 +398,23 @@ version 0.12.1
         +{ filenames => [ $opt->{input}, ] } );
 
     path( $opt->{output} )->spew_utf8("Success!");
+
+Command-line usage:
+
+    shlomif[perl-begin]:$trunk$ deps-app -h
+    deps-app <command> [-?h] [long options...]
+            --help (or -h)  show help
+                            aka -?
+
+    Available commands:
+
+          commands: list the application's commands
+              help: display a command's help screen
+
+            plinst: install perl5 dependencies from CPAN
+      plupdatetask: update a Task::Weaver perl5 dependencies Task
+           py3list: list python3 dependencies from PyPI
+            verify: verify the presence of dependencies
 
 =head1 DESCRIPTION
 

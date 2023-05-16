@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel             => 'error',
             authentication       => 'Demo',
@@ -89,7 +91,7 @@ ok(
 count(1);
 
 my ($logouturl) = grep( /iframe/, split( "\n", $res->[2]->[0] ) );
-$logouturl =~ s/.*<iframe src="([^"]+)".*/\1/;
+$logouturl =~ s/.*<iframe src="([^"]+)".*/$1/;
 my $ep = $logouturl;
 $ep =~ s/https?:\/\/[^\/]+//;
 
@@ -98,7 +100,8 @@ $ep =~ s/https?:\/\/[^\/]+//;
 ##       - locationRules
 ##       - presence of resource in the server (404,...)
 ok(
-    $res = $app->( {
+    $res = $app->(
+        {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -123,7 +126,6 @@ count(1);
 
 # Verify that there is no pdata
 $cookies = getCookies($res);
-$id;
 ok(
     !defined( $id = $cookies->{'lemonldappdata'} ),
     " Verify absence of cookie lemonldappdata"

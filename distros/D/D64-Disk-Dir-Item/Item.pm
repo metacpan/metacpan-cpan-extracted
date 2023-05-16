@@ -98,7 +98,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Clone';
 
@@ -742,9 +742,9 @@ sub exact_size {
 
 Print out formatted disk image directory item:
 
-  $item->print(fh => $fh, as_petscii => $as_petscii);
+  $item->print(fh => $fh, as_petscii => $as_petscii, verbose => $verbose);
 
-C<fh> defaults to the standard output. C<as_petscii> defaults to false (meaning that ASCII characters will be printed out by default).
+C<fh> defaults to the standard output. C<as_petscii> defaults to false (meaning that ASCII characters will be printed out by default). C<verbose> defaults to false (changing it to true will additionally print out file's track and sector values).
 
 =cut
 
@@ -753,6 +753,7 @@ sub print {
 
     my $fh = $args{fh};
     my $as_petscii = $args{as_petscii};
+    my $verbose = $args{verbose};
 
     $fh ||= *STDOUT;
     $fh->binmode(':bytes');
@@ -763,19 +764,33 @@ sub print {
         my $type = $self->type_to_string($self->type(), 1);
         my $closed = $self->closed() ? 0x20 : 0x2a; # "*"
         my $locked = $self->locked() ? 0x3c : 0x20; # "<"
+        my $track = sprintf "%2d", $self->track();
+        my $sector = sprintf "%2d", $self->sector();
         my $size = ascii_to_petscii($self->size());
         my $name = sprintf "\"%s\"", $self->name(padding_with_a0 => 0);
         $name =~ s/\x00//g; # align file type string to the right column
-        printf "%-4d %-18s%c%s%c\n", $size, $name, $closed, $type, $locked;
+        if ($verbose) {
+          printf "%-4d %-18s%c%s%c %s %s\n", $size, $name, $closed, $type, $locked, $track, $sector;
+        }
+        else {
+          printf "%-4d %-18s%c%s%c\n", $size, $name, $closed, $type, $locked;
+        }
     }
     else {
         my $type = $self->type_to_string($self->type());
         my $closed = $self->closed() ? ord ' ' : ord '*';
         my $locked = $self->locked() ? ord '<' : ord ' ';
+        my $track = sprintf "%2d", petscii_to_ascii $self->track();
+        my $sector = sprintf "%2d", petscii_to_ascii $self->sector();
         my $size = $self->size();
         my $name = sprintf "\"%s\"", petscii_to_ascii($self->name(padding_with_a0 => 0));
         $name =~ s/\x00//g; # align file type string to the right column
-        printf "%-4d %-18s%c%s%c\n", $size, $name, $closed, $type, $locked;
+        if ($verbose) {
+          printf "%-4d %-18s%c%s%c %s %s\n", $size, $name, $closed, $type, $locked, $track, $sector;
+        }
+        else {
+          printf "%-4d %-18s%c%s%c\n", $size, $name, $closed, $type, $locked;
+        }
     }
 
     select $stdout;
@@ -1054,11 +1069,11 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.07 (2013-03-08)
+Version 0.08 (2023-05-12)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013 by Pawel Krol <pawelkrol@cpan.org>.
+Copyright 2013-2023 by Pawel Krol <pawelkrol@cpan.org>.
 
 This library is free open source software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.
 

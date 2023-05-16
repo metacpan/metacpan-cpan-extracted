@@ -2,7 +2,7 @@
 
 use utf8;
 
-use strict;
+use v5.14;
 use warnings;
 
 [

@@ -1,51 +1,51 @@
 Revision History for File-Sticker
 =================================
 
-v1.0603 2020-11-21
+v3.0006 2023-05-15
 ------------------
 
-* 2020-11-21 02:08:24 +1100
-  Fixed bug with losing data!
-* 2020-11-20 13:46:07 +1100
-  fixing quotes problem
-* 2020-11-13 14:07:46 +1100
-  tweak
-* 2020-11-13 14:01:18 +1100
-  Added --has_data option.
-* 2020-11-08 21:51:30 +1100
-  version bump
-* 2020-11-08 21:50:28 +1100
-  Deal with the read-only-ness of filesize.
-* 2020-11-08 21:39:17 +1100
-  More consistent filesize results.
-* 2020-11-08 19:34:26 +1100
-  Fixing problem with URLs in JPEG files.
-* 2020-11-08 11:36:49 +1100
-  Pay more attention to derived values when reading.
-* 2020-11-08 11:23:14 +1100
-  suppress unnecessary warning
-* 2020-10-30 18:11:58 +1100
-  Now use "priority" rather than "is_fallback"
-* 2020-10-30 12:16:43 +1100
-  New separate GIF parser.
-* 2020-10-30 10:51:06 +1100
-  tweaking docs
-* 2020-10-27 15:03:41 +1100
-  Disable support of GIF files in Exif module.
+* 2023-05-15 19:45:10 +1000
+  Fixing bug where soft links are destroyed
 
-v1.01 2020-10-26
-----------------
+v3.0005 2023-05-14
+------------------
 
-* 2020-10-26 18:14:12 +1100
-  version bump, major changes
-* 2020-10-26 17:58:02 +1100
-  Add read_all option to read all possible meta-data
-* 2020-10-26 17:00:21 +1100
-  Extending Exif type to include any fields at all.
-* 2020-10-26 13:11:20 +1100
-  Enable MP3 files to store any field.
-* 2020-10-26 11:44:20 +1100
-  disable modules
+* 2023-05-14 20:42:18 +1000
+  fixing bug with symlinked files
+* 2023-05-14 20:23:05 +1000
+  ignore test images
+* 2023-04-10 13:17:48 +1000
+  Valid YAML data field should have prefix of "---"
+* 2023-04-10 13:10:11 +1000
+  formatting
+* 2023-04-10 13:04:10 +1000
+  problem loading YAML data
+* 2023-04-10 12:49:55 +1000
+  Merge branch 'master' of ssh://azure/home/kat/files/git/public/File-Sticker
+* 2023-04-10 12:39:57 +1000
+  Yet another incompatible change with freeform data.
+* 2023-02-01 14:49:39 +1100
+  Dealing with listing tags for readonly database
+* 2023-02-01 07:04:46 +1100
+  readonly option, prevent table creation
+* 2023-02-01 06:07:02 +1100
+  readonly option
+* 2021-11-03 16:14:39 +1100
+  fixed bug with writing YAML files
+* 2021-11-03 14:59:26 +1100
+  fixing error in reading freeform meta
+* 2021-11-01 18:44:31 +1100
+  Replace UserComment with ImageDescription for EXIF
+* 2021-08-10 16:26:27 +1000
+  space separators
+* 2021-08-10 16:24:04 +1000
+  space separators
+* 2021-08-10 16:22:31 +1000
+  space separators
+* 2020-11-25 18:32:03 +1100
+  as ever, there was a bug
+* 2020-11-25 18:14:22 +1100
+  more data from wiki pages
 
 ===================================
 End of changes in the last 365 days

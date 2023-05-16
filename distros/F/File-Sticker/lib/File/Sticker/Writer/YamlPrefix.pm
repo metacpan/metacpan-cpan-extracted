@@ -1,12 +1,12 @@
 package File::Sticker::Writer::YamlPrefix;
-$File::Sticker::Writer::YamlPrefix::VERSION = '1.0603';
+$File::Sticker::Writer::YamlPrefix::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Writer::YamlPrefix - write and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ sub allowed_file {
     my $ft = $self->{file_magic}->info_from_filename($file);
     # This needs to be a plain text file
     # We don't want to include .yml files because they are dealt with separately
-    if (-f $file
+    if (-r $file
             and $ft->{mime_type} =~ m{^text/plain}
             and $file !~ /\.yml$/)
     {

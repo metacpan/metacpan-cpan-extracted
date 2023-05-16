@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -91,7 +92,8 @@ sub init_login {
     return $res;
 }
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel             => 'error',
             mail2fActivation     => 1,

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -15,7 +16,8 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::FormEncode');
     my $res;
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel       => 'error',
                 sfOnlyUpgrade  => 1,

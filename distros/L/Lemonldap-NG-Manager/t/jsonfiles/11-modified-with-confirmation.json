@@ -1483,11 +1483,6 @@
         "title": "mailOther",
         "type": "simpleInputContainer",
         "nodes": [{
-          "default": "http://auth.example.com/resetpwd",
-          "id": "mailUrl",
-          "title": "mailUrl",
-          "data": "http://auth.example.com/resetpwd"
-        }, {
           "default": "[A-Z]{3}[a-z]{5}.\\d{2}",
           "id": "randomPasswordRegexp",
           "title": "randomPasswordRegexp",

@@ -1,5 +1,6 @@
 # Verify that bas changes are detected
 
+use warnings;
 use Test::More;
 use strict;
 use JSON;

@@ -1,5 +1,6 @@
 # Test if an UTF-8 char is well returned
 
+use warnings;
 use Test::More;
 use strict;
 

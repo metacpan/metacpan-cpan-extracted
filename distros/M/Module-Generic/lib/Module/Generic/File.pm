@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.7
+## Version v0.5.8
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/02/25
+## Modified 2023/05/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.7';
+    our $VERSION = 'v0.5.8';
 };
 
 use strict;
@@ -3175,6 +3175,8 @@ sub unload_json
     {
         foreach my $opt ( keys( %$opts ) )
         {
+            # We already save the data using the binmode utf8, so we do not want JSON to also encode it into utf8
+            next if( $opt eq 'utf8' );
             my $ref;
             $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
             {
@@ -4238,7 +4240,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.7
+    v0.5.8
 
 =head1 DESCRIPTION
 
@@ -5900,7 +5902,7 @@ Boolean. When enabled, this will add an extra optional space before the ":" sepa
 
 =item C<utf8>
 
-Boolean. When enabled, this will encode the L<JSON> result into UTF-8.
+Boolean. This option is ignored, because the JSON data are saved to file using UTF-8 and double encoding would produce mojibake.
 
 =back
 

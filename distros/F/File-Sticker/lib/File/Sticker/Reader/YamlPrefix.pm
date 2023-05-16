@@ -1,12 +1,12 @@
 package File::Sticker::Reader::YamlPrefix;
-$File::Sticker::Reader::YamlPrefix::VERSION = '1.0603';
+$File::Sticker::Reader::YamlPrefix::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Reader::YamlPrefix - read and standardize meta-data from YAML-prefixed text file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -116,13 +116,14 @@ sub read_meta {
     my $filename = shift;
     say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
 
-    my $yaml_str = $self->_get_yaml_part($filename);
+    my ($yaml_str,$more) = $self->_yaml_and_more($filename);
     my %meta = ();
     my $info;
     eval {$info = Load($yaml_str);};
     if ($@)
     {
         warn __PACKAGE__, " Load of data failed: $@";
+        say "======\n$yaml_str\n=====" if $self->{verbose} > 1;
         return \%meta;
     }
     if (!$info)
@@ -178,6 +179,19 @@ sub read_meta {
     {
         $meta{tags} .= ",private";
     }
+
+    # Check for wiki-specific meta-data in the "more" part
+    if ($more =~ m/\[\[\!meta title="([^"]+)"\]\]/)
+    {
+        $meta{title} = $1 if !$meta{title};
+        $more =~ s/\[\[\!meta title="([^"]+)"\]\]//;
+    }
+    if ($more =~ m/\[\[\!meta description="([^"]+)"\]\]/)
+    {
+        $meta{description} = $1 if !$meta{description};
+        $more =~ s/\[\[\!meta description="([^"]+)"\]\]//;
+    }
+    
     return \%meta;
 } # read_meta
 
@@ -208,13 +222,14 @@ sub _has_yaml {
     return ($first_line eq '---');
 } # _has_yaml
 
-=head2 _get_yaml_part
+=head2 _yaml_and_more
 
 Get the YAML part of the file (if any)
 by reading the stuff between the first set of --- lines
+and also the rest of the file as a separate part.
 
 =cut
-sub _get_yaml_part {
+sub _yaml_and_more {
     my $self = shift;
     my $filename = shift;
     say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
@@ -226,27 +241,36 @@ sub _get_yaml_part {
     }
 
     my $yaml_str = '';
+    my $more_str = '';
     my $yaml_started = 0;
+    my $yaml_finished = 0;
     while (<$fh>) {
         if (/^---$/) {
-            if (!$yaml_started)
+            # There could be "---" lines after the YAML is finished!
+            if (!$yaml_started and !$yaml_finished)
             {
                 $yaml_started = 1;
                 next;
             }
-            else # end of the yaml part
+            elsif (!$yaml_finished) # end of the YAML part
             {
-                last;
+                $yaml_started = 0;
+                $yaml_finished = 1;
+                next;
             }
         }
         if ($yaml_started)
         {
             $yaml_str .= $_;
         }
+        elsif ($yaml_finished)
+        {
+            $more_str .= $_;
+        }
     }
     close($fh);
-    return $yaml_str;
-} # _get_yaml_part
+    return ($yaml_str,$more_str);
+} # _yaml_and_more
 
 =head1 BUGS
 

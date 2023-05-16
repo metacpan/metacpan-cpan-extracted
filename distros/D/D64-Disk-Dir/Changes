@@ -1,5 +1,14 @@
 Revision history for Perl extension D64::Disk::Dir.
 
+0.05  2023-05-14
+    - add verbose mode of printing out disk directory content, which
+      additionally includes file's track, sector, and loading address values
+    - fixed an incomplete disk ID read from a disk directory (now getting all
+      five characters instead of only the first two)
+    - when printing out disk directory content, display disk header in
+      a reversed font, just like it happens on the original hardware
+    - validate the initial track/sector link before reading data from a file
+
 0.04  2018-11-25
     - remove hard-coded file names in tests and replace them with a File::Temp's
       "tmpnam" function call that returns the full name of a temporary file

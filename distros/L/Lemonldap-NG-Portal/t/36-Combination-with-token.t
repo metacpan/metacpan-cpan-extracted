@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -68,7 +69,8 @@ sub iniCmb {
     my $expr = shift;
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
     if (
-        my $res = LLNG::Manager::Test->new( {
+        my $res = LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel       => 'error',
                     requireToken   => '$env->{ipAddr} !~ /127\.0\.[1-3]\.1/',

@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Xattr;
-$File::Sticker::Reader::Xattr::VERSION = '1.0603';
+$File::Sticker::Reader::Xattr::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Reader::Xattr - read and standardize meta-data from ExtAttr file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ sub allowed_file {
     my $file = shift;
     say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
 
-    if (-f $file)
+    if (-r $file)
     {
         say STDERR 'Reader ' . $self->name() . ' allows any filetype ' . $file if $self->{verbose} > 1;
         return 1;

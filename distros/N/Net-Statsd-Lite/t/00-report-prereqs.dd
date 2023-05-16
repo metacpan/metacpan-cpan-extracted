@@ -36,11 +36,9 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Sub::Quote' => '0',
                                       'Sub::Util' => '1.40',
-                                      'Types::Common::Numeric' => '1.004000',
-                                      'Types::Common::String' => '0',
-                                      'Types::Standard' => '0',
+                                      'Types::Common' => '2.000000',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'perl' => 'v5.14.0',
                                       'strict' => '0'
                                     }
                     },

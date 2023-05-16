@@ -1,5 +1,12 @@
 Revision history for MooX-Const:
 
+v0.6.2    2023-05-15 19:01:45+01:00 Europe/London
+  [Documentation]
+  - Documented support policy for older Perls.
+
+  [Tests]
+  - Increased recommended minimum version of Moo for MooX::TypeTiny tests.
+
 v0.6.1    2023-01-12 14:25:42+00:00 Europe/London
   No changes sicne v0.6.0.
 

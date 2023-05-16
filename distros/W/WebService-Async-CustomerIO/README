@@ -27,6 +27,10 @@ DESCRIPTION
 
  api_token
 
+ api_uri
+
+ track_uri
+
  API endpoints:
 
     There is 2 stable API for Customer.io, if you need to add a new method
@@ -90,4 +94,6 @@ DESCRIPTION
 
     usage: c<< get_customers_by_email($email)->future([$customer_obj1,
     ...]) >>
+
+ send_transactional
 

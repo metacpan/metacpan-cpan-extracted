@@ -182,6 +182,8 @@ docs/InvitationResponseDataAllOf.md
 docs/InvitationsApi.md
 docs/InvitationsResponse.md
 docs/InvitationsResponseAllOf.md
+docs/KvStoreApi.md
+docs/KvStoreItemApi.md
 docs/LoggingAddressAndPort.md
 docs/LoggingAzureblob.md
 docs/LoggingAzureblobAllOf.md
@@ -306,8 +308,6 @@ docs/MutualAuthenticationResponseData.md
 docs/MutualAuthenticationResponseDataAllOf.md
 docs/MutualAuthenticationsResponse.md
 docs/MutualAuthenticationsResponseAllOf.md
-docs/ObjectStoreApi.md
-docs/ObjectStoreItemApi.md
 docs/PackageApi.md
 docs/PackageMetadata.md
 docs/PackageResponse.md
@@ -734,6 +734,8 @@ lib/WebService/Fastly/IamRolesApi.pm
 lib/WebService/Fastly/IamServiceGroupsApi.pm
 lib/WebService/Fastly/IamUserGroupsApi.pm
 lib/WebService/Fastly/InvitationsApi.pm
+lib/WebService/Fastly/KvStoreApi.pm
+lib/WebService/Fastly/KvStoreItemApi.pm
 lib/WebService/Fastly/LoggingAzureblobApi.pm
 lib/WebService/Fastly/LoggingBigqueryApi.pm
 lib/WebService/Fastly/LoggingCloudfilesApi.pm

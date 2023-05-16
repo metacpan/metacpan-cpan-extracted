@@ -22,7 +22,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.16.1';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -35,14 +35,17 @@ extends qw(
 # Sub module (Demo, LDAP,...)
 has registerModule => ( is => 'rw' );
 
-# Register url to set in the mail
+# Register URL to set in mail
 has registerUrl => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
-        my $p = $_[0]->conf->{portal};
+        my $self = $_[0];
+        my $p    = $self->conf->{portal};
         $p =~ s#/*$##;
-        return "$p/register";
+        return $self->conf->{registerUrl}
+          ? $self->conf->{registerUrl}
+          : "$p/register";
     }
 );
 

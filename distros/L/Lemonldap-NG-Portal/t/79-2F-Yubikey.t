@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -8,12 +9,15 @@ use JSON qw/from_json to_json/;
 require 't/test-lib.pm';
 require 't/test-yubikey.pm';
 
+no warnings 'once';
+
 SKIP: {
     eval "use Auth::Yubikey_WebClient";
     if ($@) {
         skip 'Auth::Yubikey_WebClient not found', 0;
     }
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                  => 'error',
                 yubikey2fActivation       => 1,
@@ -34,7 +38,9 @@ SKIP: {
 
     # Register ccccccdddwho as second factor of user dwho
     $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{dwho}->{_2fDevices} =
-      to_json( [ {
+      to_json(
+        [
+            {
                 "_yubikey" => "ccccccdddwho",
                 "epoch"    => "1548016213",
                 "name"     => "MyYubikey",

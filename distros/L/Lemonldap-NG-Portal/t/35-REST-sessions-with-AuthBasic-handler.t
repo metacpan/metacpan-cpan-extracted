@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use strict;
 use File::Temp 'tempdir';
@@ -5,6 +6,8 @@ use IO::String;
 use JSON;
 use MIME::Base64;
 use Test::More;
+
+no warnings 'once';
 
 our $debug = 'error';
 my ( $p, $res, $spId );
@@ -97,7 +100,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',

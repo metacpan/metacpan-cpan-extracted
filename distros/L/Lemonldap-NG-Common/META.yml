@@ -46,14 +46,16 @@ requires:
   HTML::Template: '0'
   JSON: '0'
   JSON::XS: '0'
+  LWP::UserAgent: '0'
   Mouse: '0'
   Plack: '0'
   URI: '0'
+  XML::LibXML: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
   X_twitter: https://twitter.com/lemonldapng
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.16
+version: v2.16.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

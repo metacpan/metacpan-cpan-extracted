@@ -14,7 +14,7 @@ BEGIN { use_ok('D64::Disk::Dir::Iterator', qw(:all)) };
 sub create_test_image {
     my $filename = tmpnam() . '.d64';
     my $d64 = D64::Disk::Image->create_image($filename, D64);
-    my $rawname = $d64->rawname_from_name(' djgruby/oxyron ');
+    my $rawname = $d64->rawname_from_name('dj gruby / triad');
     my $rawid = $d64->rawname_from_name('10');
     my $numstatus = $d64->format($rawname, $rawid);
     # Write file named "1" with contents "abcde":

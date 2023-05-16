@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -44,7 +45,7 @@ SKIP: {
         ),
         'Try SAML SP'
     );
-    my $spPdata;
+    my $spPdata = '';
     my ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.proxy.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
@@ -262,7 +263,8 @@ clean_sessions();
 done_testing( count() );
 
 sub idp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -307,7 +309,8 @@ sub idp {
 }
 
 sub proxy {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'proxy.com',
@@ -384,7 +387,8 @@ sub proxy {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

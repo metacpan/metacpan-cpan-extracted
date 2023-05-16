@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.160';
+our $VERSION = '0.161';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -687,10 +687,19 @@ sub __cols_to_string {
             if ( $self->{color} ) {
                 if ( defined $tbl_orig->[$row][$col] ) {
                     my @color = $tbl_orig->[$row][$col] =~ /(\e\[[\d;]*m)/g;
-                    $str =~ s/\x{feff}/shift @color/ge;
                     if ( @color ) {
-                        $str = $str . $color[-1];
+                        $str =~ s/\x{feff}/shift @color/ge;
+                        $str .= "\e[0m";
                     }
+                    #if ( @color ) {
+                    #    if ( $color[-1] !~ /^\e\[0?m/ ) {
+                    #        push @color, "\e[0m";
+                    #    }
+                    #    $str =~ s/\x{feff}/shift @color/ge;
+                    #    if ( @color ) {
+                    #        $str .= $color[-1];
+                    #    }
+                    #}
                 }
             }
             if ( $col != $#$w_cols_calc ) {
@@ -724,7 +733,6 @@ sub __print_single_row {
     my $max_value_w = $term_w - ( $max_key_w + $sep_w + 1 );
     my $separator_row = ' ';
     my $row_data = [ ' Close with ENTER' ];
-    my $last_color_prev_value;
 
     for my $col ( 0 .. $#{$tbl_orig->[0]} ) {
         push @$row_data, $separator_row;
@@ -766,18 +774,6 @@ sub __print_single_row {
         }
         if ( ref $value ) {
             $value = _handle_reference( $value );
-        }
-        if ( $self->{color} ) {
-            # keep a color to the end of a table row if not reset or overwritten
-            if ( $col && length $tbl_orig->[$row][$col-1] ) {
-                my $tmp_last_color = ( $tbl_orig->[$row][$col-1] =~ /(\e\[[\d;]*m)/g )[-1];
-                if ( $tmp_last_color && $tmp_last_color !~ /^\e\[0?m/ ) {
-                    $last_color_prev_value = $tmp_last_color;
-                }
-            }
-            if ( $last_color_prev_value && substr( $value, 0, 100 ) !~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/) {
-                $value = $last_color_prev_value . $value;
-            }
         }
         my $subseq_tab = ' ' x ( $max_key_w + $sep_w );
         my $count;
@@ -935,7 +931,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.160
+Version 0.161
 
 =cut
 
@@ -1149,6 +1145,8 @@ Enable the support for ANSI SGR escape sequences.
 1 - enabled except for the current selected row
 
 2 - enabled
+
+Colors are reset to normal after the end of each table field.
 
 Numbers with added escape sequences are aligned to the left.
 

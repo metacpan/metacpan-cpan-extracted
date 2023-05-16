@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -10,11 +11,14 @@ my $json;
 my $request;
 my $maintests = 45;
 
+no warnings 'once';
+
 SKIP: {
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel         => 'error',
                 authentication   => 'LDAP',

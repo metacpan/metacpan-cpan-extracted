@@ -2,6 +2,7 @@ Changes
 Dir.pm
 Makefile.PL
 MANIFEST
+META.yml
 README
 t/01-basic.t
 t/02-dir.t

@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -131,7 +132,8 @@ count(4);
 
 # Update a key
 ok(
-    $res = $issuer->app->( {
+    $res = $issuer->app->(
+        {
             HTTP_ACCEPT            => 'application/json',
             HTTP_ACCEPT_LANGUAGE   => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             HTTP_HOST              => 'auth.idp.com',
@@ -165,7 +167,8 @@ count(2);
 use_ok('Lemonldap::NG::Common::Apache::Session::REST');
 ok(
     $res =
-      Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions( {
+      Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions(
+        {
             baseUrl => 'http://auth.idp.com/sessions/global/',
         }
       ),
@@ -214,7 +217,8 @@ if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
 count(2);
 
 ok(
-    $res = Lemonldap::NG::Common::Apache::Session::REST->searchOn( {
+    $res = Lemonldap::NG::Common::Apache::Session::REST->searchOn(
+        {
             baseUrl => 'http://auth.idp.com/sessions/global/'
         },
         'uid', 'dwho'
@@ -241,7 +245,8 @@ count(3);
 
 # Del new session
 ok(
-    $res = $issuer->app->( {
+    $res = $issuer->app->(
+        {
             HTTP_ACCEPT          => 'application/json',
             HTTP_ACCEPT_LANGUAGE => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             HTTP_HOST            => 'auth.idp.com',
@@ -298,7 +303,8 @@ done_testing( count() );
 
 # Redefine LWP methods for tests
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
@@ -313,7 +319,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel         => $debug,
                 domain           => 'sp.com',

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -21,7 +22,8 @@ sub validate_cda {
     count(1);
 
     ok(
-        $res = $app->( {
+        $res = $app->(
+            {
                 'HTTP_ACCEPT'          => 'text/html',
                 'SCRIPT_NAME'          => '/',
                 'SERVER_NAME'          => '127.0.0.1',
@@ -48,7 +50,8 @@ sub validate_cda {
     my $cid = expectCookie($res);
 
     ok(
-        $res = $app->( {
+        $res = $app->(
+            {
                 'HTTP_ACCEPT'          => 'text/html',
                 'SCRIPT_NAME'          => '/',
                 'SERVER_NAME'          => '127.0.0.1',
@@ -77,7 +80,8 @@ sub validate_cda {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel    => 'error',
             useSafeJail => 1,

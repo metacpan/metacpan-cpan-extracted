@@ -1,3 +1,10 @@
+2.13	2023-05-13
+
+	Bug Fixes
+	* #70 add t directory to @INC
+	* #71 Do not read a file immediately after having written it..
+	* #72 Remove tree before creating; Use different name for test dirs
+
 2.12	2023-05-11
 
 	Bug Fixes

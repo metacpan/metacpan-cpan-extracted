@@ -10,7 +10,7 @@ our @CARP_NOT = ( __PACKAGE__ );
 use Path::Tiny;
 
 use vars qw( $VERSION $NAME_RE $COMMENT );
-$VERSION 	= '2.12'; 
+$VERSION 	= '2.13'; 
 
 BEGIN {
 	$NAME_RE 	= qr/ [^\s\[\|\]\#]+ /x;		# name cannot contain blanks [ | ] #

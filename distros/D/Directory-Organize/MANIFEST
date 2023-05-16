@@ -1,12 +1,16 @@
+bin/mkdir_heute
 Build.PL
 Changes
 gen_single_file
 lib/Directory/Organize.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
-mkdir_heute
 README
 t/Organize.t
 t/script-mkdir_heute.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t

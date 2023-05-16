@@ -83,7 +83,7 @@ sub as_hash
     return( $hash );
 }
 
-sub as_json { return( shift->json->scalar ); }
+sub as_json { return( shift->json(@_)->scalar ); }
 
 sub as_string { return( shift->dump ); }
 
@@ -155,7 +155,14 @@ sub json
 {
     my $self = shift( @_ );
     my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    if( ref( $_[-1] ) eq 'HASH' )
+    {
+        $opts = pop( @_ );
+    }
+    elsif( @_ && !( @_ % 2 ) )
+    {
+        $opts = { @_ };
+    }
     $self->_tie_object->enable(0);
     my $data = $self->{data};
     # $opts->{utf8} = 1 if( !CORE::exists( $opts->{utf8} ) );

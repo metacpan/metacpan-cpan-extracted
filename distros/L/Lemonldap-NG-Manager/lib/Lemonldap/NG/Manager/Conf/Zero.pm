@@ -2,7 +2,7 @@ package Lemonldap::NG::Manager::Conf::Zero;
 
 use strict;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.16.1';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir,
@@ -150,7 +150,6 @@ sub zeroConf {
             }
         },
         'registerDB'          => 'Demo',
-        'registerUrl'         => "http://auth.$domain/register",
         'portal'              => "http://auth.$domain/",
         'notificationStorage' => 'File',
         'locationRules'       => {
@@ -187,7 +186,6 @@ sub zeroConf {
         'portalSkin'           => 'bootstrap',
         'portalSkinBackground' =>
           '1280px-Cedar_Breaks_National_Monument_partially.jpg',
-        'mailUrl'                    => "http://auth.$domain/resetpwd",
         'localSessionStorage'        => 'Cache::FileCache',
         'localSessionStorageOptions' => {
             'namespace'          => 'lemonldap-ng-sessions',

@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.29.6
+        v0.30.0
 
 DESCRIPTION
 ===========
@@ -1950,74 +1950,9 @@ This provides a generic
 [lvalue](https://metacpan.org/pod/perlsub){.perl-module} method that can
 be used both in assign context or lvalue context.
 
-You only need to specify a setter and getter callback.
-
-This takes an hash reference having either of the following properties:
-
-*get*
-
-:   A code reference that will be called, passing it the module object.
-    It takes whatever value is returned and returns it to the caller.
-
-*set*
-
-:   A code reference that will be called when values were provided
-    either in assign or regular method context:
-
-            my $now = DateTime->now;
-            $o->datetime = $now;
-            # or
-            $o->datetime( $now );
-
-For example, in your module:
-
-        sub datetime : lvalue { return( shift->_lvalue({
-            set => sub
-            {
-                my( $self, $args ) = @_;
-                if( $self->_is_a( $args->[0] => 'DateTime' ) )
-                {
-                    return( $self->{datetime} = shift( @$args ) );
-                }
-                else
-                {
-                    return( $self->error( "Value provided is not a datetime." ) );
-                }
-            },
-            get => sub
-            {
-                my $self = shift( @_ );
-                my $dt = $self->{datetime};
-                return( $dt );
-            }
-        }, @_ ) ); }
-        # ^^^^
-        # Don't forget the @_ !
-
-Be mindful that even if the setter callback returns `undef` in case of
-an error, perl does not permit `undef` to be returned from an lvalue
-method, and besides the return value in assign context is useless
-anyway:
-
-        my $dt = $o->datetime = DateTime->now;
-
-If you want to check if assignment worked, you should opt to make error
-fatal and catch exceptions, such as:
-
-        $o->fatal(1);
-        try
-        {
-            $o->datetime = $not_a_datetime_object;
-        }
-        catch( $e )
-        {
-            die( "You provided a non DateTime object!: $e\n" );
-        }
-
-or you can check if an error was set:
-
-        $o->datetime = $not_a_datetime_object;
-        die( "Did not work: ", $o->error ) if( $o->error );
+As of version `0.29.6`, this is an alias for
+[\"\_set\_get\_callback\"](#set_get_callback){.perl-module}, which
+provides more extensive features.
 
 \_obj2h
 -------
@@ -2358,6 +2293,8 @@ reference.
             },
             field => 'name'
         }, @_ ) ); }
+        # ^^^^
+        # Don't forget the @_ !
 
 Then, it can be called indifferently as:
 
@@ -2808,31 +2745,8 @@ code, assuming you have that module installed.
 \_set\_get\_lvalue
 ------------------
 
-This helper method makes it very easy to implement a [\"Lvalue
-subroutines\" in
-perlsub](https://metacpan.org/pod/perlsub#Lvalue subroutines){.perl-module}
-method.
-
-        package MyObject;
-        use strict;
-        use warnings;
-        use parent qw( Module::Generic );
-        
-        sub debug : lvalue { return( shift->_set_get_lvalue( 'debug', @_ ) ); }
-
-And then, this method can be called either as a lvalue method:
-
-        my $obj = MyObject->new;
-        $obj->debug = 3;
-
-But also as a regular method:
-
-        $obj->debug( 1 );
-        printf( "Debug value is %d\n", $obj->debug );
-
-It uses [Want](https://metacpan.org/pod/Want){.perl-module} to achieve
-this. See also
-[Sentinel](https://metacpan.org/pod/Sentinel){.perl-module}
+This is now an alias for
+[\"\_set\_get\_callback\"](#set_get_callback){.perl-module}
 
 \_set\_get\_number
 ------------------
@@ -3383,7 +3297,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5608019aecd0)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56447faba528)"}\>
 
 COPYRIGHT & LICENSE
 ===================

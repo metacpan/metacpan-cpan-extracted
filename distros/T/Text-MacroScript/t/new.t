@@ -11,7 +11,8 @@ use POSIX 'strftime';
 use Test::More;
 
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 my $ms;
 my $test1 = "test~";

@@ -11,7 +11,7 @@ with qw/ Net::Statsd::Lite::Test Test::Roo::DataDriven /;
 
 package main;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Devel::StrictMode;

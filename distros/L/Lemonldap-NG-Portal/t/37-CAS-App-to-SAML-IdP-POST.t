@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -171,7 +172,8 @@ clean_sessions();
 done_testing( count() );
 
 sub idp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -215,7 +217,8 @@ sub idp {
 }
 
 sub proxy {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel              => $debug,
                 domain                => 'proxy.com',
@@ -273,7 +276,8 @@ sub proxy {
 
 sub app {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'app.com',

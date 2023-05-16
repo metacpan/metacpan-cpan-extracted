@@ -31,7 +31,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.16.1';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -60,14 +60,17 @@ has registerModule => ( is => 'rw' );
 # Captcha generator
 has captcha => ( is => 'rw' );
 
-# certificate reset url
-has certificateResetUrl => (
-    is      => 'rw',
+# Reset URL to set in mail
+has resetUrl => (
+    is      => 'ro',
     lazy    => 1,
     default => sub {
-        my $p = $_[0]->conf->{portal};
+        my $self = $_[0];
+        my $p    = $self->conf->{portal};
         $p =~ s#/*$##;
-        return "$p/certificateReset";
+        return $self->conf->{certificateResetByMailURL}
+          ? $self->conf->{certificateResetByMailURL}
+          : "$p/certificateReset";
     }
 );
 
@@ -79,8 +82,7 @@ has mailott => (
         my $ott =
           $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
         $ott->cache(0);
-        $ott->timeout( $_[0]->conf->{registerTimeout}
-              || $_[0]->conf->{timeout} );
+        $ott->timeout( $_[0]->conf->{formTimeout} || $_[0]->conf->{timeout} );
         return $ott;
     }
 );
@@ -337,7 +339,7 @@ sub _certificateReset {
         my $req_url = $req->data->{_url};
         my $skin    = $self->p->getSkin($req);
         my $url =
-          $self->certificateResetUrl . '?'
+          $self->resetUrl . '?'
           . build_urlencoded(
             mail_token => $req->{id},
             skin       => $skin,

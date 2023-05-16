@@ -1,3 +1,9 @@
+0.032   2023-03-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Change default or 'ordered' configuration to use unordered
+          until there are >6 items.
+
+
 0.031   2023-02-18  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] [regression] Script was not linkified.

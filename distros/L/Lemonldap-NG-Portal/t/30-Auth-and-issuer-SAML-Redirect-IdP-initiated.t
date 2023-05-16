@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -133,8 +134,11 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     ok( $res = $issuer->_get( $url, query => $query, accept => 'text/html' ),
         'Push SAML response to IdP' );
     expectRedirection( $res, 'http://auth.idp.com/static/common/icons/ok.png' );
-    ok( getHeader( $res, 'Content-Security-Policy' ) !~ /frame-ancestors/,
-        ' Frame can be embedded' )
+    ok(
+        !defined getHeader( $res, 'Content-Security-Policy' )
+          || getHeader( $res, 'Content-Security-Policy' ) !~ /frame-ancestors/,
+        ' Frame can be embedded'
+      )
       or explain( $res->[1],
         'Content-Security-Policy does not contain a frame-ancestors' );
 
@@ -166,7 +170,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -211,7 +216,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

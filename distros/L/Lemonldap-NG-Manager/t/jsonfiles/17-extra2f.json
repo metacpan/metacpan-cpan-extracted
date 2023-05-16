@@ -2475,11 +2475,6 @@
                      {
                         "_nodes" : [
                            {
-                              "default" : "http://auth.example.com/resetpwd",
-                              "id" : "mailUrl",
-                              "title" : "mailUrl"
-                           },
-                           {
                               "default" : 0,
                               "id" : "mailTimeout",
                               "title" : "mailTimeout",
@@ -2502,11 +2497,6 @@
                },
                {
                   "_nodes" : [
-                     {
-                        "default" : "http://auth.example.com/register",
-                        "id" : "registerUrl",
-                        "title" : "registerUrl"
-                     },
                      {
                         "default" : 0,
                         "id" : "registerTimeout",

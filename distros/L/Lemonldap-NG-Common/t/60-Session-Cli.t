@@ -1,3 +1,5 @@
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Lemonldap-NG-Manager.t'
 
@@ -63,7 +65,8 @@ my @psessionsOpts = (
 );
 
 sub resetSessions {
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @sessionsOpts,
             id   => "1b3231655cebb7a1f783eddf27d254ca",
             info => {
@@ -71,7 +74,8 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @sessionsOpts,
             id   => "9684dd2a6489bf2be2fbdd799a8028e3",
             info => {
@@ -79,7 +83,8 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @sessionsOpts,
             id   => "f90f597566f5cce47d9641377776c0c2",
             info => {
@@ -88,7 +93,8 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @sessionsOpts,
             id   => "1234",
             info => {
@@ -96,7 +102,8 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @sessionsOpts,
             id   => "1235",
             info => {
@@ -105,12 +112,15 @@ sub resetSessions {
         }
     );
 
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @psessionsOpts,
             id    => "5efe8af397fc3577e05b483aca964f1b",
             force => 1,
             info  => {
-                "_2fDevices" => to_json( [ {
+                "_2fDevices" => to_json(
+                    [
+                        {
                             'type'     => 'UBK',
                             'epoch'    => 1588691690,
                             '_yubikey' => 'cccccceijfnf',
@@ -129,7 +139,9 @@ sub resetSessions {
                         }
                     ]
                 ),
-                "_oidcConsents" => to_json( [ {
+                "_oidcConsents" => to_json(
+                    [
+                        {
                             'scope' => 'openid email',
                             'rp'    => 'rp-example',
                             'epoch' => 1589288341
@@ -145,13 +157,16 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new( {
+    Lemonldap::NG::Common::Session->new(
+        {
             @psessionsOpts,
             id    => "8d3bc3b0e14ea2a155f275aa7c07ebee",
             force => 1,
             info  => {
                 "_session_uid" => "rtyler",
-                "_2fDevices"   => to_json( [ {
+                "_2fDevices"   => to_json(
+                    [
+                        {
                             'type'     => 'UBK',
                             'epoch'    => 1588691690,
                             '_yubikey' => 'cccccceijfnf',

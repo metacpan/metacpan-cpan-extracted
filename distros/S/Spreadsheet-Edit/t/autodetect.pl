@@ -1,15 +1,17 @@
 #!/usr/bin/perl
+# *** DO NOT USE Test2 FEATURES becuase this is a sub-script ***
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
-use t_TestCommon  # Test::More etc.
+use t_TestCommon  # Test2::V0 etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug checkeq_literal expect1 check 
+            bug mycheckeq_literal expect1 mycheck 
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
             string_to_tempfile
             @quotes/;
+
 use t_SSUtils;
 
 use Spreadsheet::Edit qw(:all);
@@ -183,4 +185,5 @@ test_autodetect {required => qr/^Notmatched/}, undef,
 
 #TODO: Various operations which (with new implementation) should not auto-detect
 
+say "Done." unless $silent;
 exit 0;

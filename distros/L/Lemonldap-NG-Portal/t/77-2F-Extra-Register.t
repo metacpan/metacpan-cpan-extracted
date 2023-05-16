@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -39,7 +40,8 @@ require 't/smtp.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 
 my $res;
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel              => 'error',
             localSessionStorage   => "Cache::NullCache",
@@ -88,6 +90,7 @@ my $client = LLNG::Manager::Test->new( {
 );
 
 subtest "Register and use mail based custom SF as dwho" => sub {
+    my ( $id, $host, $url, $query );
 
     ok(
         $res = $client->_post(
@@ -99,7 +102,7 @@ subtest "Register and use mail based custom SF as dwho" => sub {
         'Auth query'
     );
 
-    my $id = expectCookie($res);
+    $id = expectCookie($res);
 
     $res = $client->_get(
         '/2fregisters',
@@ -122,8 +125,8 @@ subtest "Register and use mail based custom SF as dwho" => sub {
     );
 
     # Ajax send mail
-    my $query = buildForm( { generic => 'test@test.com' } );
-    $res = $client->_post(
+    $query = buildForm( { generic => 'test@test.com' } );
+    $res   = $client->_post(
         '/2fregisters/home/sendcode',
         IO::String->new($query),
         length => length $query,
@@ -171,7 +174,7 @@ subtest "Register and use mail based custom SF as dwho" => sub {
         'Auth query'
     );
 
-    my ( $host, $url, $query ) =
+    ( $host, $url, $query ) =
       expectForm( $res, undef, '/home2fcheck?skin=bootstrap', 'token', 'code' );
 
     like( mail(), qr%Doctor Who%,     'Found session attribute in mail' );
@@ -194,7 +197,7 @@ subtest "Register and use mail based custom SF as dwho" => sub {
         'Post code'
     );
 
-    my $id = expectCookie($res);
+    $id = expectCookie($res);
     expectSessionAttributes(
         $client, $id,
         _2f                 => "home",
@@ -246,8 +249,7 @@ subtest "Fail to register mail based custom SF as dwho" => sub {
         'Sent to self registered mail' );
 
     my $code = $1;
-    $code = $code + 1;
-
+    $code .= '1';
     $query = buildForm(
         { generic => 'test@test.com', genericcode => $code, token => $token } );
     $res = $client->_post(
@@ -264,6 +266,7 @@ subtest "Fail to register mail based custom SF as dwho" => sub {
 
 subtest "Register and use rest based custom SF as dwho" => sub {
     getPSession('dwho')->remove;
+    my ( $id, $host, $url, $query );
 
     ok(
         $res = $client->_post(
@@ -275,7 +278,7 @@ subtest "Register and use rest based custom SF as dwho" => sub {
         'Auth query'
     );
 
-    my $id = expectCookie($res);
+    $id = expectCookie($res);
 
     $res = $client->_get(
         '/2fregisters/work',
@@ -284,8 +287,8 @@ subtest "Register and use rest based custom SF as dwho" => sub {
     );
 
     # Ajax send mail
-    my $query = buildForm( { generic => 'dwho-destination' } );
-    $res = $client->_post(
+    $query = buildForm( { generic => 'dwho-destination' } );
+    $res   = $client->_post(
         '/2fregisters/work/sendcode',
         IO::String->new($query),
         length => length $query,
@@ -300,7 +303,8 @@ subtest "Register and use rest based custom SF as dwho" => sub {
 
     my $code = $receivedCode;
 
-    $query = buildForm( {
+    $query = buildForm(
+        {
             generic     => 'dwho-destination',
             genericcode => $code,
             token       => $token
@@ -330,7 +334,7 @@ subtest "Register and use rest based custom SF as dwho" => sub {
         'Auth query'
     );
 
-    my ( $host, $url, $query ) =
+    ( $host, $url, $query ) =
       expectForm( $res, undef, '/work2fcheck?skin=bootstrap', 'token', 'code' );
 
     $code = $receivedCode;
@@ -346,7 +350,7 @@ subtest "Register and use rest based custom SF as dwho" => sub {
         'Post code'
     );
 
-    my $id = expectCookie($res);
+    $id = expectCookie($res);
     expectSessionAttributes(
         $client, $id,
         _2f                 => "work",

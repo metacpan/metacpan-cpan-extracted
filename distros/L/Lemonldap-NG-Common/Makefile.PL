@@ -86,6 +86,8 @@ WriteMakefile(
         'Mouse'                  => 0,
         'Plack'                  => 0,
         'URI'                    => 0,
+        'LWP::UserAgent'         => 0,
+        'XML::LibXML'            => 0,
     },    # e.g., Module::Name => 1.1
           #EXE_FILES => [ 'scripts/convertConfig', ],
     (

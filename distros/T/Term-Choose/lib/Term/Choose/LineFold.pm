@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.761';
+our $VERSION = '1.762';
 
 use Exporter qw( import );
 
@@ -179,7 +179,17 @@ sub line_fold {
         }
     }
     if ( @color ) {
+        my $last_color;
         for my $paragraph ( @paragraphs ) {
+            if ( ! $opt->{join} ) {
+                if ( $last_color ) {
+                    $paragraph = $last_color . $paragraph;
+                }
+                my $count = () = $paragraph =~ /\x{feff}/g;
+                if ( $count ) {
+                    $last_color = $color[$count - 1];
+                }
+            }
             $paragraph =~ s/\x{feff}/shift @color/ge;
             if ( ! @color ) {
                 last;

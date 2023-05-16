@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 require 't/test-lib.pm';
 
 my $res;
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel    => 'error',
             useSafeJail => 1,
@@ -23,7 +25,8 @@ my $client = LLNG::Manager::Test->new( {
 ok(
     $res = $client->_get(
         '/',
-        query => buildForm( {
+        query => buildForm(
+            {
                 url => encodeUrl('http://test.example.org/'),
             }
         ),
@@ -55,7 +58,8 @@ my $id = expectCookie($res);
 ok(
     $res = $client->_get(
         '/',
-        query => buildForm( {
+        query => buildForm(
+            {
                 url => encodeUrl(
 'http://your-untrusted-domain.com/?attack=http://test.example.org/'
                 ),
@@ -80,7 +84,8 @@ ok( $app = Lemonldap::NG::Handler::Server->run( $client->ini ), 'App' );
 count(1);
 
 ok(
-    $res = $app->( {
+    $res = $app->(
+        {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -107,7 +112,8 @@ expectRedirection( $res, 'http://test.example.org/' );
 my $cid = expectCookie($res);
 
 ok(
-    $res = $app->( {
+    $res = $app->(
+        {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',

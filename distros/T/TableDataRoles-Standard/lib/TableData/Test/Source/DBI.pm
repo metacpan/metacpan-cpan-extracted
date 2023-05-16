@@ -3,9 +3,9 @@
 package TableData::Test::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-20'; # DATE
+our $DATE = '2023-02-24'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use alias::module 'TableData::DBI';
 
@@ -24,7 +24,7 @@ TableData::Test::Source::DBI - Alias package for TableData::DBI
 
 =head1 VERSION
 
-This document describes version 0.014 of TableData::Test::Source::DBI (from Perl distribution TableDataRoles-Standard), released on 2022-02-20.
+This document describes version 0.015 of TableData::Test::Source::DBI (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
 
 =head1 METHODS
 
@@ -43,25 +43,47 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dbh> => I<obj>
 
+(No description)
+
 =item * B<dsn> => I<str>
+
+(No description)
 
 =item * B<password> => I<str|code>
 
+(No description)
+
 =item * B<query> => I<str>
+
+(No description)
 
 =item * B<row_count_query> => I<obj>
 
+(No description)
+
 =item * B<row_count_sth> => I<obj>
+
+(No description)
 
 =item * B<row_count_sth_bind_params> => I<array>
 
+(No description)
+
 =item * B<sth> => I<obj>
+
+(No description)
 
 =item * B<sth_bind_params> => I<array>
 
+(No description)
+
 =item * B<table> => I<str>
 
+(No description)
+
 =item * B<user> => I<str|code>
+
+(No description)
 
 
 =back
@@ -106,13 +128,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

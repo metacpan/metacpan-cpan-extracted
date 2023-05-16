@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -8,7 +9,8 @@ require 't/test-lib.pm';
 
 SKIP: {
     skip 'REMOTELLNG is not set', $maintests unless ( $ENV{REMOTELLNG} );
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel         => 'error',
                 useSafeJail      => 1,

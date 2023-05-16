@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -18,7 +19,8 @@ SKIP: {
     $dbh->do('CREATE TABLE users (user text,password text,cn text)');
     $dbh->do("INSERT INTO users VALUES ('french','french','Frédéric Accents')");
     $dbh->do("INSERT INTO users VALUES ('russian','russian','Русский')");
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,

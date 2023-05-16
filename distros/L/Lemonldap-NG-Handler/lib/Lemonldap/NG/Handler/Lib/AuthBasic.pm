@@ -39,9 +39,8 @@ sub fetchId {
     my ( $class, $req ) = @_;
     if ( my $creds = $req->env->{'HTTP_AUTHORIZATION'} ) {
         $creds =~ s/^Basic\s+//;
-        my @date = localtime;
-        my $day  = $date[5] * 366 + $date[7];
-        return Digest::SHA::sha256_hex( $creds . $day );
+        my $pepper = int( time / $class->tsv->{timeout} ) . $class->tsv->{keyH};
+        return sha256_hex( $creds . $pepper );
     }
     else {
         return 0;

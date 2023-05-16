@@ -3,6 +3,7 @@ Item.pm
 Item.xs
 Makefile.PL
 MANIFEST
+META.yml
 README
 t/01-new.t
 t/02-get.t

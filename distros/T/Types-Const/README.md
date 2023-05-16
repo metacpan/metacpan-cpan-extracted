@@ -4,7 +4,7 @@ Types::Const - Types that coerce references to read-only
 
 # VERSION
 
-version v0.4.2
+version v0.5.0
 
 # SYNOPSIS
 
@@ -44,18 +44,6 @@ It supports coercions to read-only.
 
 This was added in v0.3.0.
 
-# SEE ALSO
-
-[Const::Fast](https://metacpan.org/pod/Const%3A%3AFast)
-
-[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)
-
-[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)
-
-[Types::ReadOnly](https://metacpan.org/pod/Types%3A%3AReadOnly)
-
-[MooX::Const](https://metacpan.org/pod/MooX%3A%3AConst)
-
 # KNOWN ISSUES
 
 ## Side-effects of read-only data structures
@@ -91,7 +79,29 @@ once. (Since it is read-only, there is no need to re-check it.)
 There may be an issue with regexp references. See
 [RT#127635](https://rt.cpan.org/Ticket/Display.html?id=127635).
 
-## Bug reports and feature requests
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.5.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.4.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
+# SEE ALSO
+
+[Const::Fast](https://metacpan.org/pod/Const%3A%3AFast)
+
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)
+
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)
+
+[Types::ReadOnly](https://metacpan.org/pod/Types%3A%3AReadOnly)
+
+[MooX::Const](https://metacpan.org/pod/MooX%3A%3AConst)
+
+# BUGS
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/Types-Const/issues](https://github.com/robrwo/Types-Const/issues)
@@ -115,7 +125,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

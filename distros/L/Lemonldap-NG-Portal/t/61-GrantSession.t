@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel          => 'error',
             authentication    => 'Demo',
@@ -142,7 +144,8 @@ ok( not(%$c), 'No cookie' );
 count(1);
 
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-$client = LLNG::Manager::Test->new( {
+$client = LLNG::Manager::Test->new(
+    {
         ini => {
             authentication    => 'Demo',
             userdb            => 'Same',

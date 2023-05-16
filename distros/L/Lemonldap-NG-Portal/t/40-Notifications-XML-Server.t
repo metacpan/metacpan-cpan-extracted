@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -92,7 +93,8 @@ SKIP: {
         skip 'SOAP::Lite or XML::Lib* not found', $maintests;
     }
 
-    $client = LLNG::Manager::Test->new( {
+    $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel           => 'error',
                 useSafeJail        => 1,

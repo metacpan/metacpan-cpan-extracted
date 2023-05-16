@@ -59,9 +59,12 @@ $EXPORT_TAGS{'all'} = [];
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp qw/carp croak verbose/;
+use Data::Dumper;
+use IO::Scalar;
+use Term::ANSIColor qw(:constants);
 
 use D64::Disk::Dir::Entry;
 use D64::Disk::Image qw(:all);
@@ -211,7 +214,6 @@ sub _get_dir_info {
     # Get title and ID:
     my ($title, $id) = $d64DiskImageObj->title();
     $title = D64::Disk::Image->name_from_rawname($title);
-    $id = D64::Disk::Image->name_from_rawname($id);
     # Store directory details in a hash:
     $self->{'DIR_INFO'} = {
         'TITLE'       => $title,
@@ -264,7 +266,7 @@ sub get_title {
 
 =head2 get_id
 
-Get 2 character disk directory ID (PETSCII string):
+Get 5 character disk directory ID (PETSCII string):
 
   my $convert2ascii = 0;
   my $diskID = $d64DiskDirObj->get_id($convert2ascii);
@@ -361,6 +363,22 @@ sub get_file_data {
         return undef;
     }
     my $d64DiskImageObj = $self->{'D64_DISK_IMAGE'};
+
+    # Validate initial track/sector:
+    my $track = $entryObj->get_track();
+    my $sector = $entryObj->get_sector();
+    my $imageType = $d64DiskImageObj->type();
+    my $tracks = $d64DiskImageObj->tracks($imageType);
+    if ($track < 1 || $track > $tracks) {
+        carp "Unable to get file data from an illegal track (validate first that initial track ${track} really exists on this disk!)";
+        return undef;
+    }
+    my $sectors_per_track = $d64DiskImageObj->sectors_per_track($imageType, $track);
+    if ($sector < 0 || $sector >= $sectors_per_track) {
+        carp "Unable to get file data from an illegal sector (validate first that initial sector ${sector} really exists on track ${track}!)";
+        return undef;
+    }
+
     # Get filename from the specified directory index position:
     my $name = $entryObj->get_name(0);
     my $rawname = D64::Disk::Image->rawname_from_name($name);
@@ -380,20 +398,49 @@ sub get_file_data {
 
 Print out the entire directory content to any opened file handle (the standard output by default):
 
-  $d64DiskDirObj->print_dir($fh);
+  $d64DiskDirObj->print_dir($fh, { verbose => $verbose });
+
+C<verbose> defaults to false (changing it to true will additionally print out all files' track, sector, and loading address values).
 
 =cut
 
 sub print_dir {
-    my $self = shift;
-    my $fh = shift;
+    my ($self, $fh, $args) = @_;
     $fh = *STDOUT unless defined $fh;
+    $args = {} unless defined $args;
+    my $verbose = $args->{verbose};
     $self->_check_dir_read();
     $self->_print_title($fh);
     my $num_entries = $self->num_entries();
     for (my $i = 0; $i < $num_entries; $i++) {
         my $entryObj = $self->get_entry($i);
-        $entryObj->print_entry($fh);
+        # Set up the loading address:
+        my $loading_address = '';
+        if ($verbose) {
+          # Get the actual file type:
+          my $type = $entryObj->get_type();
+          my $filetype = $file_type_constants{$type};
+          # Read the file data only for PRG files:
+          if ($filetype == T_PRG) {
+            # Do not attempt to read loading address of a non-closed file:
+            if ($entryObj->get_closed()) {
+              # Compute the loading address:
+              my $data = $self->get_file_data($i);
+              if ($data) {
+                my ($lo, $hi) = map { ord } split //, substr $data, 0, 2;
+                $loading_address = sprintf ' $%04x', $lo + $hi * 256;
+              }
+            }
+          }
+        }
+        my $print_fh = new IO::Scalar;
+        $entryObj->print_entry($print_fh, { verbose => $verbose });
+        my $entry_content = ${$print_fh->sref};
+        # Append the loading address to printed entry:
+        chomp $entry_content;
+        $entry_content .= $loading_address . "\n";
+        # Print entry to $fh:
+        print $fh $entry_content;
     }
     $self->_print_blocks_free($fh);
 }
@@ -406,7 +453,10 @@ sub _print_title {
     # Get disk ID converted to ASCII:
     my $id = $self->get_id(1);
     # Print title and disk ID:
-    printf $fh "0 \"%-16s\" %s\n", $title, $id;
+    print $fh '0 ';
+    my $header_text = sprintf "\"%-16s\" %-5s", $title, $id;
+    print $fh REVERSE, $header_text, RESET;
+    print $fh "\n";
 }
 
 sub _print_blocks_free {
@@ -448,7 +498,7 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.04 (2018-11-25)
+Version 0.05 (2023-05-14)
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -473,7 +523,7 @@ Redistributions in binary form must reproduce the above copyright notice, this l
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-diskimage.c website: L<http://www.paradroid.net/diskimage/>
+diskimage.c website: L<https://paradroid.automac.se/diskimage/>
 
 =cut
 

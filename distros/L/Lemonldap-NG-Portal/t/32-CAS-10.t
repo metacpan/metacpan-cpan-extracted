@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;    # skip_all => 'CAS is in rebuild';
 use strict;
@@ -85,7 +86,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

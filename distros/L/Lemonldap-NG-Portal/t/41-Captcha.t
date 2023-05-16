@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -15,7 +16,8 @@ SKIP: {
         skip 'Image::Magick not found', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                  => 'error',
                 useSafeJail               => 1,
@@ -143,7 +145,8 @@ m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" al
     ok( ( defined $json->{newtoken} and $json->{newtoken} =~ /^\w+$/ ),
         'New token has been received' )
       or explain( $json->{newtoken}, 'New token not received' );
-    ok( (
+    ok(
+        (
             defined $json->{newimage}
               and $json->{newimage} =~ m%^data:image/png;base64,.+%
         ),

@@ -1,0 +1,17 @@
+Revision history for Perl extension WebService::Whistle::Pet::Tracker::API.
+
+0.03 2023-05-02
+  - Updated lib/WebService/Whistle/Pet/Tracker/API.pm
+    - Moved debug logging from Data::Dumper to JSON::XS
+    - Cleaned up some error messages
+  - Added scripts/perl-WebService-Whistle-Pet-Tracker-API-pets.pl
+  - Added scripts/perl-WebService-Whistle-Pet-Tracker-API-device.pl
+  - Added MQTT systemd service files and rpm package
+  - Cleaned up scripts/perl-WebService-Whistle-Pet-Tracker-API-mqtt.pl
+
+0.02 2023-04-23
+  - Added scripts/perl-WebService-Whistle-Pet-Tracker-API-mqtt.pl
+  - Updated lib/WebService/Whistle/Pet/Tracker/API.pm to clean up error messages
+
+0.01 2023-04-22
+  - original version

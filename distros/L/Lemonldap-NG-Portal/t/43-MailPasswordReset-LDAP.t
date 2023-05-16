@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -15,6 +16,8 @@ my $mailSend  = 0;
 
 my $mail2 = 0;
 
+no warnings 'once';
+
 SKIP: {
     eval
       'require Email::Sender::Simple;use GD::SecurityImage;use Image::Magick;';
@@ -25,7 +28,8 @@ SKIP: {
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,

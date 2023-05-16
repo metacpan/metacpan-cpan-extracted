@@ -29,10 +29,12 @@ optional_features: {}
 provides:
   Story::Interact::WWW:
     file: lib/Story/Interact/WWW.pm
-    version: '0.001004'
+    version: '0.001006'
 requires:
+  Digest::SHA: '0'
   Mojo::ShareDir: '0'
   Mojolicious: '0'
+  Nanoid: '0'
   Story::Interact: '0.001004'
   Text::Markdown::Hoedown: '0'
   perl: '5.024000'
@@ -42,7 +44,7 @@ resources:
   homepage: https://metacpan.org/release/Story-Interact-WWW
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-story-interact-www.git
-version: '0.001004'
+version: '0.001006'
 x_provides_scripts:
   si_www:
     file: bin/si_www

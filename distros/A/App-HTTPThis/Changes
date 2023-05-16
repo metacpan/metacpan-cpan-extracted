@@ -1,5 +1,11 @@
 # Changes for App-HTTPThis
 
+0.004 Mon May 15 16:42:00 UTC 2023
+     * Fix prereqs
+
+0.003 Mon May 15 14:41:00 UTC 2023
+     * Handle default pages (like index.html)
+
 0.002 Thu Jul 29 10:59:43 UTC 2010
      * Use Plack::Runner higher-level interface instead of
        Plack::Handler::Standalone directly

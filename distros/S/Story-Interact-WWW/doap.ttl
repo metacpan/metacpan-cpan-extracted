@@ -17,11 +17,11 @@
 		doap-deps:on "Story::Interact 0.001004"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Text::Markdown::Hoedown"^^doap-deps:CpanId;
-	];
-	doap-deps:test-requirement [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
-		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
-	], [
+	], [ doap-deps:on "Digest::SHA"^^doap-deps:CpanId ], [ doap-deps:on "Nanoid"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [
 		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
+		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
 	];
 	doap:bug-database    <https://github.com/tobyink/p5-story-interact-www/issues>;
 	doap:created         "2023-01-13"^^xsd:date;
@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Story-Interact-WWW";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-story-interact-www>;
@@ -79,6 +79,22 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-WWW-0.001004.tar.gz>;
 	doap:revision        "0.001004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001005>
+	a                    doap:Version;
+	dc:identifier        "Story-Interact-WWW-0.001005"^^xsd:string;
+	dc:issued            "2023-05-12"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-WWW-0.001005.tar.gz>;
+	doap:revision        "0.001005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/v_0-001006>
+	a                    doap:Version;
+	dc:identifier        "Story-Interact-WWW-0.001006"^^xsd:string;
+	dc:issued            "2023-05-13"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-WWW-0.001006.tar.gz>;
+	doap:revision        "0.001006"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -509,9 +509,21 @@ sub run {
                 or $nameIDFormat eq $self->getNameIDFormat("unspecified") )
             {
                 $nameIDFormat = $self->getNameIDFormat($nameIDFormatKey);
+
+                # Update NameIDFormat in request
                 eval {
+                    if ( !$login->request()->NameIDPolicy ) {
+
+                        # Create NameIDFormat object if it doesnt exist
+                        $login->request()
+                          ->NameIDPolicy( Lasso::Samlp2NameIDPolicy->new() );
+                    }
                     $login->request()->NameIDPolicy()->Format($nameIDFormat);
                 };
+                if ($@) {
+                    $self->logger->warn(
+                        "Could not update NameIDPolicy in request: $@");
+                }
             }
 
             # Force AllowCreate to TRUE for transient/persistent NameIDPolicy

@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -6,7 +7,8 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel          => 'error',
             useSafeJail       => 1,
@@ -159,7 +161,8 @@ sub checkCorsPolicy {
     my ($res) = @_;
     my %headers = @{ $res->[1] };
 
-    ok( $headers{'Access-Control-Allow-Origin'} eq '', "CORS origin '' found" )
+    ok( !defined $headers{'Access-Control-Allow-Origin'},
+        "CORS origin '' found" )
       or print STDERR Dumper( $res->[1] );
     ok( $headers{'Access-Control-Allow-Credentials'} eq 'true',
         "CORS credentials 'true' found" )

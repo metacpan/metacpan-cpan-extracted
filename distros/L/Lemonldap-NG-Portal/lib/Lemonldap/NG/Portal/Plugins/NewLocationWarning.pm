@@ -12,7 +12,7 @@ has locationAttribute        => ( is => 'rw' );
 has locationDisplayAttribute => ( is => 'rw' );
 has locationMaxValues        => ( is => 'rw' );
 has mailSessionKey => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
         return

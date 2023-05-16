@@ -1,3 +1,4 @@
+use warnings;
 use Test::More tests => 5;
 
 use_ok('Lemonldap::NG::Portal::Main');

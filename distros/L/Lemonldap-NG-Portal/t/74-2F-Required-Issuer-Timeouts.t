@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -12,7 +13,8 @@ SKIP: {
     }
     require Lemonldap::NG::Common::TOTP;
 
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => 'error',
                 totp2fSelfRegistration => 1,
@@ -33,7 +35,8 @@ SKIP: {
     ok(
         $res = $client->_get(
             '/cas/login',
-            query => buildForm( {
+            query => buildForm(
+                {
                     service => "http://cas.example.com/",
                 }
             ),

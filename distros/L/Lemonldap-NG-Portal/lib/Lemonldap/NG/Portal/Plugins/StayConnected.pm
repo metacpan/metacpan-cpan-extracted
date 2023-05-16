@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.16.1';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -35,14 +35,14 @@ has ott => (
     }
 );
 has cookieName => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
         $_[0]->conf->{stayConnectedCookieName} || 'llngconnection';
     }
 );
 has singleSession => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
         $_[0]->conf->{stayConnectedSingleSession};
@@ -51,7 +51,7 @@ has singleSession => (
 
 # Default timeout: 1 month
 has timeout => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
         $_[0]->conf->{stayConnectedTimeout} || 2592000;

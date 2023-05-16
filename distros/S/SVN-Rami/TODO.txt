@@ -1,4 +1,5 @@
 The TODO list for Rami
 
+Fix bug when script is invoked with no arguments.
 Add file CONTRIBUTING or CONTRIBUTING.md
 Have the script checkout its configuration from SVN.

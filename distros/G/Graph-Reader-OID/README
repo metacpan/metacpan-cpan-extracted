@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Graph::Reader::OID;
+
      my $obj = Graph::Reader::OID->new;
      my $graph = $obj->read_graph($oid_file);
 
@@ -25,11 +26,9 @@ OID FILE FORMAT
      1.2.276.0.7230010.3.0.3.6.1 Label #2
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Graph::Reader::OID;
      use IO::Barf qw(barf);
      use File::Temp qw(tempfile);
@@ -75,17 +74,18 @@ SEE ALSO
         Install the Graph::Writer modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Graph-Reader-OID>
+    <https://github.com/michal-josef-spacek/Graph-Reader-OID>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension D64::Disk::Dir::Item.
 
+0.08  2023-05-12
+    - added verbose mode of printing out formatted disk image directory item,
+      which additionally includes file's track and sector values
+
 0.07  2013-03-08
     - fixed "First argument to Readonly must be a reference" compilation error
       for Perl 5.6.2 by extracting a complete list of module constants and

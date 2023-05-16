@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.1;
 use parent ('App::cpanminus::reporter');
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Carp;
 use File::Path qw( make_path );
 use File::Spec;
@@ -266,15 +266,7 @@ sub parse_uri {
     return;
   }
 
-  my $author;
-  if ($scheme eq 'file') {
-    # A local file may not be in the correct format for Metabase::Resource.
-    # Hence, we may not be able to parse it for the author.
-    $author = '';
-  }
-  else {
-    $author = $self->get_author( $uri->path );
-  }
+  my $author = $self->get_author( $uri );
   unless (defined $author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
       unless $self->quiet;

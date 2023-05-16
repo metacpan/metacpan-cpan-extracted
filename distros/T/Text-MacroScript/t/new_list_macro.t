@@ -8,11 +8,13 @@ use warnings;
 use Capture::Tiny 'capture';
 use Test::Differences;
 use Test::More;
+use Path::Tiny;
 
 my $ms;
 my($out,$err,@res);
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 sub void(&) { $_[0]->(); () }
 

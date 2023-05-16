@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.16.1';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -17,6 +17,40 @@ has stayConnected            => ( is => 'rw', default => sub { 0 } );
 has requireOldPwd            => ( is => 'rw', default => sub { 1 } );
 has rememberAuthChoice       => ( is => 'rw', default => sub { 0 } );
 has passwordPolicyActivation => ( is => 'rw', default => sub { 0 } );
+has passwordResetUrl => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = $_[0];
+        my $p    = $self->conf->{portal};
+        $p =~ s#/*$##;
+        return $self->conf->{mailUrl} ? $self->conf->{mailUrl} : "$p/resetpwd";
+    }
+);
+has certificateResetUrl => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = $_[0];
+        my $p    = $self->conf->{portal};
+        $p =~ s#/*$##;
+        return $self->conf->{certificateResetByMailURL}
+          ? $self->conf->{certificateResetByMailURL}
+          : "$p/certificateReset";
+    }
+);
+has registerUrl => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = $_[0];
+        my $p    = $self->conf->{portal};
+        $p =~ s#/*$##;
+        return $self->conf->{registerUrl}
+          ? $self->conf->{registerUrl}
+          : "$p/register";
+    }
+);
 
 sub displayInit {
     my ($self) = @_;
@@ -402,9 +436,9 @@ sub display {
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
             DISPLAY_UPDATECERTIF  =>
               $self->conf->{portalDisplayCertificateResetByMail},
-            MAILCERTIF_URL => $self->conf->{certificateResetByMailURL},
-            MAIL_URL       => $self->conf->{mailUrl},
-            REGISTER_URL   => $self->conf->{registerUrl},
+            MAILCERTIF_URL => $self->certificateResetUrl,
+            MAIL_URL       => $self->passwordResetUrl,
+            REGISTER_URL   => $self->registerUrl,
             HIDDEN_INPUTS  => $self->buildHiddenForm($req),
             IMPERSONATION  => $self->conf->{impersonationRule}
               || $self->conf->{proxyAuthServiceImpersonation},
@@ -436,15 +470,15 @@ sub display {
         # External links
         if ( $self->conf->{portalDisplayResetPassword} ) {
             $templateParams{"MAIL_URL_EXTERNAL"} =
-              $self->_isExternalUrl( $self->conf->{mailUrl} );
+              $self->_isExternalUrl( $self->passwordResetUrl );
         }
         if ( $self->conf->{portalDisplayRegister} ) {
             $templateParams{"REGISTER_URL_EXTERNAL"} =
-              $self->_isExternalUrl( $self->conf->{registerUrl} );
+              $self->_isExternalUrl( $self->registerUrl );
         }
         if ( $self->conf->{portalDisplayCertificateResetByMail} ) {
             $templateParams{MAILCERTIF_URL_EXTERNAL} =
-              $self->_isExternalUrl( $self->conf->{certificateResetByMailURL} );
+              $self->_isExternalUrl( $self->certificateResetUrl );
         }
 
         # Display captcha if it's enabled

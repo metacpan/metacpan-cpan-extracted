@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use IO::String;
 use strict;
@@ -7,7 +8,8 @@ require 't/test-lib.pm';
 my $res;
 my $maintests = 6;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel          => 'error',
             useSafeJail       => 1,

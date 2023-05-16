@@ -1,5 +1,6 @@
 # Test viewer API
 
+use warnings;
 use Test::More;
 use strict;
 use IO::String;

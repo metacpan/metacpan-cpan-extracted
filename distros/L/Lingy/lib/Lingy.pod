@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Lingy - A Modern Acmeist Lisp Dialect
+Lingy - Do for Perl what Clojure did for Java
 
 =head1 SYNOPSIS
 
@@ -13,10 +13,12 @@ Run the Lingy REPL:
     $ lingy
     Welcome to Lingy [perl]
 
-    user> (prn "Hello, world!")
+    user=> (p<TAB>
+    pos?     println  prn      pr-str
+    user=> (prn "Hello, world!")
     "Hello, world!"
     nil
-    user>
+    user=>
 
 or a Lingy one-liner:
 
@@ -47,21 +49,61 @@ or run an example Lingy program:
     Take one down, pass it around
     0 bottles of beer on the wall.
 
+=head1 STATUS
+
+Lingy is in ALPHA status.
+
+It has:
+
+=over
+
+=item * The C<eg> directory of example programs that work
+
+=item * A pretty good REPL
+
+=over
+
+=item * Tab completion
+
+=item * Command history
+
+=item * History search
+
+=item * Parentheses visual matching
+
+=item * Other nice readline features
+
+=back
+
+=back
+
+To Do:
+
+=over
+
+=item * AOT and JIT compile to LLVM bytecode
+
+=item * Compile to native Perl code
+
+=back
+
 =head1 DESCRIPTION
 
-Lingy is a Lisp dialect written in many languages, including: Perl.
+Lingy is an implementation of the Clojure language that is written in Perl and hosted by Perl and LLVM. Programs and modules written in Lingy have full access to Perl and its CPAN modules.
 
-Clojure is a Lisp dialect that compiles to run on the JVM.
+Perl modules can be written in Lingy and distributed on CPAN. Since Lingy code is compiled to LLVM, it should perform on the same order of magnitude as XS modules.
 
-ClojureScript uses the same Clojure source code but compiles to NodeJS.
+Since Lingy is a complete Clojure implementation, it should be able to run programs written in Clojure and make use of libraries written in Clojure.
 
-Lingy is the runtime that supports the YAMLScript language.
+Clojure is a language that cleanly solves many of the problems of Java including making concurrency simple, and writing functional programs with mostly immutable data types. It is a Lisp dialect that is hosted by Java and compiles to JVM byte code. It has access to any libraries that target the JVM.
 
-YAMLScript is meant to be implemented in all the same languages as Lingy.
+Much of the Clojure language is written in Clojure (self hosted) and Lingy actually uses the Clojure source code. A variant of Clojure called ClojureScript uses the same Clojure source code but is hosted by JavaScript with full access to NPM modules. Lingy also intends to eventually be ported to and hosted by many other programming languages.
 
-Lingy is heavily influenced by the Clojure (Lisp) language. It aspires to be largely interoperable with Clojure. Currently it supports just a tiny subset of Clojure but supports Lisp basics like function application and macros.
+Lingy started as a Perl L<implementation|https://github.com/ingydotnet/mal/tree/perl.2/impls/perl.2> of the L<Make a Lisp|https://github.com/kanaka/mal> project. This provided a bare-bones Clojure-inspired Lisp interpreter from which Lingy has grown upon.
 
-Lingy started as a Perl L<implementation|https://github.com/ingydotnet/mal/tree/perl.2/impls/perl.2> of the L<Make a Lisp|https://github.com/kanaka/mal> project. This provided a bare-bones Clojure-inspired Lisp interpreter.
+=head1 INSTALLATION
+
+    cpanm Lingy
 
 =head1 C<LINGY> CLI USAGE
 
@@ -125,215 +167,17 @@ YAML dump the Lingy compiled AST for a C<-e> expression.
 
 =back
 
-=head1 SUPPORTED FUNCTIONS
-
-=over
-
-=item * C<*>
-
-=item * C<+>
-
-=item * C<->
-
-=item * C</>
-
-=item * C<<<>>
-
-=item * C<<<=>>
-
-=item * C<=>
-
-=item * C<==>
-
-=item * C<>>
-
-=item * C<>=>
-
-=item * C<apply>
-
-=item * C<*ARGV*>
-
-=item * C<assoc>
-
-=item * C<atom>
-
-=item * C<atom?>
-
-=item * C<catch>
-
-=item * C<concat>
-
-=item * C<cond>
-
-=item * C<conj>
-
-=item * C<cons>
-
-=item * C<contains?>
-
-=item * C<count>
-
-=item * C<dec>
-
-=item * C<def>
-
-=item * C<defmacro>
-
-=item * C<deref>
-
-=item * C<dissoc>
-
-=item * C<do>
-
-=item * C<empty?>
-
-=item * C<eval>
-
-=item * C<false>
-
-=item * C<false?>
-
-=item * C<*file*>
-
-=item * C<first>
-
-=item * C<fn>
-
-=item * C<fn?>
-
-=item * C<get>
-
-=item * C<getenv>
-
-=item * C<hash-map>
-
-=item * C<*host-language*>
-
-=item * C<if>
-
-=item * C<join>
-
-=item * C<keys>
-
-=item * C<keyword>
-
-=item * C<keyword?>
-
-=item * C<let>
-
-=item * C<list>
-
-=item * C<list?>
-
-=item * C<load-file>
-
-=item * C<macro?>
-
-=item * C<macroexpand>
-
-=item * C<map>
-
-=item * C<map?>
-
-=item * C<meta>
-
-=item * C<nil>
-
-=item * C<nil?>
-
-=item * C<not>
-
-=item * C<nth>
-
-=item * C<number>
-
-=item * C<number?>
-
-=item * C<println>
-
-=item * C<prn>
-
-=item * C<pr-str>
-
-=item * C<quasiquote>
-
-=item * C<quasiquoteexpand>
-
-=item * C<quote>
-
-=item * C<range>
-
-=item * C<readline>
-
-=item * C<read-string>
-
-=item * C<reset!>
-
-=item * C<rest>
-
-=item * C<seq>
-
-=item * C<sequential?>
-
-=item * C<slurp>
-
-=item * C<str>
-
-=item * C<string?>
-
-=item * C<swap!>
-
-=item * C<symbol>
-
-=item * C<symbol?>
-
-=item * C<throw>
-
-=item * C<time-ms>
-
-=item * C<true>
-
-=item * C<true?>
-
-=item * C<try>
-
-=item * C<vals>
-
-=item * C<vec>
-
-=item * C<vector>
-
-=item * C<vector?>
-
-=item * C<with-meta>
-
-=item * C<PPP>
-
-=item * C<WWW>
-
-=item * C<XXX>
-
-=item * C<YYY>
-
-=item * C<ZZZ>
-
-=back
-
 =head1 ROADMAP
 
 The next major things to add are:
 
 =over
 
-=item * Multi-arity function/macro definition and application
+=item * Compilation to Perl code
 
-=item * Namespaces
+=item * Compilation to LLVM bytecode
 
 =item * Lambdas
-
-=item * lingy.core libary
-
-=item * Regex support
 
 =back
 
@@ -346,10 +190,6 @@ The next major things to add are:
 =item * L<YAMLTest|https://metacpan.org/pod/YAMLTest>
 
 =back
-
-=head1 STATUS
-
-Lingy is in ALPHA status.
 
 =head1 AUTHORS
 

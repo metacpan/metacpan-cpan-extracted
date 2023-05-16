@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -98,7 +99,8 @@ my $notifs = q%[{
 
 my $content = '{"uid":"dwho"}';
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel           => 'error',
             useSafeJail        => 1,
@@ -419,13 +421,15 @@ expectForm( $res, undef, '/notifback', 'reference1x1' );
 ok(
     $res->[2]->[0] =~
 m%<input class="form-check-input" type="checkbox" name="check1x1x1" id="1x1x1" value="accepted"/>%
-      and m%<label class="form-check-label" for="1x1x1">I agree</label>%,
+      && $res->[2]->[0] =~
+      m%<label class="form-check-label" for="1x1x1">I agree</label>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok(
     $res->[2]->[0] =~
 m%<input class="form-check-input" type="checkbox" name="check1x1x2" id="1x1x2" value="accepted"/>%
-      and m%<label class="form-check-label" for="1x1x2">I am sure</label>%,
+      && $res->[2]->[0] =~
+      m%<label class="form-check-label" for="1x1x2">I am sure</label>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 @c = ( $res->[2]->[0] =~ m%<input class="form-check-input" type="checkbox"%gs );

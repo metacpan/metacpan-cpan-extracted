@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -51,7 +52,8 @@ SKIP: {
     ok(
         $res = $issuer->_get(
             '/saml/singleSignOn',
-            query => buildForm( {
+            query => buildForm(
+                {
                     IDPInitiated => 1,
                     spConfKey    => 'sp.com',
                     spDest       =>
@@ -71,7 +73,8 @@ SKIP: {
     ok(
         $res = $issuer->_get(
             '/saml/singleSignOn',
-            query => buildForm( {
+            query => buildForm(
+                {
                     IDPInitiated => 1,
                     spConfKey    => 'sp.com',
                     spDest       =>
@@ -221,7 +224,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -266,7 +270,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

@@ -893,13 +893,14 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         use strict;
         use warnings;
         use parent qw( Module::Generic );
+        use vars qw( $ERROR $VERSION );
         use overload (
             '""' => sub{ $_[0]->matched },
             '0+' => sub{ $_[0]->matched },
             fallback => 1,
         );
         our $ERROR = '';
-        our $VERSION = 'v0.1.0';
+        our $VERSION = 'v0.1.1';
     };
     
     sub init

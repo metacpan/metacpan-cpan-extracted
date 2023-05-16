@@ -798,12 +798,12 @@ sub checkIDTokenValidity {
 
     # Check acr
     my $acr = $id_token->{acr};
-    if ( defined $acr_values ) {
+    if ($acr_values) {
         unless ($acr) {
             $self->logger->error("ACR was not returned by OP $op");
             return 0;
         }
-        unless ( $acr_values =~ /\b$acr\b/i ) {
+        unless ( grep { $_ eq $acr } split( /[\s,]+/, $acr_values ) ) {
             $self->logger->error(
                 "ACR $acr not listed in request ACR values ($acr_values)");
             return 0;

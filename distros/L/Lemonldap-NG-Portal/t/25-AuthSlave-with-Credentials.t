@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -8,7 +9,8 @@ require 't/test-lib.pm';
 my $res;
 my $json;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel           => 'error',
             useSafeJail        => 1,

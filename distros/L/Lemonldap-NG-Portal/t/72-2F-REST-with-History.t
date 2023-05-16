@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -33,7 +34,8 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel            => 'error',
             rest2fActivation    => 1,

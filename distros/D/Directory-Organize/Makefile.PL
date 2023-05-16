@@ -11,7 +11,7 @@ WriteMakefile
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
-                   'mkdir_heute'
+                   'bin/mkdir_heute'
                  ],
   'PL_FILES' => {}
 )

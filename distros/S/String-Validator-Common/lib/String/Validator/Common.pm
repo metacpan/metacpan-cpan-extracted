@@ -1,5 +1,5 @@
 package String::Validator::Common;
-$String::Validator::Common::VERSION = '2.00';
+$String::Validator::Common::VERSION = '2.04';
 # ABSTRACT: Base Module for creating new String::Validator Modules.
 
 use 5.008;
@@ -157,7 +157,7 @@ String::Validator::Common - Base Module for creating new String::Validator Modul
 
 =head1 VERSION
 
-version 2.00
+version 2.04
 
 =head1 DESCRIPTION
 

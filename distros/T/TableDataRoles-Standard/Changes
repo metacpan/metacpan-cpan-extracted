@@ -1,3 +1,11 @@
+0.015   2023-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Mention TableDataRole::Source::SQLite.
+
+        - Aid debugging CSV parsing error by setting Text::CSV's options
+          auto_diag=>9 and diag_verbose=>1.
+
+
 0.014   2022-02-20  Released-By: PERLANCAR; Urgency: medium
 
         - Add missing dep to Class::Method::Modifiers (RT#141389).

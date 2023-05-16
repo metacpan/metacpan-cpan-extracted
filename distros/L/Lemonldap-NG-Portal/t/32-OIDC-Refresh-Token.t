@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -69,7 +70,8 @@ sub runTest {
     );
     ok( ( grep { $_ eq "rpid" } @{ $id_token_payload->{aud} } ),
         'Check that clientid is in audience' );
-    ok( (
+    ok(
+        (
             grep { $_ eq "http://my.extra.audience/test" }
               @{ $id_token_payload->{aud} }
         ),

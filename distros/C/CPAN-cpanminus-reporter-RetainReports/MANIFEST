@@ -28,8 +28,8 @@ t/data/build.verbose_cpanm.log
 t/data/build.version_strings.log
 t/data/cpanriver.01.build.log
 t/data/cpanriver.02.build.log
+t/data/M/ME/METATEST/Phony-PASS-0.01.tar.gz
 t/data/mixed_scheme.build.log
-t/data/Phony-PASS-0.01.tar.gz
 t/lib/Testing.pm
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)

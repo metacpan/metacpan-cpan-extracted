@@ -35,7 +35,7 @@
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/bootstrap/dist/css/bootstrap-theme.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-bootstrap/ui-bootstrap-csp.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">css/manager.css" />
+<!-- //endif -->
   <TMPL_IF NAME="CUSTOM_CSS">
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="CUSTOM_CSS">" />
   </TMPL_IF>
-<!-- //endif -->

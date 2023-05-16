@@ -2,6 +2,7 @@
 
 use Test::More;
 use strict;
+use warnings;
 
 require 't/test-lib.pm';
 

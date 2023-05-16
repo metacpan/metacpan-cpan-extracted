@@ -65,7 +65,7 @@ subtest 'Getters methods' => sub {
     is $api->api_key,   'some_api_key',   'Get api_key';
     is $api->api_token, 'some_api_token', 'Get api_token';
 
-    for my $type ('track', 'api', 'trigger') {
+    for my $type ('track', 'api', 'trigger', 'transactional') {
         my $obj = $api->ratelimiter($type);
         isa_ok($obj, 'WebService::Async::CustomerIO::RateLimiter');
         is($obj, $api->ratelimiter($type), 'same instance returned on second call');
@@ -286,6 +286,60 @@ subtest 'Search customers by email' => sub {
     is ref $response,      'ARRAY',                                   ' Method returns list';
     is ref $response->[0], 'WebService::Async::CustomerIO::Customer', 'Object created correctly';
     is $response->[0]->id, 2,                                         'Object has correct data';
+};
+
+subtest 'sending transactional emails' => sub {
+    my $api = WebService::Async::CustomerIO->new(
+        site_id   => 'some_site_id',
+        api_key   => 'some_api_key',
+        api_token => 'some_api_token',
+    );
+
+    $api = Test::MockObject::Extends->new($api);
+    $api->mock(
+        api_request => sub {
+            my %h;
+            @h{qw(method uri data)} = @_[1 .. 3];
+            Future->done(\%h);
+        });
+
+    my $response = $api->send_transactional({
+            transactional_message_id => 1,
+            to                       => 1,
+            identifiers              => {id => 1}})->get;
+
+    is $response->{method}, 'POST',       'Method is correct';
+    is $response->{uri},    'send/email', 'URI is correct';
+    is_deeply $response->{data},
+        {
+        transactional_message_id => 1,
+        to                       => 1,
+        identifiers              => {id => 1}
+        },
+        'Data is correct';
+    my $err = exception { $api->send_transactional(undef)->get };
+    like $err, qr/^Missing required attribute: transactional_message_id/, "Got error for missing transactional_message_id";
+    my $err = exception {
+        $api->send_transactional({transactional_message_id => 1})->get
+    };
+    like $err, qr/^Missing required attribute: to/, "Got error for missing to";
+    my $err = exception {
+        $api->send_transactional({
+                transactional_message_id => 1,
+                to                       => 1
+            }
+        )->get
+    };
+    like $err, qr/^Missing required attribute: identifiers/, "Got error for missing identifiers";
+    my $err = exception {
+        $api->send_transactional({
+                transactional_message_id => 1,
+                to                       => 1,
+                identifiers              => 'scalar'
+            }
+        )->get
+    };
+    like $err, qr/^Missing required attribute: identifiers value/, "Got error for missing identifiers";
 };
 
 done_testing();

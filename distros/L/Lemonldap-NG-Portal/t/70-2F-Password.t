@@ -1,10 +1,12 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
 
 require 't/test-lib.pm';
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                   => 'error',
             password2fSelfRegistration => 1,
@@ -76,7 +78,7 @@ subtest 'Register Password 2FA' => sub {
     );
     is( $res->{error}, 'PE34' );
 
-    my $s = "password=&passwordverify=";
+    $s = "password=&passwordverify=";
     ok(
         $res = expectJSON(
             $client->_post(
@@ -90,7 +92,7 @@ subtest 'Register Password 2FA' => sub {
     );
     is( $res->{error}, 'missingPassword' );
 
-    my $s = "password=somethingyouknow&passwordverify=somethingyouknow";
+    $s = "password=somethingyouknow&passwordverify=somethingyouknow";
     ok(
         $res = expectJSON(
             $client->_post(

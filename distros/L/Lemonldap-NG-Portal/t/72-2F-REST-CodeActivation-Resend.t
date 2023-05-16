@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -122,7 +123,8 @@ sub init_login {
     return $res;
 }
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel             => 'error',
             rest2fActivation     => 1,

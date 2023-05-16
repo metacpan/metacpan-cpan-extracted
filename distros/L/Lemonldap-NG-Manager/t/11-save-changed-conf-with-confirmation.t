@@ -1,6 +1,7 @@
 # Verify that a modified configuration can be saved and that all changes are
 # detected
 
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -118,7 +119,8 @@ done_testing( count() );
 `rm -rf t/sessions`;
 
 sub changes {
-    return [ {
+    return [
+        {
             'key' => 'portal',
             'new' => 'http://auth2.example.com/',
             'old' => 'http://auth.example.com/'

@@ -1,3 +1,5 @@
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Lemonldap-NG-Manager.t'
 
@@ -18,7 +20,8 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::Conf');
     my $h;
     ok(
-        $h = new Lemonldap::NG::Common::Conf( {
+        $h = new Lemonldap::NG::Common::Conf(
+            {
                 type             => 'LDAP',
                 ldapServer       => 'ldap://localhost',
                 ldapConfBase     => 'ou=conf,ou=websso,dc=example,dc=com',

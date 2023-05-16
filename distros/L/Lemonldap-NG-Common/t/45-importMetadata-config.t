@@ -1,5 +1,4 @@
-#!/usr/bin/perl 
-
+use warnings;
 use Test::More;
 use strict;
 use warnings;

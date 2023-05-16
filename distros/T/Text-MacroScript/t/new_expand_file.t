@@ -9,9 +9,11 @@ use strict;
 use warnings;
 use Capture::Tiny 'capture';
 use Test::More;
+use Path::Tiny;
 
 use_ok 'Text::MacroScript';
-require_ok 't/mytests.pl';
+push @INC, path($0)->dirname;
+require_ok 'mytests.pl';
 
 sub void(&) { $_[0]->(); () }
 

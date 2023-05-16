@@ -15,7 +15,7 @@ WebService::Async::CustomerIO::Trigger - Class for working with triggers end poi
 
 use Carp qw();
 
-our $VERSION = '0.001';    ## VERSION
+our $VERSION = '0.002';    ## VERSION
 
 =head2 new
 

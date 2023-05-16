@@ -19,7 +19,7 @@ name: Dist-Zilla-Plugin-InsertExecsList
 provides:
   Dist::Zilla::Plugin::InsertExecsList:
     file: lib/Dist/Zilla/Plugin/InsertExecsList.pm
-    version: '0.031'
+    version: '0.032'
 requires:
   Dist::Zilla::Role::FileFinderUser: '0'
   Dist::Zilla::Role::FileMunger: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertExecsList
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-InsertExecsList
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertExecsList.git
-version: '0.031'
+version: '0.032'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

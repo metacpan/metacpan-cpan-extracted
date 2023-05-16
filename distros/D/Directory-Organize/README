@@ -16,7 +16,7 @@ or
 If you just want the script, you may take the script gen_single_file to
 incorporate the library into the script and have all in one place.
 
-  $ gen_single_file mkdir_heute > mkdir_heute_single
+  $ gen_single_file bin/mkdir_heute > mkdir_heute_single
 
 Place mkdir_heute_single anywhere in your $PATH.
 
@@ -56,7 +56,7 @@ or
 so that you can say ’cdheute’ on the command line and your working
 directory will be changed to the choosen directory.
 
-Version v1.0.1
+Version v1.0.2
 
 Copyright (c) 2009-2018 Mathias Weidner (mamawe@cpan.org).
 All rights reserved.

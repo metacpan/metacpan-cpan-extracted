@@ -57,7 +57,7 @@ requires:
   JSON::XS: '4.03'
   List::Util: '1.56'
   Module::Metadata: '1.000037'
-  Nice::Try: v1.2.0
+  Nice::Try: v1.3.4
   POSIX: 1.53_01
   Regexp::Common: '2017060201'
   Scalar::Util: '1.50'
@@ -79,5 +79,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v0.29.6
+version: v0.30.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -68,7 +69,8 @@ LWP::Protocol::PSGI->register(
 $client = register(
     'portal',
     sub {
-        LLNG::Manager::Test->new( {
+        LLNG::Manager::Test->new(
+            {
                 ini => {
                     logLevel          => $debug,
                     useSafeJail       => 1,
@@ -117,7 +119,8 @@ switch ('app');
 $app = register(
     'app',
     sub {
-        Lemonldap::NG::Handler::Server->run( {
+        Lemonldap::NG::Handler::Server->run(
+            {
                 %{ $client->ini },
                 globalStorage => 'Lemonldap::NG::Common::Apache::Session::REST',
                 globalStorageOptions =>
@@ -129,7 +132,8 @@ $app = register(
 );
 
 ok(
-    $res = $app->( {
+    $res = $app->(
+        {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -155,7 +159,8 @@ expectRedirection( $res, 'http://test.example.org/' );
 my $cid = expectCookie($res);
 
 ok(
-    $res = $app->( {
+    $res = $app->(
+        {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',

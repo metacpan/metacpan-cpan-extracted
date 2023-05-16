@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -8,7 +9,8 @@ BEGIN {
 
 my ( $client, $res, $id );
 
-$client = LLNG::Manager::Test->new( {
+$client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel          => 'error',
             restSessionServer => 1,

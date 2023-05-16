@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;    # skip_all => 'CAS is in rebuild';
 use strict;
@@ -85,10 +86,11 @@ my $pgt2 = casGetPgt( $issuer, $pt, "http://service.com/srv",
 my $pt2 = casGetProxyTicket( $issuer, $pgt2, "http://subservice.com/srv" );
 
 # Sub-service validates PT
-my $res = casGetProxyResponse( $issuer, $pt2, "http://subservice.com/srv" );
+$res = casGetProxyResponse( $issuer, $pt2, "http://subservice.com/srv" );
 expectCasSuccess($res);
 
-is_deeply( [
+is_deeply(
+    [
         casXPathAll(
             $res->[2]->[0],
             '/cas:serviceResponse/cas:authenticationSuccess'
@@ -102,7 +104,7 @@ count(1);
 
 # Make sure PGT is still valid a long time later
 Time::Fake->offset("+10h");
-my $pt = casGetProxyTicket( $issuer, $pgt, "http://service.com/srv" );
+$pt = casGetProxyTicket( $issuer, $pgt, "http://service.com/srv" );
 expectCasSuccess(
     casGetProxyResponse( $issuer, $pt, "http://service.com/srv" ) );
 
@@ -110,7 +112,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel              => $debug,
                 domain                => 'idp.com',
@@ -167,7 +170,8 @@ sub casGetPgt {
     ok(
         my $res = $issuer->_get(
             '/cas/p3/proxyValidate',
-            query => buildForm( {
+            query => buildForm(
+                {
                     service => $service,
                     ticket  => $ticket,
                     pgtUrl  => $pgtUrl,
@@ -206,7 +210,8 @@ sub casGetProxyTicket {
     ok(
         my $res = $issuer->_get(
             '/cas/proxy',
-            query => buildForm( {
+            query => buildForm(
+                {
                     pgt           => $pgt,
                     targetService => $service,
                 }

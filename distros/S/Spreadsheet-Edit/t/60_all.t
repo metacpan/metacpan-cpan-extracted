@@ -5,6 +5,8 @@ use t_Common qw/oops/; # strict, warnings, Carp
 use t_TestCommon # Test::More etc.
   qw/$silent $verbose $debug run_perlscript verif_no_internals_mentioned/;
 
+use Test2::Tools::Subtest qw/subtest_buffered subtest_streamed/;
+
 # Run all "subtests" twice:
 #
 #  1. In silent mode, verifying that nothing was printed
@@ -13,7 +15,10 @@ use t_TestCommon # Test::More etc.
 #     full tracebacks or other mention of internal packages
 #     (this checks that "caller_level" is handled correctly).
 #
-# "Subtests" are all the scripts called t/*.pl 
+# "Subtests" are all the scripts called t/*.pl which do NOT use
+#  the test harness infrastructure at all (otherwise we get trouble
+#  with even mis-odering, or something like that).
+#
 
 use Capture::Tiny qw/capture_merged tee_merged/;
 
@@ -37,32 +42,44 @@ if (@subtests == 0) {
 
 plan tests => scalar(@subtests) * 2;
 
+# Note: --silent --debug etc. arguments are parsed in t_TestCommon.pm
 
-#--------------------------------------------------------------------------
+##### Run with --silent ##### 
 for my $st (@subtests) {
-  # The --silent argument is parsed in t_TestCommon.pm and sets the global $silent
-  my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
-  if ($swstat != 0) {
-    # Diagnostic has already been displayed
-    die "$soutput\nNon-zero exit status from subtest '$st' --silent"; 
-  }
-  ok ($soutput eq "", basename($st)." --silent is really silent") 
-    or die; # stop immediately
+  subtest_buffered with_silent => sub {
+    my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
+    ok($swstat == 0, "zero subtest exit status",
+       "$soutput\nNon-zero exit status from subtest '$st' --silent"
+      ) || return;
+    like($soutput,
+         # If a subtest uses Test2 it will output the usual messages. Otherwise
+         # it should output nothing at all when invoked with --silent.
+         qr/\A(?:(?:\#\ Seeded.*\n)? # The test system sometimes(?) puts this out first
+               (?:ok\ \d+.*\n)+    # successful test outputs
+               1\.\.\d+\n          # The final line
+            )?\z/x
+    ,
+    "checking '$st' for silence violations",
+    "<<$soutput>>\nSILENCE VIOLATED by subtest '$st' --silent"
+    );
+    done_testing();
+  };
 }
-#--------------------------------------------------------------------------
+
+##### Run with --verbose --debug #####
 for my $st (@subtests) {
-  my ($doutput, $dwstat) = capture_merged { 
-                             run_subtest($st,'--verbose', '--debug') };
-  if ($dwstat != 0) {
-    say $doutput;
-    die "Non-zero exit status ($dwstat) from $st";
-  }
-  if (! eval { verif_no_internals_mentioned($doutput) }) {
-    say $@;
-    die "internals inappropriately mentioned in output from $st";
-  }
-  note basename($st)." produced ".length($doutput)." characters\n";
-  ok (1, basename($st)." --verbose --debug : no inappropriate output detected");
+  subtest_buffered with_debug => sub {
+    my ($doutput, $dwstat) = capture_merged { 
+                               run_subtest($st,'--verbose', '--debug') };
+    is($dwstat, 0, "zero subtest exit stat");
+    if (! eval { verif_no_internals_mentioned($doutput) }) {
+      say $@;
+      die "internals inappropriately mentioned in output from $st";
+    }
+    print basename($st)." --verbose --debug produced ".length($doutput)." characters\n";
+    print basename($st)." --verbose --debug : no inappropriate output detected\n";
+    done_testing();
+  };
 }
 
 exit 0;

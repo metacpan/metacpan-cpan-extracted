@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.16.1';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -22,7 +22,7 @@ use constant beforeAuth => 'checkRememberedAuthChoice';
 has rule => ( is => 'rw', default => sub { 0 } );
 
 has rememberCookieName => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
         $_[0]->conf->{rememberCookieName} // 'llngrememberauthchoice';
@@ -31,7 +31,7 @@ has rememberCookieName => (
 
 # Default timeout: 1 year
 has rememberCookieTimeout => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
     default => sub {
         $_[0]->conf->{rememberCookieTimeout} // 31536000;

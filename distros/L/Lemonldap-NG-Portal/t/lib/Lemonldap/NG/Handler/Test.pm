@@ -58,7 +58,7 @@ LWP::Protocol::PSGI->register(
         my $content = $req->content;
         print $rin JSON::to_json( [ $method => $url, [], $content ] ) . "\n";
         my $res;
-        $res = <$rout>, 'Get portal response';
+        $res = <$rout>;
         return JSON::from_json($res);
     }
 );

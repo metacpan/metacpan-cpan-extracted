@@ -12,8 +12,7 @@ use App::HTTPThis;
 
 App::HTTPThis->new->run;
 
-
-
+__END__
 
 =pod
 
@@ -23,7 +22,7 @@ http_this - export the current directory over HTTP
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -38,6 +37,9 @@ version 0.002
 
     ## Announces the HTTP server via Bonjour with the specified name
     $ http_this --name "My cool webserver"
+
+    ## Start the server using index.html for directory requests
+    $ http_this --autoindex
 
     ## Show documentation about our options
     $ http_this --help
@@ -82,6 +84,12 @@ appropriate backend for your operating system, both available from
 L<CPAN|http://search.cpan.org/>. If one of them cannot be found, a
 warning message will be displayed.
 
+=item --autoindex
+
+By default, if the server gets a request that ends in / then it displays
+a listing of that directory. With the C<--autoindex> flag, it will serve
+the C<index.html> file from that directory (if it exists).
+
 =item --help
 
 Print information about the script usage and its options.
@@ -102,10 +110,6 @@ This software is Copyright (c) 2010 by Pedro Melo.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-
-__END__
-

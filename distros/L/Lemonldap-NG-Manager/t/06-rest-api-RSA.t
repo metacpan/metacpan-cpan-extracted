@@ -1,5 +1,6 @@
 # Test RSA key generation
 
+use warnings;
 use Test::More;
 use strict;
 use JSON;

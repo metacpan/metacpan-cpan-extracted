@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -15,7 +16,8 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $op = LLNG::Manager::Test->new( {
+my $op = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                        => $debug,
             domain                          => 'idp.com',
@@ -126,7 +128,8 @@ count(1);
 my ($code) = expectRedirection( $res, qr#http://rp2\.com/.*code=([^\&]*)# );
 
 # Play code on RP2
-$query = buildForm( {
+$query = buildForm(
+    {
         grant_type   => 'authorization_code',
         code         => $code,
         redirect_uri => 'http://rp2.com/',
@@ -171,7 +174,8 @@ count(1);
 ($code) = expectRedirection( $res, qr#http://rp\.com/.*code=([^\&]*)# );
 
 # Play code on RP1
-$query = buildForm( {
+$query = buildForm(
+    {
         grant_type   => 'authorization_code',
         code         => $code,
         redirect_uri => 'http://rp.com/',
@@ -197,7 +201,8 @@ is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
 count(1);
 
 # Bad auth (form)
-$query = buildForm( {
+$query = buildForm(
+    {
         grant_type    => 'authorization_code',
         code          => $code,
         redirect_uri  => 'http://rp.com/',
@@ -221,7 +226,8 @@ is( getHeader( $res, "WWW-Authenticate" ), undef );
 count(1);
 
 # Correct parameters
-$query = buildForm( {
+$query = buildForm(
+    {
         grant_type    => 'authorization_code',
         code          => $code,
         redirect_uri  => 'http://rp.com/',

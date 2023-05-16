@@ -302,18 +302,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/singleLogout"
     ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/singleSignOn" />
   </IDPSSODescriptor>
@@ -357,18 +351,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/proxySingleLogout"
     ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
@@ -413,18 +401,12 @@ entityID="http://auth.$name.com/saml/metadata">
     </KeyDescriptor>
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
      Location="http://auth.$name.com/saml/AA/SOAP" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
   </AttributeAuthorityDescriptor>
   <Organization>
     <OrganizationName xml:lang="en">$org</OrganizationName>
@@ -486,18 +468,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSLO"
      Location="http://auth.$name.com/saml/singleLogout"
     ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSSO"
      Location="http://auth.$name.com/saml/singleSignOn" />
   </IDPSSODescriptor>
@@ -541,18 +517,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSLO"
      Location="http://auth.$name.com/saml/proxySingleLogout"
     ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
@@ -597,18 +567,12 @@ entityID="http://auth.$name.com/saml/metadata">
     </KeyDescriptor>
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
      Location="http://auth.$name.com/saml/AA/SOAP" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
   </AttributeAuthorityDescriptor>
   <Organization>
     <OrganizationName xml:lang="en">$org</OrganizationName>
@@ -671,18 +635,12 @@ oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/singleLogout"
     ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/singleSignOn" />
   </IDPSSODescriptor>
@@ -728,18 +686,12 @@ oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/proxySingleLogout"
     ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
@@ -783,18 +735,12 @@ oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
     </KeyDescriptor>
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
      Location="http://auth.$name.com/saml/AA/SOAP" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
   </AttributeAuthorityDescriptor>
   <Organization>
     <OrganizationName xml:lang="en">$org</OrganizationName>
@@ -857,18 +803,12 @@ oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSLO"
      Location="http://auth.$name.com/saml/singleLogout"
     ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSSO"
      Location="http://auth.$name.com/saml/singleSignOn" />
   </IDPSSODescriptor>
@@ -914,18 +854,12 @@ oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSLO"
      Location="http://auth.$name.com/saml/proxySingleLogout"
     ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
@@ -969,18 +903,12 @@ oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
     </KeyDescriptor>
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
      Location="http://auth.$name.com/saml/AA/SOAP" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
   </AttributeAuthorityDescriptor>
   <Organization>
     <OrganizationName xml:lang="en">$org</OrganizationName>
@@ -1042,18 +970,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/singleLogout"
     ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/singleSignOn" />
   </IDPSSODescriptor>
@@ -1097,18 +1019,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
      Location="http://auth.$name.com/saml/proxySingleLogout"
     ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
@@ -1150,18 +1066,12 @@ entityID="http://auth.$name.com/saml/metadata">
     </KeyDescriptor>
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
      Location="http://auth.$name.com/saml/AA/SOAP" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
   </AttributeAuthorityDescriptor>
   <Organization>
     <OrganizationName xml:lang="en">$org</OrganizationName>
@@ -1223,18 +1133,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSLO"
      Location="http://auth.$name.com/saml/singleLogout"
     ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSSO"
      Location="http://auth.$name.com/saml/singleSignOn" />
   </IDPSSODescriptor>
@@ -1278,18 +1182,12 @@ entityID="http://auth.$name.com/saml/metadata">
     <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$typeSLO"
      Location="http://auth.$name.com/saml/proxySingleLogout"
     ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
@@ -1331,18 +1229,12 @@ entityID="http://auth.$name.com/saml/metadata">
     </KeyDescriptor>
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
      Location="http://auth.$name.com/saml/AA/SOAP" />
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
-    <NameIDFormat>
-    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
   </AttributeAuthorityDescriptor>
   <Organization>
     <OrganizationName xml:lang="en">$org</OrganizationName>

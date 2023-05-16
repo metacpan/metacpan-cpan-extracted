@@ -71,5 +71,5 @@ requires:
   perl: '5.006002'
 resources:
   repository: https://github.com/andk/cpanpm
-version: '2.35'
+version: '2.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -253,7 +253,7 @@
 "otherSessions":"Muut aktiiviset istunnot",
 "password":"Salasana",
 "password2f":"Salasana",
-"passwordCompromised":"Not found in a compromised password database",
+"passwordCompromised":"Ei löydy vaarantuneiden salasanojen tietokannasta",
 "passwordPolicy":"Ole hyvä ja noudata seuraavaa käytännettä:",
 "passwordPolicyMinDigit":"Numeroiden vähimmäismäärä:",
 "passwordPolicyMinLower":"Pienten kirjainten vähimmäismäärä:",

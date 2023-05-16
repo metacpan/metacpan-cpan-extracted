@@ -1,9 +1,11 @@
+use warnings;
 use Test::More;
 use strict;
 
 require 't/test-lib.pm';
 
-my $app = LLNG::Manager::Test->new( {
+my $app = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel => 'error',
         }

@@ -1,3 +1,5 @@
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Lemonldap-NG-Manager.t'
 
@@ -19,7 +21,8 @@ use File::Temp;
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
 ok(
-    $h = new Lemonldap::NG::Common::Conf( {
+    $h = new Lemonldap::NG::Common::Conf(
+        {
             type    => 'File',
             dirName => $dir,
         }

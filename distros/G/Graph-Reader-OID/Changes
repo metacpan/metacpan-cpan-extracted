@@ -1,3 +1,14 @@
+0.04 2023-05-15T13:46:43+02:00
+ - Fix dependencies.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rewrite to better example filename.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.03 2015-09-29T11:58:07+02:00
  - Improve SEE ALSO section in doc.
  - Move author tests to xt/ directory.

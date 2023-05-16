@@ -10,7 +10,11 @@ README.md
 README.pod
 script/rami
 SVN-Rami-0.1.tar.gz
+SVN-Rami-0.20.tar.gz
+SVN-Rami-0.201.tar.gz
 t/00-load.t
+t/01-convert_branches_to_filesystem_paths.t
+t/01-test-rami.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

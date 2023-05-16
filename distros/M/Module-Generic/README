@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.29.6
+        v0.30.0
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -1567,72 +1567,8 @@ SUPPORT METHODS
     This provides a generic lvalue method that can be used both in assign
     context or lvalue context.
 
-    You only need to specify a setter and getter callback.
-
-    This takes an hash reference having either of the following properties:
-
-    *get*
-        A code reference that will be called, passing it the module object.
-        It takes whatever value is returned and returns it to the caller.
-
-    *set*
-        A code reference that will be called when values were provided
-        either in assign or regular method context:
-
-            my $now = DateTime->now;
-            $o->datetime = $now;
-            # or
-            $o->datetime( $now );
-
-    For example, in your module:
-
-        sub datetime : lvalue { return( shift->_lvalue({
-            set => sub
-            {
-                my( $self, $args ) = @_;
-                if( $self->_is_a( $args->[0] => 'DateTime' ) )
-                {
-                    return( $self->{datetime} = shift( @$args ) );
-                }
-                else
-                {
-                    return( $self->error( "Value provided is not a datetime." ) );
-                }
-            },
-            get => sub
-            {
-                my $self = shift( @_ );
-                my $dt = $self->{datetime};
-                return( $dt );
-            }
-        }, @_ ) ); }
-        # ^^^^
-        # Don't forget the @_ !
-
-    Be mindful that even if the setter callback returns "undef" in case of
-    an error, perl does not permit "undef" to be returned from an lvalue
-    method, and besides the return value in assign context is useless
-    anyway:
-
-        my $dt = $o->datetime = DateTime->now;
-
-    If you want to check if assignment worked, you should opt to make error
-    fatal and catch exceptions, such as:
-
-        $o->fatal(1);
-        try
-        {
-            $o->datetime = $not_a_datetime_object;
-        }
-        catch( $e )
-        {
-            die( "You provided a non DateTime object!: $e\n" );
-        }
-
-    or you can check if an error was set:
-
-        $o->datetime = $not_a_datetime_object;
-        die( "Did not work: ", $o->error ) if( $o->error );
+    As of version 0.29.6, this is an alias for "_set_get_callback", which
+    provides more extensive features.
 
   _obj2h
     This ensures the module object is an hash reference, such as when the
@@ -1853,6 +1789,8 @@ SUPPORT METHODS
             },
             field => 'name'
         }, @_ ) ); }
+        # ^^^^
+        # Don't forget the @_ !
 
     Then, it can be called indifferently as:
 
@@ -2255,27 +2193,7 @@ SUPPORT METHODS
     you have that module installed.
 
   _set_get_lvalue
-    This helper method makes it very easy to implement a "Lvalue
-    subroutines" in perlsub method.
-
-        package MyObject;
-        use strict;
-        use warnings;
-        use parent qw( Module::Generic );
-    
-        sub debug : lvalue { return( shift->_set_get_lvalue( 'debug', @_ ) ); }
-
-    And then, this method can be called either as a lvalue method:
-
-        my $obj = MyObject->new;
-        $obj->debug = 3;
-
-    But also as a regular method:
-
-        $obj->debug( 1 );
-        printf( "Debug value is %d\n", $obj->debug );
-
-    It uses Want to achieve this. See also Sentinel
+    This is now an alias for "_set_get_callback"
 
   _set_get_number
     Provided with an object property name and a number, and this will create

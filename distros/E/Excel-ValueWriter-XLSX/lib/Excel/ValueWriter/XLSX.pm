@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use Archive::Zip          qw/AZ_OK COMPRESSION_LEVEL_DEFAULT/;
-use Scalar::Util          qw/looks_like_number/;
+use Scalar::Util          qw/looks_like_number blessed/;
 use List::Util            qw/none/;
 use Params::Validate      qw/validate_with SCALAR SCALARREF UNDEF/;
 use POSIX                 qw/strftime/;
@@ -12,7 +12,7 @@ use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 #======================================================================
 # GLOBALS
@@ -86,7 +86,7 @@ sub add_sheet {
   splice @_, 3, 0, undef if @_ < 5;
 
   # now we can parse the parameters
-  my ($self, $sheet_name, $table_name, $headers, $code_or_array) = @_;
+  my ($self, $sheet_name, $table_name, $headers, $rows_maker) = @_;
 
   # check if the given sheet name is valid
   $sheet_name =~ $SHEET_NAME
@@ -99,13 +99,30 @@ sub add_sheet {
   my $bool_regex = $self->{bool_regex};
 
   # iterator for generating rows; either received as argument or built as a closure upon an array
-  my $next_row 
-    = ref $code_or_array eq 'CODE'  ? $code_or_array
-    : ref $code_or_array ne 'ARRAY' ? croak 'add_sheet() : missing or invalid $rows argument'
-    : do {my $i = 0; sub { $i < @$code_or_array ? $code_or_array->[$i++] : undef}};
-
-  # if $headers were not given explicitly, the first row will do
-  $headers //= $next_row->();
+  my $next_row;
+  my $ref = ref $rows_maker;
+  if ($ref && $ref eq 'CODE') {
+    $next_row  = $rows_maker;
+    $headers //= $next_row->();
+  }
+  elsif ($ref && $ref eq 'ARRAY') {
+    my $i = 0;
+    $next_row  = sub { $i < @$rows_maker ? $rows_maker->[$i++] : undef};
+    $headers //= $next_row->();
+  }
+  elsif (blessed $rows_maker && $rows_maker->isa('DBI::st')) {
+    $rows_maker->{Executed}
+      or croak '->add_sheet(..., $sth) : the statement handle must be executed (call the $sth->execute method)';
+    $next_row  = sub { $rows_maker->fetchrow_arrayref};
+    $headers //= $rows_maker->{NAME}; # see L<DBI>
+  }
+  elsif (blessed $rows_maker && $rows_maker->isa('DBIx::DataModel::Statement')) {
+    $headers //= $rows_maker->sth->{NAME};
+    $next_row  = sub {my $row = $rows_maker->next; return $row ? [@{$row}{@$headers}] : ()};
+  }
+  else {
+    croak 'add_sheet() : missing or invalid last argument ($rows_maker)';
+  }
 
   # array of column references in A1 Excel notation
   my @col_letters = ('A'); # this array will be expanded on demand in the loop below
@@ -202,9 +219,7 @@ sub add_sheets_from_database {
   foreach my $table (@table_names) {
     my $sth = $dbh->prepare("select * from $table");
     $sth->execute;
-    my $headers = $sth->{NAME};
-    my $rows    = $sth->fetchall_arrayref;
-    $self->add_sheet("$sheet_prefix$table", $table, $headers, $rows);
+    $self->add_sheet("$sheet_prefix$table", $table, $sth);
   }
 }
 
@@ -566,9 +581,6 @@ sub n_days {
 }
 
 
-
-
-
 1;
 
 __END__
@@ -586,7 +598,9 @@ Excel::ValueWriter::XLSX - generating data-only Excel workbooks in XLSX format, 
                                                                  [3, 4],
                                                                  ['TRUE', 'FALSE'],
                                                                 ]);
-  $writer->add_sheet($sheet_name2, $table_name2, \@headers, $row_generator);
+  $writer->add_sheet($sheet_name2, $table_name2, \@headers, sub {...});
+  $writer->add_sheet($sheet_name3, $table_name3, $sth);       # DBI statement handle
+  $writer->add_sheet($sheet_name4, $table_name4, $statement); # DBIx::DataModel::Statement object
   $writer->add_sheets_from_database($dbh);
   $writer->add_defined_name($name, $formula, $comment);
   $writer->save_as($filename);
@@ -669,7 +683,7 @@ L<Archive::Zip>, which amounts to 6.
 
 =head2 add_sheet
 
-  $writer->add_sheet($sheet_name, $table_name, [$headers,] $rows);
+  $writer->add_sheet($sheet_name, $table_name, [$headers,] $rows_maker);
 
 Adds a new worksheet into the workbook.
 
@@ -682,7 +696,8 @@ The C<$sheet_name> is mandatory; it must be unique and between 1 and 31 characte
 =item *
 
 If C<$table_name> is not C<undef>, the sheet contents will be registered as an
-L<Excel table|https://support.microsoft.com/en-us/office/overview-of-excel-tables-7ab0bb7d-3a9e-4b56-a3c9-6c94334e492c> of that name. Excel tables offer more features than regular ranges of cells,
+L<Excel table|https://support.microsoft.com/en-us/office/overview-of-excel-tables-7ab0bb7d-3a9e-4b56-a3c9-6c94334e492c> 
+of that name. Excel tables offer more features than regular ranges of cells,
 so generally it is a good idea to always assign a table name.
 Table names must be unique, of minimum 3 characters, without spaces or special characters.
 Technically table names could be equal to sheet names, but this is
@@ -696,13 +711,22 @@ If present, it should contain an arrayref of scalar values, that will
 be used as column names for the table associated with that worksheet.
 Column names should be unique (otherwise Excel will automatically add
 a discriminating number). If C<$headers> are not present, the first
-row in C<$rows> will be treated as headers.
+row produced by C<$rows_maker> will be treated as headers.
 
 
 =item *
 
-The C<$rows> argument may be either a reference to a 2-dimensional array of values,
-or a reference to a callback function that will return a new row at each call, in the
+The C<$rows_maker> argument may be:
+
+=over
+
+=item *
+
+a reference to a 2-dimensional array of values
+
+=item *
+
+a reference to a callback function that will return a new row at each call, in the
 form of a 1-dimensional array reference. An empty return from the callback
 function signals the end of data (but intermediate empty rows may be returned
 as C<< [] >>). Callback functions should typically be I<closures> over a lexical
@@ -713,6 +737,16 @@ callback function used to feed a sheet with 500 lines of 300 columns of random n
   my $random_rows = do {my $count = 500; sub {$count-- > 0 ? [map {rand()} 1 .. 300] : undef}};
   $writer->add_sheet(RAND_SHEET => rand => \@headers_for_rand, $random_rows);
 
+=item *
+
+an executed L<DBI> statement handle
+
+=item *
+
+a L<DBIx::DataModel::Statement> object
+
+=back
+
 =back
 
 Cells within a row must contain scalar values. Values that look like numbers are treated
@@ -720,8 +754,8 @@ as numbers. String values that match the C<date_regex> are converted into number
 displayed through a date format. String values that start with an initial '=' are treated
 as formulas; but like in Excel, if you want regular string that starts with a '=', put a single
 quote just before the '=' -- that single quote will be removed from the string.
-Everything else is treated as a string. Strings are shared at the
-workbook level (hence a string that appears several times in the input data will be stored
+Everything else is treated as a string. Strings are shared at the workbook level
+(hence a string that appears several times in the input data will be stored
 only once within the workbook).
 
 =head2 add_sheets_from_database

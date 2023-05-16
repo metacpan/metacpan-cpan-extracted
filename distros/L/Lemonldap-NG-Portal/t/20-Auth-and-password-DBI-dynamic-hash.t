@@ -1,3 +1,4 @@
+use warnings;
 use MIME::Base64;
 
 use Test::More;
@@ -12,6 +13,7 @@ my $maintests = 10;
 # Hook SHA512 function into all new DBI connections
 {
     my $old_connect = \&DBI::connect;
+    no warnings 'redefine';
     *DBI::connect = sub {
         my $connection = $old_connect->(@_) or return;
 
@@ -82,7 +84,8 @@ SKIP: {
     $dbh->do(
 "INSERT INTO users VALUES ('jenny','\$6\$LvcDEZkf9SAFXpnQ\$Dzy6.c.dxPfZ1IvE.xdIYVu7iX9ia8BYhPbR9SKv7.u1WWCd0AIFIM4eVd7q24CElR.NkGA.zlK86q48n7IUL1','The Doctors Daughter')"
     );
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                         => 'error',
                 useSafeJail                      => 1,
@@ -218,9 +221,9 @@ SKIP: {
     $id = expectCookie($res);
 
 # Verify that password is hashed with correct scheme (dbiDynamicHashNewPasswordScheme)
-    my $sth = $dbh->prepare("SELECT password FROM users WHERE user='jsmith';");
+    $sth = $dbh->prepare("SELECT password FROM users WHERE user='jsmith';");
     $sth->execute();
-    my $row = $sth->fetchrow_array;
+    $row = $sth->fetchrow_array;
     ok( $row =~ /^{ssha256}/,
         'Verify that password is hashed with correct scheme' );
 

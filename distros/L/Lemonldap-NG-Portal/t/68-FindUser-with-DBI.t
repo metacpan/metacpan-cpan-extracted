@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -37,7 +38,8 @@ SKIP: {
     $dbh->do(
 "INSERT INTO users VALUES ('dalek','dalek', 'The Daleks','mutant','bad','1')"
     );
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                    => 'error',
                 authentication              => 'DBI',
@@ -240,7 +242,7 @@ m%<input id="findUser_room" name="room" type="text" autocomplete="off" class="fo
     );
     ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
       or print STDERR "$@\n" . Dumper($res);
-    ok( $json->{result} == 0, ' Good result' )
+    ok( !defined $json->{result}, ' No result' )
       or explain( $json, 'result => 0' );
     ok( $json->{error} == PE_USERNOTFOUND, ' No user found' )
       or explain( $json, 'error => 4' );
@@ -256,7 +258,7 @@ m%<input id="findUser_room" name="room" type="text" autocomplete="off" class="fo
     );
     ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
       or print STDERR "$@\n" . Dumper($res);
-    ok( $json->{result} == 0, ' Good result' )
+    ok( !defined $json->{result}, ' No result' )
       or explain( $json, 'result => 0' );
     ok( $json->{error} == PE_USERNOTFOUND, ' No user found' )
       or explain( $json, 'error => 4' );
@@ -272,7 +274,7 @@ m%<input id="findUser_room" name="room" type="text" autocomplete="off" class="fo
     );
     ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
       or print STDERR "$@\n" . Dumper($res);
-    ok( $json->{result} == 0, ' Good result' )
+    ok( !defined $json->{result}, ' No result' )
       or explain( $json, 'result => 0' );
     ok( $json->{error} == PE_USERNOTFOUND, ' No user found' )
       or explain( $json, 'error => 4' );
@@ -304,7 +306,7 @@ m%<input id="findUser_room" name="room" type="text" autocomplete="off" class="fo
     );
     ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
       or print STDERR "$@\n" . Dumper($res);
-    ok( $json->{result} == 0, ' Good result' )
+    ok( !defined $json->{result}, ' No result' )
       or explain( $json, 'result => 0' );
     ok( $json->{error} == PE_USERNOTFOUND, ' No user found' )
       or explain( $json, 'error => 4' );

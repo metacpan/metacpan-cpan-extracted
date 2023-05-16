@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.0.15.1';
+our $VERSION = '2.16.1';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -71,39 +71,32 @@ sub init {
     return 1;
 }
 
-# Check user password against an URL listing compromised passwords
+# Check user password against an URL listing compromised passwords
 # Method called before the password change, blocking if the password is compromised
 sub checkHIBP {
     my ( $self, $req, $user, $password, $old ) = @_;
 
     if ( $self->hibpRequired ) {
-        my $res = &_checkHIBP( $self, $req, $password, $self->hibpRequired );
-        if ( $res->{code} == 0 ) {
-            return PE_OK;
-        }
-        else {
-            return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
-        }
+        my $res = $self->_checkHIBP( $req, $password, $self->hibpRequired );
+        return $res->{code} == 0 ? PE_OK : PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
     }
     else {
-     # don't verify new password if checkHIBPRequired parameter has not been set
+    # Do not verify new password if checkHIBPRequired parameter has not been set
         return PE_OK;
     }
 }
 
-# Check user password against an URL listing compromised passwords
+# Check user password against an URL listing compromised passwords
 # Input : new user password, flag noJSONResponse
 # Output: JSON response, including a code.
 # code = 0 = success
 # code > 0 = error
 sub _checkHIBP {
     my ( $self, $req, $pass, $noJSONResponse ) = @_;
-
     my $response_params = {};
-
     my $password;
 
-    # password already given, so take it directly
+    # Password already given, so take it directly
     if ($pass) {
         $password = $pass;
     }
@@ -114,6 +107,7 @@ sub _checkHIBP {
         unless ($password_base64) {
             $response_params->{"code"}    = 1;
             $response_params->{"message"} = "missing parameter password";
+
             return $noJSONResponse
               ? $response_params
               : $self->sendJSONresponse( $req, $response_params );
@@ -121,11 +115,11 @@ sub _checkHIBP {
         $password = decode_base64($password_base64);
     }
 
-    my $digestFull = sha1_hex($password);   # compute sha1 hash of new password
+    my $digestFull   = sha1_hex($password);  # Compute sha1 hash of new password
     my $digestPrefix = substr $digestFull, 0,
       5;    # take only 5 first characters of the hash
 
-    # Prepare connection to blacklist URL
+    # Prepare connection to blacklist URL
     my $reqAPI;
     $reqAPI = HTTP::Request->new( "GET", $self->apiURL . $digestPrefix );
     $reqAPI->header( 'Content-type' => 'text/html' );
@@ -134,8 +128,8 @@ sub _checkHIBP {
     my $response = $self->ua->request($reqAPI);
 
     my $debugstr =
-        'checkHIBP: requesting ['
-      . $reqAPI->as_string . '] : '
+        'checkHIBP: requesting '
+      . $reqAPI->as_string
       . $response->status_line;
 
     $self->logger->debug($debugstr);
@@ -144,30 +138,29 @@ sub _checkHIBP {
     if ( $response->is_success || $response->is_info ) {
 
         # Parse compromised keys
-        foreach ( split( /[\r\n]/, $response->content ) ) {
+        foreach ( split /[\r\n]/, $response->content ) {
 
-            # Exclude empty lines
+            # Exclude empty lines
             if ( $_ ne "" ) {
                 $digest = lc("$digestPrefix$_");
                 $self->logger->debug(
 "checkHIBP: Check if new password matches compromised password $digest"
                 );
                 if ( $digest =~ /$digestFull/i ) {
-                    my ( $dig, $num ) = split( /:/, $digest );
+                    my ( $dig, $num ) = split /:/, $digest;
                     $self->userLogger->warn(
                         "checkHIBP: password $dig compromised $num times");
 
                     $response_params->{"code"} = 2;
                     $response_params->{"message"} =
                       "password $dig compromised $num times";
+
                     return $noJSONResponse
                       ? $response_params
                       : $self->sendJSONresponse( $req, $response_params );
                 }
             }
-
         }
-
     }
     else {
         $self->logger->error(
@@ -177,6 +170,7 @@ sub _checkHIBP {
         $response_params->{"code"} = 1;
         $response_params->{"message"} =
           "error while requesting " . $self->apiURL;
+
         return $noJSONResponse
           ? $response_params
           : $self->sendJSONresponse( $req, $response_params );
@@ -186,6 +180,7 @@ sub _checkHIBP {
 
     $response_params->{"code"}    = 0;
     $response_params->{"message"} = "password $digestFull not compromised";
+
     return $noJSONResponse
       ? $response_params
       : $self->sendJSONresponse( $req, $response_params );

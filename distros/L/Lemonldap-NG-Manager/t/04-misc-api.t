@@ -1,5 +1,6 @@
 # Test Providers API
 
+use warnings;
 use Test::More;
 use strict;
 use JSON;

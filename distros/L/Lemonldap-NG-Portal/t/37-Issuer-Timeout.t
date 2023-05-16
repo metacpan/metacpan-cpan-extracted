@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -21,7 +22,8 @@ ok( $op = op(), 'OP portal' );
 count(1);
 
 # Request for RP1
-my $authrequest1 = buildForm( {
+my $authrequest1 = buildForm(
+    {
         scope         => "openid",
         response_type => "code",
         client_id     => "rpid",
@@ -47,7 +49,8 @@ my $pdata = expectCookie( $res, 'lemonldappdata' );
 Time::Fake->offset("+10m");
 
 # Request for RP2 with previous pdata still around
-my $authrequest2 = buildForm( {
+my $authrequest2 = buildForm(
+    {
         scope         => "openid",
         response_type => "code",
         client_id     => "rp2id",
@@ -135,7 +138,8 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',

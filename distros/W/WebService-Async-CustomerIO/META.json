@@ -4,7 +4,7 @@
       "DERIV <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -87,19 +87,19 @@
    "provides" : {
       "WebService::Async::CustomerIO" : {
          "file" : "lib/WebService/Async/CustomerIO.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::Async::CustomerIO::Customer" : {
          "file" : "lib/WebService/Async/CustomerIO/Customer.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::Async::CustomerIO::RateLimiter" : {
          "file" : "lib/WebService/Async/CustomerIO/RateLimiter.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::Async::CustomerIO::Trigger" : {
          "file" : "lib/WebService/Async/CustomerIO/Trigger.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -114,19 +114,21 @@
          "web" : "https://github.com/binary-com/perl-WebService-Async-CustomerIO"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Kirill Sysoev <kirill@binary.com>",
       "Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>",
-      "chylli-binary <chylli@binary.com>",
       "abdalla-deriv <83196346+abdalla-deriv@users.noreply.github.com>",
       "Arun Venkataraman <arun@regentmarkets.com>",
       "billmarriott-binary <38449124+billmarriott-binary@users.noreply.github.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "chylli-deriv <chylli@binary.com>",
+      "Hani Kh <108520819+hani-deriv@users.noreply.github.com>",
       "Tom Molesworth <tom@binary.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -12,14 +12,14 @@ with (
     },
 );
 
-has ordered => (is => 'rw', default => sub{1});
+has ordered => (is => 'rw');
 
 use namespace::autoclean;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-18'; # DATE
+our $DATE = '2023-03-02'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertExecsList'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -52,10 +52,12 @@ sub _insert_execs_list {
     }
     @list = sort @list;
 
+    my $ordered = $self->ordered // (@list > 6);
+
     join(
         "",
         "=over\n\n",
-        (map {"=item ".($self->ordered ? ($_+1).".":"*")." L<$list[$_]>\n\n"} 0..$#list),
+        (map {"=item ".($ordered ? ($_+1).".":"*")." L<$list[$_]>\n\n"} 0..$#list),
         "=back\n\n",
     );
 }
@@ -76,7 +78,7 @@ Dist::Zilla::Plugin::InsertExecsList - Insert a POD containing a list of scripts
 
 =head1 VERSION
 
-This document describes version 0.031 of Dist::Zilla::Plugin::InsertExecsList (from Perl distribution Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-18.
+This document describes version 0.032 of Dist::Zilla::Plugin::InsertExecsList (from Perl distribution Dist-Zilla-Plugin-InsertExecsList), released on 2023-03-02.
 
 =head1 SYNOPSIS
 
@@ -84,7 +86,7 @@ In dist.ini:
 
  [InsertExecsList]
 
-In lib/Foo.pm:
+In F<lib/Foo.pm>:
 
  ...
 
@@ -96,7 +98,7 @@ In lib/Foo.pm:
 
  ...
 
-After build, lib/Foo.pm will contain:
+After build, F<lib/Foo.pm> will contain:
 
  ...
 
@@ -111,6 +113,8 @@ After build, lib/Foo.pm will contain:
  =item 2. L<script2>
 
  =item 3. L<script3>
+
+ ...
 
  =back
 
@@ -128,8 +132,9 @@ distribution.
 
 =head2 ordered
 
-Bool. Default true. Can be set to false to generate an unordered list instead of
-ordered one.
+Bool. Can be set to true to always generate an ordered list, or false to always
+generate an unordered list. If unset, will use unordered list for 6 or less
+items and ordered list otherwise.
 
 =head1 HOMEPAGE
 

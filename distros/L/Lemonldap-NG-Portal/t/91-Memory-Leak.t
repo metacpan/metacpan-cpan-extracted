@@ -1,4 +1,4 @@
-#!perl -w
+use warnings;
 use constant HAS_LEAKTRACE => eval { require Test::LeakTrace };
 use Test::More HAS_LEAKTRACE
   ? ( tests => 5 )

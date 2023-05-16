@@ -1,13 +1,10 @@
 package App::HTTPThis;
-BEGIN {
-  $App::HTTPThis::VERSION = '0.002';
-}
-
+$App::HTTPThis::VERSION = '0.004';
 # ABSTRACT: Export the current directory over HTTP
 
 use strict;
 use warnings;
-use Plack::App::Directory;
+use Plack::App::DirectoryIndex;
 use Plack::Runner;
 use Getopt::Long;
 use Pod::Usage;
@@ -17,7 +14,7 @@ sub new {
   my $class = shift;
   my $self = bless {port => 7007, root => '.'}, $class;
 
-  GetOptions($self, "help", "man", "port=i", "name=s") || pod2usage(2);
+  GetOptions($self, "help", "man", "port=i", "name=s", "autoindex") || pod2usage(2);
   pod2usage(1) if $self->{help};
   pod2usage(-verbose => 2) if $self->{man};
 
@@ -40,10 +37,14 @@ sub run {
     '--port'         => $self->{port},
     '--env'          => 'production',
     '--server_ready' => sub { $self->_server_ready(@_) },
+    '--autoindex'    => 0,
   );
 
+  my $app_config = { root => $self->{root} };
+  $app_config->{dir_index} = 'index.html' if $self->{autoindex};
+
   eval {
-    $runner->run(Plack::App::Directory->new({root => $self->{root}})->to_app);
+    $runner->run(Plack::App::DirectoryIndex->new( $app_config )->to_app);
   };
   if (my $e = $@) {
     die "FATAL: port $self->{port} is already in use, try another one\n"
@@ -82,8 +83,8 @@ sub _server_ready {
 
 1;
 
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -92,7 +93,7 @@ App::HTTPThis - Export the current directory over HTTP
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -136,7 +137,6 @@ This software is Copyright (c) 2010 by Pedro Melo.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

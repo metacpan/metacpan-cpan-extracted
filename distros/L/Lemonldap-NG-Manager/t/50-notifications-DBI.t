@@ -1,5 +1,6 @@
 # Test notifications explorer API
 
+use warnings;
 use strict;
 use Data::Dumper;
 use IO::String;

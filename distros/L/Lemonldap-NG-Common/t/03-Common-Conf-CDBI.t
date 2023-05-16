@@ -1,3 +1,5 @@
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Lemonldap-NG-Manager.t'
 
@@ -27,7 +29,8 @@ SKIP: {
     my $skipSQLite = 0;
 
     ok(
-        $h = new Lemonldap::NG::Common::Conf( {
+        $h = new Lemonldap::NG::Common::Conf(
+            {
                 type        => 'CDBI',
                 dbiChain    => "DBI:SQLite:dbname=t/cdbiConf.sql",
                 dbiUser     => '',

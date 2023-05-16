@@ -1,11 +1,11 @@
 package App::Deps::Verify::App::VerifyDeps::Command::plinst;
-$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.12.1';
+$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.12.2';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
 use warnings;
 
-use Path::Tiny qw/ path /;
+use Path::Tiny        qw/ path /;
 use App::Deps::Verify ();
 
 sub abstract { "install perl5 dependencies from CPAN" }
@@ -58,7 +58,7 @@ __END__
 
 =head1 VERSION
 
-version 0.12.1
+version 0.12.2
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

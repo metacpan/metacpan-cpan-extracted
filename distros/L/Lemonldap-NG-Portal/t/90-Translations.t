@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use JSON;
 use strict;

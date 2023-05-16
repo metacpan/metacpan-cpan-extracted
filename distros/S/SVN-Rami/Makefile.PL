@@ -10,7 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/SVN/Rami.pm',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.10.1',
-    EXE_FILES        => ['script/rami'],
+    EXE_FILES        => ['bin/rami'],
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '7.38',
     },

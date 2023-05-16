@@ -1,0 +1,35 @@
+---
+abstract: "Handling entire Commodore (D64/D71/D81) disk image directories (using Per Olofsson's \"diskimage.c\" library)"
+author:
+  - 'Pawel Krol <pawelkrol@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: D64-Disk-Dir
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Array::Iterator: '0'
+  Capture::Tiny: '0'
+  D64::Disk::BAM: '0.05'
+  D64::Disk::Image: '0.03'
+  D64::Disk::Layout: '0.03'
+  D64::Disk::Layout::Sector: '0.02'
+  File::Slurp: '0'
+  File::Temp: '0'
+  IO::Scalar: '0'
+  Term::ANSIColor: '5.01'
+resources:
+  bugtracker: https://github.com/pawelkrol/D64-Disk-Dir/issues
+  repository: git://github.com/pawelkrol/D64-Disk-Dir.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

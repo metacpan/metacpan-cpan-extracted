@@ -3,9 +3,9 @@ NAME
     scripts/executables in the distribution
 
 VERSION
-    This document describes version 0.031 of
+    This document describes version 0.032 of
     Dist::Zilla::Plugin::InsertExecsList (from Perl distribution
-    Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-18.
+    Dist-Zilla-Plugin-InsertExecsList), released on 2023-03-02.
 
 SYNOPSIS
     In dist.ini:
@@ -40,6 +40,8 @@ SYNOPSIS
 
      =item 3. L<script3>
 
+     ...
+
      =back
 
      ...
@@ -51,8 +53,9 @@ DESCRIPTION
 
 CONFIGURATION
   ordered
-    Bool. Default true. Can be set to false to generate an unordered list
-    instead of ordered one.
+    Bool. Can be set to true to always generate an ordered list, or false to
+    always generate an unordered list. If unset, will use unordered list for
+    6 or less items and ordered list otherwise.
 
 HOMEPAGE
     Please visit the project's homepage at

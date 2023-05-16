@@ -39,13 +39,13 @@ sub get_content_in {
 }
 
 sub content_type {
-  my ($class_or_self, $ct) = @_;
+  my ($class_or_self, @ct) = @_;
   my $class = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
-  CatalystX::RequestModel::_add_metadata($class, 'content_type', $ct) if $ct;
+  CatalystX::RequestModel::_add_metadata($class, 'content_type', @ct) if @ct;
 
   if($class_or_self->can('content_type_metadata')) {
-    my ($ct) = $class_or_self->content_type_metadata;  # needed because this returns an array but we only want the first one
-    return $ct;
+    my (@ct) = $class_or_self->content_type_metadata;  # needed because this returns an array but we only want the first onei
+    return @ct;
   }
 }
 

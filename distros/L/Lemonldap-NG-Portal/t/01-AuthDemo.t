@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                       => 'error',
             portal                         => 'https://auth.example.com/',
@@ -97,7 +99,7 @@ count(3);
 
 my ( $host, $uri, $query ) =
   expectForm( $res, undef, undef, 'user', 'password' );
-my $uri = URI->new;
+$uri = URI->new;
 $uri->query($query);
 is( $uri->query_param("user"), 'jdoe',
     "Login is pre-filled on second attemps" );

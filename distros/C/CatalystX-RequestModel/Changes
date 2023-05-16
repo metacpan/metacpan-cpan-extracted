@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension CatalystX-RequestModel.
 
+0.017 - 16 May 2023
+  - Allow a model to handle more than one content type
+
+0.016 - 12 May 2023
+  - Added BodyModelFor and QueryModelFor to let you use the default model for a different
+    action in the current controller or relative to the current controller
+
 0.015 - 29 April 2023
   - Sensible default path to model if left empty in subroutine attributes.
   - Allow you to set a path to the model based on the current controller namespace

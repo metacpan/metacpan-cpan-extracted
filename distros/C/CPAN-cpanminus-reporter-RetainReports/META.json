@@ -4,13 +4,13 @@
       "James E Keenan (jkeenan@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CPAN-cpanminus-reporter-RetainReports",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::cpanminus::reporter" : "0.17",
+            "App::cpanminus::reporter" : "0.19",
             "CPAN::DistnameInfo" : "0",
             "CPAN::Testers::Common::Client" : "0",
             "Carp" : "0",
@@ -54,6 +54,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/CPAN-cpanminus-reporter-RetainReports.git",
+         "web" : "https://github.com/jkeenan/CPAN-cpanminus-reporter-RetainReports"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

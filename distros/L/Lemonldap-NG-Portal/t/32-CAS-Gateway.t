@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -58,7 +59,8 @@ sub gatewayRequest {
     my ( $issuer, $url ) = @_;
     return $issuer->_get(
         '/cas/login',
-        query => buildForm( {
+        query => buildForm(
+            {
                 gateway => "true",
                 service => $url,
 
@@ -70,7 +72,8 @@ sub gatewayRequest {
 
 sub issuer {
     my ($policy) = @_;
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel              => $debug,
                 domain                => 'idp.com',

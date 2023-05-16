@@ -1,0 +1,15 @@
+.bak$
+_build
+Build$
+\bDirectory-Organize\b
+\bTODO\b
+.git
+Makefile$
+.mtn-ignore
+MYMETA.*
+\.project$
+^schedule.sc$
+^single$
+Spezifikation.txt
+.swp$
+^t/\d\d\d\d

@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 use FindBin qw($Bin);
 use lib $Bin;
+
 use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
 use t_TestCommon  # Test::More etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug checkeq_literal expect1 check 
+            bug mycheckeq_literal expect1 mycheck 
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -25,6 +26,7 @@ BEGIN {
   );
 
   #new_sheet; 
+  options debug => $debug;
   read_spreadsheet $inpath;
   # title_rx 0;
   tie_column_vars qw(:all :safe FutureB FutureC);
@@ -33,7 +35,7 @@ BEGIN {
   apply {
     $crow[-2] = "C$rx";
     $crow[-1] = "D$rx";
-  }
+  };
 
   tie_column_vars qw(FutureD Future4);
 
@@ -112,5 +114,5 @@ die unless $count == 3;
 
 eval{ my $dum = $Future4; } && die; die unless $@ =~ /not.*during.*apply/i;
 
-say "Ok." unless $silent;
+say "Done." unless $silent;
 exit 0;

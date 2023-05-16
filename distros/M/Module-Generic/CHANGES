@@ -1,5 +1,15 @@
 Revision history for Perl module Module::Generic
 
+v0.30.2 2023-05-16T21:33:10+0900
+    - Corrected a small bug in unload_json() in Module::Generic when JSON option utf8 was provided in overlap with the binmode also set to utf8, thus yielding mojibake.
+
+v0.30.1 2023-05-14T21:44:27+0900
+    - Corrected small bug in support function _set_get_number
+    - Improved the code of some support functions
+
+v0.30.0 2023-05-14T08:35:33+0900
+    - Changes to inner working of several support functions to better support lvalue methods
+
 v0.29.6 2023-03-12T06:55:19+0900
     - Minor improvements in Module::Generic::Scalar by adding Regexp::Common as a regexp class on top of perl's Regexp
     - Improved the helper method _set_get_object and corrected _set_get_object_without_init

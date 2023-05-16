@@ -76,7 +76,8 @@ ok(
     'checkDate extended function is defined'
 );
 is(
-    $code->( {
+    $code->(
+        {
             _2fDevices =>
 "[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
         },
@@ -86,7 +87,8 @@ is(
     "Function works"
 );
 is(
-    $code->( {
+    $code->(
+        {
             _2fDevices =>
 "[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
         },
@@ -96,7 +98,8 @@ is(
     "Function works"
 );
 is(
-    $code->( {
+    $code->(
+        {
             _2fDevices =>
 "[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
         },
@@ -105,7 +108,7 @@ is(
     "Function works"
 );
 
-$sub  = "sub { return(";
+$sub  = "sub { return()";
 $code = $jail->jail_reval($sub);
 ok( ( not defined($code) ), 'Syntax error yields undef result' );
 like(

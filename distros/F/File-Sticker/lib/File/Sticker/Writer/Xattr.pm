@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Xattr;
-$File::Sticker::Writer::Xattr::VERSION = '1.0603';
+$File::Sticker::Writer::Xattr::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Writer::Xattr - write and standardize meta-data from ExtAttr file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ sub allowed_file {
     my $file = shift;
     say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
 
-    if (-f $file)
+    if (-r $file)
     {
         return 1;
     }

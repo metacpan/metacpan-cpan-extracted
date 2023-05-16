@@ -1,5 +1,8 @@
 Revision history for App-Deps-Verify
 
+0.12.2       2023-05-14
+    - add CLI help to the POD.
+
 0.12.1       2022-03-27
     - Reupload for metacpan indexing.
 

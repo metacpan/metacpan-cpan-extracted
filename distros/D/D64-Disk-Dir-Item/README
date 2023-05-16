@@ -1,4 +1,4 @@
-D64::Disk::Dir::Item Version 0.07
+D64::Disk::Dir::Item Version 0.08
 =================================
 
 D64::Disk::Dir::Item provides a helper class for D64::Disk::Layout module,
@@ -17,7 +17,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013 by Pawel Krol.
+Copyright (C) 2013-2023 by Pawel Krol.
 
 This library is free open source software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or, at your

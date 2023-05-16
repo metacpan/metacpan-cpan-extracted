@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -346,7 +347,8 @@ SKIP: {
         ok(
             $res = $sp->_get(
                 '/',
-                query => buildForm( {
+                query => buildForm(
+                    {
                         logout => 1,
                         url    => encodeUrl("http://test1.example.com")
                     }
@@ -420,7 +422,8 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -468,7 +471,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new( {
+    return LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

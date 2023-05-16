@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -45,8 +44,8 @@ use DateTime::Format::RFC3339;';
                 certificateResetByMailCeaAttribute         => 'description',
                 certificateResetByMailCertificateAttribute =>
                   'userCertificate;binary',
-                certificateValidityDelay => 30
-
+                certificateResetByMailURL => 'http://other.example.com/certif',
+                certificateValidityDelay  => 30
             }
         }
     );
@@ -69,10 +68,11 @@ use DateTime::Format::RFC3339;';
         'Post mail'
     );
 
-    ok( mail() =~ m#a href="http://auth.example.com/certificateReset\?(.*?)"#,
-        'Found link in mail' );
-    $query = $1;
-    my $querymail = $query;
+    ok( mail() =~ m#a href="http://other\.example\.com/certif\?(.*?)"#,
+        'Found link in mail' )
+      or explain( mail(), 'Found link in mail 1' );
+
+    my $querymail = $query = $1;
     ok(
         $res = $client->_get(
             '/certificateReset',
@@ -88,8 +88,8 @@ use DateTime::Format::RFC3339;';
     ok( $res->[2]->[0] =~ /certif/s, ' Ask for a new certificate file' );
 
     #print STDERR Dumper($query);
-    my %inputs   = split( /[=&]/, $query );
-    my %querytab = split( /[=&]/, $querymail );
+    my %inputs   = split /=/, ( grep /^token=.+/, split /&/, $query )[0];
+    my %querytab = split /[=&]/, $querymail;
 
     # Create the certificate  file
     my $cert = "-----BEGIN CERTIFICATE-----
@@ -229,11 +229,10 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
         ),
         'Post mail'
     );
-
-    ok( mail() =~ m#a href="http://auth.example.com/certificateReset\?(.*?)"#,
-        'Found link in mail' );
-    $query     = $1;
-    $querymail = $query;
+    ok( mail() =~ m#a href="http://other\.example\.com/certif\?(.*?)"#,
+        'Found link in mail' )
+      or explain( mail(), 'Found link in mail 2' );
+    $querymail = $query = $1;
     ok(
         $res = $client->_get(
             '/certificateReset',
@@ -249,7 +248,7 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
     ok( $res->[2]->[0] =~ /certif/s, ' Ask for a new certificate file' );
 
     #print STDERR Dumper($query);
-    %inputs   = split( /[=&]/, $query );
+    %inputs   = split /=/, ( grep /^token=.+/, split /&/, $query )[0];
     %querytab = split( /[=&]/, $querymail );
 
     # Create the certificate  file

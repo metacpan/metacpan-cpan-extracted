@@ -497,22 +497,19 @@ sub setGroups {
 sub setPersistentSessionInfo {
     my ( $self, $req ) = @_;
 
-    # Do not restore infos if session already opened
-    unless ( $req->id ) {
-        my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
+    my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
 
-        return PE_OK unless ( $key and length($key) );
+    return PE_OK unless ( $key and length($key) );
 
-        my $persistentSession = $self->getPersistentSession($key);
-        if ($persistentSession) {
-            $self->logger->debug("Persistent session found for $key");
-            foreach my $k ( keys %{ $persistentSession->data } ) {
+    my $persistentSession = $self->getPersistentSession($key);
+    if ($persistentSession) {
+        $self->logger->debug("Persistent session found for $key");
+        foreach my $k ( keys %{ $persistentSession->data } ) {
 
-                # Do not restore some parameters
-                next if $k =~ /^_(?:utime|session_(?:u?id|kind))$/;
-                $self->logger->debug("Restore persistent parameter $k");
-                $req->{sessionInfo}->{$k} = $persistentSession->data->{$k};
-            }
+            # Do not restore some parameters
+            next if $k =~ /^_(?:utime|session_(?:u?id|kind))$/;
+            $self->logger->debug("Restore persistent parameter $k");
+            $req->{sessionInfo}->{$k} = $persistentSession->data->{$k};
         }
     }
     return PE_OK;

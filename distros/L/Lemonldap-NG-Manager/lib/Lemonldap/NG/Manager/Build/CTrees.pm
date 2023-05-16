@@ -41,6 +41,7 @@ sub cTrees {
 
             {
                 title => 'samlIDPMetaDataOptionsSession',
+                help  => 'authsaml.html#session',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsAdaptSessionUtime',
@@ -51,6 +52,7 @@ sub cTrees {
             },
             {
                 title => 'samlIDPMetaDataOptionsSignature',
+                help  => 'authsaml.html#signature',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsSignatureMethod',
@@ -62,6 +64,7 @@ sub cTrees {
             },
             {
                 title => 'samlIDPMetaDataOptionsBinding',
+                help  => 'authsaml.html#binding',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsSSOBinding',
@@ -70,6 +73,7 @@ sub cTrees {
             },
             {
                 title => 'samlIDPMetaDataOptionsSecurity',
+                help  => 'authsaml.html#security',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsEncryptionMode',
@@ -98,6 +102,7 @@ sub cTrees {
             },
             {
                 title => 'samlIDPMetaDataOptionsDisplay',
+                help  => 'authsaml.html#display',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsDisplayName',
@@ -167,6 +172,7 @@ sub cTrees {
             'oidcOPMetaDataExportedVars',
             {
                 title => 'oidcOPMetaDataOptions',
+                help  => 'authopenidconnect.html#options',
                 nodes => [ {
                         title => 'oidcOPMetaDataOptionsConfiguration',
                         form  => 'simpleInputContainer',
@@ -199,6 +205,7 @@ sub cTrees {
             },
             {
                 title => 'oidcOPMetaDataOptionsDisplayParams',
+                help  => 'authopenidconnect.html#display',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'oidcOPMetaDataOptionsDisplayName',
@@ -286,6 +293,7 @@ sub cTrees {
             'oidcRPMetaDataMacros',
             {
                 title => 'oidcRPMetaDataOptionsDisplay',
+                help  => 'idpopenidconnect.html#display',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'oidcRPMetaDataOptionsDisplayName',

@@ -1,11 +1,9 @@
 package Graph::Reader::OID;
 
-# Pragmas.
 use base qw(Graph::Reader);
 use strict;
 use warnings;
 
-# Modules.
 use Readonly;
 
 # Constants.
@@ -13,7 +11,7 @@ Readonly::Scalar our $DOT => q{.};
 Readonly::Scalar our $EMPTY_STR => q{};
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Read graph subroutine.
 sub _read_graph {
@@ -68,6 +66,7 @@ Graph::Reader::OID - Perl class for reading a graph from OID format.
 =head1 SYNOPSIS
 
  use Graph::Reader::OID;
+
  my $obj = Graph::Reader::OID->new;
  my $graph = $obj->read_graph($oid_file);
 
@@ -99,11 +98,11 @@ Graph::Reader::OID - Perl class for reading a graph from OID format.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=read_oid_graph_and_print.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Graph::Reader::OID;
  use IO::Barf qw(barf);
  use File::Temp qw(tempfile);
@@ -160,21 +159,22 @@ Install the Graph::Writer modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Graph-Reader-OID>
+L<https://github.com/michal-josef-spacek/Graph-Reader-OID>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

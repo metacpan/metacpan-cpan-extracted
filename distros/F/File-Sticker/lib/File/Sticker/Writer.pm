@@ -1,12 +1,12 @@
 package File::Sticker::Writer;
-$File::Sticker::Writer::VERSION = '1.0603';
+$File::Sticker::Writer::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Writer - write and standardize meta-data from files
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ sub init {
     {
 	$self->{$key} = $parameters{$key};
     }
-    $self->{file_magic} = File::LibMagic->new();
+    $self->{file_magic} = File::LibMagic->new(follow_symlinks=>1);
 } # init
 
 =head2 name

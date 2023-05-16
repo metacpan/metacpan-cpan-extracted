@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use JSON;
@@ -8,7 +9,8 @@ require 't/test-lib.pm';
 my $res;
 my $json;
 my $token;
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel          => 'error',
             authentication    => 'Choice',
@@ -77,7 +79,7 @@ ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
 ok( $json->{error} == 82, ' Token expired' )
   or explain( $json, 'Token expired' );
-ok( $json->{result} == 0, ' result => 0' )
+ok( !defined $json->{result}, ' result => 0' )
   or explain( $json, 'Result => 0' );
 ok( $token = $json->{token}, 'Found token' );
 count(6);

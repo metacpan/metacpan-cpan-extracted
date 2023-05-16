@@ -5,7 +5,7 @@ use WWW::CSRF ();
 use Bytes::Random::Secure ();
 
 
-our $VERSION = '0.003';
+our $VERSION = '0.007';
  
 has 'default_csrf_token_secret' => (is=>'ro', required=>1, builder=>'_build_default_csrf_token_secret');
  
@@ -64,6 +64,7 @@ sub single_use_csrf_token {
 sub check_single_use_csrf_token {
   my ($self, %args) = @_;
   my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
+  return 0 unless $token;
   if(my $session_token = delete($self->session->{current_csrf_token})) {
     return $session_token eq $token ? 1:0;
   } else {
@@ -84,11 +85,15 @@ sub find_csrf_token_in_request {
   if(my $header_token = $self->request->header('X-CSRF-Token')) {
     return $header_token;
   } else {
-    return $self->req->body_parameters->{$self->csrf_token_param_key};
+    return $self->req->body_parameters->{$self->csrf_token_param_key}
+      if exists($self->req->body_parameters->{$self->csrf_token_param_key});
+    return $self->req->body_data->{$self->csrf_token_param_key}
+      if exists($self->req->body_data->{$self->csrf_token_param_key});      
+    return undef;
   }
 }
 
-sub is_cstf_token_expired {
+sub is_csrf_token_expired {
   my ($self, %args) = @_;
   my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
   my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
@@ -143,24 +148,56 @@ sub delegate_failed_csrf_token_check {
   my $self = shift;
   return $self->controller->handle_failed_csrf_token_check($self) if $self->controller->can('handle_failed_csrf_token_check');
   return $self->handle_failed_csrf_token_check if $self->can('handle_failed_csrf_token_check');
-  return Catalyst::Exception->throw(message => 'csrf_token failed validation');
+
+  # If we get this far we need to create a rational default error response and die
+  $self->response->status(403);
+  $self->response->content_type('text/plain');
+  $self->response->body('Forbidden: Invalid CSRF token.');
+  $self->finalize;
+  Catalyst::Exception->throw(message => 'csrf_token failed validation');
 }
 
-after 'prepare_action', sub {
+sub validate_csrf_token_if_required {
   my $self = shift;
-  return unless $self->auto_check_csrf_token;
+  return (
+    (
+      ($self->req->method eq 'POST') ||
+      ($self->req->method eq 'PUT') ||
+      ($self->req->method eq 'PATCH')
+    )
+      && 
+    (
+      !$self->check_csrf_token &&
+      !$self->check_single_use_csrf_token
+    )
+  );
+}
+
+sub process_csrf_token {
+  my $self = shift;
+  return 1 unless (
+    ($self->req->method eq 'POST') ||
+    ($self->req->method eq 'PUT') ||
+    ($self->req->method eq 'PATCH')
+  );
+
+  if($self->can('session') && $self->session->{current_csrf_token}) {
+    return $self->check_single_use_csrf_token;
+  } else {
+    return $self->check_csrf_token;
+  }
+}
+
+around 'dispatch', sub {
+  my ($orig, $self, @args) = @_;
   if(
-      (
-        ($self->req->method eq 'POST') ||
-        ($self->req->method eq 'PUT') ||
-        ($self->req->method eq 'PATCH')
-      ) && (
-        !$self->check_csrf_token &&
-        !$self->check_single_use_csrf_token
-      )
+    $self->auto_check_csrf_token
+      &&
+    $self->validate_csrf_token_if_required
   ) {
     return $self->delegate_failed_csrf_token_check;
   }
+  return $self->$orig(@args);
 };
 
 1;
@@ -261,11 +298,6 @@ Default is whatever you set the configuration value 'default_secret' to.
 Return true or false depending on if the current request has a token which is valid.  Accepts the
 following arguments in the form of a hash:
 
-  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
-  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
-  my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
-  my $max_age = exists($args{max_age}) ? $args{max_age}  : $self->default_csrf_token_max_age;
-
 =over 4
 
 =item csrf_token
@@ -357,9 +389,9 @@ passing the current context.
 Else if the application class does a method called 'handle_failed_csrf_token_check' we invoke
 that instead.
 
-Failing either of those we just throw an expection which you can catch manually in the global
-'end' action or else it will fail thru eventually to Catalyst's default error handler.
-
+Failing either of those we just throw an exception and set a rational message body (403 Forbidden:
+Bad CSRF token).  In all cases if there's a CSRF error we skip the 'dispatch' phase so none of
+ your actions will run, including any global 'end' actions.  
 
 =head1 AUTHOR
 
@@ -367,7 +399,7 @@ Failing either of those we just throw an expection which you can catch manually 
  
 =head1 COPYRIGHT
  
-Copyright (c) 2022 the above named AUTHOR
+Copyright (c) 2023 the above named AUTHOR
  
 =head1 LICENSE
  

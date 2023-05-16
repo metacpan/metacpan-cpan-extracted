@@ -23,8 +23,10 @@ my $meta = {
                             develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                             runtime   => {
                                            requires => {
+                                             "Digest::SHA" => 0,
                                              "Mojo::ShareDir" => 0,
                                              "Mojolicious" => 0,
+                                             "Nanoid" => 0,
                                              "perl" => "5.024000",
                                              "Story::Interact" => 0.001004,
                                              "Text::Markdown::Hoedown" => 0,
@@ -40,7 +42,7 @@ my $meta = {
                                          },
                           },
   "provides"           => {
-                            "Story::Interact::WWW" => { file => "lib/Story/Interact/WWW.pm", version => 0.001004 },
+                            "Story::Interact::WWW" => { file => "lib/Story/Interact/WWW.pm", version => 0.001006 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -56,7 +58,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/project",
                           },
-  "version"            => 0.001004,
+  "version"            => 0.001006,
   "x_provides_scripts" => { si_www => { file => "bin/si_www" } },
 };
 

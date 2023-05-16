@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -9,7 +10,8 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                 => 'error',
             passwordDB               => 'Demo',
@@ -37,7 +39,8 @@ expectOK($res);
 my $id = expectCookie($res);
 
 # Test bad new password
-my $s = buildForm( {
+my $s = buildForm(
+    {
         oldpassword     => "dwho",
         newpassword     => "12345",
         confirmpassword => "12345",
@@ -57,7 +60,8 @@ count(1);
 expectReject( $res, 400, 28 );
 
 # Test good new password
-$s = buildForm( {
+$s = buildForm(
+    {
         oldpassword     => "dwho",
         newpassword     => "12346",
         confirmpassword => "12346",

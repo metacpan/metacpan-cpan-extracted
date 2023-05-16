@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Yaml;
-$File::Sticker::Reader::Yaml::VERSION = '1.0603';
+$File::Sticker::Reader::Yaml::VERSION = '3.0006';
 =head1 NAME
 
 File::Sticker::Reader::Yaml - read and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 1.0603
+version 3.0006
 
 =head1 SYNOPSIS
 

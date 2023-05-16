@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Complete::File" : "0.440",
-            "Complete::Util" : "0.608",
+            "Complete::Util" : "0.616",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -52,19 +52,19 @@
    "provides" : {
       "Perinci::Sub::XCompletion" : {
          "file" : "lib/Perinci/Sub/XCompletion.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "Perinci::Sub::XCompletion::comma_sep" : {
          "file" : "lib/Perinci/Sub/XCompletion/comma_sep.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "Perinci::Sub::XCompletion::dirname" : {
          "file" : "lib/Perinci/Sub/XCompletion/dirname.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "Perinci::Sub::XCompletion::filename" : {
          "file" : "lib/Perinci/Sub/XCompletion/filename.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-XCompletion"
       }
    },
-   "version" : "0.103",
+   "version" : "0.104",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

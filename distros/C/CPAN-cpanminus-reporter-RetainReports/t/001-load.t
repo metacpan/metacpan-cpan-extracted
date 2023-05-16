@@ -80,13 +80,19 @@ BEGIN { use_ok( 'CPAN::cpanminus::reporter::RetainReports' ); }
     is($gdir, $rdir, "get_report_dir worked as expected");
 
     my ($uri, $rf);
-    $uri = q|http://www.cpan.org/authors/id/J/JK/JKEENAN/Perl-Download-FTP-0.02.tar.gz|;
+    my $author = 'JKEENAN';
+    my $first_id =  substr($author, 0, 1);
+    my $second_id = substr($author, 0, 2);
+    my $distro = 'Perl-Download-FTP';
+    my $distro_version = '0.02';
+    my $tarball = "${distro}-${distro_version}.tar.gz";
+    $uri = qq|http://www.cpan.org/authors/id/$first_id/$second_id/$author/${distro}-${distro_version}.tar.gz|;
     $rf = $reporter->parse_uri($uri);
     ok($rf, "parse_uri() returned true value");
-    is($reporter->distname(),'Perl-Download-FTP', "distname() returned expected value");
-    is($reporter->distversion(), '0.02', "distversion() returned expected value");
-    is($reporter->distfile(), 'JKEENAN/Perl-Download-FTP-0.02.tar.gz', "distfile() returned expected value");
-    is($reporter->author(), 'JKEENAN', "author() returned expected value");
+    is($reporter->distname(), $distro, "distname() returned expected value");
+    is($reporter->distversion(), $distro_version, "distversion() returned expected value");
+    is($reporter->distfile(), File::Spec->catfile($author, $tarball), "distfile() returned expected value");
+    is($reporter->author(), $author, "author() returned expected value");
 }
 
 {
@@ -98,16 +104,23 @@ BEGIN { use_ok( 'CPAN::cpanminus::reporter::RetainReports' ); }
 
     my ($uri, $rf);
     my $cwd = cwd();
-    my $tarball_for_testing = File::Spec->catfile($cwd, 't', 'data', 'Phony-PASS-0.01.tar.gz');
+    my $author = 'METATEST';
+    my $first_id =  substr($author, 0, 1);
+    my $second_id = substr($author, 0, 2);
+    my $distro = 'Phony-PASS';
+    my $distro_version = '0.01';
+    my $tarball = "${distro}-${distro_version}.tar.gz";
+    my $tarball_for_testing = File::Spec->catfile($cwd, 't', 'data',
+        $first_id, $second_id, $author, $tarball);
     ok(-f $tarball_for_testing, "Located tarball '$tarball_for_testing'");
     $uri = qq|file://$tarball_for_testing|;
     $rf = $reporter->parse_uri($uri);
     ok($rf, "parse_uri() returned true value");
     my %expect = (
-        distname => 'Phony-PASS',
-        distversion => '0.01',
-        distfile => $uri,
-        author => undef,
+        distname => $distro,
+        distversion => $distro_version,
+        distfile => File::Spec->catfile($author, $tarball),
+        author => $author,
     );
     is($reporter->distname(), $expect{distname},
         "distname() returned expected value: $expect{distname}");
@@ -115,8 +128,10 @@ BEGIN { use_ok( 'CPAN::cpanminus::reporter::RetainReports' ); }
         "distversion() returned expected value: $expect{distversion}");
     is($reporter->distfile(), $expect{distfile},
         "distfile() returned expected value: $expect{distfile}");
-    ok(! defined $reporter->author(),
-        "author() returned undefined, as expected");
+    ok( defined $reporter->author(),
+        "author() returned defined value, as expected");
+    is($reporter->author(), $expect{author},
+        "author() returned expected value: $expect{author}");
 }
 
 done_testing;

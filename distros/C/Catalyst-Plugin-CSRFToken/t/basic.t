@@ -16,7 +16,7 @@ use HTTP::Request::Common;
 
 {
   ok my $res = request POST '/test', [csrf_token => 'badddd'];
-  is $res->content, 'Bad Request';
+  is $res->content, 'Forbidden: Invalid CSRF token.';
 }
 
 {
@@ -27,8 +27,8 @@ use HTTP::Request::Common;
     is $res->content, 'ok';
   }
   {
-    ok my $res = request POST '/test', [csrf_token => $token]; # SHouldn't work the second time
-    is $res->content, 'Bad Request';
+    ok my $res = request POST '/test', [csrf_token => $token]; # Shouldn't work the second time
+    is $res->content, 'Forbidden: Invalid CSRF token.';
   }
 }
 

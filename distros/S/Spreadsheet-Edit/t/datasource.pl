@@ -1,10 +1,11 @@
 #!/usr/bin/perl
+# *** DO NOT USE Test2 FEATURES becuase this is a sub-script ***
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
 use t_TestCommon  # Test::More etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug checkeq_literal expect1 check 
+            bug mycheckeq_literal expect1 mycheck 
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -53,4 +54,5 @@ die unless $s3->data_source =~ /cloned from cloned from My ds1/i;
 
 say "new_sheet: ",data_source unless $silent; 
 
+say "Done." unless $silent;
 exit 0;

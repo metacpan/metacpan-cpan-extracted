@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -36,7 +37,8 @@ SKIP: {
                 passwordPolicyMinLower      => 1,
                 passwordPolicyMinDigit      => 2,
                 passwordPolicyMinSpeChar    => 1,
-                passwordPolicySpecialChar   => '&%#'
+                passwordPolicySpecialChar   => '&%#',
+                mailUrl => 'http://other.example.com/passwdreset',
             }
         }
     );
@@ -80,9 +82,9 @@ SKIP: {
         'Found custom Main logo in mail' )
       or print STDERR Dumper( mail() );
     like( mail(), qr#<span>Hello</span>#, "Found english greeting" );
-
-    ok( mail() =~ m#a href="http://auth.example.com/resetpwd\?(.*?)"#,
-        'Found link in mail' );
+    ok( mail() =~ m#a href="http://other\.example\.com/passwdreset\?(.*?)"#,
+        'Found link in mail' )
+      or explain( mail(), 'Found link in mail' );
     $query = $1;
     ok(
         $res = $client->_get(

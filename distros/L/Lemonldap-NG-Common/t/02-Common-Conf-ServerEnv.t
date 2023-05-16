@@ -1,3 +1,4 @@
+use warnings;
 use strict;
 use Test::More tests => 14;
 use Data::Dumper;
@@ -9,7 +10,8 @@ my $dir = File::Temp::tempdir( CLEANUP => 1 );
 my $h;
 
 ok(
-    $h = new Lemonldap::NG::Common::Conf( {
+    $h = new Lemonldap::NG::Common::Conf(
+        {
             type    => 'File',
             dirName => $dir,
         }
@@ -43,7 +45,8 @@ ok( $cfg->{test} eq '%SERVERENV:A%',
 unlink 't/lmConf-1.json';
 
 ok(
-    $h = new Lemonldap::NG::Common::Conf( {
+    $h = new Lemonldap::NG::Common::Conf(
+        {
             type         => 'File',
             dirName      => "t/",
             useServerEnv => 1,
@@ -64,7 +67,8 @@ ok( $cfg->{test2} eq 'Bb Cc',
 
 ok( ( !$cfg->{'%SERVERENV:MYKEY%'} and $cfg->{MyKey} ),
     'Keyname is transformed' );
-ok( (
+ok(
+    (
               $cfg->{MyKey}->{array}->[0] eq 'a'
           and $cfg->{MyKey}->{array}->[1] eq 'Bb Cc'
     ),

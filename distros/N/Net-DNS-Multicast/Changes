@@ -1,9 +1,14 @@
 Revision history for Net::DNS::Multicast.
 
 
+**** 0.04  May 13, 2023
+
+	Rework cache_flush() to handle implicit RR class.
+
+
 **** 0.03  May 11, 2023
 
-	MDNS flag tests require Net::DNS 1.38.
+	M-DNS flag tests require Net::DNS 1.38.
 
 
 **** 0.02  May 10, 2023

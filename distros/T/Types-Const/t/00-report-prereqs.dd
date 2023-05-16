@@ -37,8 +37,7 @@ do { my $x = {
                                       'Types::Standard' => '0',
                                       'Types::TypeTiny' => '0',
                                       'namespace::autoclean' => '0.28',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
+                                      'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -53,7 +52,8 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'Test::TypeTiny' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

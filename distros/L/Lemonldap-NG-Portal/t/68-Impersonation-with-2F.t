@@ -1,3 +1,4 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
@@ -20,7 +21,8 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::FormEncode');
 
     my $res;
-    my $client = LLNG::Manager::Test->new( {
+    my $client = LLNG::Manager::Test->new(
+        {
             ini => {
                 logLevel               => 'error',
                 authentication         => 'Demo',
@@ -176,7 +178,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $r->is_success, ' Good challenge value' )
       or diag( $r->error_message );
 
-    my $registrationData = JSON::to_json( {
+    my $registrationData = JSON::to_json(
+        {
             clientData       => $r->client_data,
             errorCode        => 0,
             registrationData => $r->registration_data,

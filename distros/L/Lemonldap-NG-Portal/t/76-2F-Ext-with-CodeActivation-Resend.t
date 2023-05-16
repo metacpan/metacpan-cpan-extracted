@@ -1,9 +1,12 @@
+use warnings;
 use Test::More;
 use strict;
 use IO::String;
 use Data::Dumper;
 
 require 't/test-lib.pm';
+
+no warnings 'once';
 
 # used by sendCode to store result. Use a random name so multiple tests using
 # sendCode can run in paralell.
@@ -22,7 +25,7 @@ sub getCodeFromFile {
     return do {
         local $/;
         my $filename = $ENV{llngtmpfile};
-        open my $fh, $filename;
+        open my $fh, '<', $filename;
         <$fh>;
     };
 }
@@ -117,7 +120,8 @@ sub init_login {
     return $res;
 }
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel            => 'error',
             ext2fActivation     => 1,

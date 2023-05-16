@@ -1,3 +1,4 @@
+use warnings;
 use lib 'inc';
 use Test::More;
 use strict;
@@ -15,7 +16,8 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $op = LLNG::Manager::Test->new( {
+my $op = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel                           => $debug,
             domain                             => 'op.com',

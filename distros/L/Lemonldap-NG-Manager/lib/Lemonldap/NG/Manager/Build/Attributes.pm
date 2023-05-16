@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.16.1';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -548,7 +548,7 @@ sub attributes {
         },
         checkHIBPURL => {
             default       => 'https://api.pwnedpasswords.com/range/',
-            type          => 'text',
+            type          => 'url',
             documentation => 'URL of Have I Been Pwned API',
             flags         => 'p',
         },
@@ -823,6 +823,7 @@ sub attributes {
         },
         refreshSessions => {
             type          => 'bool',
+            help          => "refreshsessionapi.html",
             documentation => 'Refresh sessions plugin',
         },
         forceGlobalStorageIssuerOTT => {
@@ -1853,7 +1854,6 @@ sub attributes {
 
         mailUrl => {
             type          => 'url',
-            default       => 'http://auth.example.com/resetpwd',
             documentation => 'URL of password reset page',
         },
 
@@ -1884,7 +1884,6 @@ sub attributes {
         },
         certificateResetByMailURL => {
             type          => 'url',
-            default       => 'http://auth.example.com/certificateReset',
             documentation => 'URL of certificate reset page',
         },
         certificateResetByMailValidityDelay => {
@@ -1915,8 +1914,7 @@ sub attributes {
             documentation => 'Register session timeout',
         },
         registerUrl => {
-            type          => 'text',
-            default       => 'http://auth.example.com/register',
+            type          => 'url',
             documentation => 'URL of register page',
         },
         registerDB => {
@@ -2305,7 +2303,7 @@ sub attributes {
             documentation => 'Yubico nonce',
         },
         yubikey2fUrl => {
-            type          => 'text',
+            type          => 'url',
             documentation => 'Yubico server',
         },
         yubikey2fPublicIDSize => {
@@ -2476,20 +2474,19 @@ sub attributes {
         # AutoSignin
         autoSigninRules => {
             type          => 'keyTextContainer',
+            keyTest       => sub { return perlExpr(@_) },
+            test          => sub { 1 },
+            help          => 'autosignin.html',
             documentation => 'List of auto signin rules',
         },
 
-        # Adaptative Authentication Level plugin
+        # Adaptative Authentication Level
         adaptativeAuthenticationLevelRules => {
-            type    => 'keyTextContainer',
-            keyTest => sub {
-                eval { qr/$_[0]/ };
-                return $@ ? 0 : 1;
-            },
-            keyMsgFail    => '__badRegexp__',
+            type          => 'keyTextContainer',
+            keyTest       => sub { return perlExpr(@_) },
+            test          => sub { 1 },
             help          => "adaptativeauthenticationlevel.html",
             documentation => 'Adaptative authentication level rules',
-            flags         => 'p',
         },
 
         # LocationDetect plugin
@@ -3261,9 +3258,8 @@ sub attributes {
         },
         samlSPMetaDataOptionsFederationOptionalAttributes => {
             type   => 'select',
-            select => [
-                { k => '', v => 'keep' }, { k => 'ignore', v => 'ignore' },
-            ],
+            select =>
+              [ { k => '', v => 'keep' }, { k => 'ignore', v => 'ignore' }, ],
             default => '',
         },
         samlSPMetaDataOptionsFederationRequiredAttributes => {
