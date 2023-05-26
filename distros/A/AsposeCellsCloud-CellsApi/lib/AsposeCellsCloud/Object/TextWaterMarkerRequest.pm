@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::TextWaterMarkerRequest;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,48 +118,48 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Used by text water marker requests.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'TextWaterMarkerRequest',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'text' => {
-    	datatype => 'string',
-    	base_name => 'Text',
-    	description => 'water marker.',
-    	format => '',
-    	read_only => '',
-    		},
-    'font_name' => {
-    	datatype => 'string',
-    	base_name => 'FontName',
-    	description => 'font name.',
-    	format => '',
-    	read_only => '',
-    		},
-    'font_size' => {
-    	datatype => 'int',
-    	base_name => 'FontSize',
-    	description => 'font size.',
-    	format => '',
-    	read_only => '',
-    		},
-    'height' => {
-    	datatype => 'int',
-    	base_name => 'Height',
-    	description => 'height.',
-    	format => '',
-    	read_only => '',
-    		},
-    'width' => {
-    	datatype => 'int',
-    	base_name => 'Width',
-    	description => 'width.',
-    	format => '',
-    	read_only => '',
-    		},
+     'text' => {
+     	datatype => 'string',
+     	base_name => 'Text',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'font_name' => {
+     	datatype => 'string',
+     	base_name => 'FontName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'font_size' => {
+     	datatype => 'int',
+     	base_name => 'FontSize',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'height' => {
+     	datatype => 'int',
+     	base_name => 'Height',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'width' => {
+     	datatype => 'int',
+     	base_name => 'Width',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
@@ -167,7 +167,7 @@ __PACKAGE__->swagger_types( {
     'font_name' => 'string',
     'font_size' => 'int',
     'height' => 'int',
-    'width' => 'int'
+    'width' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -175,7 +175,7 @@ __PACKAGE__->attribute_map( {
     'font_name' => 'FontName',
     'font_size' => 'FontSize',
     'height' => 'Height',
-    'width' => 'Width'
+    'width' => 'Width' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

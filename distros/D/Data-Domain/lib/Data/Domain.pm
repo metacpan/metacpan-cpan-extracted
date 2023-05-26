@@ -15,7 +15,7 @@ use overload '""' => \&_stringify,
              $] < 5.037 ? ('~~' => \&_matches) : ();  # fully deprecated, so cannot be overloaded
 use match::simple ();
 
-our $VERSION = "1.11";
+our $VERSION = "1.12";
 
 our $MESSAGE;        # global var for last message from _matches()
 our $MAX_DEEP = 100; # limit for recursive calls to inspect()
@@ -144,7 +144,7 @@ my $builtin_msgs = {
     },
     Struct => {
       NOT_A_HASH      => "is not a hashref",
-      FORBIDDEN_FIELD => "contains forbidden field: '%s'"
+      FORBIDDEN_FIELD => "contains forbidden field(s): %s"
     },
   },
 
@@ -188,7 +188,7 @@ my $builtin_msgs = {
     },
     Struct => {
       NOT_A_HASH      => "n'est pas une hashref",
-      FORBIDDEN_FIELD => "contient le champ interdit: '%s'",
+      FORBIDDEN_FIELD => "contient le(s) champ(s) interdit(s): %s",
     },
   },
 };
@@ -1211,20 +1211,17 @@ sub _inspect {
   does($data, 'HASH')
     or return $self->msg(NOT_A_HASH => $data);
 
+  my %msgs;
+
   # check if there are any forbidden fields
   if (my $exclude = $self->{-exclude}) {
-  FIELD:
-    foreach my $field (keys %$data) {
-      next FIELD if $self->{-fields}{$field};
-
-      return $self->msg(FORBIDDEN_FIELD => $field)
-        if match::simple::match($field, $exclude)
-        or match::simple::match($exclude, ['*', 'all']);
-    }
+    my @other_fields = grep {!$self->{-fields}{$_}} keys %$data;
+    my @wrong_fields = match::simple::match($exclude, ['*', 'all'])
+                       ? @other_fields
+                       : grep {match::simple::match($_, $exclude)} @other_fields;
+    $msgs{-exclude} = $self->msg(FORBIDDEN_FIELD => join ", ", map {"'$_'"} sort @wrong_fields)
+      if @wrong_fields;
   }
-
-  my %msgs;
-  my $has_invalid;
 
   # prepare context for calling lazy subdomains
   $context ||= {root => $data,
@@ -1240,26 +1237,25 @@ sub _inspect {
     my $subdomain  = $self->_build_subdomain($field_spec, $context);
     my $msg        = $subdomain->inspect($data->{$field}, $context);
     $msgs{$field}  = $msg if $msg;
-    $has_invalid ||=  $msg;
   }
 
   # check the List domain for keys
   if (my $keys_dom = $self->{-keys}) {
     local $context->{path} = [@{$context->{path}}, "-keys"];
     my $subdomain  = $self->_build_subdomain($keys_dom, $context);
-    $msgs{-keys}   = $subdomain->inspect([keys %$data], $context)
-      and $has_invalid = 1;
+    my $msg        = $subdomain->inspect([keys %$data], $context);
+    $msgs{-keys}   = $msg if $msg;
   }
 
   # check the List domain for values
   if (my $values_dom = $self->{-values}) {
     local $context->{path} = [@{$context->{path}}, "-values"];
     my $subdomain  = $self->_build_subdomain($values_dom, $context);
-    $msgs{-values} = $subdomain->inspect([values %$data], $context)
-      and $has_invalid = 1;
+    my $msg        = $subdomain->inspect([values %$data], $context);
+    $msgs{-values} = $msg if $msg;
   }
 
-  return $has_invalid ? \%msgs : undef;
+  return keys %msgs ? \%msgs : undef;
 }
 
 #======================================================================
@@ -2173,6 +2169,21 @@ Specifies a List domain, for inspecting the list of keys in the hash.
 Specifies a List domain, for inspecting the list of values in the hash.
 
 =back
+
+In case of errors, the C<inspect()> method returns a hashref. Errors
+with specific fields are reported under that field's name; errors with
+the C<-exclude>, C<-keys> or C<-values> constraints are reported under
+the constraint's name. So for example in
+
+  my $dom = Struct(-fields => [age => Int], -exclude => '*');
+  my $err = $dom->inspect({age => 'canonical', foo => 123, bar => 456});
+
+C<$err> will contain :
+
+  {
+    age      => "Int: invalid number",
+    -exclude => "Struct: contains forbidden field(s): 'bar', 'foo'",
+  }
 
 
 =head2 One_of

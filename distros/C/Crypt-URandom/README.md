@@ -4,7 +4,7 @@ Crypt::URandom - Provide non blocking randomness
 
 # VERSION
 
-This document describes Crypt::URandom version 0.38
+This document describes Crypt::URandom version 0.39
 
 # SYNOPSIS
 
@@ -32,14 +32,14 @@ or equal to Windows 2000.
 
     This function accepts an integer and returns a string of the same size
     filled with random data.  The first call will initialize the native
-    cryptographic libraries (if necessary) and load all the required Perl libraries
+    cryptographic libraries (if necessary) and load all the required Perl libraries.
     This call is a buffered read on non Win32 platforms.
 
 - `urandom_ub`
 
     This function accepts an integer and returns a string of the same size
     filled with random data.  The first call will initialize the native
-    cryptographic libraries (if necessary) and load all the required Perl libraries
+    cryptographic libraries (if necessary) and load all the required Perl libraries.
     This call is a unbuffered sysread on non Win32 platforms.
 
 # DIAGNOSTICS

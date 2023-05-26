@@ -60,7 +60,7 @@
    "provides" : {
       "Complete::Sah" : {
          "file" : "lib/Complete/Sah.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Sah"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -298,7 +298,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
             "name" : "@Author::PERLANCAR/OurDate",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDist",
@@ -437,7 +437,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.784"
+                        "version" : "0.785"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

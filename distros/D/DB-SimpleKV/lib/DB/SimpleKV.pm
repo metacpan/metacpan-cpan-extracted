@@ -12,11 +12,11 @@ DB::SimpleKV - Simple k/v interface to text configuration file
 
 =head1 VERSION
 
-Version 0.04
+Version 0.15
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.15';
 
 sub new {
   my $class = shift;
@@ -88,6 +88,8 @@ sub save {
 
 This module is mainly used to manipulate a configuration file like Postfix's main.cf.
 
+If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
+
 It creates the default db file "/tmp/simplekv.db" if you don't specify the file path.
 
     use DB::SimpleKV;
@@ -95,12 +97,11 @@ It creates the default db file "/tmp/simplekv.db" if you don't specify the file 
     my $db = DB::SimpleKV->new;
     $db->set("hostname","h99.foo.com");
     $db->set("provider","rackspace cloud");
-    $db->set("ip_addr","192.168.2.10");
-    $db->set("netmask","255.255.255.0");
+    $db->set("tags","cloud,virtual,kvm");
 
     print $db->get("provider"),"\n";
-    $db->delete("netmask");
-    print  "netmask exists? ", $db->exists("netmask") ? "yes" : "no", "\n";
+    $db->delete("tags");
+    print  "tags exists? ", $db->exists("tags") ? "yes" : "no", "\n";
 
     $db->save;
 
@@ -108,9 +109,8 @@ Or you can specify the existing file for manipulation, one configuration per lin
 
     use DB::SimpleKV;
 
-    my $db = DB::SimpleKV->new("/etc/postfix/main.cf");
-    print $db->get("relayhost"),"\n";
-    print  "relay exists? ", $db->exists("relayhost") ? "yes" : "no", "\n";
+    my $db = DB::SimpleKV->new("/etc/lsb-release");
+    print "My OS is: ", $db->get("DISTRIB_ID");
 
 
 

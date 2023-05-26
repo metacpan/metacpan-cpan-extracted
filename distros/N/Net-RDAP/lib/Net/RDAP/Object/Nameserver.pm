@@ -20,7 +20,7 @@ access to all that module's methods.
 
 Other methods include:
 
-	$name = $nameserver->name;
+    $name = $nameserver->name;
 
 Returns a Net::DNS::Domain representing the name of the nameserver.
 
@@ -30,7 +30,7 @@ sub name { Net::DNS::Domain->new($_[0]->{'ldhName'}) }
 
 =pod
 
-	@addrs = $nameserver->addresses($version);
+    @addrs = $nameserver->addresses($version);
 
 Returns a (potentially empty) array of L<Net::IP> objects representing
 the nameserver's IP addresses. C<$version> can be either "v4" or "v6"
@@ -40,35 +40,35 @@ ommitted, all addresses are returned).
 =cut
 
 sub addresses {
-	my ($self, $version) = @_;
+    my ($self, $version) = @_;
 
-	my @addrs;
+    my @addrs;
 
-	my @versions;
-	if ($version) {
-		push(@versions, $version);
+    my @versions;
+    if ($version) {
+        push(@versions, $version);
 
-	} else {
-		push(@versions, qw(v4 v6));
+    } else {
+        push(@versions, qw(v4 v6));
 
-	}
+    }
 
-	foreach my $version (@versions) {
-		if (defined($self->{'ipAddresses'}->{$version})) {
-			foreach my $addr (@{$self->{'ipAddresses'}->{$version}}) {
-				push(@addrs, Net::IP->new($addr));
-			}
-		}
-	}
+    foreach my $version (@versions) {
+        if (defined($self->{'ipAddresses'}->{$version})) {
+            foreach my $addr (@{$self->{'ipAddresses'}->{$version}}) {
+                push(@addrs, Net::IP->new($addr));
+            }
+        }
+    }
 
-	return @addrs;
+    return @addrs;
 }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

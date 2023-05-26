@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::PageSection;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,64 +118,64 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'PageSection',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'picture' => {
-    	datatype => 'string',
-    	base_name => 'Picture',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'section' => {
-    	datatype => 'int',
-    	base_name => 'Section',
-    	description => '0,1,2  left , middle ,right',
-    	format => '',
-    	read_only => '',
-    		},
-    'fisrt_page_context' => {
-    	datatype => 'string',
-    	base_name => 'FisrtPageContext',
-    	description => 'fisrt page context script',
-    	format => '',
-    	read_only => '',
-    		},
-    'context' => {
-    	datatype => 'string',
-    	base_name => 'Context',
-    	description => 'page context script             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'even_page_context' => {
-    	datatype => 'string',
-    	base_name => 'EvenPageContext',
-    	description => 'Even page context script',
-    	format => '',
-    	read_only => '',
-    		},
+     'section' => {
+     	datatype => 'int',
+     	base_name => 'Section',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'context' => {
+     	datatype => 'string',
+     	base_name => 'Context',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'picture' => {
+     	datatype => 'string',
+     	base_name => 'Picture',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'fisrt_page_context' => {
+     	datatype => 'string',
+     	base_name => 'FisrtPageContext',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'even_page_context' => {
+     	datatype => 'string',
+     	base_name => 'EvenPageContext',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'picture' => 'string',
     'section' => 'int',
-    'fisrt_page_context' => 'string',
     'context' => 'string',
-    'even_page_context' => 'string'
+    'picture' => 'string',
+    'fisrt_page_context' => 'string',
+    'even_page_context' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'picture' => 'Picture',
     'section' => 'Section',
-    'fisrt_page_context' => 'FisrtPageContext',
     'context' => 'Context',
-    'even_page_context' => 'EvenPageContext'
+    'picture' => 'Picture',
+    'fisrt_page_context' => 'FisrtPageContext',
+    'even_page_context' => 'EvenPageContext' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

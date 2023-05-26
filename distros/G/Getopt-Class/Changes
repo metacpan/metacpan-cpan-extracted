@@ -1,5 +1,8 @@
 Revision history for Perl module Getopt::Class
 
+v0.104.0 2023-05-24T14:57:14+0900
+    - Improved this already stable module, by automatically enabling mirror options such as enable-something when disable-something is defined or without-something when with-something is defined in the dictionary.
+
 v0.103.3 2022-11-23T11:10:47+0900
     - Minor improvement to silence warning in TIEHASH
 

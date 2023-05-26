@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::IconSet;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::ConditionalFormattingIcon;
-use AsposeCellsCloud::Object::ConditionalFormattingValue;
+use AsposeCellsCloud::Object::ConditionalFormattingValue; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,73 +119,73 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Describe the IconSet conditional formatting rule. This conditional formatting     rule applies icons to cells according to their values.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'IconSet',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'reverse' => {
-    	datatype => 'boolean',
-    	base_name => 'Reverse',
-    	description => 'Get or set the flag indicating whether to reverses the default order of the   icons in this icon set.  Default value is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'cf_icons' => {
-    	datatype => 'ARRAY[ConditionalFormattingIcon]',
-    	base_name => 'CfIcons',
-    	description => 'Get theAspose.Cells.ConditionalFormattingIcon from the collection',
-    	format => '',
-    	read_only => '',
-    		},
-    'cfvos' => {
-    	datatype => 'ARRAY[ConditionalFormattingValue]',
-    	base_name => 'Cfvos',
-    	description => 'Get the CFValueObjects instance.',
-    	format => '',
-    	read_only => '',
-    		},
-    'icon_set_type' => {
-    	datatype => 'string',
-    	base_name => 'IconSetType',
-    	description => 'Get or Set the icon set type to display.  Setting the type will auto check    if the current Cfvos&#39;s count is accord with the new type. If not accord,    old Cfvos will be cleaned and default Cfvos will be added.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_custom' => {
-    	datatype => 'boolean',
-    	base_name => 'IsCustom',
-    	description => 'Indicates whether the icon set is custom.  Default value is false.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_value' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowValue',
-    	description => 'Get or set the flag indicating whether to show the values of the cells on    which this icon set is applied.  Default value is true.             ',
-    	format => '',
-    	read_only => '',
-    		},
+     'cf_icons' => {
+     	datatype => 'ARRAY[ConditionalFormattingIcon]',
+     	base_name => 'CfIcons',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cfvos' => {
+     	datatype => 'ARRAY[ConditionalFormattingValue]',
+     	base_name => 'Cfvos',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_custom' => {
+     	datatype => 'boolean',
+     	base_name => 'IsCustom',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'reverse' => {
+     	datatype => 'boolean',
+     	base_name => 'Reverse',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_value' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'icon_set_type' => {
+     	datatype => 'string',
+     	base_name => 'IconSetType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'reverse' => 'boolean',
     'cf_icons' => 'ARRAY[ConditionalFormattingIcon]',
     'cfvos' => 'ARRAY[ConditionalFormattingValue]',
-    'icon_set_type' => 'string',
     'is_custom' => 'boolean',
-    'show_value' => 'boolean'
+    'reverse' => 'boolean',
+    'show_value' => 'boolean',
+    'icon_set_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'reverse' => 'Reverse',
     'cf_icons' => 'CfIcons',
     'cfvos' => 'Cfvos',
-    'icon_set_type' => 'IconSetType',
     'is_custom' => 'IsCustom',
-    'show_value' => 'ShowValue'
+    'reverse' => 'Reverse',
+    'show_value' => 'ShowValue',
+    'icon_set_type' => 'IconSetType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

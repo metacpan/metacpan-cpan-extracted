@@ -12,7 +12,7 @@ use LWP::UserAgent;
 use Net::SecurityCenter::Error;
 use Net::SecurityCenter::Utils qw(trim dumper);
 
-our $VERSION = '0.310';
+our $VERSION = '0.311';
 our $ERROR;
 
 #-------------------------------------------------------------------------------
@@ -35,8 +35,8 @@ sub new {
 
     my $timeout  = delete( $options->{'timeout'} );
     my $ssl_opts = delete( $options->{'ssl_options'} ) || {};
-    my $logger   = delete( $options->{'logger'} ) || undef;
-    my $scheme   = delete( $options->{'scheme'} ) || 'https';
+    my $logger   = delete( $options->{'logger'} )      || undef;
+    my $scheme   = delete( $options->{'scheme'} )      || 'https';
 
     my $url = "$scheme://$host/rest";
 
@@ -611,7 +611,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,11 @@
 Revision history for Perl module HTML::Object
 
+v0.2.7 2023-05-24T09:55:21+0900
+    - Minor correction in modules requirements
+
+v0.2.6 2023-05-18T17:24:17+0900
+    - Corrected small bug in method detach() in HTML::Object::Element and HTML::Object::XQuery
+
 v0.2.5 2023-05-11T21:10:17+0900
     - Minor additional correction on extract_links in HTML::Object::Element
 

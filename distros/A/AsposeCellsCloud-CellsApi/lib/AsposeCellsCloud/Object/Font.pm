@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Font;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::Color; 
 
-use AsposeCellsCloud::Object::Color;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,109 +118,109 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Font',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'is_italic' => {
-    	datatype => 'boolean',
-    	base_name => 'IsItalic',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'name' => {
-    	datatype => 'string',
-    	base_name => 'Name',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'double_size' => {
-    	datatype => 'double',
-    	base_name => 'DoubleSize',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'color' => {
-    	datatype => 'Color',
-    	base_name => 'Color',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_bold' => {
-    	datatype => 'boolean',
-    	base_name => 'IsBold',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_subscript' => {
-    	datatype => 'boolean',
-    	base_name => 'IsSubscript',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_superscript' => {
-    	datatype => 'boolean',
-    	base_name => 'IsSuperscript',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_strikeout' => {
-    	datatype => 'boolean',
-    	base_name => 'IsStrikeout',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'underline' => {
-    	datatype => 'string',
-    	base_name => 'Underline',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'size' => {
-    	datatype => 'int',
-    	base_name => 'Size',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'color' => {
+     	datatype => 'Color',
+     	base_name => 'Color',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'double_size' => {
+     	datatype => 'double',
+     	base_name => 'DoubleSize',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_bold' => {
+     	datatype => 'boolean',
+     	base_name => 'IsBold',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_italic' => {
+     	datatype => 'boolean',
+     	base_name => 'IsItalic',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_strikeout' => {
+     	datatype => 'boolean',
+     	base_name => 'IsStrikeout',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_subscript' => {
+     	datatype => 'boolean',
+     	base_name => 'IsSubscript',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_superscript' => {
+     	datatype => 'boolean',
+     	base_name => 'IsSuperscript',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'name' => {
+     	datatype => 'string',
+     	base_name => 'Name',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'size' => {
+     	datatype => 'int',
+     	base_name => 'Size',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'underline' => {
+     	datatype => 'string',
+     	base_name => 'Underline',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'is_italic' => 'boolean',
-    'name' => 'string',
-    'double_size' => 'double',
     'color' => 'Color',
+    'double_size' => 'double',
     'is_bold' => 'boolean',
+    'is_italic' => 'boolean',
+    'is_strikeout' => 'boolean',
     'is_subscript' => 'boolean',
     'is_superscript' => 'boolean',
-    'is_strikeout' => 'boolean',
-    'underline' => 'string',
-    'size' => 'int'
+    'name' => 'string',
+    'size' => 'int',
+    'underline' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'is_italic' => 'IsItalic',
-    'name' => 'Name',
-    'double_size' => 'DoubleSize',
     'color' => 'Color',
+    'double_size' => 'DoubleSize',
     'is_bold' => 'IsBold',
+    'is_italic' => 'IsItalic',
+    'is_strikeout' => 'IsStrikeout',
     'is_subscript' => 'IsSubscript',
     'is_superscript' => 'IsSuperscript',
-    'is_strikeout' => 'IsStrikeout',
-    'underline' => 'Underline',
-    'size' => 'Size'
+    'name' => 'Name',
+    'size' => 'Size',
+    'underline' => 'Underline' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

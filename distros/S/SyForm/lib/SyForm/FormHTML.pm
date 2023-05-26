@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::FormHTML::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: HTML Form
-$SyForm::FormHTML::VERSION = '0.102';
+$SyForm::FormHTML::VERSION = '0.103';
 use Moo;
 use HTML::Declare ':all';
 use List::MoreUtils qw( uniq );
@@ -129,7 +129,7 @@ SyForm::FormHTML - HTML Form
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

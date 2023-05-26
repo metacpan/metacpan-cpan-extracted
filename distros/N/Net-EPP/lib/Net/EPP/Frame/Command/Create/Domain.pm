@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id$
 package Net::EPP::Frame::Command::Create::Domain;
 use base qw(Net::EPP::Frame::Command::Create);
 use Net::EPP::Frame::ObjectSpec;
@@ -87,6 +82,16 @@ sub setDomain {
 	return 1;
 }
 
+=pod
+
+=head1
+
+	$frame->setPeriod(1, 'y');
+
+Set the initial registration period. The second argument is optional.
+
+=cut
+
 sub setPeriod {
 	my ($self, $period, $unit) = @_;
 
@@ -101,6 +106,16 @@ sub setPeriod {
 	return 1;
 }
 
+=pod
+
+=head1
+
+	$frame->setRegistrant($id);
+
+Set the registrant.
+
+=cut
+
 sub setRegistrant {
 	my ($self, $contact) = @_;
 
@@ -112,15 +127,30 @@ sub setRegistrant {
 	return 1;
 }
 
+=pod
+
+=head1
+
+	$frame->setContacts({
+		'admin'   => 'H12345',
+		'tech'    => 'H54321',
+		'billing' => 'H23451',
+	}));
+
+Set the contacts.
+
+=cut
+
 sub setContacts {
 	my ($self, $contacts) = @_;
+	my $parent = $self->getNode('create')->getChildNodes->shift;
 
 	foreach my $type (keys(%{$contacts})) {
 		my $contact = $self->createElement('domain:contact');
 		$contact->setAttribute('type', $type);
 		$contact->appendText($contacts->{$type});
 
-		$self->getNode('create')->getChildNodes->shift->appendChild($contact);
+		$parent->appendChild($contact);
 	}
 
 	return 1;
@@ -224,26 +254,5 @@ sub addEl {
 	return $el;
 	
 }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
-=cut
 
 1;

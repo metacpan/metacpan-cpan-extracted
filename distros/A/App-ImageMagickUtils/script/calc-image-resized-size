@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Math/Image/CalcResized/calc_image_resized_size
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2023-03-01'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/calc_image_resized_size",
@@ -38,13 +38,15 @@ calc-image-resized-size - Given size of an image (in WxH, e.g. "2592x1944") and 
 
 =head1 VERSION
 
-This document describes version 0.019 of calc-image-resized-size (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
+This document describes version 0.020 of calc-image-resized-size (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
 
 =head1 SYNOPSIS
 
-Usage:
+B<calc-image-resized-size> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-% B<calc-image-resized-size> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<size>E<gt> E<lt>I<resize>E<gt>
+B<calc-image-resized-size> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<calc-image-resized-size> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<size|/"--size=s*">>E<gt> E<lt>I<L<resize|/"--resize=s*">>E<gt>
 
 
 
@@ -64,38 +66,38 @@ Resize instruction, follows ImageMagick format.
 
 Resize instruction can be given in several formats:
 
-    Syntax                     Meaning
-    -------------------------- ----------------------------------------------------------------
-    ""                         No resizing.
-
-    SCALE"%"                   Height and width both scaled by specified percentage.
-    SCALEX"%x"SCALEY"%"        Height and width individually scaled by specified percentages. (Only one % symbol needed.)
-
-    WIDTH                      Width given, height automagically selected to preserve aspect ratio.
-    WIDTH">"                   Shrink width if larger, height automagically selected to preserve aspect ratio.
-    WIDTH"^"                   Enlarge width if smaller, height automagically selected to preserve aspect ratio.
-
-    "x"HEIGHT                  Height given, width automagically selected to preserve aspect ratio.
-    "x"HEIGHT">"               Shrink height if larger, width automagically selected to preserve aspect ratio.
-    "x"HEIGHT"^"               Enlarge height if smaller, width automagically selected to preserve aspect ratio.
-
-    WIDTH"x"HEIGHT             Maximum values of height and width given, aspect ratio preserved.
-    WIDTH"x"HEIGHT"^"          Minimum values of height and width given, aspect ratio preserved.
-    WIDTH"x"HEIGHT"!"          Width and height emphatically given, original aspect ratio ignored.
-    WIDTH"x"HEIGHT">"          Shrinks an image with dimension(s) larger than the corresponding width and/or height argument(s).
-    WIDTH"x"HEIGHT"<"          Shrinks an image with dimension(s) larger than the corresponding width and/or height argument(s).
-
-    NUMBER"^>"                 Shrink shortest side if larger than number, aspect ratio preserved.
-    NUMBER"^<"                 Enlarge shortest side if larger than number, aspect ratio preserved.
-    "^"NUMBER">"               Shrink longer side if larger than number, aspect ratio preserved.
-    "^"NUMBER"<"               Enlarge longer side if larger than number, aspect ratio preserved.
+ Syntax                     Meaning
+ -------------------------- ----------------------------------------------------------------
+ ""                         No resizing.
+ 
+ SCALE"%"                   Height and width both scaled by specified percentage.
+ SCALEX"%x"SCALEY"%"        Height and width individually scaled by specified percentages. (Only one % symbol needed.)
+ 
+ WIDTH                      Width given, height automagically selected to preserve aspect ratio.
+ WIDTH">"                   Shrink width if larger, height automagically selected to preserve aspect ratio.
+ WIDTH"^"                   Enlarge width if smaller, height automagically selected to preserve aspect ratio.
+ 
+ "x"HEIGHT                  Height given, width automagically selected to preserve aspect ratio.
+ "x"HEIGHT">"               Shrink height if larger, width automagically selected to preserve aspect ratio.
+ "x"HEIGHT"^"               Enlarge height if smaller, width automagically selected to preserve aspect ratio.
+ 
+ WIDTH"x"HEIGHT             Maximum values of height and width given, aspect ratio preserved.
+ WIDTH"x"HEIGHT"^"          Minimum values of height and width given, aspect ratio preserved.
+ WIDTH"x"HEIGHT"!"          Width and height emphatically given, original aspect ratio ignored.
+ WIDTH"x"HEIGHT">"          Shrinks an image with dimension(s) larger than the corresponding width and/or height argument(s).
+ WIDTH"x"HEIGHT"<"          Shrinks an image with dimension(s) larger than the corresponding width and/or height argument(s).
+ 
+ NUMBER"^>"                 Shrink shortest side if larger than number, aspect ratio preserved.
+ NUMBER"^<"                 Enlarge shortest side if larger than number, aspect ratio preserved.
+ "^"NUMBER">"               Shrink longer side if larger than number, aspect ratio preserved.
+ "^"NUMBER"<"               Enlarge longer side if larger than number, aspect ratio preserved.
 
 Currently unsupported:
 
-    AREA"@"                    Resize image to have specified area in pixels. Aspect ratio is preserved.
-    X":"Y                      Here x and y denotes an aspect ratio (e.g. 3:2 = 1.5).
+ AREA"@"                    Resize image to have specified area in pixels. Aspect ratio is preserved.
+ X":"Y                      Here x and y denotes an aspect ratio (e.g. 3:2 = 1.5).
 
-Ref: <http://www.imagemagick.org/script/command-line-processing.php#geometry>
+Ref: L<http://www.imagemagick.org/script/command-line-processing.php#geometry>
 
 
 Can also be specified as the 2nd command-line argument.
@@ -120,6 +122,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -134,24 +142,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -205,122 +222,202 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
+=head2 Example #1
+
  % calc-image-resized-size 2592x1944 ''
  2592x1944
+
+=head2 Example #2
 
  % calc-image-resized-size 2592x1944 20%
  518x388
 
+=head2 Example #3
+
  % calc-image-resized-size 2592x1944 20%x40%
  518x777
+
+=head2 Example #4
 
  % calc-image-resized-size 2592x1944 20x40%
  518x777
 
+=head2 Example #5
+
  % calc-image-resized-size 2592x1944 1024
  1024x768
+
+=head2 Example #6
 
  % calc-image-resized-size 2592x1944 '1024>'
  1024x768
 
+=head2 Example #7
+
  % calc-image-resized-size 2592x1944 '10240>'
  2592x1944
+
+=head2 Example #8
 
  % calc-image-resized-size 2592x1944 1024^
  2592x1944
 
+=head2 Example #9
+
  % calc-image-resized-size 2592x1944 10240^
  10240x7680
+
+=head2 Example #10
 
  % calc-image-resized-size 2592x1944 x1024
  1365x1024
 
+=head2 Example #11
+
  % calc-image-resized-size 2592x1944 'x768>'
  1024x768
+
+=head2 Example #12
 
  % calc-image-resized-size 2592x1944 'x7680>'
  2592x1944
 
+=head2 Example #13
+
  % calc-image-resized-size 2592x1944 x768^
  2592x1944
+
+=head2 Example #14
 
  % calc-image-resized-size 2592x1944 x7680^
  10240x7680
 
+=head2 Example #15
+
  % calc-image-resized-size 2592x1944 20000x10000
  2592x1944
+
+=head2 Example #16
 
  % calc-image-resized-size 2592x1944 20000x1000
  1333x1000
 
+=head2 Example #17
+
  % calc-image-resized-size 2592x1944 100x200
  100x75
+
+=head2 Example #18
 
  % calc-image-resized-size 2592x1944 100x100
  100x75
 
+=head2 Example #19
+
  % calc-image-resized-size 2592x1944 10000x5000^
  10000x7500
+
+=head2 Example #20
 
  % calc-image-resized-size 2592x1944 5000x10000^
  13333x10000
 
+=head2 Example #21
+
  % calc-image-resized-size 2592x1944 100x100^
  2592x1944
+
+=head2 Example #22
 
  % calc-image-resized-size 2592x1944 100x100!
  100x100
 
+=head2 Example #23
+
  % calc-image-resized-size 2592x1944 '10000x5000>'
  2592x1944
+
+=head2 Example #24
 
  % calc-image-resized-size 2592x1944 '5000x10000>'
  2592x1944
 
+=head2 Example #25
+
  % calc-image-resized-size 2592x1944 '3000x1000>'
  2592x1944
+
+=head2 Example #26
 
  % calc-image-resized-size 2592x1944 '2000x1000>'
  1333x1000
 
+=head2 Example #27
+
  % calc-image-resized-size 2592x1944 '100x100>'
  100x75
+
+=head2 Example #28
 
  % calc-image-resized-size 2592x1944 '10000x5000<'
  10000x7500
 
+=head2 Example #29
+
  % calc-image-resized-size 2592x1944 '5000x10000<'
  13333x10000
+
+=head2 Example #30
 
  % calc-image-resized-size 2592x1944 '3000x1000<'
  2592x1944
 
+=head2 Example #31
+
  % calc-image-resized-size 2592x1944 '2000x1000<'
  2592x1944
+
+=head2 Example #32
 
  % calc-image-resized-size 2592x1944 '100x100<'
  2592x1944
 
+=head2 Example #33
+
  % calc-image-resized-size 2592x1944 '1024^>'
  1365x1024
+
+=head2 Example #34
 
  % calc-image-resized-size 2592x1944 '10240^>'
  2592x1944
 
+=head2 Example #35
+
  % calc-image-resized-size 2592x1944 '1024^<'
  2592x1944
+
+=head2 Example #36
 
  % calc-image-resized-size 2592x1944 '10240^<'
  13653x10240
 
+=head2 Example #37
+
  % calc-image-resized-size 2592x1944 '^1024>'
  1024x768
+
+=head2 Example #38
 
  % calc-image-resized-size 2592x1944 '^10240>'
  2592x1944
 
+=head2 Example #39
+
  % calc-image-resized-size 2592x1944 '^1024<'
  2592x1944
+
+=head2 Example #40
 
  % calc-image-resized-size 2592x1944 '^10240<'
  10240x7680
@@ -361,7 +458,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

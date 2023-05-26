@@ -1,3 +1,13 @@
+0.009 2023-05-25
+
+    * fix compat wih with < 5.028
+
+0.008 2023-05-24
+
+    * clean copyright: also cleanup (C)
+    * handle copyright specified with full date
+    * add missing use Time::localtime
+
 0.007 2022-12-30
 
     * Fix test failure on perl 5.20

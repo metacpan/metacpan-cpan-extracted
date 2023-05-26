@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::CellArea;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,55 +118,55 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'CellArea',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'start_row' => {
-    	datatype => 'int',
-    	base_name => 'StartRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'start_column' => {
-    	datatype => 'int',
-    	base_name => 'StartColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_column' => {
-    	datatype => 'int',
-    	base_name => 'EndColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_row' => {
-    	datatype => 'int',
-    	base_name => 'EndRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'end_column' => {
+     	datatype => 'int',
+     	base_name => 'EndColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_row' => {
+     	datatype => 'int',
+     	base_name => 'EndRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_column' => {
+     	datatype => 'int',
+     	base_name => 'StartColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_row' => {
+     	datatype => 'int',
+     	base_name => 'StartRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'start_row' => 'int',
-    'start_column' => 'int',
     'end_column' => 'int',
-    'end_row' => 'int'
+    'end_row' => 'int',
+    'start_column' => 'int',
+    'start_row' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'start_row' => 'StartRow',
-    'start_column' => 'StartColumn',
     'end_column' => 'EndColumn',
-    'end_row' => 'EndRow'
+    'end_row' => 'EndRow',
+    'start_column' => 'StartColumn',
+    'start_row' => 'StartRow' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

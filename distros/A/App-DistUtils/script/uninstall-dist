@@ -10,9 +10,9 @@ use Perinci::CmdLine::Any;
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-21'; # DATE
+our $DATE = '2023-02-25'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 our %SPEC;
 
@@ -89,7 +89,7 @@ uninstall-dist - Uninstall a Perl distribution
 
 =head1 VERSION
 
-This document describes version 0.152 of uninstall-dist (from Perl distribution App-DistUtils), released on 2022-08-21.
+This document describes version 0.153 of uninstall-dist (from Perl distribution App-DistUtils), released on 2023-02-25.
 
 =head1 SYNOPSIS
 
@@ -113,11 +113,17 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--dist>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
 =item B<--force>, B<-f>
+
+(No description)
+
 
 =back
 
@@ -371,7 +377,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Changelog for Catmandu-PICA
 
+1.14 2023-05-26T06:13:27Z
+  - pica_add creates missing record (#77)
+
 1.13 2023-04-14T09:01:25Z
   - pica_keep: allow multiple fields
   - pica_remove: make path optional

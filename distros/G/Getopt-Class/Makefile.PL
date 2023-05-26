@@ -16,14 +16,15 @@ my %WriteMakefileArgs = (
         'vars'          => 0,
         'warnings'      => 0,
         'parent'        => 0,
+        'Clone'         => '0.46',
         'DateTime'      => '1.51',
         'DateTime::Format::Strptime' => '1.76',
         'Devel::Confess'=> '0.009004',
         'Getopt::Long'  => '0.44',
-        'Module::Generic' => 'v0.28.3',
+        'Module::Generic' => 'v0.30.4',
+		'Nice::Try'		=> 'v1.3.4',
         'Scalar::Util'  => '1.54',
     	'Tie::Hash'     => '1.05',
-		'Nice::Try'		=> 'v1.3.1',
     },
     TEST_REQUIRES       =>
     {

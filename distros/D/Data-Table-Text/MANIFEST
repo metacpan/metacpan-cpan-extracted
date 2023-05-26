@@ -4,6 +4,7 @@ CONTRIBUTING
 lib/Data/Table/Text.pm
 MANIFEST
 README
+CONTRIBUTING.md
 README.md
 test.pl
 META.yml

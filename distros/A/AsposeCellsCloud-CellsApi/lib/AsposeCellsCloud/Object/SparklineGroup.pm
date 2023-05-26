@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::SparklineGroup;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::CellsColor;
-use AsposeCellsCloud::Object::Sparkline;
+use AsposeCellsCloud::Object::Sparkline; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,202 +119,202 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'SparklineGroup',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'display_hidden' => {
-    	datatype => 'boolean',
-    	base_name => 'DisplayHidden',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'first_point_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'FirstPointColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'high_point_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'HighPointColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'horizontal_axis_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'HorizontalAxisColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'horizontal_axis_date_range' => {
-    	datatype => 'string',
-    	base_name => 'HorizontalAxisDateRange',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'last_point_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'LastPointColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'line_weight' => {
-    	datatype => 'double',
-    	base_name => 'LineWeight',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'low_point_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'LowPointColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'markers_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'MarkersColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'negative_points_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'NegativePointsColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'plot_empty_cells_type' => {
-    	datatype => 'string',
-    	base_name => 'PlotEmptyCellsType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'plot_right_to_left' => {
-    	datatype => 'boolean',
-    	base_name => 'PlotRightToLeft',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'preset_style' => {
-    	datatype => 'string',
-    	base_name => 'PresetStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'series_color' => {
-    	datatype => 'CellsColor',
-    	base_name => 'SeriesColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_first_point' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowFirstPoint',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_high_point' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowHighPoint',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_horizontal_axis' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowHorizontalAxis',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_last_point' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowLastPoint',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_low_point' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowLowPoint',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_markers' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowMarkers',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_negative_points' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowNegativePoints',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'sparkline_collection' => {
-    	datatype => 'ARRAY[Sparkline]',
-    	base_name => 'SparklineCollection',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_axis_max_value' => {
-    	datatype => 'double',
-    	base_name => 'VerticalAxisMaxValue',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_axis_max_value_type' => {
-    	datatype => 'string',
-    	base_name => 'VerticalAxisMaxValueType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_axis_min_value' => {
-    	datatype => 'double',
-    	base_name => 'VerticalAxisMinValue',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_axis_min_value_type' => {
-    	datatype => 'string',
-    	base_name => 'VerticalAxisMinValueType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'display_hidden' => {
+     	datatype => 'boolean',
+     	base_name => 'DisplayHidden',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'first_point_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'FirstPointColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'high_point_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'HighPointColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'horizontal_axis_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'HorizontalAxisColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'horizontal_axis_date_range' => {
+     	datatype => 'string',
+     	base_name => 'HorizontalAxisDateRange',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'last_point_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'LastPointColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'line_weight' => {
+     	datatype => 'double',
+     	base_name => 'LineWeight',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'low_point_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'LowPointColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'markers_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'MarkersColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'negative_points_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'NegativePointsColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'plot_empty_cells_type' => {
+     	datatype => 'string',
+     	base_name => 'PlotEmptyCellsType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'plot_right_to_left' => {
+     	datatype => 'boolean',
+     	base_name => 'PlotRightToLeft',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'preset_style' => {
+     	datatype => 'string',
+     	base_name => 'PresetStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'series_color' => {
+     	datatype => 'CellsColor',
+     	base_name => 'SeriesColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_first_point' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowFirstPoint',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_high_point' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowHighPoint',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_horizontal_axis' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowHorizontalAxis',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_last_point' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowLastPoint',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_low_point' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowLowPoint',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_markers' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowMarkers',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_negative_points' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowNegativePoints',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sparkline_collection' => {
+     	datatype => 'ARRAY[Sparkline]',
+     	base_name => 'SparklineCollection',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_axis_max_value' => {
+     	datatype => 'double',
+     	base_name => 'VerticalAxisMaxValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_axis_max_value_type' => {
+     	datatype => 'string',
+     	base_name => 'VerticalAxisMaxValueType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_axis_min_value' => {
+     	datatype => 'double',
+     	base_name => 'VerticalAxisMinValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_axis_min_value_type' => {
+     	datatype => 'string',
+     	base_name => 'VerticalAxisMinValueType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
@@ -345,7 +344,7 @@ __PACKAGE__->swagger_types( {
     'vertical_axis_max_value' => 'double',
     'vertical_axis_max_value_type' => 'string',
     'vertical_axis_min_value' => 'double',
-    'vertical_axis_min_value_type' => 'string'
+    'vertical_axis_min_value_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -375,7 +374,7 @@ __PACKAGE__->attribute_map( {
     'vertical_axis_max_value' => 'VerticalAxisMaxValue',
     'vertical_axis_max_value_type' => 'VerticalAxisMaxValueType',
     'vertical_axis_min_value' => 'VerticalAxisMinValue',
-    'vertical_axis_min_value_type' => 'VerticalAxisMinValueType'
+    'vertical_axis_min_value_type' => 'VerticalAxisMinValueType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

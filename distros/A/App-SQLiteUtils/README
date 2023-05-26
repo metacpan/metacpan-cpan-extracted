@@ -2,17 +2,16 @@ NAME
     App::SQLiteUtils - Utilities related to SQLite
 
 VERSION
-    This document describes version 0.005 of App::SQLiteUtils (from Perl
-    distribution App-SQLiteUtils), released on 2021-09-13.
+    This document describes version 0.006 of App::SQLiteUtils (from Perl
+    distribution App-SQLiteUtils), released on 2023-02-24.
 
 DESCRIPTION
     This distribution includes several utilities:
 
-    *   import-csv-to-sqlite
-
-    *   list-sqlite-columns
-
-    *   list-sqlite-tables
+    1. csv2sqlite
+    2. import-csv-to-sqlite
+    3. list-sqlite-columns
+    4. list-sqlite-tables
 
 FUNCTIONS
   import_csv_to_sqlite
@@ -42,10 +41,10 @@ FUNCTIONS
      CSV filename          Table name         Note
      ------------          ----------         ----
      -                     stdin
-     -                     stdin_2            If 'stdinC<already exists
+     -                     stdin_2            If 'stdin' already exists
      /path/to/t1.csv       t1
-     /path/to/t1.csv       t1_2               If 't1> already exists
-     /path/to/t1.csv       t1_3               If 't1C<and>t1_2` already exist
+     /path/to/t1.csv       t1_2               If 't1' already exists
+     /path/to/t1.csv       t1_3               If 't1' and 't1_2' already exist
      ./2.csv               t2
      report 2021.csv       report_2021
      report 2021.rev1.csv  report_2021
@@ -64,9 +63,15 @@ FUNCTIONS
 
     *   csv_file => *filename* (default: "-")
 
+        (No description)
+
     *   db_file* => *filename*
 
+        (No description)
+
     *   table => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -96,7 +101,11 @@ FUNCTIONS
 
     *   db_file* => *filename*
 
+        (No description)
+
     *   table* => *str*
+
+        (No description)
 
     Return value: (any)
 
@@ -112,6 +121,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   db_file* => *filename*
+
+        (No description)
 
     Return value: (any)
 
@@ -140,13 +151,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

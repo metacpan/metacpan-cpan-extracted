@@ -17,7 +17,7 @@
  *
  * <pre code='javascript'>
  * var busy = callbackery.ui.Busy.getInstance();
- * busy.show();busy.hide();
+ * busy.manifest();busy.vanish();
  * </pre>
  */
 
@@ -49,13 +49,13 @@ qx.Class.define("callbackery.ui.Busy", {
     },
     members : {
         __blocker : null,
-        show: function(label){
+        manifest: function(label){
             this.setVisibility('visible');
             this.fadeIn(500);
             this.setLabel(label);
             this.__blocker.block();
         },
-        hide: function(){
+        vanish: function(){
             this.setVisibility('excluded');
             this.fadeOut(10);
             this.__blocker.unblock();

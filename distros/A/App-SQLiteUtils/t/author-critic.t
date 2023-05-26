@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/SQLiteUtils.pm','script/import-csv-to-sqlite','script/list-sqlite-columns','script/list-sqlite-tables'];
+my $filenames = ['lib/App/SQLiteUtils.pm','script/csv2sqlite','script/import-csv-to-sqlite','script/list-sqlite-columns','script/list-sqlite-tables'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

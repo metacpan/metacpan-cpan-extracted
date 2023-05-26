@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language>
+<!DOCTYPE language SYSTEM "language.dtd">
 <language name = "kdesrc-buildrc"
-       version = "3"
-   kateversion = "5.0"
+       version = "1"
+   kateversion = "3.5"
        section = "Configuration"
     extensions = ".kdesrc-buildrc;kdesrc-buildrc"
         author = "Michael Pyne &lt;mpyne@kde.org&gt;"
@@ -123,12 +123,10 @@
         <keyword String="openModule" attribute="Module Declaration" context="Module Decl" firstNonSpace="true" beginRegion="Module Options"/>
 
         <keyword String="includeKeyword" attribute="Option Name" context="Include Decl" firstNonSpace="true"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
       </context>
 
       <context name="Comment" attribute="Comment" lineEndContext="#pop">
-        <DetectSpaces />
-        <IncludeRules context="##Comments"/>
       </context>
 
       <context name="Include Decl" attribute="Option Value" lineEndContext="#pop">
@@ -137,7 +135,7 @@
       <context name="Module Decl" attribute="Module Name" lineEndContext="Module Options">
         <DetectSpaces/>
         <RegExpr attribute="Module Name" String="[a-zA-Z0-9/-]+"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
       </context>
 
       <context name="Common Module Options" attribute="Normal Text" lineEndContext="#stay">
@@ -150,7 +148,7 @@
         <!-- No kdesrc-build options start with digits or a dash. -->
         <RegExpr attribute="Possible Error" context="Option Value" String="[0-9-][a-zA-Z0-9_-]+" />
         <RegExpr attribute="Unknown Option Name" context="Option Value" String="[a-zA-Z0-9_-]+" />
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
       </context>
 
       <context attribute="Normal Text" name="CMake Option" lineEndContext="#pop">
@@ -161,7 +159,7 @@
       </context>
 
       <context name="Global Options" attribute="Normal Text" lineEndContext="#stay">
-        <StringDetect attribute="Module Declaration" context="Root Level" endRegion="Global Options" String="end global" firstNonSpace="true"/>
+        <RegExpr attribute="Module Declaration" context="Root Level" endRegion="Global Options" String="end global" firstNonSpace="true"/>
         <keyword attribute="Possible Error" String="moduleSetOptions"/>
 
         <!-- Specific to global section -->
@@ -173,8 +171,8 @@
 
       <context name="Module Options" attribute="Normal Text" lineEndContext="#stay">
         <DetectSpaces/>
-        <StringDetect attribute="Module Declaration" context="Root Level" endRegion="Module Options" String="end module" firstNonSpace="true"/>
-        <StringDetect attribute="Module Declaration" context="Root Level" endRegion="Module Options" String="end options" firstNonSpace="true"/>
+        <RegExpr attribute="Module Declaration" context="Root Level" endRegion="Module Options" String="end module" firstNonSpace="true"/>
+        <RegExpr attribute="Module Declaration" context="Root Level" endRegion="Module Options" String="end options" firstNonSpace="true"/>
         <keyword attribute="Possible Error" String="moduleSetOptions"/>
 
         <!-- Specific to global section -->
@@ -198,7 +196,7 @@
       </context>
 
       <context name="ModuleSet use-module" attribute="Module Name" lineEndContext="#pop">
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
         <LineContinue attribute="Possible Error" context="#stay"/>
       </context>
 
@@ -206,35 +204,36 @@
         <DetectSpaces/>
         <RegExpr attribute="Variable" String="\$\{[a-zA-Z0-9_-]+\}"/>
         <RegExpr attribute="Option Value" String="[a-zA-Z:0-9,./+!=@_-]*" context="#stay" />
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
         <LineContinue attribute="Option Value" context="#stay"/>
       </context>
 
       <context name="Bool Option Value" attribute="Possible Error" lineEndContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
         <keyword attribute="Option Value" context="#stay" String="bools"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
         <LineContinue attribute="Possible Error" context="#stay"/>
       </context>
 
       <context name="Environment Name" attribute="Environment Variable Name" lineEndContext="#pop">
         <DetectSpaces/>
         <RegExpr attribute="Environment Variable Name" context="Option Value" String="[a-zA-Z0-9_-]+" />
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="Comment" char="#"/>
       </context>
     </contexts>
 
     <itemDatas>
       <itemData name="Normal Text"         defStyleNum="dsNormal" />
       <itemData name="Comment"             defStyleNum="dsComment"/>
+      <itemData name="Boolean"             defStyleNum="dsDecVal" bold="true" color="purple"/>
       <itemData name="Option Name"         defStyleNum="dsKeyword" bold="false" />
-      <itemData name="Unknown Option Name" defStyleNum="dsKeyword" bold="false" color="#7D4C0B" />
+		<itemData name="Unknown Option Name" defStyleNum="dsWarning" bold="false" color="#7D4C0B" />
       <itemData name="Environment Variable Name" defStyleNum="dsString" color="#EE6A50" />
       <itemData name="Option Value"        defStyleNum="dsDecVal" />
       <itemData name="Variable"            defStyleNum="dsOthers" />
       <itemData name="Module Declaration"  defStyleNum="dsKeyword" bold="false"/>
-      <itemData name="Module Name"         defStyleNum="dsOthers" bold="true" />
-      <itemData name="Global Declaration"  defStyleNum="dsKeyword" bold="true" />
+		<itemData name="Module Name"         defStyleNum="dsExtension" bold="true" />
+		<itemData name="Global Declaration"  defStyleNum="dsFunction" bold="true" />
       <itemData name="Possible Error"      defStyleNum="dsError" />
     </itemDatas>
   </highlighting>
@@ -247,4 +246,3 @@
   </general>
 
 </language>
-<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

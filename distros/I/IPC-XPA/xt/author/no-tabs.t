@@ -7,12 +7,10 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
-    'lib/IPC/XPA.pm',
-    't/00-compile.t',
-    't/00-report-prereqs.dd',
-    't/00-report-prereqs.t',
+    'lib/IPC/XPA.pm',         't/00-compile.t',
+    't/00-report-prereqs.dd', 't/00-report-prereqs.t',
     't/xpamb.t'
 );
 
-notabs_ok($_) foreach @files;
+notabs_ok( $_ ) foreach @files;
 done_testing;

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::FilterColumn;
 
 require 5.6.0;
@@ -36,13 +35,13 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::ColorFilter;
 use AsposeCellsCloud::Object::CustomFilter;
 use AsposeCellsCloud::Object::DynamicFilter;
 use AsposeCellsCloud::Object::IconFilter;
 use AsposeCellsCloud::Object::MultipleFilters;
-use AsposeCellsCloud::Object::Top10Filter;
+use AsposeCellsCloud::Object::Top10Filter; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -58,12 +57,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -104,7 +103,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -112,7 +111,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -124,100 +123,100 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'FilterColumn',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'filter_type' => {
-    	datatype => 'string',
-    	base_name => 'FilterType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'multiple_filters' => {
-    	datatype => 'MultipleFilters',
-    	base_name => 'MultipleFilters',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'custom_filters' => {
-    	datatype => 'ARRAY[CustomFilter]',
-    	base_name => 'CustomFilters',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'dynamic_filter' => {
-    	datatype => 'DynamicFilter',
-    	base_name => 'DynamicFilter',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'color_filter' => {
-    	datatype => 'ColorFilter',
-    	base_name => 'ColorFilter',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'field_index' => {
-    	datatype => 'int',
-    	base_name => 'FieldIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'top10_filter' => {
-    	datatype => 'Top10Filter',
-    	base_name => 'Top10Filter',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'icon_filter' => {
-    	datatype => 'IconFilter',
-    	base_name => 'IconFilter',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'visibledropdown' => {
-    	datatype => 'string',
-    	base_name => 'Visibledropdown',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'field_index' => {
+     	datatype => 'int',
+     	base_name => 'FieldIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'filter_type' => {
+     	datatype => 'string',
+     	base_name => 'FilterType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'multiple_filters' => {
+     	datatype => 'MultipleFilters',
+     	base_name => 'MultipleFilters',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color_filter' => {
+     	datatype => 'ColorFilter',
+     	base_name => 'ColorFilter',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'custom_filters' => {
+     	datatype => 'ARRAY[CustomFilter]',
+     	base_name => 'CustomFilters',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'dynamic_filter' => {
+     	datatype => 'DynamicFilter',
+     	base_name => 'DynamicFilter',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'icon_filter' => {
+     	datatype => 'IconFilter',
+     	base_name => 'IconFilter',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'top10_filter' => {
+     	datatype => 'Top10Filter',
+     	base_name => 'Top10Filter',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'visibledropdown' => {
+     	datatype => 'string',
+     	base_name => 'Visibledropdown',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'field_index' => 'int',
     'filter_type' => 'string',
     'multiple_filters' => 'MultipleFilters',
+    'color_filter' => 'ColorFilter',
     'custom_filters' => 'ARRAY[CustomFilter]',
     'dynamic_filter' => 'DynamicFilter',
-    'color_filter' => 'ColorFilter',
-    'field_index' => 'int',
-    'top10_filter' => 'Top10Filter',
     'icon_filter' => 'IconFilter',
-    'visibledropdown' => 'string'
+    'top10_filter' => 'Top10Filter',
+    'visibledropdown' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'field_index' => 'FieldIndex',
     'filter_type' => 'FilterType',
     'multiple_filters' => 'MultipleFilters',
+    'color_filter' => 'ColorFilter',
     'custom_filters' => 'CustomFilters',
     'dynamic_filter' => 'DynamicFilter',
-    'color_filter' => 'ColorFilter',
-    'field_index' => 'FieldIndex',
-    'top10_filter' => 'Top10Filter',
     'icon_filter' => 'IconFilter',
-    'visibledropdown' => 'Visibledropdown'
+    'top10_filter' => 'Top10Filter',
+    'visibledropdown' => 'Visibledropdown' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

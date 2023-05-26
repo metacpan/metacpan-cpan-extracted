@@ -1,6 +1,6 @@
 NAME
 
-    Lingy - Do for Perl what Clojure did for Java
+    Lingy - A Perl implementation of Clojure
 
 SYNOPSIS
 
@@ -29,61 +29,62 @@ SYNOPSIS
 
     or run an example Lingy program:
 
-        $ curl -sL https://raw.githubusercontent.com/ingydotnet/lingy/main/eg/99-bottles.ly | lingy - 3
-        3 bottles of beer on the wall
-        3 bottles of beer
-        Take one down, pass it around
+        $ wget -q https://raw.githubusercontent.com/ingydotnet/lingy/main/eg/99-bottles.ly
+    
+        $ cat 99-bottles.ly
+        (defn main [number]
+          (let [
+            paragraphs (map paragraph (range number 0 -1)) ]
+            (map println paragraphs)))
+    
+        (defn paragraph [num]
+          (str
+            (bottles num) " of beer on the wall,\n"
+            (bottles num) " of beer.\n"
+            "Take one down, pass it around.\n"
+            (bottles (dec num)) " of beer on the wall.\n"))
+    
+        (defn bottles [n]
+          (cond
+            (= n 0) "No more bottles"
+            (= n 1) "1 bottle"
+            :else (str n " bottles")))
+    
+        (main (nth *ARGV* 0 99))
+    
+        $ lingy 99-bottles.ly 3
+        3 bottles of beer on the wall,
+        3 bottles of beer.
+        Take one down, pass it around.
         2 bottles of beer on the wall.
     
-        2 bottles of beer on the wall
-        2 bottles of beer
-        Take one down, pass it around
-        1 bottles of beer on the wall.
+        2 bottles of beer on the wall,
+        2 bottles of beer.
+        Take one down, pass it around.
+        1 bottle of beer on the wall.
     
-        1 bottles of beer on the wall
-        1 bottles of beer
-        Take one down, pass it around
-        0 bottles of beer on the wall.
+        1 bottle of beer on the wall,
+        1 bottle of beer.
+        Take one down, pass it around.
+        No more bottles of beer on the wall.
 
 STATUS
 
     Lingy is in ALPHA status.
 
-    It has:
-
-      * The eg directory of example programs that work
-
-      * A pretty good REPL
-
-	* Tab completion
-
-	* Command history
-
-	* History search
-
-	* Parentheses visual matching
-
-	* Other nice readline features
-
-    To Do:
-
-      * AOT and JIT compile to LLVM bytecode
-
-      * Compile to native Perl code
-
 DESCRIPTION
 
     Lingy is an implementation of the Clojure language that is written in
-    Perl and hosted by Perl and LLVM. Programs and modules written in Lingy
-    have full access to Perl and its CPAN modules.
+    Perl and hosted by Perl. Programs and modules written in Lingy have
+    full access to Perl and its CPAN modules.
 
-    Perl modules can be written in Lingy and distributed on CPAN. Since
-    Lingy code is compiled to LLVM, it should perform on the same order of
-    magnitude as XS modules.
+    Perl modules can be written in Lingy and distributed on CPAN. (In the
+    future) Lingy code is compiled to a bytecode and should perform on the
+    same order of magnitude as XS modules.
 
-    Since Lingy is a complete Clojure implementation, it should be able to
-    run programs written in Clojure and make use of libraries written in
-    Clojure.
+    Since Lingy will be a complete Clojure implementation, it should be
+    able to run programs written in Clojure and make use of libraries
+    written in Clojure.
 
     Clojure is a language that cleanly solves many of the problems of Java
     including making concurrency simple, and writing functional programs
@@ -163,21 +164,14 @@ LINGY CLI USAGE
 
       YAML dump the Lingy compiled AST for a -e expression.
 
-ROADMAP
-
-    The next major things to add are:
-
-      * Compilation to Perl code
-
-      * Compilation to LLVM bytecode
-
-      * Lambdas
-
 SEE ALSO
+
+      * Clojure <https://clojure.org/>
 
       * YAMLScript <https://metacpan.org/pod/YAMLScript>
 
-      * YAMLTest <https://metacpan.org/pod/YAMLTest>
+      * Test::More::YAMLScript
+      <https://metacpan.org/pod/Test::More::YAMLScript>
 
 AUTHORS
 

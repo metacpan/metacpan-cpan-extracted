@@ -343,9 +343,11 @@ $s->close();
 
 # test multiple async worker overflow against mock server
 #
+my $client_timeout = 10; # a timeout of 2 sec might be too short for some sunos cpan testers
+
 ($s, $client) = new_mock_client();
 $client->{trace_cb} = \&trace_cb;
-$client->{timeout} = 2;
+$client->{timeout} = $client_timeout;
 
 sub test_worker_sleep {
 	my ($params, $rpcswitch) = @_;
@@ -362,7 +364,7 @@ $s->close();
 #
 ($s, $client) = new_mock_client();
 #$client->{trace_cb} = \&trace_cb;
-$client->{timeout} = 2;
+$client->{timeout} = $client_timeout;
 $client->{flowcontrol} = 1;
 
 eval { $client->work('test_worker 5', {$method => {cb => \&test_worker_sleep}}, {max_async => 2}) };

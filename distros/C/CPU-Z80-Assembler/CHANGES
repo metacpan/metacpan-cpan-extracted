@@ -1,3 +1,25 @@
+2.22	2023-05-24
+
+	Bug Fixes
+	* Configure git workflows to test on Ubuntu, MaxOS and Windows
+	* #2 fails on Perl v10
+	* Fix failure on Windows machines
+
+2.21	2023-05-23
+
+	Bug Fixes
+	* t/issue_1.t needs full path to z80masm
+
+2.20	2023-05-23
+
+	Bug Fixes
+	* #1 Label addresses are incorrect after a second ORG
+
+2.19	2023-05-21
+
+	Bug Fixes
+	* Bug #140160 for CPU-Z80-Assembler: circular dependency in CPU::Z80::Assembler::List fails syntax check
+
 2.18	2019-07-06
 
 	Bug Fixes

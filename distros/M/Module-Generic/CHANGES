@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Generic
 
+v0.30.4 2023-05-25T04:12:20+0900
+    - Corrected a small bug in unit test 22.parse_timestamp.t when module DateTime::Format::JP is not installed
+
+v0.30.3 2023-05-23T17:56:46+0900
+    - Minor bug correction in support method _set_get_callback in Module::Generic
+
 v0.30.2 2023-05-16T21:33:10+0900
     - Corrected a small bug in unload_json() in Module::Generic when JSON option utf8 was provided in overlap with the binmode also set to utf8, thus yielding mojibake.
 

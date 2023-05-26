@@ -88,7 +88,7 @@ EOW
         "Mike Doherty <doherty\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Test-UnusedVars",
-      "dist_version" => "2.001000",
+      "dist_version" => "2.001001",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Test::UnusedVars",
       "recursive_test_files" => 1,

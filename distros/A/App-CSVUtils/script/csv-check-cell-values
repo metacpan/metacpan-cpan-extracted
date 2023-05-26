@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-31'; # DATE
+our $DATE = '2023-04-01'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.023'; # VERSION
+our $VERSION = '1.024'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_check_cell_values/csv_check_cell_values",
@@ -41,7 +41,7 @@ csv-check-cell-values - Check the value of single cells of CSV against code/sche
 
 =head1 VERSION
 
-This document describes version 1.023 of csv-check-cell-values (from Perl distribution App-CSVUtils), released on 2023-03-31.
+This document describes version 1.024 of csv-check-cell-values (from Perl distribution App-CSVUtils), released on 2023-04-01.
 
 =head1 SYNOPSIS
 
@@ -180,17 +180,17 @@ Field names to include, takes precedence over --exclude-field-pat (JSON-encoded)
 
 See C<--include-field>.
 
-=item B<-A>
-
-Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
-
-See C<--exclude-field-pat>.
-
 =item B<-a>
 
 Shortcut for --field-pat=.*, effectively selecting all fields.
 
 See C<--include-field-pat>.
+
+=item B<-A>
+
+Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
+
+See C<--exclude-field-pat>.
 
 =back
 

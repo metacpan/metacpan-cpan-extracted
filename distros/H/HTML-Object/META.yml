@@ -38,7 +38,7 @@ requires:
   HTML::Selector::XPath: '0.26'
   JSON: '4.05'
   List::Util: '1.56'
-  Module::Generic: v0.29.6
+  Module::Generic: v0.30.3
   Nice::Try: v1.3.4
   POSIX: '0'
   Promise::Me: v0.4.5
@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTML-Object/issues
   repository: https://gitlab.com/jackdeguest/HTML-Object
-version: v0.2.5
+version: v0.2.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Types::Standard' => 0,
+	'Module::Runtime' => 0,
 	'PDF::API2' => 0,
 	'Clone' => 0,
     },

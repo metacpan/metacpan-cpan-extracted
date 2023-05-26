@@ -8,7 +8,7 @@ use IO::Socket;
 use Time::HiRes qw(time);
 use POSIX ":sys_wait_h"; # WNOHANG
 
-our $VERSION = 1.19;
+our $VERSION = 1.20;
 
 sub new {
 	my ($class, %args) = @_;
@@ -65,8 +65,9 @@ sub childs_reap {
 			# chance to cleanup resources, and send nonmaskable
 			# sigkill to terminate child only after that.
 			# (note: some nfs-syscalls might block nevertheless)
+			# (note: sigkill on windows might deadlock - see below)
 			#
-			if (($waittime > 2) && ($child->{state} ne 'kill')) {
+			if (($waittime > 2) && ($child->{state} ne 'kill') && ($^O ne 'MSWin32')) {
 				warn "worker child $child->{pid}: still running after $child->{state} - send kill\n";
 				kill 'KILL', $child->{pid};
 				$child->{state} = 'kill';
@@ -86,8 +87,39 @@ sub childs_reap {
 	return 1;
 }
 
+# For perl on windows the perlfork emulation for threading systems
+# will be used internally (see: https://perldoc.perl.org/perlfork).
+#
+# The description of kill() notes that using sig-KILL the process
+# which implements the pseudo-processes can be blocked and the perl
+# interpreter hangs.
+#
+# -> this behavior is seen even on current win10/2023 systems with
+#    an interpreter like strawberry-perl-5.32.1-64bit (cpan testers).
+#
+# This should not happen for sig-TERM, where the perlfork-emulation
+# will not try to wait on childs and leak resources to avoid deadlocks.
+#
+# So the Async module should be avoided on windows, because it will
+# not work as desired.
+#
+sub _childs_term {
+	my ($self) = @_;
+
+	foreach my $child (values %{$self->{finished}}) {
+		if ($child->{state} ne 'term') {
+			warn "worker child $child->{pid}: still running after $child->{state} - force term\n";
+			kill 'TERM', $child->{pid};
+			$child->{state} = 'term';
+		}
+	}
+	return;
+}
+
 sub childs_kill {
 	my ($self) = @_;
+
+	return $self->_childs_term() if ($^O eq 'MSWin32');
 
 	foreach my $child (values %{$self->{finished}}) {
 		if ($child->{state} ne 'kill') {
@@ -95,6 +127,7 @@ sub childs_kill {
 			$child->{state} = 'kill';
 		}
 	}
+	return;
 }
 
 sub job_add {
@@ -104,6 +137,7 @@ sub job_add {
 	$child->{start} = time();
 	@$child{keys %$meta} = values %$meta;
 	$self->{jobs}{$child->{reader}->fileno} = $child;
+	return;
 }
 
 sub job_rem {
@@ -112,6 +146,7 @@ sub job_rem {
 	$child->{runtime} = sprintf "%.02f", time() - $child->{start};
 	$child->{start} = time();
 	delete $self->{jobs}{$child->{reader}->fileno};
+	return;
 }
 
 sub child_finish {
@@ -166,6 +201,7 @@ sub msg_enqueue {
 
 	# queue message and start child from rpc_handler
 	push(@{$self->{jobqueue}}, $msg);
+	return;
 }
 
 sub msg_dequeue {

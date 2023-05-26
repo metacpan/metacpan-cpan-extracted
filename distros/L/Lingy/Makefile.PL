@@ -9,7 +9,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "An Acmeist Lisp for Perl",
+  "ABSTRACT" => "A Perl implementation of Clojure",
   "AUTHOR" => "Ingy d\x{f6}t Net <ingy\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -23,32 +23,30 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Lingy",
   "PREREQ_PM" => {
-    "Capture::Tiny" => 0,
-    "Sub::Identify" => 0,
-    "Sub::Name" => 0,
-    "Term::ReadLine" => 0,
-    "Term::ReadLine::Gnu" => 0,
-    "Tie::IxHash" => 0,
-    "XXX" => 0,
-    "YAML::PP" => 0,
-    "YAMLTest" => 0
+    "Capture::Tiny" => "0.48",
+    "Sub::Identify" => "0.14",
+    "Sub::Name" => "0.27",
+    "Term::ReadLine" => "1.17",
+    "Term::ReadLine::Gnu" => "1.45",
+    "Tie::IxHash" => "1.23",
+    "XXX" => "0.38",
+    "YAML::PP" => "0.036"
   },
-  "VERSION" => "0.1.3",
+  "VERSION" => "0.1.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Capture::Tiny" => 0,
-  "Sub::Identify" => 0,
-  "Sub::Name" => 0,
-  "Term::ReadLine" => 0,
-  "Term::ReadLine::Gnu" => 0,
-  "Tie::IxHash" => 0,
-  "XXX" => 0,
-  "YAML::PP" => 0,
-  "YAMLTest" => 0
+  "Capture::Tiny" => "0.48",
+  "Sub::Identify" => "0.14",
+  "Sub::Name" => "0.27",
+  "Term::ReadLine" => "1.17",
+  "Term::ReadLine::Gnu" => "1.45",
+  "Tie::IxHash" => "1.23",
+  "XXX" => "0.38",
+  "YAML::PP" => "0.036"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

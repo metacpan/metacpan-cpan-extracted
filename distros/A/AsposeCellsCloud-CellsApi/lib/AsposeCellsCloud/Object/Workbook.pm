@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Workbook;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,118 +119,118 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Workbook',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'links' => {
-    	datatype => 'ARRAY[Link]',
-    	base_name => 'Links',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'settings' => {
-    	datatype => 'LinkElement',
-    	base_name => 'Settings',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_protected' => {
-    	datatype => 'string',
-    	base_name => 'IsProtected',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_write_protected' => {
-    	datatype => 'string',
-    	base_name => 'IsWriteProtected',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'file_name' => {
-    	datatype => 'string',
-    	base_name => 'FileName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'document_properties' => {
-    	datatype => 'LinkElement',
-    	base_name => 'DocumentProperties',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'names' => {
-    	datatype => 'LinkElement',
-    	base_name => 'Names',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'default_style' => {
-    	datatype => 'LinkElement',
-    	base_name => 'DefaultStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_encryption' => {
-    	datatype => 'string',
-    	base_name => 'IsEncryption',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'worksheets' => {
-    	datatype => 'LinkElement',
-    	base_name => 'Worksheets',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'password' => {
-    	datatype => 'string',
-    	base_name => 'Password',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'file_name' => {
+     	datatype => 'string',
+     	base_name => 'FileName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'links' => {
+     	datatype => 'ARRAY[Link]',
+     	base_name => 'Links',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'worksheets' => {
+     	datatype => 'LinkElement',
+     	base_name => 'Worksheets',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'default_style' => {
+     	datatype => 'LinkElement',
+     	base_name => 'DefaultStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'document_properties' => {
+     	datatype => 'LinkElement',
+     	base_name => 'DocumentProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'names' => {
+     	datatype => 'LinkElement',
+     	base_name => 'Names',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'settings' => {
+     	datatype => 'LinkElement',
+     	base_name => 'Settings',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_write_protected' => {
+     	datatype => 'string',
+     	base_name => 'IsWriteProtected',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_protected' => {
+     	datatype => 'string',
+     	base_name => 'IsProtected',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_encryption' => {
+     	datatype => 'string',
+     	base_name => 'IsEncryption',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'password' => {
+     	datatype => 'string',
+     	base_name => 'Password',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'links' => 'ARRAY[Link]',
-    'settings' => 'LinkElement',
-    'is_protected' => 'string',
-    'is_write_protected' => 'string',
     'file_name' => 'string',
+    'links' => 'ARRAY[Link]',
+    'worksheets' => 'LinkElement',
+    'default_style' => 'LinkElement',
     'document_properties' => 'LinkElement',
     'names' => 'LinkElement',
-    'default_style' => 'LinkElement',
+    'settings' => 'LinkElement',
+    'is_write_protected' => 'string',
+    'is_protected' => 'string',
     'is_encryption' => 'string',
-    'worksheets' => 'LinkElement',
-    'password' => 'string'
+    'password' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'links' => 'Links',
-    'settings' => 'Settings',
-    'is_protected' => 'IsProtected',
-    'is_write_protected' => 'IsWriteProtected',
     'file_name' => 'FileName',
+    'links' => 'Links',
+    'worksheets' => 'Worksheets',
+    'default_style' => 'DefaultStyle',
     'document_properties' => 'DocumentProperties',
     'names' => 'Names',
-    'default_style' => 'DefaultStyle',
+    'settings' => 'Settings',
+    'is_write_protected' => 'IsWriteProtected',
+    'is_protected' => 'IsProtected',
     'is_encryption' => 'IsEncryption',
-    'worksheets' => 'Worksheets',
-    'password' => 'Password'
+    'password' => 'Password' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

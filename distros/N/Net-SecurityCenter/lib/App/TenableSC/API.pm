@@ -10,7 +10,7 @@ use parent 'App::TenableSC';
 
 use App::TenableSC::Utils qw(:all);
 
-our $VERSION = '0.310';
+our $VERSION = '0.311';
 
 @App::TenableSC::command_options = (
     'output|format|f=s',
@@ -304,7 +304,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

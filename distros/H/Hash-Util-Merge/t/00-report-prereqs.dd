@@ -23,9 +23,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Exporter' => '0',
+                                      'Exporter' => '5.57',
                                       'Sub::Util' => '1.40',
-                                      'perl' => 'v5.10.1',
+                                      'perl' => 'v5.14.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

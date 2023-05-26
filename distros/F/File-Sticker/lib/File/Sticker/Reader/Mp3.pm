@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Mp3;
-$File::Sticker::Reader::Mp3::VERSION = '3.0006';
+$File::Sticker::Reader::Mp3::VERSION = '3.0008';
 =head1 NAME
 
 File::Sticker::Reader::Mp3 - read and standardize meta-data from MP3 file
 
 =head1 VERSION
 
-version 3.0006
+version 3.0008
 
 =head1 SYNOPSIS
 

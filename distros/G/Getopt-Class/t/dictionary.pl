@@ -17,6 +17,9 @@ our $dict =
 	api_version	    => { type => 'string', default => 1 },
 	as_admin	    => { type => 'boolean' },
 	dry_run		    => { type => 'boolean', default => 0 },
+	without_zlib    => { type => 'boolean', default => 1 },
+	enable_compress => { type => 'boolean', default => 1 },
+	disable_logging => { type => 'boolean', default => 1 },
 	
 	name            => { type => 'string', class => [qw( person product )] },
 	created         => { type => 'datetime', class => [qw( person product )] },

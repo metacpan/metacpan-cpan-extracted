@@ -1,8 +1,8 @@
 use strict; use warnings;
 package Lingy::Lang::String;
 
-use base 'Lingy::Lang::ScalarClass';
 use Lingy::Common;
+use base SCALARTYPE;
 
 use overload cmp => \&comp_pair;
 
@@ -18,6 +18,23 @@ sub replaceAll {
     my ($str, $pat, $rep) = @_;
     $str =~ s/\Q$pat\E/$rep/g;
     string($str);
+}
+
+sub substring {
+    my ($string, $offset1, $offset2) = @_;
+    my $length = length $string;
+    $offset2 //= number($length);
+    err "Begin index out of range '%d' for string length '%d'",
+        $offset1, $length
+        if $offset1 < 0 or $offset1 > $length;
+    err "End index out of range '%d' for string length '%d'",
+        $offset2, $length
+        if $offset2 < $offset1 or $offset2 > $length;
+    string(substr("$string", $offset1, $offset2 - $offset1))
+}
+
+sub toLowerCase {
+    string(lc $_[0]);
 }
 
 sub toUpperCase {

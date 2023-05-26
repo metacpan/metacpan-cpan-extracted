@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -26,21 +26,23 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Alien::XPA" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Code::TidyAll" : "0",
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
-            "Dist::Zilla::Plugin::CPANFile" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::DynamicPrereqs" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
             "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
             "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
@@ -73,12 +75,14 @@
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
             "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::Plugin::TidyAll" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Pod::Weaver::Section::GenerateSection" : "0",
             "Pod::Weaver::Section::SeeAlso" : "0",
-            "Pod::Weaver::Section::Support" : "0",
             "Pod::Wordlist" : "0",
             "Software::License::GPL_3" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -94,12 +98,13 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0",
+            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
+            "Alien::Base::Wrapper" : "0",
             "Alien::XPA" : "0",
             "Carp" : "0",
             "DynaLoader" : "0",
@@ -134,7 +139,7 @@
    "provides" : {
       "IPC::XPA" : {
          "file" : "lib/IPC/XPA.pm",
-         "version" : "0.13"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -144,13 +149,14 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-XPA"
       },
       "repository" : {
+         "type" : "git",
          "url" : "https://gitlab.com/djerius/ipc-xpa.git",
          "web" : "https://gitlab.com/djerius/ipc-xpa"
       }
    },
-   "version" : "0.13",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "0.16",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

@@ -1,0 +1,221 @@
+#!perl
+
+=head1 NAME
+
+suricata_extract_submit_extend - Provides LibreNMS style SNMP extend for 
+
+=head1 SYNOPSIS
+
+extend suricata-extract /usr/local/bin/suricata_extract_submit_extend
+
+=head1 DESCRIPTION
+
+Ihe cache file is not in the default location, it may be specified via
+the option '-c'.
+
+=cut
+
+use File::Slurp;
+use warnings;
+use strict;
+use MIME::Base64;
+use Gzip::Faster;
+use Getopt::Long;
+use JSON;
+use File::ReadBackwards;
+use Time::Piece;
+
+sub version {
+	print "suricata_extract_submit_extend v. 0.0.1\n";
+}
+
+my $t          = localtime;
+my $today_name = $t->strftime('%F');
+
+my $version;
+my $help;
+my $cache         = '/var/cache/suricata_extract_submit_stats.json';
+my $cache_dir     = '/var/cache/suricata_extract_submit_stats';
+my $rewind_by     = 300;
+my $dont_compress = 0;
+GetOptions(
+	'h'       => \$help,
+	'help'    => \$help,
+	'v'       => \$version,
+	'version' => \$version,
+	'c'       => \$cache,
+	'd'       => \$cache_dir,
+	'r'       => \$rewind_by,
+	'Z'       => \$dont_compress,
+);
+
+my $todays_file = $cache_dir . '/' . $today_name . '.json';
+my $read_till   = $t->epoch - $rewind_by;
+
+if ($version) {
+	version;
+	exit;
+}
+
+if ($help) {
+	version;
+
+	print '
+
+-c <cache>    The stats cache JSON created by suricata_extract_submit.
+              Default: /var/cache/suricata_extract_submit_stats.json
+
+-h         Print help.
+--help     Print help.
+-v         Print version info.
+--version  Print version info.
+';
+
+	exit;
+} ## end if ($help)
+
+my $to_return = {
+	data        => {},
+	version     => 1,
+	error       => 0,
+	errorString => '',
+};
+
+# compute the deltas for these items
+my @to_delta = (
+	'sub',     'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
+	'sub_5xx', 'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
+	'truncated'
+);
+
+# if todays file exists or not
+my $use_last = 0;
+if ( !-f $todays_file ) {
+	$use_last = 1;
+}
+
+if ($use_last) {
+	my $stats;
+	eval { $stats = decode_json( read_file($cache) ); };
+	if ($@) {
+		$to_return->{error}       = 1;
+		$to_return->{errorString} = 'Failed to read/decode JSON cache file,"' . $cache . '" ... ' . $@;
+	} elsif ( !defined($stats) ) {
+		$to_return->{error}       = 2;
+		$to_return->{errorString} = 'Failed to read/decode JSON cache file,"' . $cache . '" ... ' . $@;
+	} else {
+		# zero the deltas
+		foreach my $item (@to_delta) {
+			$stats->{ $item . '_delta' } = 0;
+		}
+		$to_return->{data} = $stats;
+	}
+} else {
+	my $stats;
+	eval {
+		my $bw = File::ReadBackwards->new($todays_file) or die "can't read '" . $todays_file . "' $!";
+
+		my $current_stats = decode_json( $bw->readline );
+
+		# don't go looking for previous stats if the current one is older than what we want
+		my $continue = 1;
+		if (   defined($current_stats)
+			&& defined( $current_stats->{timestamp} )
+			&& $current_stats->{timestamp} <= $read_till )
+		{
+			$continue = 0;
+		}    #if these are not defined, don't try to continue
+		elsif ( !defined($current_stats) && !defined( $current_stats->{timestamp} ) ) {
+			$continue = 0;
+		}
+
+		# see if we can find a previous item to compute the difference against
+		my $previous_stats;
+		while ($continue) {
+			my $next_raw = $bw->readline;
+			if ( defined($next_raw) ) {
+				eval {
+					my $temp_stats = decode_json($next_raw);
+					if (   defined($temp_stats)
+						&& defined( $temp_stats->{timestamp} )
+						&& $temp_stats->{timestamp} =~ /^[0-9]+$/ )
+					{
+						# once we find one at or before we are reading back till,
+						# we have found the one we want to compute the stats against
+						if ( $temp_stats->{timestamp} <= $read_till ) {
+							$previous_stats = $temp_stats;
+							$continue       = 0;
+						}
+					} else {
+						$continue = 0;
+					}
+				} ## end eval
+			} else {
+				$continue = 0;
+			}
+		} ## end while ($continue)
+
+		if ( !defined($previous_stats) ) {
+			# zero the deltas
+			foreach my $item (@to_delta) {
+				$current_stats->{ $item . '_delta' } = 0;
+			}
+			$stats = $current_stats;
+		} else {
+			foreach my $item (@to_delta) {
+				# compute the difference between the current and previous
+				my $old = $previous_stats->{$item};
+				my $new = $current_stats->{$item};
+				my $delta;
+				# value was missing for some reason in the previous
+				if ( !defined($old) ) {
+					$delta = $new;
+				}    # need to compute the delta as there was change
+				elsif ( $new > $old ) {
+					$delta = $new - $old;
+
+					# roll it over if it is over 2G
+					if ( $new > 2000000000 ) {
+						$current_stats->{$item} = $delta;
+					}
+				}    # ran subsequently and rolled over? this should not happen in general usage... regard new as correct
+				elsif ( $old > $new ) {
+					$delta = $new;
+				}    # none of the above, so zero
+				else {
+					$delta = 0;
+				}
+				$current_stats->{ $item . '_delta' } = $delta;
+			} ## end foreach my $item (@to_delta)
+			$stats = $current_stats;
+		} ## end else [ if ( !defined($previous_stats) ) ]
+	};
+	if ($@) {
+		$to_return->{error}       = 1;
+		$to_return->{errorString} = 'Failed to read/decode JSON cache file,"' . $todays_file . '" ... ' . $@;
+	} elsif ( !defined($stats) ) {
+		$to_return->{error}       = 2;
+		$to_return->{errorString} = 'Failed to read/decode JSON cache file,"' . $todays_file . '" ... ' . $@;
+	} else {
+		$to_return->{data} = $stats;
+	}
+} ## end else [ if ($use_last) ]
+
+my $data = encode_json($to_return);
+
+if ( !$dont_compress ) {
+	# gzip and print encode in base64
+	# base64 is needed as snmp does not like
+	my $compressed = encode_base64( gzip($data) );
+	$compressed =~ s/\n//g;
+	$compressed = $compressed . "\n";
+
+	# check which is smaller and prints it
+	if ( length($compressed) > length($data) ) {
+		print $data. "\n";
+	} else {
+		print $compressed;
+	}
+} else {
+	print $data. "\n";
+}

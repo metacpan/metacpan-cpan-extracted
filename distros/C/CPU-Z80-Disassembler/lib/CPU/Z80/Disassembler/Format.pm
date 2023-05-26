@@ -13,7 +13,7 @@ CPU::Z80::Disassembler::Format - Format output of disassembler
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 #------------------------------------------------------------------------------
 

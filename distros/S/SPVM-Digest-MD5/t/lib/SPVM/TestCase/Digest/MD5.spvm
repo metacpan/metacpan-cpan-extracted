@@ -12,7 +12,7 @@ class TestCase::Digest::MD5 {
       my $output_hex = "";
       
       for (my $i = 0; $i < 16; $i++) {
-        $output_hex .= Format->sprintf("%x", ((int)$output->[$i]) & 0xFF);
+        $output_hex .= Format->sprintf("%x", [(object)(((int)$output->[$i]) & 0xFF)]);
       }
       
       unless ($output_hex eq "e09c80c42fda55f9d992e59ca6b3307d") {
@@ -370,7 +370,7 @@ class TestCase::Digest::MD5 {
       my $output_hex = "";
       
       for (my $i = 0; $i < 16; $i++) {
-        $output_hex .= Format->sprintf("%x", ((int)$output->[$i]) & 0xFF);
+        $output_hex .= Format->sprintf("%x", [(object)(((int)$output->[$i]) & 0xFF)]);
       }
       
       unless ($output_hex eq "e09c80c42fda55f9d992e59ca6b3307d") {

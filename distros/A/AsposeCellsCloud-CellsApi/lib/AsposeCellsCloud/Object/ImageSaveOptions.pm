@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ImageSaveOptions;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::SaveOptions; 
 
-use AsposeCellsCloud::Object::SaveOptions;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,164 +118,156 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ImageSaveOptions',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'enable_http_compression' => {
-    	datatype => 'boolean',
-    	base_name => 'EnableHTTPCompression',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'save_format' => {
-    	datatype => 'string',
-    	base_name => 'SaveFormat',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'clear_data' => {
-    	datatype => 'boolean',
-    	base_name => 'ClearData',
-    	description => 'Make the workbook empty after saving the file.',
-    	format => '',
-    	read_only => '',
-    		},
-    'cached_file_folder' => {
-    	datatype => 'string',
-    	base_name => 'CachedFileFolder',
-    	description => 'The cached file folder is used to store some large data.',
-    	format => '',
-    	read_only => '',
-    		},
-    'validate_merged_areas' => {
-    	datatype => 'boolean',
-    	base_name => 'ValidateMergedAreas',
-    	description => 'Indicates whether validate merged areas before saving the file. The default value is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'refresh_chart_cache' => {
-    	datatype => 'boolean',
-    	base_name => 'RefreshChartCache',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'create_directory' => {
-    	datatype => 'boolean',
-    	base_name => 'CreateDirectory',
-    	description => 'If true and the directory does not exist, the directory will be automatically created before saving the file.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'sort_names' => {
-    	datatype => 'boolean',
-    	base_name => 'SortNames',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'chart_image_type' => {
-    	datatype => 'string',
-    	base_name => 'ChartImageType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'embeded_image_name_in_svg' => {
-    	datatype => 'string',
-    	base_name => 'EmbededImageNameInSvg',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'horizontal_resolution' => {
-    	datatype => 'int',
-    	base_name => 'HorizontalResolution',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'image_format' => {
-    	datatype => 'string',
-    	base_name => 'ImageFormat',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_cell_auto_fit' => {
-    	datatype => 'boolean',
-    	base_name => 'IsCellAutoFit',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'one_page_per_sheet' => {
-    	datatype => 'boolean',
-    	base_name => 'OnePagePerSheet',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'only_area' => {
-    	datatype => 'boolean',
-    	base_name => 'OnlyArea',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'printing_page' => {
-    	datatype => 'string',
-    	base_name => 'PrintingPage',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'print_with_status_dialog' => {
-    	datatype => 'int',
-    	base_name => 'PrintWithStatusDialog',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'quality' => {
-    	datatype => 'int',
-    	base_name => 'Quality',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'tiff_compression' => {
-    	datatype => 'string',
-    	base_name => 'TiffCompression',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_resolution' => {
-    	datatype => 'int',
-    	base_name => 'VerticalResolution',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'chart_image_type' => {
+     	datatype => 'string',
+     	base_name => 'ChartImageType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'embeded_image_name_in_svg' => {
+     	datatype => 'string',
+     	base_name => 'EmbededImageNameInSvg',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'horizontal_resolution' => {
+     	datatype => 'int',
+     	base_name => 'HorizontalResolution',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'image_format' => {
+     	datatype => 'string',
+     	base_name => 'ImageFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_cell_auto_fit' => {
+     	datatype => 'boolean',
+     	base_name => 'IsCellAutoFit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'one_page_per_sheet' => {
+     	datatype => 'boolean',
+     	base_name => 'OnePagePerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'only_area' => {
+     	datatype => 'boolean',
+     	base_name => 'OnlyArea',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'printing_page' => {
+     	datatype => 'string',
+     	base_name => 'PrintingPage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'print_with_status_dialog' => {
+     	datatype => 'boolean',
+     	base_name => 'PrintWithStatusDialog',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'quality' => {
+     	datatype => 'int',
+     	base_name => 'Quality',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'tiff_compression' => {
+     	datatype => 'string',
+     	base_name => 'TiffCompression',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_resolution' => {
+     	datatype => 'int',
+     	base_name => 'VerticalResolution',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'save_format' => {
+     	datatype => 'string',
+     	base_name => 'SaveFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cached_file_folder' => {
+     	datatype => 'string',
+     	base_name => 'CachedFileFolder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'clear_data' => {
+     	datatype => 'boolean',
+     	base_name => 'ClearData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'create_directory' => {
+     	datatype => 'boolean',
+     	base_name => 'CreateDirectory',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'enable_http_compression' => {
+     	datatype => 'boolean',
+     	base_name => 'EnableHTTPCompression',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refresh_chart_cache' => {
+     	datatype => 'boolean',
+     	base_name => 'RefreshChartCache',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_names' => {
+     	datatype => 'boolean',
+     	base_name => 'SortNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'validate_merged_areas' => {
+     	datatype => 'boolean',
+     	base_name => 'ValidateMergedAreas',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'enable_http_compression' => 'boolean',
-    'save_format' => 'string',
-    'clear_data' => 'boolean',
-    'cached_file_folder' => 'string',
-    'validate_merged_areas' => 'boolean',
-    'refresh_chart_cache' => 'boolean',
-    'create_directory' => 'boolean',
-    'sort_names' => 'boolean',
     'chart_image_type' => 'string',
     'embeded_image_name_in_svg' => 'string',
     'horizontal_resolution' => 'int',
@@ -285,21 +276,21 @@ __PACKAGE__->swagger_types( {
     'one_page_per_sheet' => 'boolean',
     'only_area' => 'boolean',
     'printing_page' => 'string',
-    'print_with_status_dialog' => 'int',
+    'print_with_status_dialog' => 'boolean',
     'quality' => 'int',
     'tiff_compression' => 'string',
-    'vertical_resolution' => 'int'
+    'vertical_resolution' => 'int',
+    'save_format' => 'string',
+    'cached_file_folder' => 'string',
+    'clear_data' => 'boolean',
+    'create_directory' => 'boolean',
+    'enable_http_compression' => 'boolean',
+    'refresh_chart_cache' => 'boolean',
+    'sort_names' => 'boolean',
+    'validate_merged_areas' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'enable_http_compression' => 'EnableHTTPCompression',
-    'save_format' => 'SaveFormat',
-    'clear_data' => 'ClearData',
-    'cached_file_folder' => 'CachedFileFolder',
-    'validate_merged_areas' => 'ValidateMergedAreas',
-    'refresh_chart_cache' => 'RefreshChartCache',
-    'create_directory' => 'CreateDirectory',
-    'sort_names' => 'SortNames',
     'chart_image_type' => 'ChartImageType',
     'embeded_image_name_in_svg' => 'EmbededImageNameInSvg',
     'horizontal_resolution' => 'HorizontalResolution',
@@ -311,7 +302,15 @@ __PACKAGE__->attribute_map( {
     'print_with_status_dialog' => 'PrintWithStatusDialog',
     'quality' => 'Quality',
     'tiff_compression' => 'TiffCompression',
-    'vertical_resolution' => 'VerticalResolution'
+    'vertical_resolution' => 'VerticalResolution',
+    'save_format' => 'SaveFormat',
+    'cached_file_folder' => 'CachedFileFolder',
+    'clear_data' => 'ClearData',
+    'create_directory' => 'CreateDirectory',
+    'enable_http_compression' => 'EnableHTTPCompression',
+    'refresh_chart_cache' => 'RefreshChartCache',
+    'sort_names' => 'SortNames',
+    'validate_merged_areas' => 'ValidateMergedAreas' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

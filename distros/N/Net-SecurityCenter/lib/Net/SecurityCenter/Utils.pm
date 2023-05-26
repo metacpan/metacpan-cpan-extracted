@@ -9,7 +9,7 @@ use Time::Piece;
 use Data::Dumper ();
 use Exporter qw(import);
 
-our $VERSION = '0.310';
+our $VERSION = '0.311';
 
 our @EXPORT_OK = qw(
     sc_check_params
@@ -95,10 +95,8 @@ sub cpe_decode {
 
     $cpe =~ s/cpe:\///;
 
-    my (
-        $part,     $vendor,     $product,   $version,   $update, $edition,
-        $language, $sw_edition, $target_sw, $target_hw, $other
-    );
+    my ( $part, $vendor, $product, $version, $update, $edition,
+        $language, $sw_edition, $target_sw, $target_hw, $other );
 
     ( $part, $vendor, $product, $version, $update, $edition, $language ) = split( /:/, $cpe );
 
@@ -541,7 +539,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

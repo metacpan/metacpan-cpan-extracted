@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.209';
+our $VERSION = '1.210';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2247,7 +2247,7 @@ sub minFileNumber {
 
 =head4 Synopsis
 
-  $class->mkdir($dir,@opt);
+  $dir = $class->mkdir($dir,@opt);
 
 =head4 Options
 
@@ -2282,9 +2282,13 @@ Erzeuge übergeordnete Verzeichnisse, wenn nötig.
 
 =back
 
+=head4 Returns
+
+(String) Pfad des erzeugten Verzeichnisses.
+
 =head4 Description
 
-Erzeuge Verzeichnis. Existiert das Verzeichnis bereits, hat
+Erzeuge Verzeichnis $dir. Existiert das Verzeichnis bereits, hat
 der Aufruf keinen Effekt. Kann das Verzeichnis nicht angelegt
 werden, wird eine Exception ausgelöst.
 
@@ -2320,7 +2324,7 @@ sub mkdir {
         }
     }
 
-    return if !defined($dir) || $dir eq '';
+    return $dir if !defined($dir) || $dir eq '';
 
     if (-d $dir) {
         if ($mustNotExist) {
@@ -2329,7 +2333,7 @@ sub mkdir {
                 Dir => $dir,
             );
         }    
-        return;
+        return $dir;
     }
 
     if ($recursive) {
@@ -2346,7 +2350,7 @@ sub mkdir {
         # Hack, damit rekursiv erzeugte Pfade wie /tmp/a/b/c/..
         # angelegt werden können. Ohne diesen zusätzlichen
         # Existenz-Test schlägt sonst das folgende mkdir fehl.
-        return;
+        return $dir;
     }
 
     CORE::mkdir($dir,$mode) || do {
@@ -2360,7 +2364,7 @@ sub mkdir {
         $class->chmod($dir,$forceMode);
     }
 
-    return;
+    return $dir;
 }
 
 # -----------------------------------------------------------------------------
@@ -2715,7 +2719,8 @@ sub delete {
     elsif (-d $path) {
         # Verzeichnis löschen
         (my $dir = $path) =~ s/'/\\'/g; # ' quoten
-        eval {Quiq::Shell->exec("/bin/rm -r '$dir' >/dev/null 2>&1")};
+        eval {Quiq::Shell->exec("/bin/rm -r --interactive=never".
+            " '$dir' >/dev/null 2>&1")};
         if ($@) {
             $this->throw(
                 'PATH-00002: Can\'t delete directory',
@@ -4086,7 +4091,7 @@ sub uid {
 
 =head1 VERSION
 
-1.209
+1.210
 
 =head1 AUTHOR
 

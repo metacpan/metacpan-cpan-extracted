@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::BatchConvertRequest;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::MatchConditionRequest;
-use AsposeCellsCloud::Object::SaveOptions;
+use AsposeCellsCloud::Object::SaveOptions; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,62 +119,62 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'BatchConvertRequest',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'source_folder' => {
-    	datatype => 'string',
-    	base_name => 'SourceFolder',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'source_storage' => {
-    	datatype => 'string',
-    	base_name => 'SourceStorage',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'match_condition' => {
-    	datatype => 'MatchConditionRequest',
-    	base_name => 'MatchCondition',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'format' => {
-    	datatype => 'string',
-    	base_name => 'Format',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'out_folder' => {
-    	datatype => 'string',
-    	base_name => 'OutFolder',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'out_storage' => {
-    	datatype => 'string',
-    	base_name => 'OutStorage',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'save_options' => {
-    	datatype => 'SaveOptions',
-    	base_name => 'SaveOptions',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'source_folder' => {
+     	datatype => 'string',
+     	base_name => 'SourceFolder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'source_storage' => {
+     	datatype => 'string',
+     	base_name => 'SourceStorage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'match_condition' => {
+     	datatype => 'MatchConditionRequest',
+     	base_name => 'MatchCondition',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'format' => {
+     	datatype => 'string',
+     	base_name => 'Format',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'out_folder' => {
+     	datatype => 'string',
+     	base_name => 'OutFolder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'out_storage' => {
+     	datatype => 'string',
+     	base_name => 'OutStorage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'save_options' => {
+     	datatype => 'SaveOptions',
+     	base_name => 'SaveOptions',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
@@ -185,7 +184,7 @@ __PACKAGE__->swagger_types( {
     'format' => 'string',
     'out_folder' => 'string',
     'out_storage' => 'string',
-    'save_options' => 'SaveOptions'
+    'save_options' => 'SaveOptions' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -195,7 +194,7 @@ __PACKAGE__->attribute_map( {
     'format' => 'Format',
     'out_folder' => 'OutFolder',
     'out_storage' => 'OutStorage',
-    'save_options' => 'SaveOptions'
+    'save_options' => 'SaveOptions' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

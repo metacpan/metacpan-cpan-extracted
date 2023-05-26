@@ -1,0 +1,95 @@
+#------------------------------------------------------------------------------
+# This is the complete implementation of the CPAN module
+# Test::More::YAMLScript, written entirely in YAMLScript.
+#------------------------------------------------------------------------------
+
+ns: Test::More::YAMLScript  # Define the module namespace
+
+import: Test::Builder       # Use Perl's Test::Builder module
+
+t =: Test::Builder->new()   # Create a singleton Test::Builder object
+
+use: Lingy::Util            # For debugging
+
+#------------------------------------------------------------------------------
+# All the following functions proxy to Test::Builder methods:
+#------------------------------------------------------------------------------
+
+plan(count):
+  t->plan("tests", count)
+
+pass:
+  ():
+    t->ok(true)
+  (label):
+    t->ok(true, label)
+
+fail():
+  ():
+    t->ok(false)
+  (label):
+    t->ok(false, label)
+
+note(msg): t->note(msg)
+
+diag(msg): t->diag(msg)
+
+ok:
+  (cond):
+    t->ok(cond)
+  (cond, label):
+    t->ok(cond, label)
+
+is:
+  (got, want):
+    t->is_eq(got, want)
+  (got, want, label):
+    t->is_eq(got, want, label)
+
+isnt:
+  (got, want):
+    t->isnt_eq(got, want)
+  (got, want, label):
+    t->isnt_eq(got, want, label)
+
+like:
+  (str, rgx):
+    t->like(str, rgx)
+  (str, rgx, label):
+    t->like(str, rgx, label)
+
+unlike:
+  (str, rgx):
+    t->unlike(str, rgx)
+  (str, rgx, label):
+    t->unlike(str, rgx, label)
+
+done-testing:
+  ():
+    t->done_testing()
+  (num):
+    t->done_testing(num)
+
+skip-all(label): t->skip_all(label)
+
+# Macros:
+todo((label, *tests)):
+  quasiquote: t->todo_skip(~label)
+
+skip((label, *tests)):
+  quasiquote: t->todo_skip(~label)
+
+subtest((label *tests)):
+  quasiquote: Test::More::YAMLScript->subtest(t, ~label, '~tests)
+
+# XXX - Eval this Perl code until we can figure out a better Perl iterop
+# strategy for callbacks.
+eval-perl: ! |
+  sub Test::More::YAMLScript::subtest {
+      my ($t, $label, $exprs) = @_;
+      $t->subtest(
+          $label,
+          sub { Lingy::Eval::eval($_, $Lingy::Eval::ENV) for @_ },
+          @$exprs,
+      );
+  }

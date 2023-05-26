@@ -4,14 +4,17 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-	NAME               => 'CAPE::Utils',
-	AUTHOR             => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
-	VERSION_FROM       => 'lib/CAPE/Utils.pm',
-	ABSTRACT_FROM      => 'lib/CAPE/Utils.pm',
-	LICENSE            => 'artistic_2',
-	MIN_PERL_VERSION   => '5.006',
-	INST_SCRIPT        => 'bin',
-	EXE_FILES          => [ 'src_bin/cape_utils', 'src_bin/mojo_cape_submit', 'src_bin/suricata_extract_submit' ],
+	NAME             => 'CAPE::Utils',
+	AUTHOR           => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
+	VERSION_FROM     => 'lib/CAPE/Utils.pm',
+	ABSTRACT_FROM    => 'lib/CAPE/Utils.pm',
+	LICENSE          => 'artistic_2',
+	MIN_PERL_VERSION => '5.006',
+	INST_SCRIPT      => 'bin',
+	EXE_FILES        => [
+		'src_bin/cape_utils',              'src_bin/mojo_cape_submit',
+		'src_bin/suricata_extract_submit', 'src_bin/suricata_extract_submit_extend'
+	],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},
@@ -43,6 +46,9 @@ my %WriteMakefileArgs = (
 		'Time::Piece'           => '0',
 		'File::Find::Rule'      => '0',
 		'File::Slurp'           => '0',
+		'Gzip::Faster'          => '0',
+		'MIME::Base64'          => '0',
+		'File::ReadBackwards'   => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'CAPE-Utils-*' },

@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::POE;
-$Acme::CPANAuthors::POE::VERSION = '0.86';
+$Acme::CPANAuthors::POE::VERSION = '0.88';
 #ABSTRACT: We are CPAN Authors of POE
 
 use strict;
@@ -8,7 +8,7 @@ use warnings;
 use Acme::CPANAuthors::Register (
   AAR => q[Alessandro Ranellucci],
   ABERGMAN => q[Artur Bergman],
-  ACHEN => q[Andrew A. Chen],
+  ACHEN => q[Andrew Chen],
   ADAMK => q[Adam Kennedy],
   AGRUNDMA => q[Andy Grundman],
   AHOYING => q[Andrew Hoying],
@@ -16,6 +16,7 @@ use Acme::CPANAuthors::Register (
   AJCT => q[Adam Taylor],
   ALTREUS => q[Alastair Douglas],
   ANDYPUR => q[Andrew V. Purshottam],
+  ANEI => q[Ailin Nemui],
   APOCAL => q[Apocalypse],
   ARCANEZ => q[Justin Hunter],
   AVENJ => q[Jon Portnoy (PAUSE Custodial Account)],
@@ -36,7 +37,6 @@ use Acme::CPANAuthors::Register (
   DAEMON => q[Paul G Webster],
   DAMS => q[Damien Krotkine],
   DAVINCHI => q[Pavel Boldin],
-  DAZJORZ => q[Sjors Gielen],
   DBOOK => q[Dan Book],
   DIZ => q[Mike Eldridge],
   DMAKI => q[Daisuke Maki],
@@ -72,7 +72,7 @@ use Acme::CPANAuthors::Register (
   ISHIGAKI => q[Kenichi Ishigaki],
   IVORW => q[Ivor Williams],
   JBISBEE => q[Jeff Bisbee],
-  JGOFF => q[Jeff Goff],
+  JGOFF => q[Jeff Goff (PAUSE Custodial Account)],
   JHELWIG => q[Jacob Helwig],
   JKG => q[James Green],
   JMERELO => q[J. J. Merelo Guervos],
@@ -88,6 +88,7 @@ use Acme::CPANAuthors::Register (
   MAFF => q[Matthew Connelly],
   MAHEX => q[Mark A. Hershberger],
   MARTIJN => q[Martijn van Beers],
+  MAT => q[Mathieu Arnold],
   MCHING => q[Michael Ching],
   MCMIC => q[Come Chilliet],
   MDOM => q[Mario Domgoergen],
@@ -110,7 +111,7 @@ use Acme::CPANAuthors::Register (
   MSERGEANT => q[MSERGEANT],
   NPEREZ => q[Nicholas Perez],
   NSHP => q[Nicholas Shipp],
-  NUFFIN => q[Yuval Kogman],
+  NUFFIN => q[yvbl qvg'mn (Yuval Kogman)],
   OALDERS => q[Olaf Alders],
   OMNI => q[Michael Alexander],
   ONEONETWO => q[Dominic Humphries],
@@ -177,7 +178,7 @@ Acme::CPANAuthors::POE - We are CPAN Authors of POE
 
 =head1 VERSION
 
-version 0.86
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -202,7 +203,7 @@ It is currently statically generated information, I hope to make it dynamic in t
 
   AAR => q[Alessandro Ranellucci],
   ABERGMAN => q[Artur Bergman],
-  ACHEN => q[Andrew A. Chen],
+  ACHEN => q[Andrew Chen],
   ADAMK => q[Adam Kennedy],
   AGRUNDMA => q[Andy Grundman],
   AHOYING => q[Andrew Hoying],
@@ -210,6 +211,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   AJCT => q[Adam Taylor],
   ALTREUS => q[Alastair Douglas],
   ANDYPUR => q[Andrew V. Purshottam],
+  ANEI => q[Ailin Nemui],
   APOCAL => q[Apocalypse],
   ARCANEZ => q[Justin Hunter],
   AVENJ => q[Jon Portnoy (PAUSE Custodial Account)],
@@ -230,7 +232,6 @@ It is currently statically generated information, I hope to make it dynamic in t
   DAEMON => q[Paul G Webster],
   DAMS => q[Damien Krotkine],
   DAVINCHI => q[Pavel Boldin],
-  DAZJORZ => q[Sjors Gielen],
   DBOOK => q[Dan Book],
   DIZ => q[Mike Eldridge],
   DMAKI => q[Daisuke Maki],
@@ -266,7 +267,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   ISHIGAKI => q[Kenichi Ishigaki],
   IVORW => q[Ivor Williams],
   JBISBEE => q[Jeff Bisbee],
-  JGOFF => q[Jeff Goff],
+  JGOFF => q[Jeff Goff (PAUSE Custodial Account)],
   JHELWIG => q[Jacob Helwig],
   JKG => q[James Green],
   JMERELO => q[J. J. Merelo Guervos],
@@ -282,6 +283,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   MAFF => q[Matthew Connelly],
   MAHEX => q[Mark A. Hershberger],
   MARTIJN => q[Martijn van Beers],
+  MAT => q[Mathieu Arnold],
   MCHING => q[Michael Ching],
   MCMIC => q[Come Chilliet],
   MDOM => q[Mario Domgoergen],
@@ -304,7 +306,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   MSERGEANT => q[MSERGEANT],
   NPEREZ => q[Nicholas Perez],
   NSHP => q[Nicholas Shipp],
-  NUFFIN => q[Yuval Kogman],
+  NUFFIN => q[yvbl qvg'mn (Yuval Kogman)],
   OALDERS => q[Olaf Alders],
   OMNI => q[Michael Alexander],
   ONEONETWO => q[Dominic Humphries],
@@ -368,7 +370,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

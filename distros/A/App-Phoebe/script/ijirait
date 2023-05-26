@@ -79,6 +79,7 @@ use Encode qw(decode_utf8 encode_utf8 decode encode);
 use Text::Wrapper;
 use File::Slurper qw(read_text write_text);
 use IPC::Open2;
+use utf8;
 
 my $cert;
 my $key;

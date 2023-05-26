@@ -15,7 +15,11 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-FileRenameUtils",
   "EXE_FILES" => [
     "script/move-files-here",
+    "script/mv-add-prefix",
+    "script/mv-add-prefix-datestamp",
     "script/mv-reverse",
+    "script/mv-swap",
+    "script/mv-to-from",
     "script/rename-add-prefix",
     "script/rename-add-prefix-datestamp",
     "script/rename-swap",
@@ -45,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

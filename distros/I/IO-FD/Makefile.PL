@@ -2,16 +2,46 @@ use ExtUtils::MakeMaker;
 use Config;
 
 my %defines;
+
+my @includes=(
+  # Add common include files to begin with
+  "//--BEGIN $Config{osname}",
+  '#include <fcntl.h>',
+  '#include <sys/socket.h>',
+  '#include <sys/un.h>',
+  '#include <stdio.h>',
+  '#include <unistd.h>',
+  '#include <poll.h>',
+  '#include <sys/time.h>',
+  '#include <sys/stat.h>',
+);
+
 #Do some OS detection here
 for($Config{osname}){
 	if(/darwin/){
 		$defines{IO_FD_OS_DARWIN}=1;
+    push @includes, (
+      '#include <sys/event.h>',
+      '#include <sys/uio.h>',
+      '#include <sys/types.h>',
+      '#define SOCK_NONBLOCK 0x10000000',
+      '#define SOCK_CLOEXEC  0x20000000',
+    );
 	}
 	elsif(/bsd/){
 		$defines{IO_FD_OS_BSD}=1;
+    push @includes, (
+      '#include <sys/event.h>',
+      '#include <sys/uio.h>',
+      '#include <sys/types.h>',
+    );
 	}
 	elsif(/linux/){
 		$defines{IO_FD_OS_LINUX}=1;
+
+    push @includes,(
+      '#include <sys/sendfile.h>',
+    );
 	}
 	elsif(/win32/){
 		die "WIN32 Unsupported at this time"
@@ -20,6 +50,13 @@ for($Config{osname}){
 		die "Unsupported platform: $_"
 	}
 }
+
+push @includes, "//--END $Config{osname}";
+{
+  open my $platform, ">", "platform.h" or die "Could not generate header file";
+  print $platform join "\n", @includes;
+}
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(

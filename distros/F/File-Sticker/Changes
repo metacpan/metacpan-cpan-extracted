@@ -1,6 +1,14 @@
 Revision History for File-Sticker
 =================================
 
+v3.0008 2023-05-21
+------------------
+
+* 2023-05-21 20:12:20 +1000
+  Accidental inclusion of images fixed!
+* 2023-05-16 08:13:18 +1000
+  Further attempt to fix ExifTool soft links problem
+
 v3.0006 2023-05-15
 ------------------
 

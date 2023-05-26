@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Syntax::Kamelon::XMLData;
 
-my $VERSION = '0.16';
+my $VERSION = '0.23';
 
 
 sub new {
@@ -73,6 +73,7 @@ sub CreateIndex {
 						ext =>  $l->{extensions},
 						menu => $l->{section},
 						mime => $l->{mimetype},
+						priority => $l->{priority},
 						version => $l->{version},
 					};
 				}
@@ -185,6 +186,11 @@ sub InfoMimeType {
 	return $self->Info($syntax, 'mime')
 }
 
+sub InfoPriority {
+	my ($self, $syntax) = @_;
+	return $self->Info($syntax, 'priority')
+}
+
 sub InfoMLCommentEnd {
 	my ($self, $syntax) = @_;
 	return $self->Info($syntax, 'mlcommentend')
@@ -268,7 +274,7 @@ sub SaveIndex {
 		close OFILE;
 		return 1
 	} else {
-		warn "cannot open index file" 
+		warn "cannot open index file $file" 
 	}
 }
 

@@ -15,7 +15,7 @@ my $test2 = "test2~";
 my $test3 = "test3~";
 
 use_ok 'Text::MacroScript';
-push @INC, path($0)->dirname;
+push @INC, "t", ".";
 require_ok 'mytests.pl';
 
 sub void(&) { $_[0]->(); () }

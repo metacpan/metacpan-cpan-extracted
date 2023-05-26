@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::ResultsRole::Success::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: A bool for holding the success of the form process
-$SyForm::ResultsRole::Success::VERSION = '0.102';
+$SyForm::ResultsRole::Success::VERSION = '0.103';
 use Moo::Role;
 
 use overload 'bool' => sub { $_[0]->success };
@@ -25,7 +25,7 @@ SyForm::ResultsRole::Success - A bool for holding the success of the form proces
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

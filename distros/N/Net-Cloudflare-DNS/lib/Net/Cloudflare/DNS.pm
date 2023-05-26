@@ -12,29 +12,44 @@ use LWP::Protocol::https;
 sub new {
     my $class = shift;
     my %args = @_;
-    bless \%args, $class;
+
+    my $ua = LWP::UserAgent->new;
+    my %headers;
+
+    if (defined $args{api_token}) {
+        %headers = (
+            'Content-Type' => 'application/json',
+            'Authorization' => "Bearer $args{api_token}",
+        );
+    } else {
+        %headers = (
+            'Content-Type' => 'application/json',
+            'X-Auth-Key'   => $args{api_key},
+            'X-Auth-Email' => $args{email},
+        );
+    }
+
+    my $zone_id = $args{zone_id};
+    die "no zone_id provided" unless defined $zone_id;
+
+    my $base_url = "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records";
+
+    bless { ua => $ua,
+            headers => \%headers,
+            base_url => $base_url,
+          }, $class;
 }
  
 sub get_records {
     my $self = shift;
     my %args = @_;
 
-    my $email = $self->{email};
-    my $api_key = $self->{api_key};
-    my $zone_id = $self->{zone_id};
-    
-    my $uri = URI->new("https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records");
+    my $uri = URI->new($self->{base_url});
     $uri->query_form(%args);
+    my $ua = $self->{ua};
 
-    my $ua = LWP::UserAgent->new;
-    my %headers = (
-        'Content-Type' => 'application/json',
-        'X-Auth-Key'   => $api_key,
-        'X-Auth-Email' => $email,
-    );
- 
     my $res = $ua->get($uri,
-        %headers,
+        %{$self->{headers}},
     );
 
     if ($res->is_success ) {
@@ -44,27 +59,16 @@ sub get_records {
     }
 }
 
-
 sub create_record {
     my $self = shift;
     my %args = @_;
 
     my $data = encode_json(\%args);
-    my $email = $self->{email};
-    my $api_key = $self->{api_key};
-    my $zone_id = $self->{zone_id};
-    
+    my $uri = URI->new($self->{base_url});
+    my $ua = $self->{ua};
 
-    my $uri = "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records";
-    my $ua = LWP::UserAgent->new;
-    my %headers = (
-        'Content-Type' => 'application/json',
-        'X-Auth-Key'   => $api_key,
-        'X-Auth-Email' => $email,
-    );
- 
     my $res = $ua->post($uri,
-        %headers,
+        %{$self->{headers}},
         Content => $data,
     );
 
@@ -81,20 +85,11 @@ sub update_record {
     my %args = @_;
 
     my $data = encode_json(\%args);
-    my $email = $self->{email};
-    my $api_key = $self->{api_key};
-    my $zone_id = $self->{zone_id};
+    my $uri = URI->new($self->{base_url} . "/$record_id");
+    my $ua = $self->{ua};
 
-    my $uri = "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records/$record_id";
-    my $ua = LWP::UserAgent->new;
-    my %headers = (
-        'Content-Type' => 'application/json',
-        'X-Auth-Key'   => $api_key,
-        'X-Auth-Email' => $email,
-    );
- 
     my $res = $ua->put($uri,
-        %headers,
+        %{$self->{headers}},
         Content => $data,
     );
 
@@ -109,20 +104,11 @@ sub delete_record {
     my $self = shift;
     my $record_id = shift;
 
-    my $email = $self->{email};
-    my $api_key = $self->{api_key};
-    my $zone_id = $self->{zone_id};
-
-    my $uri = "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records/$record_id";
-    my $ua = LWP::UserAgent->new;
-    my %headers = (
-        'Content-Type' => 'application/json',
-        'X-Auth-Key'   => $api_key,
-        'X-Auth-Email' => $email,
-    );
+    my $uri = URI->new($self->{base_url} . "/$record_id");
+    my $ua = $self->{ua};
  
     my $res = $ua->delete($uri,
-        %headers,
+        %{$self->{headers}},
     );
 
     if ($res->is_success ) {
@@ -138,102 +124,59 @@ Net::Cloudflare::DNS - DNS API for Cloudflare API v4
 
 =head1 VERSION
 
-Version 0.02
+Version 0.19
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.19';
 
 
 =head1 SYNOPSIS
 
-Cloudflare API v4 has big improvement to the older ones. This API operates against the specific zone based on API v4. 
+This perl module is working for Cloudflare DNS API v4.
 
-I use this module to dyna update my DNS zone everyday. Cloudflare's DNS and its API behave very well in my life.
+If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
 
-If you have met any issue with the module, please don't hesitate to drop me an email: iwesley [at] pobox.com
-
-To use the module, you must have these two perl modules installed in the system:
+My system is Ubuntu, to use the module, I have the following perl modules pre-installed in the system.
 
     sudo apt install libio-socket-ssl-perl
     sudo cpanm LWP::Protocol::https
 
-My system is Ubuntu, which can use apt to install IO::Socket::SSL. I can't install this module with cpanm tool.
+After then, you can run "cpanm Net::Cloudflare::DNS" to install this module.
 
     use Net::Cloudflare::DNS;
+    use Data::Dumper;
 
-    # new the object
+    # zone_id for your domain
+    my $zone_id = " ";
+
+    # new the object with email and api_key
+    my $email = " ";
+    my $api_key = " ";
     my $dns = Net::Cloudflare::DNS->new(email=>$email, api_key=>$api_key, zone_id=>$zone_id);
 
-    # create the record
-    my $res = $dns->create_record(type=>"A", name=>"test.myhostnames.com",content=>"1.1.1.1",ttl=>1);
+    # or, new the object with bearer token
+    my $api_token = " ";
+    my $dns = Net::Cloudflare::DNS->new(api_token=>$api_token, zone_id=>$zone_id);
 
-    # update the record
-    $res = $dns->update_record($record_id, type=>"TXT", name=>"test.myhostnames.com",content=>"bala bala",ttl=>1);
+    # create record
+    $dns->create_record(type=>"A", name=>"www.sample.com", content=>"74.81.81.81", proxied=>\1, ttl=>60);
 
-    # delete the record
-    $res = $dns->delete_record($record_id);
-
-    # list records by conditions
-    $res = $dns->get_records(name=>"test.myhostnames.com");
-
-    # if the method succeed, a structure reference was returned, whose content is response content from cloudflare 
-    # otherwise the method just dies, you should catch the error in your code
-    use Data::Dumper;
-    print Dumper $res;
-
-Hence this is my own script for test purpose:
-
-    use strict;
-    use warnings;
-    use Net::Cloudflare::DNS;
-
-    my $obj = Net::Cloudflare::DNS->new(email    => $ENV{'CLOUDFLARE_EMAIL'},
-                                        api_key  => $ENV{'CLOUDFLARE_API_KEY'},
-                                        zone_id  => $ENV{'CLOUDFLARE_ZONE_ID'},
-                                       );
-
-    #
-    # batch add
-    #
-    for (1..10) {
-        my $rand_hostname = int(rand(3333333)) . ".myhostnames.com";
-        my $rand_ip = int(rand(255)) ."." . int(rand(255)). ".". int(rand(255)). ".". int(rand(255));
-
-        $obj->create_record(type=>"A", name=>$rand_hostname,content=>$rand_ip,ttl=>1);
-    }
-
-    #
     # get records
-    #
-    my @records;
+    my $res = $dns->get_records(name=>"www.sample.com");
 
-    my $ref = $obj->get_records('per_page'=>100);
-    my @rr = @{$ref->{result}};
+    # parse record id
+    my $rid = $res->{result}->[0]->{id};
 
-    for (@rr) {
-        if ($_->{name} =~ /^\d+/) {
-          push @records, [$_->{id}, $_->{name}]; 
-        }
-    }
+    # update record
+    $dns->update_record($rid, type=>"A", name=>"www.sample.com",content=>"52.1.14.22", proxied=>\0, ttl=>60);
 
-    #
-    # batch update
-    #
-    for  (@records) {
-        my $id = $_->[0];
-        my $hostname = $_->[1];
-        my $rand_ip = int(rand(255)) ."." . int(rand(255)). ".". int(rand(255)). ".". int(rand(255));
+    # delete record
+    $dns->delete_record($rid);
 
-        $obj->update_record($id, type=>"A", name=>$hostname,content=>$rand_ip,ttl=>1);
-    }
-
-    #
-    # batch delete
-    #
-    for  (@records) {
-        $obj->delete_record($_->[0]);
-    }
+    # If it succeeds, cloudflare's response is resturned as a reference to you.
+    # Otherwise the method just dies, you could catch the error in the code.
+    print Dumper $res;
 
 
 =head1 SUBROUTINES/METHODS
@@ -241,73 +184,70 @@ Hence this is my own script for test purpose:
 =head2 new
 
     my $dns = Net::Cloudflare::DNS->new(email=>$email, api_key=>$api_key, zone_id=>$zone_id);
+    # or,
+    my $dns = Net::Cloudflare::DNS->new(api_token=>$api_token, zone_id=>$zone_id);
 
-You have to provide 3 arguments to new() method. One is your registration email on Cloudflare. Another is your API Key, which can be 
-found on Cloudflare's management panel ("Global API Key"). The last is Zone ID, each zone has the unique ID, which can be found
-on zone's page.
+You have to provide either email+api_key or api_token along with zone_id to new() method. 
+All those values can be found on cloudflare's management panel.
 
-Please notice: You must enable zone edit permissions for this API. In management panel, when you click "Create Token", you have the
-chance to setup permissions for the zone, with which you can edit zone's DNS records. 
+Please note: You must enable zone edit permissions for this API. In management panel, when you click "Create Token", 
+you have the chance to setup permissions for the zone, with which you can edit zone's DNS records. 
  
-
 
 =head2 create_record
 
-    my $res = $dns->create_record(type=>"A", name=>"test.myhostnames.com",content=>"1.1.1.1",ttl=>1);
+    $dns->create_record(type=>"A", name=>"www.sample.com",content=>"1.2.3.4",proxied=>\1,ttl=>1);
 
-You can create record in the zone with this method.
+Create record in the zone.
 
-Required parameters:
+You have to provide the following parameters.
 
-type: includes "A", "TXT", "MX", "CNAME" ... They are standard DNS record type.
+type: includes "A", "TXT", "MX", "CNAME" ... They are standard DNS record types.
 
-name: the hostname you want to create, must be FQDN.
+name: the hostname you want to create, such as www.example.com.
 
-content: record's value, for "A" record, it's an IP address.
+content: record value, for "A" record, it's an IP address.
 
-ttl: time to live. You can always set it to 1, which means automatic by Cloudflare. otherwise it's must be larger than 120.
+ttl: time to live. You can set it to 1, which means to be automated by Cloudflare.
 
 Optional parameters:
 
-priority: MX's priority, default 0.
+priority: MX priority, default 0.
 
-proxied: whether proxied by cloudflare, default false.
+proxied: whether proxied by cloudflare, it's either \1 (true) or \0 (false).
 
-Please read the official documentation here:
+Please read their official documentation below.
 
-    https://api.cloudflare.com/#dns-records-for-a-zone-properties
-
+    https://developers.cloudflare.com/api/#dns-records-for-a-zone-properties
 
 
 =head2 update_record
 
-    $res = $dns->update_record($record_id, type=>"TXT", name=>"test.myhostnames.com",content=>"bala bala",ttl=>1);
+    $dns->update_record($record_id, type=>"TXT", name=>"www.sample.com",content=>"bala bala",ttl=>1);
 
-Update the record in the zone.
+Update record in the zone.
 
-You must provide $record_id as the first argument, the left arguments are almost the same with create_record method.
+Please provide $record_id as the first argument, the rest are almost the same as create_record.
 
 You can get $record_id from get_records method.
 
 
-
 =head2 delete_record
 
-    $res = $dns->delete_record($record_id);
+    $dns->delete_record($record_id);
 
-Delete the record in the zone.
+Delete record from the zone.
 
-You must provide $record_id as the unique argument.
-
+Provide $record_id as the unique argument.
 
 
 =head2 get_records
 
-    $res = $dns->get_records(conditions...);
+    my $res = $dns->get_records(conditions...);
 
-List the records by conditions. For details you can read the documentation:
+List records by conditions. For details please read the following documentation.
 
-    https://api.cloudflare.com/#dns-records-for-a-zone-properties
+    https://developers.cloudflare.com/api/#dns-records-for-a-zone-properties
 
 
 
@@ -322,6 +262,9 @@ the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Cloud
 automatically be notified of progress on your bug as I make changes.
 
 
+=head1 THANKS
+
+1. Thibault, C<< <thibault.duponchelle at gmail.com> >> for porting the bearer token authentication method.
 
 
 =head1 SUPPORT

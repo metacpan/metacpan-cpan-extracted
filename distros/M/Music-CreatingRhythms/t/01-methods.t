@@ -55,9 +55,8 @@ subtest cfcv => sub {
     is_deeply $got, $expect, 'cfcv';
 };
 
-SKIP: {
-skip 'cfsqrt(): Unmocked OEIS', 1;
-subtest cfsqrt => sub {
+# These tests will fail without the Math::NumSeq::SqrtContinued module.
+#subtest cfsqrt => sub {
 #    my $mcr = new_ok $module;
 
 #    my $expect = [1,2];
@@ -79,8 +78,7 @@ subtest cfsqrt => sub {
 #    $expect = [1,1,2,1,2];
 #    $got = $mcr->cfsqrt(3, 5);
 #    is_deeply $got, $expect, 'cfsqrt';
-};
-};
+#};
 
 subtest chsequl => sub {
     my $mcr = new_ok $module;

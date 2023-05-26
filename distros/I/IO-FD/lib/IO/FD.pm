@@ -36,6 +36,12 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	syswrite3
 	syswrite4
 
+  pread
+  pwrite
+
+  mkfifo
+  mkfifoat
+
 	pipe
 	socketpair
 	sysseek
@@ -64,7 +70,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.1';
 
 use constant();
 use Socket qw<SOCK_NONBLOCK SOCK_CLOEXEC>;

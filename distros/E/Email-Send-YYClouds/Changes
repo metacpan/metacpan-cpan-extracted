@@ -11,3 +11,6 @@ Revision history for Email-Send-YYClouds
 
 0.04    2021-1-15
         bug fix: encode message body with utf8
+
+0.15    2023-05-22
+        add META.json

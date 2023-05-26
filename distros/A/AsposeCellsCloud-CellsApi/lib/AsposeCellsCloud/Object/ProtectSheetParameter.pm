@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ProtectSheetParameter;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,163 +118,163 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ProtectSheetParameter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'allow_selecting_unlocked_cell' => {
-    	datatype => 'string',
-    	base_name => 'AllowSelectingUnlockedCell',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_filtering' => {
-    	datatype => 'string',
-    	base_name => 'AllowFiltering',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_deleting_column' => {
-    	datatype => 'string',
-    	base_name => 'AllowDeletingColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_selecting_locked_cell' => {
-    	datatype => 'string',
-    	base_name => 'AllowSelectingLockedCell',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_using_pivot_table' => {
-    	datatype => 'string',
-    	base_name => 'AllowUsingPivotTable',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_edit_area' => {
-    	datatype => 'ARRAY[string]',
-    	base_name => 'AllowEditArea',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_inserting_hyperlink' => {
-    	datatype => 'string',
-    	base_name => 'AllowInsertingHyperlink',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_formatting_cell' => {
-    	datatype => 'string',
-    	base_name => 'AllowFormattingCell',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_formatting_row' => {
-    	datatype => 'string',
-    	base_name => 'AllowFormattingRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_inserting_row' => {
-    	datatype => 'string',
-    	base_name => 'AllowInsertingRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_formatting_column' => {
-    	datatype => 'string',
-    	base_name => 'AllowFormattingColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_sorting' => {
-    	datatype => 'string',
-    	base_name => 'AllowSorting',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_inserting_column' => {
-    	datatype => 'string',
-    	base_name => 'AllowInsertingColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'password' => {
-    	datatype => 'string',
-    	base_name => 'Password',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'allow_deleting_row' => {
-    	datatype => 'string',
-    	base_name => 'AllowDeletingRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'protection_type' => {
-    	datatype => 'string',
-    	base_name => 'ProtectionType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'protection_type' => {
+     	datatype => 'string',
+     	base_name => 'ProtectionType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'password' => {
+     	datatype => 'string',
+     	base_name => 'Password',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_edit_area' => {
+     	datatype => 'ARRAY[string]',
+     	base_name => 'AllowEditArea',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_deleting_column' => {
+     	datatype => 'string',
+     	base_name => 'AllowDeletingColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_deleting_row' => {
+     	datatype => 'string',
+     	base_name => 'AllowDeletingRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_filtering' => {
+     	datatype => 'string',
+     	base_name => 'AllowFiltering',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_formatting_cell' => {
+     	datatype => 'string',
+     	base_name => 'AllowFormattingCell',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_formatting_column' => {
+     	datatype => 'string',
+     	base_name => 'AllowFormattingColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_formatting_row' => {
+     	datatype => 'string',
+     	base_name => 'AllowFormattingRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_inserting_column' => {
+     	datatype => 'string',
+     	base_name => 'AllowInsertingColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_inserting_hyperlink' => {
+     	datatype => 'string',
+     	base_name => 'AllowInsertingHyperlink',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_inserting_row' => {
+     	datatype => 'string',
+     	base_name => 'AllowInsertingRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_selecting_locked_cell' => {
+     	datatype => 'string',
+     	base_name => 'AllowSelectingLockedCell',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_selecting_unlocked_cell' => {
+     	datatype => 'string',
+     	base_name => 'AllowSelectingUnlockedCell',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_sorting' => {
+     	datatype => 'string',
+     	base_name => 'AllowSorting',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'allow_using_pivot_table' => {
+     	datatype => 'string',
+     	base_name => 'AllowUsingPivotTable',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'allow_selecting_unlocked_cell' => 'string',
-    'allow_filtering' => 'string',
-    'allow_deleting_column' => 'string',
-    'allow_selecting_locked_cell' => 'string',
-    'allow_using_pivot_table' => 'string',
-    'allow_edit_area' => 'ARRAY[string]',
-    'allow_inserting_hyperlink' => 'string',
-    'allow_formatting_cell' => 'string',
-    'allow_formatting_row' => 'string',
-    'allow_inserting_row' => 'string',
-    'allow_formatting_column' => 'string',
-    'allow_sorting' => 'string',
-    'allow_inserting_column' => 'string',
+    'protection_type' => 'string',
     'password' => 'string',
+    'allow_edit_area' => 'ARRAY[string]',
+    'allow_deleting_column' => 'string',
     'allow_deleting_row' => 'string',
-    'protection_type' => 'string'
+    'allow_filtering' => 'string',
+    'allow_formatting_cell' => 'string',
+    'allow_formatting_column' => 'string',
+    'allow_formatting_row' => 'string',
+    'allow_inserting_column' => 'string',
+    'allow_inserting_hyperlink' => 'string',
+    'allow_inserting_row' => 'string',
+    'allow_selecting_locked_cell' => 'string',
+    'allow_selecting_unlocked_cell' => 'string',
+    'allow_sorting' => 'string',
+    'allow_using_pivot_table' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'allow_selecting_unlocked_cell' => 'AllowSelectingUnlockedCell',
-    'allow_filtering' => 'AllowFiltering',
-    'allow_deleting_column' => 'AllowDeletingColumn',
-    'allow_selecting_locked_cell' => 'AllowSelectingLockedCell',
-    'allow_using_pivot_table' => 'AllowUsingPivotTable',
-    'allow_edit_area' => 'AllowEditArea',
-    'allow_inserting_hyperlink' => 'AllowInsertingHyperlink',
-    'allow_formatting_cell' => 'AllowFormattingCell',
-    'allow_formatting_row' => 'AllowFormattingRow',
-    'allow_inserting_row' => 'AllowInsertingRow',
-    'allow_formatting_column' => 'AllowFormattingColumn',
-    'allow_sorting' => 'AllowSorting',
-    'allow_inserting_column' => 'AllowInsertingColumn',
+    'protection_type' => 'ProtectionType',
     'password' => 'Password',
+    'allow_edit_area' => 'AllowEditArea',
+    'allow_deleting_column' => 'AllowDeletingColumn',
     'allow_deleting_row' => 'AllowDeletingRow',
-    'protection_type' => 'ProtectionType'
+    'allow_filtering' => 'AllowFiltering',
+    'allow_formatting_cell' => 'AllowFormattingCell',
+    'allow_formatting_column' => 'AllowFormattingColumn',
+    'allow_formatting_row' => 'AllowFormattingRow',
+    'allow_inserting_column' => 'AllowInsertingColumn',
+    'allow_inserting_hyperlink' => 'AllowInsertingHyperlink',
+    'allow_inserting_row' => 'AllowInsertingRow',
+    'allow_selecting_locked_cell' => 'AllowSelectingLockedCell',
+    'allow_selecting_unlocked_cell' => 'AllowSelectingUnlockedCell',
+    'allow_sorting' => 'AllowSorting',
+    'allow_using_pivot_table' => 'AllowUsingPivotTable' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,3 +1,11 @@
+0.1.1 Thu May 25 04:24:25 PM PDT 2023
+ - Rewrite most of the code in Lingy
+ - Make Test::More::YAMLScript a YAMLScript file
+ - Convert entire module to YAMLScript
+
+0.1.0 Wed May 17 08:43:30 AM PDT 2023
+ - Refactor to work over YAMLScript 0.1.0
+
 0.0.5 Mon 25 Jul 2022 08:56:17 AM PDT
  - Refactor code into YAMLScript
  - Bump the YAMLScript dep version to 0.0.15

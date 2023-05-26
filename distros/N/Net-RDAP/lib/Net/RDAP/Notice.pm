@@ -24,7 +24,7 @@ response.
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

@@ -1,0 +1,17 @@
+{
+  "head": {
+    "vars": [
+      "foo"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "foo": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q104381358"
+        }
+      }
+    ]
+  }
+}

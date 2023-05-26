@@ -1,5 +1,9 @@
 Revision history for Net::SecurityCenter
 
+0.311 2023-05-17
+    - Added "Net::SecurityCenter::API::ScanResult->delete" method
+    - Added new methods for Net::SecurityCenter::API::Policy (edit, create, delete, copy)
+
 0.310 2021-03-01
     - Added "Net::SecurityCenter::API::Ticket" class
     - Fixed "ssl_opts" param in "Net::SecurityCenter::REST"

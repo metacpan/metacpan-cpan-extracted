@@ -75,13 +75,8 @@ sub assertion {
 sub config {
   my ($self, $package) = @_;
 
-  $package ||= $self->package or do {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.config');
-    $throw->message('No suitable YAML package');
-    $throw->error;
-  };
+  $package ||= $self->package
+    or $self->throw('error_on_config')->error;
 
   # YAML::XS
   if ($package eq 'YAML::XS') {
@@ -225,6 +220,17 @@ sub TO_BOOL {
   return Venus::Boolean::TO_BOOL_JPO($value);
 }
 
+# ERRORS
+
+sub error_on_config {
+  my ($self) = @_;
+
+  return {
+    name => 'on.config',
+    message => 'No suitable YAML package',
+  };
+}
+
 1;
 
 
@@ -360,6 +366,34 @@ I<Since C<0.01>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_config>
+
+This package may raise an error_on_config exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $error = $yaml->throw('error_on_config')->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_config"
+
+  # my $message = $error->message;
+
+  # "No suitable YAML package"
+
+=back
 
 =head1 AUTHORS
 

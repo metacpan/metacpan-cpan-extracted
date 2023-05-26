@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::UnusedVars; # git description: v2.000007-16-gf6a4de2
+package Dist::Zilla::Plugin::Test::UnusedVars; # git description: v2.001000-2-g97f4bf1
 # ABSTRACT: Release tests for unused variables
 
-our $VERSION = '2.001000';
+our $VERSION = '2.001001';
 
 use Path::Tiny;
 use Moose;
@@ -99,7 +99,7 @@ Dist::Zilla::Plugin::Test::UnusedVars - Release tests for unused variables
 
 =head1 VERSION
 
-version 2.001000
+version 2.001001
 
 =head1 SYNOPSIS
 

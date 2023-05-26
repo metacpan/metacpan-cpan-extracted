@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ChartArea;
 
 require 5.6.0;
@@ -36,13 +35,12 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Area;
 use AsposeCellsCloud::Object::ChartFrame;
 use AsposeCellsCloud::Object::Font;
 use AsposeCellsCloud::Object::Line;
-use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -58,12 +56,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -104,7 +102,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -112,7 +110,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -124,145 +122,136 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ChartArea',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'is_inner_mode' => {
-    	datatype => 'boolean',
-    	base_name => 'IsInnerMode',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'shape_properties' => {
-    	datatype => 'ARRAY[LinkElement]',
-    	base_name => 'ShapeProperties',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'auto_scale_font' => {
-    	datatype => 'boolean',
-    	base_name => 'AutoScaleFont',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'area' => {
-    	datatype => 'Area',
-    	base_name => 'Area',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'height' => {
-    	datatype => 'int',
-    	base_name => 'Height',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'width' => {
-    	datatype => 'int',
-    	base_name => 'Width',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'background_mode' => {
-    	datatype => 'string',
-    	base_name => 'BackgroundMode',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_automatic_size' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutomaticSize',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'y' => {
-    	datatype => 'int',
-    	base_name => 'Y',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'x' => {
-    	datatype => 'int',
-    	base_name => 'X',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'shadow' => {
-    	datatype => 'boolean',
-    	base_name => 'Shadow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'font' => {
-    	datatype => 'Font',
-    	base_name => 'Font',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'border' => {
-    	datatype => 'Line',
-    	base_name => 'Border',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'area' => {
+     	datatype => 'Area',
+     	base_name => 'Area',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'auto_scale_font' => {
+     	datatype => 'boolean',
+     	base_name => 'AutoScaleFont',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'background_mode' => {
+     	datatype => 'string',
+     	base_name => 'BackgroundMode',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'border' => {
+     	datatype => 'Line',
+     	base_name => 'Border',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'font' => {
+     	datatype => 'Font',
+     	base_name => 'Font',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_automatic_size' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutomaticSize',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_inner_mode' => {
+     	datatype => 'boolean',
+     	base_name => 'IsInnerMode',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'shadow' => {
+     	datatype => 'boolean',
+     	base_name => 'Shadow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'shape_properties' => {
+     	datatype => 'ARRAY[LinkElement]',
+     	base_name => 'ShapeProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'width' => {
+     	datatype => 'int',
+     	base_name => 'Width',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'height' => {
+     	datatype => 'int',
+     	base_name => 'Height',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'x' => {
+     	datatype => 'int',
+     	base_name => 'X',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'y' => {
+     	datatype => 'int',
+     	base_name => 'Y',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'is_inner_mode' => 'boolean',
-    'shape_properties' => 'ARRAY[LinkElement]',
-    'auto_scale_font' => 'boolean',
     'area' => 'Area',
-    'height' => 'int',
-    'width' => 'int',
+    'auto_scale_font' => 'boolean',
     'background_mode' => 'string',
-    'is_automatic_size' => 'boolean',
-    'y' => 'int',
-    'x' => 'int',
-    'shadow' => 'boolean',
-    'font' => 'Font',
     'border' => 'Line',
-    'link' => 'Link'
+    'font' => 'Font',
+    'is_automatic_size' => 'boolean',
+    'is_inner_mode' => 'boolean',
+    'shadow' => 'boolean',
+    'shape_properties' => 'ARRAY[LinkElement]',
+    'width' => 'int',
+    'height' => 'int',
+    'x' => 'int',
+    'y' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'is_inner_mode' => 'IsInnerMode',
-    'shape_properties' => 'ShapeProperties',
-    'auto_scale_font' => 'AutoScaleFont',
     'area' => 'Area',
-    'height' => 'Height',
-    'width' => 'Width',
+    'auto_scale_font' => 'AutoScaleFont',
     'background_mode' => 'BackgroundMode',
-    'is_automatic_size' => 'IsAutomaticSize',
-    'y' => 'Y',
-    'x' => 'X',
-    'shadow' => 'Shadow',
-    'font' => 'Font',
     'border' => 'Border',
-    'link' => 'link'
+    'font' => 'Font',
+    'is_automatic_size' => 'IsAutomaticSize',
+    'is_inner_mode' => 'IsInnerMode',
+    'shadow' => 'Shadow',
+    'shape_properties' => 'ShapeProperties',
+    'width' => 'Width',
+    'height' => 'Height',
+    'x' => 'X',
+    'y' => 'Y' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

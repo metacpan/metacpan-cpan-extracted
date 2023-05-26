@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ConditionalFormattingIcon;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,46 +118,46 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ConditionalFormattingIcon',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'index' => {
-    	datatype => 'int',
-    	base_name => 'Index',
-    	description => 'Gets and sets the icon&#39;s index in the icon set.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => 'Gets and sets the icon set type.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'image_data' => {
-    	datatype => 'string',
-    	base_name => 'ImageData',
-    	description => 'Gets the icon set data.             ',
-    	format => '',
-    	read_only => '',
-    		},
+     'image_data' => {
+     	datatype => 'string',
+     	base_name => 'ImageData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'index' => {
+     	datatype => 'int',
+     	base_name => 'Index',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'image_data' => 'string',
     'index' => 'int',
-    'type' => 'string',
-    'image_data' => 'string'
+    'type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'image_data' => 'ImageData',
     'index' => 'Index',
-    'type' => 'Type',
-    'image_data' => 'ImageData'
+    'type' => 'Type' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

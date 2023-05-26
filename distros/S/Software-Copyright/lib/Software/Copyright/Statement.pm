@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.007';
+$Software::Copyright::Statement::VERSION = '0.009';
 use 5.20.0;
 use warnings;
 
@@ -16,6 +16,8 @@ use Mouse;
 use Array::IntSpan;
 use Carp;
 use Software::Copyright::Owner;
+use Date::Parse;
+use Time::localtime;
 
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
@@ -46,9 +48,14 @@ has owner => (
 
 sub __clean_copyright ($c) {
     $c =~ s/^&copy;\s*//g;
-    $c =~ s/\(c\)\s*//g;
+    $c =~ s/\(c\)\s*//gi;
+    # remove space around dash between number (eg. 2003 - 2004 => 2003-2004)
+    $c =~ s/(\d+)\s*-\s*(?=\d+)/$1-/g;
+    # extract year from YY-MM-DD:hh:mm:ss format
+    $c =~ s/(\d{2,4}-\d\d-\d{2,4})[:\d]*/my @r = strptime($1); $r[5]+1900/gex;
+    # remove extra years inside range, e,g 2003- 2004- 2008 -> 2003- 2008
     $c =~ s/(?<=\b\d{4})\s*-\s*\d{4}(?=\s*-\s*(\d{4})\b)//g;
-    $c =~ s/(\d+)\s*-\s*(\d+)/$1-$2/g;
+    # add space after a comma between years
     $c =~ s/\b(\d{4}),?\s+([\S^\d])/$1, $2/g;
     $c =~ s/\s+by\s+//g;
     $c =~ s/(\\n)*all\s+rights?\s+reserved\.?(\\n)*\s*//gi; # yes there are literal \n
@@ -97,7 +104,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
             $span->set_range_as_string($year, $owner->identifier // 'unknown');
         };
         if ($@) {
-            warn "Invalid year span: '$year': $@";
+            warn "Invalid year span: '$year' found in statement '$c': $@";
             last;
         }
     }
@@ -171,7 +178,7 @@ Software::Copyright::Statement - a copyright statement for one owner
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -191,7 +198,7 @@ version 0.007
  $statement->add_years('2015, 2016-2019')->stringify; # => is '2015-2022, Joe <joe@example.com>'
 
  # stringification
- "$statement"; # => is '2015-2022, Joe <joe@example.com>'
+ my $string = "$statement"; # => is '2015-2022, Joe <joe@example.com>'
 
  # test if a statement "contains" another one
  my $st_2020 = Software::Copyright::Statement->new('2020, Joe <joe@example.com>');

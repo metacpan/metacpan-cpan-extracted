@@ -5,7 +5,7 @@ use warnings;
 
 use English qw(-no_match_vars);
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.0.4';
 
 sub new {
     my ( $class, %param ) = @ARG;
@@ -55,7 +55,7 @@ JIP::Mock::Event - Object representation of an individual call to a mocked metho
 
 =head1 VERSION
 
-This document describes L<JIP::Mock::Event> version C<v0.0.3>.
+This document describes L<JIP::Mock::Event> version C<v0.0.4>.
 
 =head1 SYNOPSIS
 

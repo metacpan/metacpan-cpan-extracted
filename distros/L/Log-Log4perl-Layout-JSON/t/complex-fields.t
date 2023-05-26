@@ -73,4 +73,38 @@ subtest "value field as hash" => sub {
     $appender->string('');
 };
 
+subtest 'deep hash references fix' => sub {
+    my $conf = q(
+        log4perl.appender.Test = Log::Log4perl::Appender::String
+        log4perl.appender.Test.layout = Log::Log4perl::Layout::JSON
+        log4perl.appender.Test.layout.field.message = %m
+        log4perl.appender.Test.layout.field.category = %c
+        log4perl.appender.Test.layout.field.class = %C
+        log4perl.appender.Test.layout.field.file = %F{1}
+        log4perl.appender.Test.layout.field.sub = %M{1}
+        log4perl.appender.Test.layout.canonical = 1
+
+        log4perl.category.TestDebug = DEBUG, Test
+        log4perl.category.TestInfo = INFO, Test
+    );
+    Log::Log4perl::init( \$conf );
+    Log::Log4perl::MDC->remove;
+
+    ok my $appender = Log::Log4perl->appender_by_name("Test");
+
+    my $info_logger = Log::Log4perl->get_logger('TestInfo');
+    $info_logger->debug('debug message');
+    is_deeply $appender->string(), '';
+
+    $info_logger->info('info message');
+    is_deeply $appender->string(), '{"category":"TestInfo","class":"main","file":"complex-fields.t","message":"info message","sub":"__ANON__"}'."\n";
+    $appender->string('');
+
+    my $debug_logger = Log::Log4perl->get_logger('TestDebug');
+    $debug_logger->debug('debug message');
+    is_deeply $appender->string(), '{"category":"TestDebug","class":"main","file":"complex-fields.t","message":"debug message","sub":"__ANON__"}'."\n";
+    $appender->string('');
+
+};
+
 done_testing();

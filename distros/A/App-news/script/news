@@ -1,0 +1,281 @@
+#! /usr/bin/env perl
+# Copyright (C) 2023  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+news - a read-only web fron-end to a local news server
+
+=head1 SYNOPSIS
+
+B<news>
+
+=head1 DESCRIPTION
+
+C<news> connects to the local news server via NNTP on port 119, lists all the
+groups and allows read-only access.
+
+An optional B<message-id> can be provided on the command line. A link to this
+article serves as the "start here" link on the front page.
+
+For each group, only posts made in the last seven days are shown. The From field
+is stripped of anything in angled brackets in an effort to remove email
+addresses: \s*<.*>
+
+For each article, an attempt is made to scrip email addresses by removing
+anything in angled brackets: \s*<\S*?@.*?>
+
+=head2 Environment variables
+
+The news server is determined by L<Net::NNTP>: If no host is passed then two
+environment variables are checked C<NNTPSERVER> then C<NEWSHOST>, then
+L<Net::Config> is checked, and if a host is not found then C<news> is used.
+
+C<NEWS_INTRO_ID> can be set to a message id for a "start here" message.
+
+=head2 Systemd
+
+To install as a service, use a C<news.service> file like the following:
+
+    [Unit]
+    Description=News (a web front-end)
+    After=network-online.target
+    Wants=network-online.target
+    [Install]
+    WantedBy=multi-user.target
+    [Service]
+    Type=simple
+    DynamicUser=true
+    Restart=always
+    MemoryHigh=80M
+    MemoryMax=100M
+    Environment="NNTPSERVER=localhost"
+    Environment="NEWS_INTRO_ID=<u4d0i0$n72d$1@sibirocobombus.campaignwiki>"
+    ExecStart=/home/alex/perl5/perlbrew/perls/perl-5.32.0/bin/perl /home/alex/perl5/perlbrew/perls/perl-5.32.0/bin/news daemon
+
+=head1 SEE ALSO
+
+The Tildeverse also runs news.
+L<https://news.tildeverse.org/>
+
+=head1 LICENSE
+
+GNU Affero General Public License
+
+=cut
+
+# corelist
+use Net::NNTP;
+use Encode qw(decode);
+# not core
+use Mojolicious::Lite;      # Mojolicious
+use DateTime::Format::Mail;
+
+get '/' => sub {
+  shift->redirect_to('index');
+};
+
+under 'news';
+
+get '/' => sub {
+  my $c = shift;
+  my $nntp = Net::NNTP->new() or die "No news server found";
+  my $list = $nntp->list();
+  $nntp->quit;
+  $c->render(template => 'index', list => $list,
+             id => $ENV{NEWS_INTRO_ID},
+             address => $c->tx->req->url->to_abs->host);
+} => 'index';
+
+get '/group/#group' => sub {
+  my $c = shift;
+  my $group = $c->param('group');
+  my $nntp = Net::NNTP->new() or die "No news server found";
+  my $ids = $nntp->newnews(time() - 7 * 24 * 60 * 60, , $group);
+  my $list = [];
+  for my $id (reverse @$ids) {
+    my $headers = Mojo::Headers->new;
+    $headers->parse("$_\r\n") for @{$nntp->head($id)};
+    my $data = {
+      id => $id,
+      from => from_header($headers),
+      subject => subject_header($headers),
+      date => date_header($headers),
+    };
+    push(@$list, $data);
+  }
+  $nntp->quit;
+  $c->render(template => 'group', group => $group, list => $list);
+} => 'group';
+
+get '/article/#id' => sub {
+  my $c = shift;
+  my $id = $c->param('id');
+  my $nntp = Net::NNTP->new() or die "No news server found";
+  my $body = $nntp->body($id);
+  return $c->render(template => 'unknown') unless $body;
+  my $headers = Mojo::Headers->new;
+  $headers->parse("$_\r\n") for @{$nntp->head($id)};
+  my $data = {
+    id => $id,
+    from => from_header($headers),
+    subject => subject_header($headers),
+    date => date_header($headers),
+    newsgroups => newsgroups_header($headers),
+    references => references_header($headers),
+    body => article_body(join("", @$body), $headers),
+  };
+  $nntp->quit;
+  $c->render(template => 'article', article => $data);
+} => 'article';
+
+sub from_header {
+  my ($headers) = @_;
+  my $value = $headers->header("from");
+  return "Anonymous" unless $value = decode("MIME-Header", $value); # decode non-ASCII
+  $value =~ s/\s*<.*>//; # remove email addresses
+  return $value;
+}
+
+sub subject_header {
+  my ($headers) = @_;
+  return "?" unless my $value = $headers->header("subject");
+  $value = decode("MIME-Header", $value); # decode non-ASCII
+  return $value;
+}
+
+sub date_header {
+  my ($headers) = @_;
+  my $value = $headers->header("date");
+  $value = decode("MIME-Header", $value); # decode non-ASCII
+  $value =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
+  my $dt = DateTime::Format::Mail->parse_datetime($value);
+  return $dt->ymd . " " . $dt->hms;
+}
+
+sub newsgroups_header {
+  my ($headers) = @_;
+  return [] unless my $value = $headers->header("newsgroups");
+  $value = decode("MIME-Header", $value); # decode non-ASCII
+  return [split(/\s*,\s*/, $value)];
+}
+
+sub references_header {
+  my ($headers) = @_;
+  return [] unless my $value = $headers->header("references");
+  $value = decode("MIME-Header", $value); # decode non-ASCII
+  return [split(/\s*,\s*/, $value)];
+}
+
+sub article_body {
+  my ($body, $headers) = @_;
+  $body =~ s/\s*<\S*?@.*?>//; # remove email addresses
+  return $body unless $headers->header('content-type');
+  my ($charset) = $headers->header('content-type') =~ /charset=(.*)/;
+  return $body unless $charset;
+  return decode($charset, $body);
+}
+
+app->start;
+
+__DATA__
+
+@@ index.html.ep
+% layout "default";
+% title 'News';
+<h1>News</h1>
+<p>
+This is a read-only forum. The groups and posts it shows are from a <a
+href="https://en.wikipedia.org/wiki/News_server">news server</a>. If you have a
+web browser that knows how to handle news URLs, like <tt>lynx</tt>, you can
+visit the news server <a href="news://<%= $address %>/">directly</a>.
+
+% if ($id) {
+<p>
+<%= link_to url_for('article', id => $id) => begin %>Start here<% end %>.
+% }
+
+<ul>
+% for my $group (sort keys %$list) {
+<li><%= link_to url_for('group', group => $group) => begin %><%= $group %><% end %>
+% }
+</ul>
+
+@@ group.html.ep
+% layout "default";
+% title "$group";
+<h1><%= $group %></h1>
+<table>
+<tr><th>Date</th><th>From</th><th>Subject</th></tr>
+% for my $article (@$list) {
+<tr><td><%= link_to url_for('article', id => $article->{id}) => begin %><%= $article->{date} %><% end %></td><td><%= $article->{from} %></td><td><%= $article->{subject} %></td></tr>
+% }
+</table>
+
+@@ article.html.ep
+% layout "default";
+% title "$article->{subject}";
+<h1><%= $article->{subject} %></h1>
+<p class="headers"><span class="value from"><%= $article->{from} %></span>,
+<span class="date"><%= $article->{date} %></span>,
+% for my $newsgroup (@{$article->{newsgroups}}) {
+<%= link_to url_for('group', group => $newsgroup) => (class => "value newsgroups") => begin %><%= $newsgroup %><% end %>
+% }
+% if (@{$article->{references}}) {
+%   for my $id (@{$article->{references}}) {
+<%= link_to url_for('article', id => $id) => (class => "value references") => begin %>ref<% end %>
+%   }
+% }
+
+<pre class="body"><%= $article->{body} %></pre>
+
+@@ unknown.html.ep
+% layout "default";
+% title "Unknown Article";
+<h1>Unknown article</h1>
+<p>Either the message id is wrong or the article has expired on this news
+server.
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= title %></title>
+%= stylesheet begin
+body {
+  padding: 1ch;
+  max-width: 80ch;
+  font-size: 12pt;
+  font-family: "DejaVu Mono", mono;
+  hyphens: auto;
+}
+td {
+  padding: 0 0.5ch;
+}
+
+% end
+<meta name="viewport" content="width=device-width">
+</head>
+<body lang="en">
+<%= content %>
+<hr>
+<p>
+<a href="https://campaignwiki.org/news">News</a>&#x2003;
+<a href="https://alexschroeder.ch/cgit/news/about/">Source</a>&#x2003;
+<a href="https://alexschroeder.ch/wiki/Contact">Alex Schroeder</a>
+</body>
+</html>

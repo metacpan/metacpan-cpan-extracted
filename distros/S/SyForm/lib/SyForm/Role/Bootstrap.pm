@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::Role::Bootstrap::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: SyForm::ViewRole::Bootstrap configuration of the form
-$SyForm::Role::Bootstrap::VERSION = '0.102';
+$SyForm::Role::Bootstrap::VERSION = '0.103';
 use Moo::Role;
 
 has bootstrap => (
@@ -23,7 +23,7 @@ SyForm::Role::Bootstrap - SyForm::ViewRole::Bootstrap configuration of the form
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

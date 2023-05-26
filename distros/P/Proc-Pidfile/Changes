@@ -1,5 +1,9 @@
 Revision history for Perl module Proc::Pidfile
 
+1.10 2023-05-26 NEILB
+    - Fixed and extended backoff handling. PR from E Choroba++
+    - Typo fixed in doc via PR from brian d foy.
+
 1.09 2018-09-26 NEILB
     - Only one odd looking fail on CPAN Testers, so doing a non-developer
       release, as that will get more testing.

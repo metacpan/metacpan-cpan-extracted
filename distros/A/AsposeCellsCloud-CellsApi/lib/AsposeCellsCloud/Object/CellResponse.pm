@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::CellResponse;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Cell;
-use AsposeCellsCloud::Object::CellsCloudResponse;
+use AsposeCellsCloud::Object::CellsCloudResponse; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,46 +119,46 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'CellResponse',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'status' => {
-    	datatype => 'string',
-    	base_name => 'Status',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'code' => {
-    	datatype => 'int',
-    	base_name => 'Code',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cell' => {
-    	datatype => 'Cell',
-    	base_name => 'Cell',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'cell' => {
+     	datatype => 'Cell',
+     	base_name => 'Cell',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'code' => {
+     	datatype => 'int',
+     	base_name => 'Code',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'status' => {
+     	datatype => 'string',
+     	base_name => 'Status',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'status' => 'string',
+    'cell' => 'Cell',
     'code' => 'int',
-    'cell' => 'Cell'
+    'status' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'status' => 'Status',
+    'cell' => 'Cell',
     'code' => 'Code',
-    'cell' => 'Cell'
+    'status' => 'Status' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

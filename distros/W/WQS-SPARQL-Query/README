@@ -1,0 +1,26 @@
+NAME
+    WQS::SPARQL::Query - Useful Wikdata Query Service SPARQL queries.
+
+SEE ALSO
+    WQS::SPARQL::Query::Count
+        Simple SPARQL count query.
+
+    WQS::SPARQL::Query::Select
+        Simple SPARQL select query.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/WQS-SPARQL-Query>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

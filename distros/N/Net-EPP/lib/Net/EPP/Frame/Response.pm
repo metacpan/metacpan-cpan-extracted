@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Response.pm,v 1.9 2011/07/04 09:48:51 gavin Exp $
 package Net::EPP::Frame::Response;
 use Net::EPP::ResponseCodes;
 use base qw(Net::EPP::Frame);
@@ -98,6 +93,7 @@ C<E<lt>svTRIDE<gt>> element.
 
 sub response {$_[0]->getNode('response') }
 sub result {$_[0]->getNode('result') }
+sub msg {$_[0]->getNode('msg') }
 sub resData {$_[0]->getNode('resData') }
 sub trID {$_[0]->getNode('trID') }
 sub clTRID {$_[0]->getNode('clTRID') }
@@ -135,26 +131,5 @@ sub msg {
 	my $msgs = $self->getElementsByLocalName('msg');
 	return $msgs->shift->textContent if ($msgs->size == 1);
 }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
-=cut
 
 1;

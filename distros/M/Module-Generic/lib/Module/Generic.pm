@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.30.2
+## Version v0.30.4
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2023/05/16
+## Modified 2023/05/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.30.2';
+    our $VERSION     = 'v0.30.4';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -829,6 +829,7 @@ sub debug
     my $class = ( ref( $self ) || $self );
     my $this  = $self->_obj2h;
     no strict 'refs';
+    no warnings 'once';
     if( @_ )
     {
         my $flag = shift( @_ );
@@ -874,6 +875,7 @@ sub error
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     my $o;
     no strict 'refs';
+    no warnings 'once';
     if( @_ )
     {
         my $args = {};
@@ -1074,7 +1076,7 @@ sub error
         my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, wants => 'object' });
         rreturn( $null );
     }
-    $self->_message( 5, "Returning error object -> ", overload::StrVal( ref( $self ) ? $this->{error} : ${ $class . '::ERROR' } ) );
+    $self->_message( 5, "Returning error object -> ", overload::StrVal( ref( $self ) ? ( $this->{error} // '' ) : ( ${ $class . '::ERROR' } // '' ) ) );
     return( ref( $self ) ? $this->{error} : ${ $class . '::ERROR' } );
 }
 
@@ -2989,7 +2991,7 @@ sub _set_get_callback : lvalue
     # $self->_message( 5, "_set_get_callback caled with ", ( defined( $field ) ? "field $field and " : "no field and " ), "context is -> ", sub{ $self->Module::Generic::dump( $context ) }, " and stack trace is ", sub{ $self->_get_stack_trace->as_string } );
     $self->_message( 5, "_set_get_callback caled with ", ( defined( $field ) ? "field $field and " : "no field and " ), "context is -> ", sub{ $self->Module::Generic::dump( $context ) } );
     
-    if( scalar( @$args ) )
+    if( CORE::defined( $args ) && scalar( @$args ) )
     {
         $self->_message( 5, "Called for mutator calback with ", scalar( @$args ), " arguments." );
         local $_ = $context;
@@ -3033,7 +3035,7 @@ sub _set_get_callback : lvalue
                 }
                 else
                 {
-                    $self->_message( 5, "No field parameter is provided, so we return the value of a private property (__lvalue) assigned the resulting value (", overload::StrVal( $rv[0] ), ")." );
+                    $self->_message( 5, "No field parameter is provided, so we return the value of a private property (__lvalue) assigned the resulting value (", overload::StrVal( $rv[0] // '' ), ")." );
                     return( $data->{__lvalue} = $rv[0] );
                 }
             }
@@ -3063,7 +3065,7 @@ sub _set_get_callback : lvalue
                     require Module::Generic::Null;
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
-                $self->_message( 5, "Returning callback single value -> ", overload::StrVal( $rv[0] ) );
+                $self->_message( 5, "Returning callback single value -> ", overload::StrVal( $rv[0] // '' ) );
                 rreturn( $rv[0] );
             }
             return;
@@ -3130,7 +3132,7 @@ sub _set_get_callback : lvalue
                     require Module::Generic::Null;
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
-                $self->_message( 5, "Returning the single value returned by callback -> '", overload::StrVal( $rv[0] ), "'" );
+                $self->_message( 5, "Returning the single value returned by callback -> '", overload::StrVal( $rv[0] // '' ), "'" );
                 rreturn( $rv[0] );
             }
         }
@@ -3152,7 +3154,7 @@ sub _set_get_callback : lvalue
                     return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( $context->{lvalue} );
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
-                $self->_message( 5, "Returning the single value returned by callback -> ", overload::StrVal( $rv[0] ) );
+                $self->_message( 5, "Returning the single value returned by callback -> ", overload::StrVal( $rv[0] // '' ) );
                 return( $rv[0] ) if( $context->{lvalue} );
                 rreturn( $rv[0] );
             }
@@ -3956,7 +3958,7 @@ sub _set_get_object_lvalue : lvalue
             }
             else
             {
-                return( $self->error( "Value provided (" . overload::StrVal( $arg ) . " is not an object." ) );
+                return( $self->error( "Value provided (" . overload::StrVal( $arg // '' ) . " is not an object." ) );
             }
             # We need to return something else than our object, or by virtue of perl's way of working
             # we would return our object as coded below, and that object will be assigned the
@@ -6999,12 +7001,12 @@ sub _parse_timestamp
         $self->_message( 5, "Instantiating datetime parser with options -> ", sub{ $self->dump( $opt ) } );
         my $strp = DateTime::Format::Strptime->new( %$opt );
         my $dt = $strp->parse_datetime( $str );
-        $self->_message( 5, "Parser returned datetime object '", overload::StrVal( $dt ), "'" );
+        $self->_message( 5, "Parser returned datetime object '", overload::StrVal( $dt // '' ), "'" );
         $self->_message( 5, "Instantiating datetime formatter with options -> ", sub{ $self->dump( $fmt ) } );
         my $strp2 = $formatter->new( %$fmt );
         # To enable the date string to be stringified to its original format
         $dt->set_formatter( $strp2 ) if( $dt );
-        $self->_message( 5, "Returning datetime object '", ( defined( $dt ) ? overload::StrVal( $dt ) : 'undef' ), "'" );
+        $self->_message( 5, "Returning datetime object '", ( defined( $dt ) ? overload::StrVal( $dt // '' ) : 'undef' ), "'" );
         return( $dt );
     }
     catch( $e )
@@ -7161,7 +7163,7 @@ sub _set_get_datetime : lvalue
             }
             my $now = $process->( $time ) || do
             {
-                $self->_message( 5, "Error processing datetime '", ( defined( $time ) ? overload::StrVal( $time ) : 'undef' ), "'" );
+                $self->_message( 5, "Error processing datetime '", ( defined( $time ) ? overload::StrVal( $time // '' ) : 'undef' ), "'" );
                 return( $self->pass_error );
             };
             $self->_message( 5, "Setting datetime object '", ( defined( $now ) ? overload::StrVal( $now ) : 'undef' ), "'" );
@@ -7665,7 +7667,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.30.2
+    v0.30.4
 
 =head1 DESCRIPTION
 

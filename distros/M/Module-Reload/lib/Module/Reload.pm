@@ -1,5 +1,5 @@
 package Module::Reload;
-$Module::Reload::VERSION = '1.11';
+$Module::Reload::VERSION = '1.12';
 use 5.006;
 use strict;
 use warnings;

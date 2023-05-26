@@ -116,7 +116,7 @@ sub import {
                                          weaken isweak refaddr/);
 
   require Cwd;
-  Cwd->import::into($target, qw/getcwd abs_path/);
+  Cwd->import::into($target, qw/getcwd abs_path fastgetcwd fast_abs_path/);
 
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));

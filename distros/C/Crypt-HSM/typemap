@@ -13,7 +13,6 @@ TYPEMAP
 	CK_ULONG                T_U_LONG
 	CK_OBJECT_HANDLE        T_U_LONG
 	CK_SLOT_ID              T_U_LONG
-	CK_USER_TYPE            T_U_LONG
 
 	CK_USER_TYPE            T_USER_TYPE
 

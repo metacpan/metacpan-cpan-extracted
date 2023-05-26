@@ -1,4 +1,6 @@
+.github/workflows/linux.yml
 .gitignore
+.proverc
 .travis.yml
 .vstags
 Build.PL
@@ -10,12 +12,15 @@ lib/Mojolicious/Plugin/Prometheus.pm
 minil.toml
 t/00_compile.t
 t/basic.t
+t/collector-execution.t
 t/custom.t
 t/custom_buckets.t
 t/custom_group.t
 t/custom_path.t
+t/custom_prometheus.t
 t/custom_route.t
 t/defaults.t
+t/lib/Prometheus/Collector/Custom.pm
 t/linux.t
 META.json
 META.yml

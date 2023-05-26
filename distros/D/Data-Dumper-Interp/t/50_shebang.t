@@ -12,9 +12,9 @@ BEGIN {
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
-use t_TestCommon ':silent', # Test::More etc.
+use t_TestCommon ':silent', # Test2::V0 etc.
                  qw/bug displaystr fmt_codestring timed_run 
-                    checkeq_literal check @quotes/;
+                    mycheckeq_literal mycheck @quotes/;
 
 $SIG{__WARN__} = sub { confess "warning trapped; @_" };
 
@@ -23,9 +23,7 @@ use Data::Compare qw(Compare);
 confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 
 # This script was written before the author knew anything about standard
-# Perl test-harness tools.  Perhaps someday it will be wholely rewritten.
-# Meanwhile, some baby steps...
-#use Test::More; (imported via t_Setup)
+# Perl test-harness tools.  So it is a big monolithic thing.
 
 use Data::Dumper::Interp;
 
@@ -72,7 +70,7 @@ confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 #    $exp =~ s/_q_/$expq_re/g;
 #    my $code_display = $code . " with \$_[1]=«$item»";
 #    local $Data::Dumper::Interp::Foldwidth = 0;  # disable wrapping
-#    check $code_display, qr/$exp/, $doeval->($code, $item) ;
+#    mycheck $code_display, qr/$exp/, $doeval->($code, $item) ;
 #  }
 #}#checkstringy()
 
@@ -82,7 +80,7 @@ confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 #
 # The given regexp specifies the expected result with Useqq(1), i.e.
 # double-quoted; a single-quoted version is derived internally.
-sub checklit(&$$) {
+sub mychecklit(&$$) {
   my ($doeval, $item, $dq_expected_re) = @_;
   (my $sq_expected_re = $dq_expected_re)
     =~ s{ ( [^\\"]++|(\\.) )*+ \K " }{'}xsg
@@ -111,16 +109,16 @@ sub checklit(&$$) {
     $exp =~ s/_q_/$sq_expected_re/g;
     my $code_display = $code . " with \$_[1]=$quotes[0].$item.$quotes[1]";
     local $Data::Dumper::Interp::Foldwidth = 0;  # disable wrapping
-    check $code_display, qr/$exp/, $doeval->($code, $item) ;
+    mycheck $code_display, qr/$exp/, $doeval->($code, $item) ;
   }
 }#checklit()
 
 # Basic test of OO interfaces
-{ my $code="Data::Dumper::Interp->new->vis('foo')  ;"; check $code, '"foo"',     eval $code }
-{ my $code="Data::Dumper::Interp->new->avis('foo') ;"; check $code, '("foo")',   eval $code }
-{ my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
-{ my $code="Data::Dumper::Interp->new->dvis('foo') ;"; check $code, 'foo',       eval $code }
-{ my $code="Data::Dumper::Interp->new->ivis('foo') ;"; check $code, 'foo',       eval $code }
+{ my $code="Data::Dumper::Interp->new->vis('foo')  ;"; mycheck $code, '"foo"',     eval $code }
+{ my $code="Data::Dumper::Interp->new->avis('foo') ;"; mycheck $code, '("foo")',   eval $code }
+{ my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; mycheck $code, '(k => "v")',eval $code }
+{ my $code="Data::Dumper::Interp->new->dvis('foo') ;"; mycheck $code, 'foo',       eval $code }
+{ my $code="Data::Dumper::Interp->new->ivis('foo') ;"; mycheck $code, 'foo',       eval $code }
 
 foreach (
           ['Foldwidth',0,1,80,9999],
@@ -233,86 +231,86 @@ package main;
 $_ = "GroupA.GroupB";
 /(.*)\W(.*)/sp or die "nomatch"; # set $1 and $2
 
-{ my $code = 'qsh("a b")';           check $code, '"a b"',  eval $code; }
-{ my $code = 'qsh(undef)';           check $code, "undef",  eval $code; }
-{ my $code = 'qsh("undef")';         check $code, "\"undef\"",  eval $code; }
-{ my $code = 'qshpath("a b")';       check $code, '"a b"',  eval $code; }
-{ my $code = 'qshpath("~user")';     check $code, "~user",  eval $code; }
-{ my $code = 'qshpath("~user/a b")'; check $code, '~user/"a b"', eval $code; }
-{ my $code = 'qshpath("~user/ab")';  check $code, "~user/ab", eval $code; }
-{ my $code = 'qsh("~user/ab")';      check $code, '"~user/ab"', eval $code; }
-{ my $code = 'qsh($_)';              check $code, "${_}",   eval $code; }
-{ my $code = 'qsh()';                check $code, "${_}",   eval $code; }
-{ my $code = 'qsh';                  check $code, "${_}",   eval $code; }
-{ my $code = 'qshpath($_)';          check $code, "${_}",   eval $code; }
-{ my $code = 'qshpath()';            check $code, "${_}",   eval $code; }
-{ my $code = 'qshpath';              check $code, "${_}",   eval $code; }
-{ my $code = q(qshlist("a b","c",'$d')); check $code, q("a b" c '$d'),  eval $code; }
+{ my $code = 'qsh("a b")';           mycheck $code, '"a b"',  eval $code; }
+{ my $code = 'qsh(undef)';           mycheck $code, "undef",  eval $code; }
+{ my $code = 'qsh("undef")';         mycheck $code, "\"undef\"",  eval $code; }
+{ my $code = 'qshpath("a b")';       mycheck $code, '"a b"',  eval $code; }
+{ my $code = 'qshpath("~user")';     mycheck $code, "~user",  eval $code; }
+{ my $code = 'qshpath("~user/a b")'; mycheck $code, '~user/"a b"', eval $code; }
+{ my $code = 'qshpath("~user/ab")';  mycheck $code, "~user/ab", eval $code; }
+{ my $code = 'qsh("~user/ab")';      mycheck $code, '"~user/ab"', eval $code; }
+{ my $code = 'qsh($_)';              mycheck $code, "${_}",   eval $code; }
+{ my $code = 'qsh()';                mycheck $code, "${_}",   eval $code; }
+{ my $code = 'qsh';                  mycheck $code, "${_}",   eval $code; }
+{ my $code = 'qshpath($_)';          mycheck $code, "${_}",   eval $code; }
+{ my $code = 'qshpath()';            mycheck $code, "${_}",   eval $code; }
+{ my $code = 'qshpath';              mycheck $code, "${_}",   eval $code; }
+{ my $code = q(qshlist("a b","c",'$d')); mycheck $code, q("a b" c '$d'),  eval $code; }
 
 # Basic checks
-{ my $code = 'vis($_)'; check $code, "\"${_}\"", eval $code; }
-{ my $code = 'vis()'; check $code, "\"${_}\"", eval $code; }
-{ my $code = 'vis'; check $code, "\"${_}\"", eval $code; }
-{ my $code = 'avis($_,1,2,3)'; check $code, "(\"${_}\",1,2,3)", eval $code; }
-{ my $code = 'hvis("foo",$_)'; check $code, "(foo => \"${_}\")", eval $code; }
-{ my $code = 'hlvis("foo",$_)'; check $code, "foo => \"${_}\"", eval $code; }
-{ my $code = 'avis(@_)'; check $code, '()', eval $code; }
-{ my $code = 'hvis(@_)'; check $code, '()', eval $code; }
-{ my $code = 'hlvis(@_)'; check $code, '', eval $code; }
-{ my $code = 'avis(undef)'; check $code, "(undef)", eval $code; }
-{ my $code = 'hvis("foo",undef)'; check $code, "(foo => undef)", eval $code; }
-{ my $code = 'vis(undef)'; check $code, "undef", eval $code; }
-{ my $code = 'ivis(undef)'; check $code, "<undef arg>", eval $code; }
-{ my $code = 'dvis(undef)'; check $code, "<undef arg>", eval $code; }
-{ my $code = 'dvisq(undef)'; check $code, "<undef arg>", eval $code; }
-{ my $code = 'vis(\undef)'; check $code, "\\undef", eval $code; }
-{ my $code = 'vis(\123)'; check $code, "\\123", eval $code; }
-{ my $code = 'vis(\"xy")'; check $code, "\\\"xy\"", eval $code; }
+{ my $code = 'vis($_)'; mycheck $code, "\"${_}\"", eval $code; }
+{ my $code = 'vis()'; mycheck $code, "\"${_}\"", eval $code; }
+{ my $code = 'vis'; mycheck $code, "\"${_}\"", eval $code; }
+{ my $code = 'avis($_,1,2,3)'; mycheck $code, "(\"${_}\",1,2,3)", eval $code; }
+{ my $code = 'hvis("foo",$_)'; mycheck $code, "(foo => \"${_}\")", eval $code; }
+{ my $code = 'hlvis("foo",$_)'; mycheck $code, "foo => \"${_}\"", eval $code; }
+{ my $code = 'avis(@_)'; mycheck $code, '()', eval $code; }
+{ my $code = 'hvis(@_)'; mycheck $code, '()', eval $code; }
+{ my $code = 'hlvis(@_)'; mycheck $code, '', eval $code; }
+{ my $code = 'avis(undef)'; mycheck $code, "(undef)", eval $code; }
+{ my $code = 'hvis("foo",undef)'; mycheck $code, "(foo => undef)", eval $code; }
+{ my $code = 'vis(undef)'; mycheck $code, "undef", eval $code; }
+{ my $code = 'ivis(undef)'; mycheck $code, "<undef arg>", eval $code; }
+{ my $code = 'dvis(undef)'; mycheck $code, "<undef arg>", eval $code; }
+{ my $code = 'dvisq(undef)'; mycheck $code, "<undef arg>", eval $code; }
+{ my $code = 'vis(\undef)'; mycheck $code, "\\undef", eval $code; }
+{ my $code = 'vis(\123)'; mycheck $code, "\\123", eval $code; }
+{ my $code = 'vis(\"xy")'; mycheck $code, "\\\"xy\"", eval $code; }
 
 { my $code = q/my $s; my @a=sort{ $s=dvis('$a $b'); $a<=>$b }(3,2); "@a $s"/ ;
-  check $code, '2 3 a=3 b=2', eval $code;
+  mycheck $code, '2 3 a=3 b=2', eval $code;
 }
 
 # Vis v1.147ish+ : Check corner cases of re-parsing code
-{ my $code = q(my $v = undef; dvis('$v')); check $code, "v=undef", eval $code; }
-{ my $code = q(my $v = \undef; dvis('$v')); check $code, "v=\\undef", eval $code; }
-{ my $code = q(my $v = \"abc"; dvis('$v')); check $code, 'v=\\"abc"', eval $code; }
-{ my $code = q(my $v = \"abc"; dvisq('$v')); check $code, "v=\\'abc'", eval $code; }
-{ my $code = q(my $v = \*STDOUT; dvisq('$v')); check $code, "v=\\*::STDOUT", eval $code; }
+{ my $code = q(my $v = undef; dvis('$v')); mycheck $code, "v=undef", eval $code; }
+{ my $code = q(my $v = \undef; dvis('$v')); mycheck $code, "v=\\undef", eval $code; }
+{ my $code = q(my $v = \"abc"; dvis('$v')); mycheck $code, 'v=\\"abc"', eval $code; }
+{ my $code = q(my $v = \"abc"; dvisq('$v')); mycheck $code, "v=\\'abc'", eval $code; }
+{ my $code = q(my $v = \*STDOUT; dvisq('$v')); mycheck $code, "v=\\*::STDOUT", eval $code; }
 { my $code = q(open my $fh, "</dev/null" or die $!; dvis('$fh'));
-  check $code, "fh=\\*{\"::\\\$fh\"}", eval $code; }
+  mycheck $code, "fh=\\*{\"::\\\$fh\"}", eval $code; }
 { my $code = q(open my $fh, "</dev/null" or die $!; dvisq('$fh'));
-  check $code, "fh=\\*{'::\$fh'}", eval $code; }
+  mycheck $code, "fh=\\*{'::\$fh'}", eval $code; }
 
 # Data::Dumper::Interp 2.12 : hex escapes including illegal code points:
 #   10FFFF is the highest legal Unicode code point which will ever be assigned.
 # Perl (v5.34 at least) mandates code points be <= max signed integer,
 # which on 32 bit systems is 7FFFFFFF.
 { my $code = q(my $v = "beyondmax:\x{110000}\x{FFFFFF}\x{7FFFFFFF}"; dvis('$v'));
-  check $code, 'v="beyondmax:\x{110000}\x{ffffff}\x{7fffffff}"', eval $code; }
+  mycheck $code, 'v="beyondmax:\x{110000}\x{ffffff}\x{7fffffff}"', eval $code; }
 
 # Check that $1 etc. can be passed (this was once a bug...)
 # The duplicated calls are to check that $1 is preserved
 { my $code = '" a~b" =~ / (.*)()/ && qsh($1); die unless $1 eq "a~b";qsh($1)';
-  check $code, '"a~b"', eval $code; }
+  mycheck $code, '"a~b"', eval $code; }
 { my $code = '" a~b" =~ / (.*)()/ && qshpath($1); die unless $1 eq "a~b";qshpath($1)';
-  check $code, '"a~b"', eval $code; }
+  mycheck $code, '"a~b"', eval $code; }
 { my $code = '" a~b" =~ / (.*)()/ && vis($1); die unless $1 eq "a~b";vis($1)';
-  check $code, '"a~b"', eval $code; }
+  mycheck $code, '"a~b"', eval $code; }
 { my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1); die unless $1 eq "a \$vv b"; dvis($1)';
-  check $code, 'a vv=123 b', eval $code; }
+  mycheck $code, 'a vv=123 b', eval $code; }
 
 # Check Deparse support
 { my $data = $test_sub;
-  { my $code = 'vis($data)'; check $code, 'sub { "DUMMY" }', eval $code; }
+  { my $code = 'vis($data)'; mycheck $code, 'sub { "DUMMY" }', eval $code; }
   local $Data::Dumper::Interp::Deparse = 1;
-  { my $code = 'vis($data)'; check $code, qr/sub \{\s*my \$x = 42;\s*\}/, eval $code; }
+  { my $code = 'vis($data)'; mycheck $code, qr/sub \{\s*my \$x = 42;\s*\}/, eval $code; }
 }
 
 # Floating point values (single values special-cased to show not as 'string')
-{ my $code = 'vis(3.14)'; check $code, '3.14', eval $code; }
+{ my $code = 'vis(3.14)'; mycheck $code, '3.14', eval $code; }
 # But multiple values are sent through Data::Dumper, so...
-{ my $code = 'vis([3.14])'; check $code, '[3.14]', eval $code; }
+{ my $code = 'vis([3.14])'; mycheck $code, '[3.14]', eval $code; }
 
 # bigint, bignum, bigrat support
 #
@@ -333,14 +331,14 @@ my $ratstr  = '1/9';
 
   my $bigf = eval $bigfstr // die;
   die(u(blessed($bigf))," <<$bigfstr>> ",u($bigf)," $@") unless blessed($bigf) =~ /^Math::BigFloat/;
-  checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+  mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
 
   # Some implementations make everything a Math::BigFloat, others make
   # integers a Math::BigInt .
   my $bigi = eval $bigistr // die;
   die(u(blessed($bigi))," <<$bigistr>> ",u($bigi)," $@")
     unless blessed($bigi) =~ /^Math::Big\w*/;
-  checklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::Big\w*[^\)]*\))?${bigistr}/);
+  mychecklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::Big\w*[^\)]*\))?${bigistr}/);
 
   # Confirm that various Objects values disable
   foreach my $Sval (0, undef, "", [], [0], [""]) {
@@ -374,29 +372,29 @@ my $ratstr  = '1/9';
   }
   # Yes if globally enabled 
   { local $Data::Dumper::Interp::Objects = 1;
-    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+    mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
   }
   # Yes if enabled only that class (regex)
   { local $Data::Dumper::Interp::Objects = [qr/^Math::BigFloat/];
-    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+    mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
   }
   # Yes if enabled only that class (string)
   { local $Data::Dumper::Interp::Objects = 'Math::BigFloat';
-    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+    mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
   }
   # Yes if enabled for class as well as others (string)
   { local $Data::Dumper::Interp::Objects = ['Somewhat::Bogus', 'Math::BigFloat'];
-    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+    mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
   }
   # Yes if enabled for class as well as others (regex)
   { local $Data::Dumper::Interp::Objects = ['AAA', qr/Bogus/, qr/^Math::BigFloat/, qr/xx/];
-    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+    mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
   }
   # Yes if enabled only for a base class (string)
   { local $Data::Dumper::Interp::Objects = ['main::Mybase'];
     my $obj = main::Myderived->new(42);
     $obj->isa("main::Mybase") or die "urp";
-    checklit(sub{eval $_[0]}, $obj, qr/\(main::Myderived\)Mybase-ish-1042/);
+    mychecklit(sub{eval $_[0]}, $obj, qr/\(main::Myderived\)Mybase-ish-1042/);
   }
 }
 
@@ -413,7 +411,7 @@ my $ratstr  = '1/9';
     use bigrat;
     my $rat = eval $ratstr // die;
     die unless $rat->isa("Math::BigRat");
-    checklit(sub{eval $_[0]}, $rat, qr/(?:\(Math::BigRat[^\)]*\))?${ratstr}/);
+    mychecklit(sub{eval $_[0]}, $rat, qr/(?:\(Math::BigRat[^\)]*\))?${ratstr}/);
 EOF
   die "urp\n$@" if $@
 }
@@ -434,7 +432,7 @@ EOF
                                     $_
                                   }segx;
     local $Data::Dumper::Interp::MaxStringwidth = $MSw;
-    check "with MaxStringwidth=$MSw", $exp_str, eval 'vis($orig_data)';
+    mycheck "with MaxStringwidth=$MSw", $exp_str, eval 'vis($orig_data)';
     die "MaxStringwidth=$MSw : Original data corrupted"
       unless Compare($orig_data, $check_data);
   }
@@ -443,7 +441,7 @@ EOF
 # There was a bug for s/dvis called direct from outer scope, so don't use eval:
 #WAS BUG HERE: On some older platforms qr/.../ can visualize to a different,
 #longer representation, so forcing wrap to be the same on all platforms.
-check
+mycheck
   'global dvis %toplex_h',
 q(%toplex_h=(
   "" => "Emp",
@@ -457,11 +455,11 @@ q(%toplex_h=(
   G => qr/foo.*bar/six
 )),
   dvis('%toplex_h');
-check 'global divs @ARGV', q(@ARGV=("fake","argv")), dvis('@ARGV');
-check 'global divs $.', q($.=1234), dvis('$.');
-check 'global divs $ENV{EnvVar}', q("Test EnvVar Value"), ivis('$ENV{EnvVar}');
+mycheck 'global divs @ARGV', q(@ARGV=("fake","argv")), dvis('@ARGV');
+mycheck 'global divs $.', q($.=1234), dvis('$.');
+mycheck 'global divs $ENV{EnvVar}', q("Test EnvVar Value"), ivis('$ENV{EnvVar}');
 sub func {
-  check 'func args', q(@_=(1,2,3)), dvis('@_');
+  mycheck 'func args', q(@_=(1,2,3)), dvis('@_');
 }
 func(1,2,3);
 
@@ -471,7 +469,7 @@ my @backtrack_bugtest_data = (
   {A => 0, BBBBBBBBBBBBB => "foo"},
 );
 timed_run {
-  check 'dvis @backtrack_bugtest_data',
+  mycheck 'dvis @backtrack_bugtest_data',
         '@backtrack_bugtest_data=(42,{A => 0,BBBBBBBBBBBBB => "foo"})',
         dvis('@backtrack_bugtest_data');
 } 0.05; # was 0.01 but that failed on slow arm machines
@@ -831,15 +829,15 @@ EOF
         if $@ or ! defined $ev;
     }
 
-    my sub checkspunct($$$) {
+    my sub mycheckspunct($$$) {
       my ($varname, $actual, $expecting) = @_;
-      check "dvis('$dvis_input') lno $lno : $varname NOT PRESERVED : ",
+      mycheck "dvis('$dvis_input') lno $lno : $varname NOT PRESERVED : ",
             $actual//"<undef>", $expecting//"<undef>" ;
     }
-    my sub checknpunct($$$) {
+    my sub mychecknpunct($$$) {
       my ($varname, $actual, $expecting) = @_;
-      # N.B. check() compares as strings
-      check "dvis('$dvis_input') lno $lno : $varname NOT PRESERVED : ",
+      # N.B. mycheck() compares as strings
+      mycheck "dvis('$dvis_input') lno $lno : $varname NOT PRESERVED : ",
             defined($actual) ? $actual+0 : "<undef>",
             defined($expecting) ? $expecting+0 : "<undef>" ;
     }
@@ -871,14 +869,14 @@ EOF
            ? Data::Dumper::Interp->new()->dvis($dvis_input)
            : dvis($dvis_input);
 
-        checkspunct('$@',  $@,   $fakeAt);
-        checkspunct('$/',  $/,   $fakeFs);
-        checkspunct('$\\', $\,   $fakeBs);
-        checkspunct('$,',  $,,   $fakeCom);
-        # In FreeBSD a reference to $& can set errno!  So can't check $! unless we save&restore it in the tests
-        checknpunct('$!',  $!+0, $fakeBang);
-        checknpunct('$^E', $^E+0,$fake_cE);
-        checknpunct('$^W', $^W+0,$fake_cW);
+        mycheckspunct('$@',  $@,   $fakeAt);
+        mycheckspunct('$/',  $/,   $fakeFs);
+        mycheckspunct('$\\', $\,   $fakeBs);
+        mycheckspunct('$,',  $,,   $fakeCom);
+        # In FreeBSD a reference to $& can set errno!  So can't mycheck $! unless we save&restore it in the tests
+        mychecknpunct('$!',  $!+0, $fakeBang);
+        mychecknpunct('$^E', $^E+0,$fake_cE);
+        mychecknpunct('$^W', $^W+0,$fake_cW);
 
         # Restore
         ($@, $/, $\, $,, $!, $^E, $^W)
@@ -888,7 +886,7 @@ EOF
       $actual = $@ if $@;
       $@ = $dollarat_val;
 
-      check(
+      mycheck(
         "Test case lno $lno, (use_oo=$use_oo) dvis input "
                               . $quotes[0].show_white($dvis_input).$quotes[1],
         $expected,

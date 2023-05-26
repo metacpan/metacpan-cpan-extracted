@@ -1,8 +1,19 @@
+0.006   2023-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        [cli csv2sqlite]
+
+        - [bugfix] Fix getting CSV from stdin to tempfile.
+
+        - [ux] Switch order of arguments to be more intuitive.
+
+        - [ux] Add shorter alias for import-csv-to-sqlite3: csv2sqlite.
+
+
 0.005   2021-09-13  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
 
-	- [cli import-csv-to-sqlite3] Mention how sqlite3 cli can also be
+	- [doc] [cli import-csv-to-sqlite] Mention how sqlite3 cli can also be
 	  used non-interactively.
 
 
@@ -10,7 +21,7 @@
 
 	- No functional changes.
 
-	- [cli import-csv-to-sqlite] Expand/fix description.
+	- [doc] [cli import-csv-to-sqlite] Expand/fix description.
 
 
 0.003   2021-09-12  Released-By: PERLANCAR; Urgency: medium

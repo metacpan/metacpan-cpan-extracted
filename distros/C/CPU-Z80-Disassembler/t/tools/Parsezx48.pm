@@ -58,7 +58,7 @@ sub read_asm {
 	my($self, $rom_asm_file) = @_;
 	
 	my @file;
-	tie @file, 'Tie::File', $rom_asm_file, mode => O_RDONLY;
+	tie @file, 'Tie::File', $rom_asm_file, mode => O_RDONLY, recsep => "\n";
 	
 	# read file header and footer
 	my $p_min = $self->read_header(\@file);

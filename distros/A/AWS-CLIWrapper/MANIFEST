@@ -8,6 +8,7 @@ t/01_new.t
 t/03_awscli_path.t
 t/03_awscli_timeout.t
 t/03_awscli_version.t
+t/03_region.t
 t/04_errors.t
 xt/01_podspell.t
 xt/02_perlcritic.t

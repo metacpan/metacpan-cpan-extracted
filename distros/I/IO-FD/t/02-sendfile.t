@@ -8,6 +8,15 @@ use POSIX qw<errno_h>;
 use Socket ":all";
 
 
+# Netbsd does not support sendfile
+use Config;
+my @vers=split /\./, $Config{osvers};
+plan skip_all=>"No sendfile to test on NetBSD or OpenBSD" if $Config{osname}=~/netbsd|openbsd/i;
+
+
+
+
+
 #create a socket pair
 #====================
 die "Could not create pair" unless defined IO::FD::socketpair my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0;

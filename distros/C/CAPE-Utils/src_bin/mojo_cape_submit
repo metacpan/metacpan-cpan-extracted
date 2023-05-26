@@ -64,36 +64,6 @@ but helps to set them to something sane and relevant.
     - type :: The type of submission. Generally going
               to be 'manual' or 'suricata_extract'.
 
-    - src_host :: The hostname of the sending system.
-
-    - src_ip :: The source IP for what Suricata picked up.
-
-    - src_port :: The source port for what Suricata picked up.
-
-    - dest_ip :: The destination IP for what Suricata picked up.
-
-    - dest_port :: The destination port for what Suricata picked up.
-
-    - proto :: Protocol, such as TCP or UDP.
-
-    - app_proto :: Application protocol, such as HTTP.
-
-    - flow_id  :: The flow ID Suricata picked it up from.
-
-    - http_host :: If HTTP, the host in the URL.
-
-    - http_url :: If HTTP, the path section of the URL.
-
-    - http_method :: If HTTP, the method, such as GET.
-
-    - http_proto :: If HTTP, the protocol version.
-
-    - http_status :: If HTTP, the status code of the session.
-
-    - http_ctype :: If HTTP, the content type.
-
-    - http_ua :: If HTTP, the useragent.
-
 =head1 PINGING
 
 If you submit a file with a file with the size of 10 and matching
@@ -107,6 +77,7 @@ use Sys::Syslog;
 use JSON;
 use CAPE::Utils;
 use File::Slurp;
+use Sys::Hostname;
 use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
 	sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
 use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u
@@ -133,7 +104,7 @@ sub log_drek {
 	openlog( 'mojo_cape_submit', 'cons,pid', 'daemon' );
 	syslog( $level, '%s', $message );
 	closelog();
-}
+} ## end sub log_drek
 
 # handle it
 sub the_stuff {
@@ -145,8 +116,7 @@ sub the_stuff {
 	my $message = 'Started. Remote IP: ' . $remote_ip . '  API key: ';
 	if ( defined($apikey) ) {
 		$message = $message . $apikey;
-	}
-	else {
+	} else {
 		$message = $message . 'undef';
 	}
 	log_drek( 'info', $message );
@@ -205,42 +175,63 @@ sub the_stuff {
 	}
 
 	# clean up the filename and log it
+	my $orig_name = $name;
 	$name =~ s/\///;
 	log_drek( 'info', 'Got File... size=' . $size . ' filename="' . $name . '"' );
 	$name = $cape_util->{config}->{_}->{incoming} . '/' . $name;
 
-	# get all the possible additional info
+	# get the json metadata info
+	my $raw_json = $c->param('json');
+	my $json;
+	eval { $json = decode_json($raw_json); };
+	if ($@) {
+		log_drek( 'err', 'json param decode error: ' . $@ );
+		$json = {};
+	}
+
+	# add initial relevant submission data
+	$json->{cape_submit} = {
+		orig_name => $orig_name,
+		name      => $name,
+		apikey    => $apikey,
+		remote_ip => $remote_ip,
+		size      => $size,
+		time      => time,
+		host      => hostname,
+	};
+
+	# get some info for logging purposes
+	# done this way for the purpose of not having to constantly check if something is undef
 	my %additional_info;
-	$additional_info{src_ip}      = $c->param('src_ip');
-	$additional_info{src_port}    = $c->param('src_port');
-	$additional_info{dest_ip}     = $c->param('dest_ip');
-	$additional_info{dest_port}   = $c->param('dest_port');
-	$additional_info{proto}       = $c->param('proto');
-	$additional_info{app_proto}   = $c->param('app_proto');
-	$additional_info{flow_id}     = $c->param('flow_id');
-	$additional_info{http_host}   = $c->param('http_host');
-	$additional_info{http_url}    = $c->param('http_url');
-	$additional_info{http_method} = $c->param('http_method');
-	$additional_info{http_proto}  = $c->param('http_proto');
-	$additional_info{http_status} = $c->param('http_status');
-	$additional_info{http_ctype}  = $c->param('http_ctype');
-	$additional_info{http_ua}     = $c->param('http_ua');
-	$additional_info{type}        = $c->param('type');
-	$additional_info{src_host}    = $c->param('src_host');
-	$additional_info{sending_ip}  = $remote_ip;
-	$additional_info{apikey}      = $apikey;
-	$additional_info{name}        = $name;
+	$additional_info{src_ip}       = $c->param('src_ip');
+	$additional_info{src_port}     = $c->param('src_port');
+	$additional_info{dest_ip}      = $c->param('dest_ip');
+	$additional_info{dest_port}    = $c->param('dest_port');
+	$additional_info{proto}        = $c->param('proto');
+	$additional_info{app_proto}    = $c->param('app_proto');
+	$additional_info{flow_id}      = $c->param('flow_id');
+	$additional_info{http_host}    = $c->param('http_host');
+	$additional_info{http_url}     = $c->param('http_url');
+	$additional_info{http_method}  = $c->param('http_method');
+	$additional_info{http_proto}   = $c->param('http_proto');
+	$additional_info{http_status}  = $c->param('http_status');
+	$additional_info{http_ctype}   = $c->param('http_ctype');
+	$additional_info{http_ua}      = $c->param('http_ua');
+	$additional_info{det_sub_type} = $c->param('type');
+	$additional_info{src_host}     = $c->param('src_host');
 
 	# set the value for anything not defined to undef for the purpose of logging
+	# this will avoid perl from throwing errors about undef used in cating
 	foreach my $item ( keys(%additional_info) ) {
 		if ( !defined( $additional_info{$item} ) ) {
 			$additional_info{$item} = 'undef';
 		}
 	}
+	$json->{det_sub_type} = $additional_info{det_sub_type};
 
 	# log additional info
 	log_drek( 'info', 'Source Host: ' . $additional_info{src_host} );
-	log_drek( 'info', 'Submission Type: ' . $additional_info{type} );
+	log_drek( 'info', 'Submission Type: ' . $additional_info{det_sub_type} );
 	log_drek( 'info',
 			  'proto='
 			. $additional_info{proto}
@@ -257,22 +248,24 @@ sub the_stuff {
 	if ( $additional_info{app_proto} eq 'http' ) {
 		log_drek( 'info', $additional_info{http_proto} . ' ' . $additional_info{http_host} );
 		log_drek( 'info',
-			$additional_info{http_method} . ' ' . $additional_info{http_status} . ' ' . $additional_info{http_url} );
+				  $additional_info{http_method} . ' '
+				. $additional_info{http_status} . ' '
+				. $additional_info{http_url} );
 		log_drek( 'info', 'useragent: ' . $additional_info{http_ua} );
-	}
-	else {
+	} else {
 		log_drek( 'info', 'App Proto: ' . $additional_info{app_proto} );
 	}
 
 	# copy it into place
 	$file->move_to($name);
-	$additional_info{sha256} = lc( sha256_file_hex($name) );
-	log_drek( 'info', 'SHA256: ' . $additional_info{sha256} );
-	$additional_info{sha1} = lc( sha1_file_hex($name) );
-	log_drek( 'info', 'SHA1: ' . $additional_info{sha1} );
-	$additional_info{md5} = lc( md5_file_hex($name) );
-	log_drek( 'info', 'MD5: ' . $additional_info{md5} );
+	$json->{cape_submit}{sha256} = lc( sha256_file_hex($name) );
+	log_drek( 'info', 'SHA256: ' . $json->{cape_submit}{sha256} );
+	$json->{cape_submit}{sha1} = lc( sha1_file_hex($name) );
+	log_drek( 'info', 'SHA1: ' . $json->{cape_submit}{sha1} );
+	$json->{cape_submit}{md5} = lc( md5_file_hex($name) );
+	log_drek( 'info', 'MD5: ' . $json->{cape_submit}{md5} );
 
+	# finally submit it
 	my $results;
 	eval { $results = $cape_util->submit( items => [$name], quiet => 1, ); };
 	if ($@) {
@@ -281,6 +274,7 @@ sub the_stuff {
 		return;
 	}
 
+	# can't continue if submission failed
 	my @submitted = keys( %{$results} );
 	if ( !defined( $submitted[0] ) ) {
 		log_drek( 'err', 'Submitting "' . $name . '" failed' );
@@ -288,26 +282,29 @@ sub the_stuff {
 		return;
 	}
 
-	log_drek( 'err', 'Submitting "' . $name . '" submitted as ' . $results->{ $submitted[0] } );
+	# log the submission
+	log_drek( 'info', 'Submitting "' . $name . '" submitted as ' . $results->{ $submitted[0] } );
 	$c->render( text => "Submitted as task ID " . $results->{ $submitted[0] } . "\n", status => 200, );
+	$json->{cape_submit}{task} = $results->{ $submitted[0] };
 
+	# can't continue if this dir does not exist
 	if ( !-d $cape_util->{config}->{_}->{incoming_json} ) {
 		log_drek( 'err',
 			'incoming_json directory, "' . $cape_util->{config}->{_}->{incoming_json} . '", does not exist' );
+		return;
 	}
-	else {
-		my $data_json      = encode_json( \%additional_info ) . "\n";
-		my $data_json_file = $cape_util->{config}->{_}->{incoming_json} . '/' . $results->{ $submitted[0] } . '.json';
-		eval { write_file( $data_json_file, $data_json ); };
-		if ($@) {
-			log_drek( 'err', 'Failed to write submission data JSON out to "' . $data_json_file . '"... ' . $@ );
-		}
-		else {
-			log_drek( 'info', 'Wrote submission data JSON out to "' . $data_json_file . '"' );
-		}
+
+	# write out the json containing the submission info
+	my $data_json      = encode_json($json) . "\n";
+	my $data_json_file = $cape_util->{config}->{_}->{incoming_json} . '/' . $results->{ $submitted[0] } . '.json';
+	eval { write_file( $data_json_file, $data_json ); };
+	if ($@) {
+		log_drek( 'err', 'Failed to write submission data JSON out to "' . $data_json_file . '"... ' . $@ );
+	} else {
+		log_drek( 'info', 'Wrote submission data JSON out to "' . $data_json_file . '"' );
 	}
 
 	return;
-}
+} ## end sub the_stuff
 
 app->start;

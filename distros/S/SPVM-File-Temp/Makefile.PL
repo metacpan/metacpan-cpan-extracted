@@ -18,14 +18,14 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.9692');
+my %configure_and_runtime_requires = ('SPVM' => '0.980');
 WriteMakefile(
   NAME              => 'SPVM::File::Temp',
   VERSION_FROM      => 'lib/SPVM/File/Temp.pm',
-  LICENSE           => 'perl_5',
+  LICENSE           => 'mit',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/File/Temp.pm',
-     AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
+     AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
   test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
@@ -47,7 +47,7 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
-    'SPVM::Sys' => '0.41',
+    'SPVM::Sys' => '0.481001',
     'SPVM::File::Path' => '0.01',
     'SPVM::File::Spec' => '0.03',
     'SPVM::IO' => '0.16',

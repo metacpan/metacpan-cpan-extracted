@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::HtmlSaveOptions;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::SaveOptions; 
 
-use AsposeCellsCloud::Object::SaveOptions;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,332 +118,324 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'HtmlSaveOptions',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'enable_http_compression' => {
-    	datatype => 'boolean',
-    	base_name => 'EnableHTTPCompression',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'save_format' => {
-    	datatype => 'string',
-    	base_name => 'SaveFormat',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'clear_data' => {
-    	datatype => 'boolean',
-    	base_name => 'ClearData',
-    	description => 'Make the workbook empty after saving the file.',
-    	format => '',
-    	read_only => '',
-    		},
-    'cached_file_folder' => {
-    	datatype => 'string',
-    	base_name => 'CachedFileFolder',
-    	description => 'The cached file folder is used to store some large data.',
-    	format => '',
-    	read_only => '',
-    		},
-    'validate_merged_areas' => {
-    	datatype => 'boolean',
-    	base_name => 'ValidateMergedAreas',
-    	description => 'Indicates whether validate merged areas before saving the file. The default value is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'refresh_chart_cache' => {
-    	datatype => 'boolean',
-    	base_name => 'RefreshChartCache',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'create_directory' => {
-    	datatype => 'boolean',
-    	base_name => 'CreateDirectory',
-    	description => 'If true and the directory does not exist, the directory will be automatically created before saving the file.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'sort_names' => {
-    	datatype => 'boolean',
-    	base_name => 'SortNames',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'save_as_single_file' => {
-    	datatype => 'string',
-    	base_name => 'SaveAsSingleFile',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_hidden_worksheet' => {
-    	datatype => 'string',
-    	base_name => 'ExportHiddenWorksheet',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_grid_lines' => {
-    	datatype => 'string',
-    	base_name => 'ExportGridLines',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'presentation_preference' => {
-    	datatype => 'string',
-    	base_name => 'PresentationPreference',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cell_css_prefix' => {
-    	datatype => 'string',
-    	base_name => 'CellCssPrefix',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'table_css_id' => {
-    	datatype => 'string',
-    	base_name => 'TableCssId',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_full_path_link' => {
-    	datatype => 'string',
-    	base_name => 'IsFullPathLink',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_worksheet_css_separately' => {
-    	datatype => 'string',
-    	base_name => 'ExportWorksheetCSSSeparately',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_similar_border_style' => {
-    	datatype => 'string',
-    	base_name => 'ExportSimilarBorderStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'merge_empty_td_forcely' => {
-    	datatype => 'string',
-    	base_name => 'MergeEmptyTdForcely',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_cell_coordinate' => {
-    	datatype => 'string',
-    	base_name => 'ExportCellCoordinate',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_extra_headings' => {
-    	datatype => 'string',
-    	base_name => 'ExportExtraHeadings',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_headings' => {
-    	datatype => 'string',
-    	base_name => 'ExportHeadings',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_formula' => {
-    	datatype => 'string',
-    	base_name => 'ExportFormula',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'add_tooltip_text' => {
-    	datatype => 'string',
-    	base_name => 'AddTooltipText',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_bogus_row_data' => {
-    	datatype => 'string',
-    	base_name => 'ExportBogusRowData',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'exclude_unused_styles' => {
-    	datatype => 'string',
-    	base_name => 'ExcludeUnusedStyles',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_document_properties' => {
-    	datatype => 'string',
-    	base_name => 'ExportDocumentProperties',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_worksheet_properties' => {
-    	datatype => 'string',
-    	base_name => 'ExportWorksheetProperties',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_workbook_properties' => {
-    	datatype => 'string',
-    	base_name => 'ExportWorkbookProperties',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_frame_scripts_and_properties' => {
-    	datatype => 'string',
-    	base_name => 'ExportFrameScriptsAndProperties',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'attached_files_directory' => {
-    	datatype => 'string',
-    	base_name => 'AttachedFilesDirectory',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'attached_files_url_prefix' => {
-    	datatype => 'string',
-    	base_name => 'AttachedFilesUrlPrefix',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'encoding' => {
-    	datatype => 'string',
-    	base_name => 'Encoding',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_active_worksheet_only' => {
-    	datatype => 'boolean',
-    	base_name => 'ExportActiveWorksheetOnly',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_chart_image_format' => {
-    	datatype => 'string',
-    	base_name => 'ExportChartImageFormat',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_images_as_base64' => {
-    	datatype => 'boolean',
-    	base_name => 'ExportImagesAsBase64',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'hidden_col_display_type' => {
-    	datatype => 'string',
-    	base_name => 'HiddenColDisplayType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'hidden_row_display_type' => {
-    	datatype => 'string',
-    	base_name => 'HiddenRowDisplayType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'html_cross_string_type' => {
-    	datatype => 'string',
-    	base_name => 'HtmlCrossStringType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_exp_image_to_temp_dir' => {
-    	datatype => 'boolean',
-    	base_name => 'IsExpImageToTempDir',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'page_title' => {
-    	datatype => 'string',
-    	base_name => 'PageTitle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'parse_html_tag_in_cell' => {
-    	datatype => 'boolean',
-    	base_name => 'ParseHtmlTagInCell',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'save_as_single_file' => {
+     	datatype => 'boolean',
+     	base_name => 'SaveAsSingleFile',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_hidden_worksheet' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportHiddenWorksheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_grid_lines' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportGridLines',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'presentation_preference' => {
+     	datatype => 'boolean',
+     	base_name => 'PresentationPreference',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cell_css_prefix' => {
+     	datatype => 'string',
+     	base_name => 'CellCssPrefix',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'table_css_id' => {
+     	datatype => 'string',
+     	base_name => 'TableCssId',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_full_path_link' => {
+     	datatype => 'boolean',
+     	base_name => 'IsFullPathLink',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_worksheet_css_separately' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportWorksheetCSSSeparately',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_similar_border_style' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportSimilarBorderStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'merge_empty_td_forcely' => {
+     	datatype => 'boolean',
+     	base_name => 'MergeEmptyTdForcely',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_cell_coordinate' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportCellCoordinate',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_extra_headings' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportExtraHeadings',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_headings' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportHeadings',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_formula' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportFormula',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'add_tooltip_text' => {
+     	datatype => 'boolean',
+     	base_name => 'AddTooltipText',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_bogus_row_data' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportBogusRowData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'exclude_unused_styles' => {
+     	datatype => 'boolean',
+     	base_name => 'ExcludeUnusedStyles',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_document_properties' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportDocumentProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_worksheet_properties' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportWorksheetProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_workbook_properties' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportWorkbookProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_frame_scripts_and_properties' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportFrameScriptsAndProperties',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'attached_files_directory' => {
+     	datatype => 'string',
+     	base_name => 'AttachedFilesDirectory',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'attached_files_url_prefix' => {
+     	datatype => 'string',
+     	base_name => 'AttachedFilesUrlPrefix',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'encoding' => {
+     	datatype => 'string',
+     	base_name => 'Encoding',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_active_worksheet_only' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportActiveWorksheetOnly',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_chart_image_format' => {
+     	datatype => 'string',
+     	base_name => 'ExportChartImageFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_images_as_base64' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportImagesAsBase64',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'hidden_col_display_type' => {
+     	datatype => 'string',
+     	base_name => 'HiddenColDisplayType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'hidden_row_display_type' => {
+     	datatype => 'string',
+     	base_name => 'HiddenRowDisplayType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'html_cross_string_type' => {
+     	datatype => 'string',
+     	base_name => 'HtmlCrossStringType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_exp_image_to_temp_dir' => {
+     	datatype => 'boolean',
+     	base_name => 'IsExpImageToTempDir',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_title' => {
+     	datatype => 'string',
+     	base_name => 'PageTitle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'parse_html_tag_in_cell' => {
+     	datatype => 'boolean',
+     	base_name => 'ParseHtmlTagInCell',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'save_format' => {
+     	datatype => 'string',
+     	base_name => 'SaveFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cached_file_folder' => {
+     	datatype => 'string',
+     	base_name => 'CachedFileFolder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'clear_data' => {
+     	datatype => 'boolean',
+     	base_name => 'ClearData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'create_directory' => {
+     	datatype => 'boolean',
+     	base_name => 'CreateDirectory',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'enable_http_compression' => {
+     	datatype => 'boolean',
+     	base_name => 'EnableHTTPCompression',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refresh_chart_cache' => {
+     	datatype => 'boolean',
+     	base_name => 'RefreshChartCache',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_names' => {
+     	datatype => 'boolean',
+     	base_name => 'SortNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'validate_merged_areas' => {
+     	datatype => 'boolean',
+     	base_name => 'ValidateMergedAreas',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'enable_http_compression' => 'boolean',
-    'save_format' => 'string',
-    'clear_data' => 'boolean',
-    'cached_file_folder' => 'string',
-    'validate_merged_areas' => 'boolean',
-    'refresh_chart_cache' => 'boolean',
-    'create_directory' => 'boolean',
-    'sort_names' => 'boolean',
-    'save_as_single_file' => 'string',
-    'export_hidden_worksheet' => 'string',
-    'export_grid_lines' => 'string',
-    'presentation_preference' => 'string',
+    'save_as_single_file' => 'boolean',
+    'export_hidden_worksheet' => 'boolean',
+    'export_grid_lines' => 'boolean',
+    'presentation_preference' => 'boolean',
     'cell_css_prefix' => 'string',
     'table_css_id' => 'string',
-    'is_full_path_link' => 'string',
-    'export_worksheet_css_separately' => 'string',
-    'export_similar_border_style' => 'string',
-    'merge_empty_td_forcely' => 'string',
-    'export_cell_coordinate' => 'string',
-    'export_extra_headings' => 'string',
-    'export_headings' => 'string',
-    'export_formula' => 'string',
-    'add_tooltip_text' => 'string',
-    'export_bogus_row_data' => 'string',
-    'exclude_unused_styles' => 'string',
-    'export_document_properties' => 'string',
-    'export_worksheet_properties' => 'string',
-    'export_workbook_properties' => 'string',
-    'export_frame_scripts_and_properties' => 'string',
+    'is_full_path_link' => 'boolean',
+    'export_worksheet_css_separately' => 'boolean',
+    'export_similar_border_style' => 'boolean',
+    'merge_empty_td_forcely' => 'boolean',
+    'export_cell_coordinate' => 'boolean',
+    'export_extra_headings' => 'boolean',
+    'export_headings' => 'boolean',
+    'export_formula' => 'boolean',
+    'add_tooltip_text' => 'boolean',
+    'export_bogus_row_data' => 'boolean',
+    'exclude_unused_styles' => 'boolean',
+    'export_document_properties' => 'boolean',
+    'export_worksheet_properties' => 'boolean',
+    'export_workbook_properties' => 'boolean',
+    'export_frame_scripts_and_properties' => 'boolean',
     'attached_files_directory' => 'string',
     'attached_files_url_prefix' => 'string',
     'encoding' => 'string',
@@ -456,18 +447,18 @@ __PACKAGE__->swagger_types( {
     'html_cross_string_type' => 'string',
     'is_exp_image_to_temp_dir' => 'boolean',
     'page_title' => 'string',
-    'parse_html_tag_in_cell' => 'boolean'
+    'parse_html_tag_in_cell' => 'boolean',
+    'save_format' => 'string',
+    'cached_file_folder' => 'string',
+    'clear_data' => 'boolean',
+    'create_directory' => 'boolean',
+    'enable_http_compression' => 'boolean',
+    'refresh_chart_cache' => 'boolean',
+    'sort_names' => 'boolean',
+    'validate_merged_areas' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'enable_http_compression' => 'EnableHTTPCompression',
-    'save_format' => 'SaveFormat',
-    'clear_data' => 'ClearData',
-    'cached_file_folder' => 'CachedFileFolder',
-    'validate_merged_areas' => 'ValidateMergedAreas',
-    'refresh_chart_cache' => 'RefreshChartCache',
-    'create_directory' => 'CreateDirectory',
-    'sort_names' => 'SortNames',
     'save_as_single_file' => 'SaveAsSingleFile',
     'export_hidden_worksheet' => 'ExportHiddenWorksheet',
     'export_grid_lines' => 'ExportGridLines',
@@ -500,7 +491,15 @@ __PACKAGE__->attribute_map( {
     'html_cross_string_type' => 'HtmlCrossStringType',
     'is_exp_image_to_temp_dir' => 'IsExpImageToTempDir',
     'page_title' => 'PageTitle',
-    'parse_html_tag_in_cell' => 'ParseHtmlTagInCell'
+    'parse_html_tag_in_cell' => 'ParseHtmlTagInCell',
+    'save_format' => 'SaveFormat',
+    'cached_file_folder' => 'CachedFileFolder',
+    'clear_data' => 'ClearData',
+    'create_directory' => 'CreateDirectory',
+    'enable_http_compression' => 'EnableHTTPCompression',
+    'refresh_chart_cache' => 'RefreshChartCache',
+    'sort_names' => 'SortNames',
+    'validate_merged_areas' => 'ValidateMergedAreas' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

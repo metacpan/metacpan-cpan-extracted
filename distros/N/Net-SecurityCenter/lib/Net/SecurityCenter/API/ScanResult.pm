@@ -10,7 +10,7 @@ use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.310';
+our $VERSION = '0.311';
 
 my $common_template = {
 
@@ -170,6 +170,24 @@ sub get {
     return $scan_result if ($raw);
 
     return sc_normalize_hash($scan_result);
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub delete {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = { id => $common_template->{'id'} };
+
+    my $params         = sc_check_params( $tmpl, \%args );
+    my $scan_result_id = delete( $params->{'id'} );
+
+    my $scan_result = $self->client->delete("/scanResult/$scan_result_id");
+
+    return 1 if ( defined $scan_result );
+    return   if ( !$scan_result );
 
 }
 
@@ -700,6 +718,22 @@ Params:
 
 =back
 
+=head2 delete
+
+Delete a scan associated with C<id>.
+
+    if ($sc->get_status( id => 1337 ) eq 'completed') {
+        $sc->delete( id => 1337 );
+    }
+
+Params:
+
+=over 4
+
+=item * C<id> : Scan result ID
+
+=back
+
 
 =head2 email
 
@@ -749,7 +783,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

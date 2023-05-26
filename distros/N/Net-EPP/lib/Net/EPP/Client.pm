@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Client.pm,v 1.17 2011/01/23 12:23:16 gavin Exp $
 package Net::EPP::Client;
 use bytes;
 use Net::EPP::Protocol;
@@ -17,7 +12,8 @@ use warnings;
 
 =head1 NAME
 
-Net::EPP::Client - a client library for the TCP transport for EPP, the Extensible Provisioning Protocol
+Net::EPP::Client - a client library for the TCP transport for EPP, the
+Extensible Provisioning Protocol.
 
 =head1 SYNOPSIS
 
@@ -44,20 +40,13 @@ Net::EPP::Client - a client library for the TCP transport for EPP, the Extensibl
 
 =head1 DESCRIPTION
 
-EPP is the Extensible Provisioning Protocol. EPP (defined in RFC 4930) is an
-application layer client-server protocol for the provisioning and management of
-objects stored in a shared central repository. Specified in XML, the protocol
-defines generic object management operations and an extensible framework that
-maps protocol operations to objects. As of writing, its only well-developed
-application is the provisioning of Internet domain names, hosts, and related
-contact details.
+L<RFC 5743|https://www.rfc-editor.org/rfc/rfc5734.html> defines a TCP based
+transport model for EPP, and this module implements a client for that model.
+You can establish and manage EPP connections and send and receive responses 
+ver this connection.
 
-RFC 4934 defines a TCP based transport model for EPP, and this module
-implements a client for that model. You can establish and manage EPP
-connections and send and receive responses over this connection.
-
-C<Net::EPP::Client> also provides some time-saving features, such as being able
-to provide request and response frames as C<Net::EPP::Frame> objects.
+C<Net::EPP::Client> also provides some time-saving features, such as being
+able to provide request and response frames as C<Net::EPP::Frame> objects.
 
 =cut
 
@@ -96,20 +85,20 @@ C<port> specifies the TCP port to connect to. This is usually 700.
 
 =item * ssl
 
-If the C<ssl> parameter is defined, then C<IO::Socket::SSL> will be used to
+If the C<ssl> parameter is defined, then L<IO::Socket::SSL> will be used to
 provide an encrypted connection. If not, then a plaintext connection will be
 created.
 
 =item * dom (deprecated)
 
 If the C<dom> parameter is defined, then all response frames will be returned
-as C<XML::LibXML::Document> objects.
+as L<XML::LibXML::Document> objects.
 
 =item * frames
 
 If the C<frames> parameter is defined, then all response frames will be
-returned as C<Net::EPP::Frame> objects (actually, C<XML::LibXML::Document>
-objects reblessed as C<Net::EPP::Frame> objects).
+returned as L<Net::EPP::Frame> objects (actually, L<XML::LibXML::Document>
+objects reblessed as L<Net::EPP::Frame> objects).
 
 =back
 
@@ -172,7 +161,7 @@ sub new {
 
 This method establishes the TCP connection. You can use the C<%PARAMS> hash to
 specify arguments that will be passed on to the constructors for
-C<IO::Socket::INET> (such as a timeout) or C<IO::Socket::SSL> (such as
+L<IO::Socket::INET> (such as a timeout) or L<IO::Socket::SSL> (such as
 certificate information). See the relevant manpage for examples.
 
 This method will C<croak()> if connection fails, so be sure to use C<eval()> if
@@ -262,8 +251,8 @@ sub request {
 	my $frame = $epp->get_frame;
 
 This method returns an EPP response frame from the server. This may either be a
-scalar filled with XML, an C<XML::LibXML::Document> object (or an
-C<XML::DOM::Document> object), depending on whether you defined the C<dom>
+scalar filled with XML, an L<XML::LibXML::Document> object (or an
+L<XML::DOM::Document> object), depending on whether you defined the C<dom>
 parameter to the constructor.
 
 B<Important Note>: this method will block your program until it receives the
@@ -331,9 +320,9 @@ This sends a request frame to the server. C<$frame> may be one of:
 
 =item * a scalar containing a filename
 
-=item * an C<XML::LibXML::Document> object (or an instance of a subclass)
+=item * an L<XML::LibXML::Document> object (or an instance of a subclass)
 
-=item * an C<XML::DOM::Document> object (or an instance of a subclass)
+=item * an L<XML::DOM::Document> object (or an instance of a subclass)
 
 =back
 
@@ -393,36 +382,9 @@ connection out of sync with the server.
 
 sub disconnect {
 	my $self = shift;
-	$self->{'connection'}->close;
+	$self->{'connection'}->close if ($self->{'connection'});
 	return 1;
 }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (L<http://www.centralnic.com/>).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=item * L<Net::EPP::Proxy>
-
-=item * RFCs 4930 and RFC 4934, available from L<http://www.ietf.org/>.
-
-=item * The CentralNic EPP site at L<http://www.centralnic.com/resellers/epp>.
-
-=back
-
-=cut
 
 sub parser {
 	my $self = shift;

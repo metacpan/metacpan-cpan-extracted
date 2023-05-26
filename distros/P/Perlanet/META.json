@@ -70,7 +70,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v3.0.2"
+         "version" : "v3.0.3"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -124,6 +124,6 @@
          "web" : "https://github.com/davorg/perlanet"
       }
    },
-   "version" : "v3.0.2",
+   "version" : "v3.0.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

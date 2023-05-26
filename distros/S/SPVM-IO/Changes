@@ -1,3 +1,18 @@
+0.202  2023-05-23
+  [Incompatibe Changes]
+    * The definition of the following methods in the IO::Handle class are changed.
+      [Before]
+      method printf : int ($format : string, $args : object[]...);
+      [After]
+      method printf : int ($format : string, $args : object[]);
+      
+0.201  2023-05-23
+  [License Change]
+    * The license is changed to MIT License.
+  [Prerequirement Changes]
+    * SPVM 0.981+ is required.
+  [New Features]
+    * The version string can be got.
 0.20  2023-03-20
   [Internal Compatible Changes]
     * Use SPVM::ExchangeAPI method instead of SPVM functions.

@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Data::Kramerius::Object::VERSION, 0.05, 'Version.');
+is($Data::Kramerius::Object::VERSION, 0.06, 'Version.');

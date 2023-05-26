@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::NegativeBarFormat;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::Color; 
 
-use AsposeCellsCloud::Object::Color;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,55 +118,55 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Represents the color settings of the data bars for negative values that are    defined by a data bar conditional formating rule.             ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'NegativeBarFormat',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'border_color' => {
-    	datatype => 'Color',
-    	base_name => 'BorderColor',
-    	description => 'Gets or sets a FormatColor object that you can use to specify the border    color for negative data bars.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'color' => {
-    	datatype => 'Color',
-    	base_name => 'Color',
-    	description => 'Gets or sets a FormatColor object that you can use to specify the fill color    for negative data bars.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'border_color_type' => {
-    	datatype => 'string',
-    	base_name => 'BorderColorType',
-    	description => 'Gets whether to use the same border color as positive data bars.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'color_type' => {
-    	datatype => 'string',
-    	base_name => 'ColorType',
-    	description => 'Gets or sets whether to use the same fill color as positive data bars.',
-    	format => '',
-    	read_only => '',
-    		},
+     'border_color' => {
+     	datatype => 'Color',
+     	base_name => 'BorderColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'border_color_type' => {
+     	datatype => 'string',
+     	base_name => 'BorderColorType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color' => {
+     	datatype => 'Color',
+     	base_name => 'Color',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color_type' => {
+     	datatype => 'string',
+     	base_name => 'ColorType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'border_color' => 'Color',
-    'color' => 'Color',
     'border_color_type' => 'string',
-    'color_type' => 'string'
+    'color' => 'Color',
+    'color_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
     'border_color' => 'BorderColor',
-    'color' => 'Color',
     'border_color_type' => 'BorderColorType',
-    'color_type' => 'ColorType'
+    'color' => 'Color',
+    'color_type' => 'ColorType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

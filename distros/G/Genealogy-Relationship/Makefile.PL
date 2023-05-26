@@ -8,6 +8,7 @@ WriteMakefile(
         Types::Standard => 0,
         List::Util      => 0,
         List::MoreUtils => 0,
+        Lingua::EN::Numbers => 0,
     },
     BUILD_REQUIRES    => {
         Test::More      => 0,

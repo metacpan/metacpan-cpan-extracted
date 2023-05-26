@@ -9,7 +9,6 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0'
-  perl: '5.006'
   strict: '0'
   warnings: '0'
 configure_requires:
@@ -43,10 +42,11 @@ requires:
   YAML::Any: '0'
   common::sense: '0'
   parent: '0'
+  perl: v5.10.0
 resources:
   homepage: https://github.com/rubykat/File-Sticker
   repository: https://github.com/rubykat/File-Sticker.git
-version: '3.0006'
+version: '3.0008'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-suricata_extract_submit - Submits files to mojo_cape_submit for detonation via CAPEv2
+suricata_extract_submit - Submits files extracted by Suricata to mojo_cape_submit for detonation via CAPEv2
 
 =head1 SYNOPSIS
 
@@ -11,6 +11,8 @@ suricata_extract_submit
 */5 * * * * /usr/local/bin/suricata_extract_submit 2> /dev/null > /dev/null
 
 =head1 DESCRIPTION
+
+What is printed to standard out is also sent to syslog.
 
 This requires having the file-store output configured akin to below.
 
@@ -26,6 +28,9 @@ This requires having the file-store output configured akin to below.
             mode: extra-data
             deployment: reverse
             header: X-Forwarded-For
+
+The force-hash values are optional as this script will automatically compute
+those for inclusion as well SHA256.
 
 =head1 CONFIGURATION
 
@@ -43,6 +48,12 @@ The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
     #ignore=
     # a file of regex to use for checking host names go ignore
     #ignoreHosts=
+    # if it should use HTTPS_PROXY and HTTP_PROXY from ENV or not
+    env_proxy=0
+    # stats file holding only the stats for the last run
+    stats_file=/var/cache/suricata_extract_submit_stats.json
+    # stats dir
+    stats_dir=/var/cache/suricata_extract_submit_stats/
 
 =cut
 
@@ -50,11 +61,15 @@ use File::Find::Rule;
 use warnings;
 use strict;
 use Config::Tiny;
-use File::Slurp;
+use File::Slurp qw(append_file write_file read_file);
 use Time::Piece;
 use File::MimeInfo::Magic;
 use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u
 	md5_file md5_file_hex md5_file_b64 md5_file_b64u );
+use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
+	sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
+use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_b64u
+	sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
 use Net::Subnet qw(subnet_matcher);
 use LWP::UserAgent;
 use HTTP::Request::Common;
@@ -64,6 +79,9 @@ use POSIX 'strftime';
 use Sys::Syslog;
 use JSON;
 use Sys::Hostname;
+
+my $t          = localtime;
+my $today_name = $t->strftime('%F');
 
 # sends stuff to syslog
 sub log_something {
@@ -78,13 +96,14 @@ sub log_something {
 	closelog();
 
 	print $message. "\n";
-}
+} ## end sub log_something
 
 log_something( 'info', 'Suricata Malware Extractor starting up..' );
 
 # sensor config file
-my $config = Config::Tiny->read('/usr/local/etc/suricata_extract_submit.ini');
-log_something( 'info', 'Config /usr/local/etc/suricata_extract_submit.ini read...' );
+my $config_file = '/usr/local/etc/suricata_extract_submit.ini';
+my $config      = Config::Tiny->read($config_file);
+log_something( 'info', 'Config ' . $config_file . ' read...' );
 
 # information for submitting it...
 my $apikey = $config->{_}->{apikey};
@@ -97,11 +116,106 @@ if ( !defined($url) ) {
 	log_something( 'err', $message );
 }
 
+# make sure we have a slug
+my $slug = $config->{_}->{slug};
+if ( !defined($url) ) {
+	my $message = 'No value for slug set';
+	log_something( 'err', $message );
+}
+
 # get the file store dir
 my $filestore = $config->{_}->{filestore};
 if ( !defined($filestore) ) {
 	$filestore = '/var/log/suricata/files/';
 }
+
+# get the env proxy
+my $use_env_proxy = $config->{_}->{env_proxy};
+if ( !defined($use_env_proxy) ) {
+	$use_env_proxy = 0;
+}
+
+# get the stats file
+my $stats_file = $config->{_}->{stats_file};
+if ( !defined($stats_file) ) {
+	$stats_file = '/var/cache/suricata_extract_submit_stats.json';
+}
+
+# get the stats dir
+my $stats_dir = $config->{_}->{stats_dir};
+if ( !defined($stats_dir) ) {
+	$stats_dir = '/var/cache/suricata_extract_submit_stats/';
+}
+
+my $stats_default = {
+	sub                   => 0,
+	sub_delta             => 0,
+	sub_fail              => 0,
+	sub_fail_delta        => 0,
+	zero_sized            => 0,
+	zero_sized_delta      => 0,
+	sub_2xx               => 0,
+	sub_2xx_delta         => 0,
+	sub_3xx               => 0,
+	sub_3xx_delta         => 0,
+	sub_4xx               => 0,
+	sub_4xx_delta         => 0,
+	sub_5xx               => 0,
+	sub_5xx_delta         => 0,
+	last_errors           => [],
+	errors                => 0,
+	errors_delta          => 0,
+	ignored_ip            => 0,
+	ignored_ip_delta      => 0,
+	ignored_ip_src        => 0,
+	ignored_ip_src_delta  => 0,
+	ignored_ip_dest       => 0,
+	ignored_ip_dest_delta => 0,
+	ignored_host          => 0,
+	ignored_host_delta    => 0,
+	truncated             => 0,
+	truncated_delta       => 0,
+};
+my $stats;
+
+# compute the deltas for these items
+my @to_delta = (
+	'sub',     'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
+	'sub_5xx', 'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
+	'truncated'
+);
+
+# handle the stats file if it exists and is readable
+if ( -f $stats_file && -r $stats_file ) {
+	eval { $stats = decode_json( read_file($stats_file) ); };
+	if ($@) {
+		log_something( 'err',
+			'stats file, "' . $stats_file . '", reading or parsing failed, using default stats... ' . $@ );
+		$stats = $stats_default;
+	} else {
+		# make sure each item we will need exists and if not, zero it
+		foreach my $item (@to_delta) {
+			if ( !defined( $stats->{$item} ) ) {
+				$stats->{$item} = 0;
+			}
+		}
+	}
+
+}    # if it exists, but is not readable, error and use the default
+elsif ( -f $stats_file && !-r $stats_file ) {
+	my $error = 'stats file, "' . $stats_file . '", exists, but is not readable, using default stats';
+	log_something( 'err', $error );
+	$stats = $stats_default;
+	$stats->{errors}++;
+	push( @{ $stats->{last_errors} }, $error );
+} else {
+	$stats = $stats_default;
+}
+my %copy_stats = %{$stats};
+my $new_stats  = \%copy_stats;
+
+# reset last_errors instead of having it constantly grow
+$new_stats->{last_errors} = [];
 
 # read in the file of IPs to ignore
 my $ignore_file = $config->{_}->{ignore};
@@ -130,11 +244,11 @@ if ( defined($ignore_file) && -f $ignore_file ) {
 		push( @to_ignore, $item );
 
 		$ignored++;
-	}
+	} ## end foreach my $item (@to_ignore_raw)
 
 	log_something( 'info', 'ignoring ' . $ignored . ' subnets or IPs' );
-}
-my $white_list = subnet_matcher @to_ignore;
+} ## end if ( defined($ignore_file) && -f $ignore_file)
+my $ip_ignore = subnet_matcher @to_ignore;
 
 # read in the file of IPs to ignore
 my $ignoreHosts_file = $config->{_}->{ignoreHosts};
@@ -147,9 +261,9 @@ if ( defined($ignoreHosts_file) && -f $ignoreHosts_file ) {
 	@hosts_to_ignore = grep( !/^\w*\#/, @hosts_to_ignore );
 	@hosts_to_ignore = grep( !/^\w*$/,  @hosts_to_ignore );
 
-	my $found_regex=$#hosts_to_ignore;
+	my $found_regex = $#hosts_to_ignore;
 	log_something( 'info', $found_regex . ' regexs loaded to ignore for hosts' );
-}
+} ## end if ( defined($ignoreHosts_file) && -f $ignoreHosts_file)
 
 # create a tmpdir and chdir to it
 my $tempdir = tempdir();
@@ -161,9 +275,40 @@ my @files = File::Find::Rule->file()->name("*json")->in($filestore);
 
 # exit if we don't find anything as there is no point to continue
 if ( !defined( $files[0] ) ) {
-	log_something( 'err', 'None found at this time' );
+	log_something( 'info', 'None found at this time' );
+
+	foreach my $item (@to_delta) {
+		my $old = $stats->{$item};
+		my $new = $new_stats->{$item};
+		my $delta;
+		if ( !defined($old) ) {
+			$delta = $new;
+		} elsif ( $new > $old ) {
+
+			$delta = $new - $old;
+
+			# roll it over if it is over 2G
+			if ( $new > 2000000000 ) {
+				$new_stats->{$item} = $delta;
+			}
+		} elsif ( $old > $new ) {
+			$delta = $new;
+		} else {
+			$delta = 0;
+		}
+		$new_stats->{ $item . '_delta' } = $delta;
+	} ## end foreach my $item (@to_delta)
+
+	# write out the stats file
+	my $raw_stats = JSON->new->utf8->canonical(1)->encode($new_stats);
+	log_something( 'info', 'Run Stats: ' . $raw_stats );
+	eval { write_file( $stats_file, $raw_stats ); };
+	if ($@) {
+		log_something( 'err', 'Writing stats file, "' . $stats_file . '", failed... ' . $@ );
+	}
+
 	exit 0;
-}
+} ## end if ( !defined( $files[0] ) )
 
 # process any found
 foreach my $file (@files) {
@@ -184,76 +329,92 @@ foreach my $file (@files) {
 		my $data_size = length($data);
 		log_something( 'info', 'Sample Size: ' . $data_size );
 
-		my $src_ip      = $file_json->{src_ip};
-		my $src_port    = $file_json->{src_port};
-		my $dest_ip     = $file_json->{dest_ip};
-		my $dest_port   = $file_json->{dest_port};
-		my $proto       = $file_json->{proto};
-		my $app_proto   = $file_json->{app_proto};
-		my $flow_id     = $file_json->{flow_id};
-		my $http_host   = 'undef';
-		my $http_url    = 'undef';
-		my $http_method = 'undef';
-		my $http_proto  = 'undef';
-		my $http_status = 'undef';
-		my $http_ctype  = 'undef';
-		my $http_ua     = 'undef';
-
-		if ( defined( $file_json->{http} ) ) {
-			$http_host   = $file_json->{http}{hostname};
-			$http_url    = $file_json->{http}{url};
-			$http_method = $file_json->{http}{http_method};
-			$http_proto  = $file_json->{http}{protocol};
-			$http_status = $file_json->{http}{status};
-			$http_ctype  = $file_json->{http}{http_content_type};
-			$http_ua     = $file_json->{http}{http_user_agent};
-		}
-
 		# get the timestramp and transform it into for getting the epoch
 		my $timestamp = $file_json->{timestamp};
 		$timestamp =~ s/\..*$//;
 		my $t = Time::Piece->strptime( $timestamp, '%Y-%m-%dT%H:%M:%S' );
 
-		my $sha256 = $file_json->{fileinfo}{sha256};
-
 		my $filename = $file_json->{fileinfo}{filename};
 
-		my $extUID = lc( substr( md5_hex($data), 0, 18 ) );
-		log_something( 'info', 'extUID: ' . $extUID );
+		my $md5    = lc( md5_hex($data) );
+		my $sha1   = lc( sha1_hex($data) );
+		my $sha256 = lc( sha256_hex($data) );
+		my $extUID = lc( substr( $md5, 0, 18 ) );
 
 		my $mime = mimetype($filename);
 		if ( !defined($mime) ) {
 			$mime = 'application_x-ms-dos-executable';
-		}
-		else {
+		} else {
 			$mime =~ s/\//\_/g;
 		}
 		log_something( 'info', 'MIME type: ' . $mime );
 
-		my $add_it = 1;
-		if ( $white_list->($src_ip) ) {
-			log_something( 'info', 'Ignore Listed Source IP: ' . $src_ip );
-			$add_it = 0;
-		}
-		if ( $white_list->($dest_ip) ) {
-			log_something( 'info', 'Ignore Listed Destination IP: ' . $dest_ip );
-			$add_it = 0;
-		}
-		foreach my $item (@hosts_to_ignore) {
-			if ( $http_host =~ /$item/ ) {
-				log_something( 'info', 'Ignore Listed Host, "' . $item . '": ' . $http_host );
-				$add_it = 0;
-			}
+		# check if it was truncated or not for stats purposes
+		if (   defined( $file_json->{fileinfo} )
+			&& defined( $file_json->{fileinfo}{state} )
+			&& $file_json->{fileinfo}{state} =~ /^[Tt][Rr][Uu][Cc][Aa][Tt][Ee][Dd]$/ )
+		{
+			$new_stats->{truncated}++;
 		}
 
+		my $add_it = 1;
+		if ( $ip_ignore->( $file_json->{src_ip} ) ) {
+			my $file_hostname = '';
+			if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
+				$file_hostname = $file_json->{http}{hostname};
+			}
+			log_something( 'info',
+					  'Ignore Listed Source IP: '
+					. $file_json->{src_ip}
+					. ' ... dest_ip='
+					. $file_json->{dest_ip}
+					. ', hostname='
+					. $file_hostname );
+			$new_stats->{ignored_ip}++;
+			$new_stats->{ignored_ip_src}++;
+			$add_it = 0;
+		} ## end if ( $ip_ignore->( $file_json->{src_ip} ) )
+		if ( $ip_ignore->( $file_json->{dest_ip} ) ) {
+			my $file_hostname = '';
+			if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
+				$file_hostname = $file_json->{http}{hostname};
+			}
+			log_something( 'info',
+					  'Ignore Listed Destination IP: '
+					. $file_json->{dest_ip}
+					. ' ... src_ip='
+					. $file_json->{src_ip}
+					. ', hostname='
+					. $file_hostname );
+			$new_stats->{ignored_ip}++;
+			$new_stats->{ignored_ip_dest}++;
+			$add_it = 0;
+		} ## end if ( $ip_ignore->( $file_json->{dest_ip} ))
+		foreach my $item (@hosts_to_ignore) {
+			if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
+				if ( $file_json->{http}{hostname} =~ /$item/ ) {
+					log_something( 'info',
+							  'Ignore Listed Host, "'
+							. $item . '": '
+							. $file_json->{http}{hostname}
+							. ' ... src_ip='
+							. $file_json->{dest_ip}
+							. ', dest_ip='
+							. $file_json->{dest_ip} );
+					$add_it = 0;
+					$new_stats->{ignored_host}++;
+				} ## end if ( $file_json->{http}{hostname} =~ /$item/)
+			} ## end if ( defined( $file_json->{http} ) && defined...)
+		} ## end foreach my $item (@hosts_to_ignore)
+
 		$name
-			= $src_ip . '-'
-			. $src_port . '-'
-			. $dest_ip . '-'
-			. $dest_port . '-'
-			. $proto . '-'
+			= $file_json->{src_ip} . '-'
+			. $file_json->{src_port} . '-'
+			. $file_json->{dest_ip} . '-'
+			. $file_json->{dest_port} . '-'
+			. $file_json->{proto} . '-'
 			. $extUID . '-'
-			. $config->{_}->{slug} . '-'
+			. $slug . '-'
 			. $t->epoch . '-'
 			. $mime;
 
@@ -268,53 +429,101 @@ foreach my $file (@files) {
 				copy( $data_file, $name )
 					or die 'Copy failed(' . $data_file . ' -> ' . $tempdir . '/' . $name . '): ' . $!;
 
+				$file_json->{suricata_extract_submit} = {
+					filename => $name,
+					apikey   => $apikey,
+					host     => hostname,
+					to       => $config->{_}->{url},
+					time     => time,
+					md5      => $md5,
+					sha256   => $sha256,
+					sha1     => $sha1,
+					slug     => $config->{_}->{slug},
+				};
 				my $res;
 				eval {
 					my $ua = LWP::UserAgent->new(
 						ssl_opts => { verify_hostname => 0, SSL_verify_mode => 0 },
 						timeout  => 30
 					);
+					# use HTTPS_PROXY/HTTP_PROXY from env if set to true
+					if ($use_env_proxy) {
+						$ua->env_proxy;
+					}
 					$res = $ua->request(
 						POST $config->{_}->{url},
 						Content_type => 'multipart/form-data',
 						Content      => [
-							apikey      => $apikey,
-							filename    => [$name],
-							dest_ip     => $dest_ip,
-							dest_port   => $dest_port,
-							src_ip      => $src_ip,
-							src_port    => $src_port,
-							app_proto   => $app_proto,
-							http_host   => $http_host,
-							http_url    => $http_url,
-							flow_id     => $flow_id,
-							http_method => $http_method,
-							http_proto  => $http_proto,
-							http_status => $http_status,
-							http_ctype  => $http_ctype,
-							http_ua     => $http_ua,
-							type        => 'suricata_extract',
-							proto       => $proto,
-							src_host    => hostname,
+							apikey   => $apikey,
+							filename => [$name],
+							type     => 'suricata_extract',
+							json     => encode_json($file_json),
 						],
 					);
 				};
-				if ($@) {
-					die( "Failed to post... " . $res->status_line );
-				}
-				else {
-					log_something( 'info', 'Uplodated Response Status: ' . $res->status_line );
-				}
-			}
-			else {
+
+				# save error status for later
+				my $sub_error = $@;
+
+				# see if we can get a status line
+				my $status_line;
+				if ( defined($res) ) {
+					eval { $status_line = $res->status_line; };
+
+					# compute that status line stats
+					if ( defined($status_line) ) {
+						if ( $status_line =~ /^2\d\d/ ) {
+							$new_stats->{sub_2xx}++;
+						} elsif ( $status_line =~ /^3\d\d/ ) {
+							$new_stats->{sub_3xx}++;
+						} elsif ( $status_line =~ /^4\d\d/ ) {
+							$new_stats->{sub_4xx}++;
+						} elsif ( $status_line =~ /^5\d\d/ ) {
+							$new_stats->{sub_5xx}++;
+						}
+					} ## end if ( defined($status_line) )
+				} ## end if ( defined($res) )
+
+				# handle submission errors
+				if ($sub_error) {
+					$new_stats->{sub_fail}++;
+
+					# if this is defined, submission worked, but we got a sub error
+					if ( defined($status_line) ) {
+						my $error = "Failed to post... " . $res->status_line;
+						push( @{ $new_stats->{last_errors} }, $error );
+						die($error);
+					}    # if we don't have a status line the submission eval never got that far
+					else {
+						$new_stats->{errors}++;
+						my $error = "Failed to post... " . $sub_error;
+						push( @{ $new_stats->{last_errors} }, $error );
+						die($error);
+					}
+				} else {
+					if ( $status_line =~ /^2\d\d/ ) {
+						$new_stats->{sub}++;
+						log_something( 'info', 'Uplodated Response Status: ' . $res->status_line );
+					} else {
+						$new_stats->{sub_fail}++;
+						my $error = "Failed to post... " . $res->status_line;
+						push( @{ $new_stats->{last_errors} }, $error );
+						die($error);
+					}
+				} ## end else [ if ($sub_error) ]
+			} else {
+				$new_stats->{zero_sized}++;
 				log_something( 'info', 'Not uploading as the sample is zero sized' );
 			}
-		}
+		} ## end if ($add_it)
 
 		# rename the JSON file so we don't process it again
 		move( $file, $file . '-processed' ) or die 'Appending "-processed" to the name of the JSON failed...' . $!;
 		if ($@) {
-			log_something( 'err', 'Failed to rename ' . $file . ' ... ' . $@ );
+			my $error = 'Failed to rename ' . $file . ' ... ' . $@;
+			$new_stats->{errors}++;
+			push( @{ $new_stats->{last_errors} }, $error );
+			log_something( 'err', $error );
 		}
 	};
 	if ($@) {
@@ -327,4 +536,54 @@ foreach my $file (@files) {
 		# now that we are done with the tmp file, we can remove it
 		unlink($name);
 	}
+} ## end foreach my $file (@files)
+
+# update the stats
+foreach my $item (@to_delta) {
+	my $old = $stats->{$item};
+	my $new = $new_stats->{$item};
+	my $delta;
+	# value was missing for some reason in the previous
+	if ( !defined($old) ) {
+		$delta = $new;
+	}    # need to compute the delta as there was change
+	elsif ( $new > $old ) {
+		$delta = $new - $old;
+
+		# roll it over if it is over 2G
+		if ( $new > 2000000000 ) {
+			$new_stats->{$item} = $delta;
+		}
+	}    # ran subsequently and rolled over? this should not happen in general usage... regard new as correct
+	elsif ( $old > $new ) {
+		$delta = $new;
+	}    # none of the above, so zero
+	else {
+		$delta = 0;
+	}
+	$new_stats->{ $item . '_delta' } = $delta;
+} ## end foreach my $item (@to_delta)
+
+# set the timestamp for the when it was generated
+$new_stats->{timestamp} = $t->epoch;
+
+# write out the stats file
+my $raw_stats = JSON->new->utf8->canonical(1)->encode($new_stats) . "\n";
+log_something( 'info', 'Run Stats: ' . $raw_stats );
+eval { write_file( $stats_file, $raw_stats ); };
+if ($@) {
+	log_something( 'err', 'Writing stats file, "' . $stats_file . '", failed... ' . $@ );
 }
+
+# append it to the daily stat cache
+if ( !-d $stats_dir ) {
+	eval { mkdir($stats_dir) };
+	if ($@) {
+		log_something( 'err', 'Creating stats cache dir, "' . $stats_dir . '", failed... ' . $@ );
+		exit 1;
+	}
+}
+eval {
+	my $daily_cache = $stats_dir . '/' . $today_name . '.json';
+	append_file( $daily_cache, $raw_stats );
+};

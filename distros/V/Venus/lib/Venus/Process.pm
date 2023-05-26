@@ -95,16 +95,7 @@ sub chdir {
 
   $path ||= $GETCWD;
 
-  _chdir($path) or do {
-    my $throw;
-    my $error = "Can't chdir $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.chdir');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->stash(pid => _pid());
-    $throw->error;
-  };
+  _chdir($path) or $self->throw('error_on_chdir', $path, _pid())->error;
 
   return $self;
 }
@@ -180,13 +171,7 @@ sub fork {
   my ($self, $code, @args) = @_;
 
   if (not(_forkable())) {
-    my $throw;
-    my $error = "Can't fork process @{[_pid()]}: Fork emulation not supported";
-    $throw = $self->throw;
-    $throw->name('on.fork.support');
-    $throw->message($error);
-    $throw->stash(process => _pid());
-    $throw->error;
+    $self->throw('error_on_fork_support', _pid())->error;
   }
   if (defined(my $pid = _fork())) {
     my $process;
@@ -212,13 +197,7 @@ sub fork {
     return wantarray ? ($process, _pid()) : $process;
   }
   else {
-    my $throw;
-    my $error = "Can't fork process @{[_pid()]}: $!";
-    $throw = $self->throw;
-    $throw->name('on.fork.process');
-    $throw->message($error);
-    $throw->stash(process => _pid());
-    $throw->error;
+    $self->throw('error_on_fork_process', _pid())->error;
   }
 }
 
@@ -301,15 +280,7 @@ sub restart {
 sub setsid {
   my ($self) = @_;
 
-  return _setsid != -1 || do {
-    my $throw;
-    my $error = "Can't start a new session: $!";
-    $throw = $self->throw;
-    $throw->name('on.setsid');
-    $throw->message($error);
-    $throw->stash(pid => _pid());
-    $throw->error;
-  };
+  return _setsid != -1 || $self->throw('error_on_setid', _pid())->error;
 }
 
 sub started {
@@ -350,16 +321,8 @@ sub stderr {
     _open(\*STDERR, '>&', $STDERR);
   }
   else {
-    _open(\*STDERR, '>&', IO::File->new($path, 'w')) or do {
-      my $throw;
-      my $error = "Can't redirect STDERR to $path: $!";
-      $throw = $self->throw;
-      $throw->name('on.stderr');
-      $throw->message($error);
-      $throw->stash(path => $path);
-      $throw->stash(pid => _pid());
-      $throw->error;
-    };
+    _open(\*STDERR, '>&', IO::File->new($path, 'w'))
+      or $self->throw('error_on_stderr', $path, _pid())->error;
   }
 
   return $self;
@@ -377,16 +340,8 @@ sub stdin {
     _open(\*STDIN, '<&', $STDIN);
   }
   else {
-    _open(\*STDIN, '<&', IO::File->new($path, 'r')) or do {
-      my $throw;
-      my $error = "Can't redirect STDIN to $path: $!";
-      $throw = $self->throw;
-      $throw->name('on.stdin');
-      $throw->message($error);
-      $throw->stash(path => $path);
-      $throw->stash(pid => _pid());
-      $throw->error;
-    };
+    _open(\*STDIN, '<&', IO::File->new($path, 'r'))
+      or $self->throw('error_on_stdin', $path, _pid())->error;
   }
 
   return $self;
@@ -404,16 +359,8 @@ sub stdout {
     _open(\*STDOUT, '>&', $STDOUT);
   }
   else {
-    _open(\*STDOUT, '>&', IO::File->new($path, 'w')) or do {
-      my $throw;
-      my $error = "Can't redirect STDOUT to $path: $!";
-      $throw = $self->throw;
-      $throw->name('on.stdout');
-      $throw->message($error);
-      $throw->stash(path => $path);
-      $throw->stash(pid => _pid());
-      $throw->error;
-    };
+    _open(\*STDOUT, '>&', IO::File->new($path, 'w'))
+      or $self->throw('error_on_stdout', $path, _pid())->error;
   }
 
   return $self;
@@ -524,6 +471,96 @@ sub unwatch {
   @{$watchlist} = grep !$seen{$_}++, @{$watchlist}, @args;
 
   return wantarray ? @{$watchlist} : $watchlist;
+}
+
+# ERRORS
+
+sub error_on_chdir {
+  my ($self, $path, $pid) = @_;
+
+  return {
+    name => 'on.chdir',
+    message => "Can't chdir \"$path\": $!",
+    stash => {
+      path => $path,
+      pid => $pid,
+    }
+  };
+}
+
+sub error_on_fork_process {
+  my ($self, $pid) = @_;
+
+  return {
+    name => 'on.fork.process',
+    message => "Can't fork process $pid: $!",
+    stash => {
+      pid => $pid,
+    }
+  };
+}
+
+sub error_on_fork_support {
+  my ($self, $pid) = @_;
+
+  return {
+    name => 'on.fork.support',
+    message => "Can't fork process $pid: Fork emulation not supported",
+    stash => {
+      pid => $pid,
+    }
+  };
+}
+
+sub error_on_setid {
+  my ($self, $pid) = @_;
+
+  return {
+    name => 'on.setid',
+    message => "Can't start a new session: $!",
+    stash => {
+      pid => $pid,
+    }
+  };
+}
+
+sub error_on_stderr {
+  my ($self, $path, $pid) = @_;
+
+  return {
+    name => 'on.stderr',
+    message => "Can't redirect STDERR to \"$path\": $!",
+    stash => {
+      path => $path,
+      pid => $pid,
+    }
+  };
+}
+
+sub error_on_stdin {
+  my ($self, $path, $pid) = @_;
+
+  return {
+    name => 'on.stdin',
+    message => "Can't redirect STDIN to \"$path\": $!",
+    stash => {
+      path => $path,
+      pid => $pid,
+    }
+  };
+}
+
+sub error_on_stdout {
+  my ($self, $path, $pid) = @_;
+
+  return {
+    name => 'on.stdout',
+    message => "Can't redirect STDOUT to \"$path\": $!",
+    stash => {
+      path => $path,
+      pid => $pid,
+    }
+  };
 }
 
 1;
@@ -685,7 +722,7 @@ I<Since C<0.06>>
 
   $parent = $parent->chdir('/xyz');
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_chdir)
 
 =back
 
@@ -1047,7 +1084,7 @@ I<Since C<0.06>>
 
   # no forking attempted if NOT supported
 
-  # Exception! Venus::Process:Error (isa Venus::Error)
+  # Exception! (isa Venus::Process:Error) (see error_on_fork_support)
 
 =back
 
@@ -1483,7 +1520,7 @@ I<Since C<0.06>>
 
   my $setsid = $parent->setsid;
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_setid)
 
 =back
 
@@ -1641,7 +1678,7 @@ I<Since C<0.06>>
 
   $parent = $parent->stderr('/nowhere');
 
-  # Exception! Venus::Process:Error (isa Venus::Error)
+  # Exception! (isa Venus::Process:Error) (see error_on_stderr)
 
 =back
 
@@ -1677,7 +1714,7 @@ I<Since C<0.06>>
 
   $parent = $parent->stdin('/nowhere');
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_stdin)
 
 =back
 
@@ -1713,7 +1750,7 @@ I<Since C<0.06>>
 
   $parent = $parent->stdout('/nowhere');
 
-  # Exception! Venus::Process::Error (isa Venus::Process)
+  # Exception! Venus::Process::Error (error_on_stdout)
 
 =back
 
@@ -2245,6 +2282,188 @@ I<Since C<2.40>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_chdir>
+
+This package may raise an error_on_chdir exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_chdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_chdir"
+
+  # my $message = $error->message;
+
+  # "Can't chdir \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_fork_process>
+
+This package may raise an error_on_fork_process exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_fork_process', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_fork_process"
+
+  # my $message = $error->message;
+
+  # "Can't fork process $pid: $!"
+
+  # my $pid = $error->stash('pid');
+
+  # "123"
+
+=back
+
+=over 4
+
+=item error: C<error_on_fork_support>
+
+This package may raise an error_on_fork_support exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_fork_support', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_fork_support"
+
+  # my $message = $error->message;
+
+  # "Can't fork process $pid: Fork emulation not supported"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_setid>
+
+This package may raise an error_on_setid exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_setid', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_setid"
+
+  # my $message = $error->message;
+
+  # "Can't start a new session: $!"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_stdin>
+
+This package may raise an error_on_stdin exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stdin', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stdin"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDIN to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_stdout>
+
+This package may raise an error_on_stdout exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ( '/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stdout', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stdout"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDOUT to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
 
 =head1 OPERATORS
 

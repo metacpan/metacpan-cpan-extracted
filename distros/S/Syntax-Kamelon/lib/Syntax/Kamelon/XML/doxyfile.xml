@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language>
+<!DOCTYPE language SYSTEM "language.dtd">
 <!--
     This file is part of the KDE KSyntaxHighlighting framework.
 
@@ -27,7 +27,7 @@
           section="Configuration"
           extensions="Doxyfile;Doxyfile.*"
           mimetype=""
-          version="3"
+          version="1"
           kateversion="5.0"
           author="Ernst Maurer (ernst.maurer@gmail.com)"
           license="MIT">
@@ -333,6 +333,8 @@
             <itemData name="ValueYes" defStyleNum="dsOthers" spellChecking="0" />
             <itemData name="ValueNo" defStyleNum="dsString" spellChecking="0" />
             <itemData name="UntypedValue" defStyleNum="dsString" spellChecking="0" />
+            <itemData name="Float" defStyleNum="dsFloat" spellChecking="0" />
+            <itemData name="Int" defStyleNum="dsDecVal" spellChecking="0" />
             <itemData name="Keyword" defStyleNum="dsKeyword" spellChecking="0" />
             <itemData name="KeywordInComment" defStyleNum="dsCommentVar" spellChecking="0" />
             <itemData name="Parameter" defStyleNum="dsOthers" spellChecking="0" />
@@ -342,9 +344,9 @@
     <general>
         <comments>
             <comment name="singleLine" start="#" />
+            <comment name="singleLine" start=";" />
         </comments>
         <keywords casesensitive="0" />
     </general>
 
 </language>
-<!-- kate: replace-tabs on; tab-width 4; indent-width 4; -->

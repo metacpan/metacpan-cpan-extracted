@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.1101';
+our $VERSION = '0.1201';
 
 use strict;
 use warnings;
 
+use File::Slurper qw(write_text);
 use MIDI ();
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
@@ -22,6 +23,8 @@ our @EXPORT = qw(
     setup_score
     dura_size
     ticks
+    timidity_conf
+    play_timidity
 );
 
 use constant TICKS => 96;
@@ -243,6 +246,30 @@ sub ticks {
     return ${ $score->{Tempo} };
 }
 
+
+sub timidity_conf {
+    my ($soundfont, $config_file) = @_;
+    my $config = "soundfont $soundfont\n";
+    write_text($config_file, $config) if $config_file;
+    return $config;
+}
+
+
+sub play_timidity {
+    my ($score, $midi, $soundfont, $config) = @_;
+    my @cmd;
+    if ($soundfont) {
+        $config ||= 'timidity-midi-util.cfg';
+        timidity_conf($soundfont, $config) if $soundfont;
+        @cmd = ('timidity', '-c', $config, $midi);
+    }
+    else {
+        @cmd = ('timidity', $midi);
+    }
+    $score->write_score($midi);
+    system(@cmd) == 0 or die "system(@cmd) failed: $?";
+}
+
 1;
 
 __END__
@@ -257,13 +284,25 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.1101
+version 0.1201
 
 =head1 SYNOPSIS
 
-  use MIDI::Util qw(midi_dump midi_format set_chan_patch set_time_signature setup_score);
+  use MIDI::Util qw(
+    midi_dump
+    reverse_dump
+    midi_format
+    set_chan_patch
+    set_time_signature
+    setup_score
+    dura_size
+    ticks
+    timidity_conf
+    play_timidity
+  );
 
-  my $dump = midi_dump('volume'); # length, etc.
+  my $dump = midi_dump('length'); # volume, etc.
+  $dump = reverse_dump('length');
   print Dumper $dump;
 
   my $size = dura_size('dqn'); # 1.5
@@ -281,6 +320,12 @@ version 0.1101
 
   $score->n( $half, @notes );      # MIDI::Simple functionality
   $score->write_score('some.mid'); # "
+
+  my $cfg = timidity_conf('/some/soundfont.sf2');
+  timidity_conf('soundfont.sf2', 'timidity.cfg'); # save to a file
+
+  # Or you can just play the score:
+  play_timidity($score, 'some.mid');
 
 =head1 DESCRIPTION
 
@@ -397,11 +442,34 @@ C<96> ticks.
 
 Return the B<score> ticks.
 
+=head2 timidity_conf
+
+  $timidity_conf = timidity_conf($soundfont);
+  timidity_conf($soundfont, $config_file);
+
+A suggested timidity.cfg paragraph to allow you to use this soundfont
+in timidity. If a B<config_file> is given, the timidity configuration
+is written to that file.
+
+=head2 play_timidity
+
+  play_timidity($score_obj, $midi_file, $sf_file, $config_file);
+
+Play a given B<score> named B<midi_file> with C<timidity> and an
+optional soundfont B<sf_file>.
+
+If a soundfont is given, then if a B<config_file> is given, that is
+used for the timidity configuration. If not, C<timidity-midi-util.cfg>
+is used. If a soundfont is not given, a timidity configuration file is
+not rendered and used.
+
 =head1 SEE ALSO
 
 The F<t/01-functions.t> test file and F<eg/*> in this distribution
 
 L<Exporter>
+
+L<File::Slurper>
 
 L<MIDI>
 
@@ -415,7 +483,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2019-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

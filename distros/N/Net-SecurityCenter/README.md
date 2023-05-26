@@ -51,5 +51,5 @@ Using App::cpanminus:
 
 ## Copyright
 
- - Copyright 2018-2021 © Giuseppe Di Terlizzi
+ - Copyright 2018-2023 © Giuseppe Di Terlizzi
  - Nessus®, Tenable.sc® and SecurityCenter® is a Registered Trademark of Tenable®, Inc.

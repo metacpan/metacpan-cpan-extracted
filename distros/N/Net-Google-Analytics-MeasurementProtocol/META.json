@@ -1,16 +1,16 @@
 {
-   "abstract" : "send Google Analytics user interaction data from Perl",
+   "abstract" : "send Google Analytics (GA4) user interaction data from Perl",
    "author" : [
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Google-Analytics-MeasurementProtocol",
    "no_index" : {
@@ -34,8 +34,9 @@
          "requires" : {
             "Carp" : "0",
             "Furl" : "0",
+            "JSON" : "0",
             "Test::More" : "0.88",
-            "perl" : "5.006"
+            "perl" : "5.020"
          }
       }
    },
@@ -51,5 +52,6 @@
          "url" : "http://github.com/garu/Net-Google-Analytics-MeasurementProtocol"
       }
    },
-   "version" : 0.05
+   "version" : 4.01,
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::CellsColor;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Color;
-use AsposeCellsCloud::Object::ThemeColor;
+use AsposeCellsCloud::Object::ThemeColor; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,64 +119,91 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'CellsColor',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'color' => {
-    	datatype => 'Color',
-    	base_name => 'Color',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'theme_color' => {
-    	datatype => 'ThemeColor',
-    	base_name => 'ThemeColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_shape_color' => {
-    	datatype => 'boolean',
-    	base_name => 'IsShapeColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'color_index' => {
-    	datatype => 'int',
-    	base_name => 'ColorIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'color' => {
+     	datatype => 'Color',
+     	base_name => 'Color',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color_index' => {
+     	datatype => 'int',
+     	base_name => 'ColorIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_shape_color' => {
+     	datatype => 'boolean',
+     	base_name => 'IsShapeColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'tint' => {
+     	datatype => 'double',
+     	base_name => 'tint',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'argb' => {
+     	datatype => 'int',
+     	base_name => 'Argb',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'theme_color' => {
+     	datatype => 'ThemeColor',
+     	base_name => 'ThemeColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'transparency' => {
+     	datatype => 'double',
+     	base_name => 'Transparency',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'color' => 'Color',
-    'type' => 'string',
-    'theme_color' => 'ThemeColor',
+    'color_index' => 'int',
     'is_shape_color' => 'boolean',
-    'color_index' => 'int'
+    'tint' => 'double',
+    'argb' => 'int',
+    'theme_color' => 'ThemeColor',
+    'type' => 'string',
+    'transparency' => 'double' 
 } );
 
 __PACKAGE__->attribute_map( {
     'color' => 'Color',
-    'type' => 'Type',
-    'theme_color' => 'ThemeColor',
+    'color_index' => 'ColorIndex',
     'is_shape_color' => 'IsShapeColor',
-    'color_index' => 'ColorIndex'
+    'tint' => 'tint',
+    'argb' => 'Argb',
+    'theme_color' => 'ThemeColor',
+    'type' => 'Type',
+    'transparency' => 'Transparency' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

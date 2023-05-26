@@ -13,6 +13,7 @@ package ${package};
 
 use strict;
 use warnings;
+# @@protoc_insertion_point(after_pragmas)
 use MIME::Base64 qw();
 use Google::ProtocolBuffers::Dynamic;
 
@@ -20,8 +21,12 @@ my $gpd = Google::ProtocolBuffers::Dynamic->new;
 
 ${load_blobs}
 
+# @@protoc_insertion_point(after_loading)
+
 $gpd->map(
 ${mappings});
+
+# @@protoc_insertion_point(after_mapping)
 
 undef $gpd;
 
@@ -54,7 +59,7 @@ sub generate {
             $dump =~ s{$}{,};
             # the '+' is to make sure Perl::Critic does not consider
             # this an anonymous subroutine
-            $dump =~ s[^(\s+)\s({)][\1+\2]mg;
+            $dump =~ s[^(\s+)\s(\{)][$1+$2]mg;
             $dump
         } @{$args{mappings}};
     };
@@ -110,6 +115,7 @@ my %boolean_options = map +($_ => [$_, 1], "no_$_" => [$_, 0]), qw(
 my %string_options = map { $_ => 1 } qw(
     accessor_style
     client_services
+    boolean_values
 );
 
 sub _to_option {
@@ -157,12 +163,15 @@ sub generate_codegen_request {
         } elsif ($key eq 'map_package') {
             push @mappings, $mapping = {};
             $mapping->{package} = $value;
+        } elsif ($key eq 'map_message') {
+            push @mappings, $mapping = {};
+            $mapping->{message} = $value;
         } elsif ($key eq 'pb_prefix') {
             push @mappings, $mapping = {};
             $mapping->{pb_prefix} = $value;
-        } elsif ($key eq 'prefix') {
-            $mapping->{prefix} = _perlify_package($value);
-        } elsif (!_to_option(($mapping ? $mapping->{options} : \%global_options), $key, $value)) {
+        } elsif ($key eq 'prefix' || $key eq 'to') {
+            $mapping->{$key} = _perlify_package($value);
+        } elsif (!_to_option(($mapping ? $mapping->{options} //= {} : \%global_options), $key, $value)) {
             return error("Unrecognized option key '$key'");
         }
     }
@@ -215,7 +224,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 AUTHOR
 

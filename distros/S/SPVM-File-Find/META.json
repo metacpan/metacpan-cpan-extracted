@@ -1,12 +1,12 @@
 {
-   "abstract" : "Short Description",
+   "abstract" : "Finding Files in Subdirectories",
    "author" : [
-      "USER_NAME<USER_MAIL>"
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9692"
+            "SPVM" : "0.981"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9692",
+            "SPVM" : "0.981",
             "SPVM::File::Basename" : "0.02",
             "SPVM::File::Spec" : "0.05",
             "SPVM::Regex" : "0.19",
@@ -51,6 +51,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Find"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.021",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

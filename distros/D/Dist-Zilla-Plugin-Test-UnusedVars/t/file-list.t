@@ -26,11 +26,6 @@ subtest 'file list' => sub {
 };
 
 subtest 'naughty filenames' => sub {
-    eval 'use IPC::Run3';
-    plan $@
-        ? (skip_all => 'IPC::Run3 needed')
-        : (tests => 2);
-
     my @files_to_test = qw(one' 'two);
     my $tzil = Builder->from_config(
         { dist_root => 'corpus/DZ1' },
@@ -45,10 +40,22 @@ subtest 'naughty filenames' => sub {
 
     my ($test) = first { $_->name eq 'xt/release/unused-vars.t' } @{ $tzil->files };
 
-    run3([$^X => '-c'], \$test->content, \my $stdout, \my $stderr);
-    isnt index($stderr => q/syntax OK/), -1
-        or diag explain {out => $stdout, err => $stderr};
-    is $?, 0;
+    is(
+      $test->content,
+      <<'CONTENT',
+use Test::More 0.96 tests => 1;
+use Test::Vars;
+
+subtest 'unused vars' => sub {
+my @files = (
+    '../one\'',
+    '../\'two'
+);
+vars_ok($_) for @files;
+};
+CONTENT
+      'filenames are rendered correctly',
+    );
 };
 
 subtest 'all files' => sub {

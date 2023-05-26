@@ -71,10 +71,6 @@ __END__
 
 Exporter::Extensible::Compat - 5.8 and 5.10 compatibiliy for Exporter::Extensible
 
-=head1 VERSION
-
-version 0.10
-
 =head1 DESCRIPTION
 
 This module provides a compatibility layer for perl 5.10 and 5.8.
@@ -96,7 +92,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad.
+This software is copyright (c) 2023 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

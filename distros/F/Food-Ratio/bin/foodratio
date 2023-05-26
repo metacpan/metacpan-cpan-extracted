@@ -30,6 +30,7 @@ GetOptions(
 my $fr = Food::Ratio->new;
 
 while ( my $line = readline ) {
+    last if $line =~ m/^-/;    # so we can `foodratio | foodratio`
     chomp $line;
     my ( $mass, $name, @rest ) = split ' ', $line;
     # probably the 2nd column is ratios, assume name is in next column
@@ -74,6 +75,9 @@ any, will be treated as group names that collect ingredients into
 groups, e.g. a custom C<flour> group for recipes with different types
 of flour, or so forth.
 
+Lines beginning with C<-> are ignored; this allows C<foodratio> output
+to be piped to C<foodratio>.
+
 =head2 Options
 
 =over 4
@@ -89,14 +93,18 @@ Sets the ingredient or ingredient group to use as the key value for
 the ratio calculation, e.g. flour in a bread recipe and not the
 default total mass. I<key> must be C<id> or C<group>.
 
+By default the ratio is taken from the total of the ingredients.
+
 =item B<weigh> I<key:value>
 
 Sets the ingredient or ingredient group to use as the basis for the
-B<mass> argument, which by default is otherwise the total mass.
+B<mass> argument.
+
+By default the weight is taken from the total of the ingredients.
 
 =back
 
-=head1 EXAMPLE
+=head1 EXAMPLES
 
 Given a file containing
 
@@ -117,7 +125,12 @@ recipe based on that
   $ foodratio --mass 55 --weigh id:egg cornbread  | grep cornmeal
   151.7   21.84%  cornmeal        flour   dry
 
-and know to use 152 grams of cornmeal instead of 160.
+and know to use 152 grams of cornmeal instead of 160. To preserve the
+ratios (e.g. based on the flour, as is typical in baking) also add the
+I<--ratio> option:
+
+  $ foodratio --mass 55 --weigh id:egg --ratio group:flour cornbread
+  ...
 
 =head1 SEE ALSO
 

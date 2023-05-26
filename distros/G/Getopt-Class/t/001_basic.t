@@ -1,21 +1,21 @@
 # -*- perl -*-
-
 # t/001_basic.t - perform basic tests
-
 use Test::More qw( no_plan );
 use strict;
 use warnings;
+use lib './lib';
 use Scalar::Util ();
 
 BEGIN { use_ok( 'Getopt::Class' ) || BAIL_OUT( "Unable to load Getopt::Class" ); }
 
-our( $dict, $DEBUG, $VERBOSE, $VERSION, $HELP, $MAN );
+our( $dict, $MODULE_DEBUG, $VERBOSE, $VERSION, $HELP, $MAN );
+$MODULE_DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 
 require( './t/dictionary.pl' );
 
 my $opt = Getopt::Class->new({
     dictionary => $dict,
-    debug => 0,
+    debug => $MODULE_DEBUG,
 }) || BAIL_OUT( Getopt::Class->error, "\n" );
 # $opt->message( $opt->dumper( $dict ) ); exit;
 # my $params = $opt->parameters;
@@ -24,7 +24,7 @@ my $opt = Getopt::Class->new({
 isa_ok( $opt, 'Getopt::Class' );
 
 {
-    local @ARGV = qw( --debug 3 --dry-run --name Bob --created 2020-04-12T07:30:10 --langs en ja );
+    local @ARGV = qw( --debug 3 --dry-run --name Bob --created 2020-04-12T07:30:10 --langs en ja  --with-zlib --disable-compress --enable-logging );
     my $opts = $opt->exec || diag( "Error: " . $opt->error );
     ok( defined( $opts ), 'No Getopt::Long error' );
     is( Scalar::Util::reftype( $opts ), 'HASH', 'Expecting a hash reference' );
@@ -45,6 +45,8 @@ isa_ok( $opt, 'Getopt::Class' );
     is( Scalar::Util::reftype( $opts->{langs} ), 'ARRAY', 'Array type' );
     is( scalar( @{$opts->{langs}} ), 2, 'Array size' );
     is( join( ',', @{$opts->{langs}} ), 'en,ja', 'Array values' );
+    is( $opts->{without_zlib}, 0, 'with and without' );
+    is( $opts->{disable_logging}, 0, 'enable and disable' );
 }
 
 my $props = $opt->class_properties( 'product' );

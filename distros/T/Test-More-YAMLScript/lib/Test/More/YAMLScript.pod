@@ -2,9 +2,9 @@
 
 =encoding utf8
 
-=head1 TEST::MORE::YAMLSCRIPT
+=head1 NAME
 
-Write Perl tests in YAMLScript
+Test::More::YAMLScript - Write Perl tests in YAMLScript
 
 =head2 SYNOPSIS
 
@@ -12,94 +12,110 @@ A file C<t/test.t>:
 
     #!/usr/bin/env test-more-yamlscript
 
-    - plan: 10
+    plan: 11
 
-    - pass: This test will always 'pass'
+    pass: "This test will always 'pass'"
 
-    - todo:
-      - Testing 'todo'
-      - fail: This test will always 'fail'
+    note: "The next test has no label:"
 
-    - note: "NOTE: This is awesome"
+    pass: []
 
-    - diag: This is a WARNING!
+    todo:
+    - "Testing 'todo'"
+    - fail: "This test will always 'fail'"
 
-    - ok:
-      - true
-      - Testing 'ok'
+    note: "NOTE: This is awesome"
 
-    - is:
-      - add: [2, 2]
-      - 4
-      - 2 + 2 'is' 4
+    diag: "This is a WARNING!"
 
-    - isnt:
-      - add: [2, 2]
-      - 5
-      - 2 + 2 'isnt' 5
+    ok: [true, "Testing 'ok'"]
 
-    - like:
-      - I like pie!
-      - /\blike\b/
-      - Testing 'like'
+    is:
+    - (2 + 2)
+    - 4
+    - "2 + 2 'is' 4"
 
-    - unlike:
-      - Please like me on Facebook
-      - /\bunlike\b/
-      - Testing 'unlike'
+    isnt:
+    - (2 + 2)
+    - 5
+    - "2 + 2 'isnt' 5"
 
-    - skip:
-      - Skipping - Highway to the danger zone
-      - danger: zone
+    like:
+    - "I like pie!"
+    - /\blike\b/
+    - "Testing 'like'"
 
-    - subtest:
-      - Testing skip-all in subtest
-      - skip-all: Skipping all these subtests
-      - pass: I wanna pass...
-      - fail: Gonna fail...
+    unlike:
+    - "Please like me on Facebook"
+    - /\bunlike\b/
+    - "Testing 'unlike'"
 
-    - subtest:
-      - Testing 'subtests'
-      - for:
-        - [1, 2, 3]
-        - pass: Subtest $_
-      - done-testing: 3
+    skip:
+    - "Skipping - Highway to the danger zone"
+    - danger: zone
 
-Run C<prove t/test.t>:
+    subtest:
+    - "Testing skip-all in subtest"
+    - skip-all: "Skipping all these subtests"
+    - pass: "I wanna pass..."
+    - fail: "Gonna fail..."
 
-    test/more.t .. 
-    1..10
+    subtest:
+    - "Testing 'subtests'"
+    - pass: "Subtest 1"
+    - pass: "Subtest 2"
+    - pass: "Subtest 3"
+    - done-testing: 3
+
+Run C<prove -v t/test.t>:
+
+    t/test.t ..
+    1..11
     ok 1 - This test will always 'pass'
-    not ok 2 # TODO & SKIP Testing 'todo'
+    # The next test has no label:
+    ok 2
+    not ok 3 # TODO & SKIP Testing 'todo'
     # NOTE: This is awesome
-    ok 3 - Testing 'ok'
-    ok 4 - 2 + 2 'is' 4
     # This is a WARNING!
-    ok 5 - 2 + 2 'isnt' 5
-    ok 6 - Testing 'like'
-    ok 7 - Testing 'unlike'
-    ok 8 # skip Skipping - Highway to the danger zone
+    ok 4 - Testing 'ok'
+    ok 5 - 2 + 2 'is' 4
+    ok 6 - 2 + 2 'isnt' 5
+    ok 7 - Testing 'like'
+    ok 8 - Testing 'unlike'
+    not ok 9 # TODO & SKIP Skipping - Highway to the danger zone
     # Subtest: Testing skip-all in subtest
         1..0 # SKIP Skipping all these subtests
-    ok 9 # skip Skipping all these subtests
+    ok 10 # skip Skipping all these subtests
     # Subtest: Testing 'subtests'
         ok 1 - Subtest 1
         ok 2 - Subtest 2
         ok 3 - Subtest 3
         1..3
-    ok 10 - Testing 'subtests'
+    ok 11 - Testing 'subtests'
     ok
     All tests successful.
-    Files=1, Tests=10,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.10 cusr  0.00 csys =  0.11 CPU)
+    Files=1, Tests=11,  1 wallclock secs ( 0.02 usr  0.01 sys +  0.28 cusr  0.01 csys =  0.32 CPU)
     Result: PASS
+
+Also works with C<yath t/test.t>.
 
 =head2 DESCRIPTION
 
-Test::More::YAMLScript let's you write Perl module tests in YAMLScript.
+Test::More::YAMLScript lets you write Perl module tests in YAMLScript.
 
 You just add this shebang line to a C<t/test-file.t>:
 
     #!/usr/bin/env test-more-yamlscript
+
+=head2 SEE ALSO:
+
+=over
+
+=item * L<YAMLScript|https://metacpan.org/pod/Test::More::YAMLScript>
+
+=item * L<Lingy|https://metacpan.org/pod/Lingy>
+
+=back
 
 =head2 AUTHORS
 
@@ -111,7 +127,7 @@ You just add this shebang line to a C<t/test-file.t>:
 
 =head2 COPYRIGHT AND LICENSE
 
-Copyright 2022 by Ingy döt Net
+Copyright 2022-2023 by Ingy döt Net
 
 This library is free software and may be distributed under the same terms as perl itself.
 

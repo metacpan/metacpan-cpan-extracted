@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Test-UnusedVars
 
+2.001001  2023-05-17 02:46:03Z
+  - no longer run the test in tests, removing the need for Test::Vars to be
+    installed until the generated distribution is tested
+
 2.001000  2023-04-29 15:23:20Z
   - use the 'deprecated' warning category to issue the warning in
     [UnusedVarsTests]

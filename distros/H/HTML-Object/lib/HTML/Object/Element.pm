@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.5
+## Version v0.2.6
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2023/05/11
+## Modified 2023/05/18
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.5';
+    our $VERSION = 'v0.2.6';
 };
 
 use strict;
@@ -539,20 +539,12 @@ sub detach
     my $parent = $self->parent;
     return if( !$parent );
     my $id  = $self->eid;
-    my $pos;
-    my $new = $parent->children->for(sub
-    {
-        my( $i, $e ) = @_;
-        if( $e->eid eq $id )
-        {
-            $pos = $i;
-            return;
-        }
-    });
+    my $pos = $parent->children->pos( $self );
     if( defined( $pos ) )
     {
         $parent->children->splice( $pos, 1 );
         $self->parent( undef() );
+        $parent->reset(1);
     }
     return( $parent );
 }
@@ -1627,7 +1619,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.2.5
+    v0.2.6
 
 =head1 DESCRIPTION
 

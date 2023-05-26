@@ -9,7 +9,18 @@ user land programs.
 The method descriptions below do not duplicate the contents of the
 documentation provided with the "xpa" library.
 
-Currently, only the client side routines are accessible.
+Only the client side routines are accessible.
+
+  Methods
+
+Unless otherwise specified, the class and instance methods are simple
+wrappers around the similarly named XPA routines (just prefix the Perl
+routines with "XPA").
+
+  The XPA Library
+
+The XPA library is available via the Alien::XPA Perl module on CPAN, as
+well as at <https://github.com/ericmandel/xpa>.
 
 INSTALLATION
 

@@ -78,7 +78,8 @@ for my $msg ( @$list ) {
 	$n++;
 	next if defined $opt{n} && $opt{n} != $n;
 	print "Fetching #$n: $msg->{label} from $msg->{receivedDateTime}...\n";
-	my ( $attachments, $error ) = $e->fetch_message_and_attachments( $msg )-> wait;
+	my ( $attachments, $error, @warnings ) = $e->fetch_message_and_attachments( $msg )-> wait;
+	warn "$_\n" for @warnings;
 	die "error: $error\n" if defined $error;
 	print F $e->assemble_mail($msg, $attachments);
 }

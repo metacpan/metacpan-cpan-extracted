@@ -38,7 +38,7 @@ use CallBackery::Database;
 use CallBackery::User;
 
 
-our $VERSION = '0.45.1';
+our $VERSION = '0.46.1';
 
 
 =head2 config
@@ -176,9 +176,15 @@ sub startup {
     if (not -f $app->config->secretFile){
         $app->config->reConfigure;
     }
-
-    $app->secrets([ path($app->config->secretFile)->slurp ]);
-
+    if (my $secrets = $app->config->secretFile) {
+        if (-r $secrets) {
+            $app->secrets([ path($app->config->secretFile)->slurp ]);
+        }
+        else {
+            $app->log->error("Cannot read secrets file $secrets.  Please check permissions.");
+        }
+    }
+    
     my $routes = $app->routes;
 
     $app->plugin('CallBackery::Plugin::Doc', {

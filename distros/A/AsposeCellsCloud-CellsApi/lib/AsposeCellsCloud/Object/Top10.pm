@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Top10;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,46 +118,46 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Describe the Top10 conditional formatting rule. This conditional formatting     rule highlights cells whose values fall in the top N or bottom N bracket,     as specified.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'Top10',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'is_bottom' => {
-    	datatype => 'boolean',
-    	base_name => 'IsBottom',
-    	description => 'Get or set the flag indicating whether a \&quot;top/bottom n\&quot; rule is a \&quot;bottom    n\&quot; rule. &#39;1&#39; indicates &#39;bottom&#39;.  Default value is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_percent' => {
-    	datatype => 'boolean',
-    	base_name => 'IsPercent',
-    	description => 'Get or set the flag indicating whether a \&quot;top/bottom n\&quot; rule is a \&quot;top/bottom     n percent\&quot; rule.  Default value is false.',
-    	format => '',
-    	read_only => '',
-    		},
-    'rank' => {
-    	datatype => 'int',
-    	base_name => 'Rank',
-    	description => 'Get or set the value of \&quot;n\&quot; in a \&quot;top/bottom n\&quot; conditional formatting rule.      If IsPercent is true, the value must between 0 and 100.  Otherwise it must     between 0 and 1000.  Default value is 10.',
-    	format => '',
-    	read_only => '',
-    		},
+     'is_bottom' => {
+     	datatype => 'boolean',
+     	base_name => 'IsBottom',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_percent' => {
+     	datatype => 'boolean',
+     	base_name => 'IsPercent',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'rank' => {
+     	datatype => 'int',
+     	base_name => 'Rank',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'is_bottom' => 'boolean',
     'is_percent' => 'boolean',
-    'rank' => 'int'
+    'rank' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
     'is_bottom' => 'IsBottom',
     'is_percent' => 'IsPercent',
-    'rank' => 'Rank'
+    'rank' => 'Rank' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

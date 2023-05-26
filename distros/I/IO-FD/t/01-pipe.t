@@ -1,5 +1,10 @@
+use strict;
+use warnings;
 use Test::More;
 use IO::FD;
+use File::Basename qw<dirname>;
+use Fcntl qw<O_CREAT O_RDONLY O_WRONLY O_RDWR O_NONBLOCK F_SETFL F_GETFL>;
+use Errno qw<EAGAIN>;
 
 
 {
@@ -23,4 +28,9 @@ use IO::FD;
   ok $@, "no readonly arguments in pipe";
 
 }
+
+
+
+
+
 done_testing;

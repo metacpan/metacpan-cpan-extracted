@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ImageMagickUtils/convert_image_to
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2023-03-01'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/convert_image_to",
@@ -41,13 +41,15 @@ convert-image-to - Convert images using ImageMagick's 'convert' utility, with mu
 
 =head1 VERSION
 
-This document describes version 0.019 of convert-image-to (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
+This document describes version 0.020 of convert-image-to (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
 
 =head1 SYNOPSIS
 
-Usage:
+B<convert-image-to> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-% B<convert-image-to> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--to>=I<str>] [B<--trash-original>|B<-T>|B<--no-trash-original>|B<--notrash-original>] [B<--files-json>=I<json>] -- E<lt>I<file>E<gt> ...
+B<convert-image-to> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<convert-image-to> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--delete-original|/"--delete-original, -D">>|B<L<-D|/"--delete-original, -D">>|B<L<--no-delete-original|/"--delete-original, -D">>|B<L<--nodelete-original|/"--delete-original, -D">>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quality|/"--quality=s, -q">>=I<int>|B<L<-q|/"--quality=s, -q">>=I<int>] [B<L<--to|/"--to=s*">>=I<str>] [B<L<--trash-original|/"--trash-original, -T">>|B<L<-T|/"--trash-original, -T">>|B<L<--no-trash-original|/"--trash-original, -T">>|B<L<--notrash-original|/"--trash-original, -T">>] -- E<lt>I<L<file|/"--files-json=s">>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -72,10 +74,13 @@ C<*> marks required options.
 
 Delete (unlink) the original file after downsizing.
 
-See also the `trash_original` option.
+See also the C<trash_original> option.
 
 
 =item B<--file>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -87,17 +92,28 @@ See C<--file>.
 
 Can also be specified as the 1st command-line argument and onwards.
 
+=item B<--quality>=I<s>, B<-q>
+
+Quality setting (for JPEG/PNG), 1 (best compression, worst quality) to 100 (least compression, best quality).
+
+Default value:
+
+ 92
+
 =item B<--to>=I<s>*
+
+(No description)
+
 
 =item B<--trash-original>, B<-T>
 
 Trash the original file after downsizing.
 
-This option uses the <pm:File::Trash::FreeDesktop> module to do the trashing.
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
 Compared to deletion, with this option you can still restore the trashed
 original files from the Trash directory.
 
-See also the `delete_original` option.
+See also the C<delete_original> option.
 
 
 =back
@@ -113,6 +129,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -140,6 +167,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -154,24 +187,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -255,7 +297,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

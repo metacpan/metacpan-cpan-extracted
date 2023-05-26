@@ -9,7 +9,11 @@ use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.310';
+our $VERSION = '0.311';
+
+my $single_id_filter = sub {
+    return { 'id' => $_[0] };
+};
 
 my $common_template = {
 
@@ -21,6 +25,16 @@ my $common_template = {
             allow    => 'Invalid Policy ID',
         },
     },
+
+    policy_template => {
+        remap    => 'policyTemplate',
+        required => 1,
+        filter   => \&$single_id_filter
+    },
+
+    name        => {},
+    description => {},
+    tags        => {},
 
     filter => {
         allow => [ 'usable', 'manageable' ],
@@ -80,6 +94,92 @@ sub get {
     return         if ( !$policy );
     return $policy if ($raw);
     return sc_normalize_hash($policy);
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub create {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = {
+        name => {
+            required => 1,
+        },
+        description     => {},
+        policy_template => $common_template->{'policy_template'},
+        tags            => {},
+        preferences     => {},
+        families        => {},
+    };
+
+    my $params = sc_check_params( $tmpl, \%args );
+    my $policy = $self->client->post( '/policy', $params );
+
+    return sc_normalize_hash($policy);
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub edit {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = {
+        id           => $common_template->{'id'},
+        name         => {},
+        description  => {},
+        tags         => {},
+        preferences  => {},
+        families     => {},
+        remove_prefs => {
+            remap => 'removePrefs'
+        }
+    };
+
+    my $params    = sc_check_params( $tmpl, \%args );
+    my $policy_id = delete( $params->{'id'} );
+    my $policy    = $self->client->patch( "/policy/$policy_id", $params );
+
+    return sc_normalize_hash($policy);
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub copy {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = {
+        id   => $common_template->{'id'},
+        name => {},
+    };
+
+    my $params    = sc_check_params( $tmpl, \%args );
+    my $policy_id = delete( $params->{'id'} );
+    my $policy    = $self->client->post( "/policy/$policy_id/copy", $params );
+
+    return sc_normalize_hash($policy);
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub delete {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = { id => $common_template->{'id'} };
+
+    my $params    = sc_check_params( $tmpl, \%args );
+    my $policy_id = delete( $params->{'id'} );
+
+    $self->client->delete("/policy/$policy_id");
+
+    return 1;
 
 }
 
@@ -199,6 +299,78 @@ Params:
 
 =back
 
+=head2 create
+
+Create a policy.
+
+Params:
+
+=over 4
+
+=item * C<name>: Policy Name
+
+=item * C<description>: Description
+
+=item * C<tags>: Tags
+
+=item * C<preferences>: Preferences (HASH of C<PREFERENCE => VALUE>)
+
+=item * C<families>: Plugin Families
+
+=item * C<remove_prefs>: ARRAY of preferences to remove from policy
+
+=back
+
+=head2 edit
+
+Edit the policy associated with C<id> param.
+
+Params:
+
+=over 4
+
+=item * C<id>: Policy ID
+
+=item * C<name>: Policy Name
+
+=item * C<description>: Description
+
+=item * C<tags>: Tags
+
+=item * C<preferences>: Preferences (HASH of C<PREFERENCE => VALUE>)
+
+=item * C<families>: Plugin Families
+
+=item * C<remove_prefs>: ARRAY of preferences to remove from policy
+
+=back
+
+=head2 delete
+
+Delete the policy associated with C<id> param.
+
+Params:
+
+=over 4
+
+=item * C<id>: Policy ID
+
+=back
+
+=head2 copy
+
+Copy the policy associated with C<id> param.
+
+Params:
+
+=over 4
+
+=item * C<id>: Policy ID
+
+=item * C<id>: Policy Name
+
+=back
+
 =head2 download
 
 Download the policy XML associated with C<id> param.
@@ -243,7 +415,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

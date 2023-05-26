@@ -1,10 +1,68 @@
 package Net::RDAP::UA;
 use base qw(LWP::UserAgent);
+use Carp;
+use File::stat;
+use HTTP::Date;
 use Mozilla::CA;
-use vars qw($DEBUG);
+use constant DEFAULT_CACHE_TTL => 300;
 use strict;
 
-our $DEBUG;
+#
+# create a new object, which is just an LWP::UserAgent with
+# some additional options set by default
+#
+sub new {
+    my ($package, %options) = @_;
+
+    $options{'agent'} = sprintf('%s/%f', $package, $Net::RDAP::VERSION)     unless (defined($options{'agent'}));
+    $options{'ssl_opts'} = {}                                               unless (defined($options{'ssl_opts'}));
+    $options{'ssl_opts'}->{'verify_hostname'} = 1                           unless (defined($options{'ssl_opts'}->{'verify_hostname'}));
+    $options{'ssl_opts'}->{'SSL_ca_file'} = Mozilla::CA::SSL_ca_file()      unless (defined($options{'ssl_opts'}->{'SSL_ca_file'}));
+
+    return bless($package->SUPER::new(%options), $package);
+}
+
+#
+# usage: $ua->mirror($url, $file, $ttl);
+#
+# this overrides the parent mirror() method to avoid a network roundtrip if a locally-
+# cached copy of the resource is less than $ttl seconds old. If not provided, the default
+# value for $ttl is 300 seconds.
+#
+sub mirror {
+    my ($self, $url, $file, $ttl) = @_;
+
+    if (-e $file) {
+        my $expires = stat($file)->mtime + ($ttl || DEFAULT_CACHE_TTL);
+        return HTTP::Response->new(304) unless (time() > $expires);
+    }
+
+    my $response;
+
+    eval {
+        $response = $self->SUPER::mirror($url, $file);
+    };
+
+    if ($@) {
+        chomp($@);
+        carp($@);
+        return HTTP::Response->new(500, $@);
+    }
+
+    carp($response->status_line) unless ($response->is_success || 304 == $response->code);
+
+    if (-e $file) {
+        my $mtime = (HTTP::Date->str2time($response->header('Expires') || $response->header('Date')) || time());
+        utime(undef, $mtime, $file);
+        chmod(0600, $file);
+    }
+
+    return $response;
+}
+
+1;
+
+__END__
 
 =pod
 
@@ -20,7 +78,7 @@ should ever need to use it.
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 
@@ -41,38 +99,3 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
-
-#
-# create a new object, which is just an LWP::UserAgent with
-# some additional
-#
-sub new {
-	my ($package, %options) = @_;
-
-	$options{'agent'} = sprintf('%s/%f', $package, $Net::RDAP::VERSION) if (!defined($options{'agent'}));
-
-	$options{'ssl_opts'}= {} if (!defined($options{'ssl_opts'}));
-
-	$options{'ssl_opts'}->{'verify_hostname'} = 1 unless (defined($options{'ssl_opts'}->{'verify_hostname'}));
-	$options{'ssl_opts'}->{'SSL_ca_file'} = Mozilla::CA::SSL_ca_file() unless (defined($options{'ssl_opts'}->{'SSL_ca_file'}));
-
-	return $package->SUPER::new(%options);
-}
-
-#
-# override the default request() method to make sure that we ask the
-# server for JSON:
-#
-sub request {
-	my ($self, $request) = @_;
-
-	print STDERR $request->as_string if ($DEBUG || 1 == $ENV{'NET_RDAP_UA_DEBUG'});
-
-	my $response = $self->SUPER::request($request);
-
-	print STDERR $response->as_string if ($DEBUG || 1 == $ENV{'NET_RDAP_UA_DEBUG'});
-
-	return $response;
-}
-
-1;

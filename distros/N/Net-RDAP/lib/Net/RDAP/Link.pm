@@ -34,9 +34,9 @@ objects.
 =cut
 
 sub new {
-	my ($package, $args) = @_;
-	my %self = %{$args};
-	return bless(\%self, $package);
+    my ($package, $args) = @_;
+    my %self = %{$args};
+    return bless(\%self, $package);
 }
 
 =pod
@@ -45,7 +45,7 @@ sub new {
 
 =head2 Value
 
-	$value = $link->value;
+    $value = $link->value;
 
 Returns the "value" of the link. This corresponds to the text
 content of the C<E<lt>aE<gt>> element if the link if it were
@@ -59,7 +59,7 @@ sub value { $_[0]->{'value'} }
 
 =head2 Relationship
 
-	$rel = $link->rel;
+    $rel = $link->rel;
 
 Returns the "relationship" attribute. The possible values are defined by
 an IANA registry; see:
@@ -78,7 +78,7 @@ sub rel { $_[0]->{'rel'} }
 
 =head2 URL
 
-	$url = $link->href;
+    $url = $link->href;
 
 Returns a L<URI> object corresponding to the target of the link.
 
@@ -90,7 +90,7 @@ sub href { URI->new($_[0]->{'href'}) }
 
 =head2 Language
 
-	@languages = $link->hreflang;
+    @languages = $link->hreflang;
 
 Returns a (potentially empty) array containing the ISO-639-2 codes
 which describe the language that the target is available in.
@@ -103,7 +103,7 @@ sub hreflang { $_[0]->{'hreflang'} ? @{$_[0]->{'hreflang'}} : undef }
 
 =head2 Title
 
-	$title = $link->title;
+    $title = $link->title;
 
 Returns the "title" attribute of the link. This corresponds to the
 mousover tooltip content of the C<E<lt>aE<gt>> element if the link if
@@ -117,7 +117,7 @@ sub title { $_[0]->{'title'} }
 
 =head2 Media
 
-	$media = $link->media;
+    $media = $link->media;
 
 Returns the "media" attribute of the link. This corresponds to the
 media/device the target resource is optimized for.
@@ -130,7 +130,7 @@ sub media { $_[0]->{'media'} }
 
 =head2 Media Type
 
-	$type = $link->type;
+    $type = $link->type;
 
 Returns a L<MIME::Type> object corresponding to the media type of the
 target resource.
@@ -143,7 +143,7 @@ sub type { $_[0]->{'type'} ? MIME::Type->new('type' => $_[0]->{'type'}) : undef 
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

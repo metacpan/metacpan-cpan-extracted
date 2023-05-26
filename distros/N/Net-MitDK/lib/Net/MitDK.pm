@@ -2,7 +2,7 @@ package Net::MitDK;
 
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use Encode qw(encode decode);
 use DateTime;
 use MIME::Entity;
@@ -289,8 +289,10 @@ sub fetch_file
 
 sub fetch_message_and_attachments
 {
-	my ($self, $message) = @_;
+	my ($self, $message, %opt) = @_;
 	my @ret;
+	my @errors;
+	my $error_policy = $opt{error_policy} // 'default';
 
 	return lambda {
 		my @files;
@@ -308,11 +310,24 @@ sub fetch_message_and_attachments
 		context $self-> fetch_file($message, $ndoc, $nfile);
 	tail {
 		my ($resp, $error) = @_;
-		return ($resp, $error) unless defined $resp;
+		unless ( defined $resp ) {
+			if ( $error_policy eq 'strict') {
+				return ($resp, $error);
+			} elsif ( $error_policy eq 'warning') {
+				push @errors, $error;
+			} else {
+				push @errors, $error;
+				push @ret, [ $ndoc, $nfile, $error ];
+			}
+		} else {
+			push @ret, [ $ndoc, $nfile, $resp->content ];
+		}
 
-		push @ret, [ $ndoc, $nfile, $resp->content ];
-
-		return \@ret unless @files;
+		unless ( @files ) {
+			# if at least one attachment is successful, treat errors as warnings
+			return \@ret, undef, @errors if @ret;
+			return undef, $errors[0];
+		}
 		($ndoc, $nfile) = @{ shift @files };
 
 		context $self-> fetch_file($message, $ndoc, $nfile);

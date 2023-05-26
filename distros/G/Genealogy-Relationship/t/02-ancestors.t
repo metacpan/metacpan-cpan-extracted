@@ -9,36 +9,36 @@ use lib "$Bin/lib";
 use TestPerson;
 
 my $grandfather = TestPerson->new(
-  id     => 1,
+  id     => 'p1',
   name   => 'Grandfather',
   gender => 'm',
 );
 my $father = TestPerson->new(
-  id     => 2,
+  id     => 'p2',
   name   => 'Father',
   parent => $grandfather,
   gender => 'm',
   );
 my $son = TestPerson->new(
-  id     => 3,
+  id     => 'p3',
   name   => 'Son',
   parent => $father,
   gender => 'm',
 );
 my $uncle = TestPerson->new(
-  id     => 4,
+  id     => 'p4',
   name   => 'Uncle',
   parent => $grandfather,
   gender => 'm',
 );
 my $cousin = TestPerson->new(
-  id     => 5,
+  id     => 'p5',
   name   => 'Cousin',
   parent => $uncle,
   gender => 'f',
 );
 my $unrelated_woman = TestPerson->new(
-  id     => 6,
+  id     => 'p6',
   name   => 'Unrelated woman',
   gender => 'f',
 );
@@ -108,4 +108,14 @@ is($rel->get_relationship($cousin, $father), 'Niece',
 is($rel->get_relationship($father, $cousin), 'Uncle',
   'Father is the uncle of the niece');
 
+can_ok($rel, 'get_relationship_ancestors');
+my $rels = $rel->get_relationship_ancestors($father, $cousin);
+is(@$rels, 2, 'Correct number of items from get_relationship_ancestors()');
+is(@{$rels->[0]}, 2, 'Correct number of items from get_relationship_ancestors()');
+is(@{$rels->[1]}, 3, 'Correct number of items from get_relationship_ancestors()');
+$mrca = $rel->most_recent_common_ancestor($father, $cousin);
+is($rels->[0][0]->id, $father->id, 'Father is first');
+is($rels->[0][-1]->id, $mrca->id, 'MRCA is last');
+is($rels->[1][0]->id, $cousin->id, 'Cousin is first');
+is($rels->[1][-1]->id, $mrca->id, 'MRCA is last');
 done_testing;

@@ -1,7 +1,8 @@
 package Net::RDAP;
-use Digest::SHA1 qw(sha1_hex);
+use Digest::SHA qw(sha256_hex);
 use File::Slurp;
 use File::stat;
+use File::Spec;
 use HTTP::Request::Common;
 use JSON;
 use MIME::Base64;
@@ -15,10 +16,12 @@ use Net::RDAP::Object::Nameserver;
 use Net::RDAP::Registry;
 use Net::RDAP::SearchResult;
 use Net::RDAP::Service;
+use Net::RDAP::Values;
 use vars qw($VERSION);
+use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.18;
+$VERSION = 0.19;
 
 =pod
 
@@ -40,14 +43,14 @@ L<Net::RDAP> - an interface to the Registration Data Access Protocol
     #
 
     # get domain info:
-    $object = $rdap->domain(Net::DNS::Domain->new('example.com'));
+    $object = $rdap->domain('example.com');
 
     # get info about IP addresses/ranges:
-    $object = $rdap->ip(Net::IP->new('192.168.0.1'));
-    $object = $rdap->ip(Net::IP->new('2001:DB8::/32'));
+    $object = $rdap->ip('192.168.0.1');
+    $object = $rdap->ip('2001:DB8::/32');
 
     # get info about AS numbers:
-    $object = $rdap->autnum(Net::ASN->new(65536));
+    $object = $rdap->autnum(65536);
 
     #
     # search functions:
@@ -69,12 +72,12 @@ L<Net::RDAP> - an interface to the Registration Data Access Protocol
 L<Net::RDAP> provides an interface to the Registration Data Access
 Protocol (RDAP).
 
-RDAP is gradually replacing Whois as the preferred way of obtainining
-information about Internet resources (IP addresses, autonymous system
-numbers, and domain names). As of writing, RDAP is quite well-supported
-by Regional Internet Registries (who are responsible for the allocation
-of IP addresses and AS numbers) but is still being rolled out among
-domain name registries and registrars.
+RDAP is replacing Whois as the preferred way of obtainining information
+about Internet resources (IP addresses, autonymous system numbers, and
+domain names). As of writing, RDAP is fully supported by Regional
+Internet Registries (who are responsible for the allocation of IP
+addresses and AS numbers) and generic TLD operators (e.g. .com, .org,
+.xyz) but is still being rolled out among country-code registries.
 
 L<Net::RDAP> does all the hard work of determining the correct
 server to query (L<Net::RDAP::Registry> is an interface to the
@@ -98,9 +101,13 @@ may contain any of the following options:
 =item * C<use_cache> - if true, copies of RDAP responses are stored on
 disk, and are updated if the copy on the server is more up-to-date.
 This behaviour is disabled by default and must be explicitly enabled.
+B<Note:> this setting controls whether L<Net::RDAP> caches RDAP records;
+it doesn't control caching of IANA registries by L<Net::RDAP::Registry>
+and L<Net::RDAP::Values>.
 
-=item * C<debug> - if true, tells L<Net::RDAP::UA> to print all HTTP
-requests and responses to C<STDERR>.
+=item * C<cache_ttl> - if set, specifies how long after a record has
+been cached before L<Net::RDAP> asks the server for any update. By
+default this is one hour (3600 seconds).
 
 =back
 
@@ -109,11 +116,7 @@ requests and responses to C<STDERR>.
 sub new {
     my ($package, %options) = @_;
 
-    my $self = bless(\%options, $package);
-
-    $Net::RDAP::UA::DEBUG = $self->{'debug'};
-
-    return $self;
+    return bless(\%options, $package);
 }
 
 =pod
@@ -125,7 +128,7 @@ sub new {
 This method returns a L<Net::RDAP::Object::Domain> object containing
 information about the domain name referenced by C<$domain>.
 
-C<$domain> must be a L<Net::DNS::Domain> object or a string containing a
+C<$domain> must be either a string or a L<Net::DNS::Domain> object containing a
 fully-qualified domain name. The domain may be either a "forward" domain
 (such as C<example.com>) or a "reverse" domain (such as C<168.192.in-addr.arpa>).
 
@@ -142,7 +145,7 @@ perform this encoding:
 
     my $name = "espécime.com";
 
-    my $domain = $rdap->domain->(Net::DNS::Domain->new(idn_to_ascii($name, 'UTF-8')));
+    my $domain = $rdap->domain->(idn_to_ascii($name, 'UTF-8'));
 
 =cut
 
@@ -167,8 +170,8 @@ sub domain {
 This method returns a L<Net::RDAP::Object::IPNetwork> object containing
 information about the resource referenced by C<$ip>.
 
-C<$ip> must be either a L<Net::IP> object or a string, and can represent any of the
-following:
+C<$ip> must be either a string or a L<Net::IP> object, and can represent any
+of the following:
 
 =over
 
@@ -207,7 +210,7 @@ sub ip {
 This method returns a L<Net::RDAP::Object::Autnum> object containing
 information about the autonymous system referenced by C<$autnum>.
 
-C<$autnum> must be a L<Net::ASN> object or an literal integer AS number.
+C<$autnum> must be a a literal integer AS number or a L<Net::ASN> object.
 
 If there was an error, this method will return a L<Net::RDAP::Error>.
 
@@ -234,7 +237,7 @@ sub autnum {
 This method returns a L<Net::RDAP::Object::Entity> object containing
 information about the entity referenced by C<$handle>, which must be
 a string containing a "tagged" handle, such as C<ABC123-EXAMPLE>, as
-per RFC 8521.
+per L<RFC 8521|https://www.rfc-editor.org/rfc/rfc8521.html>.
 
 =cut
 
@@ -269,7 +272,7 @@ sub query {
             'errorCode'    => 400,
             'title'        => 'Unable to obtain URL for object',
         );
-        
+
     } else {
         return $self->fetch($url, %args);
 
@@ -281,7 +284,9 @@ sub query {
     $exists = $rdap->exists($object);
 
 This method returns a boolean indicating whether C<$object> (which
-must be a L<Net::DNS::Domain>, L<Net::IP> or L<Net::ASN>) exists.
+must be a L<Net::DNS::Domain>, L<Net::IP> or L<Net::ASN>) exists. This
+is determined by performing an HTTP C<HEAD> request and inspecting the
+resulting HTTP status code.
 
 B<Note>: the non-existence of an object does not indicate whether that
 object is available for registration.
@@ -336,150 +341,154 @@ sub fetch {
 
     } else {
         return $self->error(
-            'errorCode'        => 400,
-            'title'            => "Unable to deal with '$arg'",
+            'errorCode' => 400,
+            'title'     => "Unable to deal with '$arg'",
         );
     }
 
     #
-    # construct HTTP::Request object
+    # add Authorization header field if we have a username/password
     #
-    my ($request, $file);
-    if ('HEAD' eq $args{'method'}) {
-        $request = HEAD($url);
+    if ($args{'user'} && $args{'pass'}) {
+        $self->ua->default_header('Authorization' => 'Basic '.encode_base64($args{'user'}.':'.$args{'pass'}));
 
     } else {
-        $request = GET($url);
+        $self->ua->default_headers->remove_header('Authorization');
 
-        #
-        # add Authorization header field if we have a username/password
-        #
-        $request->header('Authorization' => sprintf('Basic %s', encode_base64(join(':', ($args{'user'}, $args{'pass'}))))) if ($args{'user'} && $args{'pass'});
-
-        #
-        # path to local copy of the remote resource
-        #
-        $file = sprintf(
-            '%s/Net-RDAP-cache-%s.json',
-            ($ENV{'TMPDIR'} || '/tmp'),
-            sha1_hex($url->isa('URI') ? $url->as_string : $url),
-        );
-
-        #
-        # we have a locally-cached copy, so add the If-Modified-Since header field
-        #
-        $request->header('If-Modified-Since' => HTTP::Date::time2str(stat($file)->mtime)) if (-e $file && $self->{'use_cache'});
     }
 
-    #
-    # get the response from the server
-    #
-    my $response = $self->request($request);
-
     if ('HEAD' eq $args{'method'}) {
-        if (404 == $response->code) {
-            return undef;
-
-        } elsif (200 == $response->code) {
-            return 1;
-
-        } else {
-            return $self->error(
-                'url'        => $url,
-                'errorCode'    => $response->code,
-                'title'        => $response->status_line,
-            );
-        }
+        return $self->_head($url);
 
     } else {
-        #
-        # attempt to parse the JSON. The RDAP server *should* only ever send JSON, but
-        # this cannot be guaranteed:
-        #
-        my $data;
+        return $self->_get($url, %args);
+
+    }
+}
+
+sub _head {
+    my ($self, $url) = @_;
+
+    my $response = $self->request(HEAD($url));
+
+    if (404 == $response->code) {
+        return undef;
+
+    } elsif (200 == $response->code) {
+        return 1;
+
+    } else {
+        return $self->error(
+            'url'           => $url,
+            'errorCode'     => $response->code,
+            'title'         => $response->status_line,
+            'description'   => [$response->status_line],
+        );
+    }
+}
+
+sub _get {
+    my ($self, $url, %args) = @_;
+
+    #
+    # this is how long we allow things to be cached before checking
+    # if they have been updated:
+    #
+    my $ttl = $self->{'cache_ttl'} || DEFAULT_CACHE_TTL;
+
+    #
+    # path to local copy of the remote resource
+    #
+    my $file = sprintf(
+        '%s/Net-RDAP-%s.json',
+        File::Spec->tmpdir,
+        sha256_hex($url->as_string),
+    );
+
+    my ($response, $data);
+    if (!$self->{'use_cache'}) {
+        $response = $self->ua->request(GET($url));
         eval { $data = decode_json($response->decoded_content) };
 
+    } else {
+        $response = $self->ua->mirror($url, $file, $ttl);
+        eval { $data = decode_json(read_file($file)) };
+
+    }
+
+    return $self->rdap_from_response($url, $response, $data, %args);
+}
+
+sub error_from_response {
+    my ($self, $url, $response, $data) = @_;
+
+    if ($self->is_rdap($response) && defined($data->{'errorCode'})) {
         #
-        # check and parse the response
+        # we got an RDAP response from the server which looks like
+        # it's an error, so convert it and return:
         #
-        if (-e $file && (304 == $response->code || ($response->code >= 500))) {
-            #
-            # 304 response, or some sort of network/server error, but we have a
-            # cached copy:
-            #
-            utime(undef, undef, $file) if (304 == $response->code);
-            return $self->object_from_response(decode_json(read_file($file)), $url);
+        return Net::RDAP::Error->new($data, $url);
 
-        } elsif ($response->is_error) {
-            #
-            # some other error:
-            #
-            if ($self->is_rdap($response) && defined($data->{'errorCode'})) {
-                #
-                # we got an RDAP response from the server which looks like
-                # it's an error, so convert it and return:
-                #
-                return Net::RDAP::Error->new($data, $url);
+    } else {
+        #
+        # build our own error
+        #
+        return $self->error(
+            'url'           => $url,
+            'errorCode'     => $response->code,
+            'title'         => $response->status_line,
+            'description'   => [$response->status_line],
+        );
+    }
+}
 
-            } else {
-                #
-                # build our own error
-                #
-                return $self->error(
-                    'url'        => $url,
-                    'errorCode'    => $response->code,
-                    'title'        => $response->status_line,
-                );
-            }
+sub rdap_from_response {
+    my ($self, $url, $response, $data, %args) = @_;
 
-        } elsif (!$self->is_rdap($response)) {
+    if ($response->is_error) {
+        return $self->error_from_response($url, $response, $data);
+
+    } elsif (!$self->is_rdap($response)) {
+        #
+        # we got something that isn't a valid RDAP response:
+        #
+        return $self->error(
+            'url'           => $url,
+            'errorCode'     => 500,
+            'title'         => 'Invalid Content-Type',
+            'description'   => [ sprintf("The Content-Type of the header is '%s', should be 'application/rdap+json'", $response->header('Content-Type')) ],
+        );
+
+    } elsif (!defined($data) || 'HASH' ne ref($data)) {
+        #
+        # response was not parseable as JSON:
+        #
+        return $self->error(
+            'url'           => $url,
+            'errorCode'     => 500,
+            'title'         => 'Error parsing response body',
+            'description'   => [ 'The response from the server is not a valid JSON object' ],
+        );
+
+    } else {
+        $data->{'objectClassName'} = $args{'class_override'} if ($args{'class_override'});
+
+        if (!defined($data->{'objectClassName'}) && scalar(grep { /^(domain|nameserver|entity)SearchResults$/ } keys(%{$data})) < 1) {
             #
-            # we got something that isn't a valid RDAP response:
+            # response is missing the objectClassName property and is not a search result:
             #
             return $self->error(
-                'url'        => $url,
-                'errorCode'    => 500,
-                'title'        => 'Invalid Content-Type',
-                'description'    => [ sprintf("The Content-Type of the header is '%s', should be 'application/rdap+json'", $response->header('Content-Type')) ],
-            );
-
-        } elsif (!defined($data) || 'HASH' ne ref($data)) {
-            #
-            # response was not parseable as JSON:
-            #
-            return $self->error(
-                'url'        => $url,
-                'errorCode'    => 500,
-                'title'        => 'Error parsing response body',
-                'description'    => [ 'The response from the server is not a valid JSON object' ],
+                'url'           => $url,
+                'errorCode'     => 500,
+                'title'         => "Missing 'objectClassName' property",
+                'description'   => [ "The response from the server is missing the 'objectClassName' property" ],
             );
 
         } else {
-            $data->{'objectClassName'} = $args{'class_override'} if ($args{'class_override'});
-
-            if (!defined($data->{'objectClassName'}) && scalar(grep { /^(domain|nameserver|entity)SearchResults$/ } keys(%{$data})) < 1) {
-                #
-                # response is missing the objectClassName property and is not a search result:
-                #
-                return $self->error(
-                    'url'        => $url,
-                    'errorCode'    => 500,
-                    'title'        => "Missing 'objectClassName' property",
-                    'description'    => [ "The response from the server is missing the 'objectClassName' property" ],
-                );
-
-            } else {
-                #
-                # update local cache
-                #
-                write_file($file, $response->decoded_content) if ($self->{'use_cache'});
-                chmod(0600, $file);
-
-                #
-                # return object
-                #
-                return $self->object_from_response($data, $url);
-            }
+            #
+            # return object
+            #
+            return $self->object_from_response($data, $url);
         }
     }
 }
@@ -493,12 +502,12 @@ sub object_from_response {
     #
     # lookup results
     #
-    if ('domain'        eq $data->{'objectClassName'})     { return Net::RDAP::Object::Domain->new($data, $url)    }
-    elsif ('ip network'    eq $data->{'objectClassName'})    { return Net::RDAP::Object::IPNetwork->new($data, $url)    }
-    elsif ('autnum'        eq $data->{'objectClassName'})    { return Net::RDAP::Object::Autnum->new($data, $url)    }
-    elsif ('nameserver'    eq $data->{'objectClassName'})    { return Net::RDAP::Object::Nameserver->new($data, $url)}
-    elsif ('entity'        eq $data->{'objectClassName'})    { return Net::RDAP::Object::Entity->new($data, $url)    }
-    elsif ('help'        eq $data->{'objectClassName'})    { return Net::RDAP::Help->new($data, $url)        }
+    if    ('domain'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Domain->new($data, $url)    }
+    elsif ('ip network' eq $data->{'objectClassName'})  { return Net::RDAP::Object::IPNetwork->new($data, $url) }
+    elsif ('autnum'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Autnum->new($data, $url)    }
+    elsif ('nameserver' eq $data->{'objectClassName'})  { return Net::RDAP::Object::Nameserver->new($data, $url)}
+    elsif ('entity'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Entity->new($data, $url)    }
+    elsif ('help'       eq $data->{'objectClassName'})  { return Net::RDAP::Help->new($data, $url)              }
 
     #
     # search results
@@ -511,11 +520,12 @@ sub object_from_response {
     # unprocessable response
     #
     else {
+        my $msg = "Unknown objectClassName '$data->{'objectClassName'}'";
         return $self->error(
-            'url'        => $url,
-            'errorCode'    => 500,
-            'title'        => "Unknown objectClassName '$data->{'objectClassName'}'",
-            'description'    => [ "Unknown objectClassName '$data->{'objectClassName'}'" ],
+            'url'           => $url,
+            'errorCode'     => 500,
+            'title'         => $msg,
+            'description'   => [ $msg ],
         );
     }
 }
@@ -526,7 +536,7 @@ sub object_from_response {
 sub is_rdap {
     my ($self, $response) = @_;
 
-    return ('file' eq $response->base->scheme || ($response->header('Content-Type') =~ /^application\/rdap\+json/ || $response->header('Content-Type') =~ /^application\/json/));
+    return ((!$response->base || 'file' eq $response->base->scheme) || ($response->header('Content-Type') =~ /^application\/rdap\+json/ || $response->header('Content-Type') =~ /^application\/json/));
 }
 
 #
@@ -569,10 +579,10 @@ sub ua {
     $self->{'ua'} = Net::RDAP::UA->new if (!defined($self->{'ua'}));
 
     #
-    # inject our UA object into NET::RDAP::Registry so everything
+    # inject our UA object into NET::RDAP::Registry and NET::RDAP::Values so everything
     # uses the same user agent
     #
-    $NET::RDAP::Registry::UA = $self->{'ua'} if (!defined($NET::RDAP::Registry::UA));
+    $NET::RDAP::Registry::UA = $NET::RDAP::Registry::Values = $self->{'ua'};
 
     return $self->{'ua'};
 }
@@ -584,13 +594,17 @@ sub error {
     my ($self, %params) = @_;
     return Net::RDAP::Error->new(
         {
-            'errorCode' => $params{'errorCode'},
-            'title'    => $params{'title'},
-            'description' => $params{'description'},
+            'errorCode'     => $params{'errorCode'},
+            'title'         => $params{'title'},
+            'description'   => $params{'description'},
         },
         $params{'url'},
     );
 }
+
+1;
+
+__END__
 
 =pod
 
@@ -601,13 +615,13 @@ project is hosted here:
 
 =over
 
-=item * L<https://gitlab.centralnic.com/centralnic/perl-net-rdap>
+=item * L<https://github.com/gbxyz/perl-net-rdap>
 
 =back
 
 =head1 DISTRIBUTION
 
-The L<Net::RDAP> CPAN distribution contains a large number of#
+The L<Net::RDAP> CPAN distribution contains a large number of
 RDAP-related modules that all work together. They are:
 
 =over
@@ -670,46 +684,6 @@ RDAP-related modules that all work together. They are:
 
 =back
 
-=head1 DEPENDENCIES
-
-=over
-
-=item * L<DateTime::Format::ISO8601>
-
-=item * L<Digest::SHA1>
-
-=item * L<File::Basename>
-
-=item * L<File::Slurp>
-
-=item * L<File::Spec>
-
-=item * L<File::stat>
-
-=item * L<HTTP::Request::Common>
-
-=item * L<JSON>
-
-=item * L<LWP::Protocol::https>
-
-=item * L<LWP::UserAgent>
-
-=item * L<Mozilla::CA>
-
-=item * L<Net::ASN>
-
-=item * L<Net::DNS>
-
-=item * L<Net::IP>
-
-=item * L<URI>
-
-=item * L<vCard>
-
-=item * L<XML::LibXML>
-
-=back
-
 =head1 REFERENCES
 
 =over
@@ -741,7 +715,7 @@ Protocol (RDAP) Object Tagging
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 
@@ -762,5 +736,3 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
-
-1;

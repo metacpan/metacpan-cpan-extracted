@@ -20,7 +20,7 @@ L<Net::RDAP::ID> objects.
 
 =head2 ID Type
 
-	$type = $id->type;
+    $type = $id->type;
 
 Returns a string containing the type of public identifier.
 
@@ -32,7 +32,7 @@ sub type { $_[0]->{'type'} }
 
 =head2 Identifier
 
-	$identifier = $id->identifier;
+    $identifier = $id->identifier;
 
 Returns a string containing a public identifier of the type denoted by
 the C<type>.
@@ -45,7 +45,7 @@ sub identifier { $_[0]->{'identifier'} }
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

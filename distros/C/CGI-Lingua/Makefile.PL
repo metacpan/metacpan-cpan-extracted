@@ -8,7 +8,7 @@ use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{AUTHOR_TESTING}) {
+if($ENV{'AUTHOR_TESTING'}) {
 	$online_tests = are_online();
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
@@ -18,7 +18,6 @@ if($ENV{AUTHOR_TESTING}) {
 	}
 	if(!$online_tests) {
 		print "On-line tests have been disabled\n";
-		$online_tests = 0;
 	}
 }
 
@@ -124,7 +123,8 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
+	return 0 if($ENV{'AUTOMATED_TESTING'});
 	return 0 if(!-t STDIN);
 
 	my $s = IO::Socket::INET->new(
@@ -133,11 +133,14 @@ sub are_online
 		Timeout => 5
 	);
 	if($s) {
-		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
 			close($s);
 			return 1;
 		}
-		if(-r '/usr/local/share/GeoIP/GeoIP.dat') {
+
+		# FIXME: should test if any of the modules has been installed
+		if((-r '/usr/local/share/GeoIP/GeoIP.dat') ||
+		   (-r '/usr/share/GeoIP/GeoIP.dat')) {
 			print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests
@@ -160,7 +163,7 @@ EOF
 		# Timeout inspired by Mail::IMAPClient
 		my $rc;
 		eval {
-			local $SIG{ALRM} = sub { die "alarm\n" };
+			local $SIG{ALRM} = sub { die 'alarm' };
 			alarm(60);
 			$rc = prompt('Do you want to enable these tests?', 'y') =~ /^y/i ? 1 : 0;
 			alarm(0);

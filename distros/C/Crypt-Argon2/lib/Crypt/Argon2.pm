@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.018';
+$Crypt::Argon2::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -200,13 +200,10 @@ Leon Timmermans <leont@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2013 by Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson, Samuel Neves, Thomas Pornin and Leon Timmermans.
 
-Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson, Samuel Neves, Thomas Pornin and Leon Timmermans has dedicated the work to the Commons by waiving all of his
-or her rights to the work worldwide under copyright law and all related or
-neighboring legal rights he or she had in the work, to the extent allowable by
-law.
+This is free software, licensed under:
 
-Works under CC0 do not require attribution. When citing the work, you should
-not imply endorsement by the author.
+  The Apache License, Version 2.0, January 2004
 
 =cut

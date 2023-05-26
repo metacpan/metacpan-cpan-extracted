@@ -92,13 +92,17 @@ accept_multiple
 
 # DESCRIPTION
 
-IO::FD is an XS module implementing common core Perl system I/O functions work
-with **file descriptors** instead of Perl **file handles**. Functions include but
-are not limited to `accept`, `connect`, `socket`, `bind`, `sysopen`,
-`sysread`, and `syswrite`.
+IO::FD is an XS module implementing common core Perl system I/O functions to
+work with **file descriptors** instead of Perl **file handles**. Functions
+include but are not limited to `accept`, `connect`, `socket`, `bind`,
+`sysopen`, `sysread`, and `syswrite`.
 
-It also implements some non core functions which normally would use file handles
-such as `sendfile`, `dup` and `mkstemp`.
+Many non core system functions such as `sendfile`, `dup` and `mkstemp`,
+`pread`, `pwrite`, `mkfifo` which work with file descriptors are also
+implemented.
+
+Additional support for streamlined connection accepting is included via
+`accept_multiple`.
 
 This module can significantly lower memory usage per file descriptor and
 decrease file/socket opening and socket accepting times.  `accept` performance
@@ -128,10 +132,16 @@ This modules **IS NOT** intended to be a drop in replacement for core IO
 subroutines in existing code. If you want a 'drop in replacement' please look
 at [IO::FD::DWIM](https://metacpan.org/pod/IO%3A%3AFD%3A%3ADWIM) which is part of the same distribution.
 
-Currently this module is focused on Unix/Linux systems, as this is the natural
+Currently this module is focused on UNIX/Linux systems, as this is the natural
 habitat of a file descriptor.
 
 # IMPORTANT VERSION DIFFERENCES
+
+## v0.3.0 and later
+
+**New functions:**
+
+`pread`, `pwrite`, `mkfifo`, `mkfifoat`, `open`, `openat`
 
 ## v0.2.0 and later
 
@@ -141,19 +151,19 @@ habitat of a file descriptor.
 
 **Changes:**
 
-All functions creating a new fd now behave more perlish and apply the CLOEXEC
-if larger than `$^F`  to prevent fd leakage.  This may result in an extra
-system call you didn't need if your program never calls `exec`. To disable
-this, increase the value of `$^F`. 
+All functions creating a new fd now behave more perlish and apply  O\_CLOEXEC if
+larger than `$^F`  to prevent fd leakage.  This may result in an extra system
+call you didn't need if your program never calls `exec`. To disable this,
+increase the value of `$^F` as per normal.
 
 Functions now throw **exceptions** when output variables (fds) are read only
-when they need to be writable. This matches perl behaviour in the same scenario
+when they need to be writable. This matches Perl behaviour in the same scenario
 for `sysopen` etc.
 
 When function input fd variables doesn't look like an fd (an IV), a **warning**
 'IO::FD::xxxx called with something other than a file descriptor' is generated,
 return value is `undef` and the `$!` variable is set to `EBADF` (bad file
-descriptor>). This is analogous to perl behaviour when checking for valid
+descriptor>). This is analogous to Perl behaviour when checking for valid
 GLOB/refs with `sysread` and friends.
 
 # WHERE SHOULD I USE THIS MODULE?
@@ -189,18 +199,14 @@ file descriptors directly **you will loose**:
 - <FH> 'readline' support
 - IO::Handle inheritance
 
-**NOTE:** Since version **v0.2.0**  the close on exec flag is set for file
-descriptors created above the value in `$^F`. Previouse versions did not do
-this.
-
 # MOTIVATION
 
 Perl makes working with text files easy, thanks to **file handles**.  Line
 splitting, UTF-8, EOL processing etc. are awesome and make your life easier.
 
-However, the benefits of file handles in a network context or binary files are
-not so clear cut. All the nice line ending and encoding support doesn't help in
-these scenarios.
+However, the benefits of file handles when working within a network or binary
+file context are not so clear cut. All the nice line ending and encoding
+support doesn't help in these scenarios.
 
 In addition, the OS kernel does a lot of buffering for networking already. Do we
 really need to add more?
@@ -211,7 +217,7 @@ faster with file descriptors as less setup is required internally.
 
 # APIs
 
-Each of the APIs mimic the Perl counterpart (if applicable) as much as
+Each of the APIs mimic the Perl counterpart, if applicable, as much as
 possible. Unless explicitly mentioned, they should operate like built in
 routines.  Consult perldoc -f FUNCTION for details.
 
@@ -314,13 +320,26 @@ Currently advanced header/trailer features of BSD sendfile are not supported.
 
 Same as `IO::FD::sysopen`, but expects all four arguments
 
+### IO::FD::open
+
+Binding to `open`. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
+
+### IO::FD::openat
+
+Binding to `openat`. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
+
 ### IO::FD::mktemp
 
 Behaves similar to [File::Temp::mktemp](https://metacpan.org/pod/File%3A%3ATemp%3A%3Amktemp)
 
 Requires at least six 'X' characters at the end of the template
 
-NOTE: This function does not return a file descriptor. It might be included in
+The template string used as input is modified  and is the same as the return
+value on success
+
+**NOTE:** This function does not return a file descriptor. It might be included in
 future versions of this module
 
 ### IO::FD::mkstemp
@@ -329,8 +348,11 @@ Behaves like [File::Temp::mkstemp](https://metacpan.org/pod/File%3A%3ATemp%3A%3A
 
 Requires at least six 'X' characters at the end of the template
 
-**NOTE:** Currently returns `undef` as path in list context. Cross platform fd
-paths are hard to extract.  TODO:  Fix this across platforms.
+In list context returns `($fd,$path)`, where `$fd` is the already open file
+descriptor, and `$path` is the unique path generated from the template.
+
+The template string used as input is modified  and is the same as the `$path`
+return value on success
 
 ### IO::FD::sysseek
 
@@ -341,6 +363,16 @@ paths are hard to extract.  TODO:  Fix this across platforms.
 ### IO::FD::syspipe
 
 A alias of `IO::FD::pipe`.
+
+### mkfifo
+
+Binding to `mkfifo`. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
+
+### mkfifoat
+
+Binding to `mkfifoat`. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
 
 ## Common
 
@@ -404,6 +436,14 @@ Likely differences to Perl lstat for larger integer values
 
 TODO: fix this!
 
+### IO::FD::pread
+
+Binding to `pread`. Please see your system manual.
+
+### IO::FD:pwrite
+
+Binding to `pwrite`. Please see your system manual.
+
 ## Experimental
 
 These functions haven't really been tested, documented or finished. They exist
@@ -422,7 +462,7 @@ Alias to ioctl
 
 ### IO::FD::select
 
-Broken. Probably will be removed as core perl has this already.
+Broken. Probably will be removed as core Perl has this already.
 
 ### IO::FD::poll
 
@@ -638,7 +678,7 @@ provide any networking/socket support.
 ```perl
 Further emulate linux/bsd SOCK_NONBLOCK and SOCK_CLOEXEC on darwin
       Add more tests for stat and DWIM module
-      Wider compatability for older perls
+      Wider compatability for older Perls
       Add More system functions which work with fds
       Work with win32 sockets
       Maybe make an IO::Handle sub class

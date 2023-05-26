@@ -1,5 +1,8 @@
 Revision history for Alien::geos::af
 
+1.012 2023-05-18
+    - Share builds: patch one file to build using gcc-13 on Windows.
+
 1.011 2022-11-26
     - Share builds: Use https for downloads
 

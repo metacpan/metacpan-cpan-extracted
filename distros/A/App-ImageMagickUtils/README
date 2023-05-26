@@ -2,24 +2,25 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.019 of App::ImageMagickUtils (from
-    Perl distribution App-ImageMagickUtils), released on 2022-05-08.
+    This document describes version 0.020 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2023-03-01.
 
 DESCRIPTION
     This distribution includes the following CLI utilities related to
     ImageMagick:
 
-    *   calc-image-resized-size
-
-    *   convert-image-to
-
-    *   convert-image-to-pdf
-
-    *   downsize-image
-
-    *   image-resize-notation-to-human
-
-    *   img2pdf
+    1. calc-image-resized-size
+    2. convert-image-to
+    3. convert-image-to-jpg
+    4. convert-image-to-pdf
+    5. convert-image-to-png
+    6. downsize-image
+    7. image-resize-notation-to-human
+    8. img2jpg
+    9. img2pdf
+    10. img2png
+    11. jpg2png
+    12. png2jpg
 
 FUNCTIONS
   convert_image_to
@@ -51,7 +52,78 @@ FUNCTIONS
 
     *   files* => *array[filename]*
 
+        (No description)
+
+    *   quality => *int* (default: 92)
+
+        Quality setting (for JPEG/PNG), 1 (best compression, worst quality)
+        to 100 (least compression, best quality).
+
     *   to* => *str*
+
+        (No description)
+
+    *   trash_original => *bool*
+
+        Trash the original file after downsizing.
+
+        This option uses the File::Trash::FreeDesktop module to do the
+        trashing. Compared to deletion, with this option you can still
+        restore the trashed original files from the Trash directory.
+
+        See also the "delete_original" option.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_image_to_jpg
+    Usage:
+
+     convert_image_to_jpg(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert images to JPG using ImageMagick's 'convert' utility.
+
+    This is a wrapper to "convert-image-to", with "--to" set to "jpg":
+
+     % convert-image-to-pdf *.png
+
+    is equivalent to:
+
+     % convert-image-to --to jpg *.png
+
+    which in turn is equivalent to:
+
+     % for f in *.png; do convert "$f" "$f.jpg"; done
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   delete_original => *bool*
+
+        Delete (unlink) the original file after downsizing.
+
+        See also the "trash_original" option.
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   quality => *int* (default: 92)
+
+        Quality setting (for JPEG/PNG), 1 (best compression, worst quality)
+        to 100 (least compression, best quality).
 
     *   trash_original => *bool*
 
@@ -107,6 +179,70 @@ FUNCTIONS
         See also the "trash_original" option.
 
     *   files* => *array[filename]*
+
+        (No description)
+
+    *   trash_original => *bool*
+
+        Trash the original file after downsizing.
+
+        This option uses the File::Trash::FreeDesktop module to do the
+        trashing. Compared to deletion, with this option you can still
+        restore the trashed original files from the Trash directory.
+
+        See also the "delete_original" option.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_image_to_png
+    Usage:
+
+     convert_image_to_png(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert images to JPG using ImageMagick's 'convert' utility.
+
+    This is a wrapper to "convert-image-to", with "--to" set to "png":
+
+     % convert-image-to-png *.jpg
+
+    is equivalent to:
+
+     % convert-image-to --to png *.jpg
+
+    which in turn is equivalent to:
+
+     % for f in *.jpg; do convert "$f" "$f.png"; done
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   delete_original => *bool*
+
+        Delete (unlink) the original file after downsizing.
+
+        See also the "trash_original" option.
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   quality => *int* (default: 92)
+
+        Quality setting (for JPEG/PNG), 1 (best compression, worst quality)
+        to 100 (least compression, best quality).
 
     *   trash_original => *bool*
 
@@ -173,7 +309,12 @@ FUNCTIONS
 
     *   files* => *array[filename]*
 
+        (No description)
+
     *   quality => *int* (default: 40)
+
+        Quality setting (for JPEG/PNG), 1 (best compression, worst quality)
+        to 100 (least compression, best quality).
 
     *   skip_downsized => *bool* (default: 1)
 
@@ -253,7 +394,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

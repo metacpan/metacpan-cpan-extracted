@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.103.3
+## Version v0.104.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2022/11/23
+## Modified 2023/05/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
+    use Clone;
     use DateTime;
     use DateTime::Format::Strptime;
 	use Devel::Confess;
@@ -26,7 +27,7 @@ BEGIN
     use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.103.3';
+    our $VERSION = 'v0.104.0';
 };
 
 use strict;
@@ -37,13 +38,12 @@ sub init
     my $self  = shift( @_ );
     my $param = shift( @_ ) || return( $self->error( "No hash parameter was provided." ) );
     return( $self->error( "Hash of parameters provided ($param) is not an hash reference." ) ) if( !$self->_is_hash( $param ) );
-    $self->SUPER::init( $param );
+    $self->SUPER::init( $param ) || return( $self->pass_error );
     $self->{configured} = 0;
     $self->{classes} = {};
     $self->{missing} = [];
     $self->{colour_open} = '<';
     $self->{colour_close} = '>';
-    
     my $dict = $param->{dictionary} || return( $self->error( "No dictionary was provided to initiate Getopt::Long" ) );
     return( $self->error( "Dictionary provided is not a hash reference." ) ) if( !$self->_is_hash( $dict ) );
     $self->dictionary( $dict );
@@ -67,12 +67,111 @@ sub init
     {
         dict => $dict,
         aliases => $self->{aliases},
-        debug => $self->{debug} 
+        # debug => $self->{debug} 
     }) || return( $self->error( "Unable to get a Getopt::Class::Alias tie object: ", Getopt::Class::Alias->error ) );
     
     $self->{configure_options} = [qw( no_ignore_case no_auto_abbrev auto_version auto_help )];
     my $opts = \%options;
     my $params = [];
+
+    foreach my $k ( sort( keys( %$dict ) ) )
+    {
+        my $k2_dash = $k;
+        $k2_dash =~ tr/_/-/;
+        my $k2_under = $k;
+        $k2_under =~ tr/-/_/;
+        
+        my $def = $dict->{ $k };
+        next if( $def->{__no_value_assign} );
+
+        # Do some pre-processing work for booleans
+        if( $def->{type} eq 'boolean' && !exists( $def->{mirror} ) )
+        {
+            my $mirror_opt;
+            # If this is a boolean, add their counterpart, if necessary
+            if( substr( $k, 0, 5 ) eq 'with_' && 
+                !exists( $dict->{ 'without_' . substr( $k, 5 ) } ) )
+            {
+                $mirror_opt = 'without_' . substr( $k, 5 );
+            }
+            elsif( substr( $k, 0, 8 ) eq 'without_' && 
+                   !exists( $dict->{ 'with_' . substr( $k, 8 ) } ) )
+            {
+                $mirror_opt = 'with_' . substr( $k, 8 );
+            }
+            elsif( substr( $k, 0, 7 ) eq 'enable_' && 
+                   !exists( $dict->{ 'disable_' . substr( $k, 7 ) } ) )
+            {
+                $mirror_opt = 'disable_' . substr( $k, 7 );
+            }
+            elsif( substr( $k, 0, 8 ) eq 'disable_' && 
+                   !exists( $dict->{ 'enable_' . substr( $k, 8 ) } ) )
+            {
+                $mirror_opt = 'enable_' . substr( $k, 8 );
+            }
+            
+            if( defined( $mirror_opt ) )
+            {
+                my $false = 0;
+                my $val = exists( $def->{default} )
+#                     ? ( Scalar::Util::reftype( $def->{default} // '' ) eq 'SCALAR' || ref( $def->{default} // '' ) eq 'CODE' )
+                    ? ( $self->_is_scalar( $def->{default} ) || $self->_is_code( $def->{default} ) || ref( $def->{default} ) )
+                        ? $def->{default}
+                        : \$def->{default}
+                    : exists( $def->{code} )
+                        ? $def->{code}
+                        : \$false;
+                my $copy = Clone::clone( $def );
+                $dict->{ $mirror_opt } = $copy;
+                $def->{mirror} = { name => $mirror_opt, toggle => sub
+                {
+                    my( $value ) = @_;
+                    $opts->{ $mirror_opt } = int( !$value );
+                }};
+                $def->{mirror}->{default} = delete( $def->{default} ) if( exists( $def->{default} ) && defined( $def->{default} ) );
+                # A code is used for this boolean, so we create an anon sub that call this sub just like Getopt::Long would
+                if( ref( $val ) eq 'CODE' )
+                {
+                    $copy->{mirror} = { name => $k, toggle => sub
+                    {
+                        my( $value ) = @_;
+                        $val->( $k, int( !$value ) );
+                    }};
+                }
+                # Otherwise, we create a sub that set the mirror value
+                else
+                {
+                    $copy->{mirror} = { name => $k, toggle => sub
+                    {
+                        my( $value ) = @_;
+                        $opts->{ $k } = int( !$value );
+                    }};
+                }
+                $copy->{mirror}->{default} = int( !$def->{mirror}->{default} ) if( exists( $def->{mirror}->{default} ) );
+                # We remove it, because they would be assigned by Getopt::Long even if not triggered and this would bother us.
+                delete( $def->{default} );
+                delete( $copy->{default} );
+                $def->{default} = sub
+                {
+                    my( $option, $value ) = @_;
+                    return if( $def->{mirror}->{is_set} );
+                    $def->{mirror}->{value} = $value;
+                    $def->{mirror}->{is_set}++;
+                    $def->{mirror}->{toggle}->( $value );
+                };
+                $copy->{default} = sub
+                {
+                    my( $option, $value ) = @_;
+                    return if( $copy->{mirror}->{is_set} );
+                    $copy->{mirror}->{value} = $value;
+                    $copy->{mirror}->{is_set}++;
+                    $copy->{mirror}->{toggle}->( $value );
+                };
+                $def->{__no_value_assign} = 1;
+            }
+        }
+    }
+    
     # Build the options parameters
     foreach my $k ( sort( keys( %$dict ) ) )
     {
@@ -93,7 +192,7 @@ sub init
         }
         # Add the dash option as an alias if it is not the same as the underscore one, such as when this is just one word, e.g. version
         CORE::push( @$opt_name, $k2_dash ) if( $k2_dash ne $k2_under );
-        
+
         if( !ref( $def->{alias} ) && CORE::length( $def->{alias} ) )
         {
             $def->{alias} = [$def->{alias}];
@@ -112,7 +211,7 @@ sub init
         $def->{alias} = Module::Generic::Array->new( $def->{alias} );
         
         my $opt = join( '|', @$opt_name );
-        if( length( $def->{default} ) )
+        if( defined( $def->{default} ) && ( ref( $def->{default} ) || length( $def->{default} ) ) )
         {
             $opts->{ $k2_under } = $def->{default};
         }
@@ -138,6 +237,13 @@ sub init
         elsif( $def->{type} eq 'boolean' )
         {
             $suff = '!';
+            if( exists( $def->{code} ) && 
+                ref( $def->{code} ) eq 'CODE' &&
+                # Will not override if a code ref is already assigned
+                ref( $opts->{ $k2_under } // '' ) ne 'CODE' )
+            {
+                $opts->{ $k2_under } = $def->{code};
+            }
         }
         elsif( $def->{type} eq 'hash' )
         {
@@ -482,6 +588,11 @@ sub postprocess
         }
         elsif( $def->{type} eq 'boolean' )
         {
+            if( exists( $def->{mirror} ) && 
+                exists( $def->{mirror}->{value} ) )
+            {
+                $opts->{ $k } = $def->{mirror}->{value};
+            }
             $opts->{ $k } = ( $opts->{ $k } ? $self->true : $self->false );
         }
         elsif( $def->{type} eq 'string' )
@@ -521,6 +632,7 @@ sub required { return( shift->_set_get_array_as_object( 'required', @_ ) ); }
 
 sub usage { return( shift->_set_get_code( 'usage', @_ ) ); }
 
+# NOTE: Getopt::Class::Values package
 package Getopt::Class::Values;
 BEGIN
 {
@@ -638,6 +750,7 @@ AUTOLOAD
     }
 };
 
+# NOTE: Getopt::Class::Repository package
 package Getopt::Class::Repository;
 BEGIN
 {
@@ -783,6 +896,7 @@ sub enable
     return( $self->{enable} );
 }
 
+# NOTE: Getopt::Class::Alias package
 # This is an alternative to perl feature of refealiasing
 # https://metacpan.org/pod/perlref#Assigning-to-References
 package Getopt::Class::Alias;
@@ -917,13 +1031,13 @@ sub STORE
             CORE::warn( "Alias property is not an array reference. This should not happen.\n" ) if( $self->{warnings} );
             return( $fallback->( $key, $val ) );
         }
-        $self->message_colour( 3, "Setting primary property \"<green>${key}</>\" to value \"<black on white>${val}</>\"." );
+        $self->message_colour( 3, "Setting primary property \"<green>${key}</>\" to value \"<black on white>" . ( $val // '' ) . "</>\"." );
         $data->{ $key } = $val;
         foreach my $a ( @$alias )
         {
             next if( $a eq $key );
             # We do not set the value, if for some reason, the user would have removed this key
-            $self->message_colour( 3, "Setting alias \"<green>${a}</>\" to value \"<val black on white>${val}</>\" (ref=", ref( $val ), ")." );
+            $self->message_colour( 3, "Setting alias \"<green>${a}</>\" to value \"<val black on white>", ( $val // '' ), "</>\" (ref=", ref( $val // '' ), ")." );
             # $data->{ $a } = $val if( CORE::exists( $data->{ $a } ) );
             $data->{ $a } = $val;
         }
@@ -935,7 +1049,7 @@ sub STORE
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -955,6 +1069,10 @@ Getopt::Class - Extended dictionary version of Getopt::Long
         create_user     => { type => 'boolean', alias => [qw(create_person create_customer)], action => 1 },
         create_product  => { type => 'boolean', action => 1 },
         debug           => { type => 'integer', default => \$DEBUG },
+        # Can be enabled with --enable-recurse
+        disable_recurse => { type => 'boolean', default => 1 },
+        # Can be disabled also with --disable-logging
+        enable_logging  => { type => 'boolean', default => 0 },
         help            => { type => 'code', code => sub{ pod2usage(1); }, alias => '?', action => 1 },
         man             => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); }, action => 1 },
         quiet           => { type => 'boolean', default => 0, alias => 'silent' },
@@ -965,6 +1083,9 @@ Getopt::Class - Extended dictionary version of Getopt::Long
         api_version     => { type => 'string', default => 1 },
         as_admin        => { type => 'boolean' },
         dry_run         => { type => 'boolean', default => 0 },
+        
+        # Can be enabled also with --with-zlib
+        without_zlib    => { type => 'integer', default => 1 },
     
         name            => { type => 'string', class => [qw( person product )] },
         created         => { type => 'datetime', class => [qw( person product )] },
@@ -1012,7 +1133,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.103.3
+    v0.104.0
 
 =head1 DESCRIPTION
 
@@ -1026,13 +1147,13 @@ To instantiate a new L<Getopt::Class> object, pass an hash reference of followin
 
 =over 4
 
-=item I<dictionary>
+=item * C<dictionary>
 
 This is required. It must contain a key value pair where the value is an anonymous hash reference that can contain the following parameters:
 
 =over 8
 
-=item I<alias>
+=item * C<alias>
 
 This is an array reference of alternative options that can be used in an interchangeable way
 
@@ -1047,7 +1168,7 @@ This is an array reference of alternative options that can be used in an interch
     # or
     --family-name Doe
 
-=item I<default>
+=item * C<default>
 
 This contains the default value. For a string, this could be anything, and also a reference to a scalar, such as:
 
@@ -1074,7 +1195,7 @@ would not produce an array with C<en>, C<fr> and C<ja> entries, but an array suc
 
 because the initial default value is not replaced when one is provided. This is a design from L<Getopt::Long> and although I could circumvent this, I a not sure I should.
 
-=item I<error>
+=item * C<error>
 
 A string to be used to set an error by L</"check_class_data">. Typically the string should provide meaningful information as to what the data should normally be. For example:
 
@@ -1083,7 +1204,7 @@ A string to be used to set an error by L</"check_class_data">. Typically the str
     currency => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
     };
 
-=item I<file>
+=item * C<file>
 
 This type will mark the value as a directory or file path and will become a L<Module::Generic::File> object.
 
@@ -1095,7 +1216,7 @@ And if you are not very careful and inadvertently change directory like when usi
 
 Setting this argument type to C<file> ensure the resulting value is a L<Module::Generic::File>, whose underlying file or directory will be resolved to their absolute path.
 
-=item I<file-array>
+=item * C<file-array>
 
 Same as I<file> argument type, but allows multiple value saved as an array. For example:
 
@@ -1103,17 +1224,17 @@ Same as I<file> argument type, but allows multiple value saved as an array. For 
 
 This would result in the option property I<skip> being an L<array object|Module::Generic::Array> containing 3 entries.
 
-=item I<max>
+=item * C<max>
 
 This is well explained in L<Getopt::Long/"Options with multiple values">
 
 It serves "to specify the minimal and maximal number of arguments an option takes".
 
-=item I<min>
+=item * C<min>
 
 Same as above
 
-=item I<re>
+=item * C<re>
 
 This must be a regular expression and is used by L</"check_class_data"> to check the sanity of the data provided by the user.
 So, for example:
@@ -1129,17 +1250,17 @@ then the user calls your program with, among other options:
 
 would set an error that can be retrieved as an output of L</"check_class_data">
 
-=item I<required>
+=item * C<required>
 
 Set this to true or false (1 or 0) to instruct L</"check_class_data"> whether to check if it is missing or not.
 
 This is an alternative to the L</"required"> method which is used at an earlier stage, during L</"exec">
 
-=item I<type>
+=item * C<type>
 
-Type can be I<array>, I<boolean>, I<code>, I<decimal>, I<hash>, I<integer>, I<string>, I<string-hash>
+Type can be C<array>, C<boolean>, C<code>, C<datetime>, C<decimal>, C<file>, C<hash>, C<integer>, C<string>, C<string-hash>
 
-Type I<hash> is convenient for free key-value pair such as:
+Type C<hash> is convenient for free key-value pair such as:
 
     --define customer_id=10 --define transaction_id 123
 
@@ -1149,11 +1270,26 @@ Type code implies an anonymous sub routine and should be accompanied with the at
 
     { type => 'code', code => sub{ pod2usage(1); exit( 0 ) }, alias => '?', action => 1 },
 
-Also as seen in the example above, you can add additional properties to be used in your program, here such as I<action> that could be used to identify all options that are used to trigger an action or a call to a sub routine.
+If type is C<boolean> and the key is either C<with>, C<without>, C<enable>, C<disable>, their counterpart will automatically be available as well, such as you can do, as show in the excerpt in the synopsis above:
+
+    --enable-recurse --with-zlib
+
+Be careful though. If, in your dictionary, as shown in the synopsis, you defined C<without_zlib> with a default value of true, then using the option C<--with-zlib> will set that value to false. So in your application, you would need to check like this:
+
+    if( $opts->{without_zlib} )
+    {
+        # Do something
+    }
+    else
+    {
+        # Do something else
+    }
+
+Also as seen in the example above, you can add additional properties to be used in your program, here such as C<action> that could be used to identify all options that are used to trigger an action or a call to a sub routine.
 
 =back
 
-=item I<debug>
+=item * C<debug>
 
 This takes an integer, and is used to set the level of debugging. Anything under 3 will not provide anything meaningful.
 

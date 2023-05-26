@@ -2,42 +2,28 @@ NAME
     App::DistUtils - Collection of utilities related to Perl distributions
 
 VERSION
-    This document describes version 0.152 of App::DistUtils (from Perl
-    distribution App-DistUtils), released on 2022-08-21.
+    This document describes version 0.153 of App::DistUtils (from Perl
+    distribution App-DistUtils), released on 2023-02-25.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to Perl distributions:
 
-    *   dir2dist
-
-    *   dir2mod
-
-    *   dist-dir
-
-    *   dist-has-deb
-
-    *   dist2deb
-
-    *   dist2mod
-
-    *   list-dist-contents
-
-    *   list-dist-modules
-
-    *   list-dists
-
-    *   mod2dist
-
-    *   packlist-for
-
-    *   parse-release-file-name
-
-    *   pwd2dist
-
-    *   pwd2mod
-
-    *   uninstall-dist
+    1. dir2dist
+    2. dir2mod
+    3. dist-dir
+    4. dist-has-deb
+    5. dist2deb
+    6. dist2mod
+    7. list-dist-contents
+    8. list-dist-modules
+    9. list-dists
+    10. mod2dist
+    11. packlist-for
+    12. parse-release-file-name
+    13. pwd2dist
+    14. pwd2mod
+    15. uninstall-dist
 
     The main feature of these utilities is tab completion.
 
@@ -103,8 +89,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2017, 2016, 2015, 2014 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2020, 2017, 2016, 2015, 2014
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

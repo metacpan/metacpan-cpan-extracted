@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::ViewRole::Success::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: Fetching success value from SyForn::Results of give back true
-$SyForm::ViewRole::Success::VERSION = '0.102';
+$SyForm::ViewRole::Success::VERSION = '0.103';
 use Moo::Role;
 
 use overload 'bool' => sub { $_[0]->success };
@@ -30,7 +30,7 @@ SyForm::ViewRole::Success - Fetching success value from SyForn::Results of give 
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

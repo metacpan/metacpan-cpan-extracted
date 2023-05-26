@@ -42,6 +42,8 @@ There is no configuration. Simply add it to your F<config> file:
 
     use App::Phoebe::Ijirait;
 
+By default, /play/ijirait on all hosts is the same game.
+
 In a virtual host setup, this extension serves all the hosts. Here's how to
 serve just one of them:
 
@@ -58,6 +60,7 @@ L<gemini://transjovian.org/ijiraq/page/Help>.
 package App::Phoebe::Ijirait;
 use App::Phoebe qw(@extensions $log $server @request_handlers success result);
 use Modern::Perl;
+use Archive::Tar;
 use Encode qw(encode_utf8 decode_utf8);
 use File::Slurper qw(read_binary write_binary read_text);
 use Mojo::JSON qw(decode_json encode_json);
@@ -86,6 +89,7 @@ our $commands = {
   type     => \&type,
   save     => \&save,
   backup   => \&backup,
+  export   => \&export,
   say      => \&speak, # can't use say!
   who      => \&who,
   go       => \&go,
@@ -247,7 +251,10 @@ sub main {
   my $stream = shift;
   my $url = shift;
   my $port = App::Phoebe::port($stream);
-  if ($url =~ m!^gemini://(?:$host)(?::$port)?/play/ijirait(?:/([a-z]+))?(?:\?(.*))?!) {
+  if ($url =~ m!^gemini://(?:$host)(?::$port)?/play/ijirait\.tar\.gz$!) {
+    export_archive($stream);
+  }
+  elsif ($url =~ m!^gemini://(?:$host)(?::$port)?/play/ijirait(?:/([a-z]+))?(?:\?(.*))?!) {
     my $command = ($1 || "look") . ($2 ? " " . decode_utf8 uri_unescape($2) : "");
     $log->debug("Handling $url - $command");
     # some commands require no client certificate (and no person argument!)
@@ -367,6 +374,57 @@ sub look {
     }
   }
   menu($stream);
+}
+
+sub export {
+  my $stream = shift;
+  result($stream, "31", "/play/ijirait.tar.gz"); # redirect in order to get a better filename
+}
+
+sub export_archive {
+  my $stream = shift;
+  success($stream, "application/gzip");
+  my $tar = Archive::Tar->new;
+  my $bytes = "# Rooms\n";
+  $bytes .= encode_utf8 "=> rooms/$_->{id}.gmi $_->{name}\n" for @{$data->{rooms}};
+  $tar->add_data("ijirait/index.gmi", $bytes);
+  for my $room (@{$data->{rooms}}) {
+    $bytes = encode_utf8 "# " . $room->{name} . "\n";
+    $bytes .= encode_utf8 $room->{description} . "\n" if $room->{description};
+    my @things = @{$room->{things}};
+    $bytes .= "## Things\n" if @things > 0;
+    for my $thing (@things) {
+      my $name = uri_escape_utf8 $thing->{short};
+      $bytes .= encode_utf8 "=> ../things/$room->{id}/$name.gmi $thing->{name}\n";
+      my $bytes2 = encode_utf8 "# $thing->{name}\n";
+      $bytes2 .= encode_utf8 "$thing->{description}\n";
+      $bytes2 .= "=> ../../rooms/$room->{id}.gmi Back\n";
+      $tar->add_data("ijirait/things/$room->{id}/$name.gmi", $bytes2);
+    }
+    my @exits = @{$room->{exits}};
+    $bytes .= "## Exits\n" if @exits > 0;
+    for my $exit (@exits) {
+      my $direction = uri_escape_utf8 $exit->{direction};
+      my $destination = first { $_->{id} == $exit->{destination} } @{$data->{rooms}};
+      $bytes .= encode_utf8 "=> $destination->{id}.gmi $exit->{name}\n";
+    }
+    # We also print rooms without people! We also print inactive people.
+    my @people = grep { $_->{location} == $room->{id} } @{$data->{people}};
+    $bytes .= "## People\n" if @people > 0;
+    for my $o (@people) {
+      $bytes .= encode_utf8 "=> ../people/$o->{id}.gmi $o->{name}\n";
+      my $bytes2 = encode_utf8 "# $o->{name}\n";
+      $bytes2 .= encode_utf8 "$o->{description}\n";
+      $bytes2 .= encode_utf8 "=> ../rooms/$room->{id}.gmi $room->{name}\n";
+      $tar->add_data("ijirait/people/$o->{id}.gmi", $bytes2);
+    }
+    $tar->add_data("ijirait/rooms/$room->{id}.gmi", $bytes);
+  }
+  my $io;
+  open(my $fh, ">", \$io) or $log->error("Error preparing string for tarball: $!");
+  $tar->write($fh) or $log->error("Error writing tarball: " . $tar->error);
+  close($fh);
+  $stream->write(gzip $io);
 }
 
 sub timespan {

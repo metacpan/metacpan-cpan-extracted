@@ -45,6 +45,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Digest-MD5"
       }
    },
-   "version" : "1.001001",
+   "version" : "1.001002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

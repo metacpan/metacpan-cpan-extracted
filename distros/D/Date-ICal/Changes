@@ -1,3 +1,20 @@
+2023-05-24  skim
+
+    * Add L<> in doc to SEE ALSO modules.
+    * Cleanup of distribution infrastructure.
+    * Remove warning message about deprecation of module.
+
+2023-05-18  skim
+
+    * Add abstract to Makefile.PL.
+    * Add author to Makefile.PL.
+    * Add LICENSE AND COPYRIGHT section to doc.
+    * Add minimal Perl version to Makefile.PL.
+    * Add missing license to Makefile.PL.
+    * Add use strict and warnings to Makefile.PL.
+    * Add use warnings.
+    * Unify version number in distribution.
+
 2023-04-04  skim
 
     * RT#147274: Fix link to datetime project (http://datetime.perl.org is dead).

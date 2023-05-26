@@ -52,6 +52,6 @@
          "url" : "https://github.com/noxxi/p5-io-socket-ssl"
       }
    },
-   "version" : "2.081",
+   "version" : "2.083",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

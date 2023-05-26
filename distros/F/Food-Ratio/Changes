@@ -1,5 +1,9 @@
 Revision history for Food-Ratio
 
+0.03    2023-05-22
+        foodratio(1) can parse foodratio(1) output. More documentation
+        improvements.
+
 0.02    2023-03-30
         Add some examples of how to use this thing.
 

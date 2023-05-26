@@ -15,7 +15,7 @@ CPU::Z80::Assembler::Program - Represents one assembly program
 use strict;
 use warnings;
 
-our $VERSION = '2.18';
+our $VERSION = '2.22';
 
 use CPU::Z80::Assembler::Parser;
 use CPU::Z80::Assembler::Segment;
@@ -310,6 +310,10 @@ sub _locate_opcodes {
 								"0x%04X, next starts at 0x%04X",
 								$address, $segment->address));
 				die; # NOT REACHED
+			}
+			# check for new address
+			elsif ($segment->address > $address) {
+				$address = $segment->address;
 			}
 		}
 		else {

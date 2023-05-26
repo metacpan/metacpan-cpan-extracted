@@ -8,7 +8,7 @@ use CPAN::DistnameInfo;
 use Getopt::Long;
 
 my $version;
-my $mirror = 'http://www.cpan.org/';
+my $mirror = 'http://cpan.mirror.local/CPAN/';
 
 GetOptions('mirror=s', \$mirror);
 

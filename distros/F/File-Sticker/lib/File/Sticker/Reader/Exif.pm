@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Exif;
-$File::Sticker::Reader::Exif::VERSION = '3.0006';
+$File::Sticker::Reader::Exif::VERSION = '3.0008';
 =head1 NAME
 
 File::Sticker::Reader::Exif - read and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 3.0006
+version 3.0008
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,9 @@ nomenclature, such as "tags" for things called tags, or Keywords or Subject etc.
 
 =cut
 
+use v5.10;
 use common::sense;
+use Carp;
 use File::LibMagic;
 use Image::ExifTool qw(:Public);
 use YAML::Any;
@@ -324,6 +326,8 @@ Title
 =head2 _get_the_real_file
 
 If the file is a directory, look for a cover file.
+If the file is a soft link, look for the file it is pointing to
+(because ExifTool behaves badly with soft links).
 
     my $real_file = $writer->_get_the_real_file(filename=>$filename);
 
@@ -339,9 +343,33 @@ sub _get_the_real_file {
     {
         my $cover_file = ($self->{cover_file} ? $self->{cover_file} : 'cover.jpg');
         $cover_file = File::Spec->catfile($filename, $cover_file);
-        if (-r $cover_file)
+        if (-f $cover_file)
         {
             $filename = $cover_file;
+        }
+        else # give up and die
+        {
+            croak "$args{filename} is directory, cannot find $cover_file";
+        }
+    }
+    # ExifTool has a wicked habit of replacing soft-linked files with the
+    # contents of the file rather than honouring the link.  While using the
+    # exiftool script offers -overwrite_original_in_place to deal with this,
+    # the Perl module does not appear to have such an option available.
+
+    # So the way to get around this is to check if the file is a soft link, and
+    # if it is, find the real file, and write to that. And if *that* file is
+    # a soft link... go down the rabbit-hole as deep as it goes.
+    while (-l $filename)
+    {
+        my $realfile = readlink $filename;
+        if (-f $realfile)
+        {
+            $filename = $realfile;
+        }
+        else # give up and die
+        {
+            croak "$args{filename} is soft link, cannot find $realfile";
         }
     }
     return $filename;

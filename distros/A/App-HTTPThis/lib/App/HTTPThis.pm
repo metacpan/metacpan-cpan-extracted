@@ -1,5 +1,5 @@
 package App::HTTPThis;
-$App::HTTPThis::VERSION = '0.004';
+$App::HTTPThis::VERSION = '0.006';
 # ABSTRACT: Export the current directory over HTTP
 
 use strict;
@@ -93,7 +93,7 @@ App::HTTPThis - Export the current directory over HTTP
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ version 0.004
 This class implements all the logic of the L<http_this> command.
 
 Actually, this is just a very thin wrapper around
-L<Plack::App::Directory>, that is where the magic really is.
+L<Plack::App::DirectoryIndex>, that is where the magic really is.
 
 =head1 METHODS
 
@@ -119,7 +119,7 @@ Start the HTTP server.
 
 =head1 SEE ALSO
 
-L<http_this>, L<Plack>, L<Plack::App::Directory>, and L<Net::Rendezvous::Publish>.
+L<http_this>, L<Plack>, L<Plack::App::DirectoryIndex>, and L<Net::Rendezvous::Publish>.
 
 =head1 THANKS
 

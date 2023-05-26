@@ -4,7 +4,7 @@
       "Vidar Tyldum"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.3",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "artistic_2"
    ],
@@ -37,9 +37,10 @@
             "Software::License::Artistic_2_0" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
          }
       },
       "runtime" : {
@@ -61,7 +62,7 @@
    "provides" : {
       "Mojolicious::Plugin::Prometheus" : {
          "file" : "lib/Mojolicious/Plugin/Prometheus.pm",
-         "version" : "v1.3.1"
+         "version" : "v1.4.1"
       }
    },
    "release_status" : "stable",
@@ -71,11 +72,12 @@
       },
       "homepage" : "https://github.com/tyldum/mojolicious-plugin-prometheus",
       "repository" : {
-         "url" : "git://github.com/tyldum/mojolicious-plugin-prometheus.git",
+         "type" : "git",
+         "url" : "https://github.com/tyldum/mojolicious-plugin-prometheus.git",
          "web" : "https://github.com/tyldum/mojolicious-plugin-prometheus"
       }
    },
-   "version" : "1.3.1",
+   "version" : "1.4.1",
    "x_authority" : "cpan:TYLDUM",
    "x_contributors" : [
       "Christopher Rasch-Olsen Raa <christopher@stix.no>",
@@ -85,6 +87,6 @@
       "anton <tosha.fedotov.2000@gmail.com>",
       "lammel <lammel@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

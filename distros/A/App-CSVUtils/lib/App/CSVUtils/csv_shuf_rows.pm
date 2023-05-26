@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-31'; # DATE
+our $DATE = '2023-04-01'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.023'; # VERSION
+our $VERSION = '1.024'; # VERSION
 
 use App::CSVUtils::csv_sort_rows;
 use Perinci::Sub::Util qw(gen_modified_sub);
@@ -63,7 +63,7 @@ App::CSVUtils::csv_shuf_rows - Shuffle CSV rows
 
 =head1 VERSION
 
-This document describes version 1.023 of App::CSVUtils::csv_shuf_rows (from Perl distribution App-CSVUtils), released on 2023-03-31.
+This document describes version 1.024 of App::CSVUtils::csv_shuf_rows (from Perl distribution App-CSVUtils), released on 2023-04-01.
 
 =head1 FUNCTIONS
 

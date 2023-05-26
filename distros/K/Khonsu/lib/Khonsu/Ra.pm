@@ -141,6 +141,25 @@ sub new {
 			$self->{$key} = $params{$key};
 		}
 	}
+
+	for my $plugin (@{$params{PLUGINS}}) {
+		my ($key) = lc($plugin) =~ m/::([^:]*)$/;
+		$self->{attributes}->{$key} = sub {
+			my ($self, $val) = @_;
+			if (defined $val) {
+				$self->{$key} = $val;
+			}
+			return $self->{$key};
+		};
+		$self->{$key} = $plugin->new();
+		$self->{attributes}->{"add_$key"} = sub {
+			my ($self, %args) = @_;
+			$self->$key->add($self, %args);
+			return $self;
+		};
+	}
+
+	$self->BUILD(%params) if $self->can('BUILD');
 	
 	return $self;
 }
@@ -192,8 +211,6 @@ sub AUTOLOAD {
 	if ( $_[0]->{attributes}->{$key} ) {
 		$_[0]->{attributes}->{$key}->(@_);
 	} else {
-use Data::Dumper;
-warn Dumper [caller()];
 		die "illegal use of AUTOLOAD $classname -> $key -";
 	}
 }

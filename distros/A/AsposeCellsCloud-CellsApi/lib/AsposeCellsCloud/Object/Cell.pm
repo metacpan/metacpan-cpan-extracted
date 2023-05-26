@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Cell;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,172 +119,172 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents a single Workbook cell.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'Cell',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'style' => {
-    	datatype => 'LinkElement',
-    	base_name => 'Style',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'html_string' => {
-    	datatype => 'string',
-    	base_name => 'HtmlString',
-    	description => 'Gets and sets the html string which contains data and some formattings in this cell.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'name' => {
-    	datatype => 'string',
-    	base_name => 'Name',
-    	description => 'Gets the name of the cell.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'column' => {
-    	datatype => 'int',
-    	base_name => 'Column',
-    	description => 'Gets column number (zero based) of the cell.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'worksheet' => {
-    	datatype => 'string',
-    	base_name => 'Worksheet',
-    	description => 'Gets the parent worksheet.',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_in_table' => {
-    	datatype => 'boolean',
-    	base_name => 'IsInTable',
-    	description => 'Indicates whethe this cell is part of table formula.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_array_header' => {
-    	datatype => 'boolean',
-    	base_name => 'IsArrayHeader',
-    	description => 'Inidicates the cell&#39;s formula is and array formula and it is the first cell of the array.',
-    	format => '',
-    	read_only => '',
-    		},
-    'value' => {
-    	datatype => 'string',
-    	base_name => 'Value',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_formula' => {
-    	datatype => 'boolean',
-    	base_name => 'IsFormula',
-    	description => 'Represents if the specified cell contains formula.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_style_set' => {
-    	datatype => 'boolean',
-    	base_name => 'IsStyleSet',
-    	description => 'Indicates if the cell&#39;s style is set. If return false, it means this cell has a default cell format.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_in_array' => {
-    	datatype => 'boolean',
-    	base_name => 'IsInArray',
-    	description => 'Indicates whether the cell formula is an array formula.',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_error_value' => {
-    	datatype => 'boolean',
-    	base_name => 'IsErrorValue',
-    	description => 'Checks if a formula can properly evaluate a result.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_merged' => {
-    	datatype => 'boolean',
-    	base_name => 'IsMerged',
-    	description => 'Checks if a cell is part of a merged range or not.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'formula' => {
-    	datatype => 'string',
-    	base_name => 'Formula',
-    	description => 'Gets or sets a formula of the Aspose.Cells.Cell.',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => 'Specifies a cell value type.',
-    	format => '',
-    	read_only => '',
-    		},
-    'row' => {
-    	datatype => 'int',
-    	base_name => 'Row',
-    	description => 'Gets row number (zero based) of the cell.             ',
-    	format => '',
-    	read_only => '',
-    		},
+     'name' => {
+     	datatype => 'string',
+     	base_name => 'Name',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'row' => {
+     	datatype => 'int',
+     	base_name => 'Row',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'column' => {
+     	datatype => 'int',
+     	base_name => 'Column',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'value' => {
+     	datatype => 'string',
+     	base_name => 'Value',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'formula' => {
+     	datatype => 'string',
+     	base_name => 'Formula',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_formula' => {
+     	datatype => 'boolean',
+     	base_name => 'IsFormula',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_merged' => {
+     	datatype => 'boolean',
+     	base_name => 'IsMerged',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_array_header' => {
+     	datatype => 'boolean',
+     	base_name => 'IsArrayHeader',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_in_array' => {
+     	datatype => 'boolean',
+     	base_name => 'IsInArray',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_error_value' => {
+     	datatype => 'boolean',
+     	base_name => 'IsErrorValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_in_table' => {
+     	datatype => 'boolean',
+     	base_name => 'IsInTable',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_style_set' => {
+     	datatype => 'boolean',
+     	base_name => 'IsStyleSet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'html_string' => {
+     	datatype => 'string',
+     	base_name => 'HtmlString',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'style' => {
+     	datatype => 'LinkElement',
+     	base_name => 'Style',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'worksheet' => {
+     	datatype => 'string',
+     	base_name => 'Worksheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
-    'style' => 'LinkElement',
-    'html_string' => 'string',
     'name' => 'string',
+    'row' => 'int',
     'column' => 'int',
-    'worksheet' => 'string',
-    'is_in_table' => 'boolean',
-    'is_array_header' => 'boolean',
     'value' => 'string',
+    'type' => 'string',
+    'formula' => 'string',
     'is_formula' => 'boolean',
-    'is_style_set' => 'boolean',
+    'is_merged' => 'boolean',
+    'is_array_header' => 'boolean',
     'is_in_array' => 'boolean',
     'is_error_value' => 'boolean',
-    'is_merged' => 'boolean',
-    'formula' => 'string',
-    'type' => 'string',
-    'row' => 'int'
+    'is_in_table' => 'boolean',
+    'is_style_set' => 'boolean',
+    'html_string' => 'string',
+    'style' => 'LinkElement',
+    'worksheet' => 'string',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
-    'style' => 'Style',
-    'html_string' => 'HtmlString',
     'name' => 'Name',
+    'row' => 'Row',
     'column' => 'Column',
-    'worksheet' => 'Worksheet',
-    'is_in_table' => 'IsInTable',
-    'is_array_header' => 'IsArrayHeader',
     'value' => 'Value',
+    'type' => 'Type',
+    'formula' => 'Formula',
     'is_formula' => 'IsFormula',
-    'is_style_set' => 'IsStyleSet',
+    'is_merged' => 'IsMerged',
+    'is_array_header' => 'IsArrayHeader',
     'is_in_array' => 'IsInArray',
     'is_error_value' => 'IsErrorValue',
-    'is_merged' => 'IsMerged',
-    'formula' => 'Formula',
-    'type' => 'Type',
-    'row' => 'Row'
+    'is_in_table' => 'IsInTable',
+    'is_style_set' => 'IsStyleSet',
+    'html_string' => 'HtmlString',
+    'style' => 'Style',
+    'worksheet' => 'Worksheet',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

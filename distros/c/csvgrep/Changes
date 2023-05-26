@@ -1,5 +1,13 @@
 Revision history for Perl script csvgrep
 
+0.09 2022-01-18 NEILB
+    - Add strict and warnings pragmas to test file.
+    - Remove trailing whitespace in source files.
+    - Basic set of tests added by Paul Cochrane++.
+    - Paul Cochrane++ added a testsuite for tab-separated fields.
+    - You weren't able to search on column zero. Fix from Rick Bychowski++.
+    - Switched to strict binmode handle. PR from Paul Cochrane++.
+
 0.08 2019-05-16 NEILB
     - Stripped pod out of lib/csvgrep.pm, so MetaCPAN will direct people
       to the pod in the script. Thanks to Håkon Haegland for the PR.

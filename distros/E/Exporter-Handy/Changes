@@ -1,0 +1,11 @@
+Revision history for Exporter-Handy
+
+0.200000                2023-05-25 21:53:21+00:00 UTC TABULO
+
+    [MAJOR]
+    - Fix xtags() and add some tests
+
+0.001000                2023-05-21 02:15:40+00:00 UTC TABULO
+
+    [MAJOR]
+    - First version, unleashed on an unsuspecting world.

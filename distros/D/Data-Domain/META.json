@@ -47,7 +47,7 @@
    "provides" : {
       "Data::Domain" : {
          "file" : "lib/Data/Domain.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Data::Domain::All_of" : {
          "file" : "lib/Data/Domain.pm"
@@ -101,6 +101,6 @@
          "url" : "https://github.com/damil/Data-Domain"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

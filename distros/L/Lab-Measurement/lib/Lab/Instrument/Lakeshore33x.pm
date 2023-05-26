@@ -1,5 +1,5 @@
 package Lab::Instrument::Lakeshore33x;
-$Lab::Instrument::Lakeshore33x::VERSION = '3.860';
+$Lab::Instrument::Lakeshore33x::VERSION = '3.872';
 #ABSTRACT: Lakeshore 33x Temperature controller
 
 use v5.20;
@@ -937,7 +937,7 @@ Lab::Instrument::Lakeshore33x - Lakeshore 33x Temperature controller
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 SYNOPSIS
 

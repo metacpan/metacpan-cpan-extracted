@@ -1,3 +1,16 @@
+1.210 2023-05-26
+================
+
+[Quiq::Path]
+* mkdir(): liefert nun Pfad zurück
+* delete(): interaktive Rückfrage unterdrückt
+
+[Quiq::Shell]
+* DESTROY(): Time Summary nur, wenn Logging eingeschaltet ist
+
+[Quiq::Ssh]
+* exec(): Probleme mit Kommando-Encoding dokumentiert
+
 1.209 2023-04-30
 ================
 

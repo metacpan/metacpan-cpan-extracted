@@ -1,0 +1,521 @@
+NAME
+    MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined
+    by MARC record.
+
+SYNOPSIS
+     use MARC::Convert::Wikidata::Object;
+
+     my $obj = MARC::Convert::Wikidata::Object->new(%params);
+     my $authors_ar = $obj->authors;
+     my $authors_of_afterword_ar = $obj->authors_of_afterword;
+     my $authors_of_introduction_ar = $obj->authors_of_introduction;
+     my $ccnb = $obj->ccnb;
+     my $compilers = $obj->compilers;
+     my $cover = $obj->cover;
+     my $directors_ar = $obj->directors;
+     my $dml = $obj->dml;
+     my $edition_number = $obj->edition_number;
+     my $editors_ar = $obj->editors;
+     my $end_time = $obj->end_time;
+     my $full_name = $obj->full_name;
+     my $illustrators_ar = $obj->illustrators;
+     my $isbns_ar = $obj->isbns;
+     my $issn = $obj->issn;
+     my $kramerius_ar = $obj->krameriuses;
+     my $languages_ar = $obj->languages;
+     my $narrators_ar = $obj->narrators;
+     my $number_of_pages = $obj->number_of_pages;
+     my $oclc = $obj->oclc;
+     my $publication_date = $obj->publication_date;
+     my $publishers_ar = $obj->publishers;
+     my $series_ar = $obj->series;
+     my $start_time = $obj->start_time;
+     my $subtitles_ar = $obj->subtitles;
+     my $title = $obj->title;
+     my $translators_ar = $obj->translators;
+
+METHODS
+  "new"
+     my $obj = MARC::Convert::Wikidata::Object->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "authors"
+
+            List of authors. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "authors_of_afterword"
+
+            List of authors of afterword. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "authors_of_introduction"
+
+            List of authors of introduction. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "ccnb"
+
+            ČČNB (Česká národní bibliografie) id.
+
+            Default value is undef.
+
+    *       "compilers"
+
+            List of compilers. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "cover"
+
+            Book cover. Possible values: * hardback * paperback
+
+            Default value is undef.
+
+    *       "directors"
+
+            List of directors. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "dml"
+
+            DML id.
+
+            Default value is undef.
+
+    *       "edition_number"
+
+            Edition number.
+
+            Default value is undef.
+
+    *       "editors"
+
+            List of editors. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "end_time"
+
+            End time.
+
+            Default value is undef.
+
+    *       "illustrators"
+
+            List of illustrators. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "isbns"
+
+            List of ISBNs. Reference to array with
+            MARC::Convert::Wikidata::Object::ISBN instances.
+
+            Default value is reference to blank array.
+
+    *       "issn"
+
+            ISSN number.
+
+            Default value is undef.
+
+    *       "krameriuses"
+
+            List of Kramerius systems with digitized scan. Reference to
+            array with MARC::Convert::Wikidata::Object::Kramerius instances.
+
+            Default value is reference to blank array.
+
+    *       "languages"
+
+            List of languages of book edition (TODO Format)
+
+            Default value is reference to blank array.
+
+    *       "narrators"
+
+            List of narrators. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+    *       "number_of_pages"
+
+            Number of pages.
+
+            Default value is undef.
+
+    *       "oclc"
+
+            OCLC control number.
+
+            Default value is undef.
+
+    *       "publication_date"
+
+            Publication date.
+
+            Default value is undef.
+
+    *       "publishers"
+
+            List of Publishers. Reference to array with
+            MARC::Convert::Wikidata::Object::Publisher instances.
+
+            Default value is [].
+
+    *       "series"
+
+            List of book series. Reference to array with
+            MARC::Convert::Wikidata::Object::Series instances.
+
+            Default value is [].
+
+    *       "start_time"
+
+            Start time.
+
+            Default value is undef.
+
+    *       "subtitles"
+
+            List of subtitles. Reference to array with strings.
+
+            Default value is [].
+
+    *       "title"
+
+            Title of book edition.
+
+            Default value is undef.
+
+    *       "translators"
+
+            List of translators. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
+  "authors"
+     my $authors_ar = $obj->authors;
+
+    Get reference to array with author objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
+  "authors_of_afterword"
+     my $authors_of_afterword_ar = $obj->authors_of_afterword;
+
+    Get reference to array with author of afterword objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
+  "authors_of_introduction"
+     my $authors_of_introduction_ar = $obj->authors_of_introduction;
+
+    Get reference to array with author of introduction objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
+  "ccnb"
+     my $ccnb = $obj->ccnb;
+
+    Get ČČNB (Česká národní bibliografie) ID.
+
+    Returns string.
+
+  "compilers"
+     my $compilers_ar = $obj->compilers;
+
+    Get reference to array with compiler objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
+  "cover"
+     my $cover = $obj->cover;
+
+    Get book cover.
+
+    Returns string (hardback or paperback).
+
+  "directors"
+     my $directors_ar = $obj->directors;
+
+    Get list of directors.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
+  "dml"
+     my $dml = $obj->dml;
+
+    Get DML id.
+
+    Returns number.
+
+  "edition_number"
+     my $edition_number = $obj->edition_number;
+
+    Get edition number.
+
+    Returns number.
+
+  "editors"
+     my $editors_ar = $obj->editors;
+
+    TODO
+
+  "end_time"
+     my $end_time = $obj->end_time;
+
+    Get end time.
+
+    Returns number.
+
+  "full_name"
+     my $full_name = $obj->full_name;
+
+    Get full name of edition in format '__TITLE__: __SUBTITLE__'.
+
+    Returns string.
+
+  "illustrators"
+     my $illustrators_ar = $obj->illustrators;
+
+    TODO
+
+  "isbns"
+     my $isbns_ar = $obj->isbns;
+
+    TODO
+
+  "issn"
+     my $issn = $obj->issn;
+
+    Get ISSN number.
+
+    Returns string.
+
+  c<krameriuses>
+     my $kramerius_ar = $obj->krameriuses;
+
+    Get reference to array with Kramerius item objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::Kramerius
+    instances.
+
+  "languages"
+     my $languages_ar = $obj->languages;
+
+    TODO
+
+  "narrators"
+     my $narrators_ar = $obj->narrators;
+
+    Get list of narrators.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
+  "number_of_pages"
+     my $number_of_pages = $obj->number_of_pages;
+
+    TODO
+
+  "oclc"
+     my $oclc = $obj->oclc;
+
+    Get OCLC control number.
+
+    Returns string.
+
+  "publication_date"
+     my $publication_date = $obj->publication_date;
+
+    TODO
+
+  "publishers"
+     my $publishers_ar = $obj->publishers;
+
+    TODO
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::Publisher
+    instances.
+
+  "series"
+     my $series_ar = $obj->series;
+
+    Get reference to array with Serie item objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::Series
+    instances.
+
+  "start_time"
+     my $start_time = $obj->start_time;
+
+    Get start time.
+
+    Returns number.
+
+  "subtitle"
+     my $subtitles_ar = $obj->subtitles;
+
+    Get reference to array with subtitles.
+
+    Returns reference to array of strings.
+
+  "title"
+     my $title = $obj->title;
+
+    TODO
+
+  "translators"
+     my $translators_ar = $obj->translators;
+
+    TODO
+
+ERRORS
+     new():
+             From Mo::utils::check_array_object():
+                     Author isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Author of afterword isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Author of introduction isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Book series isn't 'MARC::Convert::Wikidata::Object::Series' object.
+                     Book cover '%s' doesn't exist.
+                     Compiler isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Director isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Editor isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Illustrator isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Narrator isn't 'MARC::Convert::Wikidata::Object::People' object.
+                     Parameter 'authors' must be a array.
+                     Parameter 'authors_of_afterword' must be a array.
+                     Parameter 'authors_of_introduction' must be a array.
+                     Parameter 'compilers' must be a array.
+                     Parameter 'directors' must be a array.
+                     Parameter 'editors' must be a array.
+                     Parameter 'end_time' must be a number.
+                     Parameter 'illustrators' must be a array.
+                     Parameter 'languages' must be a array.
+                     Parameter 'narrators' must be a array.
+                     Parameter 'publishers' must be a array.
+                     Parameter 'series' must be a array.
+                     Parameter 'start_time' must be a number.
+                     Parameter 'translators' must be a array.
+                     Publisher isn't 'MARC::Convert::Wikidata::Object::Publisher' object.
+                     Translator isn't 'MARC::Convert::Wikidata::Object::People' object.
+
+             From Mo::utils::check_number():
+                     Parameter '%s' must a number.
+                             Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use MARC::Convert::Wikidata::Object;
+     use MARC::Convert::Wikidata::Object::ISBN;
+     use MARC::Convert::Wikidata::Object::People;
+     use MARC::Convert::Wikidata::Object::Publisher;
+     use Unicode::UTF8 qw(decode_utf8);
+ 
+     my $aut = MARC::Convert::Wikidata::Object::People->new(
+             'date_of_birth' => '1952-12-08',
+             'name' => decode_utf8('Jiří'),
+             'nkcr_aut' => 'jn20000401266',
+             'surname' => 'Jurok',
+     );
+
+     my $publisher = MARC::Convert::Wikidata::Object::Publisher->new(
+             'name' => decode_utf8('Město Příbor'),
+             'place' => decode_utf8('Příbor'),
+     );
+
+     my $isbn = MARC::Convert::Wikidata::Object::ISBN->new(
+             'isbn' => '80-238-9541-9',
+             'publisher' => $publisher,
+     );
+
+     my $obj = MARC::Convert::Wikidata::Object->new(
+             'authors' => [$aut],
+             'ccnb' => 'cnb001188266',
+             'date_of_publication' => 2002,
+             'edition_number' => 2,
+             'isbns' => [$isbn],
+             'number_of_pages' => 414,
+             'publishers' => [$publisher],
+     );
+ 
+     p $obj;
+
+     # Output:
+     # MARC::Convert::Wikidata::Object  {
+     #     Parents       Mo::Object
+     #     public methods (11) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), full_name, check_array (Mo::utils), check_array_object (Mo::utils), isa (UNIVERSAL), none (List::MoreUtils::XS), Readonly (Readonly), VERSION (UNIVERSAL)
+     #     private methods (1) : __ANON__ (Mo::is)
+     #     internals: {
+     #         authors                   [
+     #             [0] MARC::Convert::Wikidata::Object::People
+     #         ],
+     #         authors_of_introduction   [],
+     #         ccnb                      "cnb001188266",
+     #         compilers                 [],
+     #         date_of_publication       2002,
+     #         edition_number            2,
+     #         editors                   [],
+     #         illustrators              [],
+     #         isbns                     [
+     #             [0] MARC::Convert::Wikidata::Object::ISBN
+     #         ],
+     #         krameriuses               [],
+     #         number_of_pages           414,
+     #         publishers                [
+     #             [0] MARC::Convert::Wikidata::Object::Publisher
+     #         ],
+     #         series                    [],
+     #         translators               []
+     #     }
+     # }
+
+DEPENDENCIES
+    Error::Pure, List::MoreUtils, Mo, Mo::utils, Readonly.
+
+SEE ALSO
+    MARC::Convert::Wikidata
+        Conversion class between MARC record and Wikidata object.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2021-2023
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

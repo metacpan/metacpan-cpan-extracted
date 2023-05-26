@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Crypt::URandom version 0.38
+    This document describes Crypt::URandom version 0.39
 
 SYNOPSIS
 
@@ -32,7 +32,7 @@ SUBROUTINES/METHODS
       This function accepts an integer and returns a string of the same
       size filled with random data. The first call will initialize the
       native cryptographic libraries (if necessary) and load all the
-      required Perl libraries This call is a buffered read on non Win32
+      required Perl libraries. This call is a buffered read on non Win32
       platforms.
 
     urandom_ub
@@ -40,7 +40,7 @@ SUBROUTINES/METHODS
       This function accepts an integer and returns a string of the same
       size filled with random data. The first call will initialize the
       native cryptographic libraries (if necessary) and load all the
-      required Perl libraries This call is a unbuffered sysread on non
+      required Perl libraries. This call is a unbuffered sysread on non
       Win32 platforms.
 
 DIAGNOSTICS

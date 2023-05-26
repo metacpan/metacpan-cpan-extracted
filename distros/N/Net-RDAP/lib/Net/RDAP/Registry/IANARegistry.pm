@@ -21,7 +21,7 @@ This class is used internally by L<Net::RDAP::Registry>.
 
 =head1 CONSTRUCTOR
 
-	$registry = Net::RDAP::Registry::IANARegistry->new($data);
+    $registry = Net::RDAP::Registry::IANARegistry->new($data);
 
 C<$data> is a hashref corresponding to the decoded JSON representation
 of the IANA registry.
@@ -29,29 +29,29 @@ of the IANA registry.
 =cut
 
 sub new {
-	my ($package, $args, $url) = @_;
-	my %self = %{$args};
-	return bless(\%self, $package);
+    my ($package, $args, $url) = @_;
+    my %self = %{$args};
+    return bless(\%self, $package);
 }
 
 =pod
 
 =head1 METHODS
 
-	$description = $registry->description;
+    $description = $registry->description;
 
 Returns a string containing the description of the registry.
 
-	$version = $registry->version;
+    $version = $registry->version;
 
 Returns a string containing the version of the registry.
 
-	$date = $registry->publication;
+    $date = $registry->publication;
 
 Returns a L<DateTime> object corresponding to the date and time
 that the registry was last updated.
 
-	@services = $registry->services;
+    @services = $registry->services;
 
 Returns an array of L<Net::RDAP::Registry::IANARegistry::Service>
 objects corresponding to each of the RDAP services listed in the
@@ -59,26 +59,26 @@ registry.
 
 =cut
 
-sub description	{ $_[0]->{'description'} }
-sub version	{ $_[0]->{'version'} }
-sub publication	{ DateTime::Format::ISO8601->parse_datetime($_[0]->{'publication'}) }
+sub description { $_[0]->{'description'} }
+sub version     { $_[0]->{'version'} }
+sub publication { DateTime::Format::ISO8601->parse_datetime($_[0]->{'publication'}) }
 
 sub services {
-	my $self = shift;
-	my @services;
+    my $self = shift;
+    my @services;
 
-	foreach my $svc (@{$self->{'services'}}) {
-		push(@services, Net::RDAP::Registry::IANARegistry::Service->new(@{$svc}));
-	}
+    foreach my $svc (@{$self->{'services'}}) {
+        push(@services, Net::RDAP::Registry::IANARegistry::Service->new(@{$svc}));
+    }
 
-	return @services;
+    return @services;
 }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

@@ -1,0 +1,94 @@
+NAME
+    Wikidata::Reconcilation - Abstract class for Wikidata reconcilations.
+
+SYNOPSIS
+     use Wikidata::Reconcilation;
+
+     my $obj = Wikidata::Reconcilation->new;
+     my @qids = $obj->reconcile($reconcilation_rules_hr);
+
+DESCRIPTION
+    Abstract class for Wikidata reconcilation. Method, which need to
+    implement: "_reconcile()".
+
+METHODS
+  "new"
+     my $obj = Wikidata::Reconcilation->new;
+
+    Constructor.
+
+    Returns instance of object.
+
+  "reconcile"
+     my @qids = $obj->reconcile($reconcilation_rules_hr);
+
+    Reconcile information defined in input structure and returns list of
+    QIDs.
+
+    Returns list of strings.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             Parameter 'lwp_user_agent' must be a 'LWP::UserAgent' instance.
+
+     reconcile():
+             This is abstract class. You need to implement _reconcile() method.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     package Foo;
+
+     use base qw(Wikidata::Reconcilation);
+
+     sub _reconcile {
+             my ($self, $reconcilation_rules_hr) = @_;
+
+             # TODO
+
+             return @sparql;
+     }
+
+     package main;
+
+     # Object.
+     my $obj = Foo->new;
+
+     # Save cached value.
+     my @qids = $obj->reconcile({
+             'name' => 'Michal',
+     });
+
+     # Print out.
+     # TODO
+
+     # Output like:
+     # TODO
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, LWP::UserAgent, Unicode::UTF8, WQS::SPARQL,
+    WQS::SPARQL::Result.
+
+SEE ALSO
+    Wikidata::Reconcilation::Periodical
+        TODO
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-Reconcilation>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

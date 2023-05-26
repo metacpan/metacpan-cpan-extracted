@@ -1,5 +1,9 @@
 Revision history for MySQL-GrantParser
 
+1.005     2023-05-24 10:28:58+00:00 UTC
+    [BUG FIXES]
+        - Pack grants carefully in case of existing same objects
+
 1.004     2023-03-24 11:12:16+00:00 UTC
     [IMPROVEMENTS]
         - Support MySQL 5.8

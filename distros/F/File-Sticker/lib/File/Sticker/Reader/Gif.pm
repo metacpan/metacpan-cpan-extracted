@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Gif;
-$File::Sticker::Reader::Gif::VERSION = '3.0006';
+$File::Sticker::Reader::Gif::VERSION = '3.0008';
 =head1 NAME
 
 File::Sticker::Reader::Gif - read and standardize meta-data from GIF file
 
 =head1 VERSION
 
-version 3.0006
+version 3.0008
 
 =head1 SYNOPSIS
 
@@ -18,12 +18,14 @@ version 3.0006
 
 =head1 DESCRIPTION
 
-This will read meta-data from EXIF files, and standardize it to a common
+This will read meta-data from GIF files, and standardize it to a common
 nomenclature, such as "tags" for things called tags, or Keywords or Subject etc.
 
 =cut
 
+use v5.10;
 use common::sense;
+use Carp;
 use File::LibMagic;
 use Image::ExifTool qw(:Public);
 use YAML::Any;
@@ -66,6 +68,7 @@ sub allowed_file {
     my $file = shift;
     say STDERR whoami(), " filename=$file" if $self->{verbose} > 2;
 
+    $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
     if ($ft->{mime_type} eq 'image/gif')
     {
@@ -109,6 +112,7 @@ sub read_meta {
     my $filename = shift;
     say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
 
+    my $filename = $self->_get_the_real_file($filename);
     my $info = ImageInfo($filename);
     my %meta = ();
 
@@ -167,6 +171,46 @@ Megapixels
 
     return \%meta;
 } # read_meta
+
+=head2 _get_the_real_file
+
+If the file is a soft link, look for the file it is pointing to
+(because ExifTool behaves badly with soft links).
+
+    my $real_file = $writer->_get_the_real_file(filename=>$filename);
+
+=cut
+
+sub _get_the_real_file {
+    my $self = shift;
+    my %args = @_;
+    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+
+    my $filename = $args{filename};
+    # ExifTool has a wicked habit of replacing soft-linked files with the
+    # contents of the file rather than honouring the link.  While using the
+    # exiftool script offers -overwrite_original_in_place to deal with this,
+    # the Perl module does not appear to have such an option available.
+
+    # So the way to get around this is to check if the file is a soft link, and
+    # if it is, find the real file, and write to that. And if *that* file is
+    # a soft link... go down the rabbit-hole as deep as it goes.
+
+    while (-l $filename)
+    {
+        my $realfile = readlink $filename;
+        if (-f $realfile)
+        {
+            $filename = $realfile;
+        }
+        else # give up and die
+        {
+            croak "$args{filename} is soft link, cannot find $realfile";
+        }
+    }
+
+    return $filename;
+} # _get_the_real_file
 
 =head1 BUGS
 

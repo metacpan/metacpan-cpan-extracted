@@ -4,6 +4,19 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.872 2023-05-22
+  * Fix driver for Keysight N9310A RF generator
+
+3.871 2023-05-19
+  * Add driver for Keysight N9310A RF generator
+  * Add driver for Agilent 33210A AWG
+
+3.870 2023-05-19
+  * Add driver for Bluefors DR temperature control
+  * Add driver for Zurich Instruments HDAWG generator
+  * Add HTTP request connection
+  * Add power sweep functionality to R&S ZVM
+
 3.860 2023-03-09
   * Add both_directions option for sweeps
   * AH2700A: Bug fix

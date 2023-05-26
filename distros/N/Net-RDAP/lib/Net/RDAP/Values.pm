@@ -1,21 +1,18 @@
 package Net::RDAP::Values;
 use Carp;
-use File::Basename qw(dirname basename);
-use File::Slurp;
+use File::Basename qw(basename);
 use File::Spec;
-use File::Temp;
-use File::stat;
-use HTTP::Request::Common;
-use List::MoreUtils qw(any);
 use Net::RDAP::UA;
 use XML::LibXML;
 use vars qw($UA $REGISTRY @EXPORT);
 use constant {
-	RDAP_TYPE_NOTICE_OR_REMARK_TYPE		=> 'notice or remark type',	# 
-	RDAP_TYPE_STATUS			=> 'status',			# these values are defined in
-	RDAP_TYPE_ROLE				=> 'role',			# RFC 7483, section 10.2.
-	RDAP_TYPE_EVENT_ACTION			=> 'event action',		# 
-	RDAP_TYPE_DOMAIN_VARIANT_RELATION	=> 'domain variant relation',	# 
+    IANA_REGISTRY_URL                   => 'https://www.iana.org/assignments/rdap-json-values/rdap-json-values.xml',
+    RDAP_TYPE_NOTICE_OR_REMARK_TYPE     => 'notice or remark type',     #
+    RDAP_TYPE_STATUS                    => 'status',                    # these values are defined in
+    RDAP_TYPE_ROLE                      => 'role',                      # RFC 7483, section 10.2.
+    RDAP_TYPE_EVENT_ACTION              => 'event action',              #
+    RDAP_TYPE_DOMAIN_VARIANT_RELATION   => 'domain variant relation',   #
+    CACHE_TTL                           => 86400,                       # this registry is fairly stable
 };
 use base qw(Exporter);
 use strict;
@@ -24,22 +21,14 @@ use strict;
 # export these symbols
 #
 our @EXPORT = qw(
-	RDAP_TYPE_NOTICE_OR_REMARK_TYPE
-	RDAP_TYPE_STATUS
-	RDAP_TYPE_ROLE
-	RDAP_TYPE_EVENT_ACTION
-	RDAP_TYPE_DOMAIN_VARIANT_RELATION
+    RDAP_TYPE_NOTICE_OR_REMARK_TYPE
+    RDAP_TYPE_STATUS
+    RDAP_TYPE_ROLE
+    RDAP_TYPE_EVENT_ACTION
+    RDAP_TYPE_DOMAIN_VARIANT_RELATION
 );
 
-#
-# in case we need to download something
-#
-$UA = Net::RDAP::UA->new;
-
-#
-# where we store the registry data
-#
-$REGISTRY = load_registry();
+our ($UA, $REGISTRY);
 
 =pod
 
@@ -61,11 +50,11 @@ that it retrieves from the IANA web server.
 
 =head2 check()
 
-	Net::RDAP::Values->check($value, $type);
+    Net::RDAP::Values->check($value, $type);
 
-	Net::RDAP::Values->check('add period', RDAP_TYPE_STATUS);
+    Net::RDAP::Values->check('add period', RDAP_TYPE_STATUS);
 
-	Net::RDAP::Values->check('registration', RDAP_TYPE_EVENT_ACTION);
+    Net::RDAP::Values->check('registration', RDAP_TYPE_EVENT_ACTION);
 
 The C<check()> function allows you to determine if a given value is present
 in the registry. You must also specify the type of the value using one of
@@ -77,22 +66,22 @@ value, otherwise it returns C<undef>.
 =cut
 
 sub check {
-	my ($self, $value, $type) = @_;
+    my ($self, $value, $type) = @_;
 
-	foreach my $registered ($self->values($type)) {
-		return 1 if ($registered eq $value);
-	}
+    foreach my $registered ($self->values($type)) {
+        return 1 if ($registered eq $value);
+    }
 
-	return undef;
+    return undef;
 }
 
 =pod
 
 =head2 values()
 
-	@values = Net::RDAP::Values->values($type);
+    @values = Net::RDAP::Values->values($type);
 
-	@values = Net::RDAP::Values->values(RDAP_TYPE_ROLE);
+    @values = Net::RDAP::Values->values(RDAP_TYPE_ROLE);
 
 The C<values()> function returns a list of the permitted values for the
 given value type. If you specify an invalid type, an exception is raised.
@@ -100,47 +89,49 @@ given value type. If you specify an invalid type, an exception is raised.
 =cut
 
 sub values {
-	my ($self, $type) = @_;
+    my ($self, $type) = @_;
 
-	if (!defined($REGISTRY->{'values_by_type'}->{$type})) {
-		croak(sprintf("'%s' is not a permitted value type", $type));
+    $REGISTRY = load_registry() unless ($REGISTRY);
 
-	} else {
-		return sort @{$REGISTRY->{'values_by_type'}->{$type}};
+    if (!defined($REGISTRY->{'values_by_type'}->{$type})) {
+        croak(sprintf("'%s' is not a permitted value type", $type));
 
-	}
+    } else {
+        return sort @{$REGISTRY->{'values_by_type'}->{$type}};
+
+    }
 }
 
 =pod
 
 =head2 types()
 
-	@types = Net::RDAP::Values->types;
+    @types = Net::RDAP::Values->types;
 
 The C<types()> function returns a list of all possible RDAP value types.
 
 =cut
 
 sub types {
-	return (
-		RDAP_TYPE_NOTICE_OR_REMARK_TYPE,
-		RDAP_TYPE_STATUS,
-		RDAP_TYPE_ROLE,
-		RDAP_TYPE_EVENT_ACTION,
-		RDAP_TYPE_DOMAIN_VARIANT_RELATION,
-	);
+    return (
+        RDAP_TYPE_NOTICE_OR_REMARK_TYPE,
+        RDAP_TYPE_STATUS,
+        RDAP_TYPE_ROLE,
+        RDAP_TYPE_EVENT_ACTION,
+        RDAP_TYPE_DOMAIN_VARIANT_RELATION,
+    );
 }
 
 =pod
 
 =head2 description()
 
-	$description = Net::RDAP::Values->description($value, $type);
+    $description = Net::RDAP::Values->description($value, $type);
 
-	$description = Net::RDAP::Values->description('registration', RDAP_TYPE_EVENT_ACTION);
+    $description = Net::RDAP::Values->description('registration', RDAP_TYPE_EVENT_ACTION);
 
-	use Net::RDAP::EPPStatusMap;
-	$description = Net::RDAP::Values->description(epp2rdap('serverHold'), RDAP_TYPE_STATUS);
+    use Net::RDAP::EPPStatusMap;
+    $description = Net::RDAP::Values->description(epp2rdap('serverHold'), RDAP_TYPE_STATUS);
 
 The C<description()> function returns a textual description (in English) of the value
 in the registry, suitable for display to the user.
@@ -148,71 +139,47 @@ in the registry, suitable for display to the user.
 =cut
 
 sub description {
-	my ($self, $value, $type) = @_;
+    my ($self, $value, $type) = @_;
 
-	return $REGISTRY->{'descriptions'}->{$type}->{$value};
+    $REGISTRY = load_registry() unless ($REGISTRY);
+
+    return $REGISTRY->{'descriptions'}->{$type}->{$value};
 }
 
 sub load_registry {
-	my $package = shift;
+    my $package = shift;
 
-	my $url = 'https://www.iana.org/assignments/rdap-json-values/rdap-json-values.xml';
+    my $file = sprintf('%s/%s-%s', File::Spec->tmpdir, $package, basename(IANA_REGISTRY_URL));
 
-	my $file = sprintf('%s/%s-%s', File::Spec->tmpdir, $package, basename($url));
+    #
+    # $UA may have been injected by Net::RDAP->ua()
+    #
+    $UA = Net::RDAP::UA->new unless(defined($UA));
 
-	my ($mirror, $stat);
-	if (-e $file) {
-		$stat = stat($file);
-		$mirror = (time() - $stat->mtime > 86400);
+    $UA->mirror(IANA_REGISTRY_URL, $file, CACHE_TTL);
 
-	} else {
-		$mirror = 1;
+    return undef unless (-e $file);
 
-	}
+    my $doc = XML::LibXML->load_xml('location' => $file, 'no_blanks' => 1);
 
-	if ($mirror) {
-		my $request = GET($url);
-		$request->header('Accept' => '*/*');
-		$request->header('If-Modified-Since' => HTTP::Date::time2str($stat->mtime)) if ($stat);
+    my $registry = {};
 
-		my $response = $UA->request($request);
+    foreach my $record ($doc->getElementsByTagName('record')) {
+        my $value       = $record->getElementsByTagName('value')->shift->textContent;
+        my $type        = $record->getElementsByTagName('type')->shift->textContent;
+        my $description = $record->getElementsByTagName('description')->shift->textContent;
 
-		if (304 == $response->code) {
-			utime(undef, undef, $file);
+        push(@{$registry->{'value_types'}->{$value}}, $type);
+        push(@{$registry->{'values_by_type'}->{$type}}, $value);
+        $registry->{'descriptions'}->{$type}->{$value} = $description;
+    }
 
-		} elsif ($response->is_success) {
-			my $tmpfile = File::Temp::tempnam(dirname($file), basename($file));
-			carp("Unable to write response data to $tmpfile: $!") if (!write_file($tmpfile, $response->content));
-			carp("Unable to move $tmpfile to $file: $!") if (!rename($tmpfile, $file));
-
-		} else {
-			carp($response->status_line);
-
-		}
-	}
-
-	if (-e $file) {
-		my $doc = XML::LibXML->load_xml('location' => $file, 'no_blanks' => 1);
-
-		my $registry = {};
-
-		foreach my $record ($doc->getElementsByTagName('record')) {
-			my $value = $record->getElementsByTagName('value')->shift->textContent;
-			my $type = $record->getElementsByTagName('type')->shift->textContent;
-			my $description = $record->getElementsByTagName('description')->shift->textContent;
-
-			push(@{$registry->{'value_types'}->{$value}}, $type);
-			push(@{$registry->{'values_by_type'}->{$type}}, $value);
-			$registry->{'descriptions'}->{$type}->{$value} = $description;
-		}
-
-		return $registry;
-
-	} else {
-		return undef;
-
-	}
+    return $registry;
 }
+
+1;
+
+__END__
 
 =pod
 
@@ -237,7 +204,7 @@ to the permitted types of RDAP values:
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 
@@ -258,5 +225,3 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
-
-1;

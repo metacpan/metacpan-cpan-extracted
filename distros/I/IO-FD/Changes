@@ -1,4 +1,36 @@
 Revision history for Perl extension IO::FD.
+v0.3.1 2023-05-24
+    [tests]
+    - Fix failing send file test on OpenBSD. No sendfile to test!
+
+v0.3.0  2023-05-24
+    [features]
+    - Added pread and pwrite
+    - Added mkfifo and mkfifoat
+    - Added open (not sysopen) and openat
+
+    [improvements]
+    - Fcntl call to set O_CLOEXEC in open/openat/sysopen*/mkfifo* is only
+      applied if the mode parameter DIDN'T specify O_CLOEXEC, AND if the fd is
+      greater than $^F. Saves a useless syscall to set the value twice when
+      manually specified during opens.
+
+    [tests]
+    - pread and pwrite tests added
+    - mkfifo, mktemp and mkstemp tests added
+    - mkfifoat tests added
+    - open and openat tests added
+    
+    [documentation]
+    - added POD (minimal) for new features
+    - Fixed typos and grammar errors
+
+    [other]
+    - Code split across multiple files.
+    - Conditional building to better handle missing functions on NetBSD
+      (sendfile) and earily versions of macOS (mkfifoat)
+
+
 v0.2.0  2023-01-06
     [features]
     - Added accept4 function. Native on linux, emulates on darwin and bsd
@@ -9,17 +41,17 @@ v0.2.0  2023-01-06
     [changes]
     - All functions returning a new fd to an existing variable now check the
       variable can be modified. If it cannot a exception is thrown. This is
-      more ie built in perl behaviour.
+      more ie built in Perl behaviour.
 
     - All functions taking an fd now check it is an IV and and warns, returns
-      undef and $! is set to EBADF. This is more like built in perl behaviour.
+      undef and $! is set to EBADF. This is more like built in Perl behaviour.
 
     - All functions (minus accept4) returning an new fd set CLOEXEC flag if its
-      larger than $^F behaving more like standard perl. accept4 uses an
+      larger than $^F behaving more like standard Perl. accept4 uses an
       explicit flag to manually set and is not set automatically
     - Function accept_multiple now implemented via accep4 on linux with
       SOCK_NONBLOCK set
-    - Added explicit $^F=1000 to IO::FD and core perl benchmarking code
+    - Added explicit $^F=1000 to IO::FD and core Perl benchmarking code
 
     [bug fixes]
     - Fixed multiple argument handling issues of input fds which would lead to
@@ -85,9 +117,9 @@ v0.1.2	2022-10-23
 
 v0.1.1	2022-10-09
   [bug fixes]
-	- Added thread context macros to fix failing build on threaded perl
+	- Added thread context macros to fix failing build on threaded Perl
 	- Fixed IO::FD::recv bug, not updating current length of PV
-	- IO::FD::recv now returns single element, like perl
+	- IO::FD::recv now returns single element, like Perl
 	- Added test for IO::FD::send and IO::FD::recv
 	- Fixed IO:FD::readline to actually work as documented.
 

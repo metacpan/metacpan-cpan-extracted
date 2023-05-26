@@ -4,7 +4,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.64
+Version 0.65
 
 # SYNOPSIS
 
@@ -154,6 +154,9 @@ when you've asked for en-gb, or undef.
 Gives a human readable rendition of what language the user asked for whether
 or not it is supported.
 
+Returns the sublanguage (if appropriate) in parentheses,
+e.g. "English (United Kingdom)"
+
 ## country
 
 Returns the two character country code of the remote end in lower case.
@@ -199,10 +202,14 @@ or through the web interface at
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+Uses [I18N::Acceptlanguage](https://metacpan.org/pod/I18N%3A%3AAcceptlanguage) to find the highest priority accepted language.
+This means that if you support languages at a lower priority, it may be missed.
+
 # SEE ALSO
 
-[Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)
 [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
+[I18N::AcceptLangauge](https://metacpan.org/pod/I18N%3A%3AAcceptLangauge)
+[Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)
 
 # SUPPORT
 
@@ -240,6 +247,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2022 Nigel Horne.
+Copyright 2010-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

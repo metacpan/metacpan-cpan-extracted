@@ -48,9 +48,10 @@ In your F<config> file:
 package App::Phoebe::Galleries;
 use App::Phoebe qw(@extensions $log port success result print_link);
 use File::Slurper qw(read_dir read_binary read_text);
-use Encode qw(encode_utf8);
+use Encode qw(decode_utf8 encode_utf8);
 use Modern::Perl;
 use Mojo::JSON qw(decode_json encode_json);
+use Mojo::Util qw(url_unescape);
 
 # galleries
 
@@ -128,11 +129,13 @@ sub galleries {
     }
     return 1;
   } elsif (my ($file, $extension) = $url =~ m!^gemini://$host(?::$port)?/do/gallery/([^/?]*/(?:thumbs|imgs)/[^/?]*\.(jpe?g|png))$!i) {
+    $file = url_unescape $file; # do not decode UTF-8
+    my $name = decode_utf8($file);
     if (not -r "$galleries_dir/$file") {
-      $stream->write(encode_utf8 "40 Cannot read $file\r\n");
+      $stream->write(encode_utf8 "40 Cannot read $name\r\n");
     } else {
       success($stream, $extension =~ /^png$/i ? "image/png" : "image/jpeg");
-      $log->info("Serving image $file");
+      $log->info("Serving image $name");
       $stream->write(read_binary("$galleries_dir/$file"));
     }
     return 1;

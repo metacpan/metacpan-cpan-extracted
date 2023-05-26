@@ -1,5 +1,14 @@
 Revision history for MIDI-Util
 
+0.1201 2023-05-17 11:41:22
+    - Make the soundfont optional for play_timidity().
+    - Improve documentation.
+
+0.1200 2023-05-17 11:18:08
+    - Add timidity support.
+    - Use subtests.
+    - Improve documentation.
+
 0.1101 2022-05-29 13:41:16
     - Improve documentation.
 

@@ -16,6 +16,13 @@ handle_warning(SV *text)
   CODE:
     cxt->warn_with_context(aTHX_ text);
 
+void
+set_decoder_options(SV *klass, HV *options)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    mapper->set_decoder_options(options);
+
 SV*
 new(SV *klass, SV *ref = NULL)
   INIT:
@@ -36,40 +43,29 @@ new_and_check(SV *klass, SV *ref = NULL)
   OUTPUT: RETVAL
 
 SV*
-message_descriptor(SV *klass)
-  INIT:
-    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
-  CODE:
-    RETVAL = mapper->message_descriptor();
-  OUTPUT: RETVAL
-
-SV*
-enum_descriptor(SV *klass)
-  INIT:
-    gpd::EnumMapper *mapper = (gpd::EnumMapper *) CvXSUBANY(cv).any_ptr;
-  CODE:
-    RETVAL = mapper->enum_descriptor();
-  OUTPUT: RETVAL
-
-SV*
-service_descriptor(SV *klass)
-  INIT:
-    gpd::ServiceMapper *mapper = (gpd::ServiceMapper *) CvXSUBANY(cv).any_ptr;
-  CODE:
-    RETVAL = mapper->service_descriptor();
-  OUTPUT: RETVAL
-
-SV*
-decode(SV *klass, SV *scalar)
+decode_upb(SV *klass, SV *scalar)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
     STRLEN bufsize;
     const char *buffer = SvPV(scalar, bufsize);
   CODE:
-    RETVAL = mapper->decode(buffer, bufsize);
+    RETVAL = mapper->decode_upb(buffer, bufsize);
 
     if (!RETVAL) {
-        sv_2mortal(RETVAL);
+        croak("Deserialization failed: %s", mapper->last_error_message());
+    }
+  OUTPUT: RETVAL
+
+SV*
+decode_bbpb(SV *klass, SV *scalar)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+    STRLEN bufsize;
+    const char *buffer = SvPV(scalar, bufsize);
+  CODE:
+    RETVAL = mapper->decode_bbpb(buffer, bufsize);
+
+    if (!RETVAL) {
         croak("Deserialization failed: %s", mapper->last_error_message());
     }
   OUTPUT: RETVAL
@@ -81,10 +77,9 @@ static_decode(SV *scalar)
     STRLEN bufsize;
     const char *buffer = SvPV(scalar, bufsize);
   CODE:
-    RETVAL = mapper->decode(buffer, bufsize);
+    RETVAL = mapper->decode_upb(buffer, bufsize);
 
     if (!RETVAL) {
-        sv_2mortal(RETVAL);
         croak("Deserialization failed: %s", mapper->last_error_message());
     }
   OUTPUT: RETVAL
@@ -99,7 +94,6 @@ decode_json(SV *klass, SV *scalar)
     RETVAL = mapper->decode_json(buffer, bufsize);
 
     if (!RETVAL) {
-        sv_2mortal(RETVAL);
         croak("Deserialization failed: %s", mapper->last_error_message());
     }
   OUTPUT: RETVAL
@@ -119,7 +113,6 @@ encode(SV *klass_or_object, SV *ref = NULL)
     RETVAL = mapper->encode(ref);
 
     if (!RETVAL) {
-        sv_2mortal(RETVAL);
         croak("Serialization failed: %s", mapper->last_error_message());
     }
   OUTPUT: RETVAL
@@ -132,7 +125,6 @@ static_encode(SV *ref)
     RETVAL = mapper->encode(ref);
 
     if (!RETVAL) {
-        sv_2mortal(RETVAL);
         croak("Serialization failed: %s", mapper->last_error_message());
     }
   OUTPUT: RETVAL
@@ -152,7 +144,6 @@ encode_json(SV *klass_or_object, SV *ref = NULL)
     RETVAL = mapper->encode_json(ref);
 
     if (!RETVAL) {
-        sv_2mortal(RETVAL);
         croak("Serialization failed: %s", mapper->last_error_message());
     }
   OUTPUT: RETVAL
@@ -446,6 +437,9 @@ get_or_set_map(HV *self, SV *ref = NULL)
 
 BOOT:
     gpd::WarnContext::setup(aTHX);
+
+    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::debug_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_debug_transform));
+    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::profile_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_profile_transform));
 
 SV *
 grpc_xs_call_service_passthrough(SV *self, ...)

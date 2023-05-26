@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 62984530471e729bc9668eafb142fd1405e7a6440b7574e8ff12322fc75c5b65 Changes
+SHA256 f2e4872487ee11343bf1d37e483f1138b8936f428c7d9cd1aecc757cb75bb99b LICENSE
+SHA256 61ca06590c1bcc05cead17d211f0a18f5689334637c0eb80a97aa1c5d6c16883 MANIFEST
+SHA256 9602cf812eb378a0eff339e47bca789aced01b812b9232a10d39f2d750b547da META.yml
+SHA256 769de2f46f82c66ae43e7fede2ed58c536ce2b9047532aa7f7ac1cad4a41a7e0 Makefile.PL
+SHA256 02640437474bd0d5b652fbd71f920010be6cb2710a8ff6ae73e753d27d6a4bce Query.pm
+SHA256 4a60bc4b92f490347896e193b7f7036bccc4d297be2a2d55527b1a07dc2bc4ff Query/Count.pm
+SHA256 4de90d1c7a4898a3f80b0a1a37660da782d49c94b8f6ef19b7f444ac28ede76e Query/Select.pm
+SHA256 bc1f8ac1bc0dd75861dfcff610d67f1e5406979375f7e969e8ea93ea739da396 README
+SHA256 c430dd52d773ea1bed98a8ce32924a325eadcbdd28ecdfc7d1b4f6c13556547f examples/ex1.pl
+SHA256 317194e13ff6f4991fa97576b76992932d05a3a161dd8dc59b2a7261de15b660 examples/ex2.pl
+SHA256 01469a6144345a68c0e9b5b0de8ee7901a4bdf54da88600f6f55e7f20d3149c7 examples/ex3.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 05e8907a2f9f18d4fea4d2ac9262b4ae2dd28ca96e3d00f952f8e0e5c5553ccd t/WQS-SPARQL-Query-Count/01-use.t
+SHA256 73781809a65401eb4d231cc98c137ef6aa02ad281d3693b91d7fe5eb70963f7a t/WQS-SPARQL-Query-Count/02-version.t
+SHA256 6cb0cb37741877bd97e9f66fc996dc7774c8644efccd80605eeac70740b75382 t/WQS-SPARQL-Query-Count/03-new.t
+SHA256 21129f18b360397cf2b901105420743c13389ec9d67a3497330e0c95d93f94cf t/WQS-SPARQL-Query-Count/04-count_item.t
+SHA256 7841dcf8fba6235426c8d4be1a86ee8bfbac4c06415d8e20d3b0ee165ab655fc t/WQS-SPARQL-Query-Count/05-count_value.t
+SHA256 de39e4d455fe9075dd0e76a6b830f477f4b6198d16c12e1337809e6952167a11 t/WQS-SPARQL-Query-Select/01-use.t
+SHA256 b14d26b7ea6d396fef197eec288f6eb31510dc61fd8d272fdf6b4bc42613be02 t/WQS-SPARQL-Query-Select/02-version.t
+SHA256 1e2283663f53470c972eae92ff6ef7bab42cbc2b5e1bd841fef0e2be3f83e482 t/WQS-SPARQL-Query-Select/03-new.t
+SHA256 eb6cead499447bde33b19439c324c0b6beff4a0929bf0e1e8cd0ec7a5d469c1c t/WQS-SPARQL-Query-Select/04-select_value.t
+SHA256 6bf37945964ae60bc7665dc327440131edd98ff0b91c6d31ebb426cf007f0b2e t/WQS-SPARQL-Query/01-use.t
+SHA256 226f9344248eeddfc37c6d026179046fd2cf03fb5cdc9e28b032eed97424cf68 t/WQS-SPARQL-Query/02-version.t
+SHA256 a09056887952e1fbbf4f1cd894655e120cf6d0492a9586b5246131bb169710ea xt/WQS-SPARQL-Query-Count/01-pod_coverage.t
+SHA256 3a6f1c14e74538168132c739ce324fcedd66226f9ee05871f3e8095f07c8f28c xt/WQS-SPARQL-Query-Count/02-pod.t
+SHA256 cb26c34755afaddf5dc999d905d58ead50939048f6956087ca51f3d13d27f3b8 xt/WQS-SPARQL-Query-Select/01-pod_coverage.t
+SHA256 17a93bbfdbfce9793569b0df478f7538d29bc5f107ace348aa80b43078da1cf1 xt/WQS-SPARQL-Query-Select/02-pod.t
+SHA256 b1fc3f26c120aac1ac69b4a60dc520f38d98815cf182161f1714ec3850536050 xt/WQS-SPARQL-Query/01-pod_coverage.t
+SHA256 4133debcb05194c3f75f8f5df01547887b5ad58c71d82445410c16d218bac0aa xt/WQS-SPARQL-Query/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmRwaQMACgkQojV9Rpe/
+B8vhgg/+KgG+9ebiQuT4nI4CbQdzT3A2wCA4b6QD+Ap46wG5sJJDFqTvzWzNIZOi
+J7yaHEUJm/4C3M8EicJkOzv5+sUW1sKCQimOb56CewX9kVE8UewtFs69Azkgh368
+bEW88hxj/g+pRFVM1//Ml4WKkk6xvFjU6NL5dyUtSSXUc3TSwEeMxLwlqX4aP98X
+mGRuHRNMB/pKTC88II0I/XfaE18RhmkkvAlBJVes3o1UHH+nxzdu4/P+nMvVfBd4
+jhveANfFTnApSF81Wu+UchV85fSCrqJw00pZ+Pyhh1OUuUBU7/3+dzbTHWi5kz/O
+dCJsWx8+1tJSWIAkPKLy2xYevAd1iyiZbR1yoRXVS1jT7wIXBbrGhtHE1ax6Puow
+NKncTq7Tg3++tYcRMc7LGrb4l4am6SXWGjVM59dwUsaG2Dodzm/i5xcIQqWVfjqi
+d7iXghaKLllN/ZVdgbBPWHhujLrjRVP95R2wFrYkV300MVi9fUDQUQYsHbnA9IY2
+0PqwPuo2C+lXNKDVGOeYAyGd/siG2a3u9LUw1Xne5MYIbcY5kFSnqK8aPsiSpJat
+ERqvFrnxU+6q2MPfuhz7KeoNJvqbgqEL47TpkhasWia601wgXBpV8gTHCdRlxAIi
+uBArMeUji9VcwsZFUFbygOlcF0FQ3CNMAz8xbKHhbW5y3N2PM88=
+=0fo4
+-----END PGP SIGNATURE-----

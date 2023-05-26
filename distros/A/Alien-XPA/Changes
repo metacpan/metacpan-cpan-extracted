@@ -1,5 +1,26 @@
 Revision history for Alien-XPA
 
+v2.1.20.7 2023-05-18 18:09:17-04:00 America/New_York
+
+    * promote to production; No changes from v2.1.20.6.
+
+    * MSWin32 always fails tests due to what seems to be a free in the
+      wrong thread.  No clue at the moment what is causing that and
+      how to fix it.
+
+v2.1.20.6 2023-05-17 14:00:45-04:00 America/New_York (TRIAL RELEASE)
+
+  [TEST]
+
+    * switch from single to double quotes to resolve(?) problem
+      with builds on Windows.
+
+v2.1.20.5 2023-05-16 23:36:59-04:00 America/New_York (TRIAL RELEASE)
+
+  [TEST]
+
+    * inadvertently introduced syntax which works only for Perl > 5.20
+
 v2.1.20.4 2023-05-10 23:16:14-04:00 America/New_York
 
   [TEST]

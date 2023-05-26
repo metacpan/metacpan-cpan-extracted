@@ -21,4 +21,4 @@ requires:
   IO::Socket::SSL: 1
   JSON: 1
   perl: 5.016
-version: 1.66
+version: 1.67

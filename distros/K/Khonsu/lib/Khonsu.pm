@@ -1,7 +1,7 @@
 package Khonsu;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 use PDF::API2;
 
 use base 'Khonsu::File';
@@ -28,7 +28,7 @@ Khonsu - PDF Generation!
 
 =head1 VERSION
 
-Version 0.08
+Version 0.12
 
 =cut
 
@@ -42,6 +42,8 @@ Version 0.08
 	};
 
 	use Khonsu;
+
+	Khonsu->load_plugin(qw/+Syntax/);
 
 	my $padding = 20;
 	my $page_padding = $padding * 2;
@@ -138,6 +140,10 @@ Version 0.08
 
 	$khonsu->add_checkbox(
 		text => 'Checkbox:'
+	);
+
+	$khonsu->add_syntax(
+		text => $perl_string
 	);
 
 	$khonsu->save();
@@ -386,6 +392,38 @@ Get and set the Khonsu::Form::Field::Checkbox object.
 =cut
 
 =head1 METHODS
+
+=cut
+
+=head2 load_plugin
+
+Load an external custom plugin.
+
+	package Khonsu::Test;
+
+	use parent 'Khonsu::Text';
+
+	sub add {
+		my ($self, $file, %attributes) = @_;
+		return $self->SUPER::add($file, %attributes);
+	}
+
+	1;
+
+	...
+
+	Khonsu->load_plugin(qw/+Test/);
+
+	my $khonsu = Khonsu->new(
+		'PDFName',
+		configure => {
+			test => {
+				...
+			}
+		}
+	);
+
+	$khonsu->add_test(...);
 
 =cut
 

@@ -1,0 +1,9 @@
+lib/Object/Meta.pm
+lib/Object/Meta/List.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+t/test_object-list.t
+t/test_object.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

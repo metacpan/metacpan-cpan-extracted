@@ -4,6 +4,7 @@ my $d = Google::ProtocolBuffers::Dynamic->new('t/proto');
 $d->load_file("map.proto");
 $d->map_message("test.Maps", "Maps");
 $d->map_message("test.Item", "Item");
+$d->map_message("test.StringMap", "StringMap");
 $d->resolve_references();
 
 my %values = (
@@ -77,6 +78,14 @@ my %values = (
             0 => "\x32\x04\x08\x00\x12\x00",
         },
     ],
+    string_string_map_map => [
+        {
+            'x' => StringMap->new({ string_int32_map => { 'b' => 2 } }),
+        },
+        {
+            x => "\x3a\x0c\x0a\x01x\x12\x07\x0a\x05\x0a\x01b\x10\x02",
+        },
+    ],
 );
 
 sub encode {
@@ -88,12 +97,11 @@ sub encode {
 for my $field (sort keys %values) {
     my ($values, $encoded) = @{$values{$field}};
     my $bytes = Maps->encode({ $field => $values });
-    my $decoded = Maps->decode($bytes);
 
     eq_or_diff($bytes, encode($values, $encoded),
                "$field - encoded value");
-    eq_or_diff($decoded, Maps->new({ $field => $values }),
-               "$field - round trip");
+    decode_eq_or_diff('Maps', $bytes, Maps->new({ $field => $values }),
+                      "$field - round trip");
 }
 
 done_testing();

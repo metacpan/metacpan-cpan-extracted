@@ -2,7 +2,7 @@
 #
 # Ultima Ratio Coquorum
 
-package Food::Ratio 0.02;
+package Food::Ratio 0.03;
 use Object::Pad 0.52;
 class Food::Ratio :strict(params);
 use Carp 'croak';
@@ -343,6 +343,8 @@ Bugs are commonly present in flour and other ingredients.
 Forkish, Ken. Flour water salt yeast: The fundamentals of artisan bread and pizza. Random House Digital, Inc., 2012.
 
 Ruhlman, Michael. Ratio: The simple codes behind the craft of everyday cooking. Simon and Schuster, 2009.
+
+L<https://github.com/hendricius/the-sourdough-framework>
 
 =head1 COPYRIGHT AND LICENSE
 

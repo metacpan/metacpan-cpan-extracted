@@ -2,6 +2,7 @@
 
 use Test::More;
 
+my $keyserver = $ENV{MODULE_SIGNATURE_KEYSERVER} || 'pool.sks-keyservers.net';
 if (!$ENV{AUTHOR_TESTING}) {
     plan skip_all => 
       "Set the environment variable AUTHOR_TESTING to enable this test.";
@@ -17,7 +18,7 @@ elsif ( !-e 'SIGNATURE' ) {
 elsif ( -s 'SIGNATURE' == 0 ) {
     plan skip_all => "SIGNATURE file empty";
 }
-elsif (!eval { require Socket; Socket::inet_aton('pool.sks-keyservers.net') }) {
+elsif (!eval { require Socket; Socket::inet_aton($keyserver) }) {
     plan skip_all => "Cannot connect to the keyserver to check module ".
                      "signature";
 }

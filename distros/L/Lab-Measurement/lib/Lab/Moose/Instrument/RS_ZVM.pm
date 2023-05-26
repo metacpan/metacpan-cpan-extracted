@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVM;
-$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.860';
+$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.872';
 #ABSTRACT: Rohde & Schwarz ZVM Vector Network Analyzer
 
 use v5.20;
@@ -7,7 +7,7 @@ use v5.20;
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
-use Lab::Moose::Instrument qw/getter_params timeout_param validated_getter/;
+use Lab::Moose::Instrument qw/getter_params timeout_param validated_getter validated_setter/;
 use Carp;
 use Config;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ with 'Lab::Moose::Instrument::SCPI::Format' => {
     },
     qw(
     Lab::Moose::Instrument::SCPI::Sense::Function
-
+    Lab::Moose::Instrument::SCPI::Source::Power
     Lab::Moose::Instrument::VNASweep
 );
 
@@ -81,6 +81,18 @@ sub sparam_sweep_data {
 
 
 
+
+sub set_power {
+    my ( $self, $value, %args ) = validated_setter( \@_ );
+    $self->source_power_level_immediate_amplitude( value => $value );
+}
+
+sub get_power {
+	my $self = shift;
+	return $self->source_power_level_immediate_amplitude_query();
+}
+
+
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -97,7 +109,7 @@ Lab::Moose::Instrument::RS_ZVM - Rohde & Schwarz ZVM Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 SYNOPSIS
 
@@ -109,6 +121,10 @@ version 3.860
 See L<Lab::Moose::Instrument::VNASweep> for the high-level C<sparam_sweep> and
 C<sparam_catalog> methods.
 
+=head2 set_power, get_power
+
+Interface for power sweeps
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
@@ -116,6 +132,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2020       Andreas K. Huettel
+            2023       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

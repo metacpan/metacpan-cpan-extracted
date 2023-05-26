@@ -4,7 +4,7 @@ File::Rotate::Simple - no-frills file rotation
 
 # VERSION
 
-version v0.2.5
+version v0.3.0
 
 # SYNOPSIS
 
@@ -80,7 +80,7 @@ Note that it does not track whether intermediate files are missing.
 
 ## `file`
 
-The file to rotate. This can be a string or [Path::Tiny](https://metacpan.org/pod/Path::Tiny) object.
+The file to rotate. This can be a string or [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) object.
 
 ## `files`
 
@@ -103,7 +103,7 @@ Added in v0.2.0.
 ## `extension_format`
 
 The extension to add when rotating. This is a string that is passed to
-["strftime" in Time::Piece](https://metacpan.org/pod/Time::Piece#strftime) with the following addition of the `%#` code,
+["strftime" in Time::Piece](https://metacpan.org/pod/Time%3A%3APiece#strftime) with the following addition of the `%#` code,
 which corresponds to the rotation number of the file.
 
 Added in v0.2.0.
@@ -141,7 +141,7 @@ Touch ["file"](#file) after rotating.
 
 A time object corresponding to the time used for generating
 timestamped extensions in ["extension\_format"](#extension_format).  It defaults to a
-[Time::Piece](https://metacpan.org/pod/Time::Piece) object with the current local time.
+[Time::Piece](https://metacpan.org/pod/Time%3A%3APiece) object with the current local time.
 
 You can specify an alternative time (including time zone) in the
 constructor, e.g.
@@ -156,7 +156,7 @@ my $r = File::Rotate::Simple->new(
 );
 ```
 
-[Time::Moment](https://metacpan.org/pod/Time::Moment) and [DateTime](https://metacpan.org/pod/DateTime) objects can also be given.
+[Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment) and [DateTime](https://metacpan.org/pod/DateTime) objects can also be given.
 
 Unlike other attributes, ["time"](#time) is read-write, so that it can be
 updated between calls to ["rotate"](#rotate):
@@ -198,12 +198,22 @@ rotate_files(
 
 Added in v0.2.0.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.3.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.8, please use one of the v0.2.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 # SEE ALSO
 
 The following modules have similar functionality:
 
-- [File::Rotate::Backup](https://metacpan.org/pod/File::Rotate::Backup)
-- [File::Write::Rotate](https://metacpan.org/pod/File::Write::Rotate)
+- [File::Rotate::Backup](https://metacpan.org/pod/File%3A%3ARotate%3A%3ABackup)
+- [File::Write::Rotate](https://metacpan.org/pod/File%3A%3AWrite%3A%3ARotate)
 
 There are also several logging modueles that support log rotation.
 
@@ -231,7 +241,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2020 by Robert Rothenberg.
+This software is Copyright (c) 2015-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

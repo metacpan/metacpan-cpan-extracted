@@ -2,8 +2,8 @@ NAME
     Complete::Sah - Sah-related completion routines
 
 VERSION
-    This document describes version 0.011 of Complete::Sah (from Perl
-    distribution Complete-Sah), released on 2023-01-28.
+    This document describes version 0.012 of Complete::Sah (from Perl
+    distribution Complete-Sah), released on 2023-03-19.
 
 SYNOPSIS
      use Complete::Sah qw(complete_from_schema);

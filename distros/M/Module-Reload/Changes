@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Reload
 
+1.12 2023-05-15 NEILB
+    - Changed the tests to use Test::More. PR from HAARG++.
+
 1.11 2017-04-17 NEILB
     - Fix the tests to pass when '.' is no longer in @INC (Perl 5.26.0)
 

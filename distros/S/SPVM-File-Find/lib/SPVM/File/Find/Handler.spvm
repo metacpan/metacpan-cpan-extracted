@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Find::Handler : interface_t {
   required method : void ($dir : string, $file_base_name : string);
 }

@@ -1,5 +1,26 @@
 Revision history for Hash-Util-Merge:
 
+v0.2.0    2023-05-24 17:02:55+01:00 Europe/London
+  [Incompatible Changes]
+  - Bumped minimum version of Perl to v5.14.
+
+  [Documentation]
+  - Bump copyright year.
+
+  - Fix encoding of links in README.
+
+  [Tests]
+  - Remove Storable from report-prereqs test.
+
+  [Other]
+  - Specify minimum version of Exporter.
+
+  - Remove bad rule from MANIFEST.SKIP.
+
+  - Update MANIFEST.SKIP rules.
+
+  - Sign distributon.
+
 v0.1.2    2020-06-29 23:28:49+01:00 Europe/London
   [Enhancements]
   - Removed use of syntactic prototype.

@@ -1,5 +1,31 @@
 Revision history for CAPE-Utils
 
+2.3.0   2023-05-18/18:00
+		- suricata_extract_submit can now use env specified proxies optionally
+		- suricata_extract_submit_extend now recomputes deltas
+
+2.2.2   2023-05-18/10:00
+		- Fix pod error in Utils.pm, reneeb PR#1
+		- Set extend version to 1 in returned JSON.
+
+2.2.1   2023-05-17/15:00
+		- Actually reset last_errors post loading the old stats JSON
+
+2.2.0   2023-05-17/12:00
+		- cpanratings.perl.org no longer exists(147814)
+		- src_bin/suricata_extract_submit now properly adds slug to the submission section
+		- src_bin/suricata_extract_submit now tracks truncated files count
+
+2.1.0   2023-05-17/09:45
+		- Update logging for ignored items to be more verbose.
+
+2.0.0   2023-05-16/16:00
+		- Add CAPE::Utils->eve_process and matching eve command to cape_utils.
+		- suricata_extract_submit now creates a stats file at '/var/cache/suricata_extract_submit_stats.json'.
+		- suricata_extract_submit also sends stats to syslog
+		- suricata_extract_submit sends the full extract JSON and mojo_cape_submit saves it.
+		- Add src_bin/suricata_extract_submit_extend.
+
 1.0.1   2023-03-30/20:00
 		- Fix a typo in regards to regex loading for ignore hosts regex file
 

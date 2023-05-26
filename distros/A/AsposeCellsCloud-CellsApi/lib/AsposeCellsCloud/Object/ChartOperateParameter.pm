@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ChartOperateParameter;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::OperateParameter; 
 
-use AsposeCellsCloud::Object::OperateParameter;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,109 +118,127 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ChartOperateParameter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'operate_type' => {
-    	datatype => 'string',
-    	base_name => 'OperateType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'title' => {
-    	datatype => 'string',
-    	base_name => 'Title',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'area' => {
-    	datatype => 'string',
-    	base_name => 'Area',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'category_data' => {
-    	datatype => 'string',
-    	base_name => 'CategoryData',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'upper_left_row' => {
-    	datatype => 'int',
-    	base_name => 'UpperLeftRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'lower_right_column' => {
-    	datatype => 'int',
-    	base_name => 'LowerRightColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'lower_right_row' => {
-    	datatype => 'int',
-    	base_name => 'LowerRightRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_auto_get_serial_name' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutoGetSerialName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'chart_type' => {
-    	datatype => 'string',
-    	base_name => 'ChartType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_vertical' => {
-    	datatype => 'boolean',
-    	base_name => 'IsVertical',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'chart_index' => {
+     	datatype => 'int',
+     	base_name => 'ChartIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'chart_type' => {
+     	datatype => 'string',
+     	base_name => 'ChartType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'upper_left_row' => {
+     	datatype => 'int',
+     	base_name => 'UpperLeftRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'upper_left_column' => {
+     	datatype => 'int',
+     	base_name => 'UpperLeftColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'lower_right_row' => {
+     	datatype => 'int',
+     	base_name => 'LowerRightRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'lower_right_column' => {
+     	datatype => 'int',
+     	base_name => 'LowerRightColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'area' => {
+     	datatype => 'string',
+     	base_name => 'Area',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_vertical' => {
+     	datatype => 'boolean',
+     	base_name => 'IsVertical',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'category_data' => {
+     	datatype => 'string',
+     	base_name => 'CategoryData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_auto_get_serial_name' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutoGetSerialName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'title' => {
+     	datatype => 'string',
+     	base_name => 'Title',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'operate_type' => {
+     	datatype => 'string',
+     	base_name => 'OperateType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'operate_type' => 'string',
-    'title' => 'string',
-    'area' => 'string',
-    'category_data' => 'string',
-    'upper_left_row' => 'int',
-    'lower_right_column' => 'int',
-    'lower_right_row' => 'int',
-    'is_auto_get_serial_name' => 'boolean',
+    'chart_index' => 'int',
     'chart_type' => 'string',
-    'is_vertical' => 'boolean'
+    'upper_left_row' => 'int',
+    'upper_left_column' => 'int',
+    'lower_right_row' => 'int',
+    'lower_right_column' => 'int',
+    'area' => 'string',
+    'is_vertical' => 'boolean',
+    'category_data' => 'string',
+    'is_auto_get_serial_name' => 'boolean',
+    'title' => 'string',
+    'operate_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'operate_type' => 'OperateType',
-    'title' => 'Title',
-    'area' => 'Area',
-    'category_data' => 'CategoryData',
-    'upper_left_row' => 'UpperLeftRow',
-    'lower_right_column' => 'LowerRightColumn',
-    'lower_right_row' => 'LowerRightRow',
-    'is_auto_get_serial_name' => 'IsAutoGetSerialName',
+    'chart_index' => 'ChartIndex',
     'chart_type' => 'ChartType',
-    'is_vertical' => 'IsVertical'
+    'upper_left_row' => 'UpperLeftRow',
+    'upper_left_column' => 'UpperLeftColumn',
+    'lower_right_row' => 'LowerRightRow',
+    'lower_right_column' => 'LowerRightColumn',
+    'area' => 'Area',
+    'is_vertical' => 'IsVertical',
+    'category_data' => 'CategoryData',
+    'is_auto_get_serial_name' => 'IsAutoGetSerialName',
+    'title' => 'Title',
+    'operate_type' => 'OperateType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

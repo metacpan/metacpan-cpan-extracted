@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::CalculationOptions;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,55 +118,55 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'CalculationOptions',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'precision_strategy' => {
-    	datatype => 'string',
-    	base_name => 'PrecisionStrategy',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'ignore_error' => {
-    	datatype => 'boolean',
-    	base_name => 'IgnoreError',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'recursive' => {
-    	datatype => 'boolean',
-    	base_name => 'Recursive',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'calc_stack_size' => {
-    	datatype => 'int',
-    	base_name => 'CalcStackSize',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'calc_stack_size' => {
+     	datatype => 'int',
+     	base_name => 'CalcStackSize',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'ignore_error' => {
+     	datatype => 'boolean',
+     	base_name => 'IgnoreError',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'precision_strategy' => {
+     	datatype => 'string',
+     	base_name => 'PrecisionStrategy',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'recursive' => {
+     	datatype => 'boolean',
+     	base_name => 'Recursive',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'precision_strategy' => 'string',
+    'calc_stack_size' => 'int',
     'ignore_error' => 'boolean',
-    'recursive' => 'boolean',
-    'calc_stack_size' => 'int'
+    'precision_strategy' => 'string',
+    'recursive' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'precision_strategy' => 'PrecisionStrategy',
+    'calc_stack_size' => 'CalcStackSize',
     'ignore_error' => 'IgnoreError',
-    'recursive' => 'Recursive',
-    'calc_stack_size' => 'CalcStackSize'
+    'precision_strategy' => 'PrecisionStrategy',
+    'recursive' => 'Recursive' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

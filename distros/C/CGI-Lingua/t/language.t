@@ -7,7 +7,7 @@ use lib 't/lib';
 use MyLogger;
 
 if(-e 't/online.enabled') {
-	plan(tests => 146);
+	plan(tests => 149);
 
 	use_ok('CGI::Lingua');
 	require_ok('Test::NoWarnings');
@@ -322,6 +322,15 @@ if(-e 't/online.enabled') {
 		ok($l->language() eq 'German');
 		ok(!defined($l->sublanguage()));
 	}
+
+	delete $ENV{'QUERY_STRING'};
+	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'fr,en-GB;q=0.9,en;q=0.8';
+
+	$l = new_ok('CGI::Lingua' => [
+		supported => [ 'en-gb', 'fr' ]
+	]);
+	cmp_ok($l->language(), 'eq', 'French', 'Check order of preference is honoured');
+	is($l->sublanguage(), undef, 'No sublanguage has been requested');
 } else {
 	plan(skip_all => 'On-line tests disabled');
 }

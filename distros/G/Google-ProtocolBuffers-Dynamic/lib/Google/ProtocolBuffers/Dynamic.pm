@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.42'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -74,6 +74,16 @@ sub _dump {
     Data::Dumper::Dumper(@_)
 }
 
+sub _stack_trace {
+    my ($package, $filename, $line);
+    for (my $level = 0; $level < 4; ++$level) {
+        ($package, $filename, $line) = caller($level);
+        last if $package ne __PACKAGE__;
+    }
+
+    return "$filename line $line";
+}
+
 1;
 
 __END__
@@ -88,7 +98,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -557,6 +567,11 @@ Maps C<true> to C<1> and C<false> to C<"">.
 =item numeric
 
 Maps C<true> to C<1> and C<false> to C<0>.
+
+=item json
+
+Loads L<JSON> and uses C<JSON::true> and C<JSON::false> as
+C<true>/C<false> values.
 
 =back
 

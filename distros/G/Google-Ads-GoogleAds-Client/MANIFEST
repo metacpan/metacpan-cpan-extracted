@@ -95,10 +95,6 @@ examples/feeds/link_feed_item_set.pl
 examples/feeds/remove_feed_items.pl
 examples/feeds/remove_flights_feed_item_attribute_value.pl
 examples/feeds/update_flights_feed_item_string_attribute_value.pl
-examples/hotel_ads/add_hotel_ad.pl
-examples/hotel_ads/add_hotel_ad_group_bid_modifiers.pl
-examples/hotel_ads/add_hotel_listing_group_tree.pl
-examples/hotel_ads/add_performance_max_for_travel_goals_campaign.pl
 examples/misc/campaign_report_to_csv.pl
 examples/misc/get_all_image_assets.pl
 examples/misc/get_all_videos_and_images.pl
@@ -153,6 +149,11 @@ examples/targeting/add_demographic_targeting_criteria.pl
 examples/targeting/get_campaign_targeting_criteria.pl
 examples/targeting/get_geo_target_constants_by_names.pl
 examples/targeting/search_for_language_and_carrier_constants.pl
+examples/travel/add_hotel_ad.pl
+examples/travel/add_hotel_ad_group_bid_modifiers.pl
+examples/travel/add_hotel_listing_group_tree.pl
+examples/travel/add_performance_max_for_travel_goals_campaign.pl
+examples/travel/add_things_to_do_ad.pl
 googleads.properties
 lib/Google/Ads/GoogleAds/BaseEntity.pm
 lib/Google/Ads/GoogleAds/BaseService.pm
@@ -2211,6 +2212,7 @@ lib/Google/Ads/GoogleAds/V13/Enums/ListingGroupFilterProductTypeLevelEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/ListingGroupFilterTypeEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/ListingGroupFilterVerticalEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/ListingGroupTypeEnum.pm
+lib/Google/Ads/GoogleAds/V13/Enums/ListingTypeEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/LocalPlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/LocationExtensionTargetingCriterionFieldEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/LocationGroupRadiusUnitsEnum.pm
@@ -2281,6 +2283,7 @@ lib/Google/Ads/GoogleAds/V13/Enums/SeasonalityEventStatusEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/ServedAssetFieldTypeEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/SharedSetStatusEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/SharedSetTypeEnum.pm
+lib/Google/Ads/GoogleAds/V13/Enums/ShoppingAddProductsToCampaignRecommendationEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/SimulationModificationMethodEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/SimulationTypeEnum.pm
 lib/Google/Ads/GoogleAds/V13/Enums/SitelinkPlaceholderFieldEnum.pm
@@ -2429,6 +2432,7 @@ lib/Google/Ads/GoogleAds/V13/Resources/ConversionAction.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ConversionCustomVariable.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ConversionGoalCampaignConfig.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ConversionTrackingSetting.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ConversionValueMapping.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ConversionValueRule.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ConversionValueRuleSet.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CurrencyConstant.pm
@@ -2447,6 +2451,7 @@ lib/Google/Ads/GoogleAds/V13/Resources/CustomerFeed.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CustomerLabel.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CustomerManagerLink.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CustomerNegativeCriterion.pm
+lib/Google/Ads/GoogleAds/V13/Resources/CustomerSkAdNetworkConversionValueSchema.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CustomerUserAccess.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CustomerUserAccessInvitation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/CustomInterest.pm
@@ -2464,6 +2469,8 @@ lib/Google/Ads/GoogleAds/V13/Resources/DomainCategory.pm
 lib/Google/Ads/GoogleAds/V13/Resources/DynamicSearchAdsSearchTermView.pm
 lib/Google/Ads/GoogleAds/V13/Resources/DynamicSearchAdsSetting.pm
 lib/Google/Ads/GoogleAds/V13/Resources/EnhancedCpcOptInRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/Event.pm
+lib/Google/Ads/GoogleAds/V13/Resources/EventOccurrenceRange.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ExpandedLandingPageView.pm
 lib/Google/Ads/GoogleAds/V13/Resources/Experiment.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ExperimentArm.pm
@@ -2480,6 +2487,7 @@ lib/Google/Ads/GoogleAds/V13/Resources/FeedItemTarget.pm
 lib/Google/Ads/GoogleAds/V13/Resources/FeedItemValidationError.pm
 lib/Google/Ads/GoogleAds/V13/Resources/FeedMapping.pm
 lib/Google/Ads/GoogleAds/V13/Resources/FeedPlaceholderView.pm
+lib/Google/Ads/GoogleAds/V13/Resources/FineGrainedConversionValueMappings.pm
 lib/Google/Ads/GoogleAds/V13/Resources/FirebaseSettings.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ForecastingSetTargetRoasRecommendation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/GenderView.pm
@@ -2532,6 +2540,7 @@ lib/Google/Ads/GoogleAds/V13/Resources/MediaImage.pm
 lib/Google/Ads/GoogleAds/V13/Resources/MediaVideo.pm
 lib/Google/Ads/GoogleAds/V13/Resources/MerchantCenterFeed.pm
 lib/Google/Ads/GoogleAds/V13/Resources/MerchantCenterLink.pm
+lib/Google/Ads/GoogleAds/V13/Resources/MerchantInfo.pm
 lib/Google/Ads/GoogleAds/V13/Resources/MobileAppCategoryConstant.pm
 lib/Google/Ads/GoogleAds/V13/Resources/MobileDeviceConstant.pm
 lib/Google/Ads/GoogleAds/V13/Resources/MoveUnusedBudgetRecommendation.pm
@@ -2573,14 +2582,22 @@ lib/Google/Ads/GoogleAds/V13/Resources/RemarketingSetting.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ResponsiveSearchAdAssetRecommendation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ResponsiveSearchAdImproveAdStrengthRecommendation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ResponsiveSearchAdRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/RevenueRange.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SearchPartnersOptInRecommendation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SearchTermView.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SelectiveOptimization.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SharedCriterion.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SharedSet.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ShoppingAddProductsToCampaignRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ShoppingFixDisapprovedProductsRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ShoppingMerchantCenterAccountSuspensionRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ShoppingMigrateRegularShoppingCampaignOffersToPerformanceMaxRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ShoppingOfferAttributeRecommendation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ShoppingPerformanceView.pm
 lib/Google/Ads/GoogleAds/V13/Resources/ShoppingSetting.pm
+lib/Google/Ads/GoogleAds/V13/Resources/ShoppingTargetAllOffersRecommendation.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SitelinkAssetRecommendation.pm
+lib/Google/Ads/GoogleAds/V13/Resources/SkAdNetworkConversionValueSchema.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SmartCampaignSearchTermView.pm
 lib/Google/Ads/GoogleAds/V13/Resources/SmartCampaignSetting.pm
 lib/Google/Ads/GoogleAds/V13/Resources/TargetCpa.pm
@@ -2987,6 +3004,11 @@ lib/Google/Ads/GoogleAds/V13/Services/CustomerService/ListAccessibleCustomersRes
 lib/Google/Ads/GoogleAds/V13/Services/CustomerService/MutateCustomerRequest.pm
 lib/Google/Ads/GoogleAds/V13/Services/CustomerService/MutateCustomerResponse.pm
 lib/Google/Ads/GoogleAds/V13/Services/CustomerService/MutateCustomerResult.pm
+lib/Google/Ads/GoogleAds/V13/Services/CustomerSkAdNetworkConversionValueSchemaService.pm
+lib/Google/Ads/GoogleAds/V13/Services/CustomerSkAdNetworkConversionValueSchemaService/CustomerSkAdNetworkConversionValueSchemaOperation.pm
+lib/Google/Ads/GoogleAds/V13/Services/CustomerSkAdNetworkConversionValueSchemaService/MutateCustomerSkAdNetworkConversionValueSchemaRequest.pm
+lib/Google/Ads/GoogleAds/V13/Services/CustomerSkAdNetworkConversionValueSchemaService/MutateCustomerSkAdNetworkConversionValueSchemaResponse.pm
+lib/Google/Ads/GoogleAds/V13/Services/CustomerSkAdNetworkConversionValueSchemaService/MutateCustomerSkAdNetworkConversionValueSchemaResult.pm
 lib/Google/Ads/GoogleAds/V13/Services/CustomerUserAccessInvitationService.pm
 lib/Google/Ads/GoogleAds/V13/Services/CustomerUserAccessInvitationService/CustomerUserAccessInvitationOperation.pm
 lib/Google/Ads/GoogleAds/V13/Services/CustomerUserAccessInvitationService/MutateCustomerUserAccessInvitationRequest.pm

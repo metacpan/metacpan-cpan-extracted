@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::FilesUploadResult;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::Error; 
 
-use AsposeCellsCloud::Object::Error;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,37 +118,37 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'File upload result',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'FilesUploadResult',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'uploaded' => {
-    	datatype => 'ARRAY[string]',
-    	base_name => 'Uploaded',
-    	description => 'List of uploaded file names',
-    	format => '',
-    	read_only => '',
-    		},
-    'errors' => {
-    	datatype => 'ARRAY[Error]',
-    	base_name => 'Errors',
-    	description => 'List of errors.',
-    	format => '',
-    	read_only => '',
-    		},
+     'uploaded' => {
+     	datatype => 'ARRAY[string]',
+     	base_name => 'Uploaded',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'errors' => {
+     	datatype => 'ARRAY[Error]',
+     	base_name => 'Errors',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'uploaded' => 'ARRAY[string]',
-    'errors' => 'ARRAY[Error]'
+    'errors' => 'ARRAY[Error]' 
 } );
 
 __PACKAGE__->attribute_map( {
     'uploaded' => 'Uploaded',
-    'errors' => 'Errors'
+    'errors' => 'Errors' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

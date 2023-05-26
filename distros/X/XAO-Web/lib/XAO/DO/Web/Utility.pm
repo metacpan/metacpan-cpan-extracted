@@ -88,6 +88,8 @@ Arguments are "carrier" and "tracknum". Supported carriers are:
 
 =item * 'yellow' (see http://www.yellowcorp.com/)
 
+=item * 'sefl' (see https://www.sefl.com/)
+
 =back
 
 Example:
@@ -127,6 +129,10 @@ sub tracking_url ($%) {
         $tracknum=sprintf('%09u',int($tracknum));
         $url='http://www2.yellowcorp.com/cgi-bin/gx.cgi/applogic+yfsgentracing.E000YfsTrace' .
              '?diff=protrace&PRONumber=' . t2hq($tracknum);
+    }
+    elsif(lc($carrier) eq 'sefl') {
+        $tracknum =~ s/\D//g;
+        $url='https://www.sefl.com/webconnect/tracing?Type=PN&RefNum1=' . t2hq($tracknum);
     }
     else {
         eprint "Unknown carrier '$carrier'";

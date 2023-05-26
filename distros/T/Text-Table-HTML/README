@@ -2,8 +2,8 @@ NAME
     Text::Table::HTML - Generate HTML table
 
 VERSION
-    This document describes version 0.009 of Text::Table::HTML (from Perl
-    distribution Text-Table-HTML), released on 2022-10-11.
+    This document describes version 0.010 of Text::Table::HTML (from Perl
+    distribution Text-Table-HTML), released on 2023-05-22.
 
 SYNOPSIS
      use Text::Table::HTML;
@@ -20,7 +20,8 @@ SYNOPSIS
 
 DESCRIPTION
     This module provides a single function, "table", which formats a
-    two-dimensional array of data as HTML table.
+    two-dimensional array of data as HTML table. Its interface is modelled
+    after Text::Table::Tiny 0.03.
 
     The example shown in the SYNOPSIS generates the following table:
 
@@ -35,25 +36,37 @@ DESCRIPTION
      </tbody>
      </table>
 
+COMPATIBILITY NOTES WITH TEXT::TABLE::TINY
+    In "Text::Table::HTML", "header_row" is an integer instead of boolean.
+    It supports multiple header rows.
+
+    Cells in "rows" can be hashrefs instead of scalars.
+
 FUNCTIONS
   table(%params) => str
   OPTIONS
     The "table" function understands these arguments, which are passed as a
     hash.
 
-    *   rows (aoaos)
+    *   rows
 
-        Takes an array reference which should contain one or more rows of
-        data, where each row is an array reference. And each array element
-        is a string (cell content) or hashref (with key "text" to contain
-        the cell text or "raw_html" to contain the cell's raw HTML which
-        won't be escaped further), and optionally attributes too like
-        "rowspan", "colspan").
+        Required. Array of array of (scalars or hashrefs). One or more rows
+        of data, where each row is an array reference. And each array
+        element is a string (cell content) or hashref (with key "text" to
+        contain the cell text or "raw_html" to contain the cell's raw HTML
+        which won't be escaped further), and optionally other attributes:
+        "rowspan", "colspan", "align", "bottom_border").
 
     *   caption
 
         Optional. Str. If set, will add an HTML "<caption>" element to set
         the table caption.
+
+    *   header_row
+
+        Optional. Integer. Default 0. Whether we should add header row(s)
+        (rows inside "<thead>" instead of "<tbody>"). Support multiple
+        header rows; you can set this argument to an integer larger than 1.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -73,6 +86,9 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Diab Jerius <djerius@cfa.harvard.edu>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -90,7 +106,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2017, 2016 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2017, 2016 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

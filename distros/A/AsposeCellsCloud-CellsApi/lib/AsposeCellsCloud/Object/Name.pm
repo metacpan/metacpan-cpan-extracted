@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Name;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,91 +119,91 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Name',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'comment' => {
-    	datatype => 'string',
-    	base_name => 'Comment',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text' => {
-    	datatype => 'string',
-    	base_name => 'Text',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'worksheet_index' => {
-    	datatype => 'int',
-    	base_name => 'WorksheetIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'r1_c1_refers_to' => {
-    	datatype => 'string',
-    	base_name => 'R1C1RefersTo',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'refers_to' => {
-    	datatype => 'string',
-    	base_name => 'RefersTo',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_referred' => {
-    	datatype => 'boolean',
-    	base_name => 'IsReferred',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_visible' => {
-    	datatype => 'boolean',
-    	base_name => 'IsVisible',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'comment' => {
+     	datatype => 'string',
+     	base_name => 'Comment',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'worksheet_index' => {
+     	datatype => 'int',
+     	base_name => 'WorksheetIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_referred' => {
+     	datatype => 'boolean',
+     	base_name => 'IsReferred',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_visible' => {
+     	datatype => 'boolean',
+     	base_name => 'IsVisible',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'r1_c1_refers_to' => {
+     	datatype => 'string',
+     	base_name => 'R1C1RefersTo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refers_to' => {
+     	datatype => 'string',
+     	base_name => 'RefersTo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text' => {
+     	datatype => 'string',
+     	base_name => 'Text',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
     'comment' => 'string',
-    'text' => 'string',
     'worksheet_index' => 'int',
+    'is_referred' => 'boolean',
+    'is_visible' => 'boolean',
     'r1_c1_refers_to' => 'string',
     'refers_to' => 'string',
-    'is_referred' => 'boolean',
-    'is_visible' => 'boolean'
+    'text' => 'string',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
     'comment' => 'Comment',
-    'text' => 'Text',
     'worksheet_index' => 'WorksheetIndex',
+    'is_referred' => 'IsReferred',
+    'is_visible' => 'IsVisible',
     'r1_c1_refers_to' => 'R1C1RefersTo',
     'refers_to' => 'RefersTo',
-    'is_referred' => 'IsReferred',
-    'is_visible' => 'IsVisible'
+    'text' => 'Text',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

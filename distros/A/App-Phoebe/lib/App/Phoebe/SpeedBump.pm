@@ -50,7 +50,7 @@ certificate with a known fingerprint.
 The exact number of requests and the length of the time window (in seconds) can
 be changed in the F<config> file, too.
 
- Here’s one way to do all that:
+Here’s one way to do all that:
 
     package App::Phoebe;
     our @known_fingerprints = qw(

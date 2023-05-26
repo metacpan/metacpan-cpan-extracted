@@ -5,7 +5,7 @@ on 'test' => sub {
   requires 'Capture::Tiny';
 };
 
-feature 'test_perl-5.10', 'testing in perl 5.10' => sub { 
+feature 'test_perl-5.10', 'testing in perl 5.10' => sub {
   requires 'local::lib';
   requires 'Perl::Build';
 };

@@ -1,5 +1,9 @@
 Revision history for perl module Net::RDAP
 
+0.18 - added extra metadata to Makefile.PL
+
+0.17 - (skipped)
+
 0.16 - 2022-10-06
   - be more lenient in what we accept to improve
     interoperability

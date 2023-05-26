@@ -7,7 +7,7 @@ use Test::Spelling 0.12;
 use Pod::Wordlist;
 
 
-add_stopwords(<DATA>);
+add_stopwords( <DATA> );
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astrophysical

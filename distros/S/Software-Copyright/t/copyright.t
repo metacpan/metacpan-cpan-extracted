@@ -105,6 +105,13 @@ subtest "single statement" => sub {
     ok($statement->is_valid, "check validity");
 };
 
+subtest "blank statement" => sub {
+    my $statement = Software::Copyright->new('');
+
+    is("$statement", '', "check simplified statement");
+    eq_or_diff([$statement->owners],[], "check statement owners");
+};
+
 subtest "single invalid statement" => sub {
     my $statement = Software::Copyright->new('2014');
 

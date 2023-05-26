@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.50
+    version 0.52
 
 SYNOPSIS
 
@@ -32,6 +32,7 @@ CONTAINED AUTHORS
 
       AMBS => q[Alberto Manuel Brandao Simoes],
       ANDK => q[Andreas J. Koenig],
+      ARISTOTLE => q[Aristotle Pagaltzis],
       ATOOMIC => q[icolas .],
       AUDREYT => q[Audrey Tang],
       BINGOS => q[Chris Williams],
@@ -64,14 +65,12 @@ CONTAINED AUTHORS
       MALLEN => q[Mark Allen],
       MAREKR => q[Marek Rouchal],
       MHX => q[Marcus Holland-Moritz],
-      MJD => q[Mark Jason Dominus],
       MSCHWERN => q[Michael G Schwern],
       MSHELOR => q[Mark Shelor],
-      MUIR => q[David Muir Sharnoff],
       NEILB => q[Neil Bowers],
       NTHYKIER => q[Niels Thykier],
       NWCLARK => q[Nicholas Clark],
-      OVID => q[Curtis 'Ovid' Poe],
+      OVID => q[Curtis Poe],
       PEVANS => q[Paul Evans],
       PJACKLAM => q[Peter John Acklam],
       PMQS => q[Paul Marquess],
@@ -105,7 +104,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2021 by Chris Williams.
+    This software is copyright (c) 2023 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

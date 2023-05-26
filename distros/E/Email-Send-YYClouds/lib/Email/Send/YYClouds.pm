@@ -12,18 +12,23 @@ use Encode qw(encode encode_utf8);
 
 =head1 NAME
 
-Email::Send::YYClouds - Send email using any smtp relay server
+Email::Send::YYClouds - Send simple mail using smtp relay server
 
 =head1 VERSION
 
-Version 0.04
+Version 0.15
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.15';
 
 
 =head1 SYNOPSIS
+
+This module sends text based simple mail with any smtp relay server, default localhost.
+
+If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
+
 
     use Email::Send::YYClouds;
     use utf8;
@@ -31,9 +36,8 @@ our $VERSION = '0.04';
     my $msg = Email::Send::YYClouds->new();
     $msg->send(recepient => ['user@yy.com','user@163.com'],
                sender => 'foo@bar.com',
-               smtprelay => 'localhost',
-               subject => '测试邮件',
-               body => '<p>这是一封测试邮件。</p><p>欢迎来到perl的世界！</p>',
+               subject => 'test mail',
+               body => 'test message body, 测试邮件',
           );
 
 
@@ -42,7 +46,7 @@ our $VERSION = '0.04';
 =head2 new
     
     $msg = Email::Send::YYClouds->new();
-    $msg = Email::Send::YYClouds->new(debug=>1);  # with debug open
+    $msg = Email::Send::YYClouds->new(debug=>1);  # enable debug
 
 =cut
 
@@ -59,10 +63,11 @@ sub new {
 =head2 send
 
     $msg->send(recepient => [a list of recepients],
-               sender => 'foo@bar.com',
+               sender => 'user@your_domain',
                smtprelay => 'relay_server',
-               subject => $subject,
-               body => $body,
+               type => 'text/plain',
+               subject => 'mail subject',
+               body => 'message body',
           );
 
 
@@ -72,18 +77,20 @@ sender - from what address the message was sent.
 
 smtprelay - relay server for smtp session, default to localhost.
 
-subject - email subject, which can be either Chinese or non-Chinese.
+type - content_type, default to text/plain, can be others like text/html.
 
-body - message body, which can be either Chinese or non-Chinese. default with HTML type.
+subject - email subject, which can be either English or UTF-8 characters.
 
-Please notice: you must have smtp realy server to approve the sending action.
+body - message body, which can be either English or UTF-8 characters.
+
+Please note: you must have smtp realy server to open the sending permission to you.
 
 Otherwise you will get error:
 
     SMTP recipient() command failed: 
     5.7.1 <xxx@yy.com>: Relay access denied
 
-Contact the sysops to authorize it.
+Contact your sysadmin to authorize it.
 
 =cut
 
@@ -96,20 +103,21 @@ sub send {
     my $sender = $args{'sender'};
     my $subject = $args{'subject'};
     my $body = $args{'body'};
-
-    my $smtprelay = $args{'smtprelay'} || 'localhost';
     my $to_address = join ',',@$recepient;
 
+    my $smtprelay = $args{'smtprelay'} || 'localhost';
+    my $type = $args{'type'} || 'text/plain';
 
     my $msg = MIME::Lite->new (
         From => $sender,
         To =>  $to_address,
+        Type     => $type,
         Subject => encode( 'MIME-Header', $subject ),
         Data    => encode_utf8($body),
-        Encoding => 'base64',
+        Encoding => 'quoted-printable',
     ) or die "create container failed: $!";
 
-    $msg->attr( 'content-type' => 'text/html; charset=utf-8' );
+    $msg->attr('content-type.charset' => 'UTF-8');
 
     $msg->send(  'smtp',
                  $smtprelay,

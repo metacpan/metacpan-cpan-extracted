@@ -2,40 +2,43 @@ package Pod::Simpler::Aoh;
 
 use Moo;
 use MooX::LazierAttributes;
-use Types::Standard qw/Str ArrayRef HashRef/;
+use Types::Standard qw/Str ArrayRef HashRef Bool/;
 
 extends 'Pod::Simple';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 attributes(
     pod => [ rw, ArrayRef, { lzy_array, clr } ],
     section => [ rw, HashRef, { lzy_hash, clr } ],
     pod_elements => [ HashRef, { lzy, bld } ],
     element_name => [ rw, Str, { clr } ],    
+    split_content => [ rw, Bool, { clr } ]
 );
 
 sub _build_pod_elements {
     return {
-        Document    => 'skip',
-        head1       => 'title',
-        head2       => 'title',
-        head2       => 'title',
-        head4       => 'title',
-        Para        => 'content',
-        'item-text' => 'content',
-        'over-text' => 'content',
-        Verbatim    => 'content',
-        Data        => 'content',
-        C           => 'content',
-        L           => 'content',
-        B           => 'content',
-        I           => 'content',
-        E           => 'content',
-        F           => 'content',
-        S           => 'content',
-        X           => 'content',
-        join        => 'content',
+        Document      => 'skip',
+        head1         => 'title',
+        head2         => 'title',
+        head2         => 'title',
+        head4         => 'title',
+        Para          => 'content',
+        'item-text'   => 'content',
+        'over-text'   => 'content',
+	'over-bullet' => 'content',
+        'item-bullet' => 'content',
+        Verbatim      => 'content',
+        Data          => 'content',
+        C             => 'content',
+        L             => 'content',
+        B             => 'content',
+        I             => 'content',
+        E             => 'content',
+        F             => 'content',
+        S             => 'content',
+        X             => 'content',
+        join          => 'content',
     };
 }
 
@@ -82,10 +85,15 @@ sub _handle_text {
         my $el_args = {
             text         => $_[1],
             element_name => $el_name,
-            content      => $_[0]->section->{content},
         };
-        $_[0]->section->{content} =
-          $_[0]->_parse_text( 'content', $el_args );
+	if ($_[0]->split_content) {
+            $el_args->{content} = delete $el_args->{text};
+            push @{$_[0]->section->{content}}, $el_args;
+	} else {
+	    $el_args->{content} = $_[0]->section->{content};
+       	    $_[0]->section->{content} =
+                $_[0]->_parse_text( 'content', $el_args );
+	}
     }
     elsif ($pel =~ m!title!) {
         $_[0]->section->{title} = $_[1];
@@ -131,7 +139,7 @@ Pod::Simpler::Aoh - Parse pod into an array of hashes.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -151,6 +159,28 @@ Parse POD into an array of hashes
             identifier => 'head1',
             title => NAME,
             content => 'Some::Module - Mehhhh?',
+        },
+        ......
+
+    ]
+
+    ...
+
+    my $pod_parser = Pod::Simpler::Aoh->new( split_content => 1 );
+    my $pod = $pod_parser->parse_file( 'perl.pod' );
+
+    @pod_aoh = $parser->aoh;
+
+    ...
+
+    [
+        {
+            identifier => 'head1',
+            title => NAME,
+            content => [ {
+               content => 'Some::Module - Mehhhh?',
+               element_name => 'Para'
+            } ]
         },
         ......
 

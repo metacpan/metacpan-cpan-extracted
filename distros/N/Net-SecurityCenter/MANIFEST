@@ -48,7 +48,9 @@ t/mock/rest-pluginFamily-1000030-get.json
 t/mock/rest-pluginFamily-2-plugins-get.json
 t/mock/rest-pluginFamily-get.json
 t/mock/rest-policy-1-get.json
+t/mock/rest-policy-delete.json
 t/mock/rest-policy-get.json
+t/mock/rest-policy-post.json
 t/mock/rest-report-1-get.json
 t/mock/rest-report-get.json
 t/mock/rest-repository-37-get.json
@@ -60,6 +62,7 @@ t/mock/rest-scanner-5-get.json
 t/mock/rest-scanner-5-health-get.json
 t/mock/rest-scanner-get.json
 t/mock/rest-scanResult-11-get.json
+t/mock/rest-scanResult-86-delete.json
 t/mock/rest-scanResult-86-pause-post.json
 t/mock/rest-scanResult-86-resume-post.json
 t/mock/rest-scanResult-86-stop-post.json

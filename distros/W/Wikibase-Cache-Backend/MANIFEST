@@ -1,5 +1,6 @@
 Backend.pm
 Changes
+examples/simple_cache_backend.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -19,5 +20,8 @@ README
 SIGNATURE
 t/Wikibase-Cache-Backend/01-use.t
 t/Wikibase-Cache-Backend/02-version.t
+t/Wikibase-Cache-Backend/03-new.t
+t/Wikibase-Cache-Backend/04-get.t
+t/Wikibase-Cache-Backend/05-save.t
 xt/Wikibase-Cache-Backend/01-pod_coverage.t
 xt/Wikibase-Cache-Backend/02-pod.t

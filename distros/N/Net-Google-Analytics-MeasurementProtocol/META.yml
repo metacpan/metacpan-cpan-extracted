@@ -1,5 +1,5 @@
 ---
-abstract: 'send Google Analytics user interaction data from Perl'
+abstract: 'send Google Analytics (GA4) user interaction data from Perl'
 author:
   - 'Breno G. de Oliveira <garu@cpan.org>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,12 @@ no_index:
 requires:
   Carp: '0'
   Furl: '0'
+  JSON: '0'
   Test::More: '0.88'
-  perl: '5.006'
+  perl: '5.020'
 resources:
   bugtracker: http://github.com/garu/Net-Google-Analytics-MeasurementProtocol/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/garu/Net-Google-Analytics-MeasurementProtocol
-version: 0.05
+version: 4.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

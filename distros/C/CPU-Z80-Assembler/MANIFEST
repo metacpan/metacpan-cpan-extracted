@@ -1,7 +1,7 @@
+.github/workflows/perltest.yml
 ARTISTIC.txt
 bin/z80masm
 CHANGES
-GPL2.txt
 lib/CPU/Z80/Assembler.pm
 lib/CPU/Z80/Assembler/Expr.pm
 lib/CPU/Z80/Assembler/JumpOpcode.pm
@@ -31,6 +31,7 @@ t/Expr-bytes.t
 t/Expr-evaluate.t
 t/Expr-parse.t
 t/hash-comments_.t
+t/issue_1.t
 t/JumpOpcode.t
 t/labels_.t
 t/Lexer-comments.t

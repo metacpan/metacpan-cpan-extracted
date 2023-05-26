@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::FormatCondition;
 
 require 5.6.0;
@@ -36,7 +35,6 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::AboveAverage;
 use AsposeCellsCloud::Object::ColorScale;
 use AsposeCellsCloud::Object::DataBar;
@@ -44,7 +42,8 @@ use AsposeCellsCloud::Object::IconSet;
 use AsposeCellsCloud::Object::Link;
 use AsposeCellsCloud::Object::LinkElement;
 use AsposeCellsCloud::Object::Style;
-use AsposeCellsCloud::Object::Top10;
+use AsposeCellsCloud::Object::Top10; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -60,12 +59,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -106,7 +105,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -114,7 +113,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -126,154 +125,154 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'FormatCondition',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'above_average' => {
-    	datatype => 'AboveAverage',
-    	base_name => 'AboveAverage',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'formula2' => {
-    	datatype => 'string',
-    	base_name => 'Formula2',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'style' => {
-    	datatype => 'Style',
-    	base_name => 'Style',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'formula1' => {
-    	datatype => 'string',
-    	base_name => 'Formula1',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'color_scale' => {
-    	datatype => 'ColorScale',
-    	base_name => 'ColorScale',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'data_bar' => {
-    	datatype => 'DataBar',
-    	base_name => 'DataBar',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text' => {
-    	datatype => 'string',
-    	base_name => 'Text',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'stop_if_true' => {
-    	datatype => 'boolean',
-    	base_name => 'StopIfTrue',
-    	description => 'True, no rules with lower priority may be applied over this rule, when this     rule evaluates to true.  Only applies for Excel 2007;',
-    	format => '',
-    	read_only => '',
-    		},
-    'priority' => {
-    	datatype => 'int',
-    	base_name => 'Priority',
-    	description => 'The priority of this conditional formatting rule. This value is used to determine     which format should be evaluated and rendered. Lower numeric values are higher     priority than higher numeric values, where &#39;1&#39; is the highest priority.',
-    	format => '',
-    	read_only => '',
-    		},
-    'top10' => {
-    	datatype => 'Top10',
-    	base_name => 'Top10',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'operator' => {
-    	datatype => 'string',
-    	base_name => 'Operator',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'icon_set' => {
-    	datatype => 'IconSet',
-    	base_name => 'IconSet',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => 'Gets and sets whether the conditional format Type.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'time_period' => {
-    	datatype => 'string',
-    	base_name => 'TimePeriod',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'priority' => {
+     	datatype => 'int',
+     	base_name => 'Priority',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'stop_if_true' => {
+     	datatype => 'boolean',
+     	base_name => 'StopIfTrue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'above_average' => {
+     	datatype => 'AboveAverage',
+     	base_name => 'AboveAverage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color_scale' => {
+     	datatype => 'ColorScale',
+     	base_name => 'ColorScale',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_bar' => {
+     	datatype => 'DataBar',
+     	base_name => 'DataBar',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'formula1' => {
+     	datatype => 'string',
+     	base_name => 'Formula1',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'formula2' => {
+     	datatype => 'string',
+     	base_name => 'Formula2',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'icon_set' => {
+     	datatype => 'IconSet',
+     	base_name => 'IconSet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'operator' => {
+     	datatype => 'string',
+     	base_name => 'Operator',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'style' => {
+     	datatype => 'Style',
+     	base_name => 'Style',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text' => {
+     	datatype => 'string',
+     	base_name => 'Text',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'time_period' => {
+     	datatype => 'string',
+     	base_name => 'TimePeriod',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'top10' => {
+     	datatype => 'Top10',
+     	base_name => 'Top10',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
+    'priority' => 'int',
+    'type' => 'string',
+    'stop_if_true' => 'boolean',
     'above_average' => 'AboveAverage',
-    'formula2' => 'string',
-    'style' => 'Style',
-    'formula1' => 'string',
     'color_scale' => 'ColorScale',
     'data_bar' => 'DataBar',
-    'text' => 'string',
-    'stop_if_true' => 'boolean',
-    'priority' => 'int',
-    'top10' => 'Top10',
-    'operator' => 'string',
+    'formula1' => 'string',
+    'formula2' => 'string',
     'icon_set' => 'IconSet',
-    'type' => 'string',
-    'time_period' => 'string'
+    'operator' => 'string',
+    'style' => 'Style',
+    'text' => 'string',
+    'time_period' => 'string',
+    'top10' => 'Top10',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
+    'priority' => 'Priority',
+    'type' => 'Type',
+    'stop_if_true' => 'StopIfTrue',
     'above_average' => 'AboveAverage',
-    'formula2' => 'Formula2',
-    'style' => 'Style',
-    'formula1' => 'Formula1',
     'color_scale' => 'ColorScale',
     'data_bar' => 'DataBar',
-    'text' => 'Text',
-    'stop_if_true' => 'StopIfTrue',
-    'priority' => 'Priority',
-    'top10' => 'Top10',
-    'operator' => 'Operator',
+    'formula1' => 'Formula1',
+    'formula2' => 'Formula2',
     'icon_set' => 'IconSet',
-    'type' => 'Type',
-    'time_period' => 'TimePeriod'
+    'operator' => 'Operator',
+    'style' => 'Style',
+    'text' => 'Text',
+    'time_period' => 'TimePeriod',
+    'top10' => 'Top10',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

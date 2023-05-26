@@ -304,8 +304,8 @@ sub Diagnoze {
 			$self->PrintLine;
 			my %h = (	
 				BaseContext => $xml->BaseContext,
-				WeakDeliminators => $xml->WeakDeliminator,
-				AdditionalDeliminators => $xml->AdditionalDeliminator,
+				WeakDeliminators => $xml->WeakDeliminators,
+				AdditionalDeliminators => $xml->AdditionalDeliminators,
 				KeywordsCase => $xml->KeywordsCase,
 			);
 			$self->PrintHash(\%h);

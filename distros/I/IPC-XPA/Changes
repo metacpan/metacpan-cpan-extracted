@@ -1,5 +1,23 @@
 Revision history for IPC-XPA
 
+0.16      2023-05-21 14:22:35-04:00 America/New_York
+
+   * No changes to 0.15
+
+
+0.15      2023-05-19 17:32:10-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+   * forgot to add Alien::XPA to prereqs.configure.requires RT#134844 ++SREZIC
+
+0.14      2023-05-19 17:23:29-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+   * freshen build infrastructure
+   * reorganizer documentation
+
 0.13      2020-11-01 19:07:01-05:00 America/New_York
 
   [BUILD]

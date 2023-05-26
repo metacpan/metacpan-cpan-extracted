@@ -22,6 +22,8 @@ Boggs
 Gene
 MIDI
 Util
+cfg
 gene
 lib
 ppqn
+soundfont

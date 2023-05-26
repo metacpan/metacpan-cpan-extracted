@@ -1,14 +1,12 @@
 package Hash::Util::Merge;
 
-use v5.10.1;
-
-use strict;
+use v5.14;
 use warnings;
 
-use Exporter ();
+use Exporter 5.57 ();
 use Sub::Util 1.40 qw( set_prototype );
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.2.0';
 
 # ABSTRACT: utility functions for merging hashes
 
@@ -70,7 +68,7 @@ Hash::Util::Merge - utility functions for merging hashes
 
 =head1 VERSION
 
-version v0.1.2
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -102,6 +100,16 @@ in the resulting hash reference.
 
 If a key does not exist in either of the hashes, then it will return
 C<undef>.
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.2.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.1.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 =head1 KNOWN ISSUES
 
@@ -143,7 +151,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -39,9 +39,10 @@
             "Integer::Partition" : "0",
             "List::Util" : "1.33",
             "Math::Sequence::DeBruijn" : "0",
+            "Module::Load::Conditional" : "0",
             "Moo" : "2",
             "Music::AtonalUtil" : "0",
-            "OEIS" : "0",
+            "if" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
@@ -68,7 +69,7 @@
          "web" : "https://github.com/ology/Music-CreatingRhythms"
       }
    },
-   "version" : "0.0700",
+   "version" : "0.0802",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -301,7 +302,6 @@
                      "Bruijn",
                      "Christoffel",
                      "Hollos",
-                     "OEIS",
                      "cfcv",
                      "cfsqrt",
                      "chsequl",

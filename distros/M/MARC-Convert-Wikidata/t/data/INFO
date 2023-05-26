@@ -1,0 +1,27 @@
+INFO
+====
+cnb000036403.mrc - Edition number (250 field).
+cnb000040543.mrc - Multiple people roles (700 field).
+cnb000087983.mrc - Translator (700 field).
+cnb000103538.mrc - Multiple publishers (710 field).
+cnb000121825.mrc - Date of birth (100 field).
+cnb000403605.mrc - Multiple publishers (260 field). Series (490 field).
+cnb000573607.mrc
+cnb000576456.mrc
+cnb000641953.mrc - Special format of series ordinal (490 field).
+cnb000750997.mrc
+cnb000754547.mrc
+cnb001002340.mrc - Bad ISBN.
+cnb001042253.mrc - Publication date in format [19--].
+cnb001657758.mrc - Two series (490 field).
+cnb002181872.mrc - Editor (100 field).
+cnb002276974.mrc - Two ISBNs in the same publishing place.
+cnb002341867.mrc - Four ISBNs in two publishing houses with two book covers.
+cnb002467522.mrc - Publisher (264 field). Illustrator (700 field).
+cnb002536669.mrc - Two publishers, two places (264 field). Two ISBNs (020 field). Book series.
+cnb002896853.mrc - Different ČČNB (015 field, z subfield)
+cnb002964680.mrc - Two ISBNs. Book series.
+cnb002981333.mrc - Has OCoLC (035 field).
+cnb003059138.mrc - Has 2x OCoLC (035 field).
+cnb003238343.mrc - Date of birth before Krist (100 field).
+cnb003369415.mrc - Has weird format of number of pages (300 field).

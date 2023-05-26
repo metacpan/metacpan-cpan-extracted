@@ -4,9 +4,40 @@ use strict;
 use warnings;
 use XML::TokeParser;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
-my $regchars = "\\^.\$|()[]{}*+?~!%^&/";
+# my $regchars = "\\^.\$|()[]{}*+?~!%^&/";
+
+my %deliminators = (
+	'.' => 1,
+	'(' => 1,
+	')' => 1,
+	':' => 1,
+	'!' => 1,
+	'+' => 1,
+	',' => 1,
+	'-' => 1,
+	'<' => 1,
+	'=' => 1,
+	'>' => 1,
+	'%' => 1,
+	'&' => 1,
+	'*' => 1,
+	'/' => 1,
+	';' => 1,
+	'?' => 1,
+	'[' => 1,
+	']' => 1,
+	'^' => 1,
+	'{' => 1,
+	'|' => 1,
+	'}' => 1,
+	'~' => 1,
+	' ' => 1,
+	"\\" => 1,
+	"\t" => 1,
+);
+my %wordwrapdeliminators = %deliminators;
 
 sub new {
 	my $proto = shift;
@@ -19,8 +50,10 @@ sub new {
 		COMMENT => {},
 		BASECONTEXT => '',
 		CONTEXTDATA => {},
+		DELIMINATORS => \%deliminators,
 		ADDDELIMINATORS => '',
 		WEAKDELIMINATORS => '',
+		WORDWRAPDELIMINATORS => \%wordwrapdeliminators,
 		FILENAME => $file,
 		KEYWORDSCASE => 'undef',
 		LANGUAGE => {},
@@ -54,18 +87,18 @@ sub Booleanize {
 	return $d;
 }
 
-sub Clear {
-	my $self = shift;
-	$self->{BASECONTEXT} = '';
-	$self->{CONTEXTDATA} = {};
-	$self->{ADDDELIMINATORS} = '';
-	$self->{WEAKDELIMINATORS} = '';
-	$self->{FILENAME} = '';
-	$self->{ITEMDATA} = {};
-	$self->{KEYWORDSCASE} = 1;
-	$self->{LANGUAGE} = {};
-	$self->{LISTS} = {};
-}
+# sub Clear {
+# 	my $self = shift;
+# 	$self->{BASECONTEXT} = '';
+# 	$self->{CONTEXTDATA} = {};
+# 	$self->{ADDDELIMINATORS} = '';
+# 	$self->{WEAKDELIMINATORS} = '';
+# 	$self->{FILENAME} = '';
+# 	$self->{ITEMDATA} = {};
+# 	$self->{KEYWORDSCASE} = 1;
+# 	$self->{LANGUAGE} = {};
+# 	$self->{LISTS} = {};
+# }
 
 sub Comment {
 	my $self = shift;
@@ -79,16 +112,28 @@ sub ContextData {
 	return $self->{CONTEXTDATA};
 }
 
-sub AdditionalDeliminator {
+sub Deliminators {
+	my $self = shift;
+	if (@_) { $self->{DELIMINATORS} = shift }
+	return $self->{DELIMINATORS}
+}
+
+sub AdditionalDeliminators {
 	my $self = shift;
 	if (@_) { $self->{ADDDELIMINATORS} = shift }
 	return $self->{ADDDELIMINATORS}
 }
 
-sub WeakDeliminator {
+sub WeakDeliminators {
 	my $self = shift;
 	if (@_) { $self->{WEAKDELIMINATORS} = shift }
 	return $self->{WEAKDELIMINATORS}
+}
+
+sub WordWrapDeliminators {
+	my $self = shift;
+	if (@_) { $self->{WORDWRAPDELIMINATORS} = shift }
+	return $self->{WORDWRAPDELIMINATORS}
 }
 
 sub FileName {
@@ -134,6 +179,24 @@ sub Lists {
 	return $self->{LISTS}
 }
 
+sub MergeAdditionalDeliminators {
+	my ($self, $delim, $additional) = @_;
+	my @a = split(//, $additional);
+	for (@a) {
+		$delim->{$_} = 1
+	}
+	return $delim
+}
+
+sub MergeWeakDeliminators {
+	my ($self, $delim, $weak) = @_;
+	my @w = split(//, $weak);
+	for (@w) {
+		delete $delim->{$_}
+	}
+	return $delim
+}
+
 sub Setup {}
 
 sub Syntax {
@@ -168,19 +231,31 @@ sub XMLGetContext {
 
 sub XMLGetKeywordSettings {
 	my ($self, $token, $parser) = @_;
+
 	my $case = delete $token->[2]->{'casesensitive'};
 	if (defined($case)) {
 		$case = $self->Booleanize($case);
-		unless (defined $case) { $case = 1 }
+		$case = 1 unless defined $case;
 		$self->KeywordsCase($case);
 	}
+
 	my $wdelim = delete $token->[2]->{'weakDeliminator'};
-	if (defined($wdelim)) {
-		$self->WeakDeliminator($wdelim)
+	if (defined $wdelim) {
+		$self->WeakDeliminators($wdelim);
+		$self->MergeWeakDeliminators($self->Deliminators, $wdelim);
 	}
+
 	my $adelim = delete $token->[2]->{'additionalDeliminator'};
-	if (defined($adelim)) {
-		$self->AdditionalDeliminator($wdelim)
+	if (defined $adelim) {
+		$self->AdditionalDeliminators($adelim);
+		$self->MergeAdditionalDeliminators($self->Deliminators, $adelim);
+	}
+
+	my $wrapdelim = delete $token->[2]->{'wordWrapDeliminator '};
+	if (defined $wrapdelim) {
+		my %wdelim = ();
+		$self->MergeAdditionalDeliminators(\%wdelim, $wrapdelim); 
+		$self->WordWrapDeliminators(\%wdelim) ;
 	}
 }
 
@@ -245,7 +320,7 @@ sub XMLLoad {
 		warn "cannot open $file";
 		return
 	};
-	$self->Clear;
+# 	$self->Clear;
 	my $parser = new XML::TokeParser(\*KATE, Noempty => 1);
 	while (my $token = $parser->get_token) {
 		if ($token->[0] eq 'S') {

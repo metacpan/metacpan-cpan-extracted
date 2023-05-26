@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Cells;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,82 +119,82 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Cells',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'rows' => {
-    	datatype => 'LinkElement',
-    	base_name => 'Rows',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cell_count' => {
-    	datatype => 'int',
-    	base_name => 'CellCount',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'max_row' => {
-    	datatype => 'int',
-    	base_name => 'MaxRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cell_list' => {
-    	datatype => 'ARRAY[LinkElement]',
-    	base_name => 'CellList',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'max_column' => {
-    	datatype => 'int',
-    	base_name => 'MaxColumn',
-    	description => 'Maximum column index of cell which contains data.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'columns' => {
-    	datatype => 'LinkElement',
-    	base_name => 'Columns',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'max_row' => {
+     	datatype => 'int',
+     	base_name => 'MaxRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'max_column' => {
+     	datatype => 'int',
+     	base_name => 'MaxColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cell_count' => {
+     	datatype => 'int',
+     	base_name => 'CellCount',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'rows' => {
+     	datatype => 'LinkElement',
+     	base_name => 'Rows',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'columns' => {
+     	datatype => 'LinkElement',
+     	base_name => 'Columns',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cell_list' => {
+     	datatype => 'ARRAY[LinkElement]',
+     	base_name => 'CellList',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
-    'rows' => 'LinkElement',
-    'cell_count' => 'int',
     'max_row' => 'int',
-    'cell_list' => 'ARRAY[LinkElement]',
     'max_column' => 'int',
-    'columns' => 'LinkElement'
+    'cell_count' => 'int',
+    'rows' => 'LinkElement',
+    'columns' => 'LinkElement',
+    'cell_list' => 'ARRAY[LinkElement]',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
-    'rows' => 'Rows',
-    'cell_count' => 'CellCount',
     'max_row' => 'MaxRow',
-    'cell_list' => 'CellList',
     'max_column' => 'MaxColumn',
-    'columns' => 'Columns'
+    'cell_count' => 'CellCount',
+    'rows' => 'Rows',
+    'columns' => 'Columns',
+    'cell_list' => 'CellList',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

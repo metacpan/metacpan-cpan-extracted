@@ -26,7 +26,7 @@ Mojolicious::Plugin::Prometheus - Mojolicious Plugin
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::Prometheus](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that exports Prometheus metrics from Mojolicious.
+[Mojolicious::Plugin::Prometheus](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3APrometheus) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that exports Prometheus metrics from Mojolicious.
 
 Hooks are also installed to measure requests response time and count requests based on method and HTTP return code.
 
@@ -34,13 +34,13 @@ Hooks are also installed to measure requests response time and count requests ba
 
 ## prometheus
 
-Create further instrumentation into your application by using this helper which gives access to the [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) object.
-See [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) for usage.
+Create further instrumentation into your application by using this helper which gives access to the [Net::Prometheus](https://metacpan.org/pod/Net%3A%3APrometheus) object.
+See [Net::Prometheus](https://metacpan.org/pod/Net%3A%3APrometheus) for usage.
 
 # METHODS
 
-[Mojolicious::Plugin::Prometheus](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::Prometheus](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3APrometheus) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -52,7 +52,7 @@ Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) applicati
 
 - route
 
-    [Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route) object to attach the metrics to, defaults to generating a new one for '/'.
+    [Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious%3A%3ARoutes%3A%3ARoute) object to attach the metrics to, defaults to generating a new one for '/'.
 
     Default: /
 
@@ -64,7 +64,7 @@ Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) applicati
 
 - prometheus
 
-    Override the [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) object. The default is a new singleton instance of [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus).
+    Override the [Net::Prometheus](https://metacpan.org/pod/Net%3A%3APrometheus) object. The default is a new singleton instance of [Net::Prometheus](https://metacpan.org/pod/Net%3A%3APrometheus).
 
 - namespace, subsystem
 
@@ -94,7 +94,7 @@ Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) applicati
 
 # METRICS
 
-In addition to exposing the default process metrics that [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) already expose
+In addition to exposing the default process metrics that [Net::Prometheus](https://metacpan.org/pod/Net%3A%3APrometheus) already expose
 this plugin will also expose
 
 - `http_requests_total`, request counter partitioned over HTTP method and HTTP response code
@@ -106,7 +106,7 @@ this plugin will also expose
 
 Vidar Tyldum
 
-(the IPC::ShareLite parts of this code is shamelessly stolen from [Mojolicious::Plugin::Status](https://metacpan.org/pod/Mojolicious::Plugin::Status) written by Sebastian Riedel and mangled into something that works for me)
+(the IPC::ShareLite parts of this code is shamelessly stolen from [Mojolicious::Plugin::Status](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AStatus) written by Sebastian Riedel and mangled into something that works for me)
 
 # COPYRIGHT AND LICENSE
 
@@ -117,8 +117,8 @@ the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
-- [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus)
-- [Mojolicious::Plugin::Status](https://metacpan.org/pod/Mojolicious::Plugin::Status)
+- [Net::Prometheus](https://metacpan.org/pod/Net%3A%3APrometheus)
+- [Mojolicious::Plugin::Status](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AStatus)
 - [Mojolicious](https://metacpan.org/pod/Mojolicious)
-- [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides)
+- [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides)
 - [http://mojolicious.org](http://mojolicious.org)

@@ -2,7 +2,7 @@ NAME
     Date::ICal - Perl extension for ICalendar date objects.
 
 VERSION
-    $Revision: 680 $
+    $Revision: 682 $
 
 SYNOPSIS
         use Date::ICal;
@@ -353,6 +353,14 @@ AUTHOR
     And the rest of the Reefknot team. See the source for a full list of
     patch contributors and version-by-version notes.
 
+LICENSE AND COPYRIGHT
+    © 2001-2022 Rich Bowen
+
+    © 2022-2023 Michal Josef Špaček
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
 SEE ALSO
     datetime@perl.org mailing list
 
@@ -367,7 +375,7 @@ NAME
     Date::ICal::Duration - durations in iCalendar format, for math purposes.
 
 VERSION
-    $Revision: 1.61 $
+    $Revision: 682 $
 
 SYNOPSIS
         use Date::ICal::Duration;
@@ -507,4 +515,12 @@ INTERNALS
     Return an arrayref to weeks and day components, or undef if ndays is
     undefined. If Given an arrayref, computs the new ndays value for the
     duration.
+
+LICENSE AND COPYRIGHT
+    © 2001-2022 Rich Bowen
+
+    © 2022-2023 Michal Josef Špaček
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

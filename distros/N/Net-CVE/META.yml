@@ -1,0 +1,37 @@
+--- 
+abstract: Fetch CVE information from cve.org
+author: 
+  - H.Merijn Brand <hmbrand@cpan.org>
+build_requires: 
+  perl: '5.014002'
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150010
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-CVE
+provides: 
+  Net::CVE: 
+    file: lib/Net/CVE.pm
+    version: '0.003'
+recommends: 
+  Data::Peek: '0.52'
+  HTTP::Tiny: '0.082'
+  Test::More: '1.302195'
+requires: 
+  Carp: 0
+  HTTP::Tiny: '0.009'
+  JSON::MaybeXS: '1.004005'
+  List::Util: 0
+  Test::More: '0.90'
+  Test::Warnings: 0
+  perl: '5.014002'
+resources: 
+  IRC: irc://irc.perl.org/#metacpan
+  bugtracker: https://github.com/Tux/Net-CVE/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Tux/Net-CVE
+version: '0.003'

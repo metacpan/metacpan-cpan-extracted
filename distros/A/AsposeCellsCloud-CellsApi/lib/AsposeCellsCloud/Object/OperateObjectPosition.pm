@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::OperateObjectPosition;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::FileSource; 
 
-use AsposeCellsCloud::Object::FileSource;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,73 +118,73 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'OperateObjectPosition',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'chart_index' => {
-    	datatype => 'int',
-    	base_name => 'ChartIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'list_object_index' => {
-    	datatype => 'int',
-    	base_name => 'ListObjectIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'sheet_name' => {
-    	datatype => 'string',
-    	base_name => 'SheetName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'shape_index' => {
-    	datatype => 'int',
-    	base_name => 'ShapeIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cell_name' => {
-    	datatype => 'string',
-    	base_name => 'CellName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'workbook' => {
-    	datatype => 'FileSource',
-    	base_name => 'Workbook',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'workbook' => {
+     	datatype => 'FileSource',
+     	base_name => 'Workbook',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sheet_name' => {
+     	datatype => 'string',
+     	base_name => 'SheetName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'chart_index' => {
+     	datatype => 'int',
+     	base_name => 'ChartIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'shape_index' => {
+     	datatype => 'int',
+     	base_name => 'ShapeIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cell_name' => {
+     	datatype => 'string',
+     	base_name => 'CellName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'list_object_index' => {
+     	datatype => 'int',
+     	base_name => 'ListObjectIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'chart_index' => 'int',
-    'list_object_index' => 'int',
+    'workbook' => 'FileSource',
     'sheet_name' => 'string',
+    'chart_index' => 'int',
     'shape_index' => 'int',
     'cell_name' => 'string',
-    'workbook' => 'FileSource'
+    'list_object_index' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'chart_index' => 'ChartIndex',
-    'list_object_index' => 'ListObjectIndex',
+    'workbook' => 'Workbook',
     'sheet_name' => 'SheetName',
+    'chart_index' => 'ChartIndex',
     'shape_index' => 'ShapeIndex',
     'cell_name' => 'CellName',
-    'workbook' => 'Workbook'
+    'list_object_index' => 'ListObjectIndex' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

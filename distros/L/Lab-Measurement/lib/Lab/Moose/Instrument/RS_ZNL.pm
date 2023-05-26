@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZNL;
-$Lab::Moose::Instrument::RS_ZNL::VERSION = '3.860';
+$Lab::Moose::Instrument::RS_ZNL::VERSION = '3.872';
 #ABSTRACT: Rohde & Schwarz ZNL Vector Network Analyzer
 
 use v5.20;
@@ -42,7 +42,7 @@ Lab::Moose::Instrument::RS_ZNL - Rohde & Schwarz ZNL Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 SYNOPSIS
 

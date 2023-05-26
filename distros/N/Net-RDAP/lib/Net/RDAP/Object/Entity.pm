@@ -19,7 +19,7 @@ access to all that module's methods.
 
 Other methods include:
 
-	@roles = $object->roles;
+    @roles = $object->roles;
 
 Returns a (potentially empty) array listing this entity's roles.
 The possible values is defined by an IANA registry, see:
@@ -36,7 +36,7 @@ sub roles { $_[0]->{'roles'} ? @{$_[0]->{'roles'}} : () }
 
 =pod
 
-	$vcard = $entity->vcard;
+    $vcard = $entity->vcard;
 
 Returns a L<vCard> object for the entity. Support for all the miriad options in vCard files is ongoing, at the moment,
 only the `fn`, `org`, `email`, `tel` and `adr` node types are supported.
@@ -44,45 +44,45 @@ only the `fn`, `org`, `email`, `tel` and `adr` node types are supported.
 =cut
 
 sub vcard {
-	my $self = shift;
+    my $self = shift;
 
-	return undef unless ($self->{'vcardArray'});
+    return undef unless ($self->{'vcardArray'});
 
-	my $card = vCard->new;
+    my $card = vCard->new;
 
-	my @nodes = @{$self->{'vcardArray'}->[1]};
+    my @nodes = @{$self->{'vcardArray'}->[1]};
 
-	my @emails;
-	my @phones;
-	my @addresses;
+    my @emails;
+    my @phones;
+    my @addresses;
 
-	foreach my $nref (@nodes) {
-		my ($type, $params, $vtype, $value) = @{$nref};
+    foreach my $nref (@nodes) {
+        my ($type, $params, $vtype, $value) = @{$nref};
 
-		#
-		# vCard is a very loosely defined format, so supporting anything
-		# beyond the most basic properties will require a lot of work.
-		# This is the bare minimum for now.
-		#
-		if 	('fn' 		eq $type)	{ $card->full_name($value)							}
-		elsif	('org'		eq $type)	{ $card->organization($value)							}
-		elsif	('email'	eq $type)	{ push(@emails, $value)								}
-		elsif	('tel'		eq $type)	{ push(@phones, { 'type' => $params->{'type'}, 'number' => $value } )		}
-		elsif	('adr'		eq $type)	{ push(@addresses, { 'type' => $params->{'type'}, 'address' => $value } )	}
-	}
+        #
+        # vCard is a very loosely defined format, so supporting anything
+        # beyond the most basic properties will require a lot of work.
+        # This is the bare minimum for now.
+        #
+        if      ('fn'       eq $type)    { $card->full_name($value)                                                 }
+        elsif   ('org'      eq $type)    { $card->organization($value)                                              }
+        elsif   ('email'    eq $type)    { push(@emails, $value)                                                    }
+        elsif   ('tel'      eq $type)    { push(@phones, { 'type' => $params->{'type'}, 'number' => $value } )      }
+        elsif   ('adr'      eq $type)    { push(@addresses, { 'type' => $params->{'type'}, 'address' => $value } )  }
+    }
 
-	$card->email_addresses([ map { { 'address' => $_ } } @emails ]);
-	$card->phones(\@phones);
-	$card->addresses(\@addresses);
+    $card->email_addresses([ map { { 'address' => $_ } } @emails ]);
+    $card->phones(\@phones);
+    $card->addresses(\@addresses);
 
-	return $card;
+    return $card;
 }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

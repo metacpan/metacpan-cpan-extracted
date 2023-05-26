@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I../lib/ -Ilib
+#!/usr/bin/perl -I../lib/ -Ilib -I/home/phil/perl/cpan/ZeroEmulator/lib/
 #-------------------------------------------------------------------------------
 # Zero assembler language implemention of a generic N-Way tree.
 # Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2023
@@ -6,14 +6,14 @@
 # Key compression in each node by eliminating any common prefix present in each key in each node especially useful if we were to add attributes like userid, process, string position, rwx etc to front of each key.  Data does does not need this additional information.
 use v5.30;
 package Zero::NWayTree;
-our $VERSION = 20230515;                                                        # Version
+our $VERSION = 20230519;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use Zero::Emulator qw(:all);
-eval "use Test::More tests=>31" unless caller;
+eval "use Test::More tests=>97" unless caller;
 
 makeDieConfess;
 
@@ -245,6 +245,7 @@ my sub Node_allocDown($%)                                                       
   my $d = Array "Down";                                                         # Allocate down
   Mov [$node, $Node->address(q(down)), 'Node'], $d;                             # Down area
  }
+
 my sub Node_openLeaf($$$$)                                                      # Open a gap in a leaf node
  {my ($node, $offset, $K, $D) = @_;                                             # Node
 
@@ -453,7 +454,7 @@ my sub Node_SplitIfFull($%)                                                     
        {Node_allocDown $r;                                                      # Add down area on right
         Node_copy($r, $node, $R, $n);                                           # New right node
         ReUp($r) unless $options{test};                                         # Simplify test set up
-        my $N = Node_fieldDown $node; Resize $N, $R;
+        my $N = Node_fieldDown $node; Resize $N, $R, "Down";
        },
       Else
        {Node_copy_leaf($r, $node, $R, $n);                                      # New right leaf
@@ -470,8 +471,8 @@ my sub Node_SplitIfFull($%)                                                     
         my $pl1 = Add $pl, 1;
         Node_setLength($p, $pl1);
         Node_setDown  ($p, $pl1, $r);
-        my $K = Node_fieldKeys $node; Resize $K, $n;
-        my $D = Node_fieldData $node; Resize $D, $n;
+        my $K = Node_fieldKeys $node; Resize $K, $n, "Keys";
+        my $D = Node_fieldData $node; Resize $D, $n, "Data";
         Jmp $good;
        },
       Else                                                                      # Splitting elsewhere in the node
@@ -479,8 +480,8 @@ my sub Node_SplitIfFull($%)                                                     
         my $pk = Node_keys($node, $n);
         my $pd = Node_data($node, $n);
         Node_open($p, $i, $pk, $pd, $r);
-        my $K = Node_fieldKeys $node; Resize $K, $n;
-        my $D = Node_fieldData $node; Resize $D, $n;
+        my $K = Node_fieldKeys $node; Resize $K, $n, "Keys";
+        my $D = Node_fieldData $node; Resize $D, $n, "Data";
         Jmp $good;
        };
      };
@@ -515,9 +516,9 @@ my sub Node_SplitIfFull($%)                                                     
     Node_setLength($node, 1);
 
     if (1)                                                                      # Resize split root node
-     {my $K = Node_fieldKeys $node; Resize $K, 1;
-      my $D = Node_fieldData $node; Resize $D, 1;
-      my $N = Node_fieldDown $node; Resize $N, 2;
+     {my $K = Node_fieldKeys $node; Resize $K, 1,  "Keys";
+      my $D = Node_fieldData $node; Resize $D, 1,  "Data";
+      my $N = Node_fieldDown $node; Resize $N, 2,  "Down";
      }
 
     Jmp $good;
@@ -802,7 +803,7 @@ sub Iterate(&$)                                                                 
     &$block($f);
 
     GoUpAndAround($f);
-   } 1e99;
+   } 2**32-1;
   FindResult_free($f);
  }
 
@@ -810,31 +811,31 @@ sub Iterate(&$)                                                                 
 
 my sub printNode($$$$$)                                                         # Print the keys or data in a node in memory
  {my ($memory, $node, $indent, $out, $keyNotData) = @_;
-  ref($node) =~ m(Node) or confess "Not a node: ".dump($node);
+  #ref($node) =~ m(Node) or confess "Not a node: ".dump($node);
   my $k = $$node[$Node->offset(q(keys))];
   my $d = $$node[$Node->offset(q(data))];
   my $n = $$node[$Node->offset(q(down))];
 
   if ($n)                                                                       # Interior node
-   {my $K = $$memory{$k};
-    my $D = $$memory{$d};
-    my $N = $$memory{$n};
+   {my $K = $$memory[$k];
+    my $D = $$memory[$d];
+    my $N = $$memory[$n];
     my $l = $$node[$Node->offset(q(length))];
 
     for my $i(0..$l-1)
-     {my $c = $$memory{$$N[$i]};                                                # Child node
-      my $p = $$memory{$$c[$Node->offset(q(up))]};
+     {my $c = $$memory[$$N[$i]];                                                # Child node
+      my $p = $$memory[$$c[$Node->offset(q(up))]];
 
       __SUB__->($memory, $c, $indent+1, $out, $keyNotData);
       push @$out, [$indent, $keyNotData ? $$K[$i] : $$D[$i]];
      }
 
-    __SUB__->($memory,   $$memory{$$N[$l]}, $indent+1, $out, $keyNotData);
+    __SUB__->($memory,   $$memory[$$N[$l]], $indent+1, $out, $keyNotData);
    }
 
   else                                                                          # Leaf node
-   {my $K = $$memory{$k};
-    my $D = $$memory{$d};
+   {my $K = $$memory[$k];
+    my $D = $$memory[$d];
     my $l = $$node[$Node->offset(q(length))];
 
     for my $i(0..$l-1)
@@ -848,8 +849,8 @@ my sub printNode($$$$$)                                                         
 
 my sub printTree($$)                                                            # Print a tree
  {my ($m, $keyNotData) = @_;                                                    # Memory, key or data
-  my $t = $$m{1};
-  my $r = $$m{$$t[$Tree->offset(q(root))]};
+  my $t = $$m[1];
+  my $r = $$m[$$t[$Tree->offset(q(root))]];
   my $o = printNode($m, $r, 0, [], $keyNotData);
 
   my $C = $#$o;                                                                 # Number of columns
@@ -875,13 +876,13 @@ my sub printTree($$)                                                            
  }
 
 sub printTreeKeys($)                                                            # Print the keys held in a tree.
- {my ($m) = @_;                                                                 # Memory
-  printTree($m, 1);
+ {my ($e) = @_;                                                                 # Memory
+  printTree($e->memory->[1], 1);
  }
 
 sub printTreeData($)                                                            # Print the data held in a tree.
- {my ($m) = @_;                                                                 # Memory
-  printTree($m, 0);
+ {my ($e) = @_;                                                                 # Memory
+  printTree($e->memory->[1], 0);
  }
 
 #D1 Utilities                                                                   # Utility functions.
@@ -928,12 +929,14 @@ if (1)                                                                          
  {Start 1;
   Out New(3);
   my $e = Execute(suppressOutput=>1);
-  is_deeply $e->out, [1];
-  is_deeply $e->memory, { 1 => bless([0, 0, 3, 0], "Tree") };
+  is_deeply $e->out, <<END;
+1
+END
+  is_deeply $e->heap(1), [ 0, 0, 3, 0];
  }
 
 #latest:;
-if (1)                                                                          ##setRoot ##root ##incKeys
+if (1)                                                                          ##New
  {Start 1;
   my $t = New(3);
   my $r = root($t);
@@ -950,8 +953,11 @@ if (1)                                                                          
   Out nodes($t);
 
   my $e = Execute(suppressOutput=>1);
-  is_deeply $e->out,    [3, 5];
-  is_deeply $e->memory, { 1 => bless([3, 5, 3, 1], "Tree") };
+  is_deeply $e->out, <<END;
+3
+5
+END
+  is_deeply $e->heap(1), [ 3, 5, 3, 1];
  }
 
 #latest:;
@@ -960,11 +966,11 @@ if (1)                                                                          
   my $t = New(7);                                                               # Create tree
   my $n = Node_new($t);                                                         # Create node
   my $e = Execute(suppressOutput=>1);
-  is_deeply $e->memory, {
-  1 => bless([0, 1, 7, 0], "Tree"),
-  2 => bless([0, 1, 0, 1, 3, 4, 0], "Node"),
-  3 => bless([], "Keys"),
-  4 => bless([], "Data")};
+
+  is_deeply $e->heap(1), [0, 1, 7, 0];
+  is_deeply $e->heap(2), [0, 1, 0, 1, 3, 4, 0];
+  is_deeply $e->heap(3), [];
+  is_deeply $e->heap(4), [];
  }
 
 #latest:;
@@ -979,21 +985,20 @@ if (1)                                                                          
 
   for my $i(0..$N-1)
    {my $I = $i + 1;
-    Node_setKeys($n, $i,  10  *$I);
-    Node_setData($n, $i,  100 *$I);
-    Node_setDown($n, $i,  1000*$I);
+    Node_setKeys($n, $i,  10*$I);
+    Node_setData($n, $i,  10*$I);
+    Node_setDown($n, $i,  10*$i+5);
    }
 
-  Node_setDown($n, $N, 8000);
+  Node_setDown($n, $N, 75);
 
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1 => bless([0, 1, 7, 0], "Tree"),
-  2 => bless([7, 1, 0, 1, 3, 4, 5], "Node"),
-  3 => bless([  10,   20,   30,   40,   50,   60,   70],       "Keys"),
-  4 => bless([ 100,  200,  300,  400,  500,  600,  700],       "Data"),
-  5 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000], "Down")};
+  is_deeply $e->heap(1), bless([0, 1, 7, 0], "Tree");
+  is_deeply $e->heap(2), bless([7, 1, 0, 1, 3, 4, 5], "Node");
+  is_deeply $e->heap(3), bless([10, 20, 30, 40, 50, 60, 70], "Keys");
+  is_deeply $e->heap(4), bless([10, 20, 30, 40, 50, 60, 70], "Data");
+  is_deeply $e->heap(5), bless([5, 15, 25, 35, 45, 55, 65, 75], "Down");
  }
 
 #latest:;
@@ -1018,12 +1023,11 @@ if (1)                                                                          
   Node_open($n, 2, 26, 26, 26);
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1 => bless([0, 1, 7, 0], "Tree"),
-  2 => bless([8, 1, 0, 1, 3, 4, 5], "Node"),
-  3 => bless([  10, 20, 26, 30, 40, 50, 60, 70],   "Keys"),
-  4 => bless([  10, 20, 26, 30, 40, 50, 60, 70],   "Data"),
-  5 => bless([ 5, 15, 25, 26, 35, 45, 55, 65, 75], "Down")};
+  is_deeply $e->heap(1), bless([0, 1, 7, 0], "Tree");
+  is_deeply $e->heap(2), bless([8, 1, 0, 1, 3, 4, 5], "Node");
+  is_deeply $e->heap(3), bless([10, 20, 26, 30, 40, 50, 60, 70], "Keys");
+  is_deeply $e->heap(4), bless([10, 20, 26, 30, 40, 50, 60, 70], "Data");
+  is_deeply $e->heap(5), bless([5, 15, 25, 26, 35, 45, 55, 65, 75], "Down");
  }
 
 #latest:;
@@ -1051,217 +1055,15 @@ if (1)                                                                          
 
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1 => bless([0, 2, 7, 0], "Tree"),
-  2 => bless([7, 1, 0, 1, 3, 4, 5], "Node"),
-  3 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Keys"),
-  4 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Data"),
-  5 => bless([6, 1050, 2050, 3050, 4050, 5050, 6050, 7500], "Down"),
-  6 => bless([7, 2, 2, 1, 7, 8, 9], "Node"),
-  7 => bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Keys"),
-  8 => bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Data"),
-  9 => bless([2005, 2015, 2025, 2035, 2045, 2055, 2065, 2075], "Down")};
- }
-
-
-#latest:;
-if (1)                                                                          ##Node_SplitIfFull split at start non root
- {Start 1;
-  my $N = 7;
-  my $t = New($N);                                                              # Create tree
-  my $n = Node_new($t);                                                         # Create node
-          Node_allocDown $n;
-  my $o = Node_new($t);                                                         # Create node
-          Node_allocDown $o;
-
-  Node_setLength $_, $N for $n, $o;
-
-  for my $i(0..$N-1)
-   {my $I = $i + 1;
-    Node_setKeys($n, $i, 1000*$I);     Node_setKeys($o, $i, 2000+10*$I);
-    Node_setData($n, $i, 1000*$I);     Node_setData($o, $i, 2000+10*$I);
-    Node_setDown($n, $i, 1000*$i+50);  Node_setDown($o, $i, 2000+10*$i+5);
-   }
-
-
-  Node_setUp  ($o, $n);
-  Node_setDown($n, $N, 7500); Node_setDown($n, 0, 6);
-  Node_setDown($o, $N, 2075);
-
-  Node_SplitIfFull($o, test=>1);
-
-  my $e = Execute(suppressOutput=>1);
-
-  is_deeply $e->memory, {
-  1  => bless([0, 3, 7, 0], "Tree"),
-  2  => bless([8, 1, 0, 1, 3, 4, 5], "Node"),
-  3  => bless([2040, 1000, 2000, 3000, 4000, 5000, 6000, 7000], "Keys"),
-  4  => bless([2040, 1000, 2000, 3000, 4000, 5000, 6000, 7000], "Data"),
-  5  => bless([6, 10, 1050, 2050, 3050, 4050, 5050, 6050, 7500], "Down"),
-  6  => bless([3, 2, 2, 1, 7, 8, 9], "Node"),
-  7  => bless([2010, 2020, 2030], "Keys"),
-  8  => bless([2010, 2020, 2030], "Data"),
-  9  => bless([2005, 2015, 2025, 2035], "Down"),
-  10 => bless([3, 3, 2, 1, 11, 12, 13], "Node"),
-  11 => bless([2050, 2060, 2070], "Keys"),
-  12 => bless([2050, 2060, 2070], "Data"),
-  13 => bless([2045, 2055, 2065, 2075], "Down")};
- }
-
-#latest:;
-if (1)                                                                          # Set up for Node_SplitIfFull in middle non root
- {Start 1;
-  my $N = 7;
-  my $t = New($N);                                                              # Create tree
-  my $n = Node_new($t);                                                         # Create node
-          Node_allocDown $n;
-  my $o = Node_new($t);                                                         # Create node
-          Node_allocDown $o;
-
-  Node_setLength $_, $N for $n, $o;
-
-  for my $i(0..$N-1)
-   {my $I = $i + 1;
-    Node_setKeys($n, $i, 1000*$I);     Node_setKeys($o, $i, 2000+10*$I);
-    Node_setData($n, $i, 1000*$I);     Node_setData($o, $i, 2000+10*$I);
-    Node_setDown($n, $i, 1000*$i+50);  Node_setDown($o, $i, 2000+10*$i+5);
-   }
-
-  Node_setUp  ($o, $n);
-  Node_setDown($n, $N, 7500); Node_setDown($n, 2, 6);
-  Node_setDown($o, $N, 2075);
-
-  my $e = Execute(suppressOutput=>1);
-
-  is_deeply $e->memory, {
-  1 => bless([0, 2, 7, 0], "Tree"),
-  2 => bless([7, 1, 0, 1, 3, 4, 5], "Node"),
-  3 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Keys"),
-  4 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Data"),
-  5 => bless([50, 1050, 6, 3050, 4050, 5050, 6050, 7500], "Down"),
-  6 => bless([7, 2, 2, 1, 7, 8, 9], "Node"),
-  7 => bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Keys"),
-  8 => bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Data"),
-  9 => bless([2005, 2015, 2025, 2035, 2045, 2055, 2065, 2075], "Down")};
- }
-
-#latest:;
-if (1)                                                                          ##Node_SplitIfFull split in middle non root
- {Start 1;
-  my $N = 7;
-  my $t = New($N);                                                              # Create tree
-  my $n = Node_new($t);                                                         # Create node
-          Node_allocDown $n;
-  my $o = Node_new($t);                                                         # Create node
-          Node_allocDown $o;
-
-  Node_setLength $_, $N for $n, $o;
-
-  for my $i(0..$N-1)
-   {my $I = $i + 1;
-    Node_setKeys($n, $i, 1000*$I);     Node_setKeys($o, $i, 2000+10*$I);
-    Node_setData($n, $i, 1000*$I);     Node_setData($o, $i, 2000+10*$I);
-    Node_setDown($n, $i, 1000*$i+50);  Node_setDown($o, $i, 2000+10*$i+5);
-   }
-
-  Node_setUp  ($o, $n);
-  Node_setDown($n, $N, 7500); Node_setDown($n, 2, 6);
-  Node_setDown($o, $N, 2075);
-
-  Node_SplitIfFull($o, test=>1);
-
-  my $e = Execute(suppressOutput=>0);
-  is_deeply $e->memory, {
-  1  => bless([0, 3, 7, 0], "Tree"),
-  2  => bless([8, 1, 0, 1, 3, 4, 5], "Node"),
-  3  => bless([1000, 2000, 2040, 3000, 4000, 5000, 6000, 7000], "Keys"),
-  4  => bless([1000, 2000, 2040, 3000, 4000, 5000, 6000, 7000], "Data"),
-  5  => bless([50, 1050, 6, 10, 3050, 4050, 5050, 6050, 7500], "Down"),
-  6  => bless([3, 2, 2, 1, 7, 8, 9], "Node"),
-  7  => bless([2010, 2020, 2030], "Keys"),
-  8  => bless([2010, 2020, 2030], "Data"),
-  9  => bless([2005, 2015, 2025, 2035], "Down"),
-  10 => bless([3, 3, 2, 1, 11, 12, 13], "Node"),
-  11 => bless([2050, 2060, 2070], "Keys"),
-  12 => bless([2050, 2060, 2070], "Data"),
-  13 => bless([2045, 2055, 2065, 2075], "Down")};
- }
-
-#latest:;
-if (1)                                                                          # Set up for Node_SplitIfFull at end non root
- {Start 1;
-  my $N = 7;
-  my $t = New($N);                                                              # Create tree
-  my $n = Node_new($t);                                                         # Create node
-          Node_allocDown $n;
-  my $o = Node_new($t);                                                         # Create node
-          Node_allocDown $o;
-
-  Node_setLength $_, $N for $n, $o;
-
-  for my $i(0..$N-1)
-   {my $I = $i + 1;
-    Node_setKeys($n, $i, 1000*$I);     Node_setKeys($o, $i, 2000+10*$I);
-    Node_setData($n, $i, 1000*$I);     Node_setData($o, $i, 2000+10*$I);
-    Node_setDown($n, $i, 1000*$i+50);  Node_setDown($o, $i, 2000+10*$i+5);
-   }
-
-  Node_setUp  ($o, $n);
-  Node_setDown($n, $N, 7500); Node_setDown($n, 7, 6);
-  Node_setDown($o, $N, 2075);
-
-  my $e = Execute(suppressOutput=>1);
-
-  is_deeply $e->memory, {
-  1 => bless([0, 2, 7, 0], "Tree"),
-  2 => bless([7, 1, 0, 1, 3, 4, 5], "Node"),
-  3 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Keys"),
-  4 => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Data"),
-  5 => bless([50, 1050, 2050, 3050, 4050, 5050, 6050, 6], "Down"),
-  6 => bless([7, 2, 2, 1, 7, 8, 9], "Node"),
-  7 => bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Keys"),
-  8 => bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Data"),
-  9 => bless([2005, 2015, 2025, 2035, 2045, 2055, 2065, 2075], "Down")};
- }
-
-#latest:;
-if (1)                                                                          ##Node_SplitIfFull at end non root
- {Start 1;
-  my $N = 7;
-  my $t = New($N);                                                              # Create tree
-  my $n = Node_new($t); Node_allocDown $n;                                      # Create node
-  my $o = Node_new($t); Node_allocDown $o;                                      # Create node
-
-  Node_setLength $_, $N for $n, $o;
-
-  for my $i(0..$N-1)
-   {my $I = $i + 1;
-    Node_setKeys($n, $i, 1000*$I);     Node_setKeys($o, $i, 2000+10*$I);
-    Node_setData($n, $i, 1000*$I);     Node_setData($o, $i, 2000+10*$I);
-    Node_setDown($n, $i, 1000*$i+50);  Node_setDown($o, $i, 2000+10*$i+5);
-   }
-
-  Node_setUp  ($o, $n);
-  Node_setDown($n, $N, 7500); Node_setDown($n, 7, 6);
-  Node_setDown($o, $N, 2075);
-
-  Node_SplitIfFull($o, test=>1);
-  my $e = Execute(suppressOutput=>1);
-
-  is_deeply $e->memory, {
-  1  => bless([0, 3, 7, 0], "Tree"),
-  2  => bless([8, 1, 0, 1, 3, 4, 5], "Node"),
-  3  => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000, 2040], "Keys"),
-  4  => bless([1000, 2000, 3000, 4000, 5000, 6000, 7000, 2040], "Data"),
-  5  => bless([50, 1050, 2050, 3050, 4050, 5050, 6050, 6, 10], "Down"),
-  6  => bless([3, 2, 2, 1, 7, 8, 9], "Node"),
-  7  => bless([2010, 2020, 2030], "Keys"),
-  8  => bless([2010, 2020, 2030], "Data"),
-  9  => bless([2005, 2015, 2025, 2035], "Down"),
-  10 => bless([3, 3, 2, 1, 11, 12, 13], "Node"),
-  11 => bless([2050, 2060, 2070], "Keys"),
-  12 => bless([2050, 2060, 2070], "Data"),
-  13 => bless([2045, 2055, 2065, 2075], "Down")};
+  is_deeply $e->heap(1), bless([0, 2, 7, 0], "Tree");
+  is_deeply $e->heap(2), bless([7, 1, 0, 1, 3, 4, 5], "Node");
+  is_deeply $e->heap(3), bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Keys");
+  is_deeply $e->heap(4), bless([1000, 2000, 3000, 4000, 5000, 6000, 7000], "Data");
+  is_deeply $e->heap(5), bless([6, 1050, 2050, 3050, 4050, 5050, 6050, 7500], "Down");
+  is_deeply $e->heap(6), bless([7, 2, 2, 1, 7, 8, 9], "Node");
+  is_deeply $e->heap(7), bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Keys");
+  is_deeply $e->heap(8), bless([2010, 2020, 2030, 2040, 2050, 2060, 2070], "Data");
+  is_deeply $e->heap(9), bless([2005, 2015, 2025, 2035, 2045, 2055, 2065, 2075], "Down");
  }
 
 #latest:;
@@ -1286,17 +1088,15 @@ if (1)                                                                          
   Node_copy($q, $p, 3, 2);
 
   my $e = Execute(suppressOutput=>1);
-
-  is_deeply $e->memory, {
-  1 => bless([0, 2, 7, 0], "Tree"),
-  2 => bless([0, 1, 0, 1, 3, 4, 5], "Node"),
-  3 => bless([11 .. 17], "Keys"),
-  4 => bless([21 .. 27], "Data"),
-  5 => bless([31 .. 37, 97], "Down"),
-  6 => bless([0, 2, 0, 1, 7, 8, 9], "Node"),
-  7 => bless([14, 15, 43 .. 47], "Keys"),
-  8 => bless([24, 25, 53 .. 57], "Data"),
-  9 => bless([34, 35, 36, 64..67, 99], "Down")}
+  is_deeply $e->heap(1), bless([0, 2, 7, 0], "Tree");
+  is_deeply $e->heap(2), bless([0, 1, 0, 1, 3, 4, 5], "Node");
+  is_deeply $e->heap(3), bless([11 .. 17], "Keys");
+  is_deeply $e->heap(4), bless([21 .. 27], "Data");
+  is_deeply $e->heap(5), bless([31 .. 37, 97], "Down");
+  is_deeply $e->heap(6), bless([0, 2, 0, 1, 7, 8, 9], "Node");
+  is_deeply $e->heap(7), bless([14, 15, 43 .. 47], "Keys");
+  is_deeply $e->heap(8), bless([24, 25, 53 .. 57], "Data");
+  is_deeply $e->heap(9), bless([34, 35, 36, 64 .. 67, 99], "Down");
  }
 
 #latest:;
@@ -1307,7 +1107,7 @@ if (1)                                                                          
   my $c = FindResult_cmp($f);
   AssertEq($c, FindResult_notFound);
   my $e = Execute(suppressOutput=>1);
-  is_deeply $e->out, [];
+  is_deeply $e->out, "";
  }
 
 #latest:;
@@ -1316,12 +1116,10 @@ if (1)                                                                          
   my $t = New(3);
   Insert($t, 1, 11);
   my $e = Execute(suppressOutput=>1);
-
-  is_deeply $e->memory, {
-  1 => bless([1, 1, 3, 3], "Tree"),
-  3 => bless([1, 1, 0, 1, 4, 5, 0], "Node"),
-  4 => bless([1], "Keys"),
-  5 => bless([11], "Data")};
+  is_deeply $e->heap(1), bless([1, 1, 3, 3], "Tree");
+  is_deeply $e->heap(3), bless([1, 1, 0, 1, 4, 5, 0], "Node");
+  is_deeply $e->heap(4), bless([1], "Keys");
+  is_deeply $e->heap(5), bless([11], "Data");
  }
 
 #latest:;
@@ -1332,11 +1130,10 @@ if (1)                                                                          
   Insert($t, 2, 22);
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1 => bless([2, 1, 3, 3], "Tree"),
-  3 => bless([2, 1, 0, 1, 4, 5, 0], "Node"),
-  4 => bless([1, 2], "Keys"),
-  5 => bless([11, 22], "Data")};
+  is_deeply $e->heap(1), bless([2, 1, 3, 3], "Tree");
+  is_deeply $e->heap(3), bless([2, 1, 0, 1, 4, 5, 0], "Node");
+  is_deeply $e->heap(4), bless([1, 2], "Keys");
+  is_deeply $e->heap(5), bless([11, 22], "Data");
  }
 
 #latest:;
@@ -1346,11 +1143,10 @@ if (1)                                                                          
   Insert($t, $_, "$_$_") for 1..3;
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1 => bless([3, 1, 3, 3], "Tree"),
-  3 => bless([3, 1, 0, 1, 4, 5, 0], "Node"),
-  4 => bless([1, 2, 3], "Keys"),
-  5 => bless([11, 22, 33], "Data")};
+  is_deeply $e->heap(1), bless([3, 1, 3, 3], "Tree");
+  is_deeply $e->heap(3), bless([3, 1, 0, 1, 4, 5, 0], "Node");
+  is_deeply $e->heap(4), bless([1, 2, 3], "Keys");
+  is_deeply $e->heap(5), bless([11, 22, 33], "Data");
  }
 
 #latest:;
@@ -1360,18 +1156,17 @@ if (1)                                                                          
   Insert($t, $_, "$_$_") for 1..4;
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1  => bless([4, 3, 3, 3], "Tree"),
-  3  => bless([1, 1, 0, 1, 4, 5, 15], "Node"),
-  4  => bless([2], "Keys"),
-  5  => bless([22], "Data"),
-  9  => bless([1, 2, 3, 1, 10, 11, 0], "Node"),
-  10 => bless([1], "Keys"),
-  11 => bless([11], "Data"),
-  12 => bless([2, 3, 3, 1, 13, 14, 0], "Node"),
-  13 => bless([3, 4], "Keys"),
-  14 => bless([33, 44], "Data"),
-  15 => bless([9, 12], "Down")};
+  is_deeply $e->heap(1 ), bless([4, 3, 3, 3], "Tree");
+  is_deeply $e->heap(3 ), bless([1, 1, 0, 1, 4, 5, 12], "Node");
+  is_deeply $e->heap(4 ), bless([2], "Keys");
+  is_deeply $e->heap(5 ), bless([22], "Data");
+  is_deeply $e->heap(6 ), bless([1, 2, 3, 1, 7, 8, 0], "Node"),;
+  is_deeply $e->heap(7 ), bless([1], "Keys");
+  is_deeply $e->heap(8 ), bless([11], "Data");
+  is_deeply $e->heap(9 ), bless([2, 3, 3, 1, 10, 11, 0], "Node"),;
+  is_deeply $e->heap(10), bless([3, 4], "Keys");
+  is_deeply $e->heap(11), bless([33, 44], "Data");
+  is_deeply $e->heap(12), bless([6, 9], "Down");
  }
 
 #latest:;
@@ -1381,21 +1176,21 @@ if (1)                                                                          
   Insert($t, $_, "$_$_") for 1..5;
 
   my $e = Execute(suppressOutput=>1);
-  is_deeply $e->memory, {
-  1  => bless([5, 4, 3, 3], "Tree"),
-  3  => bless([2, 1, 0, 1, 4, 5, 15], "Node"),
-  4  => bless([2, 4], "Keys"),
-  5  => bless([22, 44], "Data"),
-  9  => bless([1, 2, 3, 1, 10, 11, 0], "Node"),
-  10 => bless([1], "Keys"),
-  11 => bless([11], "Data"),
-  12 => bless([1, 3, 3, 1, 13, 14, 0], "Node"),
-  13 => bless([3], "Keys"),
-  14 => bless([33], "Data"),
-  15 => bless([9, 12, 17], "Down"),
-  17 => bless([1, 4, 3, 1, 18, 19, 0], "Node"),
-  18 => bless([5], "Keys"),
-  19 => bless([55], "Data")};
+
+  is_deeply $e->heap(1 ), bless([5, 4, 3, 3], "Tree");
+  is_deeply $e->heap(3 ), bless([2, 1, 0, 1, 4, 5, 12], "Node"),;
+  is_deeply $e->heap(4 ), bless([2, 4], "Keys");
+  is_deeply $e->heap(5 ), bless([22, 44], "Data");
+  is_deeply $e->heap(6 ), bless([1, 2, 3, 1, 7, 8, 0], "Node"),;
+  is_deeply $e->heap(7 ), bless([1], "Keys");
+  is_deeply $e->heap(8 ), bless([11], "Data");
+  is_deeply $e->heap(9 ), bless([1, 3, 3, 1, 10, 11, 0], "Node"),;
+  is_deeply $e->heap(10), bless([3], "Keys");
+  is_deeply $e->heap(11), bless([33], "Data");
+  is_deeply $e->heap(12), bless([6, 9, 13], "Down"),;
+  is_deeply $e->heap(13), bless([1, 4, 3, 1, 14, 15, 0], "Node"),;
+  is_deeply $e->heap(14), bless([5], "Keys");
+  is_deeply $e->heap(15), bless([55], "Data");
  }
 
 #latest:;
@@ -1405,21 +1200,20 @@ if (1)                                                                          
   Insert($t, $_, "$_$_") for 1..6;
   my $e = Execute(suppressOutput=>1);
 
-  is_deeply $e->memory, {
-  1  => bless([6, 4, 3, 3], "Tree"),
-  3  => bless([2, 1, 0, 1, 4, 5, 15], "Node"),
-  4  => bless([2, 4], "Keys"),
-  5  => bless([22, 44], "Data"),
-  9  => bless([1, 2, 3, 1, 10, 11, 0], "Node"),
-  10 => bless([1], "Keys"),
-  11 => bless([11], "Data"),
-  12 => bless([1, 3, 3, 1, 13, 14, 0], "Node"),
-  13 => bless([3], "Keys"),
-  14 => bless([33], "Data"),
-  15 => bless([9, 12, 17], "Down"),
-  17 => bless([2, 4, 3, 1, 18, 19, 0], "Node"),
-  18 => bless([5, 6], "Keys"),
-  19 => bless([55, 66], "Data")};
+  is_deeply $e->heap(1 ), bless([6, 4, 3, 3], "Tree");
+  is_deeply $e->heap(3 ), bless([2, 1, 0, 1, 4, 5, 12], "Node"),;
+  is_deeply $e->heap(4 ), bless([2, 4], "Keys");
+  is_deeply $e->heap(5 ), bless([22, 44], "Data");
+  is_deeply $e->heap(6 ), bless([1, 2, 3, 1, 7, 8, 0], "Node"),;
+  is_deeply $e->heap(7 ), bless([1], "Keys");
+  is_deeply $e->heap(8 ), bless([11], "Data");
+  is_deeply $e->heap(9 ), bless([1, 3, 3, 1, 10, 11, 0], "Node"),;
+  is_deeply $e->heap(10), bless([3], "Keys");
+  is_deeply $e->heap(11), bless([33], "Data");
+  is_deeply $e->heap(12), bless([6, 9, 13], "Down"),;
+  is_deeply $e->heap(13), bless([2, 4, 3, 1, 14, 15, 0], "Node"),;
+  is_deeply $e->heap(14), bless([5, 6], "Keys");
+  is_deeply $e->heap(15), bless([55, 66], "Data");
  }
 
 #latest:;
@@ -1444,18 +1238,17 @@ if (1)                                                                          
   AssertNe FindResult_found, FindResult_cmp(Find($t, -1));                      # Should not be present
   AssertNe FindResult_found, FindResult_cmp(Find($t, $N));
 
-  my $e = Execute(suppressOutput=>1);
-  is_deeply $e->out, [];                                                        # No asserts
+  my $e = GenerateMachineCodeDisAssembleExecute(suppressOutput=>1);
+  is_deeply $e->out, "";                                                        # No asserts
  }
 
 
 #latest:;
-if (1)                                                                          ##randomArray
- {my $W = 3; my $N = 76; my @r = randomArray $N;
+if (0)                                                                          ##randomArray
+ {my $W = 5; my $N = 76; my @r = randomArray $N;
 
   Start 1;
   my $t = New($W);
-
   for my $i(0..$N-1)
    {Insert($t, $r[$i], $r[$i]);
    }
@@ -1466,8 +1259,8 @@ if (1)                                                                          
     Out $k;
    } $t;
 
-  my $e = Execute(suppressOutput=>1);
-  is_deeply $e->out, [1..$N];
+  my $e = GenerateMachineCodeDisAssembleExecute(suppressOutput=>1);
+  is_deeply $e->outLines, [1..$N];
  }
 
 #latest:;
@@ -1513,12 +1306,12 @@ if (1)                                                                          
    } $t;
 
   Tally 3;
-  Iterate {} $t;                                                                # Iterate tree
+  Iterate {} $t;                                                                # Iterate tree without doing anything in the body to see the pure iteration overhead
   Tally 0;
 
-  my $e = Execute(suppressOutput=>1);
+  my $e = GenerateMachineCodeDisAssembleExecute(suppressOutput=>1);
 
-  is_deeply $e->out, [1..$N];                                                   # Expected sequence
+  is_deeply $e->outLines, [1..$N];                                              # Expected sequence
 
   #say STDERR dump $e->tallyCount;
   is_deeply $e->tallyCount,  24502;                                             # Insertion instruction counts
@@ -1580,8 +1373,8 @@ if (1)                                                                          
   mov        => 1111,
   not        => 180};
 
-  #say STDERR printTreeKeys($e->memory); x;
-  is_deeply printTreeKeys($e->memory), <<END;
+  #say STDERR printTreeKeys($e); x;
+  is_deeply printTreeKeys($e), <<END;
                                                                                                                 38                                                                                                    72
                                                              21                                                                                                       56                                                                                                 89
                             10             15                                     28             33                                  45                   52                                     65                                     78             83                               94          98            103
@@ -1589,8 +1382,8 @@ if (1)                                                                          
   1  2     4  5     7     9    11 12    14    16    18    20    22    24 25    27    29 30    32    34 35    37    39    41    43 44    46    48    50 51    53    55    57    59    61    63 64    66    68    70 71    73 74    76 77    79 80    82    84 85    87 88    90    92 93    95    97    99100   102   104   106107
 END
 
-  #say STDERR printTreeData($e->memory); x;
-  is_deeply printTreeData($e->memory), <<END;
+  #say STDERR printTreeData($e); x;
+  is_deeply printTreeData($e), <<END;
                                                                                                                 76                                                                                                   144
                                                              42                                                                                                      112                                                                                                178
                             20             30                                     56             66                                  90                  104                                    130                                    156            166                              188         196            206

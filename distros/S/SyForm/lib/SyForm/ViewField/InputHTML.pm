@@ -2,7 +2,7 @@ package SyForm::ViewField::InputHTML;
 BEGIN {
   $SyForm::ViewField::InputHTML::AUTHORITY = 'cpan:GETTY';
 }
-$SyForm::ViewField::InputHTML::VERSION = '0.102';
+$SyForm::ViewField::InputHTML::VERSION = '0.103';
 use Moo;
 use List::MoreUtils qw( uniq );
 use HTML::Declare ':all';
@@ -158,7 +158,7 @@ SyForm::ViewField::InputHTML
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

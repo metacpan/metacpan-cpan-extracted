@@ -1,10 +1,10 @@
 {
-   "abstract" : "a simple OO Perl module for maintaining a process id file for the curent process",
+   "abstract" : "a simple OO Perl module for maintaining a process id file for the current process",
    "author" : [
       "Ave Wrigley <awrigley@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,19 +40,21 @@
    "provides" : {
       "Proc::Pidfile" : {
          "file" : "lib/Proc/Pidfile.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/neilbowers/Proc-Pidfile",
+      "homepage" : "https://github.com/neilb/Proc-Pidfile",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/neilbowers/Proc-Pidfile.git",
-         "web" : "https://github.com/neilbowers/Proc-Pidfile"
+         "url" : "https://github.com/neilb/Proc-Pidfile.git",
+         "web" : "https://github.com/neilb/Proc-Pidfile"
       }
    },
-   "version" : "1.09",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "1.10",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

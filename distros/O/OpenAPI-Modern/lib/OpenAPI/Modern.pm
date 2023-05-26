@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.042-6-gc919d86
+package OpenAPI::Modern; # git description: v0.043-2-g20e0641
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 use 5.020;
 use Moo;
@@ -697,17 +697,13 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 
-  use YAML::XS 0.87;
-  use OpenAPI::Modern;
-  local $YAML::XS::Boolean = 'JSON::PP';
-
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => Load(<<'YAML'));
+    openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
   openapi: 3.1.0
   info:
     title: Test API

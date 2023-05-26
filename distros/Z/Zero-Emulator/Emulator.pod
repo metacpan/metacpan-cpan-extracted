@@ -25,7 +25,7 @@ Say "hello world":
 
 
 
-Version 20230514.
+Version 20230519.
 
 
 The following sections describe the methods in each functional area of this
@@ -55,17 +55,19 @@ B<Example:>
     my $a = Add 3, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out  $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [5];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  5
+  END
    }
   
 
-=head2 Array($name)
+=head2 Array($source)
 
 Create a new memory area and write its number into the address named by the target operand.
 
      Parameter  Description
-  1  $name      Name of allocation
+  1  $source    Name of allocation
 
 B<Example:>
 
@@ -81,9 +83,9 @@ B<Example:>
   
     my $n = ArraySize $a, "aaa";
   
-    Out "Array size:"; Out $n;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Out "Array size:", $n;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    ArrayDump $a, "AAAA";
+    ArrayDump $a;
   
     ForArray
      {my ($i, $e, $check, $next, $end) = @_;
@@ -93,20 +95,31 @@ B<Example:>
     Nop;
     my $e = Execute(suppressOutput=>1);
   
-    is_deeply $e->memory, {1=>[1, 22, 333]};
+    is_deeply $e->heap(1), [1, 22, 333];
+    is_deeply $e->out, <<END if $testSet <= 2;
   
-  
-    is_deeply $e->out, [ "Array size:", 3,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  Array size: 3  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+  bless([1, 22, 333], "aaa")
+  0
+  1
+  1
+  22
+  2
+  333
+  END
+    is_deeply $e->out, <<END if $testSet  > 2;
   
-    "AAAA", "bless([1, 22, 333], \"aaa\")",
-  
-    "Stack trace",
-    "    1     8 arrayDump",
-  
-    0,   1,
-    1,  22,
-    2, 333];
+  Array size: 3  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  [1, 22, 333]
+  0
+  1
+  1
+  22
+  2
+  333
+  END
    }
   
 
@@ -125,31 +138,18 @@ B<Example:>
     Mov [$a, 1, "aaa"], 20;
     Mov [$a, 2, "aaa"], 30;
   
-    Out ArrayIndex $a, 30;
-    Out ArrayIndex $a, 20;
-    Out ArrayIndex $a, 10;
-    Out ArrayIndex $a, 15;
+    Out ArrayIndex       ($a, 30), ArrayIndex       ($a, 20), ArrayIndex       ($a, 10), ArrayIndex       ($a, 15);
   
-  
-    Out ArrayCountLess $a, 35;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Out ArrayCountLess   ($a, 35), ArrayCountLess   ($a, 25), ArrayCountLess   ($a, 15), ArrayCountLess   ($a,  5);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  
-    Out ArrayCountLess $a, 25;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountLess $a, 15;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountLess $a,  5;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountGreater $a, 35;
-    Out ArrayCountGreater $a, 25;
-    Out ArrayCountGreater $a, 15;
-    Out ArrayCountGreater $a,  5;
+    Out ArrayCountGreater($a, 35), ArrayCountGreater($a, 25), ArrayCountGreater($a, 15), ArrayCountGreater($a,  5);
   
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3,2,1,0,  3,2,1,0,  0,1,2,3];
+    is_deeply $e->out, <<END;
+  3 2 1 0
+  3 2 1 0
+  0 1 2 3
+  END
    }
   
 
@@ -168,41 +168,27 @@ B<Example:>
     Mov [$a, 1, "aaa"], 20;
     Mov [$a, 2, "aaa"], 30;
   
-    Out ArrayIndex $a, 30;
-    Out ArrayIndex $a, 20;
-    Out ArrayIndex $a, 10;
-    Out ArrayIndex $a, 15;
+    Out ArrayIndex       ($a, 30), ArrayIndex       ($a, 20), ArrayIndex       ($a, 10), ArrayIndex       ($a, 15);
+    Out ArrayCountLess   ($a, 35), ArrayCountLess   ($a, 25), ArrayCountLess   ($a, 15), ArrayCountLess   ($a,  5);
   
-    Out ArrayCountLess $a, 35;
-    Out ArrayCountLess $a, 25;
-    Out ArrayCountLess $a, 15;
-    Out ArrayCountLess $a,  5;
-  
-  
-    Out ArrayCountGreater $a, 35;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountGreater $a, 25;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountGreater $a, 15;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountGreater $a,  5;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Out ArrayCountGreater($a, 35), ArrayCountGreater($a, 25), ArrayCountGreater($a, 15), ArrayCountGreater($a,  5);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3,2,1,0,  3,2,1,0,  0,1,2,3];
+    is_deeply $e->out, <<END;
+  3 2 1 0
+  3 2 1 0
+  0 1 2 3
+  END
    }
   
 
-=head2 ArrayDump($target, $title)
+=head2 ArrayDump($target)
 
 Dump an array.
 
      Parameter  Description
   1  $target    Array to dump
-  2  $title     Title of dump
 
 B<Example:>
 
@@ -210,19 +196,32 @@ B<Example:>
   if (1)                                                                           
    {Start 1;
     my $a = Array "aaa";
-      Mov [$a, 0, "aaa"], 1;
-      Mov [$a, 1, "aaa"], 22;
-      Mov [$a, 2, "aaa"], 333;
+    Mov [$a, 0, "aaa"], 1;
+    Mov [$a, 1, "aaa"], 22;
+    Mov [$a, 2, "aaa"], 333;
   
-    ArrayDump $a, "AAAA";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    ArrayDump $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
-    is_deeply $e->out, [
-    "AAAA",
-    "bless([1, 22, 333], \"aaa\")",
-    "Stack trace",
-    "    1     5 arrayDump"];
+    is_deeply eval($e->out), [1, 22, 333];
+  
+    #say STDERR $e->block->codeToString;
+    is_deeply $e->block->codeToString, <<'END' if $testSet == 1;
+  0000     array           \0             3
+  0001       mov [\0, 0, 3, 0]             1
+  0002       mov [\0, 1, 3, 0]            22
+  0003       mov [\0, 2, 3, 0]           333
+  0004  arrayDump           \0
+  END
+  
+    is_deeply $e->block->codeToString, <<'END' if $testSet == 2;
+  0000     array [undef, \0, 3, 0]  [undef, 3, 3, 0]  [undef, 0, 3, 0]
+  0001       mov [\0, 0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  0002       mov [\0, 1, 3, 0]  [undef, 22, 3, 0]  [undef, 0, 3, 0]
+  0003       mov [\0, 2, 3, 0]  [undef, 333, 3, 0]  [undef, 0, 3, 0]
+  0004  arrayDump [undef, \0, 3, 0]  [undef, 0, 3, 0]  [undef, 0, 3, 0]
+  END
    }
   
 
@@ -242,30 +241,17 @@ B<Example:>
     Mov [$a, 2, "aaa"], 30;
   
   
-    Out ArrayIndex $a, 30;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Out ArrayIndex       ($a, 30), ArrayIndex       ($a, 20), ArrayIndex       ($a, 10), ArrayIndex       ($a, 15);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  
-    Out ArrayIndex $a, 20;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayIndex $a, 10;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayIndex $a, 15;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    Out ArrayCountLess $a, 35;
-    Out ArrayCountLess $a, 25;
-    Out ArrayCountLess $a, 15;
-    Out ArrayCountLess $a,  5;
-  
-    Out ArrayCountGreater $a, 35;
-    Out ArrayCountGreater $a, 25;
-    Out ArrayCountGreater $a, 15;
-    Out ArrayCountGreater $a,  5;
+    Out ArrayCountLess   ($a, 35), ArrayCountLess   ($a, 25), ArrayCountLess   ($a, 15), ArrayCountLess   ($a,  5);
+    Out ArrayCountGreater($a, 35), ArrayCountGreater($a, 25), ArrayCountGreater($a, 15), ArrayCountGreater($a,  5);
   
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3,2,1,0,  3,2,1,0,  0,1,2,3];
+    is_deeply $e->out, <<END;
+  3 2 1 0
+  3 2 1 0
+  0 1 2 3
+  END
    }
   
 
@@ -290,8 +276,8 @@ B<Example:>
   
     my $n = ArraySize $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    Out "Array size:"; Out $n;
-    ArrayDump $a, "AAAA";
+    Out "Array size:", $n;
+    ArrayDump $a;
   
     ForArray
      {my ($i, $e, $check, $next, $end) = @_;
@@ -301,18 +287,27 @@ B<Example:>
     Nop;
     my $e = Execute(suppressOutput=>1);
   
-    is_deeply $e->memory, {1=>[1, 22, 333]};
-  
-    is_deeply $e->out, [ "Array size:", 3,
-  
-    "AAAA", "bless([1, 22, 333], \"aaa\")",
-  
-    "Stack trace",
-    "    1     8 arrayDump",
-  
-    0,   1,
-    1,  22,
-    2, 333];
+    is_deeply $e->heap(1), [1, 22, 333];
+    is_deeply $e->out, <<END if $testSet <= 2;
+  Array size: 3
+  bless([1, 22, 333], "aaa")
+  0
+  1
+  1
+  22
+  2
+  333
+  END
+    is_deeply $e->out, <<END if $testSet  > 2;
+  Array size: 3
+  [1, 22, 333]
+  0
+  1
+  1
+  22
+  2
+  333
+  END
    }
   
 
@@ -331,10 +326,13 @@ B<Example:>
   
     Assert;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
   
-    is_deeply $e->out, ["Assert failed", "    1     1 assert"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  Assert failed  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+      1     1 assert
+  END
    }
   
 
@@ -356,8 +354,11 @@ B<Example:>
   
     AssertEq \0, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 == 2 failed", "    1     2 assertEq"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Assert 1 == 2 failed
+      1     2 assertEq
+  END
    }
   
 
@@ -378,15 +379,16 @@ B<Example:>
   
     AssertFalse 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1, trace=>1);
-    is_deeply $e->out, [
-    "   1     0     1    assertTrue                      ",
+    my $e = &$ee(suppressOutput=>1, trace=>1);
   
-    "AssertFalse 1 failed",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    is_deeply $e->out, <<END;
+      1     0     1    assertTrue
+  
+  AssertFalse 1 failed  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    "    1     2 assertFalse",
-    "   2     1     1   assertFalse                      "];
-  
+      1     2 assertFalse
+      2     1     1   assertFalse
+  END
    }
   
 
@@ -408,8 +410,11 @@ B<Example:>
   
     AssertGe \0, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 >= 2 failed", "    1     2 assertGe"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Assert 1 >= 2 failed
+      1     2 assertGe
+  END
    }
   
 
@@ -431,8 +436,11 @@ B<Example:>
   
     AssertGt \0, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 >  2 failed", "    1     2 assertGt"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Assert 1 >  2 failed
+      1     2 assertGt
+  END
    }
   
 
@@ -454,8 +462,11 @@ B<Example:>
   
     AssertLe \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 <= 0 failed", "    1     2 assertLe"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Assert 1 <= 0 failed
+      1     2 assertLe
+  END
    }
   
 
@@ -477,8 +488,11 @@ B<Example:>
   
     AssertLt \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 <  0 failed", "    1     2 assertLt"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Assert 1 <  0 failed
+      1     2 assertLt
+  END
    }
   
 
@@ -500,8 +514,11 @@ B<Example:>
   
     AssertNe \0, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Assert 1 != 1 failed", "    1     2 assertNe"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Assert 1 != 1 failed
+      1     2 assertNe
+  END
    }
   
 
@@ -522,14 +539,15 @@ B<Example:>
   
     AssertTrue  0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1, trace=>1);
-    is_deeply $e->out, [
-    "   1     0     1   assertFalse                      ",
+    my $e = &$ee(suppressOutput=>1, trace=>1);
+    is_deeply $e->out, <<END;
+      1     0     1   assertFalse
   
-    "AssertTrue 0 failed",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  AssertTrue 0 failed  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    "    1     2 assertTrue",
-    "   2     1     1    assertTrue                      "];
+      1     2 assertTrue
+      2     1     1    assertTrue
+  END
    }
   
 
@@ -559,8 +577,12 @@ B<Example:>
      {Out 3;
      };
     Out 4;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1,2,4];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  2
+  4
+  END
    }
   
 
@@ -591,8 +613,12 @@ B<Example:>
      {Out 3;
      };
     Out 4;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1,2,4];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  2
+  4
+  END
    }
   
   if (1)                                                                          
@@ -611,8 +637,12 @@ B<Example:>
      {Out 3;
      };
     Out 4;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1,3,4];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  3
+  4
+  END
    }
   
 
@@ -629,14 +659,16 @@ B<Example:>
   if (1)                                                                           
    {Start 1;
     my $w = Procedure 'write', sub
-     {Out 'aaa';
+     {Out 1;
       Return;
      };
   
     Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["aaa"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  END
    }
   
   if (1)                                                                          
@@ -646,18 +678,20 @@ B<Example:>
       Out $a;
       Return;
      };
-    ParamsPut 0, 'bbb';
+    ParamsPut 0, 999;
   
     Call $w;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["bbb"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  999
+  END
    }
   
   if (1)                                                                            
    {Start 1;
     my $w = Procedure 'write', sub
-     {ReturnPut 0, "ccc";
+     {ReturnPut 0, 999;
       Return;
      };
   
@@ -665,23 +699,21 @@ B<Example:>
 
     ReturnGet \0, 0;
     Out \0;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["ccc"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  999
+  END
    }
   
   if (1)                                                                            
    {Start 1;
     my $a = Array "aaa";
-    Dump "dddd";
+    Dump;
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1], \"stackArea\")",
-    "1=bless([], \"aaa\")",
-    "Stack trace",
-    "    1     2 dump"];
+    is_deeply $e->out, <<END;
+  Stack trace:
+      1     2 dump
+  END
    }
   
   if (1)                                                                              
@@ -705,8 +737,10 @@ B<Example:>
     my $V = Mov [$a, \$i, 'aaa'];
     AssertEq $v, $V;
     Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  11
+  END
    }
   
   if (1)                                                                            
@@ -724,17 +758,23 @@ B<Example:>
   
     ParamsPut 0, 3;  Call $set;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1..3];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  2
+  3
+  END
    }
   
 
-=head2 Clear($target)
+=head2 Clear($target, $source, $source2)
 
 Clear the first bytes of an area.  The area is specified by the first element of the address, the number of locations to clear is specified by the second element of the target address.
 
      Parameter  Description
-  1  $target    Target address
+  1  $target    Target address to clear
+  2  $source    Number of bytes to clear
+  3  $source2   Name of target
 
 B<Example:>
 
@@ -743,16 +783,16 @@ B<Example:>
    {Start 1;
     my $a = Array "aaa";
   
-    Clear [$a, 10, 'aaa'];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Clear $a, 10, 'aaa';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->memory->{1}, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    my $e = &$ee(suppressOutput=>1, maximumAreaSize=>10);
+    is_deeply $e->heap(1), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
    }
   
 
 =head2 Confess()
 
-Confess with a stack trace showing the location bioth in the emulated code and in the code that produced the emulated code.
+Confess with a stack trace showing the location both in the emulated code and in the code that produced the emulated code.
 
 
 B<Example:>
@@ -766,10 +806,14 @@ B<Example:>
 
      };
     Call $c;
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
   
-    is_deeply $e->out, ["Confess at:", "    2     3 confess", "    1     6 call"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  Confess at:  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+      2     3 confess
+      1     6 call
+  END
    }
   
 
@@ -790,17 +834,17 @@ B<Example:>
     Dec $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  END
    }
   
 
-=head2 Dump($title)
+=head2 Dump()
 
 Dump all the arrays currently in memory.
 
-     Parameter  Description
-  1  $title     Title
 
 B<Example:>
 
@@ -813,22 +857,22 @@ B<Example:>
     Mov [$a, 2, 'node'], 2;
     Mov 1, [$a, \1, 'node'];
   
-    Dump "dddd";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Dump;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Free $a, "node";
     my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, [
-    1,
-  
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1, 1], \"stackArea\")",
-    "1=bless([undef, 1, 2], \"node\")",
-  
-    "Stack trace",
-    "    1     6 dump"];
+    is_deeply $e->out, <<END if $testSet <= 2;
+  1
+  1=bless([undef, 1, 2], "node")
+  Stack trace:
+      1     6 dump
+  END
+    is_deeply $e->out, <<END if $testSet >  2;
+  1
+  1=[0, 1, 2]
+  Stack trace:
+      1     6 dump
+  END
    }
   
 
@@ -842,6 +886,23 @@ Else block.
 B<Example:>
 
 
+  if (1)                                                                            
+   {Start 1;
+    IfFalse 1,
+    Then
+     {Out 1
+     },
+  
+    Else  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Out 0
+     };
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  0
+  END
+   }
+  
   if (1)                                                                            
    {Start 1;
     Trace 1;
@@ -867,8 +928,39 @@ B<Example:>
      {Mov 3, 3;
       Mov 4, 4;
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply scalar($e->out->@*), 14;
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Trace: 1
+      1     0     1         trace
+      2     1     1           jNe
+      3     5     1         label
+      4     6     1           mov  [1, 3, stackArea] = 3
+      5     7     1           mov  [1, 4, stackArea] = 4
+      6     8     1         label
+      7     9     1           jNe
+      8    10     1           mov  [1, 1, stackArea] = 1
+      9    11     1           mov  [1, 2, stackArea] = 1
+     10    12     1           jmp
+     11    16     1         label
+  END
+    my $E = &$ee(suppressOutput=>1);
+    is_deeply $E->out, <<END;
+  Trace: 1
+      1     0     1         trace
+      2     1     1           jNe
+      3     5     1         label
+      4     6     1           mov  [1, 3, stackArea] = 3
+      5     7     1           mov  [1, 4, stackArea] = 4
+      6     8     1         label
+      7     9     1           jNe
+      8    10     1           mov  [1, 1, stackArea] = 1
+      9    11     1           mov  [1, 2, stackArea] = 1
+     10    12     1           jmp
+     11    16     1         label
+  END
+  
+    is_deeply scalar($e->notExecuted->@*), 6;
+    is_deeply scalar($E->notExecuted->@*), 6;
    }
   
 
@@ -884,11 +976,13 @@ B<Example:>
 
   if (1)                                                                            
    {Start 1;
-    Out "hello World";
+    Out "Hello", "World";
   
     my $e = Execute(suppressOutput=>1);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    is_deeply $e->out, ["hello World"];
+    is_deeply $e->out, <<END;
+  Hello World
+  END
    }
   
 
@@ -904,6 +998,73 @@ For loop 0..range-1 or in reverse.
 B<Example:>
 
 
+  if (1)                                                                          
+   {Start 1;
+  
+    For  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {my ($i) = @_;
+      Out $i;
+     } 10;
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  0
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  END
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+  
+    For  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {my ($i) = @_;
+      Out $i;
+     } 10, reverse=>1;
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  9
+  8
+  7
+  6
+  5
+  4
+  3
+  2
+  1
+  0
+  END
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+  
+    For  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {my ($i) = @_;
+      Out $i;
+     } [2, 10];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  END
+   }
+  
   if (1)                                                                           
    {my $N = 5;
     Start 1;
@@ -944,8 +1105,8 @@ B<Example:>
       Mov [$a, 2, "aaa"], 333;
   
     my $n = ArraySize $a, "aaa";
-    Out "Array size:"; Out $n;
-    ArrayDump $a, "AAAA";
+    Out "Array size:", $n;
+    ArrayDump $a;
   
   
     ForArray  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
@@ -957,18 +1118,27 @@ B<Example:>
     Nop;
     my $e = Execute(suppressOutput=>1);
   
-    is_deeply $e->memory, {1=>[1, 22, 333]};
-  
-    is_deeply $e->out, [ "Array size:", 3,
-  
-    "AAAA", "bless([1, 22, 333], \"aaa\")",
-  
-    "Stack trace",
-    "    1     8 arrayDump",
-  
-    0,   1,
-    1,  22,
-    2, 333];
+    is_deeply $e->heap(1), [1, 22, 333];
+    is_deeply $e->out, <<END if $testSet <= 2;
+  Array size: 3
+  bless([1, 22, 333], "aaa")
+  0
+  1
+  1
+  22
+  2
+  333
+  END
+    is_deeply $e->out, <<END if $testSet  > 2;
+  Array size: 3
+  [1, 22, 333]
+  0
+  1
+  1
+  22
+  2
+  333
+  END
    }
   
 
@@ -990,11 +1160,10 @@ B<Example:>
     Free $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, [
-    "Wrong name: aaa for array with name: node",
-    "    1     2 free",
-  ];
+    is_deeply $e->out, <<END;
+  Wrong name: aaa for array with name: node
+      1     2 free
+  END
    }
   
   if (1)                                                                           
@@ -1004,23 +1173,23 @@ B<Example:>
     Mov [$a, 1, 'node'], 1;
     Mov [$a, 2, 'node'], 2;
     Mov 1, [$a, \1, 'node'];
-    Dump "dddd";
+    Dump;
   
     Free $a, "node";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->out, [
-    1,
-  
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1, 1], \"stackArea\")",
-    "1=bless([undef, 1, 2], \"node\")",
-  
-    "Stack trace",
-    "    1     6 dump"];
+    is_deeply $e->out, <<END if $testSet <= 2;
+  1
+  1=bless([undef, 1, 2], "node")
+  Stack trace:
+      1     6 dump
+  END
+    is_deeply $e->out, <<END if $testSet >  2;
+  1
+  1=[0, 1, 2]
+  Stack trace:
+      1     6 dump
+  END
    }
   
 
@@ -1050,8 +1219,12 @@ B<Example:>
      {Out 3;
      };
     Out 4;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1,2,4];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  2
+  4
+  END
    }
   
 
@@ -1080,7 +1253,11 @@ B<Example:>
     IfGe $a, $a, Then {Out "Ge"};
     IfGt $a, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
+    is_deeply $e->out, <<END;
+  Eq
+  Le
+  Ge
+  END
    }
   
   if (1)                                                                                   
@@ -1096,7 +1273,11 @@ B<Example:>
     IfGe $a, $b, Then {Out "Ge"};
     IfGt $a, $b, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Le
+  Lt
+  END
    }
   
   if (1)                                                                                   
@@ -1112,7 +1293,11 @@ B<Example:>
     IfGe $b, $a, Then {Out "Ge"};
     IfGt $b, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Ge
+  Gt
+  END
    }
   
 
@@ -1138,8 +1323,10 @@ B<Example:>
     Else
      {Out 0
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [0];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  0
+  END
    }
   
 
@@ -1168,7 +1355,11 @@ B<Example:>
 
     IfGt $a, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
+    is_deeply $e->out, <<END;
+  Eq
+  Le
+  Ge
+  END
    }
   
   if (1)                                                                                   
@@ -1184,7 +1375,11 @@ B<Example:>
 
     IfGt $a, $b, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Le
+  Lt
+  END
    }
   
   if (1)                                                                                   
@@ -1200,7 +1395,11 @@ B<Example:>
 
     IfGt $b, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Ge
+  Gt
+  END
    }
   
 
@@ -1229,7 +1428,11 @@ B<Example:>
     IfGt $a, $a, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
+    is_deeply $e->out, <<END;
+  Eq
+  Le
+  Ge
+  END
    }
   
   if (1)                                                                                   
@@ -1245,7 +1448,11 @@ B<Example:>
     IfGt $a, $b, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Le
+  Lt
+  END
    }
   
   if (1)                                                                                   
@@ -1261,7 +1468,11 @@ B<Example:>
     IfGt $b, $a, Then {Out "Gt"};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Ge
+  Gt
+  END
    }
   
 
@@ -1290,7 +1501,11 @@ B<Example:>
     IfGe $a, $a, Then {Out "Ge"};
     IfGt $a, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
+    is_deeply $e->out, <<END;
+  Eq
+  Le
+  Ge
+  END
    }
   
   if (1)                                                                                   
@@ -1306,7 +1521,11 @@ B<Example:>
     IfGe $a, $b, Then {Out "Ge"};
     IfGt $a, $b, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Le
+  Lt
+  END
    }
   
   if (1)                                                                                   
@@ -1322,7 +1541,11 @@ B<Example:>
     IfGe $b, $a, Then {Out "Ge"};
     IfGt $b, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Ge
+  Gt
+  END
    }
   
 
@@ -1351,7 +1574,11 @@ B<Example:>
     IfGe $a, $a, Then {Out "Ge"};
     IfGt $a, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
+    is_deeply $e->out, <<END;
+  Eq
+  Le
+  Ge
+  END
    }
   
   if (1)                                                                                   
@@ -1367,7 +1594,11 @@ B<Example:>
     IfGe $a, $b, Then {Out "Ge"};
     IfGt $a, $b, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Le
+  Lt
+  END
    }
   
   if (1)                                                                                   
@@ -1383,7 +1614,11 @@ B<Example:>
     IfGe $b, $a, Then {Out "Ge"};
     IfGt $b, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Ge
+  Gt
+  END
    }
   
 
@@ -1412,7 +1647,11 @@ B<Example:>
     IfGe $a, $a, Then {Out "Ge"};
     IfGt $a, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Eq", "Le", "Ge"];
+    is_deeply $e->out, <<END;
+  Eq
+  Le
+  Ge
+  END
    }
   
   if (1)                                                                                   
@@ -1428,7 +1667,11 @@ B<Example:>
     IfGe $a, $b, Then {Out "Ge"};
     IfGt $a, $b, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Le", "Lt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Le
+  Lt
+  END
    }
   
   if (1)                                                                                   
@@ -1444,7 +1687,11 @@ B<Example:>
     IfGe $b, $a, Then {Out "Ge"};
     IfGt $b, $a, Then {Out "Gt"};
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["Ne", "Ge", "Gt"];
+    is_deeply $e->out, <<END;
+  Ne
+  Ge
+  Gt
+  END
    }
   
 
@@ -1470,8 +1717,10 @@ B<Example:>
     Else
      {Out 0
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  END
    }
   
 
@@ -1492,8 +1741,10 @@ B<Example:>
     Inc $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [4];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  4
+  END
    }
   
 
@@ -1530,10 +1781,11 @@ B<Example:>
       Jgt $next, $d, $d;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
 
@@ -1576,8 +1828,11 @@ B<Example:>
 
       Out 4;
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2, 3];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  3
+  END
    }
   
 
@@ -1614,10 +1869,11 @@ B<Example:>
       Jgt $next, $d, $d;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
 
@@ -1654,10 +1910,11 @@ B<Example:>
 
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
 
@@ -1694,10 +1951,11 @@ B<Example:>
       Jgt $next, $d, $d;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
 
@@ -1734,10 +1992,11 @@ B<Example:>
       Jgt $next, $d, $d;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
 
@@ -1763,8 +2022,10 @@ B<Example:>
     setLabel($a);
       Out  2;
     setLabel($b);
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  END
    }
   
 
@@ -1801,10 +2062,11 @@ B<Example:>
       Jgt $next, $d, $d;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
 
@@ -1847,8 +2109,11 @@ B<Example:>
       JFalse $end, $a;
       Out 4;
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2, 3];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  3
+  END
    }
   
 
@@ -1877,10 +2142,16 @@ B<Example:>
     Mov [$a, \$c, 'array'], 33;
     Mov [$f, \$d, 'array'], 44;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1, maximumAreaSize=>6);
   
-    is_deeply $e->out,    [2,1];
-    is_deeply $e->memory, {1=>[undef, undef, 44, undef, undef, 33]};
+    is_deeply $e->out, <<END;
+  2
+  1
+  END
+  
+    is_deeply $e->heap(1), [undef, undef, 44, undef, undef, 33] if $testSet <= 2;
+    is_deeply $e->heap(1), [0,     0,     44, 0,     0,     33] if $testSet  > 2;
+    is_deeply $e->widestAreaInArena, [4,5];
    }
   
 
@@ -1909,10 +2180,16 @@ B<Example:>
     Mov [$a, \$c, 'array'], 33;
     Mov [$f, \$d, 'array'], 44;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1, maximumAreaSize=>6);
   
-    is_deeply $e->out,    [2,1];
-    is_deeply $e->memory, {1=>[undef, undef, 44, undef, undef, 33]};
+    is_deeply $e->out, <<END;
+  2
+  1
+  END
+  
+    is_deeply $e->heap(1), [undef, undef, 44, undef, undef, 33] if $testSet <= 2;
+    is_deeply $e->heap(1), [0,     0,     44, 0,     0,     33] if $testSet  > 2;
+    is_deeply $e->widestAreaInArena, [4,5];
    }
   
 
@@ -1930,9 +2207,10 @@ B<Example:>
     my $a = Mov 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out $a;
-  
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  END
    }
   
    {Start 1;                                                                      
@@ -1947,8 +2225,10 @@ B<Example:>
     Mov  1, [$a, \1, "aaa"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out \1;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  11
+  END
    }
   
   if (1)                                                                           
@@ -1966,22 +2246,19 @@ B<Example:>
   
     Mov [$c, 1, 'alloc'], 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    ok Execute(memory=>  { 1=>  bless([99, 2], "alloc") });
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->heap(1), [99, 2];
    }
   
   if (1)                                                                            
    {Start 1;
     my $a = Array "aaa";
-    Dump "dddd";
+    Dump;
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
-    "dddd",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([1], \"stackArea\")",
-    "1=bless([], \"aaa\")",
-    "Stack trace",
-    "    1     2 dump"];
+    is_deeply $e->out, <<END;
+  Stack trace:
+      1     2 dump
+  END
    }
   
   if (1)                                                                              
@@ -2011,8 +2288,10 @@ B<Example:>
 
     AssertEq $v, $V;
     Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  11
+  END
    }
   
   if (1)                                                                            
@@ -2024,8 +2303,12 @@ B<Example:>
     ParamsPut 0, 1;  Call $set;
     ParamsPut 0, 2;  Call $set;
     ParamsPut 0, 3;  Call $set;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1..3];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  2
+  3
+  END
    }
   
   if (1)                                                                                 
@@ -2055,10 +2338,11 @@ B<Example:>
       Jgt $next, $d, $d;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       24 instructions executed";
-    is_deeply $e->memory, { 1=>  bless([2], "aaa"), 2=>  bless([99], "bbb") };
+    is_deeply $e->heap(1), [2];
+    is_deeply $e->heap(2), [99];
    }
   
   if (1)                                                                           
@@ -2076,32 +2360,46 @@ B<Example:>
       Jeq $next, [$a, \$b, 'aaa'], 1;
      } 3;
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>1);
   
     is_deeply $e->analyzeExecutionResults(doubleWrite=>3), "#       19 instructions executed";
-    is_deeply $e->memory, {1=>  bless([undef, undef, 1], "aaa")};
+    is_deeply $e->heap(1), [undef, undef, 1] if $testSet <= 2;
+    is_deeply $e->heap(1), [0,     0,     1] if $testSet  > 2;
    }
   
   if (1)                                                                           
    {Start 1;
     my $a = Array "aaa";
   
-      Mov [$a, 0, "aaa"], 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Mov [$a, 0, "aaa"], 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-      Mov [$a, 1, "aaa"], 22;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Mov [$a, 1, "aaa"], 22;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-      Mov [$a, 2, "aaa"], 333;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Mov [$a, 2, "aaa"], 333;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    ArrayDump $a, "AAAA";
-    my $e = Execute(suppressOutput=>1);
+    ArrayDump $a;
+    my $e = &$ee(suppressOutput=>1);
   
-    is_deeply $e->out, [
-    "AAAA",
-    "bless([1, 22, 333], \"aaa\")",
-    "Stack trace",
-    "    1     5 arrayDump"];
+    is_deeply eval($e->out), [1, 22, 333];
+  
+    #say STDERR $e->block->codeToString;
+    is_deeply $e->block->codeToString, <<'END' if $testSet == 1;
+  0000     array           \0             3
+  0001       mov [\0, 0, 3, 0]             1
+  0002       mov [\0, 1, 3, 0]            22
+  0003       mov [\0, 2, 3, 0]           333
+  0004  arrayDump           \0
+  END
+  
+    is_deeply $e->block->codeToString, <<'END' if $testSet == 2;
+  0000     array [undef, \0, 3, 0]  [undef, 3, 3, 0]  [undef, 0, 3, 0]
+  0001       mov [\0, 0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  0002       mov [\0, 1, 3, 0]  [undef, 22, 3, 0]  [undef, 0, 3, 0]
+  0003       mov [\0, 2, 3, 0]  [undef, 333, 3, 0]  [undef, 0, 3, 0]
+  0004  arrayDump [undef, \0, 3, 0]  [undef, 0, 3, 0]  [undef, 0, 3, 0]
+  END
    }
   
 
@@ -2133,11 +2431,9 @@ B<Example:>
     MoveLong [$b, \2, 'bbb'], [$a, \4, 'aaa'], 3;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->memory, {
-    1 => bless([0 .. 9], "aaa"),
-    2 => bless([100, 101, 4, 5, 6, 105 .. 109], "bbb")};
+    my $e = &$ee(suppressOutput=>1, maximumAreaSize=>11);
+    is_deeply $e->heap(1), [0 .. 9];
+    is_deeply $e->heap(2), [100, 101, 4, 5, 6, 105 .. 109];
    }
   
 
@@ -2161,8 +2457,12 @@ B<Example:>
     Out $a;
     Out $b;
     Out $c;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [3, "", 1];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  3
+  
+  1
+  END
    }
   
 
@@ -2179,7 +2479,8 @@ B<Example:>
   
     Nop;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    ok Execute(out=>[]);
+    my $e = &$ee;
+    is_deeply $e->out, "";
    }
   
   if (1)                                                                             
@@ -2190,8 +2491,8 @@ B<Example:>
       Mov [$a, 2, "aaa"], 333;
   
     my $n = ArraySize $a, "aaa";
-    Out "Array size:"; Out $n;
-    ArrayDump $a, "AAAA";
+    Out "Array size:", $n;
+    ArrayDump $a;
   
     ForArray
      {my ($i, $e, $check, $next, $end) = @_;
@@ -2203,27 +2504,36 @@ B<Example:>
 
     my $e = Execute(suppressOutput=>1);
   
-    is_deeply $e->memory, {1=>[1, 22, 333]};
-  
-    is_deeply $e->out, [ "Array size:", 3,
-  
-    "AAAA", "bless([1, 22, 333], \"aaa\")",
-  
-    "Stack trace",
-    "    1     8 arrayDump",
-  
-    0,   1,
-    1,  22,
-    2, 333];
+    is_deeply $e->heap(1), [1, 22, 333];
+    is_deeply $e->out, <<END if $testSet <= 2;
+  Array size: 3
+  bless([1, 22, 333], "aaa")
+  0
+  1
+  1
+  22
+  2
+  333
+  END
+    is_deeply $e->out, <<END if $testSet  > 2;
+  Array size: 3
+  [1, 22, 333]
+  0
+  1
+  1
+  22
+  2
+  333
+  END
    }
   
 
-=head2 Out($source)
+=head2 Out(@source)
 
 Write memory location contents to out.
 
      Parameter  Description
-  1  $source    Either a scalar constant or memory address to output
+  1  @source    Either a scalar constant or memory address to output
 
 B<Example:>
 
@@ -2231,10 +2541,12 @@ B<Example:>
   if (1)                                                                            
    {Start 1;
   
-    Out "hello World";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Out "Hello", "World";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["hello World"];
+    is_deeply $e->out, <<END;
+  Hello World
+  END
    }
   
 
@@ -2271,8 +2583,10 @@ B<Example:>
     my $V = Mov [$a, \$i, 'aaa'];
     AssertEq $v, $V;
     Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  11
+  END
    }
   
 
@@ -2312,38 +2626,43 @@ B<Example:>
     my $V = Mov [$a, \$i, 'aaa'];
     AssertEq $v, $V;
     Out [$a, \$i, 'aaa'];
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [11];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  11
+  END
    }
   
 
-=head2 Pop(if (@_ == 0))
+=head2 Pop(if (@_ == 2))
 
 Pop the memory area specified by the source operand into the memory address specified by the target operand.
 
      Parameter     Description
-  1  if (@_ == 0)  Pop current stack frame into a local variable
+  1  if (@_ == 2)  Pop indicated area into a local variable
 
 B<Example:>
 
 
   if (1)                                                                           
    {Start 1;
-    my $a = Array "aaa";
-    Push $a, 1;
-    Push $a, 2;
+    my $a = Array   "aaa";
+    Push $a, 1,     "aaa";
+    Push $a, 2,     "aaa";
   
-    my $c = Pop $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    my $c = Pop $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-    my $d = Pop $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    my $d = Pop $a, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
     Out $c;
     Out $d;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,    [2, 1];
-    is_deeply $e->memory, { 1=>  []};
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  1
+  END
+    is_deeply $e->heap(1), [];
    }
   
 
@@ -2353,7 +2672,7 @@ Define a procedure.
 
      Parameter  Description
   1  $name      Name of procedure
-  2  $source    Source code as a subroutine# $assembly->instruction(action=>"procedure"
+  2  $source    Source code as a subroutine
 
 B<Example:>
 
@@ -2372,8 +2691,10 @@ B<Example:>
     Call $add;
     my $c = ReturnGet 0;
     Out $c;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [4];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  4
+  END
    }
   
   if (1)                                                                          
@@ -2385,46 +2706,94 @@ B<Example:>
     Then
      {Out 99;
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [1..10];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  10
+  END
+    is_deeply $e->outLines, [1..10];
    }
   
 
-=head2 Push()
+=head2 Push($target, $source, $source2)
 
 Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand.
 
+     Parameter  Description
+  1  $target    Memory area to push to
+  2  $source    Memory containing value to push
+  3  $source2
 
 B<Example:>
 
 
   if (1)                                                                           
    {Start 1;
-    my $a = Array "aaa";
+    my $a = Array   "aaa";
   
-    Push $a, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Push $a, 1,     "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-    Push $a, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Push $a, 2,     "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $c = Pop $a;
-    my $d = Pop $a;
+    my $c = Pop $a, "aaa";
+    my $d = Pop $a, "aaa";
   
     Out $c;
     Out $d;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out,    [2, 1];
-    is_deeply $e->memory, { 1=>  []};
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  1
+  END
+    is_deeply $e->heap(1), [];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "aaa";
+  
+    Push $a, 1, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Push $a, 2, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Push $a, 3, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $b = Array "bbb";
+  
+    Push $b, 11, "bbb";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Push $b, 22, "bbb";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    Push $b, 33, "bbb";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->GetMemoryHeaps->($e), 3;
+    is_deeply $e->heap(1), [1, 2, 3];
+    is_deeply $e->heap(2), [11, 22, 33];
    }
   
 
-=head2 Resize($target, $source)
+=head2 Resize($target, $source, $source2)
 
 Resize the target area to the source size.
 
      Parameter  Description
-  1  $target    Target address
-  2  $source    Source address
+  1  $target    Target array
+  2  $source    New size
+  3  $source2   Array name
 
 B<Example:>
 
@@ -2436,12 +2805,57 @@ B<Example:>
     Mov [$a, 1, 'aaa'], 2;
     Mov [$a, 2, 'aaa'], 3;
   
-    Resize $a, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    Resize $a, 2, "aaa";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+    ArrayDump $a;
+    my $e = &$ee(suppressOutput=>1);
   
-    my $e = Execute(suppressOutput=>1);
+    is_deeply $e->heap(1), [1, 2];
+    is_deeply eval($e->out), [1,2];
+   }
   
-    is_deeply $e->memory, {1=>  [1, 2]};
+
+=head2 Random(if (@_ == 1))
+
+Create a random number in a specified range
+
+     Parameter     Description
+  1  if (@_ == 1)  Create a variable
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+    RandomSeed 1;
+  
+    my $a = Random 10;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    Out $a;
+    my $e = &$ee(suppressOutput=>1);
+    ok $e->out =~ m(\A\d\Z);
+   }
+  
+
+=head2 RandomSeed($seed)
+
+Seed the random number generator
+
+     Parameter  Description
+  1  $seed      Parameters
+
+B<Example:>
+
+
+  if (1)                                                                           
+   {Start 1;
+  
+    RandomSeed 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $a = Random 10;
+    Out $a;
+    my $e = &$ee(suppressOutput=>1);
+    ok $e->out =~ m(\A\d\Z);
    }
   
 
@@ -2456,14 +2870,16 @@ B<Example:>
   if (1)                                                                           
    {Start 1;
     my $w = Procedure 'write', sub
-     {Out 'aaa';
+     {Out 1;
   
       Return;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
      };
     Call $w;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["aaa"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  1
+  END
    }
   
 
@@ -2480,7 +2896,7 @@ B<Example:>
   if (1)                                                                            
    {Start 1;
     my $w = Procedure 'write', sub
-     {ReturnPut 0, "ccc";
+     {ReturnPut 0, 999;
       Return;
      };
     Call $w;
@@ -2488,8 +2904,10 @@ B<Example:>
     ReturnGet \0, 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out \0;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["ccc"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  999
+  END
    }
   
 
@@ -2508,15 +2926,17 @@ B<Example:>
    {Start 1;
     my $w = Procedure 'write', sub
   
-     {ReturnPut 0, "ccc";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+     {ReturnPut 0, 999;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       Return;
      };
     Call $w;
     ReturnGet \0, 0;
     Out \0;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["ccc"];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  999
+  END
    }
   
 
@@ -2542,10 +2962,11 @@ B<Example:>
 
     Out $b;
   
-    my $e = Execute(suppressOutput=>1);
-  
-    is_deeply $e->memory, {1=>[0, 2]};
-    is_deeply $e->out,    [99];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->heap(1), [0, 2];
+    is_deeply $e->out, <<END;
+  99
+  END
    }
   
 
@@ -2567,8 +2988,10 @@ B<Example:>
     ShiftLeft $a, $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  END
    }
   
 
@@ -2590,8 +3013,10 @@ B<Example:>
     ShiftRight $a, 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  END
    }
   
 
@@ -2614,12 +3039,69 @@ B<Example:>
     Mov [$a, 1, 'array'], 1;
     Mov [$a, 2, 'array'], 2;
   
+    ShiftUp [$a, 0, 'array'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = &$ee(suppressOutput=>0);
+    is_deeply $e->heap(1), [99, 0, 1, 2];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "array";
+  
+    Mov [$a, 0, 'array'], 0;
+    Mov [$a, 1, 'array'], 1;
+    Mov [$a, 2, 'array'], 2;
+  
     ShiftUp [$a, 1, 'array'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-    my $e = Execute(suppressOutput=>1);
+    my $e = &$ee(suppressOutput=>0);
+    is_deeply $e->heap(1), [0, 99, 1, 2];
+   }
   
-    is_deeply $e->memory, {1=>[0, 99, 1, 2]};
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "array";
+  
+    Mov [$a, 0, 'array'], 0;
+    Mov [$a, 1, 'array'], 1;
+    Mov [$a, 2, 'array'], 2;
+  
+    ShiftUp [$a, 2, 'array'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = &$ee(suppressOutput=>0);
+    is_deeply $e->heap(1), [0, 1, 99, 2];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "array";
+  
+    Mov [$a, 0, 'array'], 0;
+    Mov [$a, 1, 'array'], 1;
+    Mov [$a, 2, 'array'], 2;
+  
+    ShiftUp [$a, 3, 'array'], 99;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = &$ee(suppressOutput=>0);
+    is_deeply $e->heap(1), [0, 1, 2, 99];
+   }
+  
+  if (1)                                                                          
+   {Start 1;
+    my $a = Array "array";
+  
+    Mov [$a, $_-1, 'array'], 10*$_ for 1..7;
+  
+    ShiftUp [$a, 2, 'array'], 26;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    my $e = &$ee(suppressOutput=>1, maximumAreaSize=>8);
+    is_deeply $e->heap(1), bless([10, 20, 26, 30, 40, 50, 60, 70], "array");
    }
   
 
@@ -2637,9 +3119,11 @@ B<Example:>
   
    {Start 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    Out "hello World";
+    Out "Hello", "World";
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, ["hello World"];
+    is_deeply $e->out, <<END;
+  Hello World
+  END
    }
   
 
@@ -2661,8 +3145,10 @@ B<Example:>
     my $a = Subtract 4, 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     Out $a;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  END
    }
   
 
@@ -2711,6 +3197,23 @@ B<Example:>
 
   if (1)                                                                            
    {Start 1;
+    IfFalse 1,
+  
+    Then  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {Out 1
+     },
+    Else
+     {Out 0
+     };
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  0
+  END
+   }
+  
+  if (1)                                                                            
+   {Start 1;
     Trace 1;
     IfEq 1, 2,
   
@@ -2734,14 +3237,45 @@ B<Example:>
      {Mov 3, 3;
       Mov 4, 4;
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply scalar($e->out->@*), 14;
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  Trace: 1
+      1     0     1         trace
+      2     1     1           jNe
+      3     5     1         label
+      4     6     1           mov  [1, 3, stackArea] = 3
+      5     7     1           mov  [1, 4, stackArea] = 4
+      6     8     1         label
+      7     9     1           jNe
+      8    10     1           mov  [1, 1, stackArea] = 1
+      9    11     1           mov  [1, 2, stackArea] = 1
+     10    12     1           jmp
+     11    16     1         label
+  END
+    my $E = &$ee(suppressOutput=>1);
+    is_deeply $E->out, <<END;
+  Trace: 1
+      1     0     1         trace
+      2     1     1           jNe
+      3     5     1         label
+      4     6     1           mov  [1, 3, stackArea] = 3
+      5     7     1           mov  [1, 4, stackArea] = 4
+      6     8     1         label
+      7     9     1           jNe
+      8    10     1           mov  [1, 1, stackArea] = 1
+      9    11     1           mov  [1, 2, stackArea] = 1
+     10    12     1           jmp
+     11    16     1         label
+  END
+  
+    is_deeply scalar($e->notExecuted->@*), 6;
+    is_deeply scalar($E->notExecuted->@*), 6;
    }
   
 
 =head2 Trace($source)
 
-Start or stop tracing.  Tracing prints each instruction executed and its effect on memeory.
+Start or stop tracing.  Tracing prints each instruction executed and its effect on memory.
 
      Parameter  Description
   1  $source    Trace setting
@@ -2772,14 +3306,49 @@ B<Example:>
      {Mov 3, 3;
       Mov 4, 4;
      };
-    my $e = Execute(suppressOutput=>1);
-    is_deeply scalar($e->out->@*), 14;
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  
+  Trace: 1  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      1     0     1         trace
+      2     1     1           jNe
+      3     5     1         label
+      4     6     1           mov  [1, 3, stackArea] = 3
+      5     7     1           mov  [1, 4, stackArea] = 4
+      6     8     1         label
+      7     9     1           jNe
+      8    10     1           mov  [1, 1, stackArea] = 1
+      9    11     1           mov  [1, 2, stackArea] = 1
+     10    12     1           jmp
+     11    16     1         label
+  END
+    my $E = &$ee(suppressOutput=>1);
+    is_deeply $E->out, <<END;
+  
+  Trace: 1  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      1     0     1         trace
+      2     1     1           jNe
+      3     5     1         label
+      4     6     1           mov  [1, 3, stackArea] = 3
+      5     7     1           mov  [1, 4, stackArea] = 4
+      6     8     1         label
+      7     9     1           jNe
+      8    10     1           mov  [1, 1, stackArea] = 1
+      9    11     1           mov  [1, 2, stackArea] = 1
+     10    12     1           jmp
+     11    16     1         label
+  END
+  
+    is_deeply scalar($e->notExecuted->@*), 6;
+    is_deeply scalar($E->notExecuted->@*), 6;
    }
   
 
-=head2 TracePoints($source)
+=head2 TraceLabels($source)
 
-Enable or disable trace points.  If trace points are enabled a stack trace is printed for each instructyion executed showing the call stack at the time the instruction was generated as well as the current stack frames.
+Enable or disable label tracing.  If tracing is enabled a stack trace is printed for each label instruction executed showing the call stack at the time the instruction was generated as well as the current stack frames.
 
      Parameter  Description
   1  $source    Trace points if true
@@ -2791,27 +3360,45 @@ B<Example:>
    {my $N = 5;
     Start 1;
   
-    TracePoints 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    TraceLabels 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     For
      {my $a = Mov 1;
       Inc $a;
      } $N;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
+    my $e = &$ee(suppressOutput=>1);
   
-    "TracePoints: 1",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    is_deeply $e->out, <<END;
+  
+  TraceLabels: 1  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint",
-    "Trace",
-    "    1     6 tracePoint"];
+  Label
+      1     2 label
+  Label
+      1     4 label
+  Label
+      1     8 label
+  Label
+      1     4 label
+  Label
+      1     8 label
+  Label
+      1     4 label
+  Label
+      1     8 label
+  Label
+      1     4 label
+  Label
+      1     8 label
+  Label
+      1     4 label
+  Label
+      1     8 label
+  Label
+      1     4 label
+  Label
+      1    11 label
+  END
    }
   
 
@@ -2828,11 +3415,11 @@ B<Example:>
   if (1)                                                                          
    {Start 1;
   
-    my $a = Var 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    my $a = Var 22;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    AssertEq $a, 1;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [];
+    AssertEq $a, 22;
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, "";
    }
   
 
@@ -2858,19 +3445,115 @@ B<Example:>
     Mov $b, 5;
     Mov $c, 6;
     my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [
-    "Change at watched area: 0 (stackArea), address: 1",
-    "    1     6 mov",
-    "Current value: 2",
-    "New     value: 5",
-    "-2=bless([], \"return\")",
-    "-1=bless([], \"params\")",
-    "0=bless([4, 2, 3], \"stackArea\")"];
+    is_deeply $e->out, <<END;
+  Change at watched arena: 0, area: 1(stackArea), address: 1
+      1     6 mov
+  Current value: 2 New value: 5
+  END
+   }
+  
+
+=head1 Instruction Set Architecture
+
+Map the instruction set into a machine architecture.
+
+=head2 GenerateMachineCode(%options)
+
+Generate a string of machine code from the current block of code.
+
+     Parameter  Description
+  1  %options   Generation options
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    my $a = Mov 1;
+  
+    my $g = GenerateMachineCode;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    is_deeply dump($g), 'pack("H*","0000002300000000000000000000017f000000010000007f000000000000007f")';
+  
+    my $d = disAssemble $g;
+       $d->assemble;
+    is_deeply $d->codeToString, <<'END';
+  0000       mov [undef, \0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  END
+    my $e =  GenerateMachineCodeDisAssembleExecute;
+    is_deeply $e->block->codeToString, <<'END';
+  0000       mov [undef, \0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  END
+   }
+  
+
+=head2 disAssemble($mc)
+
+Disassemble machine code.
+
+     Parameter  Description
+  1  $mc        Machine code string
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    my $a = Mov 1;
+    my $g = GenerateMachineCode;
+    is_deeply dump($g), 'pack("H*","0000002300000000000000000000017f000000010000007f000000000000007f")';
+  
+  
+    my $d = disAssemble $g;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+       $d->assemble;
+    is_deeply $d->codeToString, <<'END';
+  0000       mov [undef, \0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  END
+    my $e =  GenerateMachineCodeDisAssembleExecute;
+    is_deeply $e->block->codeToString, <<'END';
+  0000       mov [undef, \0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  END
+   }
+  
+
+=head2 GenerateMachineCodeDisAssembleExecute(%options)
+
+Round trip: generate machine code and write it onto a string, disassemble the generated machine code string and recreate a block of code from it, then execute the reconstituted code to prove that it works as well as the original code.
+
+     Parameter  Description
+  1  %options   Options
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {Start 1;
+    my $a = Mov 1;
+    my $g = GenerateMachineCode;
+    is_deeply dump($g), 'pack("H*","0000002300000000000000000000017f000000010000007f000000000000007f")';
+  
+    my $d = disAssemble $g;
+       $d->assemble;
+    is_deeply $d->codeToString, <<'END';
+  0000       mov [undef, \0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  END
+  
+    my $e =  GenerateMachineCodeDisAssembleExecute;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    is_deeply $e->block->codeToString, <<'END';
+  0000       mov [undef, \0, 3, 0]  [undef, 1, 3, 0]  [undef, 0, 3, 0]
+  END
    }
   
 
 
 =head1 Private Methods
+
+=head2 Assembly()
+
+Start some assembly code
+
 
 =head2 Assert1($op, $a)
 
@@ -2920,13 +3603,16 @@ B<Example:>
     setLabel($b);
   
     Jgt ((my $c = label), \0, 3);
-      Out  1;
+      Out  3;
       Jmp (my $d = label);
     setLabel($c);
-      Out  2;
+      Out  4;
     setLabel($d);
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [2,1];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  2
+  3
+  END
    }
   
   if (1)                                                                          
@@ -2936,17 +3622,102 @@ B<Example:>
       Out \0;
       Inc \0;
     Jlt $a, \0, 10;
-    my $e = Execute(suppressOutput=>1);
-    is_deeply $e->out, [0..9];
+    my $e = &$ee(suppressOutput=>1);
+    is_deeply $e->out, <<END;
+  0
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  END
    }
   
 
-=head2 TracePoint(%options)
+=head2 instructionList()
 
-Trace point - a point in the code where the flow of execution might change.
+Create a list of instructinos
+
+
+=head2 instructionListExport()
+
+Create an export statement
+
+
+=head2 instructionListReadMe()
+
+List  instructions for inclusion in read me
+
+
+=head2 instructionListMapping()
+
+Map instructions to small integers
+
+
+=head2 refDepth($ref)
+
+The depth of a reference.
 
      Parameter  Description
-  1  %options   Parameters
+  1  $ref       Reference to pack
+
+=head2 refValue($ref)
+
+The value of a reference after dereferencing.
+
+     Parameter  Description
+  1  $ref       Reference to pack
+
+=head2 rerefValue($value, $depth)
+
+Rereference a value.
+
+     Parameter  Description
+  1  $value     Value to reference
+  2  $depth     Depth of reference
+
+=head2 Zero::Emulator::Code::packRef($code, $instruction, $ref)
+
+Pack a reference into 8 bytes.
+
+     Parameter     Description
+  1  $code         Code block being packed
+  2  $instruction  Instruction being packed
+  3  $ref          Reference being packed
+
+=head2 Zero::Emulator::Code::unpackRef($code, $a)
+
+Unpack a reference.
+
+     Parameter  Description
+  1  $code      Code block being packed
+  2  $a         Instruction being packed
+
+=head2 Zero::Emulator::Code::packInstruction($code, $i)
+
+Pack an instruction.
+
+     Parameter  Description
+  1  $code      Code being packed
+  2  $i         Instruction to pack
+
+=head2 unpackInstruction($I)
+
+Unpack an instruction.
+
+     Parameter  Description
+  1  $I         Instruction numbers
+
+=head2 disAssembleMinusContext($D)
+
+Disassemble and remove context information from disassembly to make testing easier.
+
+     Parameter  Description
+  1  $D         Machine code string
 
 
 =head1 Index
@@ -2966,151 +3737,185 @@ Trace point - a point in the code where the flow of execution might change.
 
 7 L<ArraySize|/ArraySize> - The current size of an array.
 
-8 L<Assert|/Assert> - Assert regardless.
+8 L<Assembly|/Assembly> - Start some assembly code
 
-9 L<Assert1|/Assert1> - Assert operation.
+9 L<Assert|/Assert> - Assert regardless.
 
-10 L<Assert2|/Assert2> - Assert operation.
+10 L<Assert1|/Assert1> - Assert operation.
 
-11 L<AssertEq|/AssertEq> - Assert two memory locations are equal.
+11 L<Assert2|/Assert2> - Assert operation.
 
-12 L<AssertFalse|/AssertFalse> - Assert false.
+12 L<AssertEq|/AssertEq> - Assert two memory locations are equal.
 
-13 L<AssertGe|/AssertGe> - Assert are greater than or equal.
+13 L<AssertFalse|/AssertFalse> - Assert false.
 
-14 L<AssertGt|/AssertGt> - Assert two memory locations are greater than.
+14 L<AssertGe|/AssertGe> - Assert are greater than or equal.
 
-15 L<AssertLe|/AssertLe> - Assert two memory locations are less than or equal.
+15 L<AssertGt|/AssertGt> - Assert two memory locations are greater than.
 
-16 L<AssertLt|/AssertLt> - Assert two memory locations are less than.
+16 L<AssertLe|/AssertLe> - Assert two memory locations are less than or equal.
 
-17 L<AssertNe|/AssertNe> - Assert two memory locations are not equal.
+17 L<AssertLt|/AssertLt> - Assert two memory locations are less than.
 
-18 L<AssertTrue|/AssertTrue> - Assert true.
+18 L<AssertNe|/AssertNe> - Assert two memory locations are not equal.
 
-19 L<Bad|/Bad> - A bad ending.
+19 L<AssertTrue|/AssertTrue> - Assert true.
 
-20 L<Block|/Block> - Block of code that can either be restarted or come to a good or a bad ending.
+20 L<Bad|/Bad> - A bad ending.
 
-21 L<Call|/Call> - Call the subroutine at the target address.
+21 L<Block|/Block> - Block of code that can either be restarted or come to a good or a bad ending.
 
-22 L<Clear|/Clear> - Clear the first bytes of an area.
+22 L<Call|/Call> - Call the subroutine at the target address.
 
-23 L<Confess|/Confess> - Confess with a stack trace showing the location bioth in the emulated code and in the code that produced the emulated code.
+23 L<Clear|/Clear> - Clear the first bytes of an area.
 
-24 L<Dec|/Dec> - Decrement the target.
+24 L<Confess|/Confess> - Confess with a stack trace showing the location both in the emulated code and in the code that produced the emulated code.
 
-25 L<Dump|/Dump> - Dump all the arrays currently in memory.
+25 L<Dec|/Dec> - Decrement the target.
 
-26 L<Else|/Else> - Else block.
+26 L<disAssemble|/disAssemble> - Disassemble machine code.
 
-27 L<Execute|/Execute> - Execute the current assembly.
+27 L<disAssembleMinusContext|/disAssembleMinusContext> - Disassemble and remove context information from disassembly to make testing easier.
 
-28 L<For|/For> - For loop 0.
+28 L<Dump|/Dump> - Dump all the arrays currently in memory.
 
-29 L<ForArray|/ForArray> - For loop to process each element of the named area.
+29 L<Else|/Else> - Else block.
 
-30 L<Free|/Free> - Free the memory area named by the target operand after confirming that it has the name specified on the source operand.
+30 L<Execute|/Execute> - Execute the current assembly.
 
-31 L<Good|/Good> - A good ending.
+31 L<For|/For> - For loop 0.
 
-32 L<IfEq|/IfEq> - Execute then or else clause depending on whether two memory locations are equal.
+32 L<ForArray|/ForArray> - For loop to process each element of the named area.
 
-33 L<IfFalse|/IfFalse> - Execute then clause if the specified memory address is zero thus representing false.
+33 L<Free|/Free> - Free the memory area named by the target operand after confirming that it has the name specified on the source operand.
 
-34 L<IfGe|/IfGe> - Execute then or else clause depending on whether two memory locations are greater than or equal.
+34 L<GenerateMachineCode|/GenerateMachineCode> - Generate a string of machine code from the current block of code.
 
-35 L<IfGt|/IfGt> - Execute then or else clause depending on whether two memory locations are greater than.
+35 L<GenerateMachineCodeDisAssembleExecute|/GenerateMachineCodeDisAssembleExecute> - Round trip: generate machine code and write it onto a string, disassemble the generated machine code string and recreate a block of code from it, then execute the reconstituted code to prove that it works as well as the original code.
 
-36 L<IfLe|/IfLe> - Execute then or else clause depending on whether two memory locations are less than or equal.
+36 L<Good|/Good> - A good ending.
 
-37 L<IfLt|/IfLt> - Execute then or else clause depending on whether two memory locations are less than.
+37 L<IfEq|/IfEq> - Execute then or else clause depending on whether two memory locations are equal.
 
-38 L<IfNe|/IfNe> - Execute then or else clause depending on whether two memory locations are not equal.
+38 L<IfFalse|/IfFalse> - Execute then clause if the specified memory address is zero thus representing false.
 
-39 L<IfTrue|/IfTrue> - Execute then clause if the specified memory address is not zero thus representing true.
+39 L<IfGe|/IfGe> - Execute then or else clause depending on whether two memory locations are greater than or equal.
 
-40 L<Ifx|/Ifx> - Execute then or else clause depending on whether two memory locations are equal.
+40 L<IfGt|/IfGt> - Execute then or else clause depending on whether two memory locations are greater than.
 
-41 L<Inc|/Inc> - Increment the target.
+41 L<IfLe|/IfLe> - Execute then or else clause depending on whether two memory locations are less than or equal.
 
-42 L<Jeq|/Jeq> - Jump to a target label if the first source field is equal to the second source field.
+42 L<IfLt|/IfLt> - Execute then or else clause depending on whether two memory locations are less than.
 
-43 L<JFalse|/JFalse> - Jump to a target label if the first source field is equal to zero.
+43 L<IfNe|/IfNe> - Execute then or else clause depending on whether two memory locations are not equal.
 
-44 L<Jge|/Jge> - Jump to a target label if the first source field is greater than or equal to the second source field.
+44 L<IfTrue|/IfTrue> - Execute then clause if the specified memory address is not zero thus representing true.
 
-45 L<Jgt|/Jgt> - Jump to a target label if the first source field is greater than the second source field.
+45 L<Ifx|/Ifx> - Execute then or else clause depending on whether two memory locations are equal.
 
-46 L<Jle|/Jle> - Jump to a target label if the first source field is less than or equal to the second source field.
+46 L<Inc|/Inc> - Increment the target.
 
-47 L<Jlt|/Jlt> - Jump to a target label if the first source field is less than the second source field.
+47 L<instructionList|/instructionList> - Create a list of instructinos
 
-48 L<Jmp|/Jmp> - Jump to a label.
+48 L<instructionListExport|/instructionListExport> - Create an export statement
 
-49 L<Jne|/Jne> - Jump to a target label if the first source field is not equal to the second source field.
+49 L<instructionListMapping|/instructionListMapping> - Map instructions to small integers
 
-50 L<JTrue|/JTrue> - Jump to a target label if the first source field is not equal to zero.
+50 L<instructionListReadMe|/instructionListReadMe> - List  instructions for inclusion in read me
 
-51 L<Label|/Label> - Create a label.
+51 L<Jeq|/Jeq> - Jump to a target label if the first source field is equal to the second source field.
 
-52 L<LoadAddress|/LoadAddress> - Load the address component of an address.
+52 L<JFalse|/JFalse> - Jump to a target label if the first source field is equal to zero.
 
-53 L<LoadArea|/LoadArea> - Load the area component of an address.
+53 L<Jge|/Jge> - Jump to a target label if the first source field is greater than or equal to the second source field.
 
-54 L<Mov|/Mov> - Copy a constant or memory address to the target address.
+54 L<Jgt|/Jgt> - Jump to a target label if the first source field is greater than the second source field.
 
-55 L<MoveLong|/MoveLong> - Copy the number of elements specified by the second source operand from the location specified by the first source operand to the target operand.
+55 L<Jle|/Jle> - Jump to a target label if the first source field is less than or equal to the second source field.
 
-56 L<Nop|/Nop> - Do nothing (but do it well!).
+56 L<Jlt|/Jlt> - Jump to a target label if the first source field is less than the second source field.
 
-57 L<Not|/Not> - Move and not.
+57 L<Jmp|/Jmp> - Jump to a label.
 
-58 L<Out|/Out> - Write memory location contents to out.
+58 L<Jne|/Jne> - Jump to a target label if the first source field is not equal to the second source field.
 
-59 L<ParamsGet|/ParamsGet> - Get a word from the parameters in the previous frame and store it in the current frame.
+59 L<JTrue|/JTrue> - Jump to a target label if the first source field is not equal to zero.
 
-60 L<ParamsPut|/ParamsPut> - Put a word into the parameters list to make it visible in a called procedure.
+60 L<Label|/Label> - Create a label.
 
-61 L<Pop|/Pop> - Pop the memory area specified by the source operand into the memory address specified by the target operand.
+61 L<LoadAddress|/LoadAddress> - Load the address component of an address.
 
-62 L<Procedure|/Procedure> - Define a procedure.
+62 L<LoadArea|/LoadArea> - Load the area component of an address.
 
-63 L<Push|/Push> - Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand.
+63 L<Mov|/Mov> - Copy a constant or memory address to the target address.
 
-64 L<Resize|/Resize> - Resize the target area to the source size.
+64 L<MoveLong|/MoveLong> - Copy the number of elements specified by the second source operand from the location specified by the first source operand to the target operand.
 
-65 L<Return|/Return> - Return from a procedure via the call stack.
+65 L<Nop|/Nop> - Do nothing (but do it well!).
 
-66 L<ReturnGet|/ReturnGet> - Get a word from the return area and save it.
+66 L<Not|/Not> - Move and not.
 
-67 L<ReturnPut|/ReturnPut> - Put a word into the return area.
+67 L<Out|/Out> - Write memory location contents to out.
 
-68 L<ShiftDown|/ShiftDown> - Shift an element down one in an area.
+68 L<ParamsGet|/ParamsGet> - Get a word from the parameters in the previous frame and store it in the current frame.
 
-69 L<ShiftLeft|/ShiftLeft> - Shift left within an element.
+69 L<ParamsPut|/ParamsPut> - Put a word into the parameters list to make it visible in a called procedure.
 
-70 L<ShiftRight|/ShiftRight> - Shift right with an element.
+70 L<Pop|/Pop> - Pop the memory area specified by the source operand into the memory address specified by the target operand.
 
-71 L<ShiftUp|/ShiftUp> - Shift an element up one in an area.
+71 L<Procedure|/Procedure> - Define a procedure.
 
-72 L<Start|/Start> - Start the current assembly using the specified version of the Zero language.
+72 L<Push|/Push> - Push the value in the current stack frame specified by the source operand onto the memory area identified by the target operand.
 
-73 L<Subtract|/Subtract> - Subtract the second source operand value from the first source operand value and store the result in the target area.
+73 L<Random|/Random> - Create a random number in a specified range
 
-74 L<Tally|/Tally> - Counts instructions when enabled.
+74 L<RandomSeed|/RandomSeed> - Seed the random number generator
 
-75 L<Then|/Then> - Then block.
+75 L<refDepth|/refDepth> - The depth of a reference.
 
-76 L<Trace|/Trace> - Start or stop tracing.
+76 L<refValue|/refValue> - The value of a reference after dereferencing.
 
-77 L<TracePoint|/TracePoint> - Trace point - a point in the code where the flow of execution might change.
+77 L<rerefValue|/rerefValue> - Rereference a value.
 
-78 L<TracePoints|/TracePoints> - Enable or disable trace points.
+78 L<Resize|/Resize> - Resize the target area to the source size.
 
-79 L<Var|/Var> - Create a variable initialized to the specified value.
+79 L<Return|/Return> - Return from a procedure via the call stack.
 
-80 L<Watch|/Watch> - Watches for changes to the specified memory location.
+80 L<ReturnGet|/ReturnGet> - Get a word from the return area and save it.
+
+81 L<ReturnPut|/ReturnPut> - Put a word into the return area.
+
+82 L<ShiftDown|/ShiftDown> - Shift an element down one in an area.
+
+83 L<ShiftLeft|/ShiftLeft> - Shift left within an element.
+
+84 L<ShiftRight|/ShiftRight> - Shift right with an element.
+
+85 L<ShiftUp|/ShiftUp> - Shift an element up one in an area.
+
+86 L<Start|/Start> - Start the current assembly using the specified version of the Zero language.
+
+87 L<Subtract|/Subtract> - Subtract the second source operand value from the first source operand value and store the result in the target area.
+
+88 L<Tally|/Tally> - Counts instructions when enabled.
+
+89 L<Then|/Then> - Then block.
+
+90 L<Trace|/Trace> - Start or stop tracing.
+
+91 L<TraceLabels|/TraceLabels> - Enable or disable label tracing.
+
+92 L<unpackInstruction|/unpackInstruction> - Unpack an instruction.
+
+93 L<Var|/Var> - Create a variable initialized to the specified value.
+
+94 L<Watch|/Watch> - Watches for changes to the specified memory location.
+
+95 L<Zero::Emulator::Code::packInstruction|/Zero::Emulator::Code::packInstruction> - Pack an instruction.
+
+96 L<Zero::Emulator::Code::packRef|/Zero::Emulator::Code::packRef> - Pack a reference into 8 bytes.
+
+97 L<Zero::Emulator::Code::unpackRef|/Zero::Emulator::Code::unpackRef> - Unpack a reference.
 
 =head1 Installation
 

@@ -23,6 +23,12 @@ use overload (
   fallback => 1,
 );
 
+# HOOKS
+
+sub _exitcode {
+  $? >> 8;
+}
+
 # METHODS
 
 sub assertion {
@@ -89,6 +95,16 @@ sub children {
   my @paths = map $self->glob($_), '.??*', '*';
 
   return wantarray ? (@paths) : \@paths;
+}
+
+sub copy {
+  my ($self, $path) = @_;
+
+  require File::Copy;
+
+  File::Copy::copy("$self", "$path") or $self->throw('error_on_copy', $path)->error;
+
+  return $self;
 }
 
 sub default {
@@ -228,15 +244,8 @@ sub open {
 
   my $handle = IO::File->new;
 
-  $handle->open($path, @args) or do {
-    my $throw;
-    my $error = "Can't open $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.open');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  $handle->open($path, @args)
+    or $self->throw('error_on_open', $path)->error;
 
   return $handle;
 }
@@ -244,23 +253,18 @@ sub open {
 sub mkcall {
   my ($self, $args) = @_;
 
+  require File::Spec;
+
   my $path = File::Spec->catfile(File::Spec->splitdir($self->get));
 
   my $result;
 
-  (defined($result = ($args ? qx($path $args) : qx($path)))) or do {
-    my $throw;
-    my $error = "Can't mkcall $path: " . ($! ? "$!" : "exit code ($?)");
-    $throw = $self->throw;
-    $throw->name('on.mkcall');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  (defined($result = ($args ? qx($path $args) : qx($path))))
+    or $self->throw('error_on_mkcall', $path)->error;
 
   chomp $result;
 
-  return wantarray ? ($result, $?) : $result;
+  return wantarray ? ($result, _exitcode()) : $result;
 }
 
 sub mkdir {
@@ -268,15 +272,8 @@ sub mkdir {
 
   my $path = $self->get;
 
-  ($mode ? CORE::mkdir($path, $mode) : CORE::mkdir($path)) or do {
-    my $throw;
-    my $error = "Can't mkdir $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.mkdir');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  ($mode ? CORE::mkdir($path, $mode) : CORE::mkdir($path))
+    or $self->throw('error_on_mkdir', $path)->error;
 
   return $self;
 }
@@ -301,6 +298,22 @@ sub mkdirs {
   return wantarray ? (@paths) : \@paths;
 }
 
+sub mktemp_dir {
+  my ($self) = @_;
+
+  require File::Temp;
+
+  return $self->class->new(File::Temp::tempdir());
+}
+
+sub mktemp_file {
+  my ($self) = @_;
+
+  require File::Temp;
+
+  return $self->class->new((File::Temp::tempfile())[1]);
+}
+
 sub mkfile {
   my ($self) = @_;
 
@@ -310,15 +323,18 @@ sub mkfile {
 
   $self->open('>');
 
-  CORE::utime(undef, undef, $path) or do {
-    my $throw;
-    my $error = "Can't mkfile $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.mkfile');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  CORE::utime(undef, undef, $path)
+    or $self->throw('error_on_mkfile', $path)->error;
+
+  return $self;
+}
+
+sub move {
+  my ($self, $path) = @_;
+
+  require File::Copy;
+
+  File::Copy::move("$self", "$path") or $self->throw('error_on_move', $path)->error;
 
   return $self;
 }
@@ -364,27 +380,12 @@ sub read {
 
   my $path = $self->get;
 
-  CORE::open(my $handle, '<', $path) or do {
-    my $throw;
-    my $error = "Can't read $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.read.open');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  CORE::open(my $handle, '<', $path)
+    or $self->throw('error_on_read_open', $path)->error;
 
   CORE::binmode($handle, $binmode) or do {
-    my $throw;
-    my $error = "Can't binmode $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.read.binmode');
-    $throw->message($error);
-    $throw->stash(binmode => $binmode);
-    $throw->stash(path => $path);
-    $throw->error;
-  }
-  if defined($binmode);
+    $self->throw('error_on_read_binmode', $path, $binmode)->error;
+  } if defined($binmode);
 
   my $result = my $content = '';
 
@@ -392,19 +393,10 @@ sub read {
     $content .= $buffer;
   }
 
-  if (not(defined($result))) {
-    my $throw;
-    my $error = "Can't read from file $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.read.error');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  }
+  $self->throw('error_on_read_error', $path)->error if !defined $result;
 
-  if ($^O =~ /win32/i) {
-    $content =~ s/\015\012/\012/g;
-  }
+  require Venus::Os;
+  $content =~ s/\015\012/\012/g if Venus::Os->is_win;
 
   return $content;
 }
@@ -424,15 +416,8 @@ sub rmdir {
 
   my $path = $self->get;
 
-  CORE::rmdir($path) or do {
-    my $throw;
-    my $error = "Can't rmdir $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.rmdir');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  CORE::rmdir($path)
+    or $self->throw('error_on_rmdir', $path)->error;
 
   return $self;
 }
@@ -538,15 +523,8 @@ sub unlink {
 
   my $path = $self->get;
 
-  CORE::unlink($path) or do {
-    my $throw;
-    my $error = "Can't unlink $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.unlink');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  CORE::unlink($path)
+    or $self->throw('error_on_unlink', $path)->error;
 
   return $self;
 }
@@ -556,39 +534,192 @@ sub write {
 
   my $path = $self->get;
 
-  CORE::open(my $handle, '>', $path) or do {
-    my $throw;
-    my $error = "Can't write $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.write.open');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  CORE::open(my $handle, '>', $path)
+    or $self->throw('error_on_write_open', $path)->error;
 
   CORE::binmode($handle, $binmode) or do {
-    my $throw;
-    my $error = "Can't binmode $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.write.binmode');
-    $throw->message($error);
-    $throw->stash(binmode => $binmode);
-    $throw->stash(path => $path);
-    $throw->error;
-  }
-  if defined($binmode);
+    $self->throw('error_on_write_binmode', $path, $binmode)->error;
+  } if defined($binmode);
 
-  (($handle->syswrite($data) // -1) == length($data)) or do {
-    my $throw;
-    my $error = "Can't write to file $path: $!";
-    $throw = $self->throw;
-    $throw->name('on.write.error');
-    $throw->message($error);
-    $throw->stash(path => $path);
-    $throw->error;
-  };
+  (($handle->syswrite($data) // -1) == length($data))
+    or $self->throw('error_on_write_error', $path)->error;
 
   return $self;
+}
+
+# ERRORS
+
+sub error_on_copy {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.copy',
+    message => "Can't copy \"$self\" to \"$path\": $!",
+    stash => {
+      path => $path,
+      self => $self,
+    },
+  };
+}
+
+sub error_on_mkcall {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.mkcall',
+    message => ("Can't make system call to \"$path\": "
+        . ($! ? "$!" : sprintf("exit code (%s)", _exitcode()))),
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_mkdir {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.mkdir',
+    message => "Can't make directory \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_mkfile {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.mkfile',
+    message => "Can't make file \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_move {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.move',
+    message => "Can't move \"$self\" to \"$path\": $!",
+    stash => {
+      path => $path,
+      self => $self,
+    },
+  };
+}
+
+sub error_on_open {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.open',
+    message => "Can't open \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_read_binmode {
+  my ($self, $path, $binmode) = @_;
+
+  return {
+    name => 'on.read.binmode',
+    message => "Can't binmode \"$path\": $!",
+    stash => {
+      binmode => $binmode,
+      path => $path,
+    },
+  };
+}
+
+sub error_on_read_error {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.read.error',
+    message => "Can't read from file \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_read_open {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.read.open',
+    message => "Can't read \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_rmdir {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.rmdir',
+    message => "Can't rmdir \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_write_binmode {
+  my ($self, $path, $binmode) = @_;
+
+  return {
+    name => 'on.write.binmode',
+    message => "Can't binmode \"$path\": $!",
+    stash => {
+      binmode => $binmode,
+      path => $path,
+    },
+  };
+}
+
+sub error_on_write_error {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.write.error',
+    message => "Can't write to file \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_write_open {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.write.open',
+    message => "Can't write \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
+}
+
+sub error_on_unlink {
+  my ($self, $path) = @_;
+
+  return {
+    name => 'on.unlink',
+    message => "Can't unlink \"$path\": $!",
+    stash => {
+      path => $path,
+    },
+  };
 }
 
 1;
@@ -798,6 +929,31 @@ I<Since C<0.01>>
   $path = $path->chown(-1, -1);
 
   # bless({ value => "t/data/planets" }, "Venus::Path")
+
+=back
+
+=cut
+
+=head2 copy
+
+  copy(Str | Path $path) (Path)
+
+The copy method uses L<File::Copy/copy> to copy the file represented by the
+invocant to the path provided and returns the invocant.
+
+I<Since C<2.80>>
+
+=over 4
+
+=item copy example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $copy = $path->child('mercury')->copy($path->child('yrucrem'));
+
+  # bless({...}, 'Venus::Path')
 
 =back
 
@@ -1314,7 +1470,7 @@ I<Since C<0.01>>
 
   my ($call_output, $exit_code) = $path->mkcall('t/data/sun --heat-death');
 
-  # ("", 256)
+  # ("", 1)
 
 =back
 
@@ -1330,7 +1486,7 @@ I<Since C<0.01>>
 
   my $output = $path->mkcall;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_mkcall)
 
 =back
 
@@ -1372,7 +1528,7 @@ I<Since C<0.01>>
 
   $path = $path->mkdir;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_mkdir)
 
 =back
 
@@ -1462,7 +1618,84 @@ I<Since C<0.01>>
 
   $path = $path->mkfile;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_mkfile)
+
+=back
+
+=cut
+
+=head2 mktemp_dir
+
+  mktemp_dir() (Path)
+
+The mktemp_dir method uses L<File::Temp/tempdir> to create a temporary
+directory which isn't automatically removed and returns a new path object.
+
+I<Since C<2.80>>
+
+=over 4
+
+=item mktemp_dir example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mktemp_dir = $path->mktemp_dir;
+
+  # bless({value => "/tmp/ZnKTxBpuBE"}, "Venus::Path")
+
+=back
+
+=cut
+
+=head2 mktemp_file
+
+  mktemp_file() (Path)
+
+The mktemp_file method uses L<File::Temp/tempfile> to create a temporary file
+which isn't automatically removed and returns a new path object.
+
+I<Since C<2.80>>
+
+=over 4
+
+=item mktemp_file example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mktemp_file = $path->mktemp_file;
+
+  # bless({value => "/tmp/y5MvliBQ2F"}, "Venus::Path")
+
+=back
+
+=cut
+
+=head2 move
+
+  move(Str | Path $path) (Path)
+
+The move method uses L<File::Copy/move> to move the file represented by the
+invocant to the path provided and returns the invocant.
+
+I<Since C<2.80>>
+
+=over 4
+
+=item move example 1
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data');
+
+  my $unknown = $path->child('unknown')->mkfile->move($path->child('titan'));
+
+  # bless({...}, 'Venus::Path')
 
 =back
 
@@ -1558,7 +1791,7 @@ I<Since C<0.01>>
 
   my $fh = $path->open('>');
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_open)
 
 =back
 
@@ -1668,7 +1901,7 @@ I<Since C<0.01>>
 
   my $content = $path->read;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_read_open)
 
 =back
 
@@ -1754,7 +1987,7 @@ I<Since C<0.01>>
 
   my $rmdir = $path->mkdir->rmdir;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_rmdir)
 
 =back
 
@@ -2039,7 +2272,7 @@ I<Since C<0.01>>
 
   my $unlink = $path->unlink;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_unlink)
 
 =back
 
@@ -2079,11 +2312,421 @@ I<Since C<0.01>>
 
   my $write = $path->write('nothing');
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_write_open)
 
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_copy>
+
+This package may raise an error_on_copy exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_copy', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_copy"
+
+  # my $message = $error->message;
+
+  # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $self = $error->stash('self');
+
+  # bless({...}, 'Venus::Path')
+
+=back
+
+=over 4
+
+=item error: C<error_on_mkcall>
+
+This package may raise an error_on_mkcall exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_mkcall', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_mkcall"
+
+  # my $message = $error->message;
+
+  # "Can't make system call to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_mkdir>
+
+This package may raise an error_on_mkdir exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_mkdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_mkdir"
+
+  # my $message = $error->message;
+
+  # "Can't make directory \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_mkfile>
+
+This package may raise an error_on_mkfile exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_mkfile', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_mkfile"
+
+  # my $message = $error->message;
+
+  # "Can't make file \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_move>
+
+This package may raise an error_on_move exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_move', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_move"
+
+  # my $message = $error->message;
+
+  # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $self = $error->stash('self');
+
+  # bless({...}, 'Venus::Path')
+
+=back
+
+=over 4
+
+=item error: C<error_on_open>
+
+This package may raise an error_on_open exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_open', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_open"
+
+  # my $message = $error->message;
+
+  # "Can't open \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_read_binmode>
+
+This package may raise an error_on_read_binmode exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_read_binmode', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_read_binmode"
+
+  # my $message = $error->message;
+
+  # "Can't binmode \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_read_error>
+
+This package may raise an error_on_read_error exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_read_error', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_read_error"
+
+  # my $message = $error->message;
+
+  # "Can't read from file \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_read_open>
+
+This package may raise an error_on_read_open exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_read_open', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_read_open"
+
+  # my $message = $error->message;
+
+  # "Can't read \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_rmdir>
+
+This package may raise an error_on_rmdir exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_rmdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_rmdir"
+
+  # my $message = $error->message;
+
+  # "Can't rmdir \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_write_binmode>
+
+This package may raise an error_on_write_binmode exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere", ":utf8");
+
+  my $error = $path->throw('error_on_write_binmode', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_write_binmode"
+
+  # my $message = $error->message;
+
+  # "Can't binmode \"/nowhere\": $!"
+
+  # my $binmode = $error->stash('binmode');
+
+  # ":utf8"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_write_error>
+
+This package may raise an error_on_write_error exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_write_error', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_write_error"
+
+  # my $message = $error->message;
+
+  # "Can't write to file \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_write_open>
+
+This package may raise an error_on_write_open exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_write_open', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_write_open"
+
+  # my $message = $error->message;
+
+  # "Can't write \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_unlink>
+
+This package may raise an error_on_unlink exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_unlink', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_unlink"
+
+  # my $message = $error->message;
+
+  # "Can't unlink \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
 
 =head1 OPERATORS
 

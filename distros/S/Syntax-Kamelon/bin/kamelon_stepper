@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 use Syntax::Kamelon::Debugger;
-use Data::Dumper;
 
 my $noindex = 0;
 my $syntax;
 my $xmldir;
 my $file;
+my $ifh = *STDIN;
 
 while (@ARGV) {
 	my $o = shift @ARGV;
@@ -19,7 +19,7 @@ while (@ARGV) {
 	} elsif ($o eq '-file') {
 		$file = shift @ARGV
 	} elsif ($o eq '-noindex') {
-		$noindex = shift @ARGV
+		$noindex = 1
 	} else {
 		die "available options: -xmlfolder, -syntax, -file, -noindex";
 	}
@@ -27,25 +27,27 @@ while (@ARGV) {
 
 my @o = (noindex => $noindex);
 if (defined $xmldir) {
-	unless (-e $xmldir) { die "$xmldir folder does not exist" }
-	unless (-d $xmldir) { die "$xmldir is not a folder" }
+	die "$xmldir folder does not exist" unless -e $xmldir;
+	die "$xmldir is not a folder" unless -d $xmldir;
 	push @o, 'xmlfolder', $xmldir;
 }
 
-unless (defined $file) { die "Option -file must be specified" }
-unless (-e $file) { die "File $file does not exist" }
-unless (-f $file) { die "File $file is a folder" }
+if (defined $file) {
+	die "File $file does not exist" unless -e $file;
+	die "File $file is a folder" unless -f $file;
+	die "Cannot open input $file" unless open($ifh, "<", $file);
+}
 
-unless (defined $syntax) { die "Option -syntax must be specified" }
+die "Option -syntax must be specified" unless defined $syntax;
 
 my $kam = Syntax::Kamelon::Debugger->new(@o);
 $kam->Syntax($syntax);
 $kam->SetTasks('step');
 
-unless (open(IFILE, "<", $file)) { die "Cannot open input $file" }
+unless (open($ifh, "<", $file)) {  }
 
-while (my $in = <IFILE>) {
+while (my $in = <$ifh>) {
 	$kam->ParseRaw($in);
 }
 
-close IFILE;
+close $ihf;

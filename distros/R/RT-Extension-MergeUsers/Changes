@@ -1,5 +1,9 @@
 Revision history for RT-Extension-MergeUsers
 
+1.08 2023-05-16
+ - Cover merged user ids for ticket owner searches
+ - Cover merged user ids for ACL check in searches
+
 1.07 2023-04-13
  - Support the new CombineSearchAndCount feature in DBIx::SearchBuilder
    (Fix the issue that the first page of user search results might be empty)

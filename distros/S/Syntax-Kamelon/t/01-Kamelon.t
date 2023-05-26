@@ -10,6 +10,8 @@ my $kam = Syntax::Kamelon->new(
 );
 
 ok(defined $kam, 'Creation');
+my $syntax = $kam->SuggestSyntax('index.html');
+ok($syntax eq 'HTML', 'SuggestSyntax');
 
 my @syntaxes = $kam->AvailableSyntaxes;
 
@@ -18,6 +20,6 @@ for (@syntaxes) {
 	ok(((defined $lexer) and ($lexer =~ /^HASH\(/)), "syntax: $_");
 }
 
-my $tests = @syntaxes + 2;
+my $tests = @syntaxes + 3;
 
 done_testing($tests)

@@ -3,10 +3,8 @@ use strict;
 use warnings;
 use Path::Tiny;
 use HTTP::Tiny;
-use YAML::XS 0.87 'LoadFile';
+use YAML::PP;
 use JSON::Schema::Modern;
-
-local $YAML::XS::Boolean = 'JSON::PP';
 
 my %files = (
   # metaschema for json schemas contained within openapi documents
@@ -39,8 +37,9 @@ foreach my $target (keys %files) {
   $target->spew($response->{content});
 }
 
+my $yaml = YAML::PP->new(boolean => 'JSON::PP');
 my $js = JSON::Schema::Modern->new(validate_formats => 1);
-$js->add_schema($files{$_} => LoadFile('share/'.$_)) foreach grep /json$/, keys %files;
+$js->add_schema($files{$_} => $yaml->load_file('share/'.$_)) foreach grep /json$/, keys %files;
 
 foreach my $uri (values %files) {
   next if $uri =~ /LICENSE$/;

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.860';
+$Lab::Moose::Instrument::VERSION = '3.872';
 #ABSTRACT: Base class for instrument drivers
 
 use v5.20;
@@ -138,7 +138,11 @@ sub _trim_pmt {
 
 sub read {
     my $self = shift;
-    return _trim_pmt( $self->binary_read(@_) );
+    if ($self->connection_type ne 'HTTP') {
+        return _trim_pmt( $self->binary_read(@_) );
+    } else {
+        return $self->binary_read(@_);
+    }
 }
 
 sub query {
@@ -274,7 +278,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 SYNOPSIS
 
@@ -429,7 +433,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
             2018       Simon Reinhardt
             2020       Andreas K. Huettel, Sam Bingner
             2021       Fabian Weinelt
-            2022       Mia Schambeck
+            2022-2023  Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

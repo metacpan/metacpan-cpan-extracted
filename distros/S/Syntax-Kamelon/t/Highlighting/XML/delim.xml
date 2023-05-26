@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="delim" version="0.1" section="Test" extensions="*.delim;">
+<highlighting>
+<list name="colours">
+	<item> black </item>
+	<item> blue </item>
+	<item> green </item>
+	<item> red </item>
+	<item> yellow </item>
+</list>
+
+<list name="units">
+	<item> farad </item>
+	<item> ampere </item>
+	<item> liter </item>
+	<item> meter </item>
+	<item> volt </item>
+</list>
+
+<list name="elements">
+	<item> air </item>
+	<item> ether </item>
+	<item> fire </item>
+	<item> water </item>
+	<item> woodr </item>
+</list>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Word" String="&lt;Word&gt;" />
+	<StringDetect attribute="Test Area" context="Number" String="&lt;Number&gt;" />
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<context name="Word" attribute="Test Area" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Word&gt;" />
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<WordDetect attribute="Match" context="#stay" String="strong" />
+	<WordDetect attribute="Match" context="#stay" String="weak" weakDeliminator="."/>
+	<WordDetect attribute="Match" context="#stay" String="TheX" additionalDeliminator="x"/>
+	<keyword attribute="Match" context="#stay" String="colours"/>
+	<keyword attribute="Match" context="#stay" String="units" weakDeliminator="."/>
+	<keyword attribute="Match" context="#stay" String="elements" additionalDeliminator="x"/>
+</context>
+
+<context name="Number" attribute="Test Area" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Number&gt;" />
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<HlCOct attribute="Match" context="#stay" additionalDeliminator="."/>
+	<HlCHex attribute="Match" context="#stay" weakDeliminator=":"/>
+	<Int attribute="Match" context="#stay" />
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsBaseN" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>
+

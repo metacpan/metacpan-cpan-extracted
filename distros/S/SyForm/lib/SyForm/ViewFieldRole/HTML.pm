@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::ViewFieldRole::HTML::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: 
-$SyForm::ViewFieldRole::HTML::VERSION = '0.102';
+$SyForm::ViewFieldRole::HTML::VERSION = '0.103';
 use Moo::Role;
 use SyForm::ViewField::InputHTML;
 use SyForm::ViewField::LabelHTML;
@@ -83,7 +83,7 @@ SyForm::ViewFieldRole::HTML -
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

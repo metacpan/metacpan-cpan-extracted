@@ -3,6 +3,7 @@ ext=
 file=alert.xml
 menu=Other
 mime=
+priority=
 version=1.11
 
 [XML]
@@ -10,6 +11,9 @@ ext=*.docbook;*.xml;*.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc
 file=xml.xml
 menu=Markup
 mime=text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/xml
+mlcommentend=-->
+mlcommentstart=<!--
+priority=
 version=2.03
 
 [anychar]
@@ -17,6 +21,7 @@ ext=*.anychar;
 file=anychar.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [commonoptions]
@@ -24,6 +29,15 @@ ext=*.commonoptions;
 file=commonoptions.xml
 menu=Test
 mime=
+priority=
+version=0.1
+
+[delim]
+ext=*.delim;
+file=delim.xml
+menu=Test
+mime=
+priority=
 version=0.1
 
 [detect2chars]
@@ -31,6 +45,7 @@ ext=*.detect2chars;
 file=detect2chars.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [detectchar]
@@ -38,6 +53,7 @@ ext=*.detectchar;
 file=detectchar.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [detectid]
@@ -45,6 +61,7 @@ ext=*.detectid;
 file=detectid.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [detectsp]
@@ -52,6 +69,7 @@ ext=*.detectsp;
 file=detectsp.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [dyncontext]
@@ -59,6 +77,7 @@ ext=*.dyncontext;
 file=dyncontext.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [kwinsens]
@@ -66,6 +85,7 @@ ext=*.kwinsens;
 file=kwinsens.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [kwsens]
@@ -73,6 +93,7 @@ ext=*.kwsens;
 file=kwsens.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [linecont]
@@ -80,6 +101,7 @@ ext=*.linecont;
 file=linecont.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [numbers]
@@ -87,6 +109,15 @@ ext=*.numbers;
 file=numbers.xml
 menu=Test
 mime=
+priority=
+version=0.1
+
+[pop2context]
+ext=*.pop2context;
+file=pop2context.xml
+menu=Test
+mime=
+priority=
 version=0.1
 
 [rangedet]
@@ -94,6 +125,7 @@ ext=*.rangedet;
 file=rangedet.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [regexpr]
@@ -101,6 +133,7 @@ ext=*.regexpr;
 file=regexpr.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [stringdet]
@@ -108,6 +141,7 @@ ext=*.stringdet;
 file=stringdet.xml
 menu=Test
 mime=
+priority=
 version=0.1
 
 [worddet]
@@ -115,5 +149,6 @@ ext=*.worddet;
 file=worddet.xml
 menu=Test
 mime=
+priority=
 version=0.1
 

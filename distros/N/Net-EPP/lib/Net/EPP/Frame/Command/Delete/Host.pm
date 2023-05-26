@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Host.pm,v 1.3 2011/01/23 12:26:24 gavin Exp $
 package Net::EPP::Frame::Command::Delete::Host;
 use base qw(Net::EPP::Frame::Command::Delete);
 use Net::EPP::Frame::ObjectSpec;
@@ -85,26 +80,5 @@ sub setHost {
 
 	return 1;
 }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
-=cut
 
 1;

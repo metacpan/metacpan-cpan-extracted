@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Update.pm,v 1.5 2011/12/14 12:02:08 gavin Exp $
 package Net::EPP::Frame::Command::Update;
 use Net::EPP::Frame::Command::Update::Contact;
 use Net::EPP::Frame::Command::Update::Domain;
@@ -62,23 +57,6 @@ sub chg {
 
 These methods return the elements that should be used to contain the changes
 to be made to the object (ie C<domain:add>, C<domain:rem>, C<domain:chg>).
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
 
 =cut
 

@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Gif;
-$File::Sticker::Writer::Gif::VERSION = '3.0006';
+$File::Sticker::Writer::Gif::VERSION = '3.0008';
 =head1 NAME
 
 File::Sticker::Writer::Gif - write and standardize meta-data from GIF file
 
 =head1 VERSION
 
-version 3.0006
+version 3.0008
 
 =head1 SYNOPSIS
 
@@ -18,12 +18,14 @@ version 3.0006
 
 =head1 DESCRIPTION
 
-This will write meta-data from EXIF files, and standardize it to a common
+This will write meta-data from GIF files, and standardize it to a common
 nomenclature, such as "tags" for things called tags, or Keywords or Subject etc.
 
 =cut
 
+use v5.10;
 use common::sense;
+use Carp;
 use File::LibMagic;
 use Image::ExifTool qw(:Public);
 use YAML::Any;
@@ -65,6 +67,7 @@ sub allowed_file {
     my $file = shift;
     say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
 
+    $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
     if ($ft->{mime_type} eq 'image/gif')
     {
@@ -153,13 +156,7 @@ sub replace_all_meta {
     my %args = @_;
     say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
 
-    my $filename = $args{filename};
-    my $meta = $args{meta};
-    my $et = new Image::ExifTool;
-    $et->Options(ListSep=>',',ListSplit=>',');
-    $et->ExtractInfo($filename);
-
-    $self->_write_meta(filename=>$filename,meta=>$meta);
+    $self->_write_meta(%args);
     
 } # replace_all_meta
 
@@ -202,6 +199,7 @@ sub _load_meta {
     my $filename = shift;
     say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
 
+    $filename = $self->_get_the_real_file(filename=>$filename);
     my $et = new Image::ExifTool;
     $et->Options(ListSep=>',',ListSplit=>',');
     $et->ExtractInfo($filename);
@@ -234,7 +232,7 @@ sub _write_meta {
     my $self = shift;
     my %args = @_;
 
-    my $filename = $args{filename};
+    my $filename = $self->_get_the_real_file(filename=>$args{filename});
     my $meta = $args{meta};
     my $et = new Image::ExifTool;
     $et->Options(ListSep=>',',ListSplit=>',');
@@ -257,29 +255,50 @@ sub _write_meta {
     my $success = $et->SetNewValue('Comment', $yaml_str);
     if ($success)
     {
-        # ExifTool has a wicked habit of replacing soft-linked files
-        # with the contents of the file rather than honouring the link.
-        # While using the exiftool script offers -overwrite_original_in_place
-        # to deal with this, the Perl module does not appear to have
-        # such an option available.
-
-        # So the way to get around this is to check if $filename is
-        # a soft link, and if it is, find the real file, and
-        # write to that. (Note that this will not work if the
-        # soft link points to *another* soft link, but I'm
-        # not prepared to go down that rabbit-hole.)
-        if (-l $filename)
-        {
-            my $realfile = readlink $filename;
-            $et->WriteInfo($filename,$realfile);
-        }
-        else
-        {
-            $et->WriteInfo($filename);
-        }
+        $et->WriteInfo($filename);
     }
 
 } # _write_meta
+
+=head2 _get_the_real_file
+
+If the file is a soft link, look for the file it is pointing to
+(because ExifTool behaves badly with soft links).
+
+    my $real_file = $writer->_get_the_real_file(filename=>$filename);
+
+=cut
+
+sub _get_the_real_file {
+    my $self = shift;
+    my %args = @_;
+    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+
+    my $filename = $args{filename};
+    # ExifTool has a wicked habit of replacing soft-linked files with the
+    # contents of the file rather than honouring the link.  While using the
+    # exiftool script offers -overwrite_original_in_place to deal with this,
+    # the Perl module does not appear to have such an option available.
+
+    # So the way to get around this is to check if the file is a soft link, and
+    # if it is, find the real file, and write to that. And if *that* file is
+    # a soft link... go down the rabbit-hole as deep as it goes.
+
+    while (-l $filename)
+    {
+        my $realfile = readlink $filename;
+        if (-f $realfile)
+        {
+            $filename = $realfile;
+        }
+        else # give up and die
+        {
+            croak "$args{filename} is soft link, cannot find $realfile";
+        }
+    }
+
+    return $filename;
+} # _get_the_real_file
 
 =head1 BUGS
 

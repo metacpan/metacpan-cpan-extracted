@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::AboveAverage;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,46 +118,46 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Describe the AboveAverage conditional formatting rule. This conditional formatting     rule highlights cells that are above or below the average for all values     in the range.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'AboveAverage',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'is_above_average' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAboveAverage',
-    	description => 'Get or set the flag indicating whether the rule is an \&quot;above average\&quot; rule.    &#39;true&#39; indicates &#39;above average&#39;.  Default value is true.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_equal_average' => {
-    	datatype => 'boolean',
-    	base_name => 'IsEqualAverage',
-    	description => 'Get or set the flag indicating whether the &#39;aboveAverage&#39; and &#39;belowAverage&#39;    criteria is inclusive of the average itself, or exclusive of that value.    &#39;true&#39; indicates to include the average value in the criteria.  Default value    is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'std_dev' => {
-    	datatype => 'int',
-    	base_name => 'StdDev',
-    	description => 'Get or set the number of standard deviations to include above or below the   average in the conditional formatting rule. The input value must between   0 and 3 (include 0 and 3). Setting this value to 0 means stdDev is not set.    The default value is 0.             ',
-    	format => '',
-    	read_only => '',
-    		},
+     'is_above_average' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAboveAverage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_equal_average' => {
+     	datatype => 'boolean',
+     	base_name => 'IsEqualAverage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'std_dev' => {
+     	datatype => 'int',
+     	base_name => 'StdDev',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'is_above_average' => 'boolean',
     'is_equal_average' => 'boolean',
-    'std_dev' => 'int'
+    'std_dev' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
     'is_above_average' => 'IsAboveAverage',
     'is_equal_average' => 'IsEqualAverage',
-    'std_dev' => 'StdDev'
+    'std_dev' => 'StdDev' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

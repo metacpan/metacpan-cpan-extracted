@@ -5,7 +5,12 @@ use warnings;
 
 use Mo qw(is required);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
+
+has active => (
+	is => 'ro',
+	required => 1,
+);
 
 has id => (
 	is => 'ro',
@@ -44,6 +49,7 @@ Data::Kramerius::Object - Data object for kramerius instance.
  use Data::Kramerius::Object;
 
  my $obj = Data::Kramerius::Object->new(%params);
+ my $active = $obj->active;
  my $id = $obj->id;
  my $name = $obj->name;
  my $url = $obj->url;
@@ -60,6 +66,11 @@ Constructor.
 Returns instance of object.
 
 =over 8
+
+=item * C<active>
+
+Flag which means, if project is or not active.
+It's required.
 
 =item * C<id>
 
@@ -82,6 +93,14 @@ Version of Kramerius system.
 It's required.
 
 =back
+
+=head2 C<active>
+
+ my $active = $obj->active;
+
+Get flag about activity of Kramerius system.
+
+Returns 0/1.
 
 =head2 C<id>
 
@@ -117,12 +136,15 @@ Returns number.
 
 =head1 EXAMPLE
 
+=for comment filename=create_object_and_print.pl
+
  use strict;
  use warnings;
 
  use Data::Kramerius::Object;
 
  my $obj = Data::Kramerius::Object->new(
+         'active' => 1,
          'id' => 'foo',
          'name' => 'Foo Kramerius',
          'url' => 'https://foo.example.com',
@@ -130,12 +152,14 @@ Returns number.
  );
 
  # Print out.
+ print 'Active: '.$obj->active."\n";
  print 'Id: '.$obj->id."\n";
  print 'Name: '.$obj->name."\n";
  print 'URL: '.$obj->url."\n";
  print 'Version: '.$obj->version."\n";
 
  # Output:
+ # Active: 1
  # Id: foo
  # Name: Foo Kramerius
  # URL: https://foo.example.com
@@ -157,12 +181,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -34,6 +34,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'Test::More'  => 0,
+        'Test::Pod'  => 1.14,
     },
     PREREQ_PM => {
 	'Exporter'   => 0,

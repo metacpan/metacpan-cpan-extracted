@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::FieldRole::Default::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: A default for the field
-$SyForm::FieldRole::Default::VERSION = '0.102';
+$SyForm::FieldRole::Default::VERSION = '0.103';
 use Moo::Role;
 
 has default => (
@@ -36,7 +36,7 @@ SyForm::FieldRole::Default - A default for the field
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

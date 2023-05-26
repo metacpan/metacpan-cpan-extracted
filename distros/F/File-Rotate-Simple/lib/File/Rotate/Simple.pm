@@ -1,6 +1,6 @@
 package File::Rotate::Simple;
 
-use v5.8.8;
+use v5.14;
 
 use Moo 1.001000;
 extends 'Exporter';
@@ -15,7 +15,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.5';
+our $VERSION = 'v0.3.0';
 
 # ABSTRACT: no-frills file rotation
 
@@ -234,7 +234,7 @@ sub _rotated_name {
     my $format = $self->extension_format;
     {
         no warnings 'uninitialized';
-        $format =~ s/\%(\d+)*#/sprintf("\%0$1d", $index)/ge;
+        $format =~ s/\%(\d+)*#/sprintf("\%0$1d", $index)/gea;
     }
 
     my $file      = $self->file->stringify;
@@ -244,9 +244,7 @@ sub _rotated_name {
     if (defined $replace) {
 
         my $re = quotemeta($replace);
-        $file =~ s/${re}$/${extension}/;
-
-        return path($file);
+        return path($file =~ s/${re}$/${extension}/r );
 
     } else {
 
@@ -275,7 +273,7 @@ File::Rotate::Simple - no-frills file rotation
 
 =head1 VERSION
 
-version v0.2.5
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -487,6 +485,16 @@ Added in v0.2.0.
 
 =for readme continue
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.3.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.8, please use one of the v0.2.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 The following modules have similar functionality:
@@ -527,7 +535,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2020 by Robert Rothenberg.
+This software is Copyright (c) 2015-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

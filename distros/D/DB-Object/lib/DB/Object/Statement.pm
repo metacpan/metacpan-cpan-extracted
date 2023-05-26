@@ -231,7 +231,15 @@ sub execute
 #         ) )
     if( $q && $self->{bind} )
     {
-        if( @_ && ( $self->_is_hash( $_[0] ) ) )
+        # if( @_ && ( $self->_is_hash( $_[0] ) ) )
+        if( @_ && 
+            (
+                # hash reference
+                ( @_ == 1 && $self->_is_hash( $_[0] ) ) ||
+                # key => value pairs
+                ( !( @_ % 2 ) && ref( $_[0] ) ne 'HASH' )
+            )
+          )
         {
             my $vals = {};
             if( $self->_is_hash( $_[0] ) )
@@ -278,6 +286,55 @@ sub execute
             CORE::push( @binded, @binded );
         }
     }
+    
+    if( scalar( @_ ) )
+    {
+        my $temp = {};
+        for( my $i = 0; $i < scalar( @_ ); $i++ )
+        {
+            # { $some_value => 'varchar' }
+            if( ref( $_[$i] ) eq 'HASH' && 
+                scalar( keys( %{$_[$i]} ) ) == 1 &&
+                # e.g. DBI::SQL_VARCHAR or DBI::SQL_INTEGER
+                DBI->can( "SQL_" . uc( [values( %{$_[$i]} )]->[0] ) ) )
+            {
+                my $constant = DBI->can( "SQL_" . uc( [values( %{$_[$i]} )]->[0] ) );
+                $temp->{$i} = { type => $constant->(), value => [keys( %{$_[$i]} )]->[0] };
+            }
+        }
+    
+        # The user has chosen to override any datatype computed and be explicit.
+        if( scalar( keys( %$temp ) ) == scalar( @_ ) )
+        {
+            @binded = @_;
+        }
+        elsif( scalar( keys( %$temp ) ) )
+        {
+            foreach my $i ( sort( keys( %$temp ) ) )
+            {
+                CORE::splice( @binded_types, $i, 0, $temp->{ $i }->{type} );
+                $binded[$i] = $temp->{ $i }->{value};
+            }
+        }
+    }
+    
+    # $sth->exec({ $my_value => DBI::SQL_VARCHAR });
+#     for( my $i = 0; $i < scalar( @binded ); $i++ )
+#     {
+#         # { $some_value => 'varchar' }
+#         if( ref( $binded[$i] ) eq 'HASH' && 
+#             scalar( keys( %{$binded[$i]} ) ) == 1 &&
+#             # e.g. DBI::SQL_VARCHAR or DBI::SQL_INTEGER
+#             DBI->can( "SQL_" . uc( [values( %{$binded[$i]} )]->[0] ) ) )
+#         {
+#             my $constant = DBI->can( "SQL_" . uc( [values( %{$binded[$i]} )]->[0] ) );
+#             # Get the DBI SQL contant value and add it as a type
+#             CORE::splice( @binded_types, $i, 0, $constant->() );
+#             # Replace our current value with the actual value
+#             $binded[$i] = [keys( %{$binded[$i]} )]->[0];
+#         }
+#     }
+    
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
         warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", @binded_types ) ) );
@@ -1073,6 +1130,39 @@ DB::Object::Statement - Statement Object
 
 =head1 SYNOPSIS
 
+    say $sth->as_string;
+    $sth->bind_param( 2, $binded_value );
+    $sth->bind_param( 2, $binded_value, $binded_type );
+    $sth->commit;
+    my $dbh = $sth->database_object;
+    $sth->distinct;
+    say $sth->dump;
+    say $sth->execute;
+    $sth->execute( $val1, $val2 ) || die( $sth->error );
+    # explicitly specify types
+    # Here in this mixed example, $val1 and $val3 have known types
+    $tbl->where( $dbh->AND(
+        $tbl->fo->name == '?',
+        $tbl->fo>city == '?',
+        '?' == ANY( $tbl->fo->alias )
+    ) );
+    my $sth = $tbl->select || die( $tbl->error );
+    $sth->execute( $val1, $val2, { $val3 => 'varchar' } ) || die( $sth->error );
+    my $ref = $sth->fetchall_arrayref;
+    my $val = $sth->fetchcol;
+    my %hash = $sth->fetchhash;
+    my @values = $sth->fetchrow;
+    my $ref = $sth->fetchrow_hashref;
+    my $obj = $sth->fetchrow_object;
+    $sth->finish;
+    $sth->ignore;
+    $sth->join( $join_condition );
+    my $qo = $sth->query_object;
+    $sth->rollback;
+    my $rows = $sth->rows;
+    my $dbi_sth = $sth->sth;
+    my $tbl = $sth->table_object;
+
 =head1 VERSION
 
 v0.4.2
@@ -1123,7 +1213,37 @@ This is an alias for L</execute>
 
 =head2 execute
 
+    $sth->execute || die( $sth->error );
+    $sth->execute( $val1, $val2 ) || die( $sth->error );
+    # explicitly specify types
+    # Here in this mixed example, $val1 and $val3 have known types
+    $tbl->where( $dbh->AND(
+        $tbl->fo->name == '?',
+        $tbl->fo>city == '?',
+        '?' == ANY( $tbl->fo->alias )
+    ) );
+    my $sth = $tbl->select || die( $tbl->error );
+    $sth->execute( $val1, $val2, { $val3 => 'varchar' } ) || die( $sth->error );
+
 If binded values have been prepared, they are applied here before executing the query.
+
+Sometime, you need to clearly specify what the datatype are for the value provided with C<execute>, because L<DB::Object::Query> could not figure it out.
+
+Thus, if you do:
+
+    $tbl->where(
+        $tbl->fo->name == '?'
+    );
+
+L<DB::Object::Query> knows the datatype, because you are using a field object (C<fo>), but if you were doing:
+
+    $tbl->where(
+        '?' == ANY( $tbl->fo->alias )
+    );
+
+In this scenario, L<DB::Object::Query> does not know what the bind value would be, although we could venture a guess by looking at the right-hand side, but this is a bit hazardous. So you are left with a placeholder, but no datatype. So you would execute like:
+
+    $sth->execute({ $val => 'varchar' });
 
 If the total number of binded values does not match the total number of binded type, this will trigger a warning.
 

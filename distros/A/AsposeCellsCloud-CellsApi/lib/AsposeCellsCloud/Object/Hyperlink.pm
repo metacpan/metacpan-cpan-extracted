@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Hyperlink;
 
 require 5.6.0;
@@ -36,10 +35,10 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::CellArea;
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -55,12 +54,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -101,7 +100,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -109,7 +108,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -121,64 +120,73 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Hyperlink',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'screen_tip' => {
-    	datatype => 'string',
-    	base_name => 'ScreenTip',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'area' => {
-    	datatype => 'CellArea',
-    	base_name => 'Area',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text_to_display' => {
-    	datatype => 'string',
-    	base_name => 'TextToDisplay',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'address' => {
-    	datatype => 'string',
-    	base_name => 'Address',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'address' => {
+     	datatype => 'string',
+     	base_name => 'Address',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'area' => {
+     	datatype => 'CellArea',
+     	base_name => 'Area',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'screen_tip' => {
+     	datatype => 'string',
+     	base_name => 'ScreenTip',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_to_display' => {
+     	datatype => 'string',
+     	base_name => 'TextToDisplay',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link_type' => {
+     	datatype => 'string',
+     	base_name => 'LinkType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
-    'screen_tip' => 'string',
+    'address' => 'string',
     'area' => 'CellArea',
+    'screen_tip' => 'string',
     'text_to_display' => 'string',
-    'address' => 'string'
+    'link_type' => 'string',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
-    'screen_tip' => 'ScreenTip',
+    'address' => 'Address',
     'area' => 'Area',
+    'screen_tip' => 'ScreenTip',
     'text_to_display' => 'TextToDisplay',
-    'address' => 'Address'
+    'link_type' => 'LinkType',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

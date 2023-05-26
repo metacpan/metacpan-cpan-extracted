@@ -285,6 +285,21 @@ It can include the following keys:
     A integer or array ref of integers representing the family type an interface
     supports.
 
+    **From v0.4.0:** Also can be a string or array ref of strings, which are matched
+    against supported families. See `parse_passive_spec` for matching details
+
+- type
+
+    ```perl
+        examples: type=>SOCK_STREAM type=>[SOCK_STREAM, SOCK_DGRAM]
+    ```
+
+    A integer or array ref of integers representing the socket type an interface
+    supports.
+
+    **From v0.4.0:** Also can be a string or array ref of strings, which are matched
+    against supported socket types. See `parse_passive_spec` for matching details
+
 - port
 
     ```perl
@@ -310,7 +325,7 @@ It can include the following keys:
     Either `port` or `path` are required, otherwise no addresses will be
     generated.
 
-    **NOTE** The actually path resulting from the specification will have a '\_D' or
+    **NOTE** The actual path resulting from the specification will have a '\_D' or
     '\_S' appended to the path. This is done to ensure sockets of different type
     don't attempt to use the same path.
 

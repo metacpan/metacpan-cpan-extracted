@@ -35,7 +35,6 @@ never need to access it directly.
         +----L<Net::EPP::Frame>
             +----L<Net::EPP::Frame::Command>
 
-
 =cut
 
 sub new {
@@ -119,26 +118,5 @@ sub getCommandNode {
 
 sub command { $_[0]->getNode('command') }
 sub clTRID { $_[0]->getNode('clTRID') }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
-=cut
 
 1;

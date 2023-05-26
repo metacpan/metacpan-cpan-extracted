@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2023-03-01'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our %SPEC;
 
@@ -19,11 +19,47 @@ $SPEC{':package'} = {
     summary => 'Utilities related to ImageMagick',
 };
 
-our %argspec0_files = (
+our %argspec0plus_files = (
     files => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'file',
         schema => ['array*' => of => 'filename*'],
+        req => 1,
+        pos => 0,
+        slurpy => 1,
+    },
+);
+
+our %argspec0plus_files__comp_png = (
+    files => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'file',
+        schema => ['array*' => of => 'filename*'],
+        'x.completion' => [filename => {file_ext_filter=>'png'}],
+        req => 1,
+        pos => 0,
+        slurpy => 1,
+    },
+);
+
+our %argspec0plus_files__comp_jpg = (
+    files => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'file',
+        schema => ['array*' => of => 'filename*'],
+        'x.completion' => [filename => {file_ext_filter=>qr/^(jpe?g)$/i}],
+        req => 1,
+        pos => 0,
+        slurpy => 1,
+    },
+);
+
+our %argspec0plus_files__comp_pdf = (
+    files => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'file',
+        schema => ['array*' => of => 'filename*'],
+        'x.completion' => [filename => {file_ext_filter=>'pdf'}],
         req => 1,
         pos => 0,
         slurpy => 1,
@@ -57,6 +93,24 @@ _
     },
 );
 
+our %argspecopt_quality = (
+    quality => {
+        summary => 'Quality setting (for JPEG/PNG), 1 (best compression, worst quality) to 100 (least compression, best quality)',
+        schema => ['int*', between=>[0,100]],
+        default => 92,
+        cmdline_aliases => {q=>{}},
+    },
+);
+
+our %argspecopt_quality__def40 = (
+    quality => {
+        summary => 'Quality setting (for JPEG/PNG), 1 (best compression, worst quality) to 100 (least compression, best quality)',
+        schema => ['int*', between=>[0,100]],
+        default => 40,
+        cmdline_aliases => {q=>{}},
+    },
+);
+
 our %args_rels = (
     choose_one => [qw/delete_original trash_original/],
 );
@@ -83,12 +137,8 @@ or (if downsizing is done):
 
 _
     args => {
-        %argspec0_files,
-        quality => {
-            schema => ['int*', between=>[0,100]],
-            default => 40,
-            cmdline_aliases => {q=>{}},
-        },
+        %argspec0plus_files,
+        %argspecopt_quality__def40,
         downsize_to => {
             schema => ['str*', in=>['', '640', '800', '1024', '1536', '2048']],
             default => '1024',
@@ -285,7 +335,8 @@ is basically equivalent to:
 
 _
     args => {
-        %argspec0_files,
+        %argspec0plus_files,
+        %argspecopt_quality,
         to => {
             schema => ['str*', match=>qr/\A\w+\z/],
             req => 1,
@@ -317,7 +368,7 @@ sub convert_image_to {
         log_info "Processing file %s ...", $file;
         IPC::System::Options::system(
             {log=>1},
-            "convert", $file, "$file.$to",
+            "convert", ($args{quality} ? ("-quality", $args{quality}) : ()), $file, "$file.$to",
         );
         my $ps = Process::Status->new;
 
@@ -360,7 +411,7 @@ which in turn is equivalent to:
 
 _
     args => {
-        %argspec0_files,
+        %argspec0plus_files,
         %argspecs_delete,
     },
     #features => {
@@ -375,6 +426,80 @@ _
 sub convert_image_to_pdf {
     my %args = @_;
     convert_image_to(%args, to=>'pdf');
+}
+
+$SPEC{convert_image_to_jpg} = {
+    v => 1.1,
+    summary => 'Convert images to JPG using ImageMagick\'s \'convert\' utility',
+    description => <<'_',
+
+This is a wrapper to `convert-image-to`, with `--to` set to `jpg`:
+
+    % convert-image-to-pdf *.png
+
+is equivalent to:
+
+    % convert-image-to --to jpg *.png
+
+which in turn is equivalent to:
+
+    % for f in *.png; do convert "$f" "$f.jpg"; done
+
+_
+    args => {
+        %argspec0plus_files,
+        %argspecopt_quality,
+        %argspecs_delete,
+    },
+    #features => {
+    #    dry_run => 1,
+    #},
+    deps => {
+        prog => 'convert',
+    },
+    examples => [
+    ],
+};
+sub convert_image_to_jpg {
+    my %args = @_;
+    convert_image_to(%args, to=>'jpg');
+}
+
+$SPEC{convert_image_to_png} = {
+    v => 1.1,
+    summary => 'Convert images to JPG using ImageMagick\'s \'convert\' utility',
+    description => <<'_',
+
+This is a wrapper to `convert-image-to`, with `--to` set to `png`:
+
+    % convert-image-to-png *.jpg
+
+is equivalent to:
+
+    % convert-image-to --to png *.jpg
+
+which in turn is equivalent to:
+
+    % for f in *.jpg; do convert "$f" "$f.png"; done
+
+_
+    args => {
+        %argspec0plus_files,
+        %argspecopt_quality,
+        %argspecs_delete,
+    },
+    #features => {
+    #    dry_run => 1,
+    #},
+    deps => {
+        prog => 'convert',
+    },
+    examples => [
+    ],
+};
+sub convert_image_to_png {
+    my %args = @_;
+    convert_image_to(%args, to=>'png');
 }
 
 1;
@@ -392,7 +517,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.019 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
+This document describes version 0.020 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
 
 =head1 DESCRIPTION
 
@@ -400,17 +525,29 @@ This distribution includes the following CLI utilities related to ImageMagick:
 
 =over
 
-=item * L<calc-image-resized-size>
+=item 1. L<calc-image-resized-size>
 
-=item * L<convert-image-to>
+=item 2. L<convert-image-to>
 
-=item * L<convert-image-to-pdf>
+=item 3. L<convert-image-to-jpg>
 
-=item * L<downsize-image>
+=item 4. L<convert-image-to-pdf>
 
-=item * L<image-resize-notation-to-human>
+=item 5. L<convert-image-to-png>
 
-=item * L<img2pdf>
+=item 6. L<downsize-image>
+
+=item 7. L<image-resize-notation-to-human>
+
+=item 8. L<img2jpg>
+
+=item 9. L<img2pdf>
+
+=item 10. L<img2png>
+
+=item 11. L<jpg2png>
+
+=item 12. L<png2jpg>
 
 =back
 
@@ -448,7 +585,81 @@ See also the C<trash_original> option.
 
 =item * B<files>* => I<array[filename]>
 
+(No description)
+
+=item * B<quality> => I<int> (default: 92)
+
+Quality setting (for JPEGE<sol>PNG), 1 (best compression, worst quality) to 100 (least compression, best quality).
+
 =item * B<to>* => I<str>
+
+(No description)
+
+=item * B<trash_original> => I<bool>
+
+Trash the original file after downsizing.
+
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the C<delete_original> option.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 convert_image_to_jpg
+
+Usage:
+
+ convert_image_to_jpg(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert images to JPG using ImageMagick's 'convert' utility.
+
+This is a wrapper to C<convert-image-to>, with C<--to> set to C<jpg>:
+
+ % convert-image-to-pdf *.png
+
+is equivalent to:
+
+ % convert-image-to --to jpg *.png
+
+which in turn is equivalent to:
+
+ % for f in *.png; do convert "$f" "$f.jpg"; done
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<delete_original> => I<bool>
+
+Delete (unlink) the original file after downsizing.
+
+See also the C<trash_original> option.
+
+=item * B<files>* => I<array[filename]>
+
+(No description)
+
+=item * B<quality> => I<int> (default: 92)
+
+Quality setting (for JPEGE<sol>PNG), 1 (best compression, worst quality) to 100 (least compression, best quality).
 
 =item * B<trash_original> => I<bool>
 
@@ -509,6 +720,74 @@ Delete (unlink) the original file after downsizing.
 See also the C<trash_original> option.
 
 =item * B<files>* => I<array[filename]>
+
+(No description)
+
+=item * B<trash_original> => I<bool>
+
+Trash the original file after downsizing.
+
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the C<delete_original> option.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 convert_image_to_png
+
+Usage:
+
+ convert_image_to_png(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert images to JPG using ImageMagick's 'convert' utility.
+
+This is a wrapper to C<convert-image-to>, with C<--to> set to C<png>:
+
+ % convert-image-to-png *.jpg
+
+is equivalent to:
+
+ % convert-image-to --to png *.jpg
+
+which in turn is equivalent to:
+
+ % for f in *.jpg; do convert "$f" "$f.png"; done
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<delete_original> => I<bool>
+
+Delete (unlink) the original file after downsizing.
+
+See also the C<trash_original> option.
+
+=item * B<files>* => I<array[filename]>
+
+(No description)
+
+=item * B<quality> => I<int> (default: 92)
+
+Quality setting (for JPEGE<sol>PNG), 1 (best compression, worst quality) to 100 (least compression, best quality).
 
 =item * B<trash_original> => I<bool>
 
@@ -580,7 +859,11 @@ C<--dont-downsize> on the CLI.
 
 =item * B<files>* => I<array[filename]>
 
+(No description)
+
 =item * B<quality> => I<int> (default: 40)
+
+Quality setting (for JPEGE<sol>PNG), 1 (best compression, worst quality) to 100 (least compression, best quality).
 
 =item * B<skip_downsized> => I<bool> (default: 1)
 
@@ -666,7 +949,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

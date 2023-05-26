@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::FontSetting;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Font;
-use AsposeCellsCloud::Object::TextOptions;
+use AsposeCellsCloud::Object::TextOptions; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,64 +119,64 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'FontSetting',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'text_options' => {
-    	datatype => 'TextOptions',
-    	base_name => 'TextOptions',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'length' => {
-    	datatype => 'int',
-    	base_name => 'Length',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'font' => {
-    	datatype => 'Font',
-    	base_name => 'Font',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'start_index' => {
-    	datatype => 'int',
-    	base_name => 'StartIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'font' => {
+     	datatype => 'Font',
+     	base_name => 'Font',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'length' => {
+     	datatype => 'int',
+     	base_name => 'Length',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_index' => {
+     	datatype => 'int',
+     	base_name => 'StartIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_options' => {
+     	datatype => 'TextOptions',
+     	base_name => 'TextOptions',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'text_options' => 'TextOptions',
-    'length' => 'int',
     'font' => 'Font',
-    'type' => 'string',
-    'start_index' => 'int'
+    'length' => 'int',
+    'start_index' => 'int',
+    'text_options' => 'TextOptions',
+    'type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'text_options' => 'TextOptions',
-    'length' => 'Length',
     'font' => 'Font',
-    'type' => 'Type',
-    'start_index' => 'StartIndex'
+    'length' => 'Length',
+    'start_index' => 'StartIndex',
+    'text_options' => 'TextOptions',
+    'type' => 'Type' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

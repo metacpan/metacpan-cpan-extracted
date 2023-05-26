@@ -26,10 +26,14 @@ README
 README.md
 t/00-IO-FD.t
 t/01-file-basic.t
+t/01-mkfifo.t
+t/01-mkfifoat.t
+t/01-open.t
 t/01-pipe.t
+t/01-pread-pwrite.t
 t/01-readline.t
+t/01-temp.t
 t/02-accept.t
-t/02-bind-connect.t
 t/02-bind.t
 t/02-send-recv.t
 t/02-sendfile.t
@@ -43,5 +47,17 @@ t/06-stat.t
 t/07-dwim.t
 t/08-shutdown.t
 t/09-accept-multiple.t
+xs-include/close.c
+xs-include/experimental.c
+xs-include/file.c
+xs-include/mkfifo.c
+xs-include/mkfifoat.pl
+xs-include/open.c
+xs-include/read.c
+xs-include/send-recv.c
+xs-include/sendfile.pl
+xs-include/socket.c
+xs-include/temp.c
+xs-include/write.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

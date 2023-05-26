@@ -1,5 +1,14 @@
 Revision history for Perl extension Mojolicious-Plugin-Prometheus
 
+1.4.1 2023-05-25T16:18:10Z
+    - Added a missing dependency for cutting releases
+    - Adding path to @INC for one test file (thanks @leont)
+
+1.4.0 2023-05-23T09:07:39Z
+
+    - Making sure collectors are only run on requests to `/metrics`
+    - Option to use custom `Net::Prometheus` instance
+
 1.3.1 2020-04-12T18:37:25Z
     - Document `route` parameter
 

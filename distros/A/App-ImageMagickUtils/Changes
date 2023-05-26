@@ -1,3 +1,11 @@
+0.020   2023-03-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities convert-image-to-jpg (img2jpg, png2jpg),
+          convert-image-to-png (img2png, jpg2png).
+
+        - Add --quality (-q) option to the convert-* utilities.
+
+
 0.019   2022-05-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -1,10 +1,9 @@
 # -*- perl -*-
-
 # t/007_object.t - Checks access to option values as methods
-
 use Test::More qw( no_plan );
 use strict;
 use warnings;
+use lib './lib';
 
 BEGIN { use_ok( 'Getopt::Class' ) || BAIL_OUT( "Unable to load Getopt::Class" ); }
 

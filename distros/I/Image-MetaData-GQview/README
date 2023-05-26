@@ -5,6 +5,8 @@ SYNOPSIS
 
          use Image::MetaData::GQview;
          my $md = Image::MetaData::GQview->new("test.jpg");
+	 my $md2 = Image::MetaData::GQview->new("test2.jpg", {fields => ['keywords', 'comment', 'picture info']});
+	 my $md3 = Image::MetaData::GQview->new({file => "test2.jpg", fields => ['keywords', 'comment', 'picture info']});
          $md->load("test.jpg");
          my $comment = $md->comment;
          my @keywords = $md->keywords;
@@ -17,31 +19,55 @@ DESCRIPTION
 
 This module is a abstraction to the image meta data of GQview.
 
+All internal errors will trow an error!
+
 METHODS
 
-   new
-      This is a class method and the only one. It is used to get a object
-      of Image::MetaData::GQview. It can be called without parameter or
-      with the image as only option in witch case it try to load the meta
-      data.
+    new This is a class method and the only one. It is used to get a object
+        of Image::MetaData::GQview. It can be called without parameter or
+        with the image as only option in witch case it try to load the meta
+        data.
 
-   load
-      If you didn't load the data with new you can do that with this
-      method. If the parameter is left out the one setted before is used.
+        You can provide a hash reference as second or as only parameter
+        which specify file and/or fields. The fields are default "keywords"
+        and "comment" in this order.
 
-   comment
-      Get or set the comment.
+    load
+        If you didn't load the data with new you can do that with this
+        method. If the parameter is left out the one setted before is used.
 
-   keywords
-      Get or set the keywords.
+        You can also specify the location for the meta file as second
+        parameter.
 
-   raw
-      Get the raw data
+    comment
+        Get or set the comment.
 
-   save
-      Save the data to disk. This will read the location from the gqview
-      configuration. If there is none, the info will be saved in local
-      directory.
+    keywords
+        Get or set the keywords. This is the preferred method for the
+        keywords as it shift out empty keywords.
+
+    raw Get the raw data
+
+    save
+        Save the data to disk. This will read the location from the gqview
+        configuration. If there is none, the info will be saved in local
+        directory.
+
+        You can also specify the location for the meta file as second
+        parameter.
+
+    get_field
+        This will extract the information of one field and return it as
+        single sting (in scalar context) or as array splitted in lines.
+
+        Please note, it array context also empty lines can be returned!
+
+    set_field
+        Well, of cause if you can get a field you have to be able to set it.
+
+        The arguments are the field name and the data.
+
+        The data can be a single value or a array.
 
 INSTALLATION
 
@@ -52,6 +78,19 @@ To install this module, run the following commands:
    make test
    make install
 
+BUGS
+
+Please report any bugs or feature requests to "bug-image-metadata-gqview at
+rt.cpan.org", or through the web interface at
+<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Image-MetaData-GQview>. I will
+be notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
+
+INCOMPATIBILITIES
+
+The module cannot be used under non unixoid systems like windows. But there is
+no need for this module anyway as the tool gqview is only available on unixoid
+systems.
 
 SUPPORT AND DOCUMENTATION
 
@@ -75,7 +114,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2006 by Klaus Ethgen. All rights reserved.
+Copyright (c) 2006-2009 by Klaus Ethgen. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

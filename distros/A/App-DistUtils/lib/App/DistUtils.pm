@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-21'; # DATE
+our $DATE = '2023-02-25'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 our %dist_arg_single = (
     dist => {
@@ -51,7 +51,7 @@ App::DistUtils - Collection of utilities related to Perl distributions
 
 =head1 VERSION
 
-This document describes version 0.152 of App::DistUtils (from Perl distribution App-DistUtils), released on 2022-08-21.
+This document describes version 0.153 of App::DistUtils (from Perl distribution App-DistUtils), released on 2023-02-25.
 
 =head1 SYNOPSIS
 
@@ -60,35 +60,35 @@ distributions:
 
 =over
 
-=item * L<dir2dist>
+=item 1. L<dir2dist>
 
-=item * L<dir2mod>
+=item 2. L<dir2mod>
 
-=item * L<dist-dir>
+=item 3. L<dist-dir>
 
-=item * L<dist-has-deb>
+=item 4. L<dist-has-deb>
 
-=item * L<dist2deb>
+=item 5. L<dist2deb>
 
-=item * L<dist2mod>
+=item 6. L<dist2mod>
 
-=item * L<list-dist-contents>
+=item 7. L<list-dist-contents>
 
-=item * L<list-dist-modules>
+=item 8. L<list-dist-modules>
 
-=item * L<list-dists>
+=item 9. L<list-dists>
 
-=item * L<mod2dist>
+=item 10. L<mod2dist>
 
-=item * L<packlist-for>
+=item 11. L<packlist-for>
 
-=item * L<parse-release-file-name>
+=item 12. L<parse-release-file-name>
 
-=item * L<pwd2dist>
+=item 13. L<pwd2dist>
 
-=item * L<pwd2mod>
+=item 14. L<pwd2mod>
 
-=item * L<uninstall-dist>
+=item 15. L<uninstall-dist>
 
 =back
 
@@ -162,7 +162,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

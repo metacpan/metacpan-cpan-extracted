@@ -1,5 +1,9 @@
 Revision history for JIP-Spy-Events
 
+v0.0.4    2023-05-26
+  - Added called method.
+  - Added not_called method.
+
 v0.0.3    2023-04-16
   - Improved portability of some tests.
   - More documentation.

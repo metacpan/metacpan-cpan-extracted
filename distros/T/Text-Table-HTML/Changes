@@ -1,3 +1,16 @@
+0.010   2023-05-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix some bugs with placement of <tbody> tag (thanks DJERIUS).
+
+        - Add multiple header row support (header_row is now an integer instead
+          of boolean) (thanks DJERIUS).
+
+        - [optimize] Optimize hot path (thanks DJERIUS).
+
+        - [doc] Document header_row argument, mention Text::Table::Tiny,
+          add compatibility notes with Text::Table::Tiny.
+
+
 0.009   2022-10-11  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.007 and 0.007.2.

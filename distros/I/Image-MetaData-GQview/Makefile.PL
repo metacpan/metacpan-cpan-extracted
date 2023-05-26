@@ -5,10 +5,10 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
    NAME          => 'Image::MetaData::GQview',
-   AUTHOR        => 'Klaus Ethgen <Klaus@Ethgen.de>',
+   AUTHOR        => 'Klaus Ethgen <Klaus@Ethgen.ch>',
    VERSION_FROM  => 'lib/Image/MetaData/GQview.pm',
    ABSTRACT_FROM => 'lib/Image/MetaData/GQview.pm',
-   LICENSE       => 'GPL v2',
+   LICENSE       => 'gpl_2',
    PL_FILES      => {},
    PREREQ_PM     => {
       'Cwd'	   => 0,

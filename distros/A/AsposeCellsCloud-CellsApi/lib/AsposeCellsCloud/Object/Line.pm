@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Line;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Color;
-use AsposeCellsCloud::Object::GradientFill;
+use AsposeCellsCloud::Object::GradientFill; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,190 +119,190 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Line',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'style' => {
-    	datatype => 'string',
-    	base_name => 'Style',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_auto' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAuto',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'begin_arrow_length' => {
-    	datatype => 'string',
-    	base_name => 'BeginArrowLength',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'weight' => {
-    	datatype => 'string',
-    	base_name => 'Weight',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'gradient_fill' => {
-    	datatype => 'GradientFill',
-    	base_name => 'GradientFill',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'color' => {
-    	datatype => 'Color',
-    	base_name => 'Color',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'compound_type' => {
-    	datatype => 'string',
-    	base_name => 'CompoundType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'weight_pt' => {
-    	datatype => 'double',
-    	base_name => 'WeightPt',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_visible' => {
-    	datatype => 'boolean',
-    	base_name => 'IsVisible',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'join_type' => {
-    	datatype => 'string',
-    	base_name => 'JoinType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_arrow_length' => {
-    	datatype => 'string',
-    	base_name => 'EndArrowLength',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_automatic_color' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutomaticColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'dash_type' => {
-    	datatype => 'string',
-    	base_name => 'DashType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'begin_type' => {
-    	datatype => 'string',
-    	base_name => 'BeginType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cap_type' => {
-    	datatype => 'string',
-    	base_name => 'CapType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_type' => {
-    	datatype => 'string',
-    	base_name => 'EndType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'begin_arrow_width' => {
-    	datatype => 'string',
-    	base_name => 'BeginArrowWidth',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_arrow_width' => {
-    	datatype => 'string',
-    	base_name => 'EndArrowWidth',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'transparency' => {
-    	datatype => 'double',
-    	base_name => 'Transparency',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'begin_arrow_length' => {
+     	datatype => 'string',
+     	base_name => 'BeginArrowLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'begin_arrow_width' => {
+     	datatype => 'string',
+     	base_name => 'BeginArrowWidth',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'begin_type' => {
+     	datatype => 'string',
+     	base_name => 'BeginType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cap_type' => {
+     	datatype => 'string',
+     	base_name => 'CapType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color' => {
+     	datatype => 'Color',
+     	base_name => 'Color',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'compound_type' => {
+     	datatype => 'string',
+     	base_name => 'CompoundType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'dash_type' => {
+     	datatype => 'string',
+     	base_name => 'DashType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_arrow_length' => {
+     	datatype => 'string',
+     	base_name => 'EndArrowLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_arrow_width' => {
+     	datatype => 'string',
+     	base_name => 'EndArrowWidth',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_type' => {
+     	datatype => 'string',
+     	base_name => 'EndType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'gradient_fill' => {
+     	datatype => 'GradientFill',
+     	base_name => 'GradientFill',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_auto' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAuto',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_automatic_color' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutomaticColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_visible' => {
+     	datatype => 'boolean',
+     	base_name => 'IsVisible',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'join_type' => {
+     	datatype => 'string',
+     	base_name => 'JoinType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'style' => {
+     	datatype => 'string',
+     	base_name => 'Style',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'transparency' => {
+     	datatype => 'double',
+     	base_name => 'Transparency',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'weight' => {
+     	datatype => 'string',
+     	base_name => 'Weight',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'weight_pt' => {
+     	datatype => 'double',
+     	base_name => 'WeightPt',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'style' => 'string',
-    'is_auto' => 'boolean',
     'begin_arrow_length' => 'string',
-    'weight' => 'string',
-    'gradient_fill' => 'GradientFill',
-    'color' => 'Color',
-    'compound_type' => 'string',
-    'weight_pt' => 'double',
-    'is_visible' => 'boolean',
-    'join_type' => 'string',
-    'end_arrow_length' => 'string',
-    'is_automatic_color' => 'boolean',
-    'dash_type' => 'string',
+    'begin_arrow_width' => 'string',
     'begin_type' => 'string',
     'cap_type' => 'string',
-    'end_type' => 'string',
-    'begin_arrow_width' => 'string',
+    'color' => 'Color',
+    'compound_type' => 'string',
+    'dash_type' => 'string',
+    'end_arrow_length' => 'string',
     'end_arrow_width' => 'string',
-    'transparency' => 'double'
+    'end_type' => 'string',
+    'gradient_fill' => 'GradientFill',
+    'is_auto' => 'boolean',
+    'is_automatic_color' => 'boolean',
+    'is_visible' => 'boolean',
+    'join_type' => 'string',
+    'style' => 'string',
+    'transparency' => 'double',
+    'weight' => 'string',
+    'weight_pt' => 'double' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'style' => 'Style',
-    'is_auto' => 'IsAuto',
     'begin_arrow_length' => 'BeginArrowLength',
-    'weight' => 'Weight',
-    'gradient_fill' => 'GradientFill',
-    'color' => 'Color',
-    'compound_type' => 'CompoundType',
-    'weight_pt' => 'WeightPt',
-    'is_visible' => 'IsVisible',
-    'join_type' => 'JoinType',
-    'end_arrow_length' => 'EndArrowLength',
-    'is_automatic_color' => 'IsAutomaticColor',
-    'dash_type' => 'DashType',
+    'begin_arrow_width' => 'BeginArrowWidth',
     'begin_type' => 'BeginType',
     'cap_type' => 'CapType',
-    'end_type' => 'EndType',
-    'begin_arrow_width' => 'BeginArrowWidth',
+    'color' => 'Color',
+    'compound_type' => 'CompoundType',
+    'dash_type' => 'DashType',
+    'end_arrow_length' => 'EndArrowLength',
     'end_arrow_width' => 'EndArrowWidth',
-    'transparency' => 'Transparency'
+    'end_type' => 'EndType',
+    'gradient_fill' => 'GradientFill',
+    'is_auto' => 'IsAuto',
+    'is_automatic_color' => 'IsAutomaticColor',
+    'is_visible' => 'IsVisible',
+    'join_type' => 'JoinType',
+    'style' => 'Style',
+    'transparency' => 'Transparency',
+    'weight' => 'Weight',
+    'weight_pt' => 'WeightPt' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

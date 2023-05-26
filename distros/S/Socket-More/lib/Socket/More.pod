@@ -270,6 +270,19 @@ names currently available.
 A integer or array ref of integers representing the family type an interface
 supports.
 
+B<From v0.4.0:> Also can be a string or array ref of strings, which are matched
+against supported families. See C<parse_passive_spec> for matching details
+
+=item type
+
+	examples: type=>SOCK_STREAM type=>[SOCK_STREAM, SOCK_DGRAM]
+
+A integer or array ref of integers representing the socket type an interface
+supports.
+
+B<From v0.4.0:> Also can be a string or array ref of strings, which are matched
+against supported socket types. See C<parse_passive_spec> for matching details
+
 
 =item port
 
@@ -292,7 +305,7 @@ families. Ignored for others.
 Either C<port> or C<path> are required, otherwise no addresses will be
 generated.
 
-B<NOTE> The actually path resulting from the specification will have a '_D' or
+B<NOTE> The actual path resulting from the specification will have a '_D' or
 '_S' appended to the path. This is done to ensure sockets of different type
 don't attempt to use the same path.
 

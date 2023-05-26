@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Comment;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,127 +119,127 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Comment',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'auto_size' => {
-    	datatype => 'boolean',
-    	base_name => 'AutoSize',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'author' => {
-    	datatype => 'string',
-    	base_name => 'Author',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_visible' => {
-    	datatype => 'boolean',
-    	base_name => 'IsVisible',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text_orientation_type' => {
-    	datatype => 'string',
-    	base_name => 'TextOrientationType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'height' => {
-    	datatype => 'int',
-    	base_name => 'Height',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'note' => {
-    	datatype => 'string',
-    	base_name => 'Note',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'width' => {
-    	datatype => 'int',
-    	base_name => 'Width',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text_vertical_alignment' => {
-    	datatype => 'string',
-    	base_name => 'TextVerticalAlignment',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cell_name' => {
-    	datatype => 'string',
-    	base_name => 'CellName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'html_note' => {
-    	datatype => 'string',
-    	base_name => 'HtmlNote',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text_horizontal_alignment' => {
-    	datatype => 'string',
-    	base_name => 'TextHorizontalAlignment',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'cell_name' => {
+     	datatype => 'string',
+     	base_name => 'CellName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'author' => {
+     	datatype => 'string',
+     	base_name => 'Author',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'html_note' => {
+     	datatype => 'string',
+     	base_name => 'HtmlNote',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'note' => {
+     	datatype => 'string',
+     	base_name => 'Note',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'auto_size' => {
+     	datatype => 'boolean',
+     	base_name => 'AutoSize',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_visible' => {
+     	datatype => 'boolean',
+     	base_name => 'IsVisible',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'width' => {
+     	datatype => 'int',
+     	base_name => 'Width',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'height' => {
+     	datatype => 'int',
+     	base_name => 'Height',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_horizontal_alignment' => {
+     	datatype => 'string',
+     	base_name => 'TextHorizontalAlignment',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_orientation_type' => {
+     	datatype => 'string',
+     	base_name => 'TextOrientationType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_vertical_alignment' => {
+     	datatype => 'string',
+     	base_name => 'TextVerticalAlignment',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
-    'auto_size' => 'boolean',
-    'author' => 'string',
-    'is_visible' => 'boolean',
-    'text_orientation_type' => 'string',
-    'height' => 'int',
-    'note' => 'string',
-    'width' => 'int',
-    'text_vertical_alignment' => 'string',
     'cell_name' => 'string',
+    'author' => 'string',
     'html_note' => 'string',
-    'text_horizontal_alignment' => 'string'
+    'note' => 'string',
+    'auto_size' => 'boolean',
+    'is_visible' => 'boolean',
+    'width' => 'int',
+    'height' => 'int',
+    'text_horizontal_alignment' => 'string',
+    'text_orientation_type' => 'string',
+    'text_vertical_alignment' => 'string',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
-    'auto_size' => 'AutoSize',
-    'author' => 'Author',
-    'is_visible' => 'IsVisible',
-    'text_orientation_type' => 'TextOrientationType',
-    'height' => 'Height',
-    'note' => 'Note',
-    'width' => 'Width',
-    'text_vertical_alignment' => 'TextVerticalAlignment',
     'cell_name' => 'CellName',
+    'author' => 'Author',
     'html_note' => 'HtmlNote',
-    'text_horizontal_alignment' => 'TextHorizontalAlignment'
+    'note' => 'Note',
+    'auto_size' => 'AutoSize',
+    'is_visible' => 'IsVisible',
+    'width' => 'Width',
+    'height' => 'Height',
+    'text_horizontal_alignment' => 'TextHorizontalAlignment',
+    'text_orientation_type' => 'TextOrientationType',
+    'text_vertical_alignment' => 'TextVerticalAlignment',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

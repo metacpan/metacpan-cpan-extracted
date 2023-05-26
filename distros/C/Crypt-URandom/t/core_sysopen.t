@@ -12,7 +12,7 @@ SKIP: {
 		*CORE::GLOBAL::sysopen = sub { $! = POSIX::EACCES(); return };
 		use warnings;
 		require POSIX;
-		my $required_error_message = quotemeta POSIX::strerror(POSIX::EACCES());
+		my $required_error_message = q[(?:] . (quotemeta POSIX::strerror(POSIX::EACCES())) . q[|Permission[ ]denied)];
 		require Crypt::URandom;
 		my $generated = 0;
 		eval {

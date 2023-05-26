@@ -14,11 +14,22 @@ my $cver = eval "v$1";
 
 my @check;
 {
+	my %ex;
+
+	open my $ein, "<", "inc/symbols-excluded"
+		or die "Cannot open symbols-excluded file: $!\n";
+	while ( <$ein> ) {
+		s/^\s+|\s+$//g;
+		$ex{ $_ }++;
+	}
+
 	open my $fin, "<", "inc/symbols-in-versions"
 	    or die "Cannot open symbols file: $!\n";
 	while ( <$fin> ) {
 		next if /^[#\s]/;
 		my ( $sym, $in, $dep, $out ) = split /\s+/, $_;
+
+		next if $ex{ $sym };
 
 		if ( $out ) {
 			my $vout = eval "v$out";
@@ -77,5 +88,5 @@ foreach my $sym ( @check ) {
 	eval { $value = LIBCURL_VERSION() };
 	is( $@, "", 'LIBCURL_VERSION constant can be retrieved' );
 	ok( defined( $value ), "LIBCURL_VERSION is defined");
-	like( $value, qr/^7\.\d{2}\.\d{1,2}(-.*)?$/, 'LIBCURL_VERSION is correct' );
+	like( $value, qr/^[78]\.\d{1,2}\.\d{1,2}(-.*)?$/, 'LIBCURL_VERSION is correct' );
 }

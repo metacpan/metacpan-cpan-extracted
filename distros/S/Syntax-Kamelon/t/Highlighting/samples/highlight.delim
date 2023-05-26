@@ -1,0 +1,27 @@
+Testing deliminators
+
+<WordDetect attribute="Match" context="#stay" String="strong" />
+<WordDetect attribute="Match" context="#stay" String="weak" weakDeliminator="."/>
+<WordDetect attribute="Match" context="#stay" String="TheX" additionalDeliminator="x"/>
+
+<Word>
+This is strong. #Match, the dot is a deliminator
+This is weak. #No match, the dot is not a deliminator
+This is xTheX. #Match, x is an additionalDeliminator
+A color green. #Match, the dot is a deliminator
+A unit ampere. #No match, the dot is not a deliminator
+An element xwater. #Match, x is an additionalDeliminator
+<Word>
+
+<HlOct attribute="Match" context="#stay" additionalDeliminator="."/>
+<HlHex attribute="Match" context="#stay" weakDeliminator=":"/>
+<Int attribute="Match" context="#stay" />
+
+<Number>
+.456 #No match, the dot is not a deliminator
+.073 #Match, the dot is an additionalDeliminator
+:0xFF #No match, the colon is a weakDeliminator
+<Number>
+
+
+

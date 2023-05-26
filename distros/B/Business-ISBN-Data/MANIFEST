@@ -6,7 +6,6 @@ lib/Business/ISBN/Data.pm
 lib/Business/ISBN/RangeMessage.url
 lib/Business/ISBN/RangeMessage.xml
 LICENSE
-make_data.pl
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

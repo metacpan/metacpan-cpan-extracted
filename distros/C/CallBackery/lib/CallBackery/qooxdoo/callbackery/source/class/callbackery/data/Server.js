@@ -103,7 +103,7 @@ qx.Class.define("callbackery.data.Server", {
             var origHandler = handler;
             var busy = callbackery.ui.Busy.getInstance();
             var superHandler = function(ret, exc, id) {
-                busy.hide();
+                busy.vanish();
                 if (exc) {
                     callbackery.ui.MsgBox.getInstance().exc(exc);
                 } else {
@@ -112,7 +112,7 @@ qx.Class.define("callbackery.data.Server", {
             };
             var newArgs = Array.prototype.slice.call(arguments);
             newArgs[0] = superHandler;
-            busy.show('Runnning ' + methodName);
+            busy.manifest('Runnning ' + methodName);
             this.callAsync.apply(this, newArgs);
         },
         /**

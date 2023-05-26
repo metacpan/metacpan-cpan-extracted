@@ -1,6 +1,40 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 4e0e5603ab6094699db5bca768ba98163fc6d94c
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon May 22 14:37:26 2023 -0700
+
+    Version bump to 1.91
+    
+    SEFL tracking URL support from Bill Gerrard
+
+commit b0c2d1a0ca743abed57e6f8a4d532facb6bea43e
+Merge: b7f38e6 75bcf14
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon May 22 14:33:26 2023 -0700
+
+    Merge pull request #3 from billgerrard/patch-1
+    
+    Add shipping tracking support for SELF (South Eastern Freight Lines)
+
+commit 75bcf14956ca9344a3f8b8dd3c75121b8de3c2cc
+Author: Bill Gerrard <beachbill@gmail.com>
+Date:   Mon May 22 15:01:36 2023 -0600
+
+    Add shipping tracking support for SELF (South Eastern Freight Lines)
+
+commit b7f38e6e5640a8cf617b9e51ce9960f6b9cd41e7
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Dec 7 20:46:26 2022 -0800
+
+    v1.90 Fixed error handling in FilloutForm
+    
+    Error messages returned from external error checking were not included
+    in field HTML content. Default content does not use that, but it did not
+    work if a site used custom templates that rely on error messages (e.g.
+    for styling).
+
 commit 6d0c6f422dab440d3bddd084e9b6a7c2a5be5f08
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jul 1 16:44:50 2022 -0700
@@ -48,34 +82,4 @@ Date:   Thu Sep 17 20:22:22 2020 -0700
     1.84 Security fix for json-embed in Web::Action
     
     Encoding <> characters in json output
-
-commit 88febab5e2a7b1a1b1ae8f31dd3fd8817a9e7ddf
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Sep 9 16:15:38 2020 -0700
-
-    README update
-
-commit 26e3d50176a1362bb5760858f5e2ccd367a219a8
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Aug 31 14:29:48 2020 -0700
-
-    Minor POD update, linked to Apache::XAO and Plack modules
-
-commit 550acb723c1b9fb4976518fc67c2eae7867cde1d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Aug 26 16:15:47 2020 -0700
-
-    1.83 Added a missing MANIFEST entry
-    
-    Requires a version bump :(
-
-commit 4a2b0169814ddb4322902459aa633bdb87db2947
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Aug 26 15:24:55 2020 -0700
-
-    1.82 Support for samesite and sscompat in cookies
-    
-    Setting SameSite and optionally a compatibility setting for browsers
-    that have not caught up yet. Can be set in a global configuration or for
-    specific cookies.
 

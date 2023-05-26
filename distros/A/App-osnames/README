@@ -1,4 +1,319 @@
-SEE ALSO
+NAME
+    App::osnames - List possible $^O ($OSNAME) values, with description
 
+VERSION
+    This document describes version 0.101 of App::osnames (from Perl
+    distribution App-osnames), released on 2023-02-24.
+
+FUNCTIONS
+  list_osnames
+    Usage:
+
+     list_osnames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List possible $^O ($OSNAME) values, with description.
+
+    Examples:
+
+    *   String search:
+
+         list_osnames(queries => ["ux"]);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           ["dgux", "gnu", "hpux", "linux"],
+           { "table.fields" => ["value"] },
+         ]
+
+    *   List Unices:
+
+         list_osnames(detail => 1, tags => "unix");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [],
+           { "table.fields" => ["value", "tags", "description"] },
+         ]
+
+    This list might be useful when coding, e.g. when you want to exclude or
+    include certain OS (families) in your application/test.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   description => *str*
+
+        Only return records where the 'description' field equals specified
+        value.
+
+    *   description.contains => *str*
+
+        Only return records where the 'description' field contains specified
+        text.
+
+    *   description.in => *array[str]*
+
+        Only return records where the 'description' field is in the
+        specified values.
+
+    *   description.is => *str*
+
+        Only return records where the 'description' field equals specified
+        value.
+
+    *   description.isnt => *str*
+
+        Only return records where the 'description' field does not equal
+        specified value.
+
+    *   description.max => *str*
+
+        Only return records where the 'description' field is less than or
+        equal to specified value.
+
+    *   description.min => *str*
+
+        Only return records where the 'description' field is greater than or
+        equal to specified value.
+
+    *   description.not_contains => *str*
+
+        Only return records where the 'description' field does not contain
+        specified text.
+
+    *   description.not_in => *array[str]*
+
+        Only return records where the 'description' field is not in the
+        specified values.
+
+    *   description.xmax => *str*
+
+        Only return records where the 'description' field is less than
+        specified value.
+
+    *   description.xmin => *str*
+
+        Only return records where the 'description' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   queries => *array[str]*
+
+        Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   tags => *str*
+
+        Only return records where the 'tags' field equals specified value.
+
+    *   tags.contains => *str*
+
+        Only return records where the 'tags' field contains specified text.
+
+    *   tags.in => *array[str]*
+
+        Only return records where the 'tags' field is in the specified
+        values.
+
+    *   tags.is => *str*
+
+        Only return records where the 'tags' field equals specified value.
+
+    *   tags.isnt => *str*
+
+        Only return records where the 'tags' field does not equal specified
+        value.
+
+    *   tags.max => *str*
+
+        Only return records where the 'tags' field is less than or equal to
+        specified value.
+
+    *   tags.min => *str*
+
+        Only return records where the 'tags' field is greater than or equal
+        to specified value.
+
+    *   tags.not_contains => *str*
+
+        Only return records where the 'tags' field does not contain
+        specified text.
+
+    *   tags.not_in => *array[str]*
+
+        Only return records where the 'tags' field is not in the specified
+        values.
+
+    *   tags.xmax => *str*
+
+        Only return records where the 'tags' field is less than specified
+        value.
+
+    *   tags.xmin => *str*
+
+        Only return records where the 'tags' field is greater than specified
+        value.
+
+    *   value => *str*
+
+        Only return records where the 'value' field equals specified value.
+
+    *   value.contains => *str*
+
+        Only return records where the 'value' field contains specified text.
+
+    *   value.in => *array[str]*
+
+        Only return records where the 'value' field is in the specified
+        values.
+
+    *   value.is => *str*
+
+        Only return records where the 'value' field equals specified value.
+
+    *   value.isnt => *str*
+
+        Only return records where the 'value' field does not equal specified
+        value.
+
+    *   value.max => *str*
+
+        Only return records where the 'value' field is less than or equal to
+        specified value.
+
+    *   value.min => *str*
+
+        Only return records where the 'value' field is greater than or equal
+        to specified value.
+
+    *   value.not_contains => *str*
+
+        Only return records where the 'value' field does not contain
+        specified text.
+
+    *   value.not_in => *array[str]*
+
+        Only return records where the 'value' field is not in the specified
+        values.
+
+    *   value.xmax => *str*
+
+        Only return records where the 'value' field is less than specified
+        value.
+
+    *   value.xmin => *str*
+
+        Only return records where the 'value' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-osnames>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-osnames>.
+
+SEE ALSO
     Perl::osnames
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2015, 2014, 2013 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-osnames>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

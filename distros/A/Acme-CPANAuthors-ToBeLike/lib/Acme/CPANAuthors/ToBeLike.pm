@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::ToBeLike;
-$Acme::CPANAuthors::ToBeLike::VERSION = '0.52';
+$Acme::CPANAuthors::ToBeLike::VERSION = '0.54';
 #ABSTRACT: BeLike other CPAN Authors
 
 use strict;
@@ -23,6 +23,7 @@ use Acme::CPANAuthors::Register (
   FELLIOTT => q[Fitz Elliott],
   FIBO => q[Gianluca Casati],
   FLORA => q[Florian Ragwitz],
+  GEEKRUTH => q[D Ruth Holloway],
   GENEHACK => q[John SJ Anderson],
   GETTY => q[Torsten Raudssus],
   JAHERO => q[Jan Herout],
@@ -40,6 +41,7 @@ use Acme::CPANAuthors::Register (
   RJBS => q[Ricardo SIGNES],
   RJRAY => q[Randy J Ray],
   RSRCHBOY => q[Chris Weyl],
+  RWP => q[Elvin Aslanov],
   SARTAK => q[Shawn M Moore],
   SCHWIGON => q[Steffen Schwigon],
   SHANTANU => q[Shantanu Bhadoria],
@@ -65,7 +67,7 @@ Acme::CPANAuthors::ToBeLike - BeLike other CPAN Authors
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -106,6 +108,7 @@ a module indexed with C<BeLike> in the name.
   FELLIOTT => q[Fitz Elliott],
   FIBO => q[Gianluca Casati],
   FLORA => q[Florian Ragwitz],
+  GEEKRUTH => q[D Ruth Holloway],
   GENEHACK => q[John SJ Anderson],
   GETTY => q[Torsten Raudssus],
   JAHERO => q[Jan Herout],
@@ -123,6 +126,7 @@ a module indexed with C<BeLike> in the name.
   RJBS => q[Ricardo SIGNES],
   RJRAY => q[Randy J Ray],
   RSRCHBOY => q[Chris Weyl],
+  RWP => q[Elvin Aslanov],
   SARTAK => q[Shawn M Moore],
   SCHWIGON => q[Steffen Schwigon],
   SHANTANU => q[Shantanu Bhadoria],
@@ -145,7 +149,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

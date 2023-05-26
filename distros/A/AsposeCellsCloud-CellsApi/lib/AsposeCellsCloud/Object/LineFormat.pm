@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::LineFormat;
 
 require 5.6.0;
@@ -36,12 +35,12 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::FillFormat;
 use AsposeCellsCloud::Object::GradientFill;
 use AsposeCellsCloud::Object::PatternFill;
 use AsposeCellsCloud::Object::SolidFill;
-use AsposeCellsCloud::Object::TextureFill;
+use AsposeCellsCloud::Object::TextureFill; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -57,12 +56,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -103,7 +102,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -111,7 +110,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -123,172 +122,172 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'LineFormat',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'texture_fill' => {
-    	datatype => 'TextureFill',
-    	base_name => 'TextureFill',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'image_data' => {
-    	datatype => 'string',
-    	base_name => 'ImageData',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'pattern_fill' => {
-    	datatype => 'PatternFill',
-    	base_name => 'PatternFill',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'solid_fill' => {
-    	datatype => 'SolidFill',
-    	base_name => 'SolidFill',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'gradient_fill' => {
-    	datatype => 'GradientFill',
-    	base_name => 'GradientFill',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'begin_arrowhead_length' => {
-    	datatype => 'string',
-    	base_name => 'BeginArrowheadLength',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'dash_style' => {
-    	datatype => 'string',
-    	base_name => 'DashStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_arrowhead_width' => {
-    	datatype => 'string',
-    	base_name => 'EndArrowheadWidth',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_arrowhead_length' => {
-    	datatype => 'string',
-    	base_name => 'EndArrowheadLength',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'begin_arrowhead_width' => {
-    	datatype => 'string',
-    	base_name => 'BeginArrowheadWidth',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'compound_type' => {
-    	datatype => 'string',
-    	base_name => 'CompoundType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'join_type' => {
-    	datatype => 'string',
-    	base_name => 'JoinType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'weight' => {
-    	datatype => 'double',
-    	base_name => 'Weight',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'begin_arrowhead_style' => {
-    	datatype => 'string',
-    	base_name => 'BeginArrowheadStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_arrowhead_style' => {
-    	datatype => 'string',
-    	base_name => 'EndArrowheadStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'cap_type' => {
-    	datatype => 'string',
-    	base_name => 'CapType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'begin_arrowhead_length' => {
+     	datatype => 'string',
+     	base_name => 'BeginArrowheadLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'begin_arrowhead_style' => {
+     	datatype => 'string',
+     	base_name => 'BeginArrowheadStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'begin_arrowhead_width' => {
+     	datatype => 'string',
+     	base_name => 'BeginArrowheadWidth',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cap_type' => {
+     	datatype => 'string',
+     	base_name => 'CapType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'compound_type' => {
+     	datatype => 'string',
+     	base_name => 'CompoundType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'dash_style' => {
+     	datatype => 'string',
+     	base_name => 'DashStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_arrowhead_length' => {
+     	datatype => 'string',
+     	base_name => 'EndArrowheadLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_arrowhead_style' => {
+     	datatype => 'string',
+     	base_name => 'EndArrowheadStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_arrowhead_width' => {
+     	datatype => 'string',
+     	base_name => 'EndArrowheadWidth',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'join_type' => {
+     	datatype => 'string',
+     	base_name => 'JoinType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'weight' => {
+     	datatype => 'double',
+     	base_name => 'Weight',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'solid_fill' => {
+     	datatype => 'SolidFill',
+     	base_name => 'SolidFill',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'pattern_fill' => {
+     	datatype => 'PatternFill',
+     	base_name => 'PatternFill',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'texture_fill' => {
+     	datatype => 'TextureFill',
+     	base_name => 'TextureFill',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'gradient_fill' => {
+     	datatype => 'GradientFill',
+     	base_name => 'GradientFill',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'image_data' => {
+     	datatype => 'string',
+     	base_name => 'ImageData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'texture_fill' => 'TextureFill',
-    'image_data' => 'string',
-    'pattern_fill' => 'PatternFill',
-    'solid_fill' => 'SolidFill',
-    'gradient_fill' => 'GradientFill',
-    'type' => 'string',
     'begin_arrowhead_length' => 'string',
-    'dash_style' => 'string',
-    'end_arrowhead_width' => 'string',
-    'end_arrowhead_length' => 'string',
+    'begin_arrowhead_style' => 'string',
     'begin_arrowhead_width' => 'string',
+    'cap_type' => 'string',
     'compound_type' => 'string',
+    'dash_style' => 'string',
+    'end_arrowhead_length' => 'string',
+    'end_arrowhead_style' => 'string',
+    'end_arrowhead_width' => 'string',
     'join_type' => 'string',
     'weight' => 'double',
-    'begin_arrowhead_style' => 'string',
-    'end_arrowhead_style' => 'string',
-    'cap_type' => 'string'
+    'type' => 'string',
+    'solid_fill' => 'SolidFill',
+    'pattern_fill' => 'PatternFill',
+    'texture_fill' => 'TextureFill',
+    'gradient_fill' => 'GradientFill',
+    'image_data' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'texture_fill' => 'TextureFill',
-    'image_data' => 'ImageData',
-    'pattern_fill' => 'PatternFill',
-    'solid_fill' => 'SolidFill',
-    'gradient_fill' => 'GradientFill',
-    'type' => 'Type',
     'begin_arrowhead_length' => 'BeginArrowheadLength',
-    'dash_style' => 'DashStyle',
-    'end_arrowhead_width' => 'EndArrowheadWidth',
-    'end_arrowhead_length' => 'EndArrowheadLength',
+    'begin_arrowhead_style' => 'BeginArrowheadStyle',
     'begin_arrowhead_width' => 'BeginArrowheadWidth',
+    'cap_type' => 'CapType',
     'compound_type' => 'CompoundType',
+    'dash_style' => 'DashStyle',
+    'end_arrowhead_length' => 'EndArrowheadLength',
+    'end_arrowhead_style' => 'EndArrowheadStyle',
+    'end_arrowhead_width' => 'EndArrowheadWidth',
     'join_type' => 'JoinType',
     'weight' => 'Weight',
-    'begin_arrowhead_style' => 'BeginArrowheadStyle',
-    'end_arrowhead_style' => 'EndArrowheadStyle',
-    'cap_type' => 'CapType'
+    'type' => 'Type',
+    'solid_fill' => 'SolidFill',
+    'pattern_fill' => 'PatternFill',
+    'texture_fill' => 'TextureFill',
+    'gradient_fill' => 'GradientFill',
+    'image_data' => 'ImageData' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::DualLife;
-$Acme::CPANAuthors::DualLife::VERSION = '0.50';
+$Acme::CPANAuthors::DualLife::VERSION = '0.52';
 #ABSTRACT: We are CPAN Authors of Dual Life core modules
 
 use strict;
@@ -8,6 +8,7 @@ use warnings;
 use Acme::CPANAuthors::Register (
   AMBS => q[Alberto Manuel Brandao Simoes],
   ANDK => q[Andreas J. Koenig],
+  ARISTOTLE => q[Aristotle Pagaltzis],
   ATOOMIC => q[icolas .],
   AUDREYT => q[Audrey Tang],
   BINGOS => q[Chris Williams],
@@ -40,14 +41,12 @@ use Acme::CPANAuthors::Register (
   MALLEN => q[Mark Allen],
   MAREKR => q[Marek Rouchal],
   MHX => q[Marcus Holland-Moritz],
-  MJD => q[Mark Jason Dominus],
   MSCHWERN => q[Michael G Schwern],
   MSHELOR => q[Mark Shelor],
-  MUIR => q[David Muir Sharnoff],
   NEILB => q[Neil Bowers],
   NTHYKIER => q[Niels Thykier],
   NWCLARK => q[Nicholas Clark],
-  OVID => q[Curtis 'Ovid' Poe],
+  OVID => q[Curtis Poe],
   PEVANS => q[Paul Evans],
   PJACKLAM => q[Peter John Acklam],
   PMQS => q[Paul Marquess],
@@ -84,7 +83,7 @@ Acme::CPANAuthors::DualLife - We are CPAN Authors of Dual Life core modules
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -109,6 +108,7 @@ It is currently statically generated information, I hope to make it dynamic in t
 
   AMBS => q[Alberto Manuel Brandao Simoes],
   ANDK => q[Andreas J. Koenig],
+  ARISTOTLE => q[Aristotle Pagaltzis],
   ATOOMIC => q[icolas .],
   AUDREYT => q[Audrey Tang],
   BINGOS => q[Chris Williams],
@@ -141,14 +141,12 @@ It is currently statically generated information, I hope to make it dynamic in t
   MALLEN => q[Mark Allen],
   MAREKR => q[Marek Rouchal],
   MHX => q[Marcus Holland-Moritz],
-  MJD => q[Mark Jason Dominus],
   MSCHWERN => q[Michael G Schwern],
   MSHELOR => q[Mark Shelor],
-  MUIR => q[David Muir Sharnoff],
   NEILB => q[Neil Bowers],
   NTHYKIER => q[Niels Thykier],
   NWCLARK => q[Nicholas Clark],
-  OVID => q[Curtis 'Ovid' Poe],
+  OVID => q[Curtis Poe],
   PEVANS => q[Paul Evans],
   PJACKLAM => q[Peter John Acklam],
   PMQS => q[Paul Marquess],
@@ -182,7 +180,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

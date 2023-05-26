@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.86
+    version 0.88
 
 SYNOPSIS
 
@@ -31,7 +31,7 @@ CONTAINED AUTHORS
 
       AAR => q[Alessandro Ranellucci],
       ABERGMAN => q[Artur Bergman],
-      ACHEN => q[Andrew A. Chen],
+      ACHEN => q[Andrew Chen],
       ADAMK => q[Adam Kennedy],
       AGRUNDMA => q[Andy Grundman],
       AHOYING => q[Andrew Hoying],
@@ -39,6 +39,7 @@ CONTAINED AUTHORS
       AJCT => q[Adam Taylor],
       ALTREUS => q[Alastair Douglas],
       ANDYPUR => q[Andrew V. Purshottam],
+      ANEI => q[Ailin Nemui],
       APOCAL => q[Apocalypse],
       ARCANEZ => q[Justin Hunter],
       AVENJ => q[Jon Portnoy (PAUSE Custodial Account)],
@@ -59,7 +60,6 @@ CONTAINED AUTHORS
       DAEMON => q[Paul G Webster],
       DAMS => q[Damien Krotkine],
       DAVINCHI => q[Pavel Boldin],
-      DAZJORZ => q[Sjors Gielen],
       DBOOK => q[Dan Book],
       DIZ => q[Mike Eldridge],
       DMAKI => q[Daisuke Maki],
@@ -95,7 +95,7 @@ CONTAINED AUTHORS
       ISHIGAKI => q[Kenichi Ishigaki],
       IVORW => q[Ivor Williams],
       JBISBEE => q[Jeff Bisbee],
-      JGOFF => q[Jeff Goff],
+      JGOFF => q[Jeff Goff (PAUSE Custodial Account)],
       JHELWIG => q[Jacob Helwig],
       JKG => q[James Green],
       JMERELO => q[J. J. Merelo Guervos],
@@ -111,6 +111,7 @@ CONTAINED AUTHORS
       MAFF => q[Matthew Connelly],
       MAHEX => q[Mark A. Hershberger],
       MARTIJN => q[Martijn van Beers],
+      MAT => q[Mathieu Arnold],
       MCHING => q[Michael Ching],
       MCMIC => q[Come Chilliet],
       MDOM => q[Mario Domgoergen],
@@ -133,7 +134,7 @@ CONTAINED AUTHORS
       MSERGEANT => q[MSERGEANT],
       NPEREZ => q[Nicholas Perez],
       NSHP => q[Nicholas Shipp],
-      NUFFIN => q[Yuval Kogman],
+      NUFFIN => q[yvbl qvg'mn (Yuval Kogman)],
       OALDERS => q[Olaf Alders],
       OMNI => q[Michael Alexander],
       ONEONETWO => q[Dominic Humphries],
@@ -197,7 +198,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Chris Williams.
+    This software is copyright (c) 2023 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

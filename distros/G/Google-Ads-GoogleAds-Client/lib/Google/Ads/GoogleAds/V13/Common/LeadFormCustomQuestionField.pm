@@ -24,6 +24,7 @@ sub new {
   my ($class, $args) = @_;
   my $self = {
     customQuestionText  => $args->{customQuestionText},
+    hasLocationAnswer   => $args->{hasLocationAnswer},
     singleChoiceAnswers => $args->{singleChoiceAnswers}};
 
   # Delete the unassigned fields in this object for a more concise JSON payload

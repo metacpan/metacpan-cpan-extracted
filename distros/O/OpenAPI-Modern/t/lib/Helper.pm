@@ -13,7 +13,6 @@ use HTTP::Response;
 use HTTP::Status ();
 use Mojo::Message::Request;
 use Mojo::Message::Response;
-use YAML::XS 0.87;
 
 # type can be
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
@@ -97,11 +96,6 @@ sub document_result ($document) {
     valid => $document->has_errors,
     errors => [ $document->errors ],
   );
-}
-
-sub yaml ($string) {
-  local $YAML::XS::Boolean = 'JSON::PP';
-  Load(Encode::encode('UTF-8', $string));
 }
 
 1;

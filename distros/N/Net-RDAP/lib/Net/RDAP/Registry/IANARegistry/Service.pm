@@ -24,18 +24,18 @@ This class is used internally by L<Net::RDAP::Registry>.
 
 The constructor accepts two or three arguments:
 
-	$svc = Net::RDAP::Registry::IANARegistry::Service->new(
-		$registryref,
-		$urlref,
-	);
+    $svc = Net::RDAP::Registry::IANARegistry::Service->new(
+        $registryref,
+        $urlref,
+    );
 
-	# or:
+    # or:
 
-	$svc = Net::RDAP::Registry::IANARegistry::Service->new(
-		$registrant,
-		$registryref,
-		$urlref,
-	);
+    $svc = Net::RDAP::Registry::IANARegistry::Service->new(
+        $registrant,
+        $registryref,
+        $urlref,
+    );
 
 =over
 
@@ -53,32 +53,32 @@ tags.
 =cut
 
 sub new {
-	my ($package, @args) = @_;
-	my $self = bless({}, $package);
+    my ($package, @args) = @_;
+    my $self = bless({}, $package);
 
-	# populate object proprties from @args, right to left:
-	$self->{'urls'} = pop(@args);
-	$self->{'registries'} = pop(@args);
-	$self->{'registrant'} = pop(@args); # may be undefined
+    # populate object proprties from @args, right to left:
+    $self->{'urls'} = pop(@args);
+    $self->{'registries'} = pop(@args);
+    $self->{'registrant'} = pop(@args); # may be undefined
 
-	return $self;
+    return $self;
 }
 
 =pod
 
 =head1 METHODS
 
-	@urls = $svc->urls;
+    @urls = $svc->urls;
 
 This method returns an array of C<URI> objects representing the
 RDAP base URL(s) for the RDAP service.
 
-	@registries = $svc->registries;
+    @registries = $svc->registries;
 
 This method returns an array of "registries" (TLDs, IP blocks,
 ASN ranges, etc) for which the RDAP service is authoritatie.
 
-	$registrant = $svc->registrant;
+    $registrant = $svc->registrant;
 
 This method returns the registrant of the entry into the
 registry. This is typically an email address. Note that as of
@@ -94,7 +94,7 @@ sub registrant { $_[0]->{'registries'} }
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

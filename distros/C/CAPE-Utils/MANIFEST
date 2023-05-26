@@ -10,7 +10,9 @@ t/pod.t
 src_bin/cape_utils
 src_bin/mojo_cape_submit
 src_bin/suricata_extract_submit
+src_bin/suricata_extract_submit_extend
 bin/.exists
 systemd/mojo_cape_submit.service
+perltidyrc
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

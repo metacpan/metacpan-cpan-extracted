@@ -1,6 +1,6 @@
 package SPVM::IO;
 
-our $VERSION = '0.20';
+our $VERSION = "0.202";
 
 1;
 
@@ -27,3 +27,10 @@ C<IO> provide for File IO, Socket, Select/Polling.
 =item * L<IO::Select|SPVM::IO::Select>
 
 =back
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

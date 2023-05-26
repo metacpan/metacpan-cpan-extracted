@@ -1,0 +1,48 @@
+{
+   "abstract" : "Parse and transform obfuscated php code",
+   "author" : [
+      "Barnim Dzwillo @ Strato AG"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PHP-Decode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : "1",
+            "Digest::MD5" : "1",
+            "Digest::SHA1" : "1",
+            "HTML::Entities" : "1",
+            "MIME::Base64" : "1",
+            "Tie::IxHash" : "1",
+            "URI::Escape" : "1",
+            "perl" : "5.016"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.302"
+}

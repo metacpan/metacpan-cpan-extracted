@@ -28,7 +28,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use WebService::Fastly::Object::BulkUpdateDictionaryItemAllOf;
+use WebService::Fastly::Object::BulkUpdateConfigStoreItemAllOf;
 use WebService::Fastly::Object::DictionaryItem;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");

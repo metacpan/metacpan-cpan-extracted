@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::PageBreakOperateParameter;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::OperateParameter; 
 
-use AsposeCellsCloud::Object::OperateParameter;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,82 +118,82 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'PageBreakOperateParameter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'operate_type' => {
-    	datatype => 'string',
-    	base_name => 'OperateType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'index' => {
-    	datatype => 'int',
-    	base_name => 'Index',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_index' => {
-    	datatype => 'int',
-    	base_name => 'EndIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'column' => {
-    	datatype => 'int',
-    	base_name => 'Column',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'start_index' => {
-    	datatype => 'int',
-    	base_name => 'StartIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'page_break_type' => {
-    	datatype => 'string',
-    	base_name => 'PageBreakType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'row' => {
-    	datatype => 'int',
-    	base_name => 'Row',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'page_break_type' => {
+     	datatype => 'string',
+     	base_name => 'PageBreakType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'index' => {
+     	datatype => 'int',
+     	base_name => 'Index',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'row' => {
+     	datatype => 'int',
+     	base_name => 'Row',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'column' => {
+     	datatype => 'int',
+     	base_name => 'Column',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_index' => {
+     	datatype => 'int',
+     	base_name => 'StartIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_index' => {
+     	datatype => 'int',
+     	base_name => 'EndIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'operate_type' => {
+     	datatype => 'string',
+     	base_name => 'OperateType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'operate_type' => 'string',
+    'page_break_type' => 'string',
     'index' => 'int',
-    'end_index' => 'int',
+    'row' => 'int',
     'column' => 'int',
     'start_index' => 'int',
-    'page_break_type' => 'string',
-    'row' => 'int'
+    'end_index' => 'int',
+    'operate_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'operate_type' => 'OperateType',
+    'page_break_type' => 'PageBreakType',
     'index' => 'Index',
-    'end_index' => 'EndIndex',
+    'row' => 'Row',
     'column' => 'Column',
     'start_index' => 'StartIndex',
-    'page_break_type' => 'PageBreakType',
-    'row' => 'Row'
+    'end_index' => 'EndIndex',
+    'operate_type' => 'OperateType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

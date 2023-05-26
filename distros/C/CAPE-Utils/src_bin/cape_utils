@@ -18,23 +18,7 @@ cape_utils -a tasks [B<-c> <config>] [B<-C>] [B<-w> <where>] [B<--direction> <di
 
 cape_utils -a fail [B<-c> <config>] B<-w> <where>
 
-=head1 GENERAL FLAGS
-
-=head2 -c <ini>
-
-Config INI file.
-
-Default: /usr/local/etc/cape_utils.ini
-
-=head2 -a <action>
-
-Action to perform.
-
-=head2 --json
-
-For submission or searches, output the results as JSON.
-
-=head1 Action: submit
+cape_utils -a eve [B<-c> <config>]=head1 Action: submit
 
 =head2 @ARGS
 
@@ -143,6 +127,10 @@ getting running items.
 Additional SQL args for use with statement for
 failing pending items.
 
+=head1 Action: eve
+
+Invoke CAPE::Utils->process_eve.
+
 =head1 CONFIG FILE
 
 For this, see the docs for CAPE::Utils.
@@ -240,8 +228,12 @@ Action: fail
 
 -w <where>             Additional SQL args for use with statement for
                        failing pending items.
+
+Action: fail
+
+No other args taken.
 ';
-}
+} ## end sub help
 
 # get the commandline options
 my $help    = 0;
@@ -318,8 +310,7 @@ if ( !defined($action) ) {
 if ( $action eq 'pending' ) {
 	if ($count) {
 		print $cape_utils->get_pending_count( where => $where ) . "\n";
-	}
-	else {
+	} else {
 		if ($use_json) {
 			my $items = $cape_utils->get_pending( where => $where );
 			my $j     = JSON->new;
@@ -330,19 +321,17 @@ if ( $action eq 'pending' ) {
 			if ( !$pretty ) {
 				print "\n";
 			}
-		}
-		else {
+		} else {
 			print $cape_utils->get_pending_table( where => $where );
 		}
-	}
+	} ## end else [ if ($count) ]
 	exit 0;
-}
+} ## end if ( $action eq 'pending' )
 
 if ( $action eq 'running' ) {
 	if ($count) {
 		print $cape_utils->get_running_count( where => $where ) . "\n";
-	}
-	else {
+	} else {
 		if ($use_json) {
 			my $items = $cape_utils->get_running( where => $where );
 			my $j     = JSON->new;
@@ -353,19 +342,17 @@ if ( $action eq 'running' ) {
 			if ( !$pretty ) {
 				print "\n";
 			}
-		}
-		else {
+		} else {
 			print $cape_utils->get_running_table( where => $where );
 		}
-	}
+	} ## end else [ if ($count) ]
 	exit 0;
-}
+} ## end if ( $action eq 'running' )
 
 if ( $action eq 'tasks' ) {
 	if ($count) {
 		print $cape_utils->get_tasks_count( where => $where ) . "\n";
-	}
-	else {
+	} else {
 		if ($use_json) {
 			my $items = $cape_utils->get_tasks(
 				where => $where,
@@ -382,8 +369,7 @@ if ( $action eq 'tasks' ) {
 			if ( !$pretty ) {
 				print "\n";
 			}
-		}
-		else {
+		} else {
 			print $cape_utils->get_tasks_table(
 				limit     => $limit,
 				order     => $order,
@@ -391,9 +377,9 @@ if ( $action eq 'tasks' ) {
 				direction => $direction
 			);
 		}
-	}
+	} ## end else [ if ($count) ]
 	exit 0;
-}
+} ## end if ( $action eq 'tasks' )
 
 if ( $action eq 'submit' ) {
 	if ($use_json) {
@@ -421,13 +407,18 @@ if ( $action eq 'submit' ) {
 		if ( !$pretty ) {
 			print "\n";
 		}
-	}
+	} ## end if ($use_json)
 
 	exit 0;
-}
+} ## end if ( $action eq 'submit' )
 
 if ( $action eq 'fail' ) {
 	print $cape_utils->fail( where => $where );
+	exit 0;
+}
+
+if ( $action eq 'eve' ) {
+	$cape_utils->eve_process();
 	exit 0;
 }
 

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ImportCSVDataOption;
 
 require 5.6.0;
@@ -36,10 +35,10 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::CustomParserConfig;
 use AsposeCellsCloud::Object::FileSource;
-use AsposeCellsCloud::Object::ImportOption;
+use AsposeCellsCloud::Object::ImportOption; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -55,12 +54,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -101,7 +100,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -109,7 +108,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -121,109 +120,109 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ImportCSVDataOption',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'source' => {
-    	datatype => 'FileSource',
-    	base_name => 'Source',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'import_data_type' => {
-    	datatype => 'string',
-    	base_name => 'ImportDataType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'destination_worksheet' => {
-    	datatype => 'string',
-    	base_name => 'DestinationWorksheet',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_insert' => {
-    	datatype => 'boolean',
-    	base_name => 'IsInsert',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'convert_numeric_data' => {
-    	datatype => 'boolean',
-    	base_name => 'ConvertNumericData',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'first_column' => {
-    	datatype => 'int',
-    	base_name => 'FirstColumn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'source_file' => {
-    	datatype => 'string',
-    	base_name => 'SourceFile',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'first_row' => {
-    	datatype => 'int',
-    	base_name => 'FirstRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'separator_string' => {
-    	datatype => 'string',
-    	base_name => 'SeparatorString',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'custom_parsers' => {
-    	datatype => 'ARRAY[CustomParserConfig]',
-    	base_name => 'CustomParsers',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'separator_string' => {
+     	datatype => 'string',
+     	base_name => 'SeparatorString',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'convert_numeric_data' => {
+     	datatype => 'boolean',
+     	base_name => 'ConvertNumericData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'first_row' => {
+     	datatype => 'int',
+     	base_name => 'FirstRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'first_column' => {
+     	datatype => 'int',
+     	base_name => 'FirstColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'source_file' => {
+     	datatype => 'string',
+     	base_name => 'SourceFile',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'custom_parsers' => {
+     	datatype => 'ARRAY[CustomParserConfig]',
+     	base_name => 'CustomParsers',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'destination_worksheet' => {
+     	datatype => 'string',
+     	base_name => 'DestinationWorksheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_insert' => {
+     	datatype => 'boolean',
+     	base_name => 'IsInsert',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'import_data_type' => {
+     	datatype => 'string',
+     	base_name => 'ImportDataType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'source' => {
+     	datatype => 'FileSource',
+     	base_name => 'Source',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'source' => 'FileSource',
-    'import_data_type' => 'string',
-    'destination_worksheet' => 'string',
-    'is_insert' => 'boolean',
+    'separator_string' => 'string',
     'convert_numeric_data' => 'boolean',
+    'first_row' => 'int',
     'first_column' => 'int',
     'source_file' => 'string',
-    'first_row' => 'int',
-    'separator_string' => 'string',
-    'custom_parsers' => 'ARRAY[CustomParserConfig]'
+    'custom_parsers' => 'ARRAY[CustomParserConfig]',
+    'destination_worksheet' => 'string',
+    'is_insert' => 'boolean',
+    'import_data_type' => 'string',
+    'source' => 'FileSource' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'source' => 'Source',
-    'import_data_type' => 'ImportDataType',
-    'destination_worksheet' => 'DestinationWorksheet',
-    'is_insert' => 'IsInsert',
+    'separator_string' => 'SeparatorString',
     'convert_numeric_data' => 'ConvertNumericData',
+    'first_row' => 'FirstRow',
     'first_column' => 'FirstColumn',
     'source_file' => 'SourceFile',
-    'first_row' => 'FirstRow',
-    'separator_string' => 'SeparatorString',
-    'custom_parsers' => 'CustomParsers'
+    'custom_parsers' => 'CustomParsers',
+    'destination_worksheet' => 'DestinationWorksheet',
+    'is_insert' => 'IsInsert',
+    'import_data_type' => 'ImportDataType',
+    'source' => 'Source' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

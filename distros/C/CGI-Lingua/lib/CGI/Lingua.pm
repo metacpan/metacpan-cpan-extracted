@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.64
+Version 0.65
 
 =cut
 
@@ -106,10 +106,23 @@ The optional parameter debug is passed on to L<I18N::AcceptLanguage>.
 =cut
 
 sub new {
-	my $proto = shift;
+	my $class = $_[0];
 
-	my $class = ref($proto) || $proto;
+	shift;
+
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	if(!defined($class)) {
+		# Using CGI::Lingua->new(), not CGI::Lingua()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %params }, ref($class);
+	}
 
 	# TODO: check that the number of supported languages is > 0
 	# unless($params{supported} && ($#params{supported} > 0)) {
@@ -353,7 +366,6 @@ sub language_code_alpha2 {
 	return $self->{_slanguage_code_alpha2};
 }
 
-
 =head2 code_alpha2
 
 Synonym for language_code_alpha2, kept for historical reasons.
@@ -387,6 +399,9 @@ sub sublanguage_code_alpha2 {
 
 Gives a human readable rendition of what language the user asked for whether
 or not it is supported.
+
+Returns the sublanguage (if appropriate) in parentheses,
+e.g. "English (United Kingdom)"
 
 =cut
 
@@ -445,7 +460,7 @@ sub _find_language {
 				$self->{_logger}->debug("l: $l");
 			}
 
-			unless($l =~ /^..-..$/) {
+			if($l !~ /^..-..$/) {
 				$self->{_slanguage} = $self->_code2language($l);
 				if($self->{_slanguage}) {
 					if($self->{_logger}) {
@@ -472,9 +487,7 @@ sub _find_language {
 					}
 					return;
 				}
-			}
-			# TODO: Handle es-419 "Spanish (Latin America)"
-			if($l =~ /(.+)-(..)$/) {
+			} elsif($l =~ /(.+)-(..)$/) {	# TODO: Handle es-419 "Spanish (Latin America)"
 				my $alpha2 = $1;
 				my $variety = $2;
 				# my $accepts = $i18n->accepts($l, $self->{_supported});
@@ -600,6 +613,8 @@ sub _find_language {
 					}
 				}
 			}
+		} elsif(($http_accept_language =~ /;/) && (defined($self->{_logger}))) {
+			$self->{_logger}->warn(__PACKAGE__, ": lower priority supported language may be missed HTTP_ACCEPT_LANGUAGE=$http_accept_language");
 		}
 		if($self->{_slanguage} && ($self->{_slanguage} ne 'Unknown')) {
 			if($self->{_rlanguage} eq 'Unknown') {
@@ -1233,6 +1248,9 @@ sub time_zone {
 		}
 	}
 
+	if($self->{_logger} && !defined($self->{_timezone})) {
+		$self->{_logger}->warn("Couldn't determine the timezone");
+	}
 	return $self->{_timezone};
 }
 
@@ -1335,10 +1353,14 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Lingua>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+Uses L<I18N::Acceptlanguage> to find the highest priority accepted language.
+This means that if you support languages at a lower priority, it may be missed.
+
 =head1 SEE ALSO
 
-L<Locale::Country>
 L<HTTP::BrowserDetect>
+L<I18N::AcceptLangauge>
+L<Locale::Country>
 
 =head1 SUPPORT
 
@@ -1380,7 +1402,7 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2022 Nigel Horne.
+Copyright 2010-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

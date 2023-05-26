@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::FileVersion;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::StorageFile; 
 
-use AsposeCellsCloud::Object::StorageFile;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,82 +118,82 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'File Version',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'FileVersion',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'name' => {
-    	datatype => 'string',
-    	base_name => 'Name',
-    	description => 'File or folder name.',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_folder' => {
-    	datatype => 'boolean',
-    	base_name => 'IsFolder',
-    	description => 'True if it is a folder.',
-    	format => '',
-    	read_only => '',
-    		},
-    'modified_date' => {
-    	datatype => 'DateTime',
-    	base_name => 'ModifiedDate',
-    	description => 'File or folder last modified DateTime.',
-    	format => '',
-    	read_only => '',
-    		},
-    'size' => {
-    	datatype => 'int',
-    	base_name => 'Size',
-    	description => 'File or folder size.',
-    	format => '',
-    	read_only => '',
-    		},
-    'path' => {
-    	datatype => 'string',
-    	base_name => 'Path',
-    	description => 'File or folder path.',
-    	format => '',
-    	read_only => '',
-    		},
-    'version_id' => {
-    	datatype => 'string',
-    	base_name => 'VersionId',
-    	description => 'File Version ID.',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_latest' => {
-    	datatype => 'boolean',
-    	base_name => 'IsLatest',
-    	description => 'Specifies whether the file is (true) or is not (false) the latest version of an file.',
-    	format => '',
-    	read_only => '',
-    		},
+     'version_id' => {
+     	datatype => 'string',
+     	base_name => 'VersionId',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_latest' => {
+     	datatype => 'boolean',
+     	base_name => 'IsLatest',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'name' => {
+     	datatype => 'string',
+     	base_name => 'Name',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_folder' => {
+     	datatype => 'boolean',
+     	base_name => 'IsFolder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'modified_date' => {
+     	datatype => 'DateTime',
+     	base_name => 'ModifiedDate',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'size' => {
+     	datatype => 'int',
+     	base_name => 'Size',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'path' => {
+     	datatype => 'string',
+     	base_name => 'Path',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'version_id' => 'string',
+    'is_latest' => 'boolean',
     'name' => 'string',
     'is_folder' => 'boolean',
     'modified_date' => 'DateTime',
     'size' => 'int',
-    'path' => 'string',
-    'version_id' => 'string',
-    'is_latest' => 'boolean'
+    'path' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'version_id' => 'VersionId',
+    'is_latest' => 'IsLatest',
     'name' => 'Name',
     'is_folder' => 'IsFolder',
     'modified_date' => 'ModifiedDate',
     'size' => 'Size',
-    'path' => 'Path',
-    'version_id' => 'VersionId',
-    'is_latest' => 'IsLatest'
+    'path' => 'Path' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

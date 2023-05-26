@@ -20,7 +20,7 @@ L<Net::RDAP::Remark> objects.
 
 =head2 Remark Title
 
-	$title = $remark->title;
+    $title = $remark->title;
 
 Returns the textual description of the remark.
 
@@ -32,7 +32,7 @@ sub title { $_[0]->{'title'} }
 
 =head2 Remark Type
 
-	$type = $link->type;
+    $type = $link->type;
 
 Returns the "type" of the remark. The possible values are defined by
 an IANA registry; see:
@@ -51,7 +51,7 @@ sub type { $_[0]->{'type'} }
 
 =head2 Remark Description
 
-	my @description = $link->description;
+    my @description = $link->description;
 
 Returns an array containing lines of text.
 
@@ -63,13 +63,13 @@ sub description { $_[0]->{'description'} ? @{$_[0]->{'description'}} : () }
 
 =head2 Remark Links
 
-	$links = $remark->links;
+    $links = $remark->links;
 
 Returns a (potentially empty) array of L<Net::RDAP::Link> objects.
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

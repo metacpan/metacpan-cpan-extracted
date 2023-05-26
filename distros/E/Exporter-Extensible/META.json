@@ -4,7 +4,7 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,14 +54,19 @@
       "bugtracker" : {
          "web" : "https://github.com/nrdvana/perl-Exporter-Extensible/issues"
       },
+      "homepage" : "https://github.com/nrdvana/perl-Exporter-Extensible",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/nrdvana/perl-Exporter-Extensible.git",
          "web" : "https://github.com/nrdvana/perl-Exporter-Extensible"
       }
    },
-   "version" : "0.10",
-   "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "0.11",
+   "x_contributors" : [
+      "Tabulo <dev-git.perl@tabulo.net>"
+   ],
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

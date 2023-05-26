@@ -126,6 +126,7 @@ lib/Lab/Moose.pm
 lib/Lab/Moose/Catfile.pm
 lib/Lab/Moose/Connection.pm
 lib/Lab/Moose/Connection/Debug.pm
+lib/Lab/Moose/Connection/HTTP.pm
 lib/Lab/Moose/Connection/IsoBus.pm
 lib/Lab/Moose/Connection/LinuxGPIB.pm
 lib/Lab/Moose/Connection/Mock.pm
@@ -151,13 +152,16 @@ lib/Lab/Moose/Instrument/ABB_TRMC2.pm
 lib/Lab/Moose/Instrument/AH2700A.pm
 lib/Lab/Moose/Instrument/AdjustRange.pm
 lib/Lab/Moose/Instrument/Agilent33120A.pm
+lib/Lab/Moose/Instrument/Agilent33210A.pm
 lib/Lab/Moose/Instrument/Agilent34410A.pm
 lib/Lab/Moose/Instrument/Agilent34460A.pm
+lib/Lab/Moose/Instrument/Bluefors_Temp.pm
 lib/Lab/Moose/Instrument/Cache.pm
 lib/Lab/Moose/Instrument/Common.pm
 lib/Lab/Moose/Instrument/Cryomagnetics_4G.pm
 lib/Lab/Moose/Instrument/DisplayXY.pm
 lib/Lab/Moose/Instrument/DummySource.pm
+lib/Lab/Moose/Instrument/HP33120A.pm
 lib/Lab/Moose/Instrument/HP34410A.pm
 lib/Lab/Moose/Instrument/HP34420A.pm
 lib/Lab/Moose/Instrument/HP3458A.pm
@@ -172,6 +176,7 @@ lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/KeysightB2901A.pm
 lib/Lab/Moose/Instrument/KeysightDSOS604A.pm
 lib/Lab/Moose/Instrument/KeysightE3633E.pm
+lib/Lab/Moose/Instrument/KeysightN9310A.pm
 lib/Lab/Moose/Instrument/Lakeshore340.pm
 lib/Lab/Moose/Instrument/Lakeshore340/Helium3.pm
 lib/Lab/Moose/Instrument/Lakeshore350.pm
@@ -226,6 +231,7 @@ lib/Lab/Moose/Instrument/TBS1000C.pm
 lib/Lab/Moose/Instrument/VNASweep.pm
 lib/Lab/Moose/Instrument/Yokogawa7651.pm
 lib/Lab/Moose/Instrument/YokogawaGS200.pm
+lib/Lab/Moose/Instrument/ZI_HDAWG.pm
 lib/Lab/Moose/Instrument/ZI_HF2LI.pm
 lib/Lab/Moose/Instrument/ZI_MFIA.pm
 lib/Lab/Moose/Instrument/ZI_MFLI.pm

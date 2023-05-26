@@ -20,12 +20,13 @@ no_index:
     - t
     - inc
 requires:
+  Clone: '0.46'
   DateTime: '1.51'
   DateTime::Format::Strptime: '1.76'
   Devel::Confess: '0.009004'
   Getopt::Long: '0.44'
-  Module::Generic: v0.28.3
-  Nice::Try: v1.3.1
+  Module::Generic: v0.30.4
+  Nice::Try: v1.3.4
   Scalar::Util: '1.54'
   Tie::Hash: '1.05'
   parent: '0'
@@ -36,5 +37,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Getopt-Class/issues
   repository: https://gitlab.com/jackdeguest/Getopt-Class
-version: v0.103.3
+version: v0.104.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

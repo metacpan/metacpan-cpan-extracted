@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ImageMagickUtils/downsize_image
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2023-03-01'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/downsize_image",
@@ -39,13 +39,15 @@ downsize-image - Reduce image size, by default via compressing to JPEG quality 4
 
 =head1 VERSION
 
-This document describes version 0.019 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
+This document describes version 0.020 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
 
 =head1 SYNOPSIS
 
-Usage:
+B<downsize-image> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-% B<downsize-image> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [B<--downsize-to>=I<str>|B<--1536>|B<--2048>|B<--dont-downsize>|B<--no-downsize>] [B<--dry-run>|B<-n>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quality>=I<int>|B<-q>=I<int>] [B<--skip-downsized>|B<--no-skip-downsized>|B<--noskip-downsized>] [B<--skip-whatsapp>|B<--no-skip-whatsapp>|B<--noskip-whatsapp>] [B<--trash-original>|B<-T>|B<--no-trash-original>|B<--notrash-original>] [B<--files-json>=I<json>] -- E<lt>I<file>E<gt> ...
+B<downsize-image> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<downsize-image> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--delete-original|/"--delete-original, -D">>|B<L<-D|/"--delete-original, -D">>|B<L<--no-delete-original|/"--delete-original, -D">>|B<L<--nodelete-original|/"--delete-original, -D">>] [B<L<--downsize-to|/"--no-downsize">>=I<str>|B<L<--1536|/"--no-downsize">>|B<L<--2048|/"--no-downsize">>|B<L<--dont-downsize|/"--no-downsize">>|B<L<--no-downsize|/"--no-downsize">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quality|/"--quality=s, -q">>=I<int>|B<L<-q|/"--quality=s, -q">>=I<int>] [B<L<--skip-downsized|/"--no-skip-downsized">>|B<L<--no-skip-downsized|/"--no-skip-downsized">>|B<L<--noskip-downsized|/"--no-skip-downsized">>] [B<L<--skip-whatsapp|/"--no-skip-whatsapp">>|B<L<--no-skip-whatsapp|/"--no-skip-whatsapp">>|B<L<--noskip-whatsapp|/"--no-skip-whatsapp">>] [B<L<--trash-original|/"--trash-original, -T">>|B<L<-T|/"--trash-original, -T">>|B<L<--no-trash-original|/"--trash-original, -T">>|B<L<--notrash-original|/"--trash-original, -T">>] -- E<lt>I<L<file|/"--files-json=s">>E<gt> ...
 
 
 
@@ -88,7 +90,7 @@ See C<--downsize-to>.
 
 Delete (unlink) the original file after downsizing.
 
-See also the `trash_original` option.
+See also the C<trash_original> option.
 
 
 =item B<--dont-downsize>
@@ -110,11 +112,14 @@ Valid values:
 Downsizing will only be done if the input image's shortest side is indeed larger
 then the target downsize.
 
-To disable downsizing, set `--downsize-to` to '' (empty string), or specify on
-`--dont-downsize` on the CLI.
+To disable downsizing, set C<--downsize-to> to '' (empty string), or specify on
+C<--dont-downsize> on the CLI.
 
 
 =item B<--file>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -137,8 +142,8 @@ See C<--downsize-to>.
 Do not skip previously downsized images.
 
 By default, when given a filename that looks like it's already downsized, e.g.
-`foo.1024-q40.jpg` or `foo.q40.jpg`, will skip downsizing. The
-`--no-skip-downsized` option will process such filenames nevertheless.
+C<foo.1024-q40.jpg> or C<foo.q40.jpg>, will skip downsizing. The
+C<--no-skip-downsized> option will process such filenames nevertheless.
 
 
 =item B<--no-skip-whatsapp>
@@ -146,13 +151,15 @@ By default, when given a filename that looks like it's already downsized, e.g.
 Do not skip WhatsApp images.
 
 By default, assuming that WhatsApp already compresses images, when given a
-filename that matches a WhatsApp image filename, e.g. `IMG-20220508-WA0001.jpg`
-(will be checked using <pm:Regexp::Pattern::Filename::Image::WhatsApp>), will
-skip downsizing. The `--no-skip-whatsapp` option will process such filenames
+filename that matches a WhatsApp image filename, e.g. C<IMG-20220508-WA0001.jpg>
+(will be checked using L<Regexp::Pattern::Filename::Image::WhatsApp>), will
+skip downsizing. The C<--no-skip-whatsapp> option will process such filenames
 nevertheless.
 
 
 =item B<--quality>=I<s>, B<-q>
+
+Quality setting (for JPEG/PNG), 1 (best compression, worst quality) to 100 (least compression, best quality).
 
 Default value:
 
@@ -162,11 +169,11 @@ Default value:
 
 Trash the original file after downsizing.
 
-This option uses the <pm:File::Trash::FreeDesktop> module to do the trashing.
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
 Compared to deletion, with this option you can still restore the trashed
 original files from the Trash directory.
 
-See also the `delete_original` option.
+See also the C<delete_original> option.
 
 
 =back
@@ -179,13 +186,37 @@ See also the `delete_original` option.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -196,6 +227,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -210,6 +245,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -237,6 +283,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -251,24 +303,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -328,7 +389,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/downsize-image.conf>, F</home/s1/downsize-image.conf>, or F</etc/downsize-image.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/downsize-image.conf>, F</home/u1/downsize-image.conf>, or F</etc/downsize-image.conf>.
 
 All found files will be read and merged.
 
@@ -370,25 +431,25 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 DOWNSIZE_IMAGE_OPT => str
+=head2 DOWNSIZE_IMAGE_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F</home/s1/.config/downsize-image.conf>
+=head2 /home/u1/.config/downsize-image.conf
 
-F</home/s1/downsize-image.conf>
+=head2 /home/u1/downsize-image.conf
 
-F</etc/downsize-image.conf>
+=head2 /etc/downsize-image.conf
 
 =head1 EXAMPLES
 
-The default setting is to downsize to 1024p:
+=head2 The default setting is to downsize to 1024p
 
  % downsize-image *
 
-Do not downsize, just recompress to JPEG quality 40, delete original files:
+=head2 Do not downsize, just recompress to JPEG quality 40, delete original files
 
  % downsize-image --dont-downsize --delete-original *
 
@@ -424,7 +485,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <!-- GENERATED WITH OPM::Maker::Command::sopm (1.1.0) -->
+    <Name>NotThereYet</Name>
+    <Version>6.0.10</Version>
+</otrs_package>

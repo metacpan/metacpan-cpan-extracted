@@ -1,0 +1,36 @@
+---
+abstract: 'automatically upgrade Perl native strings to utf8 before sending them to the database'
+author:
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  DBD::SQLite: '1.68'
+  DBI: '0'
+  Encode: '0'
+  Getopt::Long: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-AutoUpgrade-NativeStrings
+provides:
+  DBIx::AutoUpgrade::NativeStrings:
+    file: lib/DBIx/AutoUpgrade/NativeStrings.pm
+    version: '1.01'
+requires:
+  DBI: '0'
+  Encode: '0'
+  Encode::Locale: '0'
+  Scalar::Util: '0'
+  perl: '5.010001'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/damil/DBIx-AutoUpgrade-NativeStrings/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/DBIx-AutoUpgrade-NativeStrings
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

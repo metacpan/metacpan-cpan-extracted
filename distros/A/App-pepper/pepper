@@ -1,0 +1,3 @@
+#!perl
+use lib qw(./lib);
+use App::pepper;

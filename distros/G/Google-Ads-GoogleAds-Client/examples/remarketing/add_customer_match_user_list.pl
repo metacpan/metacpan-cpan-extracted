@@ -96,6 +96,7 @@ sub add_customer_match_user_list {
 }
 
 # Creates a Customer Match user list.
+# [START add_customer_match_user_list_3]
 sub create_customer_match_user_list {
   my ($api_client, $customer_id) = @_;
 
@@ -134,6 +135,7 @@ sub create_customer_match_user_list {
 
   return $user_list_resource_name;
 }
+# [END add_customer_match_user_list_3]
 
 # Creates and executes an asynchronous job to add users to the Customer Match
 # user list.
@@ -229,6 +231,7 @@ sub add_users_to_customer_match_user_list {
 # [END add_customer_match_user_list]
 
 # Retrieves, checks, and prints the status of the offline user data job.
+# [START add_customer_match_user_list_4]
 sub check_job_status() {
   my ($api_client, $customer_id, $offline_user_data_job_resource_name) = @_;
 
@@ -280,6 +283,7 @@ sub check_job_status() {
 
   return 1;
 }
+# [END add_customer_match_user_list_4]
 
 # Builds and returns offline user data job operations to add one user identified
 # by an email address and one user identified based on a physical address.
@@ -287,30 +291,30 @@ sub build_offline_user_data_job_operations() {
   # [START add_customer_match_user_list_2]
   # The first user data has an email address and a phone number.
   my $raw_record_1 = {
-    email => 'test@gmail.com',
+    email => 'dana@example.com',
     # Phone number to be converted to E.164 format, with a leading '+' as
     # required. This includes whitespace that will be removed later.
-    phone => '+1 234 5678910',
+    phone => '+1 800 5550101',
   };
 
   # The second user data has an email address, a mailing address, and a phone
   # number.
   my $raw_record_2 = {
     # Email address that includes a period (.) before the Gmail domain.
-    email => 'test.2@gmail.com',
+    email => 'alex.2@example.com',
     # Address that includes all four required elements: first name, last
     # name, country code, and postal code.
-    firstName   => 'John',
-    lastName    => 'Doe',
+    firstName   => 'Alex',
+    lastName    => 'Quinn',
     countryCode => 'US',
-    postalCode  => '10011',
+    postalCode  => '94045',
     # Phone number to be converted to E.164 format, with a leading '+' as
     # required.
-    phone => '+1 234 5678910',
+    phone => '+1 800 5550102',
   };
 
   # The third user data only has an email address.
-  my $raw_record_3 = {email => 'test3@gmail.com',};
+  my $raw_record_3 = {email => 'charlie@example.com',};
 
   my $raw_records = [$raw_record_1, $raw_record_2, $raw_record_3];
 
@@ -391,7 +395,6 @@ sub build_offline_user_data_job_operations() {
                 })}));
       }
     }
-    # [END add_customer_match_user_list_2]
 
     # If the user_identifiers array is not empty, create a new
     # OfflineUserDataJobOperation and add the UserData to it.
@@ -406,7 +409,7 @@ sub build_offline_user_data_job_operations() {
           }));
     }
   }
-
+  # [END add_customer_match_user_list_2]
   return $operations;
 }
 
@@ -414,6 +417,7 @@ sub build_offline_user_data_job_operations() {
 sub print_customer_match_user_list_info {
   my ($api_client, $customer_id, $user_list_resource_name) = @_;
 
+  # [START add_customer_match_user_list_5]
   # Create a query that retrieves the user list.
   my $search_query =
     "SELECT user_list.size_for_display, user_list.size_for_search " .
@@ -436,6 +440,7 @@ sub print_customer_match_user_list_info {
       service => $google_ads_service,
       request => $search_stream_request
     });
+  # [END add_customer_match_user_list_5]
 
   # Issue a search request and process the stream response to print out some
   # information about the user list.

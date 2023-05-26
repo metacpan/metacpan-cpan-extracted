@@ -1,0 +1,95 @@
+# stopwords  -- to please Pod::Spell, Test::PodSpelling and friends
+#
+
+# stopwords -- technical
+cpan    CPAN
+cpanfile
+darkpan
+dir
+distro
+distros
+dzil dist zilla
+evalbytes
+fc
+Raku
+README
+Readme
+repo
+str
+trustme
+vcs
+wikidoc
+
+## stopwords -- technical / POD
+attr    # attributes
+cattr   # class attributes
+pattr   # private attributes
+
+## stopwords -- technical / Odd
+MAXWORDLENGTH
+mayhap
+xtags   # export tags
+
+# stopwords -- English words that are somehow not recognized
+casefolding
+merchantability
+optimizations
+unsetting
+
+## stopwords -- brands & the like
+bitbucket
+GitHub
+github
+gitlab
+
+
+# Author monikers (CPAN-ID, github-ID, etc)
+DAGOLDEN            @DAGOLDEN
+ETHER               @ETHER
+KENTNL              @KENTNL
+TABULO              @TABULO
+TABULON             @TABULON
+
+
+# Pod::Weaver  - plugins, ...
+AllowOverride
+AppendPrepend
+CommentString
+EnsureUniqueSections
+GenerateSection
+ReplaceName
+SeeAlso
+SortSections
+WarrantyDisclaimer
+
+
+# Dist::Zilla  - plugins
+ArchiveRelease
+AutoPrereqs
+AutoVersion
+BeforeRelease
+BumpVersionAfterRelease
+ConfirmRelease
+ExecDir
+FakeRelease
+GatherDir
+GithubMeta
+ManifestSkip
+MetaJSON
+MetaNoIndex
+MetaResources
+MetaYAML
+ModuleBuild
+ModuleBuildTiny
+PodCoverage
+PodSyntaxTests
+PruneCruft
+Readme
+ReadmeAnyFromPod
+RewriteVersion
+RunExtraTests
+ShareDir
+SurgicalPodWeaver
+TaskWeaver
+TestRelease
+UploadToCPAN

@@ -3,8 +3,9 @@ Testing worddet
 Testing default without options
 <WordDetect attribute="Match" context="#stay" String="antimoon" />
 <Test>
-antimoon ddantimoondd
-ANTIMOON DDANTIMOONDD
+ddantimoondd antimoon #last antimoon matches
+antimoon ddantimoondd #first antomoon matches
+ANTIMOON DDANTIMOONDD #nothing matches
 <Test>
 
 Testing dynamic

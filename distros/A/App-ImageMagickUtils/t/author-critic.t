@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ImageMagickUtils.pm','script/calc-image-resized-size','script/convert-image-to','script/convert-image-to-pdf','script/downsize-image','script/image-resize-notation-to-human','script/img2pdf'];
+my $filenames = ['lib/App/ImageMagickUtils.pm','script/calc-image-resized-size','script/convert-image-to','script/convert-image-to-jpg','script/convert-image-to-pdf','script/convert-image-to-png','script/downsize-image','script/image-resize-notation-to-human','script/img2jpg','script/img2pdf','script/img2png','script/jpg2png','script/png2jpg'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

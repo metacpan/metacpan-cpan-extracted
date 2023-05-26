@@ -1,0 +1,29 @@
+---
+abstract: 'Parse and transform obfuscated php code'
+author:
+  - 'Barnim Dzwillo @ Strato AG'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PHP-Decode
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Zlib: 1
+  Digest::MD5: 1
+  Digest::SHA1: 1
+  HTML::Entities: 1
+  MIME::Base64: 1
+  Tie::IxHash: 1
+  URI::Escape: 1
+  perl: 5.016
+version: 0.302

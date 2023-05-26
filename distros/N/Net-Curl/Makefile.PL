@@ -169,6 +169,7 @@ WriteMakefile(
 		},
 		x_contributors	=> [
 			"B${a_}lint Szilakszi",
+			"David Geiger",
 			"Felipe Gasper",
 			"Fuji, Goro",
 			"Przemys${l_}aw Iskra",
@@ -264,6 +265,15 @@ sub get_constants_symbols
 	$curlver =~ s/[^\d]*$//;
 	my $cver = eval "v$curlver";
 
+	my %ex;
+
+	open my $ein, "<", "inc/symbols-excluded"
+		or die "Cannot open symbols-excluded file: $!\n";
+	while ( <$ein> ) {
+		s/^\s+|\s+$//g;
+		$ex{ $_ }++;
+	}
+
 	my %out;
 
 	open my $fin, "<", "inc/symbols-in-versions"
@@ -271,6 +281,8 @@ sub get_constants_symbols
 	while ( <$fin> ) {
 		next if /^[#\s]/;
 		my ( $sym, $in, $dep, $out ) = split /\s+/, $_;
+
+		next if $ex{ $sym };
 
 		if ( $out ) {
 			my $vout = eval "v$out";
@@ -329,7 +341,7 @@ sub get_constants_headers
 
 	my @out;
 	foreach my $e (sort keys %syms) {
-		if ( $e =~ /(OBSOLETE|^CURL_EXTERN|_LAST\z|_LASTENTRY\z|^CURL_FORMAT_OFF_T$|^CURL_ISOCPP$|^CURLOPT$)/ ) {
+		if ( $e =~ /(OBSOLETE|^CURL_DEPRECATED\z|^CURL_EXTERN|^CURL_IGNORE_DEPRECATION\z|^CURLOPTDEPRECATED\z|_LAST\z|_LASTENTRY\z|^CURL_FORMAT_OFF_T$|^CURL_ISOCPP$|^CURLOPT$)/ ) {
 			next;
 		}
 		push @out, $e;

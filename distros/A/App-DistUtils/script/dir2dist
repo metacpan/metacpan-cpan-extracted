@@ -9,9 +9,9 @@ use Cwd qw(abs_path);
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-21'; # DATE
+our $DATE = '2023-02-25'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 our %SPEC;
 
@@ -76,7 +76,7 @@ dir2dist - Convert directory name to dist name
 
 =head1 VERSION
 
-This document describes version 0.152 of dir2dist (from Perl distribution App-DistUtils), released on 2022-08-21.
+This document describes version 0.153 of dir2dist (from Perl distribution App-DistUtils), released on 2023-02-25.
 
 =head1 SYNOPSIS
 
@@ -116,6 +116,9 @@ See C<--dirs>.
 Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--dirs>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -378,7 +381,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

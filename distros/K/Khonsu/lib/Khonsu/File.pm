@@ -6,9 +6,24 @@ use Khonsu::Page;
 use Khonsu::Page::Header;
 use Khonsu::Page::Footer;
 
+use Module::Runtime qw/use_module/;
+
+our @PLUGINS = ();
+
+sub load_plugin {
+	my ($self, @plugins) = @_;
+	for my $plugin (@plugins) {
+		$plugin =~ s/^\+/Khonsu::/;
+		use_module($plugin);
+		push @PLUGINS, $plugin;
+	}
+}
+
 sub new {
 	my ($self, %params) = @_;
-	$self = $self->SUPER::new(%params);
+	
+	$self = $self->SUPER::new(%params, PLUGINS => \@PLUGINS);
+
 	$self->add_page();
 	if ($params{configure}) {
 		$self->add_page_header(%{delete $params{configure}->{page_header}})
@@ -115,7 +130,9 @@ sub add_page_header {
 	$self->page->header(Khonsu::Page::Header->new(
 		%args
 	));
-
+	if ($self->page->y < $self->page->header->h) {
+		$self->page->column_y($self->page->y($self->page->header->h));
+	}
 	return $self;
 }
 

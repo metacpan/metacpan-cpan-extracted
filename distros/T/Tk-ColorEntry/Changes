@@ -6,7 +6,7 @@ Revision history for Perl extension Tk::ColorEntry.
 0.01  Tue Mar 21
 	- initial release
 
-0.02  Fri Mar 24
+0.02  Fri Mar 24 2023
 	-added -command option to ColorEntry.pm
 	-added -variable option to ColorEntry.pm
 	-added -balloon option to ColorPicker.pm
@@ -14,5 +14,6 @@ Revision history for Perl extension Tk::ColorEntry.
 	-fixed history storing/retrieving
 	-made the Recent tab into a scrolled Pane
 	-fixed and updated documentation
-
+0.03  Mon may 22 2023
+	- Modified configspecs for background and foreground colors
 	

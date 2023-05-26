@@ -1,0 +1,19 @@
+1.02
+
+- No user-visible changes. All changes are CPAN related.
+
+1.01
+
+- Instead of using localhost, rely on Net::NNTP to figure it out: it
+  uses the environment variable NNTPSERVER, for example.
+
+- Message-id for the intro must come from an environment variable.
+
+- Do away with the group filter since lynx and the like also don't
+  filter.
+
+- Systemd service example.
+
+1.00
+
+- Initial release.

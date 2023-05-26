@@ -8,7 +8,7 @@ use English qw(-no_match_vars);
 
 use JIP::Mock::Control;
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.0.4';
 
 our @EXPORT_OK = qw(take_control);
 
@@ -31,7 +31,7 @@ JIP::Mock - Override subroutines in a module
 
 =head1 VERSION
 
-This document describes L<JIP::Mock> version C<v0.0.3>.
+This document describes L<JIP::Mock> version C<v0.0.4>.
 
 =head1 SYNOPSIS
 

@@ -4,40 +4,40 @@ use Net::RDAP;
 use strict;
 
 sub new {
-	my ($package, $base, $client) = @_;
-	return bless({
-		'base' 		=> $base->isa('REF') ? $base : URI->new($base),
-		'client'	=> $client || Net::RDAP->new,
-	}, $package);
+    my ($package, $base, $client) = @_;
+    return bless({
+        'base'      => $base->isa('REF') ? $base : URI->new($base),
+        'client'    => $client || Net::RDAP->new,
+    }, $package);
 }
 
-sub help	{ $_[0]->fetch('help'					) }
-sub domain	{ $_[0]->fetch('domain',	$_[1]->name		) }
-sub ip 		{ $_[0]->fetch('ip',		$_[1]->prefix		) }
-sub autnum 	{ $_[0]->fetch('autnum',	$_[1]->toasplain	) }
-sub entity 	{ $_[0]->fetch('entity',	$_[1]->handle		) }
-sub nameserver	{ $_[0]->fetch('nameserver',	$_[1]->name		) }
+sub help        { $_[0]->fetch('help'                               ) }
+sub domain      { $_[0]->fetch('domain',        $_[1]->name         ) }
+sub ip          { $_[0]->fetch('ip',            $_[1]->prefix       ) }
+sub autnum      { $_[0]->fetch('autnum',        $_[1]->toasplain    ) }
+sub entity      { $_[0]->fetch('entity',        $_[1]->handle       ) }
+sub nameserver  { $_[0]->fetch('nameserver',    $_[1]->name         ) }
 
 sub fetch {
-	my ($self, $type, $handle, %params) = @_;
+    my ($self, $type, $handle, %params) = @_;
 
-	my $uri = clone($self->base);
+    my $uri = clone($self->base);
 
-	$uri->path_segments(grep { defined } ($uri->path_segments, $type, $handle));
-	$uri->query_form(%params);
+    $uri->path_segments(grep { defined } ($uri->path_segments, $type, $handle));
+    $uri->query_form(%params);
 
-	my %opt;
-	$opt{'class_override'} = 'help' if ('help' eq $type);
+    my %opt;
+    $opt{'class_override'} = 'help' if ('help' eq $type);
 
-	return $self->client->fetch($uri, %opt);
+    return $self->client->fetch($uri, %opt);
 }
 
-sub base	{ $_[0]->{'base'}   }
-sub client	{ $_[0]->{'client'} }
+sub base    { $_[0]->{'base'}   }
+sub client  { $_[0]->{'client'} }
 
-sub domains	{ $_[0]->fetch('domains',	undef, $_[1] => $_[2]) }
-sub nameservers	{ $_[0]->fetch('nameservers',	undef, $_[1] => $_[2]) }
-sub entities	{ $_[0]->fetch('entities',	undef, $_[1] => $_[2]) }
+sub domains     { $_[0]->fetch('domains',       undef, $_[1] => $_[2]) }
+sub nameservers { $_[0]->fetch('nameservers',   undef, $_[1] => $_[2]) }
+sub entities    { $_[0]->fetch('entities',      undef, $_[1] => $_[2]) }
 
 1;
 
@@ -51,31 +51,31 @@ L<Net::RDAP::Service> - an interface to an RDAP server.
 
 =head1 SYNOPSIS
 
-	use Net::RDAP::Service;
+    use Net::RDAP::Service;
 
-	#
-	# create a new service object:
-	#
+    #
+    # create a new service object:
+    #
 
-	my $svc = Net::RDAP::Service->new('https://www.example.com/rdap');
+    my $svc = Net::RDAP::Service->new('https://www.example.com/rdap');
 
-	#
-	# get a domain:
-	#
+    #
+    # get a domain:
+    #
 
-	my $domain = $svc->domain(Net::DNS::Domain->new('example.com'));
+    my $domain = $svc->domain(Net::DNS::Domain->new('example.com'));
 
-	#
-	# do a search:
-	#
+    #
+    # do a search:
+    #
 
-	my $result = $svc->domains('name' => 'ex*mple.com');
+    my $result = $svc->domains('name' => 'ex*mple.com');
 
-	#
-	# get help:
-	#
+    #
+    # get help:
+    #
 
-	my $help = $svc->help;
+    my $help = $svc->help;
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,7 @@ searches.
 
 =head2 Constructor
 
-	my $svc = Net::RDAP::Service->new($url);
+    my $svc = Net::RDAP::Service->new($url);
 
 Creates a new L<Net::RDAP::Service> object. C<$url> is a string or a
 L<URI> object representing the base URL of the service.
@@ -99,7 +99,7 @@ L<URI> object representing the base URL of the service.
 You can also provide a second argument which should be an existing
 L<Net::RDAP> instance. This is used when fetching resources from the
 server.
-	
+
 =head2 Lookup Methods
 
 You can do direct lookups of objects using the following methods:
@@ -126,20 +126,20 @@ L<Net::RDAP>.
 You can perform searches using the following methods. Note that
 different services will support different search functions.
 
-	$result = $svc->domains(%QUERY);
+    $result = $svc->domains(%QUERY);
 
-	$result = $svc->entities(%QUERY);
+    $result = $svc->entities(%QUERY);
 
-	$result = $svc->nameservers(%QUERY);
+    $result = $svc->nameservers(%QUERY);
 
 In all cases, C<%QUERY> is a set of search parameters. Here are some
 examples:
 
-	$result = $svc->domains('name' => 'ex*mple.com');
+    $result = $svc->domains('name' => 'ex*mple.com');
 
-	$result = $svc->entities('fn' => 'Ex*ample, Inc');
+    $result = $svc->entities('fn' => 'Ex*ample, Inc');
 
-	$result = $svc->nameservers('ip' => '192.168.0.1');
+    $result = $svc->nameservers('ip' => '192.168.0.1');
 
 The following parameters can be specified:
 
@@ -167,13 +167,13 @@ rate-limiting policy, supported authentication methods, supported
 extensions, technical support contact, etc.). This information may be
 obtained by performing a C<help> query:
 
-	my $help = $svc->help;
+    my $help = $svc->help;
 
 The return value is a L<Net::RDAP::Help> object.
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

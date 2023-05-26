@@ -9,7 +9,7 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
@@ -95,8 +95,10 @@ sub Populate {
 	$self->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
 
 	$self->ConfigSpecs(
+		-background => ['SELF', 'DESCENDATNS'],
 		-borderwidth => ['SELF'],
 		-filter => ['PASSIVE', undef, undef, 0],
+		-foreground => ['SELF', 'DESCENDATNS'],
 		-selectcall => ['CALLBACK', undef, undef, sub {}],
 		-relief => ['SELF'],
 		'-values' => ['METHOD', undef, undef, []],
@@ -124,6 +126,7 @@ Filters the list of values on $filter.
 
 sub filter {
 	my ($self, $filter) = @_;
+	$filter = quotemeta($filter);
 	my $values = $self->{VALUES};
 	my @new = ();
 	my $len = length($filter);

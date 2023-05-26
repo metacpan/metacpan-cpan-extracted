@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::Role::Verify::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: Main verification logic (role for form holding config)
-$SyForm::Role::Verify::VERSION = '0.102';
+$SyForm::Role::Verify::VERSION = '0.103';
 use Moo::Role;
 use Module::Runtime qw( use_module );
 
@@ -55,7 +55,7 @@ SyForm::Role::Verify - Main verification logic (role for form holding config)
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

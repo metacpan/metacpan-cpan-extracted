@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::Results::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: Results of the processing of SyForm::Values
-$SyForm::Results::VERSION = '0.102';
+$SyForm::Results::VERSION = '0.103';
 use Moo;
 
 with qw(
@@ -77,7 +77,7 @@ SyForm::Results - Results of the processing of SyForm::Values
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

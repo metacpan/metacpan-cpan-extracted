@@ -1,6 +1,7 @@
 #include "descriptorloader.h"
 #include "unordered_map.h"
 
+#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/duration.pb.h>
 #include <google/protobuf/timestamp.pb.h>
 #include <google/protobuf/wrappers.pb.h>
@@ -14,149 +15,111 @@ using namespace gpd;
 using namespace std;
 
 namespace {
-    const string wkt_prefix = "google.protobuf";
-    STD_TR1::unordered_map<string, string> wkt_types_to_file;
-    STD_TR1::unordered_set<string> wkt_files;
+    void PerlLogHandler(LogLevel level, const char *filename, int line,
+                        const std::string &message) {
+        const char *level_str = NULL;
 
-    // it seems the only way to add a Descriptor to a pool is to go through the Proto object
-    void add_descriptor_to_pool(DescriptorPool *pool, const Descriptor *descriptor) {
-        const FileDescriptor *file_descriptor = descriptor->file();
-        FileDescriptorProto file_proto;
-
-        file_descriptor->CopyTo(&file_proto);
-        pool->BuildFile(file_proto);
-
-        for (int j = 0, max = file_proto.message_type_size(); j < max; ++j) {
-            const DescriptorProto &message = file_proto.message_type(j);
-            const string full_name = file_proto.package() + "." + message.name();
-
-            wkt_types_to_file.insert(make_pair(full_name, file_proto.name()));
+        switch (level) {
+        case LOGLEVEL_WARNING:
+            level_str = "";
+            break;
+        case LOGLEVEL_ERROR:
+            level_str = " error";
+            break;
+        case LOGLEVEL_FATAL:
+            level_str = " fatal error";
+            break;
+        default:
+            return;
         }
 
-        wkt_files.insert(file_proto.name());
+        warn("protobuf%s: %s [%s:%d]", level_str, message.c_str(), filename, line);
     }
 
-    STD_TR1::unordered_set<string> find_wkt_files(const FileDescriptorProto &file) {
-        const string &package = file.package();
-        STD_TR1::unordered_set<string> wkt_files;
-
-        if (package != wkt_prefix)
-            return wkt_files;
-
-        // for well-known-types, use the compiled-in version. This
-        // version of the code handles also in-tree copies of WKT
-        // .proto files
-        for (int j = 0, max = file.message_type_size(); j < max; ++j) {
-            const DescriptorProto &message = file.message_type(j);
-            const string full_name = package + "." + message.name();
-
-            STD_TR1::unordered_map<string, string>::iterator entry = wkt_types_to_file.find(full_name);
-            if (entry != wkt_types_to_file.end())
-                wkt_files.insert(entry->second);
+    class CaptureWarnings {
+    public:
+        CaptureWarnings() {
+            previous = SetLogHandler(PerlLogHandler);
         }
 
-        return wkt_files;
-    }
+        ~CaptureWarnings() {
+            SetLogHandler(previous);
+        }
+
+    private:
+        LogHandler *previous;
+    };
 }
 
-void DescriptorLoader::ErrorCollector::AddError(const string &filename, const string &element_name, const Message *descriptor, DescriptorPool::ErrorCollector::ErrorLocation location, const string &message) {
+void DescriptorLoader::CollectMultiFileErrors::AddError(const string &filename, int line, int column, const string &message) {
     if (!errors.empty())
         errors += "\n";
 
     errors +=
-        "Error processing serialized protobuf descriptor: " +
-        filename +
-        ": " +
+        "Error during protobuf parsing: " +
+        filename + ":" + to_string(line) + ":" + to_string(column) + ": " +
         message;
 }
 
-void DescriptorLoader::ErrorCollector::AddWarning(const string &filename, const string &element_name, const Message *descriptor, DescriptorPool::ErrorCollector::ErrorLocation location, const string &message) {
-    warn("Processing serialized protobuf descriptor: %s: %s", filename.c_str(), message.c_str());
+void DescriptorLoader::CollectMultiFileErrors::AddWarning(const string &filename, int line, int column, const string &message) {
+    // seems to never be called, warnings go to log
+    warn("Parsing protobuf file: %s:%d:%d: %s", filename.c_str(), line, column, message.c_str());
 }
 
-DescriptorLoader::DescriptorLoader(SourceTree *source_tree,
-                                   MultiFileErrorCollector *error_collector) :
-        source_database(source_tree),
-        binary_database(binary_pool),
-        merged_database(&binary_database, &source_database),
-        merged_pool(&merged_database, source_database.GetValidationErrorCollector()) {
+void DescriptorLoader::CollectMultiFileErrors::maybe_croak() {
+    if (errors.empty())
+        return;
+
+    string copy = errors;
+
+    errors.clear();
+    croak("%s", copy.c_str());
+}
+
+DescriptorLoader::DescriptorLoader() :
+        overlay_source_tree(&memory_source_tree, &disk_source_tree),
+        generated_database(*DescriptorPool::generated_pool()),
+        source_database(&overlay_source_tree, &generated_database),
+        merged_source_binary_database(&binary_database, &source_database),
+        merged_pool(&merged_source_binary_database, source_database.GetValidationErrorCollector()) {
     merged_pool.EnforceWeakDependencies(true);
-    source_database.RecordErrorsTo(error_collector);
+    source_database.RecordErrorsTo(&multifile_error_collector);
 
-    #define ADD_WKT_FILE(name) add_descriptor_to_pool(&binary_pool, google::protobuf:: name ::descriptor())
-
-    // only one WKT per .proto file is needed
-    ADD_WKT_FILE(Duration);
-    ADD_WKT_FILE(Timestamp);
-    ADD_WKT_FILE(DoubleValue); // all types in wrappers.proto
-
-    #undef ADD_WKT
+    // make sure the descriptors are available in the generated pool (doing this for one descriptor
+    // pulls in all the descriptors in the same file)
+    Duration::descriptor();
+    Timestamp::descriptor();
+    FloatValue::descriptor();
+    DescriptorProto::descriptor();
 }
 
 DescriptorLoader::~DescriptorLoader() { }
 
 const FileDescriptor *DescriptorLoader::load_proto(const string &filename) {
+    CaptureWarnings capture_warnings;
+
     return merged_pool.FindFileByName(filename);
 }
 
 const vector<const FileDescriptor *> DescriptorLoader::load_serialized(const char *buffer, size_t length) {
+    CaptureWarnings capture_warnings;
     FileDescriptorSet fds;
-    DescriptorLoader::ErrorCollector collector;
 
     if (!fds.ParseFromArray(buffer, length))
         croak("Error deserializing message descriptors");
     vector<const FileDescriptor *> result;
 
-    STD_TR1::unordered_set<string> removed_wkt, needed_wkt;
     for (int i = 0, max = fds.file_size(); i < max; ++i) {
-        FileDescriptorProto file = fds.file(i);
+        const FileDescriptorProto &file = fds.file(i);
 
-        // this somewhat dodgy code tries to address cases where
-        // WKT .proto files have been copied and imported using a
-        // non-standard path.
-        //
-        // For binary descriptors, this requires the binary descriptor to
-        // be skipped, and dependency information to be upated to use the
-        // compiled-in WKT descritpros.
-        STD_TR1::unordered_set<string> standard_wkt_files = find_wkt_files(file);
-        if (!standard_wkt_files.empty()) {
-            removed_wkt.insert(file.name());
-            needed_wkt.insert(standard_wkt_files.begin(), standard_wkt_files.end());
-            continue;
-        }
+        if (!binary_database.Add(file))
+            break;
 
-        // See comment above. If this file dependes on WKT descriptors that
-        // have been removed, the corresponding dependency need to be adjusted
-        // to point to the compiled-in descriptor.
-        //
-        // The crude and hopefully robust way of doing this is to add a
-        // dependency to all compled-in descritprs, that provide types that
-        // are used, regardless of whether they are used by a given serialized
-        // descriptor
-        if (!removed_wkt.empty()) {
-            vector<string> dependency(file.dependency().begin(), file.dependency().end());
-            bool add_builtin_wkt = false;
-
-            file.clear_dependency();
-            for (int j = 0, max = dependency.size(); j < max; ++j) {
-                if (removed_wkt.find(dependency[j]) != removed_wkt.end()) {
-                    add_builtin_wkt = true;
-                } else {
-                    file.add_dependency(dependency[j]);
-                }
-            }
-
-            if (add_builtin_wkt) {
-                for (STD_TR1::unordered_set<string>::const_iterator it = needed_wkt.begin(), en = needed_wkt.end(); it != en; ++it)
-                    file.add_dependency(*it);
-            }
-        }
-
-        result.push_back(binary_pool.BuildFileCollectingErrors(file, &collector));
+        const FileDescriptor *file_def = merged_pool.FindFileByName(file.name());
+        if (file_def == NULL)
+            break;
+        result.push_back(file_def);
     }
-
-    if (!collector.errors.empty())
-        croak("%s", collector.errors.c_str());
 
     return result;
 }

@@ -4,7 +4,7 @@
       "Neil Bowers <neilb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,6 +31,9 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -44,7 +47,9 @@
          "web" : "https://github.com/neilb/csvgrep"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.09",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

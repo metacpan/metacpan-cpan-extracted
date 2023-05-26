@@ -2,7 +2,7 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, etc.
-use t_TestCommon ':silent', qw/bug/; # Test::More etc.
+use t_TestCommon ':silent', qw/bug/; # Test2::V0 etc.
 
 use Data::Dumper::Interp;
 
@@ -59,15 +59,15 @@ my $sobj = main::SObj->new();
 my $cobj = main::CObj->new();
 my $gobj = main::GObj->new();
 
-is_deeply(\@$hvobj, [0..9], "\\\@Hvobj basic test");
-is_deeply(\%$hvobj, {c => 333 , a => 111,b => 222}, "\\\%HVobj basic test");
-is_deeply(\%$hobj, {a => 111,b => 222,c => 333}, "Hobj basic test");
-is_deeply(\$$sobj, \"virtual value", "\$Sobj basic test");
+is(\@$hvobj, [0..9], "\\\@Hvobj basic test");
+is(\%$hvobj, {c => 333 , a => 111,b => 222}, "\\\%HVobj basic test");
+is(\%$hobj, {a => 111,b => 222,c => 333}, "Hobj basic test");
+is(\$$sobj, \"virtual value", "\$Sobj basic test");
 is (&$cobj, q<from virtual coderef>, "Cobj basic test");
 is (${ *{ $gobj }{SCALAR} }, "scalar via virtual glob", "Gobj basic test");
-is_deeply (*{ $gobj }{SCALAR},\"scalar via virtual glob" , "*{Gobj}{SCALAR} basic test");
-is_deeply (*{ $gobj }{ARRAY},[qw/array via virtual glob/] , "*{Gobj}{ARRAY} basic test");
-is_deeply (*{ $gobj }{HASH},{hash_via_virtual_glob => 123}, "*{Gobj}{HASH} basic test");
+is (*{ $gobj }{SCALAR},\"scalar via virtual glob" , "*{Gobj}{SCALAR} basic test");
+is (*{ $gobj }{ARRAY},[qw/array via virtual glob/] , "*{Gobj}{ARRAY} basic test");
+is (*{ $gobj }{HASH},{hash_via_virtual_glob => 123}, "*{Gobj}{HASH} basic test");
 
 $Data::Dumper::Interp::Objects = 0;
 is (vis \@$hvobj, '[0,1,2,3,4,5,6,7,8,9]', "\@{HVObj}");

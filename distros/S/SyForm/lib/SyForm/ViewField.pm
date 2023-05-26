@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::ViewField::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: View fields inside a SyForm::View
-$SyForm::ViewField::VERSION = '0.102';
+$SyForm::ViewField::VERSION = '0.103';
 use Moo;
 
 with qw(
@@ -81,7 +81,7 @@ SyForm::ViewField - View fields inside a SyForm::View
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

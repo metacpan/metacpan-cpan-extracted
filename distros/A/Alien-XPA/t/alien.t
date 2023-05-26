@@ -13,7 +13,7 @@ use Child 'child';
 sub run { MyRun->new( @_ ) }
 
 # so we can catch segv's
-plan( 5 + ( want_smoke ? 3 : 0 ) );
+plan( 5 + ( want_smoke() ? 3 : 0 ) );
 
 # this modifies @PATH appropriately
 alien_ok 'Alien::XPA';

@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Frame.pm,v 1.17 2011/01/23 12:26:24 gavin Exp $
 package Net::EPP::Frame;
 use Carp;
 use Net::EPP::Frame::Command;
@@ -110,18 +105,13 @@ Net::EPP::Frame - An EPP XML frame system built on top of L<XML::LibXML>.
 
 =head1 DESCRIPTION
 
-EPP is the Extensible Provisioning Protocol. EPP (defined in RFC 4930) is an
-application layer client-server protocol for the provisioning and management of
-objects stored in a shared central repository. Specified in XML, the protocol
-defines generic object management operations and an extensible framework that
-maps protocol operations to objects. As of writing, its only well-developed
-application is the provisioning of Internet domain names, hosts, and related
-contact details.
+The Extensible Provisioning Protocol (EPP) uses XML documents called "frames"
+send data to and from clients and servers.
 
-EPP uses XML documents called "frames" send data to and from clients
-and servers. This module implements a subclass of the L<XML::LibXML::Document>
-module that simplifies the process of creation of these frames. It is designed
-to be used alongside the L<Net::EPP::Client> module.
+This module implements a subclass of the L<XML::LibXML::Document> module that
+simplifies the process of creation of these frames. It is designed to be used
+alongside the L<Net::EPP::Client> module, but could also be used on the server
+side.
 
 =head1 OBJECT HIERARCHY
 
@@ -132,15 +122,15 @@ to be used alongside the L<Net::EPP::Client> module.
 
 =head1 USAGE
 
-As a rule, you will not need to create Net::EPP::Frame objects directly.
+As a rule, you will not need to create C<Net::EPP::Frame> objects directly.
 Instead, you should use one of the subclasses included with the distribution.
-The subclasses all inherit from Net::EPP::Frame.
+The subclasses all inherit from C<Net::EPP::Frame>.
 
-Net::EPP::Frame is itself a subclass of L<XML::LibXML::Document> so all the
+C<Net::EPP::Frame> is itself a subclass of L<XML::LibXML::Document> so all the
 methods available from that class are also available to instances of
-Net::EPP::Frame.
+C<Net::EPP::Frame>.
 
-The available subclasses of Net::EPP::Frame exist to add any additional
+The available subclasses of C<Net::EPP::Frame> exist to add any additional
 elements required by the EPP specification. For example, the E<lt>loginE<gt>
 frame must contain the E<lt>clIDE<gt> and E<lt>pwE<gt> frames, so when you
 create a new L<Net::EPP::Frame::Command::Login> object, you get these already
@@ -268,68 +258,41 @@ sub frame {
 
 =over
 
-=item L<Net::EPP::Frame>, the base class
+=item * L<Net::EPP::Frame>, the base class
 
-=item L<Net::EPP::Frame::Command>, for EPP client command frames
+=item * L<Net::EPP::Frame::Command>, for EPP client command frames
 
-=item L<Net::EPP::Frame::Command::Check>, for EPP E<lt>checkE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Check>, for EPP E<lt>checkE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Create>, for EPP E<lt>createE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Create>, for EPP E<lt>createE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Delete>, for EPP E<lt>deleteE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Delete>, for EPP E<lt>deleteE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Info>, for EPP E<lt>infoE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Info>, for EPP E<lt>infoE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Login>, for EPP E<lt>loginE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Login>, for EPP E<lt>loginE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Logout>, for EPP E<lt>logoutE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Logout>, for EPP E<lt>logoutE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Poll>, for EPP E<lt>pollE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Poll>, for EPP E<lt>pollE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Renew>, for EPP E<lt>renewE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Renew>, for EPP E<lt>renewE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Transfer>, for EPP E<lt>transferE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Transfer>, for EPP E<lt>transferE<gt> client commands
 
-=item L<Net::EPP::Frame::Command::Update>, for E<lt>updateE<gt> client commands
+=item * L<Net::EPP::Frame::Command::Update>, for E<lt>updateE<gt> client commands
 
-=item L<Net::EPP::Frame::Greeting>, for EPP server greetings
+=item * L<Net::EPP::Frame::Greeting>, for EPP server greetings
 
-=item L<Net::EPP::Frame::Hello>, for EPP client greetings
+=item * L<Net::EPP::Frame::Hello>, for EPP client greetings
 
-=item L<Net::EPP::Frame::Response>, for EPP server response frames
+=item * L<Net::EPP::Frame::Response>, for EPP server response frames
 
 =back
 
-Each subclass has its own subclasses for various objects, for example L<Net::EPP::Frame::Command::Check::Domain> creates C<E<lt>checkE<gt>> frame for domain names.
+Each subclass has its own subclasses for various objects, for example L<Net::EPP::Frame::Command::Check::Domain> creates a C<E<lt>checkE<gt>> frame for domain names.
 
 Coverage for all combinations of command and object type is not complete, but work is ongoing.
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<XML::LibXML>, the Perl bindings to the libxml library
-
-=item * The libxml website at L<http://www.xmlsoft.org/>
-
-=item * the L<Net::EPP::Client> module, for communicating with EPP servers.
-
-=item * the L<Net::EPP::Frame::ObjectSpec> module, for managing EP object metadata.
-
-=item * RFCs 4930 and RFC 4934, available from L<http://www.ietf.org/>.
-
-=item * The CentralNic EPP site at L<http://www.centralnic.com/resellers/epp>.
-
-=back
 
 =cut
 

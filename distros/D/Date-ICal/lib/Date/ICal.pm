@@ -1,9 +1,10 @@
-# $Rev: 680 $
+# $Rev: 682 $
 package Date::ICal;
 use strict;
+use warnings;
 
 use vars qw($VERSION $localzone $localoffset @months @leapmonths %add_units);
-$VERSION = '2.'.(qw'$Rev: 680 $')[1];
+$VERSION = '2.'.(qw'$Rev: 682 $')[1];
 use Carp;
 use Time::Local;
 use Date::Leapyear qw();
@@ -18,13 +19,15 @@ $localoffset = _calc_local_offset();
 
 # Documentation {{{
 
+=encoding utf8
+
 =head1 NAME
 
 Date::ICal - Perl extension for ICalendar date objects.
 
 =head1 VERSION
 
-$Revision: 680 $
+$Revision: 682 $
 
 =head1 SYNOPSIS
 
@@ -1271,15 +1274,24 @@ Rich Bowen (DrBacchus) rbowen@rcbowen.com
 And the rest of the Reefknot team. See the source for a full
 list of patch contributors and version-by-version notes.
 
+=head1 LICENSE AND COPYRIGHT
+
+© 2001-2022 Rich Bowen
+
+© 2022-2023 Michal Josef Špaček
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
 =head1 SEE ALSO
 
 datetime@perl.org mailing list
 
 L<https://github.com/houseabsolute/DateTime.pm/wiki>
 
-Time::Local
+L<Time::Local>
 
-Net::ICal
+L<Net::ICal>
 
 =cut
 

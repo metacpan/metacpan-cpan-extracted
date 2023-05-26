@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 #  make sure we find geos and geos_c
 sub dynamic_libs {

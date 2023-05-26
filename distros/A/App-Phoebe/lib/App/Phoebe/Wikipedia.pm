@@ -70,7 +70,7 @@ sub wikipedia {
     $log->info("Redirecting to ask for a term");
     my $lang = $1;
     result($stream, "30", "gemini://$host:$port/$lang");
-  } elsif ($url =~ m!^gemini://$host(?::$port)?/([a-z][a-z][a-z]?)$!) {
+  } elsif ($url =~ m!^gemini://$host(?::$port)?/([a-z]+)$!) {
     $log->info("Asking for a term");
     my $lang = $1;
     result($stream, "10", "Search term");
@@ -84,7 +84,7 @@ sub wikipedia {
     success($stream, "text/plain");
     $stream->write("User-agent: *\n");
     $stream->write("Disallow: /\n");
-  } elsif (my ($lang, $term) = $url =~ m!^GET /(?:search/|text/|full/)?(?:([a-z][a-z][a-z]?)/)?(.*) HTTP/1\.[01]$!
+  } elsif (my ($lang, $term) = $url =~ m!^GET /(?:search/|text/|full/)?(?:([a-z]+)/)?(.*) HTTP/1\.[01]$!
 	   and $headers->{host} and $headers->{host} =~ m!^$host(?::$port)?$!) {
     $lang ||= "www";
     my $url = "https://$lang.wikipedia.org/wiki/$term";

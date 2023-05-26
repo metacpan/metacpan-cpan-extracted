@@ -2,7 +2,7 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
-use t_TestCommon ':silent', qw/bug/; # Test::More etc.
+use t_TestCommon ':silent', qw/bug/; # Test2::V0 etc.
 
 use Data::Dumper::Interp;
 my $pkgname = "Data::Dumper::Interp";

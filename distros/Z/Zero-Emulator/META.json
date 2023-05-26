@@ -34,11 +34,11 @@
    "provides" : {
       "Zero::Emulator" : {
          "file" : "lib/Zero/Emulator.pm",
-         "version" : "20230515"
+         "version" : "20230519"
       },
       "Zero::NWayTree" : {
          "file" : "lib/Zero/NWayTree.pm",
-         "version" : "20230515"
+         "version" : "20230519"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/philiprbrenan/zero"
       }
    },
-   "version" : "20230515",
+   "version" : "20230519",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

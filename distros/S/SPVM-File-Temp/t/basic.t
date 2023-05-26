@@ -8,6 +8,15 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'TestCase::File::Temp';
 
+use SPVM 'Fn';
+use SPVM::File::Temp;
+use SPVM 'File::Temp';
+
 ok(SPVM::TestCase::File::Temp->test);
+
+# Version
+{
+  is($SPVM::File::Temp::VERSION, SPVM::Fn->get_version_string('File::Temp'));
+}
 
 done_testing;

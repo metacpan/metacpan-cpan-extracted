@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Temp::Dir {
   use Sys::FileTest;
   use File::Path;

@@ -1,4 +1,9 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Find {
+  version "0.021";
+  
   use StringList;
   use File::Spec;
   use Sys;

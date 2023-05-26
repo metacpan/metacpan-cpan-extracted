@@ -1,0 +1,704 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/osnames/list_osnames
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-24'; # DATE
+our $DIST = 'App-osnames'; # DIST
+our $VERSION = '0.101'; # VERSION
+
+# code_before_instantiate_cmdline
+require App::osnames; { no warnings; $App::osnames::SPEC{list_osnames}{args}{detail}{cmdline_aliases} = {l=>{}} }; # convenience
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/osnames/list_osnames",
+    program_name => "osnames",
+    pass_cmdline_object => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List possible $^O ($OSNAME) values, with description
+# PODNAME: osnames
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+osnames - List possible $^O ($OSNAME) values, with description
+
+=head1 VERSION
+
+This document describes version 0.101 of osnames (from Perl distribution App-osnames), released on 2023-02-24.
+
+=head1 SYNOPSIS
+
+B<osnames> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<osnames> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<osnames> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--description-contains|/"--description-contains=s">>=I<str>] [(B<L<--description-in|/"--description-in=s@">>=I<str>)+|B<L<--description-in-json|/"--description-in=s@">>=I<json>] [B<L<--description-is|/"--description-is=s">>=I<str>] [B<L<--description-isnt|/"--description-isnt=s">>=I<str>] [B<L<--description-max|/"--description-max=s">>=I<str>] [B<L<--description-min|/"--description-min=s">>=I<str>] [B<L<--description-not-contains|/"--description-not-contains=s">>=I<str>] [(B<L<--description-not-in|/"--description-not-in=s@">>=I<str>)+|B<L<--description-not-in-json|/"--description-not-in=s@">>=I<json>] [B<L<--description-xmax|/"--description-xmax=s">>=I<str>] [B<L<--description-xmin|/"--description-xmin=s">>=I<str>] [B<L<--description|/"--description=s">>=I<str>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--tags-contains|/"--tags-contains=s">>=I<str>] [(B<L<--tags-in|/"--tags-in=s@">>=I<str>)+|B<L<--tags-in-json|/"--tags-in=s@">>=I<json>] [B<L<--tags-is|/"--tags-is=s">>=I<str>] [B<L<--tags-isnt|/"--tags-isnt=s">>=I<str>] [B<L<--tags-max|/"--tags-max=s">>=I<str>] [B<L<--tags-min|/"--tags-min=s">>=I<str>] [B<L<--tags-not-contains|/"--tags-not-contains=s">>=I<str>] [(B<L<--tags-not-in|/"--tags-not-in=s@">>=I<str>)+|B<L<--tags-not-in-json|/"--tags-not-in=s@">>=I<json>] [B<L<--tags-xmax|/"--tags-xmax=s">>=I<str>] [B<L<--tags-xmin|/"--tags-xmin=s">>=I<str>] [B<L<--tags|/"--tags=s">>=I<str>] [B<L<--value-contains|/"--value-contains=s">>=I<str>] [(B<L<--value-in|/"--value-in=s@">>=I<str>)+|B<L<--value-in-json|/"--value-in=s@">>=I<json>] [B<L<--value-is|/"--value-is=s">>=I<str>] [B<L<--value-isnt|/"--value-isnt=s">>=I<str>] [B<L<--value-max|/"--value-max=s">>=I<str>] [B<L<--value-min|/"--value-min=s">>=I<str>] [B<L<--value-not-contains|/"--value-not-contains=s">>=I<str>] [(B<L<--value-not-in|/"--value-not-in=s@">>=I<str>)+|B<L<--value-not-in-json|/"--value-not-in=s@">>=I<json>] [B<L<--value-xmax|/"--value-xmax=s">>=I<str>] [B<L<--value-xmin|/"--value-xmin=s">>=I<str>] [B<L<--value|/"--value=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This list might be useful when coding, e.g. when you want to exclude or include
+certain OS (families) in your application/test.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for description options
+
+=over
+
+=item B<--description-contains>=I<s>
+
+Only return records where the 'description' field contains specified text.
+
+=item B<--description-in-json>=I<s>
+
+Only return records where the 'description' field is in the specified values (JSON-encoded).
+
+See C<--description-in>.
+
+=item B<--description-in>=I<s@>
+
+Only return records where the 'description' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--description-is>=I<s>
+
+Only return records where the 'description' field equals specified value.
+
+=item B<--description-isnt>=I<s>
+
+Only return records where the 'description' field does not equal specified value.
+
+=item B<--description-max>=I<s>
+
+Only return records where the 'description' field is less than or equal to specified value.
+
+=item B<--description-min>=I<s>
+
+Only return records where the 'description' field is greater than or equal to specified value.
+
+=item B<--description-not-contains>=I<s>
+
+Only return records where the 'description' field does not contain specified text.
+
+=item B<--description-not-in-json>=I<s>
+
+Only return records where the 'description' field is not in the specified values (JSON-encoded).
+
+See C<--description-not-in>.
+
+=item B<--description-not-in>=I<s@>
+
+Only return records where the 'description' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--description-xmax>=I<s>
+
+Only return records where the 'description' field is less than specified value.
+
+=item B<--description-xmin>=I<s>
+
+Only return records where the 'description' field is greater than specified value.
+
+=item B<--description>=I<s>
+
+Only return records where the 'description' field equals specified value.
+
+=back
+
+=head2 Filtering for tags options
+
+=over
+
+=item B<--tags-contains>=I<s>
+
+Only return records where the 'tags' field contains specified text.
+
+=item B<--tags-in-json>=I<s>
+
+Only return records where the 'tags' field is in the specified values (JSON-encoded).
+
+See C<--tags-in>.
+
+=item B<--tags-in>=I<s@>
+
+Only return records where the 'tags' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--tags-is>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=item B<--tags-isnt>=I<s>
+
+Only return records where the 'tags' field does not equal specified value.
+
+=item B<--tags-max>=I<s>
+
+Only return records where the 'tags' field is less than or equal to specified value.
+
+=item B<--tags-min>=I<s>
+
+Only return records where the 'tags' field is greater than or equal to specified value.
+
+=item B<--tags-not-contains>=I<s>
+
+Only return records where the 'tags' field does not contain specified text.
+
+=item B<--tags-not-in-json>=I<s>
+
+Only return records where the 'tags' field is not in the specified values (JSON-encoded).
+
+See C<--tags-not-in>.
+
+=item B<--tags-not-in>=I<s@>
+
+Only return records where the 'tags' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--tags-xmax>=I<s>
+
+Only return records where the 'tags' field is less than specified value.
+
+=item B<--tags-xmin>=I<s>
+
+Only return records where the 'tags' field is greater than specified value.
+
+=item B<--tags>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=back
+
+=head2 Filtering for value options
+
+=over
+
+=item B<--value-contains>=I<s>
+
+Only return records where the 'value' field contains specified text.
+
+=item B<--value-in-json>=I<s>
+
+Only return records where the 'value' field is in the specified values (JSON-encoded).
+
+See C<--value-in>.
+
+=item B<--value-in>=I<s@>
+
+Only return records where the 'value' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--value-is>=I<s>
+
+Only return records where the 'value' field equals specified value.
+
+=item B<--value-isnt>=I<s>
+
+Only return records where the 'value' field does not equal specified value.
+
+=item B<--value-max>=I<s>
+
+Only return records where the 'value' field is less than or equal to specified value.
+
+=item B<--value-min>=I<s>
+
+Only return records where the 'value' field is greater than or equal to specified value.
+
+=item B<--value-not-contains>=I<s>
+
+Only return records where the 'value' field does not contain specified text.
+
+=item B<--value-not-in-json>=I<s>
+
+Only return records where the 'value' field is not in the specified values (JSON-encoded).
+
+See C<--value-not-in>.
+
+=item B<--value-not-in>=I<s@>
+
+Only return records where the 'value' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--value-xmax>=I<s>
+
+Only return records where the 'value' field is less than specified value.
+
+=item B<--value-xmin>=I<s>
+
+Only return records where the 'value' field is greater than specified value.
+
+=item B<--value>=I<s>
+
+Only return records where the 'value' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
+
+Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C osnames osnames
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete osnames 'p/*/`osnames`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/osnames.conf>, F</home/u1/osnames.conf>, or F</etc/osnames.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ description (see --description)
+ description.contains (see --description-contains)
+ description.in (see --description-in)
+ description.is (see --description-is)
+ description.isnt (see --description-isnt)
+ description.max (see --description-max)
+ description.min (see --description-min)
+ description.not_contains (see --description-not-contains)
+ description.not_in (see --description-not-in)
+ description.xmax (see --description-xmax)
+ description.xmin (see --description-xmin)
+ detail (see --detail)
+ exclude_fields (see --exclude-field)
+ fields (see --field)
+ format (see --format)
+ naked_res (see --naked-res)
+ queries (see --query)
+ query_boolean (see --query-boolean)
+ sort (see --sort)
+ tags (see --tags)
+ tags.contains (see --tags-contains)
+ tags.in (see --tags-in)
+ tags.is (see --tags-is)
+ tags.isnt (see --tags-isnt)
+ tags.max (see --tags-max)
+ tags.min (see --tags-min)
+ tags.not_contains (see --tags-not-contains)
+ tags.not_in (see --tags-not-in)
+ tags.xmax (see --tags-xmax)
+ tags.xmin (see --tags-xmin)
+ value (see --value)
+ value.contains (see --value-contains)
+ value.in (see --value-in)
+ value.is (see --value-is)
+ value.isnt (see --value-isnt)
+ value.max (see --value-max)
+ value.min (see --value-min)
+ value.not_contains (see --value-not-contains)
+ value.not_in (see --value-not-in)
+ value.xmax (see --value-xmax)
+ value.xmin (see --value-xmin)
+ with_field_names (see --with-field-names)
+
+=head1 ENVIRONMENT
+
+=head2 OSNAMES_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/osnames.conf
+
+=head2 /home/u1/osnames.conf
+
+=head2 /etc/osnames.conf
+
+=head1 EXAMPLES
+
+=head2 String search
+
+ % osnames ux
+ dgux
+ gnu
+ hpux
+ linux
+
+=head2 List Unices
+
+ % osnames --tags unix -l
+ 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-osnames>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-osnames>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-osnames>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

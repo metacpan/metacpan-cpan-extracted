@@ -4,7 +4,7 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
 use IPC::ShareLite;
 
-our $VERSION = '1.3.1';
+our $VERSION = '1.4.1';
 
 has prometheus => sub { Net::Prometheus->new(disable_process_collector => 1) };
 has route => sub {undef};
@@ -27,6 +27,7 @@ sub register {
 
   $self->{key} = $config->{shm_key} || '12345';
 
+  $self->prometheus($config->{prometheus}) if $config->{prometheus};
   $app->helper(prometheus => sub { $self->prometheus });
 
   # Only the two built-in servers are supported for now
@@ -78,20 +79,6 @@ sub register {
     )
   );
 
-  # Collect stats
-  $app->hook(
-    after_render => sub {
-      my ($c) = @_;
-      $self->_guard->_change(
-        sub {
-          $_->{$$} = $app->prometheus->render;
-        }
-      );
-
-      #$self->_guard->_store({$$ => $app->prometheus->render});
-    }
-  );
-
   $app->hook(
     before_dispatch => sub {
       my ($c) = @_;
@@ -124,6 +111,8 @@ sub register {
   $self->route->to(
     cb => sub {
       my ($c) = @_;
+      # Collect stats and render
+      $self->_guard->_change(sub { $_->{$$} = $app->prometheus->render });
       $c->render(
         text => join("\n",
           map { ($self->_guard->_fetch->{$_}) }
@@ -155,7 +144,6 @@ sub _start {
     sub {
       my $pc = Net::Prometheus::ProcessCollector->new(labels => [worker => $$]);
       $self->prometheus->register($pc) if $pc;
-      $self->_guard->_store({$$ => $self->prometheus->render});
     }
   );
 

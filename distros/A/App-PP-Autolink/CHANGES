@@ -1,5 +1,8 @@
 Revision history for App::PP::Autolink
 
+2.11 20230517
+  - Handle absolute paths under Strawberry Perl 5.36. GH#19
+
 2.10 20221126
   - Non-windows: Copy pp_autolink.pl to pp_autolink at build time
     so the docs match.  An imperfect approach but works for now.  

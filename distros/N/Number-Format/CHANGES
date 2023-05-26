@@ -1,3 +1,13 @@
+Changes for version 1.76 (May 25, 2023)
+------------------------
+  - NOTE: This release was made by starting from the release archive on the
+    CPAN and then applying a patch.  It does not reflect the contents of the
+    reference repository.  Also, the file "bigfloat.t", referenced in the v1.75
+    changelog, was not in the previous release and is therefore not included
+    here.
+  - Patch to continue working on v5.38 upon its release (thanks, Karl
+    Williamson)
+
 Changes for version 1.75 (June 25, 2015)
 ------------------------
   - Export only necessary from POSIX (RT#99970, thanks Alexandr Ciornii)

@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Math/Image/CalcResized/image_resize_notation_to_human
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2023-03-01'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/image_resize_notation_to_human",
@@ -38,13 +38,15 @@ image-resize-notation-to-human - Translate ImageMagick-like resize notation (e.g
 
 =head1 VERSION
 
-This document describes version 0.019 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
+This document describes version 0.020 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
 
 =head1 SYNOPSIS
 
-Usage:
+B<image-resize-notation-to-human> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-% B<image-resize-notation-to-human> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<resize>E<gt>
+B<image-resize-notation-to-human> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<image-resize-notation-to-human> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<resize|/"--resize=s*">>E<gt>
 
 
 
@@ -66,6 +68,9 @@ C<*> marks required options.
 
 =item B<--resize>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -82,6 +87,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -96,24 +107,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -167,56 +187,92 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
+=head2 Example #1
+
  % image-resize-notation-to-human ''
  no resizing
+
+=head2 Example #2
 
  % image-resize-notation-to-human 50%
  scale to 50%
 
+=head2 Example #3
+
  % image-resize-notation-to-human 50%x50%
  scale width to 50%, height to 50%
+
+=head2 Example #4
 
  % image-resize-notation-to-human 720
  set width to 720px
 
+=head2 Example #5
+
  % image-resize-notation-to-human '720>'
  shrink width to 720px
+
+=head2 Example #6
 
  % image-resize-notation-to-human 720^
  enlarge width to 720px
 
+=head2 Example #7
+
  % image-resize-notation-to-human x720
  set height to 720px
+
+=head2 Example #8
 
  % image-resize-notation-to-human 'x720>'
  shrink height to 720px
 
+=head2 Example #9
+
  % image-resize-notation-to-human x720^
  enlarge height to 720px
+
+=head2 Example #10
 
  % image-resize-notation-to-human 640x480
  fit image inside 640x480
 
+=head2 Example #11
+
  % image-resize-notation-to-human 640x480^
  fit image to fit 640x480 inside it
+
+=head2 Example #12
 
  % image-resize-notation-to-human '640x480>'
  shrink image to fit inside 640x480
 
+=head2 Example #13
+
  % image-resize-notation-to-human '640x480<'
  enlarge image to fit 640x480 inside it
+
+=head2 Example #14
 
  % image-resize-notation-to-human 640x480!
  set dimension to 640x480
 
+=head2 Example #15
+
  % image-resize-notation-to-human '720^>'
  shrink shortest side to 720px
+
+=head2 Example #16
 
  % image-resize-notation-to-human '720^<'
  enlarge shortest side to 720px
 
+=head2 Example #17
+
  % image-resize-notation-to-human '^720>'
  shrink longest side to 720px
+
+=head2 Example #18
 
  % image-resize-notation-to-human '^720<'
  enlarge longest side to 720px
@@ -253,7 +309,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

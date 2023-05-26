@@ -1,4 +1,9 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Temp {
+  version "0.021";
+  
   use File::Temp::Dir;
   use Hash;
   use Cwd;
@@ -6,7 +11,7 @@ class File::Temp {
   use File::Path;
   use Fn;
   use Errno;
-  use Time;
+  use Sys::Time;
   use Sys::FileTest;
   use Format;
   
@@ -15,8 +20,8 @@ class File::Temp {
     
     my $obj_temp_dir = File::Temp::Dir->new;
 
-    my $object_id_peseud_string = Format->sprintf("%p", $obj_temp_dir);
-    my $seed = (int)Time->time;
+    my $object_id_peseud_string = Format->sprintf("%p", [(object)$obj_temp_dir]);
+    my $seed = (int)Sys::Time->time;
     my $len = length $object_id_peseud_string;
     for (my $i = length $object_id_peseud_string - 1; $i >= 0; $i--) {
       $seed += $object_id_peseud_string->[$i] * (10 * $i);

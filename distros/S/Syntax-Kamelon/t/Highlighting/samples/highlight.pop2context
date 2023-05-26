@@ -1,0 +1,18 @@
+Testing #pop!context
+
+<StringDetect attribute="Match" context="#pop!Secondary" String="&lt;Secondary&gt;" />
+<StringDetect attribute="Test Area" context="#pop" String="&lt;TestArea&gt;" />
+
+Secondary
+<StringDetect attribute="Match" context="#pop!TestArea" String="&lt;Secondary&gt;" />
+
+<TestArea>
+We are now testing
+<Secondary>
+Jumped to secondary
+<Secondary>
+And back again
+<TestArea>
+
+Finished
+

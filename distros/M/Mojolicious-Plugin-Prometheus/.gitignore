@@ -10,6 +10,7 @@ lib-minil/
 *.o
 *.pm.tdy
 *.bs
+.perl-version
 
 # Devel::Cover
 cover_db/

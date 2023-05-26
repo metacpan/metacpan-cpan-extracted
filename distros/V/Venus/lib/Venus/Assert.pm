@@ -344,7 +344,7 @@ sub hashkeys {
 
   $self->constraints->when(sub{
     CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-      && %{$_->value} > 0
+      && (keys %{$_->value}) > 0
   })->then(sub{
     my $check = 0;
     my $value = $_->value;
@@ -584,15 +584,9 @@ sub validate {
   my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
   my $message = sprintf($self->message, $self->name, $identity, $expected);
 
-  my $throw;
-  $throw = $self->throw;
-  $throw->name('on.validate');
-  $throw->message($message . "\n\nReceived:\n\n\"@{[$self->received($data)]}\"\n\n");
-  $throw->stash(identity => $identity);
-  $throw->stash(variable => $data);
-  $throw->error;
+  $self->throw('error_on_validate', $data)->error;
 
-  return $throw;
+  return;
 }
 
 sub validator {
@@ -625,7 +619,7 @@ sub within {
   if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
     $self->constraints->when(sub{
       CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-        && %{$_->value} > 0
+        && (keys %{$_->value}) > 0
     })->then(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'HASH')
@@ -643,12 +637,7 @@ sub within {
     });
   }
   else {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.within');
-    $throw->message(qq(Invalid type ("$type") provided to the "within" method));
-    $throw->stash(argument => $type);
-    $throw->error;
+    $self->throw('error_on_within', $type, @next)->error;
   }
 
   $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
@@ -664,6 +653,54 @@ sub yesno {
   })->then(@code ? @code : sub{true});
 
   return $self;
+}
+
+# ERRORS
+
+sub error_on_validate {
+  my ($self, $data) = @_;
+
+  require Venus::Type;
+
+  my $legend = {
+    array => 'arrayref',
+    code => 'coderef',
+    hash => 'hashref',
+    regexp => 'regexpref',
+    scalar => 'scalarref',
+    scalar => 'scalarref',
+  };
+
+  my $identity = Venus::Type->new(value => $data)->identify;
+     $identity = $legend->{lc($identity)} || lc($identity);
+
+  my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
+
+  my $message = sprintf($self->message, $self->name, $identity, $expected);
+     $message .= "\n\nReceived:\n\n\"@{[$self->received($data)]}\"\n\n";
+
+  return {
+    name => 'on.validate',
+    message => $message,
+    stash => {
+      identity => $identity,
+      variable => $data,
+    },
+  };
+}
+
+sub error_on_within {
+  my ($self, $type, @args) = @_;
+
+  return {
+    name => 'on.within',
+    message => "Invalid type (\"$type\") provided to the \"within\" method",
+    stash => {
+      self => $self,
+      type => $type,
+      args => [@args],
+    },
+  };
 }
 
 # ROUTINES
@@ -3078,7 +3115,7 @@ I<Since C<1.23>>
 
   my $result = $assert->validate;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
 
 =back
 
@@ -3094,7 +3131,7 @@ I<Since C<1.23>>
 
   my $result = $assert->validate('0.01');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
 
 =back
 
@@ -3126,7 +3163,7 @@ I<Since C<1.23>>
 
   my $result = $assert->validate(time);
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
 
 =back
 
@@ -3160,7 +3197,7 @@ I<Since C<1.40>>
 
   # $validator->(['goodbye']);
 
-  # Exception! (isa Venus::Error)
+  # Exception! (isa Venus::Error) (see error_on_validate)
 
 =back
 
@@ -3363,6 +3400,76 @@ I<Since C<2.01>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_validate>
+
+This package may raise an error_on_validate exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("...");
+
+  my $error = $assert->throw('error_on_validate', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_validate"
+
+  # my $message = $error->message;
+
+  # "..."
+
+  # my $identity = $error->stash('identity');
+
+  # "string"
+
+=back
+
+=over 4
+
+=item error: C<error_on_within>
+
+This package may raise an error_on_within exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ('coderef', 'string');
+
+  my $error = $assert->throw('error_on_within', @args)->catch('error');
+
+  # my $ = $error->name;
+
+  # "on_within"
+
+  # my $message = $error->message;
+
+  # "Invalid type (\"$type\") palid ed to the \"within\" method"
+
+  # my $self = $error->stash('self');
+
+  # $assert
+
+  # my $type = $error->stash('type'
+
+  # "coderef"
+
+  # my $args = $error->stash('args');
+
+  # ["string"]
+
+=back
 
 =head1 AUTHORS
 

@@ -14,7 +14,7 @@ my $MAXPID          = 32768;
 my $TMPDIR          = tmpdir();
 my $DEFAULT_PIDFILE = catfile($TMPDIR, "Proc-Pidfile-Test-$$.pid");
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 BEGIN { require_ok( 'Proc::Pidfile' ); }
 my ( $err, $obj, $pidfile, $ppid, $pid );
 # test for simple pidfile creation and destruction
@@ -127,6 +127,26 @@ SKIP: {
     $err = $@; undef $@;
     like( $err, qr/already running: $pid/, "other users pid" );
     undef $obj;
+    unlink( $pidfile ) if -e $pidfile;
+}
+
+# Check backoff
+{
+    my $obj1 = Proc::Pidfile->new();
+    open my $old_err, '>&', \*STDERR or die "Can't dup STDERR";
+    close STDERR;
+    open STDERR, '>', \ my $err;
+    eval {
+        my $backoff = 1;
+        my $obj2 = Proc::Pidfile->new(
+            verbose => 1,
+            retries => 4,
+            backoff => sub { $backoff *= 2 } );
+    };
+    open STDERR, '>&', $old_err;
+    is_deeply( [ $err =~ / (\d+) microseconds/g ],
+               [ 2, 4, 8, 16 ],
+               'backoff' );
 }
 
 sub find_unused_pid

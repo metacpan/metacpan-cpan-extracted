@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/DBIx/AutoUpgrade/NativeStrings.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/autoupgrade_nativestrings.t
+
+

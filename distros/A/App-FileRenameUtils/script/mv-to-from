@@ -1,0 +1,112 @@
+#!perl
+
+use strict;
+use warnings;
+use Log::ger;
+use Log::ger::Screen;
+
+unless (@ARGV == 2) {
+    die "Usage: rename-to-from <new-filename> <current-filename>\n";
+}
+
+die "rename-to-from: File '$ARGV[1]' doesn't exist\n" unless -e $ARGV[1];
+die "rename-to-from: File '$ARGV[1]' already exist\n" if     -e $ARGV[0]; # for safety
+
+{
+    # try rename first
+    rename $ARGV[1], $ARGV[0] and last;
+    log_debug "[rename-to-from] rename() failed: $!, will try using File::Copy's move()";
+
+    require File::Copy;
+    File::Copy::move($ARGV[1], $ARGV[0]) and last;
+    last unless $!;
+    log_error "[rename-to-from] Failed renaming $ARGV[1] -> $ARGV[0]: $!";
+    exit 1;
+}
+
+# ABSTRACT: Rename a file, with reversed order of arguments
+# PODNAME: mv-to-from
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mv-to-from - Rename a file, with reversed order of arguments
+
+=head1 VERSION
+
+This document describes version 0.009 of mv-to-from (from Perl distribution App-FileRenameUtils), released on 2023-03-02.
+
+=head1 SYNOPSIS
+
+ % rename-to-from <new-filename> <current-filename>
+ % mv-reverse     <new-filename> <current-filename>
+
+=head1 DESCRIPTION
+
+This utility is handy if you happen to just rename a file that has a long name:
+
+ % mv some-rather-long-file-name.txt some-other-name
+
+and made a mistake and want to reverse the previous operation:
+
+ % rename-to-from some-rather-long-file-name.txt some-other-name
+
+or:
+
+ % mv-reverse     some-rather-long-file-name.txt some-other-name
+
+On the command-line, you just press Ctrl-A (or some other equivalent shortcut to
+move to the start of line) and replace C<mv> with C<rename-to-from> (or
+C<mv-reverse>).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FileRenameUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FileRenameUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

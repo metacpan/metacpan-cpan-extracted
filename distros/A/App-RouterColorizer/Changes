@@ -1,3 +1,7 @@
+1.231460  2023-05-25 20:38:08-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Do not colorize "show platform jericho tcam summary" on Arista
+
 1.231100  2023-04-20 03:11:30+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * [feature] Colorize Arista "show bgp rpki cache"

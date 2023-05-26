@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ListObject;
 
 require 5.6.0;
@@ -36,11 +35,11 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::AutoFilter;
 use AsposeCellsCloud::Object::Link;
 use AsposeCellsCloud::Object::LinkElement;
-use AsposeCellsCloud::Object::ListColumn;
+use AsposeCellsCloud::Object::ListColumn; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -56,12 +55,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -102,7 +101,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -110,7 +109,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -122,163 +121,163 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ListObject',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_totals' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowTotals',
-    	description => 'Gets and sets whether this ListObject show total row.',
-    	format => '',
-    	read_only => '',
-    		},
-    'table_style_type' => {
-    	datatype => 'string',
-    	base_name => 'TableStyleType',
-    	description => 'Gets and the built-in table style.',
-    	format => '',
-    	read_only => '',
-    		},
-    'display_name' => {
-    	datatype => 'string',
-    	base_name => 'DisplayName',
-    	description => 'Gets and sets the display name.Gets the data range of the ListObject.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_header_row' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowHeaderRow',
-    	description => 'Gets and sets whether this ListObject show header row.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'start_column' => {
-    	datatype => 'int',
-    	base_name => 'StartColumn',
-    	description => 'Gets the start column of the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_table_style_last_column' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowTableStyleLastColumn',
-    	description => 'Indicates whether the last column in the table should have the style applied.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_table_style_column_stripes' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowTableStyleColumnStripes',
-    	description => 'Indicates whether column stripe formatting is applied.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_table_style_first_column' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowTableStyleFirstColumn',
-    	description => 'Inidicates whether the first column in the table should have the style applied.',
-    	format => '',
-    	read_only => '',
-    		},
-    'start_row' => {
-    	datatype => 'int',
-    	base_name => 'StartRow',
-    	description => 'Gets the start row of the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'auto_filter' => {
-    	datatype => 'AutoFilter',
-    	base_name => 'AutoFilter',
-    	description => 'Gets auto filter.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_table_style_row_stripes' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowTableStyleRowStripes',
-    	description => 'Indicates whether row stripe formatting is applied.',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_column' => {
-    	datatype => 'int',
-    	base_name => 'EndColumn',
-    	description => 'Gets the end column of the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'table_style_name' => {
-    	datatype => 'string',
-    	base_name => 'TableStyleName',
-    	description => 'Gets and sets the table style name.',
-    	format => '',
-    	read_only => '',
-    		},
-    'list_columns' => {
-    	datatype => 'ARRAY[ListColumn]',
-    	base_name => 'ListColumns',
-    	description => 'Gets ListColumns of the ListObject.',
-    	format => '',
-    	read_only => '',
-    		},
-    'end_row' => {
-    	datatype => 'int',
-    	base_name => 'EndRow',
-    	description => 'Gets the end row of the range.',
-    	format => '',
-    	read_only => '',
-    		},
+     'auto_filter' => {
+     	datatype => 'AutoFilter',
+     	base_name => 'AutoFilter',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'display_name' => {
+     	datatype => 'string',
+     	base_name => 'DisplayName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_column' => {
+     	datatype => 'int',
+     	base_name => 'StartColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_row' => {
+     	datatype => 'int',
+     	base_name => 'StartRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_column' => {
+     	datatype => 'int',
+     	base_name => 'EndColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'end_row' => {
+     	datatype => 'int',
+     	base_name => 'EndRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'list_columns' => {
+     	datatype => 'ARRAY[ListColumn]',
+     	base_name => 'ListColumns',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_header_row' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowHeaderRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_table_style_column_stripes' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowTableStyleColumnStripes',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_table_style_first_column' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowTableStyleFirstColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_table_style_last_column' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowTableStyleLastColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_table_style_row_stripes' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowTableStyleRowStripes',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_totals' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowTotals',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'table_style_name' => {
+     	datatype => 'string',
+     	base_name => 'TableStyleName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'table_style_type' => {
+     	datatype => 'string',
+     	base_name => 'TableStyleType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
-    'show_totals' => 'boolean',
-    'table_style_type' => 'string',
+    'auto_filter' => 'AutoFilter',
     'display_name' => 'string',
-    'show_header_row' => 'boolean',
     'start_column' => 'int',
-    'show_table_style_last_column' => 'boolean',
+    'start_row' => 'int',
+    'end_column' => 'int',
+    'end_row' => 'int',
+    'list_columns' => 'ARRAY[ListColumn]',
+    'show_header_row' => 'boolean',
     'show_table_style_column_stripes' => 'boolean',
     'show_table_style_first_column' => 'boolean',
-    'start_row' => 'int',
-    'auto_filter' => 'AutoFilter',
+    'show_table_style_last_column' => 'boolean',
     'show_table_style_row_stripes' => 'boolean',
-    'end_column' => 'int',
+    'show_totals' => 'boolean',
     'table_style_name' => 'string',
-    'list_columns' => 'ARRAY[ListColumn]',
-    'end_row' => 'int'
+    'table_style_type' => 'string',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
-    'show_totals' => 'ShowTotals',
-    'table_style_type' => 'TableStyleType',
+    'auto_filter' => 'AutoFilter',
     'display_name' => 'DisplayName',
-    'show_header_row' => 'ShowHeaderRow',
     'start_column' => 'StartColumn',
-    'show_table_style_last_column' => 'ShowTableStyleLastColumn',
+    'start_row' => 'StartRow',
+    'end_column' => 'EndColumn',
+    'end_row' => 'EndRow',
+    'list_columns' => 'ListColumns',
+    'show_header_row' => 'ShowHeaderRow',
     'show_table_style_column_stripes' => 'ShowTableStyleColumnStripes',
     'show_table_style_first_column' => 'ShowTableStyleFirstColumn',
-    'start_row' => 'StartRow',
-    'auto_filter' => 'AutoFilter',
+    'show_table_style_last_column' => 'ShowTableStyleLastColumn',
     'show_table_style_row_stripes' => 'ShowTableStyleRowStripes',
-    'end_column' => 'EndColumn',
+    'show_totals' => 'ShowTotals',
     'table_style_name' => 'TableStyleName',
-    'list_columns' => 'ListColumns',
-    'end_row' => 'EndRow'
+    'table_style_type' => 'TableStyleType',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

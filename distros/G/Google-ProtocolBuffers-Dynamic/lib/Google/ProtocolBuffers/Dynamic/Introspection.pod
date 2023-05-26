@@ -12,7 +12,7 @@ Google::ProtocolBuffers::Dynamic::Introspection - introspection API for classes
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ version 0.41
 
 =head1 DESCRIPTION
 
-A simple introspection API wrapping uPB descriptor API.
+Introspection API wrapping Protocol Buffers descriptor API.
 
 Note that this API does not respect referential integrity; for example
 this snippet
@@ -40,7 +40,7 @@ this snippet
 
 C<die()>s because even if C<$message_def> and C<$containing_def>
 represent the same underlying entity, their are two distinct objects
-in Perl. This is true for all methods below returning an object.
+in Perl. This is true for all methods returning an object.
 
 The same applies to multiple invocations of the same method, for example
 
@@ -51,6 +51,12 @@ The same applies to multiple invocations of the same method, for example
     die "Oops" if $field_def != $field_def_again;
 
 =head1 Google::ProtocolBuffers::Dynamic::MessageDef
+
+=head2 name
+
+    $name = $message_def->name;
+
+The short name of this message (the one used in the message definition).
 
 =head2 full_name
 
@@ -99,6 +105,19 @@ Returns all fields/oneof as an array reference.
 True if this message is a key/value pair that Protocol Buffers 3 uses
 to represent a map entry.
 
+=head2 file
+
+    $file_def = $message_def->file;
+
+Returns the file this message was defined in.
+
+=head2 options
+
+    $options = $message_def->options;
+
+Describes the options set on the message, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
+
 =head1 Google::ProtocolBuffers::Dynamic::FieldDef
 
 =head2 name
@@ -111,8 +130,8 @@ The short name of this field (the one used in the message definition).
 
     $name = $field_def->full_name;
 
-Same as C<name> for regular fields, returns the fully-qualified name
-for extension fields.
+The fully-qualified name of this field (including package and outer
+messages).
 
 =head2 number
 
@@ -190,19 +209,33 @@ definition, or undef if the fields is not a message/enum.
 
 Returns whether the field supports L<field presence|https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md#application-note-field-presence>.
 
+=head2 file
+
+    $file_def = $field_def->file;
+
+Returns the file this field was defined in.
+
+=head2 options
+
+    $options = $field_def->options;
+
+Describes the options set on the field, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
+
 =head1 Google::ProtocolBuffers::Dynamic::OneofDef
 
 =head2 name
 
     $name = $oneof_def->name;
 
-The short name of this field (the one used in the message definition).
+The short name of this oneof (the one used in the message definition).
 
 =head2 full_name
 
     $name = $oneof_def->full_name;
 
-Same as C<name>.
+The fully-qualified name of this oneof (including package and outer
+messages).
 
 =head2 field_count
 
@@ -241,7 +274,26 @@ Containing message.
 C<true> for oneof definitions that have been created by proto3
 C<optional> implementation.
 
+=head2 file
+
+    $file_def = $oneof_def->file;
+
+Returns the file this oneof was defined in.
+
+=head2 options
+
+    $options = $oneof_def->options;
+
+Describes the options set on the oneof, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
+
 =head1 Google::ProtocolBuffers::Dynamic::EnumDef
+
+=head2 name
+
+    $name = $enum_def->name;
+
+The short name of this enum (the one used in the message definition).
 
 =head2 full_name
 
@@ -276,7 +328,26 @@ Returns the name of the enum entry with the given value, or C<undef>.
 Returns a hash reference containing all name/value pairs for this
 enum.
 
+=head2 file
+
+    $file_def = $enum_def->file;
+
+Returns the file this enum was defined in.
+
+=head2 options
+
+    $options = $enum_def->options;
+
+Describes the options set on the enum, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
+
 =head1 Google::ProtocolBuffers::Dynamic::ServiceDef
+
+=head2 name
+
+    $name = $service_def->name;
+
+The short name of this service (the one used in the message definition).
 
 =head2 full_name
 
@@ -289,6 +360,19 @@ The fully-qualified name of this service (including package).
     $method_defs = $service_def->methods;
 
 Returns all methods as an array reference.
+
+=head2 file
+
+    $file_def = $service_def->file;
+
+Returns the file this service was defined in.
+
+=head2 options
+
+    $options = $service_def->options;
+
+Describes the options set on the service, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
 
 =head1 Google::ProtocolBuffers::Dynamic::MethodDef
 
@@ -335,6 +419,78 @@ the C<stream> annotation in the method definition).
 
 True if the service produces streaming output (i.e. the output type has
 the C<stream> annotation in the method definition).
+
+=head2 file
+
+    $file_def = $method_def->file;
+
+Returns the file this method was defined in.
+
+=head2 options
+
+    $options = $method_def->options;
+
+Describes the options set on the method, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
+
+=head1 Google::ProtocolBuffers::Dynamic::FileDef
+
+=head2 name
+
+    $name = $file_def->name;
+
+The file name relative to the search path.
+
+=head2 package
+
+    $package = $file_def->package;
+
+The Protocol Buffers package declared in the file.
+
+=head2 dependencies, public_dependencies, messages, enums, services, extensions
+
+    $message_defs = $file_def->messages;
+    $enum_defs = $file_def->enums;
+    $service_defs = $file_def->servicess;
+    $field_defs = $file_def->extensionss;
+    $file_defs = $file_def->dependencies;
+    $file_defs = $file_def->public_dependencies;
+
+Returns all messages/enums/services/extensions/dependencies and
+public dependencies as an array reference.
+
+=head2 options
+
+    $options = $file_def->options;
+
+Describes the options set on the file, see L<OPTIONS|/OPTIONS>.
+Always returns a value, even if no options are set.
+
+=head1 OPTIONS
+
+This section documents the option objects returned by the vairous
+C<options()> methods.
+
+Standard Protocol Buffers options can be accessed by using a method
+with the same name of the option (e.g. C<<< $options->java_package >>>.
+
+In addition to that, all option objects provide the following methods.
+
+=head2 custom_option_by_name
+
+    $option_value = $options->custom_option_by_name('myoptions.some_option');
+
+Return the value of a custom option. If the option is not set on this
+entity, returns the default value. If the option name does not match
+an existing custom option, return C<undef>.
+
+=head2 custom_option_by_number
+
+    $option_value = $options->custom_option_by_name(51234);
+
+Return the value of a custom option. If the option is not set on this
+entity, returns the default value. If the option name does not match
+an existing custom option, return C<undef>.
 
 =head1 CONSTANTS
 

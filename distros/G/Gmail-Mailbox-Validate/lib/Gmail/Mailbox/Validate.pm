@@ -11,16 +11,19 @@ Gmail::Mailbox::Validate - Find if the username has a valid mailbox in gmail
 
 =head1 VERSION
 
-Version 0.02
+Version 0.15
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.15';
 
 
 =head1 SYNOPSIS
 
-It's quite simple to use:
+This module just checks if the given username has a valid mailbox in gmail.
+
+If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
+
 
     use Gmail::Mailbox::Validate;
 
@@ -35,11 +38,11 @@ Or run with docker:
 
     $ docker run geekml/gmbox mytest
 
-Plese note,
+Plese notice:
 
 1. Your host running this program should have access to port 25 of gmail servers. Many providers disable users to access external SMTP port.
 
-2. If the program shows mailbox not exists, it doesn't mean you can register that username. Because the username can be reserved by google, or just has been deleted.
+2. If the program shows mailbox not existing, it doesn't mean you can register that username. Because the username can be reserved by google, or has been deleted.
 
 
 

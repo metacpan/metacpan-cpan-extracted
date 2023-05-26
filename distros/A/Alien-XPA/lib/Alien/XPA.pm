@@ -6,7 +6,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v2.1.20.4';
+our $VERSION = 'v2.1.20.7';
 
 use base qw( Alien::Base );
 
@@ -34,7 +34,7 @@ Alien::XPA - Find or Build libxpa
 
 =head1 VERSION
 
-version v2.1.20.4
+version v2.1.20.7
 
 =head1 DESCRIPTION
 

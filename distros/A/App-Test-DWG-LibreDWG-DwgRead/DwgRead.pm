@@ -16,7 +16,7 @@ use Readonly;
 
 Readonly::Scalar our $DR => 'dwgread';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -37,14 +37,16 @@ sub run {
 	$self->{'_opts'} = {
 		'd' => undef,
 		'h' => 0,
+		'm' => undef,
 		'v' => 1,
 	};
-	if (! getopts('d:hv:', $self->{'_opts'}) || @ARGV < 1
+	if (! getopts('d:hm:v:', $self->{'_opts'}) || @ARGV < 1
 		|| $self->{'_opts'}->{'h'}) {
 
-		print STDERR "Usage: $0 [-d test_dir] [-h] [-v level] [--version] directory\n";
+		print STDERR "Usage: $0 [-d test_dir] [-h] [-m match_string] [-v level] [--version] directory\n";
 		print STDERR "\t-d test_dir\tTest directory (default is directory in system tmp).\n";
 		print STDERR "\t-h\t\tPrint help.\n";
+		print STDERR "\t-m match_string\tMatch string (default is not defined).\n";
 		print STDERR "\t-v level\tVerbosity level (default 1, min 0, max 9).\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tdirectory\tDirectory with DWG files to test.\n";
@@ -111,9 +113,28 @@ sub _exec {
 		if (my @num = ($stderr =~ m/ERROR/gms)) {
 			print STDERR "dwgread '$dwg_file' has ".scalar @num." ERRORs\n";
 		}
+
+		if (defined $self->{'_opts'}->{'m'}) {
+			foreach my $match_line ($self->_match_lines($stderr)) {
+				print $match_line."\n";
+			}
+		}
 	}
 
 	return;
+}
+
+sub _match_lines {
+	my ($self, $string) = @_;
+
+	my @ret;
+	foreach my $line (split m/\n/ms, $string) {
+		if ($line =~ /$self->{'_opts'}->{'m'}/) {
+			push @ret, $line;
+		}
+	}
+
+	return @ret;
 }
 
 1;
@@ -162,17 +183,34 @@ Returns 1 for error, 0 for success.
  use warnings;
 
  use App::Test::DWG::LibreDWG::DwgRead;
+ use File::Temp qw(tempdir);
+ use File::Spec::Functions qw(catfile);
+ use IO::Barf qw(barf);
+ use MIME::Base64;
+
+ # Bad DWG data in base64.
+ my $bad_dwg_data = <<'END';
+ QUMxMDAyAAAAAAAAAAAAAAAK
+ END
+
+ # Prepare file in temp dir.
+ my $temp_dir = tempdir(CLEANUP => 1);
+
+ # Save data to file.
+ my $temp_file = catfile($temp_dir, 'bad.dwg');
+ barf($temp_file, decode_base64($bad_dwg_data));
 
  # Arguments.
  @ARGV = (
-         '__DIR__',
+         $temp_dir,
  );
 
  # Run.
  exit App::Test::DWG::LibreDWG::DwgRead->new->run;
 
  # Output like:
- # TODO
+ # Cannot dwgread '/tmp/__TMP_DIR__/bad.dwg'.
+ #         Command 'dwgread -v1 /tmp/__TMP_DIR__/1.dwg' exit with 256.
 
 =head1 DEPENDENCIES
 
@@ -205,6 +243,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -152,28 +152,17 @@ subtest fill => sub {
     is_deeply $got, $expect, 'add_fill';
 };
 
-subtest euclidean => sub {
-    my $d = new_ok 'MIDI::Drummer::Tiny';
-
-    my $expect = '';
-    my $got = $d->euclidean(0, 0);
-    is $got, $expect, 'euclidean';
-
-    $expect = '0';
-    $got = $d->euclidean(0, 1);
-    is $got, $expect, 'euclidean';
-
-    $expect = '00';
-    $got = $d->euclidean(0, 2);
-    is $got, $expect, 'euclidean';
-
-    $expect = '10';
-    $got = $d->euclidean(1, 2);
-    is $got, $expect, 'euclidean';
-
-    $expect = '10010100';
-    $got = $d->euclidean(3, 8);
-    is $got, $expect, 'euclidean';
+subtest timidity_conf => sub {
+    my $d = new_ok 'MIDI::Drummer::Tiny' => [
+        soundfont => 'soundfont.sf2',
+    ];
+    my $sf = $d->soundfont;
+    like $d->timidity_cfg, qr/$sf$/, 'timidity_conf';
+    my $filename = 'timidity_conf';
+    $d->timidity_cfg($filename);
+    ok -e $filename, 'timidity_conf with filename';
+    unlink $filename;
+    ok !-e $filename, 'file unlinked';
 };
 
 done_testing();

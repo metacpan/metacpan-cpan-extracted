@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Quickstart
 
 =head1 VERSION
 
-version 0.4208
+version 0.4303
 
 =head1 Import the Module
 
@@ -120,15 +120,21 @@ This beat is extra-cheesy.
 
 =head1 And Finally...
 
-We need to write-out the score to a MIDI file.
+Either play the score with the built-in L<timidity++|https://timidity.sourceforge.net/|> functionality:
+
+  $d->play_with_timidity;
+
+Or write-out the score to a MIDI file:
 
   $d->write;
 
-=head1 MIDI Playback
-
-Use the venerable command-line program, L<timidity++|https://timidity.sourceforge.net/|> - which is likely available through your package manager (e.g. apt, homebrew). You can also use the excellent, cross platform program, L<VLC|https://www.videolan.org/vlc/|>.
+And then play the score with timidity:
 
   > timidity drums.mid
+
+You can also use the excellent, cross platform program, L<VLC|https://www.videolan.org/vlc/|>.
+
+You can also convert the MIDI file into MP3, or whatever format you like.
 
 Easy!
 

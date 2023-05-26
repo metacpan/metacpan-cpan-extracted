@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::SqlScriptSaveOptions;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::CellArea;
-use AsposeCellsCloud::Object::SaveOptions;
+use AsposeCellsCloud::Object::SaveOptions; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,199 +119,217 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'SqlScriptSaveOptions',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'enable_http_compression' => {
-    	datatype => 'boolean',
-    	base_name => 'EnableHTTPCompression',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'save_format' => {
-    	datatype => 'string',
-    	base_name => 'SaveFormat',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'clear_data' => {
-    	datatype => 'boolean',
-    	base_name => 'ClearData',
-    	description => 'Make the workbook empty after saving the file.',
-    	format => '',
-    	read_only => '',
-    		},
-    'cached_file_folder' => {
-    	datatype => 'string',
-    	base_name => 'CachedFileFolder',
-    	description => 'The cached file folder is used to store some large data.',
-    	format => '',
-    	read_only => '',
-    		},
-    'validate_merged_areas' => {
-    	datatype => 'boolean',
-    	base_name => 'ValidateMergedAreas',
-    	description => 'Indicates whether validate merged areas before saving the file. The default value is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'refresh_chart_cache' => {
-    	datatype => 'boolean',
-    	base_name => 'RefreshChartCache',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'create_directory' => {
-    	datatype => 'boolean',
-    	base_name => 'CreateDirectory',
-    	description => 'If true and the directory does not exist, the directory will be automatically created before saving the file.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'sort_names' => {
-    	datatype => 'boolean',
-    	base_name => 'SortNames',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'check_if_table_exists' => {
-    	datatype => 'boolean',
-    	base_name => 'CheckIfTableExists',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'column_type_map' => {
-    	datatype => 'string',
-    	base_name => 'ColumnTypeMap',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'check_all_data_for_column_type' => {
-    	datatype => 'boolean',
-    	base_name => 'CheckAllDataForColumnType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'add_blank_line_between_rows' => {
-    	datatype => 'boolean',
-    	base_name => 'AddBlankLineBetweenRows',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'operator_type' => {
-    	datatype => 'string',
-    	base_name => 'OperatorType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'create_table' => {
-    	datatype => 'boolean',
-    	base_name => 'CreateTable',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'id_name' => {
-    	datatype => 'string',
-    	base_name => 'IdName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'start_id' => {
-    	datatype => 'int',
-    	base_name => 'StartId',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'table_name' => {
-    	datatype => 'string',
-    	base_name => 'TableName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_as_string' => {
-    	datatype => 'boolean',
-    	base_name => 'ExportAsString',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'export_area' => {
-    	datatype => 'CellArea',
-    	base_name => 'ExportArea',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'has_header_row' => {
-    	datatype => 'boolean',
-    	base_name => 'HasHeaderRow',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'check_if_table_exists' => {
+     	datatype => 'boolean',
+     	base_name => 'CheckIfTableExists',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'column_type_map' => {
+     	datatype => 'string',
+     	base_name => 'ColumnTypeMap',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'check_all_data_for_column_type' => {
+     	datatype => 'boolean',
+     	base_name => 'CheckAllDataForColumnType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'add_blank_line_between_rows' => {
+     	datatype => 'boolean',
+     	base_name => 'AddBlankLineBetweenRows',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'separator' => {
+     	datatype => 'string',
+     	base_name => 'Separator',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'operator_type' => {
+     	datatype => 'string',
+     	base_name => 'OperatorType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'primary_key' => {
+     	datatype => 'int',
+     	base_name => 'PrimaryKey',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'create_table' => {
+     	datatype => 'boolean',
+     	base_name => 'CreateTable',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'id_name' => {
+     	datatype => 'string',
+     	base_name => 'IdName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'start_id' => {
+     	datatype => 'int',
+     	base_name => 'StartId',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'table_name' => {
+     	datatype => 'string',
+     	base_name => 'TableName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_as_string' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportAsString',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_area' => {
+     	datatype => 'CellArea',
+     	base_name => 'ExportArea',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'has_header_row' => {
+     	datatype => 'boolean',
+     	base_name => 'HasHeaderRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'save_format' => {
+     	datatype => 'string',
+     	base_name => 'SaveFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cached_file_folder' => {
+     	datatype => 'string',
+     	base_name => 'CachedFileFolder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'clear_data' => {
+     	datatype => 'boolean',
+     	base_name => 'ClearData',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'create_directory' => {
+     	datatype => 'boolean',
+     	base_name => 'CreateDirectory',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'enable_http_compression' => {
+     	datatype => 'boolean',
+     	base_name => 'EnableHTTPCompression',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refresh_chart_cache' => {
+     	datatype => 'boolean',
+     	base_name => 'RefreshChartCache',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_names' => {
+     	datatype => 'boolean',
+     	base_name => 'SortNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'validate_merged_areas' => {
+     	datatype => 'boolean',
+     	base_name => 'ValidateMergedAreas',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'enable_http_compression' => 'boolean',
-    'save_format' => 'string',
-    'clear_data' => 'boolean',
-    'cached_file_folder' => 'string',
-    'validate_merged_areas' => 'boolean',
-    'refresh_chart_cache' => 'boolean',
-    'create_directory' => 'boolean',
-    'sort_names' => 'boolean',
     'check_if_table_exists' => 'boolean',
     'column_type_map' => 'string',
     'check_all_data_for_column_type' => 'boolean',
     'add_blank_line_between_rows' => 'boolean',
+    'separator' => 'string',
     'operator_type' => 'string',
+    'primary_key' => 'int',
     'create_table' => 'boolean',
     'id_name' => 'string',
     'start_id' => 'int',
     'table_name' => 'string',
     'export_as_string' => 'boolean',
     'export_area' => 'CellArea',
-    'has_header_row' => 'boolean'
+    'has_header_row' => 'boolean',
+    'save_format' => 'string',
+    'cached_file_folder' => 'string',
+    'clear_data' => 'boolean',
+    'create_directory' => 'boolean',
+    'enable_http_compression' => 'boolean',
+    'refresh_chart_cache' => 'boolean',
+    'sort_names' => 'boolean',
+    'validate_merged_areas' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'enable_http_compression' => 'EnableHTTPCompression',
-    'save_format' => 'SaveFormat',
-    'clear_data' => 'ClearData',
-    'cached_file_folder' => 'CachedFileFolder',
-    'validate_merged_areas' => 'ValidateMergedAreas',
-    'refresh_chart_cache' => 'RefreshChartCache',
-    'create_directory' => 'CreateDirectory',
-    'sort_names' => 'SortNames',
     'check_if_table_exists' => 'CheckIfTableExists',
     'column_type_map' => 'ColumnTypeMap',
     'check_all_data_for_column_type' => 'CheckAllDataForColumnType',
     'add_blank_line_between_rows' => 'AddBlankLineBetweenRows',
+    'separator' => 'Separator',
     'operator_type' => 'OperatorType',
+    'primary_key' => 'PrimaryKey',
     'create_table' => 'CreateTable',
     'id_name' => 'IdName',
     'start_id' => 'StartId',
     'table_name' => 'TableName',
     'export_as_string' => 'ExportAsString',
     'export_area' => 'ExportArea',
-    'has_header_row' => 'HasHeaderRow'
+    'has_header_row' => 'HasHeaderRow',
+    'save_format' => 'SaveFormat',
+    'cached_file_folder' => 'CachedFileFolder',
+    'clear_data' => 'ClearData',
+    'create_directory' => 'CreateDirectory',
+    'enable_http_compression' => 'EnableHTTPCompression',
+    'refresh_chart_cache' => 'RefreshChartCache',
+    'sort_names' => 'SortNames',
+    'validate_merged_areas' => 'ValidateMergedAreas' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -3,7 +3,7 @@ use warnings;
 use 5.006; # warnings
 package Software::License;
 # ABSTRACT: packages that provide templated software licenses
-$Software::License::VERSION = '0.104002';
+$Software::License::VERSION = '0.104004';
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
 
@@ -220,6 +220,7 @@ sub _fill_in {
 #pod * L<Software::License::Apache_1_1>
 #pod * L<Software::License::Apache_2_0>
 #pod * L<Software::License::Artistic_1_0>
+#pod * L<Software::License::Artistic_1_0_Perl>
 #pod * L<Software::License::Artistic_2_0>
 #pod * L<Software::License::BSD>
 #pod * L<Software::License::CC0_1_0>
@@ -268,7 +269,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.104002
+version 0.104004
 
 =head1 SYNOPSIS
 
@@ -281,11 +282,16 @@ version 0.104002
 =head1 PERL VERSION
 
 This module is part of CPAN toolchain, or is treated as such.  As such, it
-follows the agreement of the Perl Toolchain Gang to require no newer version of
-perl than v5.8.1.  This version may change by agreement of the Toolchain Gang,
-but for now is governed by the L<Lancaster
+follows the agreement of the Perl Toolchain Gang to require no newer version
+of perl than one released in the last ten years.  This version may change by
+agreement of the Toolchain Gang, but for now is governed by the L<Lancaster
 Consensus|https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
-of 2013.
+of 2013 and the Lyon Amendment of 2023 (described at the linked-to document).
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -433,6 +439,10 @@ L<Software::License::Artistic_1_0>
 
 =item *
 
+L<Software::License::Artistic_1_0_Perl>
+
+=item *
+
 L<Software::License::Artistic_2_0>
 
 =item *
@@ -550,7 +560,7 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
+=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia Marcel Telka mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Petr Písař Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
 
 =over 4
 
@@ -656,6 +666,10 @@ magnolia <magnolia.k@me.com>
 
 =item *
 
+Marcel Telka <marcel@telka.sk>
+
+=item *
+
 mikegrb <mgreb@linode.com>
 
 =item *
@@ -673,6 +687,10 @@ Olivier Mengué <dolmen@cpan.org>
 =item *
 
 Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+=item *
+
+Petr Písař <ppisar@redhat.com>
 
 =item *
 
@@ -702,7 +720,7 @@ Wesley Schwengle <wesley@schwengle.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -18,7 +18,7 @@ use NOLookup::Whois::WhoisLookup qw /
 
 require_ok('NOLookup::Whois::WhoisLookup');
 
-my $SERVER = $ENV{WHOIS_SERVICE} || "registrarwhois.norid.no";
+my $SERVER = $ENV{WHOIS_SERVICE} || "whois.test.norid.no";
 
 my @ho_handles;
 my @do_handles;
@@ -50,14 +50,18 @@ foreach my $q (sort @doms) {
 	    ok(1, "No access");
 	    
 	} else {
-	    BAIL_OUT("Some error, should not happen, errcode is: " . $wh->errno);	    
+	    BAIL_OUT("Some error, should not happen, check your environment, errcode is: " . $wh->errno);
 	}
 	
     } else {
     
 	ok($wh, "Whois1 object returned  for q: " . encode('UTF-8', $q));
 	ok($do, "Domain1 object returned");
-	ok($ho, "Holder1 object returned");
+	if ($SERVER =~ m/registrarwhois/) {
+	    ok($ho, "Holder1 object returned from a closed registrarwhois service");
+	} else {
+	    ok(1, "Holder1 object not returned from a public whois service");
+	}
 	
 	#print "do: ", Dumper $do;
 	#print "ho: ", Dumper $ho;

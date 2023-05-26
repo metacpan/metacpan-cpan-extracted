@@ -17,28 +17,20 @@ use File::Path qw(make_path remove_tree);
 
 SVN::Rami - Automates merging to multiple branches
 
-=head1 VERSION
-
-Version 0.201
-
 =cut
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 
 =head1 SYNOPSIS
 
-Used by the script F<rami>. This is not (yet) a stand-alone module.
-
-Should be invoked from the command line:
-
-  rami -c <version-number>
+Used by the script L<rami|https://metacpan.org/dist/SVN-Rami/view/bin/rami>. This is not (yet) a stand-alone module.
 
 =head1 SUBROUTINES/METHODS
 
 There are currently no publicly available methods because
-this module is only intended to be used by the script "rami",
-as explained above.
+this module is only intended to be used by the script
+L<rami|https://metacpan.org/dist/SVN-Rami/view/bin/rami>.
 
 =cut
 

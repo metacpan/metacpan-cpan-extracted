@@ -81,11 +81,7 @@ sub evaluate {
   my $error = $@;
 
   if ($error) {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.evaluate');
-    $throw->message($error);
-    $throw->error;
+    $self->throw('error_on_evaluate', $error)->error;
   }
 
   return $self->stash(evaluation => [
@@ -204,6 +200,17 @@ sub set {
   my $evaluation = $self->evaluate;
 
   return $evaluation->[1];
+}
+
+# ERRORS
+
+sub error_on_evaluate {
+  my ($self, $error) = @_;
+
+  return {
+    name => 'on.evaluate',
+    message => $error,
+  };
 }
 
 1;
@@ -380,7 +387,7 @@ I<Since C<0.01>>
 
   my $evaluate = $search->evaluate;
 
-  # Exception! Venus::Search::Error (isa Venus::Error)
+  # Exception! (isa Venus::Search::Error) (see error_on_evaluate)
 
 =back
 
@@ -638,6 +645,36 @@ I<Since C<0.01>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_evaluate>
+
+This package may raise an error_on_evaluate exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Exception!");
+
+  my $error = $search->throw('error_on_evaluate', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_evaluate"
+
+  # my $message = $error->message;
+
+  # "Exception!"
+
+=back
 
 =head1 OPERATORS
 

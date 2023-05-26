@@ -1,22 +1,17 @@
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
-# Write data in tabular text format.
+# Write data in tabular text format inter alia.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2023
 #-------------------------------------------------------------------------------
 # podDocumentation
-# cd /home/phil/perl/cpan/DataTableText/; perl Build.PL && perl Build test && sudo perl Build install
-# To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
-# E for exportable methods
-# write binary data without complaints about wide characters
 # formatTableHH hash with sub hash of {} fails to print see svgToDita
 # runInParallel - processing statistics
 # formatTable should optionally clear left columns identical to previous line
 # checkKeys information should be formatted so it can be referred to in sub descriptions
 # updateDocumentation - mark synopsis tests with #S and place in synopsis
-# pop r15 before calling target sub
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20230503;                                                        # Version
+our $VERSION = 20230521;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -2051,6 +2046,16 @@ sub setIntersection(@)                                                          
   my $e = setCombination(@_);
   my $S = @s;                                                                   # Set count
   grep {$e->{$_} == $S} sort keys %$e                                           # Return words that appear in all the sets
+ }
+
+sub setDifference($$)                                                           # Subtract the keys in the second set represented as a hash from the first set represented as a hash to create a new hash showing the set difference between the two.
+ {my ($a, $b) = @_;                                                             # First set as a hash, second set as a hash
+  my %c = %$a;
+  my @b = ref($b) =~ m(hash)i  ? keys(%$b) :
+          ref($b) =~ m(array)i ? @$b       :
+          split /\s+/, $b;
+  delete $c{$_} for @b;
+  \%c
  }
 
 sub setIntersectionOverUnion(@)                                                 # Returns the size of the intersection over the size of the union of one or more sets B<@s> represented as arrays and/or hashes.
@@ -6570,7 +6575,7 @@ sub wellKnownUrls                                                               
     meme            => [q(Meme),                                                "https://en.wikipedia.org/wiki/Meme"                                                                                              ],
     memory          => [q(memory),                                              "https://en.wikipedia.org/wiki/Computer_memory"                                                                                   ],
     mentor          => [q(mentor),                                              "https://en.wikipedia.org/wiki/Mentorship"                                                                                        ],
-    mergeSort       => [q(Merge Sort),                                          "https://en.wikipedia.org/wiki/Mergesort"                                                                                          ],
+    mergeSort       => [q(Merge Sort),                                          "https://en.wikipedia.org/wiki/Mergesort"                                                                                         ],
     metadata        => [q(metadata),                                            "https://en.wikipedia.org/wiki/Metadata"                                                                                          ],
     mfa             => [q(Multi-factor authentication),                         "https://en.wikipedia.org/wiki/Multi-factor_authentication"                                                                       ],
     microsoft       => [q(Microsoft)  ,                                         "https://en.wikipedia.org/wiki/Microsoft"                                                                                         ],
@@ -6660,6 +6665,7 @@ sub wellKnownUrls                                                               
     sam             => [q(Serveless Application Model),                         "https://aws.amazon.com/serverless/sam/"                                                                                          ],
     sandbox         => [q(sandbox),                                             "https://en.wikipedia.org/wiki/Sandbox_(software_development)"                                                                    ],
     sas             => [q(SAS Institute),                                       "https://en.wikipedia.org/wiki/SAS_Institute"                                                                                     ],
+    schiehallion    => [q(Schiehallion),                                        "https://en.wikipedia.org/wiki/Schiehallion"                                                                                      ],
     securityGroup   => [q(security group),                                      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/working-with-security-groups.html"                                           ],
     selfaware       => [q(self aware),                                          "https://en.wikipedia.org/wiki/Self-awareness"                                                                                    ],
     server          => [q(server),                                              "https://en.wikipedia.org/wiki/Server_(computing)"                                                                                ],
@@ -6668,6 +6674,8 @@ sub wellKnownUrls                                                               
     shell           => [q(shell),                                               "https://en.wikipedia.org/wiki/Shell_(computing)"                                                                                 ],
     shib            => [q(Shibboleth),                                          "https://www.shibboleth.net/"                                                                                                     ],
     simd            => [q(SIMD),                                                "https://www.officedaytime.com/simd512e/"                                                                                         ],
+    silicon         => [q(Silicon),                                             "https://en.wikipedia.org/wiki/Silicon"                                                                                           ],
+    sort            => [q(sort),                                                "https://en.wikipedia.org/wiki/Sorting"                                                                                           ],
     sqn             => [q(sine qua non),                                        "https://en.wikipedia.org/wiki/Sine_qua_non"                                                                                      ],
     smartmatch      => [q(smartmatch),                                          "https://perldoc.perl.org/perlop.html#Smartmatch-Operator"                                                                        ],
     snake_case      => [q(snake_case),                                          "https://en.wikipedia.org/wiki/Snake_case"                                                                                        ],
@@ -6703,6 +6711,7 @@ sub wellKnownUrls                                                               
     tar             => [q(Tar),                                                 "https://en.wikipedia.org/wiki/Tar_(computing)"                                                                                   ],
     task            => [q(task),                                                "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/task.html#task"      ],
     tcl             => [q(Tcl),                                                 "https://en.wikipedia.org/wiki/Tcl"                                                                                               ],
+    tcpip           => [q(TcpIp),                                               "https://en.wikipedia.org/wiki/Internet_protocol_suite"                                                                           ],
     tdd             => [q(test driven development),                             "https://en.wikipedia.org/wiki/Test-driven_development"                                                                           ],
     test            => [q(test),                                                "https://en.wikipedia.org/wiki/Software_testing"                                                                                  ],
     teul            => [q(tanquam ex ungue leonem),                             "https://en.wikipedia.org/wiki/Later_life_of_Isaac_Newton#Bernoulli's_mathematical_challenge"                                     ],
@@ -6722,7 +6731,7 @@ sub wellKnownUrls                                                               
     tritium         => [q(tritium),                                             "https://en.wikipedia.org/wiki/Tritium"                                                                                           ],
     ttk             => [q(Template Toolkit),                                    "https://github.com/abw/Template2/graphs/contributors"                                                                            ],
     turing          => [q(Turing),                                              "https://en.wikipedia.org/wiki/Alan_Turing"                                                                                       ],
-    ttsa            => [q(Turn The Ship Around),                                "https://en.wikipedia.org/wiki/David_Marquet"                                                                                       ],
+    ttsa            => [q(Turn The Ship Around),                                "https://en.wikipedia.org/wiki/David_Marquet"                                                                                     ],
     ubuntu          => [q(Ubuntu),                                              "https://ubuntu.com/download/desktop"                                                                                             ],
     ucla            => [q(University of California at Los Angeles),             "https://en.wikipedia.org/wiki/University_of_California,_Los_Angeles"                                                             ],
     ucsd            => [q(University of California at San Diego),               "https://en.wikipedia.org/wiki/University_of_California,_San_Diego"                                                               ],
@@ -6745,13 +6754,13 @@ sub wellKnownUrls                                                               
     upload          => [q(upload),                                              "https://en.wikipedia.org/wiki/Upload"                                                                                            ],
     url             => [q(url),                                                 "https://en.wikipedia.org/wiki/URL"                                                                                               ],
     usa             => [q(United States),                                       "https://en.wikipedia.org/wiki/United_States"                                                                                     ],
-    usb             => [q(USB),                                                 "https://en.wikipedia.org/wiki/USB"                                                                                     ],
+    usb             => [q(USB),                                                 "https://en.wikipedia.org/wiki/USB"                                                                                               ],
     userid          => [q(userid),                                              "https://en.wikipedia.org/wiki/User_identifier"                                                                                   ],
     user            => [q(user),                                                "https://en.wikipedia.org/wiki/User_(computing)"                                                                                  ],
     uspto           => [q(United States Patent and Trademark Office),           "https://en.wikipedia.org/wiki/USPTO"                                                                                             ],
     utf8            => [q(utf8),                                                "https://en.wikipedia.org/wiki/UTF-8"                                                                                             ],
     userExp         => [q(User Experience),                                     "https://en.wikipedia.org/wiki/User_experience"                                                                                   ],
-    vector2         => [q(Vectors In Two Dimensions),                           "https://pypi.org/project/Vector2/"                                                                                                ],
+    vector2         => [q(Vectors In Two Dimensions),                           "https://pypi.org/project/Vector2/"                                                                                               ],
     verify          => [q(verify),                                              "https://en.wikipedia.org/wiki/Software_verification_and_validation"                                                              ],
     vhdl            => [q(VHDL),                                                "https://ghdl.readthedocs.io/en/latest/about.html"                                                                                ],
     vi              => [q(vi),                                                  "https://www.vim.org/"                                                                                                            ],
@@ -6765,6 +6774,7 @@ sub wellKnownUrls                                                               
     widget          => [q(widget),                                              "https://en.wikipedia.org/wiki/Graphical_widget"                                                                                  ],
     wikipedia       => [q(Wikipedia),                                           "https://en.wikipedia.org"                                                                                                        ],
     word            => [q(word),                                                "https://en.wikipedia.org/wiki/Doc_(computing)"                                                                                   ],
+    wsl             => [q(Windows Services for Linux),                          "https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux"                                                                       ],
     x64             => [q(X86-64),                                              "https://en.wikipedia.org/wiki/X86-64"                                                                                            ],
     xmllint         => [q(Xml Lint),                                            "http://xmlsoft.org/xmllint.html"                                                                                                 ],
     xmlparser       => [q(Xml parser),                                          "https://metacpan.org/pod/XML::Parser/"                                                                                           ],
@@ -6775,6 +6785,7 @@ sub wellKnownUrls                                                               
     youngtableaug   => [q(Young Tableau on GitHub),                             "https://github.com/philiprbrenan/youngTableauSort/"                                                                              ],
     youngtableau    => [q(Young Tableau),                                       "https://en.wikipedia.org/wiki/Young_tableau"                                                                                     ],
     yubikeybio      => [q(Yubi Key Bio),                                        "https://www.yubico.com/products/yubikey-bio-series/"                                                                             ],
+    zeasl           => [q(Zero assembler programming language),                 "https://github.com/philiprbrenan/zero"                                                                                           ],
     zerowidthspace  => [q(zero width space),                                    "https://en.wikipedia.org/wiki/Zero-width_space"                                                                                  ],
     zip             => [q(zip),                                                 "https://linux.die.net/man/1/zip"                                                                                                 ],
     zoom            => [q(Zoom),                                                "https://zoom.us/"                                                                                                                ],
@@ -6928,7 +6939,7 @@ sub expandNewLinesInDocumentation($)                                            
 sub extractTest($)                                                              #P Remove example markers from test code.
  {my ($string) = @_;                                                            # String containing test line
  #$string =~ s/\A\s*{?(.+?)\s*#.*\Z/$1/;                                        # Remove any initial white space and possible { and any trailing white space and comments
-  $string =~ s(#T(\w|:)+) ()gs;                                                 # Remove test tags from line
+  $string =~ s(#[T#](\w|:)+) ()gs;                                              # Remove test tags from line
   $string
  }
 
@@ -6945,7 +6956,7 @@ sub extractCodeBlock($;$)                                                       
   my $b = 2;                                                                    #CODEBLOCK-end
  }
 
-sub updateDocumentation(;$)                                                     # Update the documentation for a Perl module from the comments in its source code. Comments between the lines marked with:\m  #Dn title # description\mand:\m  #D\mwhere n is either 1, 2 or 3 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be chosen from:\m=over\m=item I\mmethod of interest to new users\m=item P\mprivate method\m=item r\moptionally replaceable method\m=item R\mrequired replaceable method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. Lines containing comments consisting of '#T'.methodName will also be aggregated and displayed as examples for that method.\mLines formatted as:\m  BEGIN{*source=*target}\mstarting in column 1 will define a synonym for a method.\mLines formatted as:\m  #C emailAddress text\mwill be aggregated in the acknowledgments section at the end of the documentation.\mThe character sequence B<\\xn> in the comment will be expanded to one new line, B<\\xm> to two new lines and B<L>B<<$_>>,B<L>B<<confess>>,B<L>B<<die>>,B<L>B<<eval>>,B<L>B<<lvalueMethod>> to links to the perl documentation.\mSearch for '#D1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20180810/lib/Data/Table/Text.pm> to see  more examples of such documentation in action - although it is quite difficult to see as it looks just like normal comments placed in the code.\mParameters:\n.
+sub updateDocumentation(;$)                                                     # Update the documentation for a Perl module from the comments in its source code. Comments between the lines marked with:\m  #Dn title # description\mand:\m  #D\mwhere n is either 1, 2 or 3 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be chosen from:\m=over\m=item I\mmethod of interest to new users\m=item P\mprivate method\m=item r\moptionally replaceable method\m=item R\mrequired replaceable method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. Lines containing comments consisting of '#[T#]'.methodName will also be aggregated and displayed as examples for that method.\mLines formatted as:\m  BEGIN{*source=*target}\mstarting in column 1 will define a synonym for a method.\mLines formatted as:\m  #C emailAddress text\mwill be aggregated in the acknowledgments section at the end of the documentation.\mThe character sequence B<\\xn> in the comment will be expanded to one new line, B<\\xm> to two new lines and B<L>B<<$_>>,B<L>B<<confess>>,B<L>B<<die>>,B<L>B<<eval>>,B<L>B<<lvalueMethod>> to links to the perl documentation.\mSearch for '#D1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20180810/lib/Data/Table/Text.pm> to see  more examples of such documentation in action - although it is quite difficult to see as it looks just like normal comments placed in the code.\mParameters:\n.
  {my ($perlModule) = @_;                                                        # Optional file name with caller's file being the default
   $perlModule //= $0;                                                           # Extract documentation from the caller if no perl module is supplied
   my $package = perlPackage($perlModule);                                       # Package name
@@ -7022,7 +7033,7 @@ END
 
   for my $l(keys @lines)                                                        # Tests associated with each method
    {my $line = $lines[$l];
-    if (my @tags = $line =~ m/(?:\s#T((?:\w|:)+))/g)
+    if (my @tags = $line =~ m/(?:\s#[T#]((?:\w|:)+))/g)
      {my %tags; $tags{$_}++ for @tags;
 
       for(grep {$tags{$_} > 1} sort keys %tags)                                 # Check for duplicate example names on the same line
@@ -7205,6 +7216,7 @@ END
                               s/\A\x28//gsr     =~
                               s/\x29\s*(:lvalue\s*)?\Z//gsr;
       my $name      = $sub =~ s/\x28.*?\x29//r;                                 # Method name after removing parameters
+         $name      =~ s(\s*\{)    ()gs;                                        # Remove opening curly used to show that the method does not have a standard parameter list
 
       my $methodX   = $flags =~ m/X/;                                           # Die rather than return undef
       my $private   = $flags =~ m/P/;                                           # Private
@@ -7214,7 +7226,7 @@ END
       my $exported  = $flags =~ m/E/;                                           # Exported
       my $replace   = $flags =~ m/r/;                                           # Optionally replaceable
       my $Replace   = $flags =~ m/R/;                                           # Required replaceable
-      my $userFlags = $flags =~ s/[EIPrRSX]//gsr;                               # User flags == all flags minus the known flags
+#     my $userFlags = $flags =~ s/[EIPrRSX]//gsr;                               # User flags == all flags minus the known flags
 
       confess "(P)rivate and (rR)eplacable are incompatible on method $name\n"
         if $private and $replace || $Replace;
@@ -7244,9 +7256,9 @@ END
         $moduleDescription{methods}{$name}{$field} = $v;
        }
 
-      $userFlags{$name} =                                                       # Process user flags
-        &docUserFlags($userFlags, $perlModule, $package, $name)
-        if $userFlags;
+#      $userFlags{$name} =                                                       # Process user flags
+#        &docUserFlags($userFlags, $perlModule, $package, $name)
+#        if $userFlags;
 
       my ($parmNames, $parmDescriptions);
       if ($signature)                                                           # Parameters, parameter descriptions from comment
@@ -7302,9 +7314,9 @@ END
       $methodParms{$name} = $name;                                              # Method names not including parameters
       $methodParms{$name.'X'} = $name if $methodX;                              # Method names not including parameters
       $methodX{$name}++ if $methodX;                                            # Method names that have an X version
-      if (my $u = $userFlags{$name})                                            # Add names of any generated methods
-       {$methodParms{$_} = $name for @{$u->[2]};                                # Generated names array
-       }
+#      if (my $u = $userFlags{$name})                                            # Add names of any generated methods
+#       {$methodParms{$_} = $name for @{$u->[2]};                                # Generated names array
+#       }
 
       my @method;                                                               # Accumulate method documentation
 
@@ -7319,8 +7331,8 @@ END
         [qw(Parameter Description)]), '  ')
         if $parmNames and $parmDescriptions and $parmDescriptions !~ /\A#/;     # Add parameter description if present
 
-      push @method,                                                             # Add user documentation
-       "\n".$userFlags{$name}[0]."\n"          if $userFlags{$name}[0];
+#      push @method,                                                             # Add user documentation
+#       "\n".$userFlags{$name}[0]."\n"          if $userFlags{$name}[0];
 
       push @method,                                                             # Add example
        "\nB<Example:>\n\n  $example"           if $example;
@@ -7573,7 +7585,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 `head1 Copyright
 
-Copyright (c) 2016-2021 Philip R Brenan.
+Copyright (c) 2016-2023 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -7602,11 +7614,11 @@ END
     push @doc, formatTableBasic(\@x);
    }
 
-  for my $name(sort keys %userFlags)                                            # Insert generated method definitions
-   {if (my $doc = $userFlags{$name})
-     {push @doc, $doc->[1] if $doc->[1];
-     }
-   }
+#  for my $name(sort keys %userFlags)                                            # Insert generated method definitions
+#   {if (my $doc = $userFlags{$name})
+#     {push @doc, $doc->[1] if $doc->[1];
+#     }
+#   }
 
   push @doc, <<'END';                                                           # Standard test sequence
 
@@ -7667,10 +7679,10 @@ sub docUserFlags($$$$)                                                          
 ${package}::extractDocumentationFlags("$flags", "$name");
 END
 
-  use Data::Dump qw(dump);
-  my $r = eval $s;
-  confess "$s\n". dump($@, $!) if $@;
-  $r
+#  use Data::Dump qw(dump);
+#  my $r = eval $s;
+#  confess "$s\n". dump($@, $!) if $@;
+#  $r
  }
 
 sub updatePerlModuleDocumentation($)                                            #P Update the documentation in a B<$perlModule> and display said documentation in a web browser.
@@ -7815,7 +7827,7 @@ sub extractPythonDocumentationFromFiles(@)                                      
        {$classFiles{$class}       = $class = $1;
         $classDefinitions{$class} = getDocString
        }
-      elsif ($text =~ m(\A\s*if\s+1\s*:\s*#T(\w+)))                             # Test as if 1: statement
+      elsif ($text =~ m(\A\s*if\s+1\s*:\s*#[T#](\w+)))                          # Test as if 1: statement
        {my $test = $1;
         my @test;
         while(@text and $text[0] !~ m(\A\s*\Z))
@@ -7823,7 +7835,7 @@ sub extractPythonDocumentationFromFiles(@)                                      
          }
         push $tests{$class}{$test}->@*, @test;
        }
-      elsif ($text =~ m(\A(.*?)#T(\w+)))                                        # Test on a single line
+      elsif ($text =~ m(\A(.*?)#[T#](\w+)))                                     # Test on a single line
        {my ($text, $test) = @{^CAPTURE};;
         push @{$testsCommon{$test}}, $text;
        }
@@ -8054,7 +8066,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  s3DownloadFolder s3FileExists s3ListFilesAndSizes s3ReadFile s3ReadString
  s3WriteFile s3WriteString s3ZipFolder s3ZipFolders saveCodeToS3 saveSourceToS3
  saveAwsDomain saveAwsIp
- searchDirectoryTreesForMatchingFiles searchDirectoryTreeForSubFolders setFileExtension setIntersection
+ searchDirectoryTreesForMatchingFiles searchDirectoryTreeForSubFolders setFileExtension setIntersection setDifference
  setIntersectionOfArraysOfStrings setIntersectionOverUnion setPackageSearchOrder
  setPartitionOnIntersectionOverUnion
  setPartitionOnIntersectionOverUnionOfHashStringSets
@@ -20436,7 +20448,7 @@ Test::More->builder->output("/dev/null") if $localTest;                         
 
 if ($^V ge v5.26.0)                                                             # Supported versions
  {if ($^O =~ m(bsd|linux|darwin)i)                                              # Supported systems
-    {plan tests => 709;
+    {plan tests => 712;
     }
   #lsif (onWindows) {plan tests    => 620}                                      # Somewhat supported systems
   else
@@ -21006,6 +21018,12 @@ if (1)
 if (1) {                                                                        #TsetIntersection
   is_deeply [qw(a b c)], [setIntersection[qw(e f g a b c )],[qw(a A b B c C)]];
   is_deeply [qw(e)],   [setIntersection {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e)];
+ }
+
+if (1) {                                                                        #TsetDifference
+  is_deeply {a=>1}, setDifference({a=>1, b=>2}, {b=>3,c=>4});
+  is_deeply {a=>1}, setDifference({a=>1, b=>2}, [qw(b c)]);
+  is_deeply {a=>1}, setDifference({a=>1, b=>2},   q(b c));
  }
 
 

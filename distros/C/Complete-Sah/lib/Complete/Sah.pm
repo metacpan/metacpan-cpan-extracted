@@ -10,9 +10,9 @@ use Complete::Util qw(combine_answers complete_array_elem hashify_answer);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-28'; # DATE
+our $DATE = '2023-03-19'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our %SPEC;
 our @EXPORT_OK = qw(complete_from_schema);
@@ -71,7 +71,7 @@ sub complete_from_schema {
 
     unless ($args{schema_is_normalized}) {
         require Data::Sah::Normalize;
-        $sch =Data::Sah::Normalize::normalize_schema($sch);
+        $sch = Data::Sah::Normalize::normalize_schema($sch);
     }
 
     my $fres;
@@ -135,9 +135,15 @@ sub complete_from_schema {
                 }
             }
             if ($comp) {
+                # create a validator, to be used by the completion routine
+                #require Data::Sah;
+                #my $vdr = Data::Sah::gen_validator($sch, {schema_is_normalized=>1});
+
                 my %cargs = (
                     %{$args{extras} // {}},
                     word=>$word, arg=>$args{arg}, args=>$args{args},
+                    #_schema_validator => $vdr,
+                    _schema => $sch,
                 );
                 log_trace("[compsah] using arg completion routine from schema's 'x.completion' attribute with args (%s)", \%cargs);
                 $fres = $comp->(%cargs);
@@ -373,7 +379,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.011 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-01-28.
+This document describes version 0.012 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-03-19.
 
 =head1 SYNOPSIS
 

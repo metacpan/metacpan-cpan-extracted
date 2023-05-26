@@ -152,6 +152,7 @@ share {
     #"%{configure} $with_local $with_cpp11 $build_static",
     #'echo %{make}',
     #\&pause,
+    \&update_hilbert_encoder_h,
     'mkdir _build',
     'cd _build',
     $cmake_cmd,
@@ -172,6 +173,25 @@ gather [
   #  get all the geos-config fields
   \&set_runtime_props_from_config,
 ];
+
+#  needed for gcc-13
+sub update_hilbert_encoder_h {
+  my $build = shift;
+
+  my @files
+    = File::Find::Rule->file()
+                      ->name( 'HilbertEncoder.h' )
+                      ->in( '.' );
+
+  log ("Updating " . path ($files[0])->absolute);
+  my $replace = '#include <cstdint>';
+  path($files[0])->edit (
+    sub {
+      s{(\Qinclude <vector>\E)([\r\n]+)}{$1\n$replace$2}xms;
+    }
+  );
+
+}
 
 #  a bit brute force
 sub copy_geos_c_dll {

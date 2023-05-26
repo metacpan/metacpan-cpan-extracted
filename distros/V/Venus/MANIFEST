@@ -57,6 +57,7 @@ lib/Venus/Mixin.pm
 lib/Venus/Name.pm
 lib/Venus/Number.pm
 lib/Venus/Opts.pm
+lib/Venus/Os.pm
 lib/Venus/Path.pm
 lib/Venus/Process.pm
 lib/Venus/Prototype.pm
@@ -145,6 +146,7 @@ t/Venus_Mixin.t
 t/Venus_Name.t
 t/Venus_Number.t
 t/Venus_Opts.t
+t/Venus_Os.t
 t/Venus_Path.t
 t/Venus_Process.t
 t/Venus_Prototype.t
@@ -219,3 +221,16 @@ t/data/planets/uranus
 t/data/planets/venus
 t/data/sections
 t/data/sun
+t/path/user/bin/app3
+t/path/user/bin/app3.exe
+t/path/user/bin/cmd
+t/path/usr/bin/app1
+t/path/usr/bin/app2
+t/path/usr/bin/cmd
+t/path/usr/local/bin/app4
+t/path/usr/local/bin/cmd
+t/path/usr/local/sbin/app4
+t/path/usr/local/sbin/cmd
+t/path/usr/sbin/app1
+t/path/usr/sbin/app3
+t/path/usr/sbin/cmd

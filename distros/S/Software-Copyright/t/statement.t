@@ -2,6 +2,7 @@ use 5.20.0;
 
 use Test::More;
 use Test::Synopsis::Expectation;
+use Time::localtime;
 
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
@@ -13,6 +14,14 @@ synopsis_ok('lib/Software/Copyright/Statement.pm');
 sub new_st($str) {
     return Software::Copyright::Statement->new($str);
 }
+
+subtest "blank statement" => sub {
+    my $statement = new_st('');
+
+    is("$statement", '', "check simplified statement");
+    is($statement->name, undef, "check simplified statement name");
+    is($statement->email, undef, "check simplified statement email");
+};
 
 subtest "just a name" => sub {
     my $statement = new_st('Marcel <marcel@example.com>');
@@ -123,6 +132,42 @@ subtest "contains record" => sub {
     foreach my $t (@tests) {
         my ($str, $expect) = $t->@*;
         is($statement->contains(new_st($str)), $expect, "check $str");
+    }
+};
+
+subtest "clean copyright" => sub {
+    my $current_year =  localtime->year() + 1900;
+
+    my @tests = (
+        [
+            '(c) 2006-present Philipp Lehman,',
+            "2006-$current_year, Philipp Lehman"
+        ],
+        [
+            # see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1033406
+            '2022 -01-17:16:26:37 -- Version 1.3 André Hilbig, mail@andrehilbig.de',
+            '2022, Version 1.3 André Hilbig, mail@andrehilbig.de',
+        ],
+        [
+            'Uwe Lueck 2012-11-06',
+            '2012, Uwe Lueck'
+        ],
+        [
+            '2003  - 2004 - 2006 Alphonse',
+            '2003-2006, Alphonse'
+        ],
+        [
+            '(C) Werenfried Spit    04-10-90',
+            '1990, Werenfried Spit'
+        ],
+        [
+            '(c) 2003--2005 Alexej Kryukov <basileia@yandex.ru>.',
+            '2003-2005, Alexej Kryukov <basileia@yandex.ru>.',
+        ]
+    );
+    foreach my $t (@tests) {
+        my ($str, $expect) = $t->@*;
+        is(new_st($str), $expect, "check «$str»");
     }
 };
 

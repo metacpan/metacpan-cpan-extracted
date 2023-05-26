@@ -4,7 +4,7 @@
       "Giuseppe Di Terlizzi <gdt@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -55,6 +55,6 @@
          "web" : "https://github.com/giterlizzi/perl-Net-SecurityCenter"
       }
    },
-   "version" : "0.310",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.311",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -84,13 +84,18 @@ Advanced:
 
 =head1 DESCRIPTION
 
-IO::FD is an XS module implementing common core Perl system I/O functions work
-with B<file descriptors> instead of Perl B<file handles>. Functions include but
-are not limited to C<accept>, C<connect>, C<socket>, C<bind>, C<sysopen>,
-C<sysread>, and C<syswrite>.
+IO::FD is an XS module implementing common core Perl system I/O functions to
+work with B<file descriptors> instead of Perl B<file handles>. Functions
+include but are not limited to C<accept>, C<connect>, C<socket>, C<bind>,
+C<sysopen>, C<sysread>, and C<syswrite>.
 
-It also implements some non core functions which normally would use file handles
-such as C<sendfile>, C<dup> and C<mkstemp>.
+Many non core system functions such as C<sendfile>, C<dup> and C<mkstemp>,
+C<pread>, C<pwrite>, C<mkfifo> which work with file descriptors are also
+implemented.
+
+Additional support for streamlined connection accepting is included via
+C<accept_multiple>.
+
 
 This module can significantly lower memory usage per file descriptor and
 decrease file/socket opening and socket accepting times.  C<accept> performance
@@ -118,10 +123,17 @@ This modules B<IS NOT> intended to be a drop in replacement for core IO
 subroutines in existing code. If you want a 'drop in replacement' please look
 at L<IO::FD::DWIM> which is part of the same distribution.
 
-Currently this module is focused on Unix/Linux systems, as this is the natural
+Currently this module is focused on UNIX/Linux systems, as this is the natural
 habitat of a file descriptor.
 
 =head1 IMPORTANT VERSION DIFFERENCES
+
+=head2 v0.3.0 and later
+
+B<New functions:>
+
+C<pread>, C<pwrite>, C<mkfifo>, C<mkfifoat>, C<open>, C<openat>
+
 
 =head2 v0.2.0 and later
 
@@ -131,20 +143,19 @@ C<accept4>, C<accept_multiple>, C<sendfile>
 
 B<Changes:>
 
-All functions creating a new fd now behave more perlish and apply the CLOEXEC
-if larger than C<$^F>  to prevent fd leakage.  This may result in an extra
-system call you didn't need if your program never calls C<exec>. To disable
-this, increase the value of C<$^F>. 
-
+All functions creating a new fd now behave more perlish and apply  O_CLOEXEC if
+larger than C<$^F>  to prevent fd leakage.  This may result in an extra system
+call you didn't need if your program never calls C<exec>. To disable this,
+increase the value of C<$^F> as per normal.
 
 Functions now throw B<exceptions> when output variables (fds) are read only
-when they need to be writable. This matches perl behaviour in the same scenario
+when they need to be writable. This matches Perl behaviour in the same scenario
 for C<sysopen> etc.
 
 When function input fd variables doesn't look like an fd (an IV), a B<warning>
 'IO::FD::xxxx called with something other than a file descriptor' is generated,
 return value is C<undef> and the C<$!> variable is set to C<EBADF> (bad file
-descriptor>). This is analogous to perl behaviour when checking for valid
+descriptor>). This is analogous to Perl behaviour when checking for valid
 GLOB/refs with C<sysread> and friends.
 
 
@@ -183,7 +194,6 @@ file descriptors directly B<you will loose>:
 
 =item Automatic close when out of scope
 
-
 =item Special variables not supported (ie '_' in stat)
 
 =item <FH> 'readline' support
@@ -192,20 +202,15 @@ file descriptors directly B<you will loose>:
 
 =back
 
-B<NOTE:> Since version B<v0.2.0>  the close on exec flag is set for file
-descriptors created above the value in C<$^F>. Previouse versions did not do
-this.
-
-
 
 =head1 MOTIVATION
 
 Perl makes working with text files easy, thanks to B<file handles>.  Line
 splitting, UTF-8, EOL processing etc. are awesome and make your life easier.
 
-However, the benefits of file handles in a network context or binary files are
-not so clear cut. All the nice line ending and encoding support doesn't help in
-these scenarios.
+However, the benefits of file handles when working within a network or binary
+file context are not so clear cut. All the nice line ending and encoding
+support doesn't help in these scenarios.
 
 In addition, the OS kernel does a lot of buffering for networking already. Do we
 really need to add more?
@@ -216,7 +221,7 @@ faster with file descriptors as less setup is required internally.
 
 =head1 APIs
 
-Each of the APIs mimic the Perl counterpart (if applicable) as much as
+Each of the APIs mimic the Perl counterpart, if applicable, as much as
 possible. Unless explicitly mentioned, they should operate like built in
 routines.  Consult perldoc -f FUNCTION for details.
 
@@ -254,7 +259,6 @@ C<IO::FD::SOCK_CLOEXEC> on that platform.
 B<NOTE:>Unlike other functions returning new file descriptors, this B<DOES NOT>
 automatically apply the CLOEXEC flag. The C<$flags> argument must be set
 accordingly to achieve this.
-
 
 B<NOTE:> On emulated systems, any errors reported are only from the accept
 call, not subsequent C<fcntl> calls
@@ -315,13 +319,26 @@ Currently advanced header/trailer features of BSD sendfile are not supported.
 
 Same as C<IO::FD::sysopen>, but expects all four arguments
 
+=head3 IO::FD::open
+
+Binding to C<open>. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
+
+=head3 IO::FD::openat
+
+Binding to C<openat>. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
+
 =head3 IO::FD::mktemp
 
 Behaves similar to L<File::Temp::mktemp>
 
 Requires at least six 'X' characters at the end of the template
 
-NOTE: This function does not return a file descriptor. It might be included in
+The template string used as input is modified  and is the same as the return
+value on success
+
+B<NOTE:> This function does not return a file descriptor. It might be included in
 future versions of this module
 
 =head3 IO::FD::mkstemp
@@ -330,11 +347,14 @@ Behaves like L<File::Temp::mkstemp>
 
 Requires at least six 'X' characters at the end of the template
 
-B<NOTE:> Currently returns C<undef> as path in list context. Cross platform fd
-paths are hard to extract.  TODO:  Fix this across platforms.
+In list context returns C<($fd,$path)>, where C<$fd> is the already open file
+descriptor, and C<$path> is the unique path generated from the template.
+
+The template string used as input is modified  and is the same as the C<$path>
+return value on success
+
 
 =head3 IO::FD::sysseek
-
 
 =head2 Pipes
 
@@ -343,6 +363,16 @@ paths are hard to extract.  TODO:  Fix this across platforms.
 =head3 IO::FD::syspipe
 
 A alias of C<IO::FD::pipe>.
+
+=head3 mkfifo
+
+Binding to C<mkfifo>. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
+
+=head3 mkfifoat
+
+Binding to C<mkfifoat>. Please see your system manual. If no mode is specified,
+the 'perlish' 0666, is used.
 
 =head2 Common
 
@@ -406,6 +436,16 @@ Likely differences to Perl lstat for larger integer values
 
 TODO: fix this!
 
+=head3 IO::FD::pread
+
+Binding to C<pread>. Please see your system manual.
+
+=head3 IO::FD:pwrite
+
+Binding to C<pwrite>. Please see your system manual.
+
+
+
 
 =head2 Experimental
 
@@ -425,7 +465,7 @@ Alias to ioctl
 
 =head3 IO::FD::select
 
-Broken. Probably will be removed as core perl has this already.
+Broken. Probably will be removed as core Perl has this already.
 
 =head3 IO::FD::poll
 
@@ -628,7 +668,7 @@ provide any networking/socket support.
 
   Further emulate linux/bsd SOCK_NONBLOCK and SOCK_CLOEXEC on darwin
 	Add more tests for stat and DWIM module
-	Wider compatability for older perls
+	Wider compatability for older Perls
 	Add More system functions which work with fds
 	Work with win32 sockets
 	Maybe make an IO::Handle sub class

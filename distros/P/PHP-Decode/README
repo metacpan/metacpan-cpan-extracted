@@ -1,0 +1,14 @@
+PHP::Decode
+===========
+
+Parse and transform obfuscated php code.
+
+The module applies static transformations to PHP statements
+and returns the transformed PHP code.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2023 by Barnim Dzwillo
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

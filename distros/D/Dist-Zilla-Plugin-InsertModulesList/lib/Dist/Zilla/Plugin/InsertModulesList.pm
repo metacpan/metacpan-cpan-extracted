@@ -1,8 +1,5 @@
 package Dist::Zilla::Plugin::InsertModulesList;
 
-our $DATE = '2019-02-08'; # DATE
-our $VERSION = '0.030'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -15,7 +12,14 @@ with (
     },
 );
 
+has ordered => (is => 'rw');
+
 use namespace::autoclean;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-03-02'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-InsertModulesList'; # DIST
+our $VERSION = '0.031'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -83,11 +87,14 @@ sub _insert_modules_list {
         }
         push @list, $mod if !$opts_has_includes || $found;
     }
+    @list = sort @list;
+
+    my $ordered = $self->ordered // (@list > 6);
 
     join(
         "",
         "=over\n\n",
-        (map {"=item * L<$_>\n\n"} @list),
+        (map {"=item ".($ordered ? ($_+1).".":"*")." L<$list[$_]>\n\n"} 0..$#list),
         "=back\n\n",
     );
 }
@@ -108,15 +115,15 @@ Dist::Zilla::Plugin::InsertModulesList - Insert a POD containing a list of modul
 
 =head1 VERSION
 
-This document describes version 0.030 of Dist::Zilla::Plugin::InsertModulesList (from Perl distribution Dist-Zilla-Plugin-InsertModulesList), released on 2019-02-08.
+This document describes version 0.031 of Dist::Zilla::Plugin::InsertModulesList (from Perl distribution Dist-Zilla-Plugin-InsertModulesList), released on 2023-03-02.
 
 =head1 SYNOPSIS
 
-In dist.ini:
+In F<dist.ini>:
 
  [InsertModulesList]
 
-In lib/Foo.pm:
+In F<lib/Foo.pm>:
 
  ...
 
@@ -128,7 +135,7 @@ In lib/Foo.pm:
 
  ...
 
-After build, lib/Foo.pm will contain:
+After build, F<lib/Foo.pm> will contain:
 
  ...
 
@@ -138,11 +145,13 @@ After build, lib/Foo.pm will contain:
 
  =over
 
- =item * L<Foo>
+ =item 1. L<Foo>
 
- =item * L<Foo::Bar>
+ =item 2. L<Foo::Bar>
 
- =item * L<Foo::Baz>
+ =item 3. L<Foo::Baz>
+
+ ...
 
  =back
 
@@ -171,6 +180,14 @@ Excludes and includes can be combined.
 
 =for Pod::Coverage .+
 
+=head1 CONFIGURATION
+
+=head2 ordered
+
+Bool. Can be set to true to always generate an ordered list, or false to always
+generate an unordered list. If unset, will use unordered list for 6 or less
+items and ordered list otherwise.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-InsertModulesList>.
@@ -178,14 +195,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertModulesList>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertModulesList>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -195,11 +204,37 @@ L<Dist::Zilla::Plugin::InsertExecsList>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2019, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertModulesList>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

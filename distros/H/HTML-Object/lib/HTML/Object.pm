@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.2.5
+## Version v0.2.7
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2023/05/11
+## Modified 2023/05/24
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.2.5';
+    our $VERSION = 'v0.2.7';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -862,7 +862,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.2.5
+    v0.2.7
 
 =head1 DESCRIPTION
 
@@ -897,6 +897,15 @@ Note that this interface does not enforce HTML standard. It is up to you the dev
 =head2 new
 
 Instantiate a new L<HTML::Object> object.
+
+You need to instantiate a new object prior to parse any new document. It cannot be re-used to parse another document, or if you really wanted to, you would first need to unset L</document> and unset L</current_parent>:
+
+    $p->document( undef );
+    $p->current_parent( undef );
+
+But, it is just as fast to do:
+
+    $p = HTML::Object->new;
 
 =head2 add_comment
 

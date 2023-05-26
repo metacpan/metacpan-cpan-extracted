@@ -25,7 +25,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.209';
+our $VERSION = '1.210';
 
 use Time::HiRes ();
 use Quiq::Duration;
@@ -168,7 +168,7 @@ Shell-Objekt ausgeführt wurden, ausgegeben.
 sub DESTROY {
     my $self = shift;
 
-    if ($self->{'timeSummary'}) {
+    if ($self->{'timeSummary'} && $self->{'log'}) {
         (my $prog = $0) =~ s|.*/||;
         my $fd = $self->{'logDest'};
         my $pre = $self->{'msgPrefix'};
@@ -577,7 +577,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.209
+1.210
 
 =head1 AUTHOR
 

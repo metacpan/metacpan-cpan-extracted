@@ -20,6 +20,25 @@
 #######################################################################
 
 
+2023-05-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000636 released
+
+        * Fixed Makefile.PL
+
+2023-05-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000635 released
+
+	* Fixed Makefile.PL
+
+2023-05-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000634 released
+
+        * Added Clone, Email::Address::XS and
+	  zlib-devel for amazon-linux to Makefile.PL
+
 2023-03-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000633 released

@@ -10,7 +10,7 @@ use English qw(-no_match_vars);
 
 use JIP::Spy::Event;
 
-our $VERSION = version->declare('v0.0.3');
+our $VERSION = version->declare('v0.0.4');
 our $AUTOLOAD;
 
 sub new {
@@ -78,6 +78,20 @@ sub on_spy_event {
     }
 
     return $self->{on_spy_event};
+}
+
+sub called {
+    my ($self) = @ARG;
+
+    return 1 if keys %{ $self->times() };
+    return 0;
+}
+
+sub not_called {
+    my ($self) = @ARG;
+
+    return 1 if !$self->called();
+    return 0;
 }
 
 sub AUTOLOAD {
@@ -184,7 +198,7 @@ JIP::Spy::Events - the most basic function spy ability
 
 =head1 VERSION
 
-This document describes L<JIP::Spy::Events> version C<v0.0.3>.
+This document describes L<JIP::Spy::Events> version C<v0.0.4>.
 
 =head1 SYNOPSIS
 
@@ -292,12 +306,6 @@ Returns a hash where keys are method names, and values are the number of times t
 
 Track (or not track) invocation context. Disabled by default.
 
-=head2 on_spy_event
-
-    $spy_events->on_spy_event( name => sub {...} );
-
-Declare one or more subroutines in the spied module.
-
 =head1 SUBROUTINES/METHODS
 
 =head2 new
@@ -309,6 +317,24 @@ Build new L<JIP::Spy::Events> object.
 =head2 clear
 
     $spy_events->clear();
+
+=head2 on_spy_event
+
+    $spy_events->on_spy_event( name => sub {...} );
+
+Declare one or more subroutines in the spied module.
+
+=head2 called
+
+    $bool = $control->called();
+
+Returns true if C<times> returns non-empty hash.
+
+=head2 not_called
+
+    $bool = $control->not_called();
+
+Returns true if C<times> returns an empty hash.
 
 =head1 DIAGNOSTICS
 

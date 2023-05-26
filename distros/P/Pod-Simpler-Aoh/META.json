@@ -44,7 +44,7 @@
    "provides" : {
       "Pod::Simpler::Aoh" : {
          "file" : "lib/Pod/Simpler/Aoh.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Pod-Simpler-Aoh"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

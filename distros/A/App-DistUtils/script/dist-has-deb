@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-21'; # DATE
+our $DATE = '2023-02-25'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 our %SPEC;
 
@@ -26,6 +26,21 @@ $SPEC{dist_has_deb} = {
             schema => 'bool*',
         },
     },
+    links => [
+        {
+            url=>'prog:lcpan',
+            summary => 'The lcpan debian-dist2deb subcommand',
+            description => <<'_',
+
+If you want to check multiple distribution, you can use the lcpan's
+`debian-dist2deb` subcommand, which has a `--exists-on-debian` option. For
+example, if you want to check PERLANCAR's distributions:
+
+    % lcpan dists --author PERLANCAR | lcpan debian-dist2deb --exists-on-debian --use-allpackages
+
+_
+        },
+    ],
 };
 sub dist_has_deb {
     require Dist::Util::Debian;
@@ -57,7 +72,7 @@ dist-has-deb - Check if dist has a corresponding Debian package
 
 =head1 VERSION
 
-This document describes version 0.152 of dist-has-deb (from Perl distribution App-DistUtils), released on 2022-08-21.
+This document describes version 0.153 of dist-has-deb (from Perl distribution App-DistUtils), released on 2023-02-25.
 
 =head1 SYNOPSIS
 
@@ -79,9 +94,15 @@ C<*> marks required options.
 
 =item B<--dist>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--use-allpackages>
+
+(No description)
+
 
 =back
 
@@ -313,6 +334,13 @@ Source repository is at L<https://github.com/perlancar/perl-App-DistUtils>.
 
 =head1 SEE ALSO
 
+L<lcpan>. The lcpan debian-dist2deb subcommand. If you want to check multiple distribution, you can use the lcpan's
+C<debian-dist2deb> subcommand, which has a C<--exists-on-debian> option. For
+example, if you want to check PERLANCAR's distributions:
+
+ % lcpan dists --author PERLANCAR | lcpan debian-dist2deb --exists-on-debian --use-allpackages
+
+
 L<Dist::Util::Debian>
 
 =head1 AUTHOR
@@ -339,7 +367,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

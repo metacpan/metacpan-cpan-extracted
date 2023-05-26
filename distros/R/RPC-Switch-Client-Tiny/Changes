@@ -1,5 +1,9 @@
 Revision history for Perl extension RPC::Switch::Client::Tiny.
 
+1.67  2023-05-22
+	- fixed cpantester strawberry perl sigkill on windows might deadlock
+	- fixed cpantester sunos client_timeout too short
+
 1.66  2022-11-07
 	- added msglimit param to avoid 'netstring too big' worker exit
 	- invalidate per_user session to remove childs without session from session cache

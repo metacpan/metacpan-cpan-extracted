@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Hello.pm,v 1.4 2011/12/03 11:44:51 gavin Exp $
 package Net::EPP::Frame::Hello;
 use base qw(Net::EPP::Frame);
 
@@ -35,23 +30,6 @@ types that are provisioned by the server.
 
 This module does not define any methods in addition to those it inherits from
 its ancestors.
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
 
 =cut
 

@@ -1,19 +1,21 @@
 Changes
 lib/SPVM/IO.pm
+lib/SPVM/IO.spvm
 lib/SPVM/IO/File.pm
 lib/SPVM/IO/File.spvm
 lib/SPVM/IO/Handle.pm
 lib/SPVM/IO/Handle.spvm
-lib/SPVM/IO/Select.config
 lib/SPVM/IO/Select.pm
 lib/SPVM/IO/Select.spvm
 lib/SPVM/IO/Socket.pm
 lib/SPVM/IO/Socket.spvm
 lib/SPVM/IO/Socket/INET.pm
 lib/SPVM/IO/Socket/INET.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/IO.t
 t/IO_File.t
 t/IO_Select.t
 t/IO_Socket.t

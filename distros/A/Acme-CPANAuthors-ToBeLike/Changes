@@ -1,6 +1,17 @@
 ==================================================
-Changes from 2015-05-03 00:00:00 +0000 to present.
+Changes from 2018-05-20 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.54 at 2023-05-19 17:10:40 +0000
+-----------------------------------------
+
+  Change: a6b8834be9c79023ae1dc4ea8a9c7093e070fe6a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-05-19 18:10:40 +0000
+
+    Most rulers wished to emulate Alexander the Great, but he was not a
+    CPAN author 
 
 -----------------------------------------
 version 0.52 at 2020-05-01 10:52:04 +0000
@@ -12,26 +23,6 @@ version 0.52 at 2020-05-01 10:52:04 +0000
 
     More folks to aspire to be 
 
------------------------------------------
-version 0.50 at 2017-02-03 13:47:42 +0000
------------------------------------------
-
-  Change: ed2b4c44dce244fda630478fdfaec16d74b035bd
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-02-03 13:47:42 +0000
-
-    I thought you said "emulsion" 
-
------------------------------------------
-version 0.48 at 2015-08-10 11:56:41 +0000
------------------------------------------
-
-  Change: 1b64f8432306e8dbf07deee77970e6b5f18ac86a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-08-10 12:56:41 +0000
-
-    To be like or not to be like, that is not a question 
-
 =================================================
-Plus 22 releases after 2015-05-03 00:00:00 +0000.
+Plus 24 releases after 2018-05-20 00:00:00 +0000.
 =================================================

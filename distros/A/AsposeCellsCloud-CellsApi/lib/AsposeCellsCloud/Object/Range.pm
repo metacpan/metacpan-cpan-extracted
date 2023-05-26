@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Range;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,100 +118,100 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Range',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'column_count' => {
-    	datatype => 'int',
-    	base_name => 'ColumnCount',
-    	description => 'Gets the count of columns in the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'row_height' => {
-    	datatype => 'double',
-    	base_name => 'RowHeight',
-    	description => 'Sets or gets the height of rows in this range',
-    	format => '',
-    	read_only => '',
-    		},
-    'name' => {
-    	datatype => 'string',
-    	base_name => 'Name',
-    	description => 'Gets or sets the name of the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'first_column' => {
-    	datatype => 'int',
-    	base_name => 'FirstColumn',
-    	description => 'Gets the index of the first column of the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'column_width' => {
-    	datatype => 'double',
-    	base_name => 'ColumnWidth',
-    	description => 'Sets or gets the column width of this range',
-    	format => '',
-    	read_only => '',
-    		},
-    'refers_to' => {
-    	datatype => 'string',
-    	base_name => 'RefersTo',
-    	description => 'Gets the range&#39;s refers to.',
-    	format => '',
-    	read_only => '',
-    		},
-    'row_count' => {
-    	datatype => 'int',
-    	base_name => 'RowCount',
-    	description => 'Gets the count of rows in the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'first_row' => {
-    	datatype => 'int',
-    	base_name => 'FirstRow',
-    	description => 'Gets the index of the first row of the range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'worksheet' => {
-    	datatype => 'string',
-    	base_name => 'Worksheet',
-    	description => 'Gets the Aspose.Cells.Range.Worksheetobject which contains this range.',
-    	format => '',
-    	read_only => '',
-    		},
+     'column_count' => {
+     	datatype => 'int',
+     	base_name => 'ColumnCount',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'column_width' => {
+     	datatype => 'double',
+     	base_name => 'ColumnWidth',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'first_column' => {
+     	datatype => 'int',
+     	base_name => 'FirstColumn',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'first_row' => {
+     	datatype => 'int',
+     	base_name => 'FirstRow',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'name' => {
+     	datatype => 'string',
+     	base_name => 'Name',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refers_to' => {
+     	datatype => 'string',
+     	base_name => 'RefersTo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'row_count' => {
+     	datatype => 'int',
+     	base_name => 'RowCount',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'row_height' => {
+     	datatype => 'double',
+     	base_name => 'RowHeight',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'worksheet' => {
+     	datatype => 'string',
+     	base_name => 'Worksheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'column_count' => 'int',
-    'row_height' => 'double',
-    'name' => 'string',
-    'first_column' => 'int',
     'column_width' => 'double',
+    'first_column' => 'int',
+    'first_row' => 'int',
+    'name' => 'string',
     'refers_to' => 'string',
     'row_count' => 'int',
-    'first_row' => 'int',
-    'worksheet' => 'string'
+    'row_height' => 'double',
+    'worksheet' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
     'column_count' => 'ColumnCount',
-    'row_height' => 'RowHeight',
-    'name' => 'Name',
-    'first_column' => 'FirstColumn',
     'column_width' => 'ColumnWidth',
+    'first_column' => 'FirstColumn',
+    'first_row' => 'FirstRow',
+    'name' => 'Name',
     'refers_to' => 'RefersTo',
     'row_count' => 'RowCount',
-    'first_row' => 'FirstRow',
-    'worksheet' => 'Worksheet'
+    'row_height' => 'RowHeight',
+    'worksheet' => 'Worksheet' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

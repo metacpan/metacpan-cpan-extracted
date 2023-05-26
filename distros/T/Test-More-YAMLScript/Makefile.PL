@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -19,27 +19,27 @@ my %WriteMakefileArgs = (
     "bin/test-more-yamlscript"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Test::More::YAMLScript",
   "PREREQ_PM" => {
-    "Mo" => "0.40",
-    "Mo::xxx" => "0.13",
+    "Lingy" => "v0.1.7",
     "Test::Simple" => "1.302191",
     "XXX" => "0.38",
-    "YAMLScript" => "v0.0.15"
+    "YAML::PP" => "0.036",
+    "YAMLScript" => "v0.1.1"
   },
-  "VERSION" => "0.0.5",
+  "VERSION" => "0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Mo" => "0.40",
-  "Mo::xxx" => "0.13",
+  "Lingy" => "0.1.7",
   "Test::Simple" => "1.302191",
   "XXX" => "0.38",
-  "YAMLScript" => "0.0.15"
+  "YAML::PP" => "0.036",
+  "YAMLScript" => "0.1.1"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

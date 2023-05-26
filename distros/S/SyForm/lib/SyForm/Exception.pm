@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::Exception::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: SyForm base exception class
-$SyForm::Exception::VERSION = '0.102';
+$SyForm::Exception::VERSION = '0.103';
 use Moo;
 extends 'Throwable::Error';
 
@@ -31,7 +31,7 @@ SyForm::Exception - SyForm base exception class
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

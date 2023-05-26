@@ -361,7 +361,7 @@ subtest "List" => sub {
 #----------------------------------------------------------------------
 
 subtest "Struct" => sub {
-  plan tests => 20;
+  plan tests => 22;
 
   $dom = Struct;
   ok(!$dom->inspect({}), "Struct ok");
@@ -392,6 +392,9 @@ subtest "Struct" => sub {
   ok($dom->inspect({int => 3, foo => 4}), "Struct foo");
   ok($dom->inspect({int => 3, other => 4}), "Struct other");
 
+  my $msg = $dom->inspect({int => 'WRONG_VAL', foo => 4, bar => 5});
+  like($msg->{int} ,     qr/invalid number/, "Struct wrong field with also excluded fields");
+  like($msg->{-exclude}, qr/'bar', 'foo'/,   "Struct several excluded fields");
 
   $dom = Struct(-keys   => List(-all => String(qr/^[abc]/)),
                 -values => List(-any => Int));

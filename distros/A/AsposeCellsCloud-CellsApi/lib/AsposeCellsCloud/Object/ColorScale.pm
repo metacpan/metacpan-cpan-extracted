@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ColorScale;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Color;
-use AsposeCellsCloud::Object::ConditionalFormattingValue;
+use AsposeCellsCloud::Object::ConditionalFormattingValue; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,73 +119,73 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Describe the ColorScale conditional formatting rule. This conditional formatting    rule creates a gradated color scale on the cells.             ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'ColorScale',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'max_cfvo' => {
-    	datatype => 'ConditionalFormattingValue',
-    	base_name => 'MaxCfvo',
-    	description => 'Get or set this ColorScale&#39;s max value object.  Cannot set null or CFValueObject     with type FormatConditionValueType.Min to it.',
-    	format => '',
-    	read_only => '',
-    		},
-    'mid_color' => {
-    	datatype => 'Color',
-    	base_name => 'MidColor',
-    	description => 'Get or set the mid value object&#39;s corresponding color.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'min_color' => {
-    	datatype => 'Color',
-    	base_name => 'MinColor',
-    	description => 'Get or set the min value object&#39;s corresponding color.',
-    	format => '',
-    	read_only => '',
-    		},
-    'mid_cfvo' => {
-    	datatype => 'ConditionalFormattingValue',
-    	base_name => 'MidCfvo',
-    	description => 'Get or set this ColorScale&#39;s mid value object.  Cannot set CFValueObject    with type FormatConditionValueType.Max or FormatConditionValueType.Min to    it.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'min_cfvo' => {
-    	datatype => 'ConditionalFormattingValue',
-    	base_name => 'MinCfvo',
-    	description => 'Get or set this ColorScale&#39;s min value object.  Cannot set null or CFValueObject    with type FormatConditionValueType.Max to it.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'max_color' => {
-    	datatype => 'Color',
-    	base_name => 'MaxColor',
-    	description => 'Get or set the max value object&#39;s corresponding color.',
-    	format => '',
-    	read_only => '',
-    		},
+     'max_cfvo' => {
+     	datatype => 'ConditionalFormattingValue',
+     	base_name => 'MaxCfvo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'max_color' => {
+     	datatype => 'Color',
+     	base_name => 'MaxColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'mid_cfvo' => {
+     	datatype => 'ConditionalFormattingValue',
+     	base_name => 'MidCfvo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'mid_color' => {
+     	datatype => 'Color',
+     	base_name => 'MidColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'min_cfvo' => {
+     	datatype => 'ConditionalFormattingValue',
+     	base_name => 'MinCfvo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'min_color' => {
+     	datatype => 'Color',
+     	base_name => 'MinColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'max_cfvo' => 'ConditionalFormattingValue',
-    'mid_color' => 'Color',
-    'min_color' => 'Color',
+    'max_color' => 'Color',
     'mid_cfvo' => 'ConditionalFormattingValue',
+    'mid_color' => 'Color',
     'min_cfvo' => 'ConditionalFormattingValue',
-    'max_color' => 'Color'
+    'min_color' => 'Color' 
 } );
 
 __PACKAGE__->attribute_map( {
     'max_cfvo' => 'MaxCfvo',
-    'mid_color' => 'MidColor',
-    'min_color' => 'MinColor',
+    'max_color' => 'MaxColor',
     'mid_cfvo' => 'MidCfvo',
+    'mid_color' => 'MidColor',
     'min_cfvo' => 'MinCfvo',
-    'max_color' => 'MaxColor'
+    'min_color' => 'MinColor' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

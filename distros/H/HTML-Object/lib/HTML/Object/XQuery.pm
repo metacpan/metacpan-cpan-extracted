@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2022/09/18
+## Modified 2023/05/18
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
     our $DEBUG = 0;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -667,6 +667,7 @@ sub detach
             my $pos = $parent->children->pos( $e );
             $parent->children->splice( $pos, 1 );
             $e->parent( undef() );
+            $parent->reset(1);
         });
     }
     # otherwise, process this one element individually
@@ -679,6 +680,7 @@ sub detach
         {
             $parent->children->splice( $pos, 1 );
             $self->parent( undef() );
+            $parent->reset(1);
         }
     }
     return( $self );

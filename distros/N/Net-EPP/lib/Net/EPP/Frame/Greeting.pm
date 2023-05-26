@@ -1,10 +1,9 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Greeting.pm,v 1.3 2011/12/03 11:44:51 gavin Exp $
 package Net::EPP::Frame::Greeting;
 use base qw(Net::EPP::Frame);
+
+1;
+
+__END__
 
 =pod
 
@@ -79,25 +78,4 @@ sub svDate { $_[0]->getNode('svDate') }
 sub svcMenu { $_[0]->getNode('svcMenu') }
 sub dcp { $_[0]->getNode('dcp') }
 
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
 =cut
-
-1;

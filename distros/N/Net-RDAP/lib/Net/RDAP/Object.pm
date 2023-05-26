@@ -26,11 +26,11 @@ available to that module.
 # object was loaded from
 #
 sub new {
-	my ($package, $args, $url) = @_;
+    my ($package, $args, $url) = @_;
 
-	my $self = $package->SUPER::new($args);
+    my $self = $package->SUPER::new($args);
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -39,7 +39,7 @@ sub new {
 
 =head2 RDAP Conformance
 
-	@conformance = $response->conformance;
+    @conformance = $response->conformance;
 
 Returns an array of strings, each providing a hint as to the
 specifications used (by the server) in the construction of the response.
@@ -50,15 +50,15 @@ in a response.
 =cut
 
 sub conformance {
-	my $self = shift;
-	return @{$self->{'rdapConformance'}};
+    my $self = shift;
+    return @{$self->{'rdapConformance'}};
 }
 
 =pod
 
 =head2 Notices
 
-	@notices = $response->notices;
+    @notices = $response->notices;
 
 Returns a (potentially empty) array of L<Net::RDAP::Notice> objects.
 
@@ -73,7 +73,7 @@ sub notices { $_[0]->objects('Net::RDAP::Notice', $_[0]->{'notices'}) }
 
 =head2 Object Class
 
-	$class = $object->class;
+    $class = $object->class;
 
 Returns a string containing the "class name" of this object (i.e., one
 of: C<ip network>, C<entity>, C<nameserver>, C<autnum> or C<domain>).
@@ -86,7 +86,7 @@ sub class { $_[0]->{'objectClassName'} }
 
 =head2 Handle
 
-	$handle = $object->handle;
+    $handle = $object->handle;
 
 Returns a string containing the "handle" of the object.
 
@@ -98,7 +98,7 @@ sub handle { $_[0]->{'handle'} }
 
 =head2 Status
 
-	@status = $object->status;
+    @status = $object->status;
 
 Returns a (potentially empty) array of state identifiers. The possible
 values are defined by bn IANA registry; see:
@@ -117,7 +117,7 @@ sub status { $_[0]->{'status'} ? @{$_[0]->{'status'}} : () }
 
 =head2 Remarks
 
-	@remarks = $object->remarks;
+    @remarks = $object->remarks;
 
 Returns a (potentially empty) array of L<Net::RDAP::Remark> objects.
 
@@ -129,7 +129,7 @@ sub remarks { $_[0]->objects('Net::RDAP::Remark', $_[0]->{'remarks'}) }
 
 =head2 Events
 
-	@events = $object->events;
+    @events = $object->events;
 
 Returns a (potentially empty) array of L<Net::RDAP::Event> objects.
 
@@ -141,7 +141,7 @@ sub events { $_[0]->objects('Net::RDAP::Event', $_[0]->{'events'}) }
 
 =head2 Port-43 Whois Server
 
-	$port43 = $object->port43;
+    $port43 = $object->port43;
 
 Returns a L<Net::DNS::Domain> object containing the name of the
 legacy port-43 whois server for this object.
@@ -154,7 +154,7 @@ sub port43 { $_[0]->{'port43'} }
 
 =head2 Public IDs
 
-	@ids = $object->ids;
+    @ids = $object->ids;
 
 Returns a (potentially empty) array of L<Net::RDAP::ID> objects.
 
@@ -166,7 +166,7 @@ sub ids { $_[0]->objects('Net::RDAP::ID', $_[0]->{'publicIds'}) }
 
 =head2 Entities
 
-	@entities = $object->entities;
+    @entities = $object->entities;
 
 Returns a (potentially empty) array of L<Net::RDAP::Object::Entity> objects.
 
@@ -178,7 +178,7 @@ sub entities { $_[0]->objects('Net::RDAP::Object::Entity', $_[0]->{'entities'}) 
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

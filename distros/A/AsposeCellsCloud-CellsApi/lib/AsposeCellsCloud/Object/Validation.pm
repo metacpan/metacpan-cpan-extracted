@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Validation;
 
 require 5.6.0;
@@ -36,10 +35,10 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::CellArea;
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::LinkElement; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -55,12 +54,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -101,7 +100,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -109,7 +108,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -121,172 +120,172 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Validation',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'formula2' => {
-    	datatype => 'string',
-    	base_name => 'Formula2',
-    	description => 'Represents the value or expression associated with the second part of the    data validation.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'formula1' => {
-    	datatype => 'string',
-    	base_name => 'Formula1',
-    	description => 'Represents the value or expression associated with the data validation.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_error' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowError',
-    	description => 'Indicates whether the data validation error message will be displayed whenever    the user enters invalid data.',
-    	format => '',
-    	read_only => '',
-    		},
-    'error_message' => {
-    	datatype => 'string',
-    	base_name => 'ErrorMessage',
-    	description => 'Represents the data validation error message.',
-    	format => '',
-    	read_only => '',
-    		},
-    'in_cell_drop_down' => {
-    	datatype => 'boolean',
-    	base_name => 'InCellDropDown',
-    	description => 'Indicates whether data validation displays a drop-down list that contains    acceptable values.',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_input' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowInput',
-    	description => 'Indicates whether the data validation input message will be displayed whenever    the user selects a cell in the data validation range.',
-    	format => '',
-    	read_only => '',
-    		},
-    'alert_style' => {
-    	datatype => 'string',
-    	base_name => 'AlertStyle',
-    	description => 'Represents the validation alert style.Information,Stop,Warning             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'input_title' => {
-    	datatype => 'string',
-    	base_name => 'InputTitle',
-    	description => 'Represents the title of the data-validation input dialog box.',
-    	format => '',
-    	read_only => '',
-    		},
-    'ignore_blank' => {
-    	datatype => 'boolean',
-    	base_name => 'IgnoreBlank',
-    	description => 'Indicates whether blank values are permitted by the range data validation.',
-    	format => '',
-    	read_only => '',
-    		},
-    'value2' => {
-    	datatype => 'string',
-    	base_name => 'Value2',
-    	description => 'Represents the first value associated with the data validation.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'value1' => {
-    	datatype => 'string',
-    	base_name => 'Value1',
-    	description => 'Represents the first value associated with the data validation.',
-    	format => '',
-    	read_only => '',
-    		},
-    'operator' => {
-    	datatype => 'string',
-    	base_name => 'Operator',
-    	description => 'Represents the operator for the data validation. Between,Equal,GreaterThan,GreaterOrEqual,LessThan,LessOrEqual,None,NotBetween,NotEqual',
-    	format => '',
-    	read_only => '',
-    		},
-    'error_title' => {
-    	datatype => 'string',
-    	base_name => 'ErrorTitle',
-    	description => 'Represents the title of the data-validation error dialog box.',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => 'Represents the data validation type. AnyValue ,WholeNumber,Decimal,List,Date,Time,TextLength,Custom             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'input_message' => {
-    	datatype => 'string',
-    	base_name => 'InputMessage',
-    	description => 'Represents the data validation input message.',
-    	format => '',
-    	read_only => '',
-    		},
-    'area_list' => {
-    	datatype => 'ARRAY[CellArea]',
-    	base_name => 'AreaList',
-    	description => 'Represents a collection of Aspose.Cells.CellArea which contains the data     validation settings.',
-    	format => '',
-    	read_only => '',
-    		},
+     'alert_style' => {
+     	datatype => 'string',
+     	base_name => 'AlertStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'area_list' => {
+     	datatype => 'ARRAY[CellArea]',
+     	base_name => 'AreaList',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'error_message' => {
+     	datatype => 'string',
+     	base_name => 'ErrorMessage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'error_title' => {
+     	datatype => 'string',
+     	base_name => 'ErrorTitle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'formula1' => {
+     	datatype => 'string',
+     	base_name => 'Formula1',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'formula2' => {
+     	datatype => 'string',
+     	base_name => 'Formula2',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'ignore_blank' => {
+     	datatype => 'boolean',
+     	base_name => 'IgnoreBlank',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'in_cell_drop_down' => {
+     	datatype => 'boolean',
+     	base_name => 'InCellDropDown',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'input_message' => {
+     	datatype => 'string',
+     	base_name => 'InputMessage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'input_title' => {
+     	datatype => 'string',
+     	base_name => 'InputTitle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'operator' => {
+     	datatype => 'string',
+     	base_name => 'Operator',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_error' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowError',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_input' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowInput',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'value1' => {
+     	datatype => 'string',
+     	base_name => 'Value1',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'value2' => {
+     	datatype => 'string',
+     	base_name => 'Value2',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
-    'formula2' => 'string',
-    'formula1' => 'string',
-    'show_error' => 'boolean',
-    'error_message' => 'string',
-    'in_cell_drop_down' => 'boolean',
-    'show_input' => 'boolean',
     'alert_style' => 'string',
-    'input_title' => 'string',
-    'ignore_blank' => 'boolean',
-    'value2' => 'string',
-    'value1' => 'string',
-    'operator' => 'string',
+    'area_list' => 'ARRAY[CellArea]',
+    'error_message' => 'string',
     'error_title' => 'string',
-    'type' => 'string',
+    'formula1' => 'string',
+    'formula2' => 'string',
+    'ignore_blank' => 'boolean',
+    'in_cell_drop_down' => 'boolean',
     'input_message' => 'string',
-    'area_list' => 'ARRAY[CellArea]'
+    'input_title' => 'string',
+    'operator' => 'string',
+    'show_error' => 'boolean',
+    'show_input' => 'boolean',
+    'type' => 'string',
+    'value1' => 'string',
+    'value2' => 'string',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
-    'formula2' => 'Formula2',
-    'formula1' => 'Formula1',
-    'show_error' => 'ShowError',
-    'error_message' => 'ErrorMessage',
-    'in_cell_drop_down' => 'InCellDropDown',
-    'show_input' => 'ShowInput',
     'alert_style' => 'AlertStyle',
-    'input_title' => 'InputTitle',
-    'ignore_blank' => 'IgnoreBlank',
-    'value2' => 'Value2',
-    'value1' => 'Value1',
-    'operator' => 'Operator',
+    'area_list' => 'AreaList',
+    'error_message' => 'ErrorMessage',
     'error_title' => 'ErrorTitle',
-    'type' => 'Type',
+    'formula1' => 'Formula1',
+    'formula2' => 'Formula2',
+    'ignore_blank' => 'IgnoreBlank',
+    'in_cell_drop_down' => 'InCellDropDown',
     'input_message' => 'InputMessage',
-    'area_list' => 'AreaList'
+    'input_title' => 'InputTitle',
+    'operator' => 'Operator',
+    'show_error' => 'ShowError',
+    'show_input' => 'ShowInput',
+    'type' => 'Type',
+    'value1' => 'Value1',
+    'value2' => 'Value2',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

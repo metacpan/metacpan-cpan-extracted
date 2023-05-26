@@ -2,9 +2,9 @@ package Net::RDAP::SearchResult;
 use base qw(Net::RDAP::Object);
 use strict;
 
-sub domains	{ $_[0]->objects('Net::RDAP::Object::Domain',		$_[0]->{'domainSearchResults'})		}
-sub nameservers	{ $_[0]->objects('Net::RDAP::Object::Nameserver',	$_[0]->{'nameserverSearchResults'})	}
-sub entities	{ $_[0]->objects('Net::RDAP::Object::Entity',		$_[0]->{'entitySearchResults'})		}
+sub domains     { $_[0]->objects('Net::RDAP::Object::Domain',        $_[0]->{'domainSearchResults'})        }
+sub nameservers { $_[0]->objects('Net::RDAP::Object::Nameserver',    $_[0]->{'nameserverSearchResults'})    }
+sub entities    { $_[0]->objects('Net::RDAP::Object::Entity',        $_[0]->{'entitySearchResults'})        }
 
 1;
 
@@ -25,24 +25,24 @@ access to all that module's methods.
 
 Other methods include:
 
-	$result->domains;
+    $result->domains;
 
 Returns an array of L<Net::RDAP::Object::Domain> objects which matched
 the search parameters.
 
-	$result->nameservers;
+    $result->nameservers;
 
 Returns an array of L<Net::RDAP::Object::Nameserver> objects which matched
 the search parameters.
 
-	$result->entities;
+    $result->entities;
 
 Returns an array of L<Net::RDAP::Object::Entities> objects which matched
 the search parameters.
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

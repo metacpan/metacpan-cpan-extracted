@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2021 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::ConvertWorksheetTaskParameter;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::FileSource;
-use AsposeCellsCloud::Object::TaskParameter;
+use AsposeCellsCloud::Object::TaskParameter; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,69 +119,69 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'ConvertWorksheetTaskParameter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'workbook' => {
-    	datatype => 'FileSource',
-    	base_name => 'Workbook',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'sheet' => {
-    	datatype => 'string',
-    	base_name => 'Sheet',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'target' => {
-    	datatype => 'FileSource',
-    	base_name => 'Target',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'format' => {
-    	datatype => 'string',
-    	base_name => 'Format',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'area' => {
-    	datatype => 'string',
-    	base_name => 'Area',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'page_index' => {
-    	datatype => 'int',
-    	base_name => 'PageIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_resolution' => {
-    	datatype => 'int',
-    	base_name => 'VerticalResolution',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'horizontal_resolution' => {
-    	datatype => 'int',
-    	base_name => 'HorizontalResolution',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'workbook' => {
+     	datatype => 'FileSource',
+     	base_name => 'Workbook',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sheet' => {
+     	datatype => 'string',
+     	base_name => 'Sheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'target' => {
+     	datatype => 'FileSource',
+     	base_name => 'Target',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'format' => {
+     	datatype => 'string',
+     	base_name => 'Format',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'area' => {
+     	datatype => 'string',
+     	base_name => 'Area',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_index' => {
+     	datatype => 'int',
+     	base_name => 'PageIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_resolution' => {
+     	datatype => 'int',
+     	base_name => 'VerticalResolution',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'horizontal_resolution' => {
+     	datatype => 'int',
+     	base_name => 'HorizontalResolution',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
@@ -193,7 +192,7 @@ __PACKAGE__->swagger_types( {
     'area' => 'string',
     'page_index' => 'int',
     'vertical_resolution' => 'int',
-    'horizontal_resolution' => 'int'
+    'horizontal_resolution' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -204,7 +203,7 @@ __PACKAGE__->attribute_map( {
     'area' => 'Area',
     'page_index' => 'PageIndex',
     'vertical_resolution' => 'VerticalResolution',
-    'horizontal_resolution' => 'HorizontalResolution'
+    'horizontal_resolution' => 'HorizontalResolution' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

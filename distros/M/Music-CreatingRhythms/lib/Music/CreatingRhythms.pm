@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Combinatorial algorithms to generate rhythms
 
-our $VERSION = '0.0700';
+our $VERSION = '0.0802';
 
 use Moo;
 use strictures 2;
@@ -11,10 +11,13 @@ use Algorithm::Combinatorics qw(permutations);
 use Data::Munge qw(list2re);
 use Integer::Partition ();
 use List::Util qw(all any);
-use Music::CreatingRhythms::SqrtContinued ();
 use Math::Sequence::DeBruijn qw(debruijn);
+use Module::Load::Conditional qw(check_install);
 use Music::AtonalUtil ();
 use namespace::clean;
+
+use if defined check_install(module => 'Math::NumSeq::SqrtContinued'),
+    'Math::NumSeq::SqrtContinued';
 
 
 has verbose => (
@@ -62,13 +65,14 @@ sub cfcv {
 sub cfsqrt {
     my ($self, $n, $m) = @_;
     $m ||= $n;
-    my $seq = Music::CreatingRhythms::SqrtContinued->new(
-        sqrt  => $n,
-        terms => $m,
-    );
-    my $terms = $seq->get_seq;
-    warn "OEIS terms less than $m!\n" if @$terms < $m;
-    return $terms;
+    my @terms;
+
+    my $seq = Math::NumSeq::SqrtContinued->new(sqrt => $n);
+    for my $i (1 .. $m) {
+        my ($j, $value) = $seq->next;
+        push @terms, $value;
+    }
+    return \@terms;
 }
 
 
@@ -598,7 +602,7 @@ Music::CreatingRhythms - Combinatorial algorithms to generate rhythms
 
 =head1 VERSION
 
-version 0.0700
+version 0.0802
 
 =head1 SYNOPSIS
 

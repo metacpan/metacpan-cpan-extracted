@@ -1,6 +1,9 @@
-Revision history for App-osnames
+0.101   2023-02-24  Released-By: PERLANCAR; Urgency: medium
 
-0.10    2015-09-15 (PERLANCAR)
+        - Adjust to Perinci::Sub::Gen::AccessTable 0.592.
+
+
+0.100   2015-09-15  Released-By: PERLANCAR
 
 	- [ux] Allow displaying result as text table under
 	  Perinci::CmdLine::Lite, by converting tags to comma-separated
@@ -9,7 +12,7 @@ Revision history for App-osnames
 	- [ux] Change -V to -l (mnemonic: ls -l).
 
 
-0.09    2015-09-03 (PERLANCAR)
+0.09    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -18,31 +21,31 @@ Revision history for App-osnames
 	  requirement.
 
 
-0.08    2015-07-01 (PERLANCAR)
+0.08    2015-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to Perinci::Sub::Gen::AccessTable 0.46.
 
 
-0.07    2014-12-18 (PERLANCAR)
+0.07    2014-12-18  Released-By: PERLANCAR
 
 	- Split data to Perl-osnames.
 
 
-0.06    2014-12-18 (PERLANCAR)
+0.06    2014-12-18  Released-By: PERLANCAR
 
 	- Add tag: posix, document the tags.
 
 
-0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.05     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.04     2014-07-22 (SHARYANTO)
+0.04     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -50,14 +53,14 @@ Revision history for App-osnames
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.03    2013-10-26 (SHARYANTO)
+0.03    2013-10-26  Released-By: SHARYANTO
 
         - Allow specifying query in first argument.
 
         - Add examples.
 
 
-0.02    2013-09-12 (SHARYANTO)
+0.02    2013-09-12  Released-By: SHARYANTO
 
         - Add -V alias for --detail for convenience.
 
@@ -65,6 +68,6 @@ Revision history for App-osnames
           column order.
 
 
-0.01    2013-09-11 (SHARYANTO)
+0.01    2013-09-11  Released-By: SHARYANTO
 
         - First release.

@@ -30,7 +30,7 @@ rename-add-prefix - Add prefix to filenames
 
 =head1 VERSION
 
-This document describes version 0.007 of rename-add-prefix (from Perl distribution App-FileRenameUtils), released on 2023-02-27.
+This document describes version 0.009 of rename-add-prefix (from Perl distribution App-FileRenameUtils), released on 2023-03-02.
 
 =head1 SYNOPSIS
 

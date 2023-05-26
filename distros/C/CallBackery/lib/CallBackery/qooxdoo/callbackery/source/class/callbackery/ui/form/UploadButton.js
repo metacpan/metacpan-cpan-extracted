@@ -10,10 +10,6 @@ qx.Class.define("callbackery.ui.form.UploadButton", {
         nullable: true,
         apply : "_applyAttribute"
       },
-      capture: {
-        nullable: true,
-        apply : "_applyAttribute"
-      },
       multiple: {
         nullable: true,
         apply : "_applyAttribute"

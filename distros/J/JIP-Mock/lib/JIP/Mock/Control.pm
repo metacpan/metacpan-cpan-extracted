@@ -9,7 +9,7 @@ use Scalar::Util qw(reftype blessed);
 
 use JIP::Mock::Event;
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.0.4';
 
 sub new {
     my ( $class, %param ) = @ARG;
@@ -101,6 +101,20 @@ sub call_original {
         return $result;
     }
 } ## end sub call_original
+
+sub called {
+    my ($self) = @ARG;
+
+    return 1 if keys %{ $self->times() };
+    return 0;
+}
+
+sub not_called {
+    my ($self) = @ARG;
+
+    return 1 if !$self->called();
+    return 0;
+}
 
 sub DESTROY {
     my ($self) = @ARG;
@@ -396,7 +410,7 @@ JIP::Mock::Control - Override subroutines in a module
 
 =head1 VERSION
 
-This document describes L<JIP::Mock::Control> version C<v0.0.3>.
+This document describes L<JIP::Mock::Control> version C<v0.0.4>.
 
 =head1 SYNOPSIS
 
@@ -562,6 +576,18 @@ Temporarily replaces one or more subroutines in the mocked module.
     $control->call_original( 'name', @arguments );
 
 Calls the original (unmocked) subroutine.
+
+=head2 called
+
+    $bool = $control->called();
+
+Returns true if C<times> returns non-empty hash.
+
+=head2 not_called
+
+    $bool = $control->not_called();
+
+Returns true if C<times> returns an empty hash.
 
 =head1 DIAGNOSTICS
 

@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class IO::Socket extends IO::Handle {
   use Sys::Socket;
   use Sys::Socket::Constant as SOCKET;
@@ -87,7 +90,10 @@ class IO::Socket extends IO::Handle {
     my $restore_blocking_at_end_of_scope : Scope::Guard = undef;
     if ($timeout > 0) {
       my $this = $self;
-      $restore_blocking_at_end_of_scope = Scope::Guard->new([$this : IO::Socket,  $old_blocking_flag : int] method : void () {
+      $restore_blocking_at_end_of_scope = Scope::Guard->new([has this : IO::Socket = $this,  has old_blocking_flag : int = $old_blocking_flag] method : void () {
+        my $this = $self->{this};
+        my $old_blocking_flag = $self->{old_blocking_flag};
+        
         $this->blocking($old_blocking_flag);
         $this->set_blocking_flag($old_blocking_flag);
       });

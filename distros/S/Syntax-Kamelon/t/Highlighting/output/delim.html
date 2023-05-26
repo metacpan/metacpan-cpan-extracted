@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="defaultstyle.css" type="text/css">
+<title>Testfile delim</title>
+</head>
+<body>
+<font class="Normal">Testing&nbsp;deliminators</font></br>
+</br>
+<font class="Keyword">&lt;WordDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;strong&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;WordDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;weak&quot;</font><font class="Others">&nbsp;weakDeliminator=</font><font class="String">&quot;.&quot;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;WordDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;TheX&quot;</font><font class="Others">&nbsp;additionalDeliminator=</font><font class="String">&quot;x&quot;</font><font class="Keyword">/&gt;</font></br>
+</br>
+<font class="Others">&lt;Word&gt;</font></br>
+<font class="Others">This&nbsp;is&nbsp;</font><font class="DataType">strong</font><font class="Others">.&nbsp;</font><font class="Comment">#Match,&nbsp;the&nbsp;dot&nbsp;is&nbsp;a&nbsp;deliminator</font></br>
+<font class="Others">This&nbsp;is&nbsp;weak.&nbsp;</font><font class="Comment">#No&nbsp;match,&nbsp;the&nbsp;dot&nbsp;is&nbsp;not&nbsp;a&nbsp;deliminator</font></br>
+<font class="Others">This&nbsp;is&nbsp;x</font><font class="DataType">TheX</font><font class="Others">.&nbsp;</font><font class="Comment">#Match,&nbsp;x&nbsp;is&nbsp;an&nbsp;additionalDeliminator</font></br>
+<font class="Others">A&nbsp;color&nbsp;</font><font class="DataType">green</font><font class="Others">.&nbsp;</font><font class="Comment">#Match,&nbsp;the&nbsp;dot&nbsp;is&nbsp;a&nbsp;deliminator</font></br>
+<font class="Others">A&nbsp;unit&nbsp;ampere.&nbsp;</font><font class="Comment">#No&nbsp;match,&nbsp;the&nbsp;dot&nbsp;is&nbsp;not&nbsp;a&nbsp;deliminator</font></br>
+<font class="Others">An&nbsp;element&nbsp;x</font><font class="DataType">water</font><font class="Others">.&nbsp;</font><font class="Comment">#Match,&nbsp;x&nbsp;is&nbsp;an&nbsp;additionalDeliminator</font></br>
+<font class="Others">&lt;Word&gt;</font></br>
+</br>
+<font class="Keyword">&lt;HlOct</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;additionalDeliminator=</font><font class="String">&quot;.&quot;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;HlHex</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;weakDeliminator=</font><font class="String">&quot;:&quot;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;Int</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+</br>
+<font class="Others">&lt;Number&gt;</font></br>
+<font class="Others">.456&nbsp;</font><font class="Comment">#No&nbsp;match,&nbsp;the&nbsp;dot&nbsp;is&nbsp;not&nbsp;a&nbsp;deliminator</font></br>
+<font class="Others">.</font><font class="DataType">073</font><font class="Others">&nbsp;</font><font class="Comment">#Match,&nbsp;the&nbsp;dot&nbsp;is&nbsp;an&nbsp;additionalDeliminator</font></br>
+<font class="Others">:</font><font class="DataType">0</font><font class="Others">xFF&nbsp;</font><font class="Comment">#No&nbsp;match,&nbsp;the&nbsp;colon&nbsp;is&nbsp;a&nbsp;weakDeliminator</font></br>
+<font class="Others">&lt;Number&gt;</font></br>
+</br>
+</br>
+</br>
+</body>
+</html>

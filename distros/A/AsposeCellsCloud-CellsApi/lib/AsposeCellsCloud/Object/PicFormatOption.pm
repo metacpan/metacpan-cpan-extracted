@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::PicFormatOption;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,73 +118,73 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'PicFormatOption',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'right' => {
-    	datatype => 'double',
-    	base_name => 'Right',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'bottom' => {
-    	datatype => 'double',
-    	base_name => 'Bottom',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'top' => {
-    	datatype => 'double',
-    	base_name => 'Top',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'scale' => {
-    	datatype => 'double',
-    	base_name => 'Scale',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'Type',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'left' => {
-    	datatype => 'double',
-    	base_name => 'Left',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'Type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'scale' => {
+     	datatype => 'double',
+     	base_name => 'Scale',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'left' => {
+     	datatype => 'double',
+     	base_name => 'Left',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'right' => {
+     	datatype => 'double',
+     	base_name => 'Right',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'top' => {
+     	datatype => 'double',
+     	base_name => 'Top',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'bottom' => {
+     	datatype => 'double',
+     	base_name => 'Bottom',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'right' => 'double',
-    'bottom' => 'double',
-    'top' => 'double',
-    'scale' => 'double',
     'type' => 'string',
-    'left' => 'double'
+    'scale' => 'double',
+    'left' => 'double',
+    'right' => 'double',
+    'top' => 'double',
+    'bottom' => 'double' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'right' => 'Right',
-    'bottom' => 'Bottom',
-    'top' => 'Top',
-    'scale' => 'Scale',
     'type' => 'Type',
-    'left' => 'Left'
+    'scale' => 'Scale',
+    'left' => 'Left',
+    'right' => 'Right',
+    'top' => 'Top',
+    'bottom' => 'Bottom' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

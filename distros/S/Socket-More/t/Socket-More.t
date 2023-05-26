@@ -78,10 +78,18 @@ use Socket::More ":all";
 			port=>[0,10,12]
 		});
 
+	#Should give same results. Not the partial name for family types
+	my @results_family_string=Socket::More::sockaddr_passive( {
+			family=>[qw(AF_INET INET6 UNIX)],
+			path=>["asdf", "path2"],
+			port=>[0,10,12]
+		});
+
 	#ok cmp_deeply(\@results, \@results_family),"Family ok";
 	ok cmp_data(\@results, \@results_family)==0,"Family ok";
 	#ok cmp_deeply(\@results, \@results_family_interface),"Family  and interface ok";
 	ok cmp_data(\@results, \@results_family_interface)==0,"Family  and interface ok";
+	ok cmp_data(\@results, \@results_family_string)==0,"Family ok";
 
 }
 
@@ -155,7 +163,6 @@ use Socket::More ":all";
 	#Command line argument string parsing
 	my @spec=parse_passive_spec("interface=eth0, family=INET\$,type=STREAM");
 	ok @spec==1, "Parsed ok";
-
 	ok cmp_data($spec[0]{family},[AF_INET])==0, "Family match ok";
 	ok cmp_data($spec[0]{type},[SOCK_STREAM])==0, "Type match ok";
 
@@ -193,7 +200,7 @@ use Socket::More ":all";
 	ok $results[0]{address} eq "127.0.0.1", "localhost";
 
 
-	IPV6_LOCALHOST: {
+  SKIP:{
 		skip "No IPv6 Interfaces", 2 unless (has_IPv6_interface);
 		#Only test this if we know the system has at least one ipv6 address.
 		@results=Socket::More::sockaddr_passive( {address=>"localhost", port=>0, family=>AF_INET6, type=>SOCK_DGRAM});
@@ -223,7 +230,7 @@ use Socket::More ":all";
   for my $r (@results){
     ok ((defined($r->{port}) and $r->{port}!=0), "port reified");
     if(defined($prev)){
-        ok ($prev==$r->{port}), "Ports are the same";     
+        ok $prev==$r->{port}, "Ports are the same";     
         $prev=$r->{port};
     }
 
@@ -245,7 +252,7 @@ use Socket::More ":all";
     if(defined($prev)){
 
         #NOTE: This is likely to work.. but no guarentee that port numbers will be different accross interfaces
-        ok ($prev!=$r->{port}), "Port different";     
+        ok $prev!=$r->{port}, "Ports different";     
         $prev=$r->{port};
     }
 

@@ -1,3 +1,17 @@
+0.46.1 2023-05-23 12:12:33 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - resync branches
+
+0.46.0 2023-05-23 12:05:29 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - the methodes 'show' and 'hide' clash with the attributes 
+   'show' and 'hide' of the underlying atom class. Replaced them with 
+   'manifest' and 'vanish'.
+
+ - the upload button tried to overwrite the capture attribute.
+
+ - these changes are necessary to make callbackery work with qx8
+
 0.45.1 2023-05-08 10:52:48 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Reload CardList on action response

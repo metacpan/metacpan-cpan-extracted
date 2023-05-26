@@ -117,7 +117,7 @@ manual-T-IV-freq.pl - Complex example of custom sweep without Sweep framework
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 COPYRIGHT AND LICENSE
 

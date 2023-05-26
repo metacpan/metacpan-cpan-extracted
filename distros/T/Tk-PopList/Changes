@@ -15,4 +15,8 @@ Revision history for Perl extension Tk::PopList.
 0.03  Sun Mar 12 2023
 	-fixed documentation
 	-relaxed the filter a bit
-	-modified config specs of TopList
+	-modified config specs of PopList
+
+0.04  Sun May 21 2023
+	-added quotemeta to filter
+	-modified configspecs for -background and -foreground.

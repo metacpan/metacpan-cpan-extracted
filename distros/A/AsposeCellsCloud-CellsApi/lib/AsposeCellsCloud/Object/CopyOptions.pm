@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::CopyOptions;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,73 +118,73 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Represents the copy options.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'CopyOptions',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'refer_to_destination_sheet' => {
-    	datatype => 'boolean',
-    	base_name => 'ReferToDestinationSheet',
-    	description => 'When copying the range in the same file and the chart refers to the source sheet,   False means the copied chart&#39;s data source will not be changed. True means the   copied chart&#39;s data source refers to the destination sheet.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'copy_names' => {
-    	datatype => 'boolean',
-    	base_name => 'CopyNames',
-    	description => 'Indicates whether copying the names.',
-    	format => '',
-    	read_only => '',
-    		},
-    'refer_to_sheet_with_same_name' => {
-    	datatype => 'boolean',
-    	base_name => 'ReferToSheetWithSameName',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'column_character_width' => {
-    	datatype => 'boolean',
-    	base_name => 'ColumnCharacterWidth',
-    	description => 'Indicates whether copying column width in unit of characters.',
-    	format => '',
-    	read_only => '',
-    		},
-    'copy_invalid_formulas_as_values' => {
-    	datatype => 'boolean',
-    	base_name => 'CopyInvalidFormulasAsValues',
-    	description => 'If the formula is not valid for the dest destination, only copy values.',
-    	format => '',
-    	read_only => '',
-    		},
-    'extend_to_adjacent_range' => {
-    	datatype => 'boolean',
-    	base_name => 'ExtendToAdjacentRange',
-    	description => 'Indicates whether extend ranges when copying the range to adjacent range.',
-    	format => '',
-    	read_only => '',
-    		},
+     'column_character_width' => {
+     	datatype => 'boolean',
+     	base_name => 'ColumnCharacterWidth',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'copy_invalid_formulas_as_values' => {
+     	datatype => 'boolean',
+     	base_name => 'CopyInvalidFormulasAsValues',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'copy_names' => {
+     	datatype => 'boolean',
+     	base_name => 'CopyNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'extend_to_adjacent_range' => {
+     	datatype => 'boolean',
+     	base_name => 'ExtendToAdjacentRange',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refer_to_destination_sheet' => {
+     	datatype => 'boolean',
+     	base_name => 'ReferToDestinationSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'refer_to_sheet_with_same_name' => {
+     	datatype => 'boolean',
+     	base_name => 'ReferToSheetWithSameName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'refer_to_destination_sheet' => 'boolean',
-    'copy_names' => 'boolean',
-    'refer_to_sheet_with_same_name' => 'boolean',
     'column_character_width' => 'boolean',
     'copy_invalid_formulas_as_values' => 'boolean',
-    'extend_to_adjacent_range' => 'boolean'
+    'copy_names' => 'boolean',
+    'extend_to_adjacent_range' => 'boolean',
+    'refer_to_destination_sheet' => 'boolean',
+    'refer_to_sheet_with_same_name' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'refer_to_destination_sheet' => 'ReferToDestinationSheet',
-    'copy_names' => 'CopyNames',
-    'refer_to_sheet_with_same_name' => 'ReferToSheetWithSameName',
     'column_character_width' => 'ColumnCharacterWidth',
     'copy_invalid_formulas_as_values' => 'CopyInvalidFormulasAsValues',
-    'extend_to_adjacent_range' => 'ExtendToAdjacentRange'
+    'copy_names' => 'CopyNames',
+    'extend_to_adjacent_range' => 'ExtendToAdjacentRange',
+    'refer_to_destination_sheet' => 'ReferToDestinationSheet',
+    'refer_to_sheet_with_same_name' => 'ReferToSheetWithSameName' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -286,7 +286,7 @@ sub pop3_retr
 	tail {
 		return remotefail($session->{error}) unless shift;
 		return fail("bad argument") if $id > @{$session->{list}};
-		context $session->{obj}->fetch_message_and_attachments( $session->{list}->[$id - 1] );
+		context $session->{obj}->fetch_message_and_attachments( $session->{list}->[$id - 1]);
 	tail {
 		my ($attachments, $error) = @_;
 		return remotefail($error) unless $attachments;

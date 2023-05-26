@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language>
-<language name="Stata" version="12" kateversion="5.0" section="Scientific" extensions="*.do;*.ado;*.doh;*.DO;*.ADO;*.DOH"
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="Stata" version="6" kateversion="2.3" section="Scientific" extensions="*.do; *.ado; *.doh; *.DO; *.ADO; *.DOH"
  casesensitive="1" priority="5" author="Larry Radbill (Larry.Radbill gmail com)" license="LGPL" >
 
   <highlighting>
@@ -3158,8 +3158,10 @@
         <keyword      attribute="Macro"         context="#stay" String="macro-extended-functions" />
         <RegExpr      attribute="GlobalMacro"   context="#stay" String="\$[A-Za-z0-9_?{}!]+" />
 
+        <keyword      attribute="Data Type"     context="#stay" String="types" />
+
         <DetectChar   attribute="String"        context="string" char="&quot;"/>
-        <Detect2Chars attribute="String"        context="#stay" char="`" char1='"'/>
+        <Detect2Chars attribute="String2"       context="#stay" char="`" char1='"'/>
 
         <RangeDetect  attribute="Macro"         context="#stay" char= "`" char1= "'" />
 
@@ -3175,19 +3177,25 @@
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="Commentar 1">
-        <DetectSpaces />
-        <IncludeRules context="##Comments" />
+        <IncludeRules context="##Alerts" />
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="Commentar 2">
-        <DetectSpaces />
         <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
-        <IncludeRules context="##Comments" />
+        <IncludeRules context="##Alerts" />
+      </context>
+
+      <context attribute="Comment" lineEndContext="#stay" name="Comment 2">
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
       </context>
 
       <context attribute="String" lineEndContext="#stay" name="string">
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+
+      <context name = "Base" attribute = "Normal Text" lineEndContext = "#stay">
+        <RegExpr String = "\$[A-Za-z0-9_?{}!]+" attribute = "GlobalMacro" context = "#stay"/>
       </context>
 
     </contexts>
@@ -3208,6 +3216,7 @@
       <itemData name="Macro"          defStyleNum="dsOthers"/>
       <itemData name="GlobalMacro"    defStyleNum="dsOthers"/>
 
+      <itemData name="Data Type"      defStyleNum="dsDataType"/>
       <itemData name="Comment"        defStyleNum="dsComment"/>
 
     </itemDatas>
@@ -3216,11 +3225,10 @@
 
   <general>
     <comments>
-      <comment name="singleLine" start="//" position="afterwhitespace" />
-      <comment name="multiLine" start="/*" end="*/" region="Comment" />
+      <comment name="singleLine" start="//" />
+      <comment name="multiLine" start="/*" end="*/" />
     </comments>
     <keywords casesensitive="1" />
   </general>
 
 </language>
-<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

@@ -1,14 +1,14 @@
 ---
-abstract: 'Short Description'
+abstract: 'Finding Files in Subdirectories'
 author:
-  - USER_NAME<USER_MAIL>
+  - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.9692'
+  SPVM: '0.981'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,12 +18,12 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.9692'
+  SPVM: '0.981'
   SPVM::File::Basename: '0.02'
   SPVM::File::Spec: '0.05'
   SPVM::Regex: '0.19'
   SPVM::Sys: '0.43'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-File-Find.git
-version: '0.02'
+version: '0.021'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

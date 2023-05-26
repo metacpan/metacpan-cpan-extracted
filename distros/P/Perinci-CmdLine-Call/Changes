@@ -1,19 +1,25 @@
-Revision history for Perinci-CmdLine-Call
+0.060   2023-05-22  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-0.05    2016-03-16 (PERLANCAR)
+        - [incompatible change] Instead of dying, call_cli_script() will now
+          return error 599 when output is not valid JSON; this is because
+          sometimes Capture::Tiny (via IPC::System::Options) sometimes fails to
+          capture output.
+
+
+0.05    2016-03-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.04    2016-02-14 (PERLANCAR)
+0.04    2016-02-14  Released-By: PERLANCAR
 
 	- [Bugfix] Don't die on non-zero exit code, we might legitimately
 	  want the result in those cases.
 
 
-0.03    2015-11-07 (PERLANCAR)
+0.03    2015-11-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -21,7 +27,7 @@ Revision history for Perinci-CmdLine-Call
 	  version.
 
 
-0.02    2015-09-03 (PERLANCAR)
+0.02    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -30,6 +36,6 @@ Revision history for Perinci-CmdLine-Call
 	  requirement.
 
 
-0.01     2015-05-15 (SHARYANTO)
+0.01     2015-05-15  Released-By: SHARYANTO
 
          - First release.

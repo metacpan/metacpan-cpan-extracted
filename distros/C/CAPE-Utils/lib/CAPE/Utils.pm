@@ -1,4 +1,3 @@
-
 package CAPE::Utils;
 
 use 5.006;
@@ -7,13 +6,15 @@ use warnings;
 use JSON;
 use Config::Tiny;
 use DBI;
-use File::Slurp;
+use File::Slurp qw(append_file write_file read_file write_file);
 use Config::Tiny;
 use IPC::Cmd qw[ run ];
 use Text::ANSITable;
 use File::Spec;
 use IPC::Cmd qw(run);
 use Net::Subnet;
+use Sys::Hostname;
+use Sys::Syslog;
 
 =head1 NAME
 
@@ -21,11 +22,11 @@ CAPE::Utils - A helpful library for with CAPE.
 
 =head1 VERSION
 
-Version 1.0.1
+Version 2.3.0
 
 =cut
 
-our $VERSION = '1.0.1';
+our $VERSION = '2.3.0';
 
 =head1 SYNOPSIS
 
@@ -66,6 +67,7 @@ sub new {
 			user                => 'cape',
 			pass                => '',
 			base                => '/opt/CAPEv2/',
+			eve                 => '/opt/CAPEv2/log/eve.json',
 			poetry              => 1,
 			fail_all            => 0,
 			pending_columns     => 'id,target,package,timeout,ET,route,options,clock,added_on',
@@ -87,14 +89,15 @@ sub new {
 			auth                => 'ip',
 			incoming            => '/malware/client-incoming',
 			incoming_json       => '/malware/incoming-json',
+			eve_look_back       => 360,
+			malscore            => 0,
 		},
 	};
 
 	my $config = Config::Tiny->read( $ini, 'utf8' );
 	if ( !defined($config) ) {
 		$config = $base_config;
-	}
-	else {
+	} else {
 		my @to_merge = keys( %{ $base_config->{_} } );
 		foreach my $item (@to_merge) {
 			if ( !defined( $config->{_}->{$item} ) ) {
@@ -108,7 +111,7 @@ sub new {
 	bless $self;
 
 	return $self;
-}
+} ## end sub new
 
 =head2 connect
 
@@ -176,7 +179,7 @@ sub fail {
 	$dbh->disconnect;
 
 	return $rows;
-}
+} ## end sub fail
 
 =head2 get_pending_count
 
@@ -214,7 +217,7 @@ sub get_pending_count {
 	$dbh->disconnect;
 
 	return $rows;
-}
+} ## end sub get_pending_count
 
 =head2 get_pending
 
@@ -257,7 +260,7 @@ sub get_pending {
 	$dbh->disconnect;
 
 	return \@rows;
-}
+} ## end sub get_pending
 
 =head2 get_pending_table
 
@@ -328,24 +331,22 @@ sub get_pending_table {
 
 				if ( ( $column eq 'clock' || $column eq 'added_on' ) && $opts{pending_time_clip} ) {
 					$row->{$column} =~ s/\.[0-9]+$//;
-				}
-				elsif ( $column eq 'target' && $opts{pending_target_clip} ) {
+				} elsif ( $column eq 'target' && $opts{pending_target_clip} ) {
 					$row->{target} =~ s/^.*\///;
 				}
 				push( @new_line, $row->{$column} );
-			}
-			else {
+			} else {
 				push( @new_line, '' );
 			}
-		}
+		} ## end foreach my $column (@columns)
 
 		push( @td, \@new_line );
-	}
+	} ## end foreach my $row ( @{$rows} )
 
 	$tb->add_rows( \@td );
 
 	return $tb->draw;
-}
+} ## end sub get_pending_table
 
 =head2 get_running
 
@@ -395,7 +396,7 @@ sub get_running {
 	$dbh->disconnect;
 
 	return \@rows;
-}
+} ## end sub get_running
 
 =head2 get_running_count
 
@@ -437,7 +438,7 @@ sub get_running_count {
 	$dbh->disconnect;
 
 	return $rows;
-}
+} ## end sub get_running_count
 
 =head2 get_running_table
 
@@ -514,24 +515,22 @@ sub get_running_table {
 					&& $opts{running_time_clip} )
 				{
 					$row->{$column} =~ s/\.[0-9]+$//;
-				}
-				elsif ( $column eq 'target' && $opts{running_target_clip} ) {
+				} elsif ( $column eq 'target' && $opts{running_target_clip} ) {
 					$row->{target} =~ s/^.*\///;
 				}
 				push( @new_line, $row->{$column} );
-			}
-			else {
+			} else {
 				push( @new_line, '' );
 			}
-		}
+		} ## end foreach my $column (@columns)
 
 		push( @td, \@new_line );
-	}
+	} ## end foreach my $row ( @{$rows} )
 
 	$tb->add_rows( \@td );
 
 	return $tb->draw;
-}
+} ## end sub get_running_table
 
 =head2 get_tasks
 
@@ -568,15 +567,13 @@ sub get_tasks {
 
 	if ( defined( $opts{order} ) && $opts{order} !~ /^[0-9a-zA-Z]+$/ ) {
 		die '$opts{order},"' . $opts{order} . '", does not match /^[0-9a-zA-Z]+$/';
-	}
-	else {
+	} else {
 		$opts{order} = 'id';
 	}
 
 	if ( defined( $opts{limit} ) && $opts{limit} !~ /^[0-9]+$/ ) {
 		die '$opts{limit},"' . $opts{limit} . '", does not match /^[0-9]+$/';
-	}
-	else {
+	} else {
 		$opts{limit} = '100';
 	}
 
@@ -585,8 +582,7 @@ sub get_tasks {
 	}
 	if ( defined( $opts{direction} ) && ( $opts{direction} ne 'desc' || $opts{direction} ne 'asc' ) ) {
 		die '$opts{diirection},"' . $opts{direction} . '", does not match desc or asc';
-	}
-	else {
+	} else {
 		$opts{direction} = 'desc';
 	}
 
@@ -622,7 +618,7 @@ sub get_tasks {
 	$dbh->disconnect;
 
 	return \@rows;
-}
+} ## end sub get_tasks
 
 =head2 get_tasks_count
 
@@ -662,7 +658,7 @@ sub get_tasks_count {
 	$dbh->disconnect;
 
 	return $rows;
-}
+} ## end sub get_tasks_count
 
 =head2 get_tasks_table
 
@@ -777,24 +773,22 @@ sub get_tasks_table {
 					)
 				{
 					$row->{$column} =~ s/\.[0-9]+$//;
-				}
-				elsif ( $column eq 'target' && $opts{task_target_clip} ) {
+				} elsif ( $column eq 'target' && $opts{task_target_clip} ) {
 					$row->{target} =~ s/^.*\///;
 				}
 				push( @new_line, $row->{$column} );
-			}
-			else {
+			} else {
 				push( @new_line, '' );
 			}
-		}
+		} ## end foreach my $column (@columns)
 
 		push( @td, \@new_line );
-	}
+	} ## end foreach my $row ( @{$rows} )
 
 	$tb->add_rows( \@td );
 
 	return $tb->draw;
-}
+} ## end sub get_tasks_table
 
 =head2 search
 
@@ -937,43 +931,35 @@ sub search {
 				# match the start of the item
 				if ( $arg =~ /^[0-9]+$/ ) {
 					$sql = $sql . " and " . $item . " = '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\=[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\=[0-9]+$/ ) {
 					$arg =~ s/^\=//;
 					$sql = $sql . " and " . $item . " <= '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\<\=[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\<\=[0-9]+$/ ) {
 					$arg =~ s/^\<\=//;
 					$sql = $sql . " and " . $item . " <= '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\<[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\<[0-9]+$/ ) {
 					$arg =~ s/^\<//;
 					$sql = $sql . " and " . $item . " < '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\>\=[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\>\=[0-9]+$/ ) {
 					$arg =~ s/^\>\=//;
 					$sql = $sql . " and " . $item . " >= '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\>[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\>[0-9]+$/ ) {
 					$arg =~ s/^\>\=//;
 					$sql = $sql . " and " . $item . " > '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\![0-9]+$/ ) {
+				} elsif ( $arg =~ /^\![0-9]+$/ ) {
 					$arg =~ s/^\!//;
 					$sql = $sql . " and " . $item . " != '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^$/ ) {
+				} elsif ( $arg =~ /^$/ ) {
 
 					# only exists for skipping when some one has passes something starting
 					# with a ,, ending with a,, or with ,, in it.
-				}
-				else {
+				} else {
 					# if we get here, it means we don't have a valid use case for what ever was passed and should error
 					die( '"' . $arg . '" does not appear to be a valid item for a numeric search for the ' . $item );
 				}
-			}
-		}
-	}
+			} ## end foreach my $arg (@arg_split)
+		} ## end if ( defined( $opts{$item} ) )
+	} ## end foreach my $item (@numeric)
 
 	#
 	# handle string items
@@ -986,8 +972,7 @@ sub search {
 		if ( defined( $opts{$item} ) ) {
 			if ( defined( $opts{ $item . '_like' } ) && $opts{ $item . '_like' } ) {
 				$sql = $sql . " and host like '" . $opts{$item} . "'";
-			}
-			else {
+			} else {
 				$sql = $sql . " and " . $item . " = '" . $opts{$item} . "'";
 			}
 		}
@@ -1007,7 +992,7 @@ sub search {
 	my $rows;
 
 	return $rows;
-}
+} ## end sub search
 
 =head2 submit
 
@@ -1097,8 +1082,7 @@ sub submit {
 	foreach my $item ( @{ $opts{items} } ) {
 		if ( -f $item ) {
 			push( @to_submit, File::Spec->rel2abs($item) );
-		}
-		elsif ( -d $item ) {
+		} elsif ( -d $item ) {
 			opendir( my $dh, $item );
 			while ( readdir($dh) ) {
 				if ( -f $item . '/' . $_ ) {
@@ -1107,7 +1091,7 @@ sub submit {
 			}
 			closedir($dh);
 		}
-	}
+	} ## end foreach my $item ( @{ $opts{items} } )
 
 	chdir( $self->{config}->{_}->{base} ) || die( 'Unable to CD to "' . $self->{config}->{_}->{base} . '"' );
 
@@ -1174,10 +1158,10 @@ sub submit {
 				$added->{$file} = $task;
 			}
 		}
-	}
+	} ## end foreach (@to_submit)
 
 	return $added;
-}
+} ## end sub submit
 
 =head2 timestamp
 
@@ -1209,7 +1193,7 @@ sub timestamp {
 	}
 
 	return $mon . '-' . $mday . '-' . $year . ' ' . $hour . ':' . $min . ':' . $sec;
-}
+} ## end sub timestamp
 
 =head2 shuffle
 
@@ -1227,7 +1211,7 @@ sub shuffle {
 		@$array[ $i, $j ] = @$array[ $j, $i ];
 	}
 	return $array;
-}
+} ## end sub shuffle
 
 =head2 check_remote
 
@@ -1284,17 +1268,14 @@ sub check_remote {
 	foreach my $item (@subnets_split) {
 		if ( $item =~ /^[\:A-Fa-f0-9]+$/ ) {
 			push( @subnets, $item . '/128' );
-		}
-		elsif ( $item =~ /^[\:A-Fa-f0-9]+\/[0-9]+$/ ) {
+		} elsif ( $item =~ /^[\:A-Fa-f0-9]+\/[0-9]+$/ ) {
 			push( @subnets, $item );
-		}
-		elsif ( $item =~ /^[\.0-9]+$/ ) {
+		} elsif ( $item =~ /^[\.0-9]+$/ ) {
 			push( @subnets, $item . '/32' );
-		}
-		elsif ( $item =~ /^[\.0-9]+\/[0-9]+$/ ) {
+		} elsif ( $item =~ /^[\.0-9]+\/[0-9]+$/ ) {
 			push( @subnets, $item );
 		}
-	}
+	} ## end foreach my $item (@subnets_split)
 	my $allowed_subnets;
 	eval { $allowed_subnets = subnet_matcher(@subnets); };
 	if ($@) {
@@ -1306,7 +1287,141 @@ sub check_remote {
 	}
 
 	return 0;
-}
+} ## end sub check_remote
+
+=head2 eve_process
+
+Process the finished tasks for CAPEv2.
+
+    $cape_utils->eve_process;
+
+=cut
+
+sub eve_process {
+	my ( $self, %opts ) = @_;
+
+	my $dbh;
+	eval { $dbh = $self->connect or die $DBI::errstr };
+	if ($@) {
+		die( 'Failed to connect to the DB... ' . $@ );
+	}
+
+	my $statement
+		= "select * from tasks where ( status = 'reported' ) AND ( completed_on  >= CURRENT_TIMESTAMP - interval '"
+		. $self->{config}{_}{eve_look_back}
+		. " seconds' )";
+
+	my $sth = $dbh->prepare($statement);
+	$sth->execute;
+
+	my $row;
+	my @rows;
+	while ( $row = $sth->fetchrow_hashref ) {
+		push( @rows, $row );
+	}
+
+	$sth->finish;
+	$dbh->disconnect;
+
+	my $main_eve = $self->{config}{_}{eve};
+
+	foreach my $row (@rows) {
+		my $report        = $self->{config}{_}{base} . '/storage/analyses/' . $row->{id} . '/reports/lite.json';
+		my $id_eve        = $self->{config}{_}{incoming_json} . '/' . $row->{id} . '.eve.json';
+		my $incoming_json = $self->{config}{_}{incoming_json} . '/' . $row->{id} . '.json';
+
+		# make sure we have the required files and they are accessible
+		# id_eve is being used as a lock file to make sure we don't reprocess it
+		if ( -f $report && -r $report && !-f $id_eve ) {
+			my $eve_json;
+			# the incoming json needs to exist if the following is to work
+			# if it does not, just a mostly empty one
+			if ( -f $incoming_json ) {
+				eval {
+					$eve_json = decode_json( read_file($incoming_json) );
+					$eve_json->{cape_eve_process} = { incoming_json_error => undef, };
+				};
+				if ($@) {
+					my $error_message = 'Failed to decode incoming JSON for ' . $row->{id} . ' ... ' . $@;
+					$self->log_drek( 'cape_eve_process', 'err', $error_message );
+					$eve_json = {
+						cape_eve_process => {
+							incoming_json_error => $error_message,
+						},
+					};
+				}
+			} else {
+				$eve_json = { cape_eve_process => {}, };
+			}
+
+			# sets various common items so they don't need to be dealt with more than once
+			# hash creation
+			$eve_json->{cape_eve_process}{time} = time;
+			$eve_json->{cape_eve_process}{host} = hostname;
+			$eve_json->{row}                    = $row;
+			$eve_json->{event_type}             = 'potential_malware_detonation';
+			if ( !defined( $eve_json->{cape_eve_process}{incoming_json_error} ) ) {
+				$eve_json->{cape_eve_process}{incoming_json_error} = undef,;
+			}
+
+			my $lite_json;
+			eval {
+				$lite_json = decode_json( read_file($report) );
+
+				if ( defined( $lite_json->{signatures} ) ) {
+					$eve_json->{signatures} = $lite_json->{signatures};
+				}
+
+				if ( defined( $lite_json->{malscore} ) ) {
+					$eve_json->{malscore} = $lite_json->{malscore};
+
+					if ( $lite_json->{malscore} >= $self->{config}{_}{malscore} ) {
+						$eve_json->{event_type} = 'alert';
+					}
+				}
+			};
+			if ($@) {
+				my $error_message = 'Failed to decode lite.json for ' . $row->{id} . ' ... ' . $@;
+				$self->log_drek( 'cape_eve_process', 'err', $error_message );
+				$eve_json->{cape_eve_process}{lite_json_error} = $error_message,;
+			}
+
+			# new line is needed as encode_json does not add one and this prevents the eve file
+			# from being one long line when appended to
+			my $raw_eve_json = encode_json($eve_json) . "\n";
+
+			eval { write_file( $id_eve, $raw_eve_json ); };
+			if ($@) {
+				my $error_message = 'Failed to write out ID EVE for ' . $row->{id} . ' at ' . $id_eve . '  ... ' . $@;
+				$self->log_drek( 'cape_eve_process', 'err', $error_message );
+			}
+
+			eval { append_file( $self->{config}{_}{eve}, $raw_eve_json ); };
+		} else {
+			if ( !-f $report || !-r $report ) {
+				warn( $row->{id} . ' reported, but lite.json does not exist for it or it is not readable' );
+			}
+		}
+	} ## end foreach my $row (@rows)
+
+} ## end sub eve_process
+
+# sends stuff to syslog
+sub log_drek {
+	my ( $self, $sender, $level, $message ) = @_;
+
+	if ( !defined($level) ) {
+		$level = 'info';
+	}
+
+	if ( !defined($sender) ) {
+		$sender = 'CAPE::Utils';
+	}
+
+	openlog( $sender, 'cons,pid', 'daemon' );
+	syslog( $level, '%s', $message );
+	closelog();
+} ## end sub log_drek
 
 =head1 CONFIG FILE
 
@@ -1368,7 +1483,35 @@ default with CAPEv2 in it's default config.
     # incoming dir to use for mojo_cape_submit
     incoming=/malware/client-incoming
     # directory to store json data files for submissions recieved by mojo_cape_submit
+    # this directory is also used for storing run specific eves
     incoming_json=/malware/incoming-json
+    # Location to write the eve log to.
+    eve=/opt/CAPEv2/log/eve.json
+    # how far to go back for processing eve
+    eve_look_back=360
+    # malscore for changing the event_type for eve from potential_malware_detonation to alert
+    malscore=0
+
+=head1 CAPEv2 lite.json to EVE handling
+
+Tasks are found by looking back X number of seconds in the tasks table for tasks that have reported.
+The amount of time is determined by the config value 'eve_look_back'.
+
+It will check if a task has been processed already or not be seeing if a task specified EVE JSON
+has been created under the 'incoming_json' directory. This is in the format $task_id.'eve.json'.
+If not, it will proceed.
+
+It reads the 'lite.json' report for task as well as the incoming JSON. It then copies the keys
+'signatures' and 'malscore' into the hash for the incoming JSON and writes it out to
+$task_id.'eve.json' and appending it to the file specified via the config value 'eve'.
+
+The are two possible values for 'event_type', 'potential_malware_detonation' and 'alert'.
+'potential_malware_detonation' is changed to alert when 'malscore' goves over the value
+specified via config value 'malscore'.
+
+'row' is the full row for the task in question from the task table as a hash.
+
+'signatures' is copied from '.signature' in the report JSON.
 
 =head1 AUTHOR
 
@@ -1395,15 +1538,11 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CAPE-Utils>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/CAPE-Utils>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/CAPE-Utils>
 
-=head * Git
+=item * Git
 
 L<git@github.com:VVelox/CAPE-Utils.git>
 

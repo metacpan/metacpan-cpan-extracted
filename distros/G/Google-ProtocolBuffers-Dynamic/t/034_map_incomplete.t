@@ -4,6 +4,7 @@ my $d = Google::ProtocolBuffers::Dynamic->new('t/proto');
 $d->load_file("map.proto");
 $d->map_message("test.Maps", "Maps");
 $d->map_message("test.Item", "Item");
+$d->map_message("test.StringMap", "StringMap");
 $d->resolve_references();
 
 my %values = (
@@ -76,10 +77,9 @@ sub encode {
 for my $field (sort keys %values) {
     my ($values, $encoded) = @{$values{$field}};
     my $bytes = Maps->encode({ $field => $values });
-    my $decoded = Maps->decode( encode($values, $encoded));
 
-    eq_or_diff($decoded, Maps->decode($bytes),
-               "$field - decode missing map values as default");
+    decode_eq_or_diff('Maps', encode($values, $encoded), Maps->decode($bytes),
+                      "$field - decode missing map values as default");
 }
 
 done_testing();

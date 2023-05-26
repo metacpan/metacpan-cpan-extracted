@@ -8,8 +8,8 @@ if ($^O ne 'MSWin32') {
     #  Make a copy of the scipt without the .pl extension.
     #  Clunky as it is not considered by "make clean".
     use File::Copy;
-    my $success = eval {copy 'bin/pp_autolink.pl', 'bin/pp_autolink'; 1};
-    warn $@ if $@;
+    my $success = eval {copy 'bin/pp_autolink.pl', 'bin/pp_autolink'};
+    warn $! if $!;
     if ($success) {
         @exe_copy = ('bin/pp_autolink');
     }

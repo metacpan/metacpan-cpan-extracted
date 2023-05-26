@@ -10,7 +10,7 @@ my $name = shift || 'length';
 
 print ddc(midi_dump($name));
 
-print ddc(reverse_dump($name, 2));
+print ddc(reverse_dump($name, 4));
 
 __END__
 volume

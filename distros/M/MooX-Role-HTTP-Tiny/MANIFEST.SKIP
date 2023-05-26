@@ -1,0 +1,10 @@
+\.git(ignore|/)
+MANIFEST\.bak
+MYMETA\.(json|yml)
+\..*\.swp
+Makefile$
+MooX-Role-HTTP-Tiny-.+/
+blib/
+pm_to_blib
+cover_db/
+debian/

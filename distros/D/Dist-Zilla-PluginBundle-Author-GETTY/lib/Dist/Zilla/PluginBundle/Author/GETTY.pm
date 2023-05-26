@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.112';
+$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.114';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
@@ -55,6 +55,13 @@ has release_branch => (
   default => sub { $_[0]->payload->{release_branch} || 'master' },
 );
 
+has deprecated => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{deprecated} },
+);
+
 has no_github => (
   is      => 'ro',
   isa     => 'Bool',
@@ -73,7 +80,7 @@ has no_travis => (
   is      => 'ro',
   isa     => 'Bool',
   lazy    => 1,
-  default => sub { $_[0]->payload->{no_travis} },
+  default => sub { exists $_[0]->payload->{no_travis} ? $_[0]->payload->{no_travis} : 1 },
 );
 
 has no_changelog_from_git => (
@@ -137,6 +144,32 @@ has weaver_config => (
   isa     => 'Str',
   lazy    => 1,
   default => sub { $_[0]->payload->{weaver_config} || '@Author::GETTY' },
+);
+
+my @gather_array_options = qw( exclude_filename exclude_match );
+my @gather_array_attributes = map { 'gather_'.$_ } @gather_array_options;
+
+for my $attr (@gather_array_attributes) {
+  has $attr => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    lazy    => 1,
+    default => sub { defined $_[0]->payload->{$attr} ? $_[0]->payload->{$attr} : [] },
+  );
+}
+
+has gather_include_dotfiles => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { exists $_[0]->payload->{gather_include_dotfiles} ? $_[0]->payload->{gather_include_dotfiles} : 1 },
+);
+
+has gather_include_untracked  => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{gather_include_untracked} },
 );
 
 my @run_options = qw( after_build before_build before_release release after_release test );
@@ -206,7 +239,7 @@ for my $attr (@travis_array_attributes) {
   );
 }
 
-sub mvp_multivalue_args { @travis_array_attributes, @run_attributes, 'alien_bin_requires' }
+sub mvp_multivalue_args { @travis_array_attributes, @run_attributes, @gather_array_attributes, 'alien_bin_requires' }
 
 sub configure {
   my ($self) = @_;
@@ -221,7 +254,10 @@ sub configure {
     if $self->no_install and $self->no_makemaker;
 
   $self->add_plugins([ 'Git::GatherDir' => {
-    include_dotfiles => 1,
+    include_dotfiles => $self->gather_include_dotfiles,
+    include_untracked => $self->gather_include_untracked,
+    scalar @{$self->gather_exclude_filename} > 0 ? ( exclude_filename => $self->gather_exclude_filename ) : (),
+    scalar @{$self->gather_exclude_match} > 0 ? ( exclude_match => $self->gather_exclude_match ) : (),
   }]);
 
   my @removes = ('GatherDir','PruneCruft');
@@ -237,6 +273,12 @@ sub configure {
   if ($self->xs) {
     $self->add_plugins(qw(
       ModuleBuildTiny
+    ));
+  }
+
+  if ($self->deprecated) {
+    $self->add_plugins(qw(
+      Deprecated
     ));
   }
 
@@ -392,7 +434,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.112
+version 0.114
 
 =head1 SYNOPSIS
 
@@ -412,10 +454,11 @@ are default):
 
   [@Author::GETTY]
   author = GETTY
+  deprecated = 0
   release_branch = master
   weaver_config = @Author::GETTY
   no_cpan = 0
-  no_travis = 0
+  no_travis = 1 # deactivate by default now
   no_install = 0
   no_makemaker = 0
   no_installrelease = 0
@@ -492,6 +535,15 @@ You can also use shortcuts for integrating L<Dist::Zilla::Plugin::Run>:
   run_if_release_test = ./Build install
   run_if_release_test = make install
 
+You can also use add up configuration for L<Dist::Zilla::Plugin::Git::GatherDir>,
+excluding I<root> or I<prefix>:
+
+  [@Author::GETTY]
+  gather_include_dotfiles = 1 # activated by default
+  gather_include_untracked = 0
+  gather_exclude_filename = dir/skip
+  gather_exclude_match = ^local_
+
 You can use all options of L<Dist::Zilla::Plugin::TravisCI> just by prefix
 them with B<travis_>, like here:
 
@@ -517,6 +569,10 @@ only required parameter here is C<alien_repo>:
 
 This is used to name the L<CPAN|http://www.cpan.org/> author of the
 distribution. See L<Dist::Zilla::Plugin::Authority/authority>.
+
+=head2 deprecated
+
+Adds L<Dist::Zilla::Plugin::Deprecated> to the distribution.
 
 =head2 release_branch
 

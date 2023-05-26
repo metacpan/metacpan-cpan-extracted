@@ -1,22 +1,39 @@
 Revision history for Image::MetaData::GQview
 
-1.8 Klaus Ethgen <Klaus@Ethgen.de>
+v2.0.2 Klaus Ethgen <Klaus@Ethgen.ch>
+
+	* New build for missing META.yml
+
+v2.0.1 Klaus Ethgen <Klaus@Ethgen.ch>
+
+	* symlink handling fixed
+	* path concatenation fixed
+
+v2.0.0 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Typo
+	* Fix the version problem
+	* Cosmetic changes
+
+v1.10 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Explizit use PerlIO; für FreeBSE
+
+v1.9 Klaus Ethgen <Klaus@Ethgen.de>
 
 	* Hmpf, making the comment silent again
 
 1.8 Klaus Ethgen <Klaus@Ethgen.de>
 
-	* Making comment section more robust (Escape '[')
-	* Add a comment char for the start comment
+	* Small changes
 
 1.7 Klaus Ethgen <Klaus@Ethgen.de>
 
-	* Make it a bit more fault tolerant (Hmpf, this seems to be not
-	  possible to test)
+	* Bugfix
 
 1.6 Klaus Ethgen <Klaus@Ethgen.de>
 
-	* I should test also the read of the data
+	* Bugfix und mehr Tests
 
 1.5 Klaus Ethgen <Klaus@Ethgen.de>
 
@@ -24,18 +41,17 @@ Revision history for Image::MetaData::GQview
 
 1.4 Klaus Ethgen <Klaus@Ethgen.de>
 
-	* Making more robust by throwing exceptions
-	* Reworking the documentation
-	* Build new tests
+	* Make the class more robust by throwing exceptions
+	* Rework of the documentation
+	* Adding tests
 
 1.3 Tue Aug 9 Klaus Ethgen <Klaus@Ethgen.de>
 
-	* Unify the changelog
-	* Update the version in all parts
+	* Update all versions and unify the change log
 
 1.2 Tue Aug 9 Klaus Ethgen <Klaus@Ethgen.de>
 
-	* Correct the license
+	* Clarify the license
 
 1.1 Tue Aug 8 Klaus Ethgen <Klaus@Ethgen.de>
 

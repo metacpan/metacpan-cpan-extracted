@@ -39,7 +39,7 @@ use warnings;
 use Tie::Hash;
 use Attribute::Handlers autotie => { "__CALLER__::Stoned" => __PACKAGE__ };
 
-our $VERSION = '1.12.2';
+our $VERSION = '1.12.3';
 our @ISA = qw(Tie::StdHash);
 
 =head2 STORE
@@ -91,8 +91,7 @@ Dave Cross <dave@mag-sol.com>
 =head1 UPDATES
 
 The latest version of this module will always be available from
-L<http://code.mag-sol.com/Tie-Hash-Cannabinol> or from CPAN
-at L<http://search.cpan.org/dist/Tie-Hash-Cannabinol/>.
+CPAN at L<https://metacpan.org/dist/Tie-Hash-Cannabinol>.
 
 =head1 COPYRIGHT
 

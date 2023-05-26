@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Border;
 
 require 5.6.0;
@@ -36,8 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Color;
+use AsposeCellsCloud::Object::ThemeColor; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,46 +119,64 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Border',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'color' => {
-    	datatype => 'Color',
-    	base_name => 'Color',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'border_type' => {
-    	datatype => 'string',
-    	base_name => 'BorderType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'line_style' => {
-    	datatype => 'string',
-    	base_name => 'LineStyle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'line_style' => {
+     	datatype => 'string',
+     	base_name => 'LineStyle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color' => {
+     	datatype => 'Color',
+     	base_name => 'Color',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'border_type' => {
+     	datatype => 'string',
+     	base_name => 'BorderType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'theme_color' => {
+     	datatype => 'ThemeColor',
+     	base_name => 'ThemeColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'argb_color' => {
+     	datatype => 'int',
+     	base_name => 'ArgbColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'line_style' => 'string',
     'color' => 'Color',
     'border_type' => 'string',
-    'line_style' => 'string'
+    'theme_color' => 'ThemeColor',
+    'argb_color' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'line_style' => 'LineStyle',
     'color' => 'Color',
     'border_type' => 'BorderType',
-    'line_style' => 'LineStyle'
+    'theme_color' => 'ThemeColor',
+    'argb_color' => 'ArgbColor' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

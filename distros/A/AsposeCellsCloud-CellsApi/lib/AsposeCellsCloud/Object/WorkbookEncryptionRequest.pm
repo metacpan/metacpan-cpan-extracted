@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::WorkbookEncryptionRequest;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,46 +118,46 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Used by workbook encryption/decryption requests.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'WorkbookEncryptionRequest',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'password' => {
-    	datatype => 'string',
-    	base_name => 'Password',
-    	description => 'Encription password.',
-    	format => '',
-    	read_only => '',
-    		},
-    'key_length' => {
-    	datatype => 'int',
-    	base_name => 'KeyLength',
-    	description => 'Encription key length.',
-    	format => '',
-    	read_only => '',
-    		},
-    'encryption_type' => {
-    	datatype => 'string',
-    	base_name => 'EncryptionType',
-    	description => 'Workbook encription type.',
-    	format => '',
-    	read_only => '',
-    		},
+     'encryption_type' => {
+     	datatype => 'string',
+     	base_name => 'EncryptionType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'key_length' => {
+     	datatype => 'int',
+     	base_name => 'KeyLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'password' => {
+     	datatype => 'string',
+     	base_name => 'Password',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'password' => 'string',
+    'encryption_type' => 'string',
     'key_length' => 'int',
-    'encryption_type' => 'string'
+    'password' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'password' => 'Password',
+    'encryption_type' => 'EncryptionType',
     'key_length' => 'KeyLength',
-    'encryption_type' => 'EncryptionType'
+    'password' => 'Password' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

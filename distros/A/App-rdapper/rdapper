@@ -1,0 +1,6 @@
+#!perl
+use lib qw(./lib);
+use App::rdapper;
+use strict;
+
+App::rdapper->main;

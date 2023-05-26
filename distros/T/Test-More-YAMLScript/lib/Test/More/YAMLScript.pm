@@ -1,4 +1,3 @@
 package Test::More::YAMLScript;
-use Mo;
-
-our $VERSION = '0.0.5';
+use base 'Lingy::Namespace';
+our $VERSION = '0.1.1';

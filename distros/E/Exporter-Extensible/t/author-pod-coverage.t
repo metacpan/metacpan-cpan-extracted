@@ -40,6 +40,7 @@ my %trustme = (
            );
 
 my @also_private = (
+                  qr/^BUILD$/u,
                   qr/^BUILD$/
                 );
 

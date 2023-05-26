@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Axis;
 
 require 5.6.0;
@@ -36,11 +35,13 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Area;
 use AsposeCellsCloud::Object::Line;
+use AsposeCellsCloud::Object::Link;
+use AsposeCellsCloud::Object::LinkElement;
 use AsposeCellsCloud::Object::TickLabels;
-use AsposeCellsCloud::Object::Title;
+use AsposeCellsCloud::Object::Title; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -56,12 +57,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -102,7 +103,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -110,7 +111,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -122,261 +123,276 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Axis',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'area' => {
-    	datatype => 'Area',
-    	base_name => 'Area',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'axis_between_categories' => {
-    	datatype => 'boolean',
-    	base_name => 'AxisBetweenCategories',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'axis_line' => {
-    	datatype => 'Area',
-    	base_name => 'AxisLine',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'base_unit_scale' => {
-    	datatype => 'string',
-    	base_name => 'BaseUnitScale',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'category_type' => {
-    	datatype => 'string',
-    	base_name => 'CategoryType',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'cross_at' => {
-    	datatype => 'double',
-    	base_name => 'CrossAt',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'cross_type' => {
-    	datatype => 'string',
-    	base_name => 'CrossType',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'display_unit' => {
-    	datatype => 'string',
-    	base_name => 'DisplayUnit',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'has_multi_level_labels' => {
-    	datatype => 'boolean',
-    	base_name => 'HasMultiLevelLabels',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_automatic_max_value' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutomaticMaxValue',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_automatic_minor_unit' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutomaticMinorUnit',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_automatic_min_value' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutomaticMinValue',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_display_unit_label_shown' => {
-    	datatype => 'boolean',
-    	base_name => 'IsDisplayUnitLabelShown',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_automatic_major_unit' => {
-    	datatype => 'boolean',
-    	base_name => 'IsAutomaticMajorUnit',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_logarithmic' => {
-    	datatype => 'boolean',
-    	base_name => 'IsLogarithmic',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_plot_order_reversed' => {
-    	datatype => 'boolean',
-    	base_name => 'IsPlotOrderReversed',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_visible' => {
-    	datatype => 'boolean',
-    	base_name => 'IsVisible',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'log_base' => {
-    	datatype => 'double',
-    	base_name => 'LogBase',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'major_grid_lines' => {
-    	datatype => 'Line',
-    	base_name => 'MajorGridLines',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'major_tick_mark' => {
-    	datatype => 'string',
-    	base_name => 'MajorTickMark',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'major_unit' => {
-    	datatype => 'double',
-    	base_name => 'MajorUnit',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'major_unit_scale' => {
-    	datatype => 'string',
-    	base_name => 'MajorUnitScale',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'max_value' => {
-    	datatype => 'double',
-    	base_name => 'MaxValue',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'minor_grid_lines' => {
-    	datatype => 'Line',
-    	base_name => 'MinorGridLines',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'minor_tick_mark' => {
-    	datatype => 'string',
-    	base_name => 'MinorTickMark',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'minor_unit' => {
-    	datatype => 'double',
-    	base_name => 'MinorUnit',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'minor_unit_scale' => {
-    	datatype => 'string',
-    	base_name => 'MinorUnitScale',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'min_value' => {
-    	datatype => 'double',
-    	base_name => 'MinValue',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'tick_label_position' => {
-    	datatype => 'string',
-    	base_name => 'TickLabelPosition',
-    	description => ' ',
-    	format => '',
-    	read_only => '',
-    		},
-    'tick_labels' => {
-    	datatype => 'TickLabels',
-    	base_name => 'TickLabels',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'tick_label_spacing' => {
-    	datatype => 'int',
-    	base_name => 'TickLabelSpacing',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'tick_mark_spacing' => {
-    	datatype => 'int',
-    	base_name => 'TickMarkSpacing',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'title' => {
-    	datatype => 'Title',
-    	base_name => 'Title',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'area' => {
+     	datatype => 'Area',
+     	base_name => 'Area',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'axis_between_categories' => {
+     	datatype => 'boolean',
+     	base_name => 'AxisBetweenCategories',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'axis_line' => {
+     	datatype => 'Line',
+     	base_name => 'AxisLine',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'base_unit_scale' => {
+     	datatype => 'string',
+     	base_name => 'BaseUnitScale',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'category_type' => {
+     	datatype => 'string',
+     	base_name => 'CategoryType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cross_at' => {
+     	datatype => 'double',
+     	base_name => 'CrossAt',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'cross_type' => {
+     	datatype => 'string',
+     	base_name => 'CrossType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'display_unit' => {
+     	datatype => 'string',
+     	base_name => 'DisplayUnit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'display_unit_label' => {
+     	datatype => 'LinkElement',
+     	base_name => 'DisplayUnitLabel',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'has_multi_level_labels' => {
+     	datatype => 'boolean',
+     	base_name => 'HasMultiLevelLabels',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_automatic_major_unit' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutomaticMajorUnit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_automatic_max_value' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutomaticMaxValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_automatic_minor_unit' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutomaticMinorUnit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_automatic_min_value' => {
+     	datatype => 'boolean',
+     	base_name => 'IsAutomaticMinValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_display_unit_label_shown' => {
+     	datatype => 'boolean',
+     	base_name => 'IsDisplayUnitLabelShown',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_logarithmic' => {
+     	datatype => 'boolean',
+     	base_name => 'IsLogarithmic',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_plot_order_reversed' => {
+     	datatype => 'boolean',
+     	base_name => 'IsPlotOrderReversed',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_visible' => {
+     	datatype => 'boolean',
+     	base_name => 'IsVisible',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'log_base' => {
+     	datatype => 'double',
+     	base_name => 'LogBase',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'major_grid_lines' => {
+     	datatype => 'Line',
+     	base_name => 'MajorGridLines',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'major_tick_mark' => {
+     	datatype => 'string',
+     	base_name => 'MajorTickMark',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'major_unit' => {
+     	datatype => 'double',
+     	base_name => 'MajorUnit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'major_unit_scale' => {
+     	datatype => 'string',
+     	base_name => 'MajorUnitScale',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'max_value' => {
+     	datatype => 'double',
+     	base_name => 'MaxValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'minor_grid_lines' => {
+     	datatype => 'Line',
+     	base_name => 'MinorGridLines',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'minor_tick_mark' => {
+     	datatype => 'string',
+     	base_name => 'MinorTickMark',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'minor_unit' => {
+     	datatype => 'double',
+     	base_name => 'MinorUnit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'minor_unit_scale' => {
+     	datatype => 'string',
+     	base_name => 'MinorUnitScale',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'min_value' => {
+     	datatype => 'double',
+     	base_name => 'MinValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'tick_label_position' => {
+     	datatype => 'string',
+     	base_name => 'TickLabelPosition',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'tick_labels' => {
+     	datatype => 'TickLabels',
+     	base_name => 'TickLabels',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'tick_label_spacing' => {
+     	datatype => 'int',
+     	base_name => 'TickLabelSpacing',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'tick_mark_spacing' => {
+     	datatype => 'int',
+     	base_name => 'TickMarkSpacing',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'title' => {
+     	datatype => 'Title',
+     	base_name => 'Title',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'link' => {
+     	datatype => 'Link',
+     	base_name => 'link',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'area' => 'Area',
     'axis_between_categories' => 'boolean',
-    'axis_line' => 'Area',
+    'axis_line' => 'Line',
     'base_unit_scale' => 'string',
     'category_type' => 'string',
     'cross_at' => 'double',
     'cross_type' => 'string',
     'display_unit' => 'string',
+    'display_unit_label' => 'LinkElement',
     'has_multi_level_labels' => 'boolean',
+    'is_automatic_major_unit' => 'boolean',
     'is_automatic_max_value' => 'boolean',
     'is_automatic_minor_unit' => 'boolean',
     'is_automatic_min_value' => 'boolean',
     'is_display_unit_label_shown' => 'boolean',
-    'is_automatic_major_unit' => 'boolean',
     'is_logarithmic' => 'boolean',
     'is_plot_order_reversed' => 'boolean',
     'is_visible' => 'boolean',
@@ -395,7 +411,8 @@ __PACKAGE__->swagger_types( {
     'tick_labels' => 'TickLabels',
     'tick_label_spacing' => 'int',
     'tick_mark_spacing' => 'int',
-    'title' => 'Title'
+    'title' => 'Title',
+    'link' => 'Link' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -407,12 +424,13 @@ __PACKAGE__->attribute_map( {
     'cross_at' => 'CrossAt',
     'cross_type' => 'CrossType',
     'display_unit' => 'DisplayUnit',
+    'display_unit_label' => 'DisplayUnitLabel',
     'has_multi_level_labels' => 'HasMultiLevelLabels',
+    'is_automatic_major_unit' => 'IsAutomaticMajorUnit',
     'is_automatic_max_value' => 'IsAutomaticMaxValue',
     'is_automatic_minor_unit' => 'IsAutomaticMinorUnit',
     'is_automatic_min_value' => 'IsAutomaticMinValue',
     'is_display_unit_label_shown' => 'IsDisplayUnitLabelShown',
-    'is_automatic_major_unit' => 'IsAutomaticMajorUnit',
     'is_logarithmic' => 'IsLogarithmic',
     'is_plot_order_reversed' => 'IsPlotOrderReversed',
     'is_visible' => 'IsVisible',
@@ -431,7 +449,8 @@ __PACKAGE__->attribute_map( {
     'tick_labels' => 'TickLabels',
     'tick_label_spacing' => 'TickLabelSpacing',
     'tick_mark_spacing' => 'TickMarkSpacing',
-    'title' => 'Title'
+    'title' => 'Title',
+    'link' => 'link' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

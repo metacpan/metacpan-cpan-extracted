@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::DataBar;
 
 require 5.6.0;
@@ -36,11 +35,11 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Color;
 use AsposeCellsCloud::Object::ConditionalFormattingValue;
 use AsposeCellsCloud::Object::DataBarBorder;
-use AsposeCellsCloud::Object::NegativeBarFormat;
+use AsposeCellsCloud::Object::NegativeBarFormat; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -56,12 +55,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -102,7 +101,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -110,7 +109,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -122,127 +121,127 @@ sub _deserialize {
 }
 
 
-
-__PACKAGE__->class_documentation({description => 'Describe the DataBar conditional formatting rule. This conditional formatting    rule displays a gradated data bar in the range of cells.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'DataBar',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'direction' => {
-    	datatype => 'string',
-    	base_name => 'Direction',
-    	description => 'Gets or sets the direction the databar is displayed.',
-    	format => '',
-    	read_only => '',
-    		},
-    'max_cfvo' => {
-    	datatype => 'ConditionalFormattingValue',
-    	base_name => 'MaxCfvo',
-    	description => 'Get or set this DataBar&#39;s max value object.  Cannot set null or CFValueObject    with type FormatConditionValueType.Min to it.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'color' => {
-    	datatype => 'Color',
-    	base_name => 'Color',
-    	description => 'Get or set this DataBar&#39;s Color.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'min_length' => {
-    	datatype => 'int',
-    	base_name => 'MinLength',
-    	description => 'Represents the min length of data bar .             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'bar_fill_type' => {
-    	datatype => 'string',
-    	base_name => 'BarFillType',
-    	description => 'Gets or sets how a data bar is filled with color.',
-    	format => '',
-    	read_only => '',
-    		},
-    'min_cfvo' => {
-    	datatype => 'ConditionalFormattingValue',
-    	base_name => 'MinCfvo',
-    	description => 'Get or set this DataBar&#39;s min value object.  Cannot set null or CFValueObject   with type FormatConditionValueType.Max to it.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'axis_position' => {
-    	datatype => 'string',
-    	base_name => 'AxisPosition',
-    	description => 'Gets or sets the position of the axis of the data bars specified by a conditional    formatting rule.',
-    	format => '',
-    	read_only => '',
-    		},
-    'negative_bar_format' => {
-    	datatype => 'NegativeBarFormat',
-    	base_name => 'NegativeBarFormat',
-    	description => 'Gets the NegativeBarFormat object associated with a data bar conditional     formatting rule.',
-    	format => '',
-    	read_only => '',
-    		},
-    'bar_border' => {
-    	datatype => 'DataBarBorder',
-    	base_name => 'BarBorder',
-    	description => 'Gets an object that specifies the border of a data bar.',
-    	format => '',
-    	read_only => '',
-    		},
-    'axis_color' => {
-    	datatype => 'Color',
-    	base_name => 'AxisColor',
-    	description => 'Gets the color of the axis for cells with conditional formatting as data bars.',
-    	format => '',
-    	read_only => '',
-    		},
-    'max_length' => {
-    	datatype => 'int',
-    	base_name => 'MaxLength',
-    	description => 'Represents the max length of data bar .',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_value' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowValue',
-    	description => 'Get or set the flag indicating whether to show the values of the cells on   which this data bar is applied.  Default value is true.             ',
-    	format => '',
-    	read_only => '',
-    		},
+     'axis_color' => {
+     	datatype => 'Color',
+     	base_name => 'AxisColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'axis_position' => {
+     	datatype => 'string',
+     	base_name => 'AxisPosition',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'bar_border' => {
+     	datatype => 'DataBarBorder',
+     	base_name => 'BarBorder',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'bar_fill_type' => {
+     	datatype => 'string',
+     	base_name => 'BarFillType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'color' => {
+     	datatype => 'Color',
+     	base_name => 'Color',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'direction' => {
+     	datatype => 'string',
+     	base_name => 'Direction',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'max_cfvo' => {
+     	datatype => 'ConditionalFormattingValue',
+     	base_name => 'MaxCfvo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'max_length' => {
+     	datatype => 'int',
+     	base_name => 'MaxLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'min_cfvo' => {
+     	datatype => 'ConditionalFormattingValue',
+     	base_name => 'MinCfvo',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'min_length' => {
+     	datatype => 'int',
+     	base_name => 'MinLength',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'negative_bar_format' => {
+     	datatype => 'NegativeBarFormat',
+     	base_name => 'NegativeBarFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_value' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowValue',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
+    'axis_color' => 'Color',
+    'axis_position' => 'string',
+    'bar_border' => 'DataBarBorder',
+    'bar_fill_type' => 'string',
+    'color' => 'Color',
     'direction' => 'string',
     'max_cfvo' => 'ConditionalFormattingValue',
-    'color' => 'Color',
-    'min_length' => 'int',
-    'bar_fill_type' => 'string',
-    'min_cfvo' => 'ConditionalFormattingValue',
-    'axis_position' => 'string',
-    'negative_bar_format' => 'NegativeBarFormat',
-    'bar_border' => 'DataBarBorder',
-    'axis_color' => 'Color',
     'max_length' => 'int',
-    'show_value' => 'boolean'
+    'min_cfvo' => 'ConditionalFormattingValue',
+    'min_length' => 'int',
+    'negative_bar_format' => 'NegativeBarFormat',
+    'show_value' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'axis_color' => 'AxisColor',
+    'axis_position' => 'AxisPosition',
+    'bar_border' => 'BarBorder',
+    'bar_fill_type' => 'BarFillType',
+    'color' => 'Color',
     'direction' => 'Direction',
     'max_cfvo' => 'MaxCfvo',
-    'color' => 'Color',
-    'min_length' => 'MinLength',
-    'bar_fill_type' => 'BarFillType',
-    'min_cfvo' => 'MinCfvo',
-    'axis_position' => 'AxisPosition',
-    'negative_bar_format' => 'NegativeBarFormat',
-    'bar_border' => 'BarBorder',
-    'axis_color' => 'AxisColor',
     'max_length' => 'MaxLength',
-    'show_value' => 'ShowValue'
+    'min_cfvo' => 'MinCfvo',
+    'min_length' => 'MinLength',
+    'negative_bar_format' => 'NegativeBarFormat',
+    'show_value' => 'ShowValue' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

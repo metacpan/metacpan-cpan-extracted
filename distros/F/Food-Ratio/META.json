@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "bsd"
    ],
@@ -37,7 +37,7 @@
    "provides" : {
       "Food::Ratio" : {
          "file" : "lib/Food/Ratio.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "https://thrig.me/src/Food-Ratio.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

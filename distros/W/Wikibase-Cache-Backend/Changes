@@ -1,2 +1,8 @@
+0.04 2023-05-25T10:17:54+02:00
+ - Add doc.
+ - Add example.
+ - Add tests.
+ - Update Module::Install to 1.21 version.
+
 0.03 2023-04-13T09:23:14+02:00
  - First version - move from Wikibase::Cache distribution

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Top10Filter;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,55 +118,55 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Top10Filter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'items' => {
-    	datatype => 'int',
-    	base_name => 'Items',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_percent' => {
-    	datatype => 'boolean',
-    	base_name => 'IsPercent',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_top' => {
-    	datatype => 'boolean',
-    	base_name => 'IsTop',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'criteria' => {
-    	datatype => 'string',
-    	base_name => 'Criteria',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'criteria' => {
+     	datatype => 'string',
+     	base_name => 'Criteria',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_percent' => {
+     	datatype => 'boolean',
+     	base_name => 'IsPercent',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_top' => {
+     	datatype => 'boolean',
+     	base_name => 'IsTop',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'items' => {
+     	datatype => 'int',
+     	base_name => 'Items',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'items' => 'int',
+    'criteria' => 'string',
     'is_percent' => 'boolean',
     'is_top' => 'boolean',
-    'criteria' => 'string'
+    'items' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'items' => 'Items',
+    'criteria' => 'Criteria',
     'is_percent' => 'IsPercent',
     'is_top' => 'IsTop',
-    'criteria' => 'Criteria'
+    'items' => 'Items' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

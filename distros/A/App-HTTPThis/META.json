@@ -52,13 +52,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/app-httpthis/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/melo/app-httpthis.git",
-         "web" : "https://github.com/melo/app-httpthis/"
+         "url" : "https://github.com/davorg/app-httpthis.git",
+         "web" : "https://github.com/davorg/app-httpthis/"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-2.0"

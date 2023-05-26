@@ -2,7 +2,7 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, etc.
-use t_TestCommon ':silent', qw/bug/; # Test::More etc.
+use t_TestCommon ':silent', qw/bug/; # Test2::V0 etc.
 
 #
 # Verify that internal function _show_as_number() distinguishes numerics
@@ -65,7 +65,7 @@ sub check_numeric($$) { # calls ok(...)
 #    }
 #  }
   @_ = ($ok, $desc);
-  goto &Test::More::ok;  # so caller's line number is shown on failure
+  goto &Test2::V0::ok;  # so caller's line number is shown on failure
 }
 
 

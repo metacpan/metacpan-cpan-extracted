@@ -51,7 +51,7 @@ qx.Class.define("callbackery.ui.plugin.Html", {
                 parentFormData = this._getParentFormData();
             }
             var busy = callbackery.ui.Busy.getInstance();
-            busy.show(this.tr('Loading HTML Data'));
+            busy.manifest(this.tr('Loading HTML Data'));
             var that = this;
             rpc.callAsync(function(data,exc){
                 if (!exc){
@@ -62,7 +62,7 @@ qx.Class.define("callbackery.ui.plugin.Html", {
                         callbackery.ui.MsgBox.getInstance().exc(exc);
                     }
                 }
-                busy.hide();
+                busy.vanish();
             },'getPluginData',cfg.name,parentFormData);
         }
     }

@@ -107,6 +107,9 @@ subtest 'new()' => sub {
         events
         want_array
         override
+        call_original
+        called
+        not_called
     );
 };
 
@@ -266,6 +269,58 @@ subtest 'times()' => sub {
     $test_me->tratata();
 
     is_deeply $sut->times(), { tratata => 2 };
+};
+
+subtest 'called()' => sub {
+    my $test_me = TestMe->new();
+
+    $test_me->tratata();
+
+    my $sut = init_sut();
+
+    is $sut->called(), 0;
+
+    $sut->override(
+        tratata => sub {
+            pass 'tratata()';
+
+            return NEW_ANSWER;
+        },
+    );
+
+    $test_me->tratata();
+
+    is $sut->called(), 1;
+
+    $test_me->tratata();
+
+    is $sut->called(), 1;
+};
+
+subtest 'not_called()' => sub {
+    my $test_me = TestMe->new();
+
+    $test_me->tratata();
+
+    my $sut = init_sut();
+
+    is $sut->not_called(), 1;
+
+    $sut->override(
+        tratata => sub {
+            pass 'tratata()';
+
+            return NEW_ANSWER;
+        },
+    );
+
+    $test_me->tratata();
+
+    is $sut->not_called(), 0;
+
+    $test_me->tratata();
+
+    is $sut->not_called(), 0;
 };
 
 subtest 'events() when applied to class' => sub {

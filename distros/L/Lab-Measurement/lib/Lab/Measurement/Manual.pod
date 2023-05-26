@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 OVERVIEW
 
@@ -138,7 +138,7 @@ instruments and the high-level Lab::XPRESS interface
 
 =item * L<Lab::Moose::Instrument::HP34410A>
 
-alias: L<Lab::Moose::Instrument::Agilent34410A>
+=item * L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::Agilent34460A>
 
@@ -154,13 +154,17 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =over
 
-=item * L<Lab::Moose::Instrument::YokogawaGS200>
+=item * L<Lab::Moose::Instrument::Agilent33120A>
 
-=item * L<Lab::Moose::Instrument::Yokogawa7651>
+=item * L<Lab::Moose::Instrument::Agilent33210A>
+
+=item * L<Lab::Moose::Instrument::HP33120A>
 
 =item * L<Lab::Moose::Instrument::KeysightE3633E>
 
-=item * L<Lab::Moose::Instrument::Agilent33120A>
+=item * L<Lab::Moose::Instrument::Yokogawa7651>
+
+=item * L<Lab::Moose::Instrument::YokogawaGS200>
 
 =item * L<Lab::Moose::Instrument::DummySource>
 
@@ -201,6 +205,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 =head3 RF generators
 
 =over
+
+=item * L<Lab::Moose::Instrument::KeysightN9310A>
 
 =item * L<Lab::Moose::Instrument::RS_SMB>
 
@@ -258,6 +264,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 =over
 
+=item * L<Lab::Moose::Instrument::Bluefors_Temp>
+
 =item * L<Lab::Moose::Instrument::OI_Triton>
 
 =item * L<Lab::Moose::Instrument::Lakeshore340>
@@ -297,6 +305,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::HP83732A>
 
 =item * L<Lab::Moose::Instrument::Agilent33120A>
+
+=item * L<Lab::Moose::Instrument::ZI_HDAWG> (work in progress)
 
 =back
 
@@ -408,8 +418,6 @@ contains support for temperature sensor and He/N2 level meters.
 
 alias: C<Lab::Moose::Connection::VISA_GPIB>
 
-=item * L<Lab::Moose::Connection::WWW>
-
 =back
 
 =head3 USB Test & Measurement
@@ -427,6 +435,16 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =over
 
 =item * L<Lab::Moose::Connection::Socket>
+
+=back
+
+=head3 Http Connection
+
+=over
+
+=item * L<Lab::Moose::Connection::HTTP>
+
+=item * L<Lab::Moose::Connection::WWW>
 
 =back
 
@@ -482,7 +500,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
             2020       Andreas K. Huettel, Sam Bingner, Simon Reinhardt
             2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
             2022       Andreas K. Huettel, Mia Schambeck, Simon Reinhardt
-            2023       Andreas K. Huettel
+            2023       Andreas K. Huettel, Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

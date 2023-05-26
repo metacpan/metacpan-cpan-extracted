@@ -17,44 +17,44 @@ access to all that module's methods.
 
 Other methods include:
 
-	$start = $network->start;
+    $start = $network->start;
 
 Returns an integer representing the starting number in the block of
 Autonomous System numbers.
 
-	$end = $network->end;
+    $end = $network->end;
 
 Returns an integer representing the ending number in the block of
 Autonomous System numbers.
 
-	$name = $network->name;
+    $name = $network->name;
 
 Returns a string containing the identifier assigned to the autnum
 registration by the registration holder.
 
-	$type = $network->type;
+    $type = $network->type;
 
 Returns a string containing an RIR-specific classification of the
 autnum.
 
-	$country = $network->country;
+    $country = $network->country;
 
 Returns a string containing the two-character country code of the
 autnum.
 
 =cut
 
-sub start		{ $_[0]->{'startAutnum'}	}
-sub end			{ $_[0]->{'endAutnum'}		}
-sub name		{ $_[0]->{'name'}		}
-sub type		{ $_[0]->{'type'}		}
-sub country		{ $_[0]->{'country'}		}
+sub start       { $_[0]->{'startAutnum'}}
+sub end         { $_[0]->{'endAutnum'}  }
+sub name        { $_[0]->{'name'}       }
+sub type        { $_[0]->{'type'}       }
+sub country     { $_[0]->{'country'}    }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

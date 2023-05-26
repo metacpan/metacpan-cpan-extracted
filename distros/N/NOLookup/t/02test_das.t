@@ -5,7 +5,7 @@ use Test::More tests => 26;
 
 require_ok( 'NOLookup::DAS::DASLookup' );
 
-my $SERVER = $ENV{DAS_SERVICE} || "finger.norid.no";
+my $SERVER = $ENV{DAS_SERVICE} || "finger.test.norid.no";
 
 # Registered/delegated
 my $q = "norid.no";

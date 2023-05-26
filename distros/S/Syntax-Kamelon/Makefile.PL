@@ -7,6 +7,11 @@ WriteMakefile(
    NAME              => 'Syntax::Kamelon',
    VERSION_FROM      => 'lib/Syntax/Kamelon.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
    LICENSE           => 'Perl',
+   EXE_FILES => [
+      'bin/kamelon',
+      'bin/kamelon_analyze',
+      'bin/kamelon_stepper',
+   ],
    PREREQ_PM         => {
       'Data::Dumper' => 0,
       'Module::Load::Conditional' => 0,

@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id$
 package Net::EPP::Frame::Command::Create::Host;
 use base qw(Net::EPP::Frame::Command::Create);
 use Net::EPP::Frame::ObjectSpec;
@@ -109,28 +104,5 @@ sub setAddr {
 	}
 	return 1;
 }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-United Domains AG (http://www.united-domains.de/) provided the original version of Net::EPP::Frame::Command::Create::Host.
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
-=cut
 
 1;

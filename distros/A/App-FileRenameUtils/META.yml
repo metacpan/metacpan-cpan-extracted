@@ -21,10 +21,10 @@ name: App-FileRenameUtils
 provides:
   App::FileMoveUtils:
     file: lib/App/FileMoveUtils.pm
-    version: '0.007'
+    version: '0.009'
   App::FileRenameUtils:
     file: lib/App/FileRenameUtils.pm
-    version: '0.007'
+    version: '0.009'
 requires:
   App::perlmv: '0.604'
   App::perlmv::scriptlet::add_prefix: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils
   homepage: https://metacpan.org/release/App-FileRenameUtils
   repository: git://github.com/perlancar/perl-App-FileRenameUtils.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -50,7 +50,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.031'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -332,7 +332,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

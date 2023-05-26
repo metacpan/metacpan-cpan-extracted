@@ -2,9 +2,9 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, etc.
-use t_TestCommon ':silent', # Test::More etc.
+use t_TestCommon ':silent', # Test2::V0 etc.
                   qw/bug displaystr fmt_codestring timed_run 
-                     checkeq_literal check @quotes/;
+                     mycheckeq_literal mycheck @quotes/;
 
 use Data::Dumper::Interp;
 use Scalar::Util qw(refaddr);
@@ -35,8 +35,9 @@ sub check_rvis($) {
   my $visq_result = visq($item);
   if (defined $addr) {
     my $reftype = reftype($item);
+    my $ref     = ref($item); # class name if blessed
     confess "mal-formed addrvis($reftype) result ($abbr_addr)" 
-      unless $abbr_addr =~ /^${reftype}\<\d{3,99}:[\da-f]{3,99}\>$/;
+      unless $abbr_addr =~ /^(?:${reftype}|${ref})\<\d{3,99}:[\da-f]{3,99}\>$/;
     $exp = $abbr_addr.$vis_result;
     $desc = sprintf "rvis(%s) is %s", u($item), rvis($exp);
   } else {

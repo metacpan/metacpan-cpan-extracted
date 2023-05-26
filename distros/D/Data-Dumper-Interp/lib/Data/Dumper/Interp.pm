@@ -22,8 +22,8 @@ use feature 'lexical_subs';
 no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
-our $VERSION = '5.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-05-10'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '5.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-05-19'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -65,7 +65,8 @@ sub addrvis(_) {
   # Display an address as decimal:hex showing only the last few digits.
   # The number of digits shown increases when collisions occur.
   # The arg can be a numeric address or a ref from which the addr is taken.
-  # If the arg is a ref, the result is REFTYPE<dec:hex> otherwise just dec:hex
+  # If the arg is a ref, the result is REFTYPEorOBJTYPE<dec:hex> 
+  # otherwise just dec:hex
   my $arg = shift // return("undef");
   my $refarg = ref($arg) ne "";
   my $a;
@@ -93,7 +94,7 @@ sub addrvis(_) {
     $addrvis_a2abv->{$a} = $abbr;
   }
   my $rawabbr = abbr_dec($a).":".abbr_hex($a);
-  $refarg ? reftype($arg)."<${rawabbr}>" : $rawabbr
+  $refarg ? ref($arg)."<${rawabbr}>" : $rawabbr
 }
 
 =for Pod::Coverage addrvis_forget
@@ -142,7 +143,7 @@ sub _dbrawstr(_) { "«".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)
 sub _dbstr($) {
   local $_ = shift;
   return "undef" if !defined;
-  s/\n/\N{U+2424}/sg; # a special NL glyph
+  s/\x{0a}/\N{U+2424}/sg; # a special NL glyph
   s/ /\N{U+00B7}/sg;  # space -> Middle Dot
   s/[\x{00}-\x{1F}]/ chr( ord($&)+0x2400 ) /aseg;
   $_
@@ -627,7 +628,7 @@ sub Dump {
   # We always call Data::Dumper with Indent(0) and Pad("") to get a single
   # maximally-compact string, and then manually fold the result to Foldwidth,
   # and insert the user's Pad before each line.
-  my $pad = $self->Pad();
+  my $users_pad = $self->Pad();
   $self->Pad("");
 
   # Data::Dumper occasionally aborts and returns a partially-complete
@@ -649,7 +650,7 @@ sub Dump {
     }
     ($@, $?) = ($sAt, $sQ);
   }
-  $self->Pad($pad);
+  $self->Pad($users_pad);
 
   my $our_result;
   if ($dd_warning) {
@@ -924,7 +925,7 @@ sub __unesc_unicode() {  # edits $_
     # Data::Dumper with Useqq(1) outputs wide characters as hex escapes
     # Note that a BOM is the ZERO WIDTH NO-BREAK SPACE character and
     # so is considered "Graphical", but we want to see it as hex rather
-    # than "", and probably for other "Format" category Unicode characters.
+    # than "", and probably any other "Format" category Unicode characters.
 
     s/
        \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\x{7B} (?<hex>[a-fA-F0-9]+) \x{7D} )
@@ -997,6 +998,7 @@ sub _postprocess_DD_result {
   my $controlpics   = $useqq =~ /pic/;
   my $spacedots     = $useqq =~ /space/;
   my $qq            = $useqq =~ /qq(?:=(..))?/ ? ($1//'{}') : '';
+  my $pad = $self->Pad() // "";
 
   $indent_unit = 2; # make configurable?
 
@@ -1160,6 +1162,9 @@ sub _postprocess_DD_result {
   
   my $foldwidthN = $foldwidth || INT_MAX;
   my $maxlinelen = $foldwidth1 || $foldwidthN;
+  $foldwidthN -= length($pad);
+  $maxlinelen -= length($pad);
+
   my $outstr; 
   my $linelen;
   our $level;
@@ -1328,6 +1333,12 @@ sub _postprocess_DD_result {
     $outstr =~ s/\A\{/(/ && $outstr =~ s/\}\z/)/s or oops;
   }
   else { oops }
+
+  # Insert user-specified padding after each embedded newline
+  if ($pad) {
+    $outstr =~ s/\n\K(?=[^\n])/$pad/g;
+  }
+  
   $outstr
 } #_postprocess_DD_result {
 
@@ -1552,6 +1563,7 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   @ARGV = ('-i', '/file/path');
   my %hash = (abc => [1,2,3,4,5], def => undef);
   my $ref = \%hash;
+  my $obj = bless {}, "Foo::Bar";
 
   # Interpolate variables in strings with Data::Dumper output
   say ivis 'FYI ref is $ref\nThat hash is: %hash\nArgs are @ARGV';
@@ -1576,8 +1588,9 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say rvis $ref;   #prints HASH<457:1c9>{abc => [1,2,3,4,5], ...}
   
   # Just abbreviate a referent address or arbitrary number
-  say addrvis $ref;           # HASH<457:1c9>
   say addrvis refaddr($ref);  # 457:1c9
+  say addrvis $ref;           # HASH<457:1c9>
+  say addrvis $obj;           # Foo::Bar<984:ef8>
 
   # Stringify objects
   { use bigint;
@@ -1709,9 +1722,9 @@ The "B<l>" variants return a bare list without the enclosing parenthesis.
 
 =head2 avisq LIST
 
-=head2 hvisq LIST
-
 =head2 alvisq LIST
+
+=head2 hvisq EVENLIST
 
 =head2 hlvisq EVENLIST
 
@@ -1726,14 +1739,17 @@ if wide characters are present.
 =head2 addrvis NUMBER
 
 Abbreviate object addresses, showing only the last few digits
-in both decimal and hex.  The result is like I<< "HASHE<lt>457:1c9E<gt>" >>
-for references, I<< "457:1c9" >> for a plain numbers, 
-or I<"undef"> if the argument is undefined.
+in both decimal and hex.  
 
 The number of digits increases over time if necessary to keep new results 
 unambiguous.  
 Every value is remembered internally, so
 calling this with billions of unique values will use lots of memory.
+
+The result is like I<< "457:1c9" >> for plain numbers,
+I<< "HASHE<lt>457:1c9E<gt>" >> for unblessed references,
+I<< "Package::NameE<lt>457:1c9E<gt>" >> for blessed refs,
+or I<"undef"> if the argument is undefined.
 
 B<rvis> is essentially the same as
 

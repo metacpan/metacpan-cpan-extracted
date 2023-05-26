@@ -84,7 +84,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-geos"
       }
    },
-   "version" : "1.011",
+   "version" : "1.012",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.73",
       "requires" : {

@@ -11,6 +11,8 @@ use Fatal qw(:void open close);
 use Cwd qw(abs_path);
 use PerlIO;
 
+sub _abs_path;
+
 =head1 NAME
 
 Image::MetaData::GQview - Perl extension for GQview image metadata
@@ -42,7 +44,7 @@ All internal errors will trow an error!
 
 =cut
 
-use version; our $VERSION = qv("v2.0.0");
+use version; our $VERSION = qv("v2.0.2");
 
 =item new
 
@@ -97,15 +99,15 @@ sub load
    my $metafile = shift;
 
    croak("No File given!") unless $image;
-   $image = abs_path($image);
-   croak("No such file ($image)!") unless -e $image;
+   $image = _abs_path($image);
+   croak("No such file ($image)!") unless -e $image or -l $image;
 
    $self->{imagefile} = $image;
 
    unless ($metafile)
    {
       (my $metadata1 = $image) =~ s#/([^/]*)$#/.metadata/$1.meta#;
-      my $metadata2 = abs_path($ENV{HOME}) . ".gqview/metadata$image.meta";
+      my $metadata2 = _abs_path($ENV{HOME}) . ".gqview/metadata$image.meta";
 
       $metafile = $metadata1 if -r $metadata1;
       $metafile ||= $metadata2 if -r $metadata2;
@@ -211,11 +213,11 @@ sub save
    $metafile ||= $self->{metafile};
 
    croak("No File given!") unless $image;
-   $image = abs_path($image);
-   croak("No such file ($image)!") unless -e $image;
+   $image = _abs_path($image);
+   croak("No such file ($image)!") unless -e $image or -l $image;
 
    (my $metadata1 = $image) =~ s#/([^/]*)$#/.metadata/$1.meta#;
-   my $metadata2 = abs_path($ENV{HOME}) . ".gqview/metadata$image.meta";
+   my $metadata2 = _abs_path($ENV{HOME}) . "/.gqview/metadata$image.meta";
 
    my $metadata;
 
@@ -356,6 +358,17 @@ sub _sync
 
    return 1;
 } ## end sub _sync
+
+sub _abs_path
+{
+   my $path = shift;
+
+   $path = './' . $path unless $path =~ m#/#;
+   my ($p, $f) = $path =~ /^(.*)\/([^\/]*)$/;
+   $p = abs_path($p);
+
+   return "$p/$f";
+}
 
 1;
 

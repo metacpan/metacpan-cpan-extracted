@@ -1,3 +1,10 @@
+0.153   2023-02-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] [cli dist-has-deb] Mention lcpan debian-dist2deb.
+
+
 0.152   2022-08-21  Released-By: PERLANCAR; Urgency: medium
 
         - [cli list-dists] Add option 'detail'.

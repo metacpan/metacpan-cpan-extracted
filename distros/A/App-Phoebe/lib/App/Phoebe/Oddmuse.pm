@@ -428,6 +428,10 @@ sub oddmuse_gemini_text {
     my @links;
     $block =~ s/^(=>.*)\n?/push(@links, $1); ""/gem;
     $block =~ s/^$full_url_regex\n?/push(@links, "=> $1"); ""/ge;
+    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\]\]\s*/push(@links, oddmuse_gemini_link($stream, $host, $space, "$1 (image)", $1)); ""/ge;
+    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\|([^\]|]*)\]\]\s*/push(@links, oddmuse_gemini_link($stream, $host, $space, "$2 (image)", $1)) if $2; ""/ge;
+    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\|([^\]|]*)\|([^\]|]+)\]\]\s*/push(@links, oddmuse_gemini_link($stream, $host, $space, "$2 (image)", $1), oddmuse_gemini_link($stream, $host, $space, "$2 (follow-up)", $3)); ""/ge;
+    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\|([^\]|]*)\|([^\]|]*)\|([^\]|]+)\]\]\s*/push(@links, oddmuse_gemini_link($stream, $host, "$2 (image)", $1), oddmuse_gemini_link($stream, $host, $space, "$4 (follow-up)", $3)); ""/ge;
     $block =~ s/\[([^]]+)\]\($full_url_regex\)/push(@links, oddmuse_gemini_link($stream, $host, $space, $1, $2)); $1/ge;
     $block =~ s/\[([^]]+)\]\(([^) ]+)\)/push(@links, oddmuse_gemini_link($stream, $host, $space, $1, $2)); $1/ge;
     $block =~ s/\[$full_url_regex\s+([^]]+)\]/push(@links, oddmuse_gemini_link($stream, $host, $space, $2, $1)); $2/ge;
@@ -437,10 +441,6 @@ sub oddmuse_gemini_text {
     $block =~ s/\[\[tag:([^]|]+)\]\]/push(@links, oddmuse_gemini_link($stream, $host, $space, $1, "tag\/$1")); $1/ge;
     $block =~ s/\[\[tag:([^]|]+)\|([^\]|]+)\]\]/push(@links, oddmuse_gemini_link($stream, $host, $space, $2, "tag\/$1")); $2/ge;
     $block =~ s/<journal search tag:(\S+)>\n*/push(@links, oddmuse_gemini_link($stream, $host, $space, "Explore the $1 tag", "tag\/$1")); ""/ge;
-    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\]\]/push(@links, oddmuse_gemini_link($stream, $host, $space, "$1 (image)", $1)); ""/ge;
-    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\|([^\]|]*)\]\]/push(@links, oddmuse_gemini_link($stream, $host, $space, "$2 (image)", $1)) if $2; ""/ge;
-    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\|([^\]|]*)\|([^\]|]+)\]\]/push(@links, oddmuse_gemini_link($stream, $host, "$2 (image)", $1), oddmuse_gemini_link($stream, $host, $space, "$2 (follow-up)", $3)); ""/ge;
-    $block =~ s/\[\[image(?:\/[^\/:]+)*:([^]|]+)\|([^\]|]*)\|([^\]|]*)\|([^\]|]+)\]\]/push(@links, oddmuse_gemini_link($stream, $host, "$2 (image)", $1), oddmuse_gemini_link($stream, $host, $space, "$4 (follow-up)", $3)); ""/ge;
     # free links with text, e.g. [[Alex Schroeder|code monkey]]
     $block =~ s/\[\[$link_regex\|([^\]|]+)\]\]/push(@links, oddmuse_gemini_link($stream, $host, $space, $2, $1)); $2/ge;
     # free links, e.g. [[Alex Schröder]]

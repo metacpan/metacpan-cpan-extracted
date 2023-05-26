@@ -1,16 +1,17 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Simple.pm,v 1.10 2011/04/08 12:57:11 gavin Exp $
 package Net::EPP::Simple;
 use Carp;
+use Config;
 use Digest::SHA qw(sha1_hex);
+use List::Util qw(any);
+use Net::EPP;
 use Net::EPP::Frame;
 use Net::EPP::ResponseCodes;
 use Time::HiRes qw(time);
 use base qw(Net::EPP::Client);
-use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
+use constant {
+    EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0',
+    LOGINSEC_XMLNS => 'urn:ietf:params:xml:ns:epp:loginSec-1.0',
+};
 use vars qw($Error $Code $Message @Log);
 use strict;
 use warnings;
@@ -24,7 +25,7 @@ our @Log	= ();
 
 =head1 Name
 
-Net::EPP::Simple - a simple EPP client interface for the most common jobs
+Net::EPP::Simple - a simple EPP client interface for the most common jobs.
 
 =head1 Synopsis
 
@@ -51,25 +52,17 @@ Net::EPP::Simple - a simple EPP client interface for the most common jobs
 
 =head1 Description
 
-EPP is the Extensible Provisioning Protocol. EPP (defined in RFC 4930) is an
-application layer client-server protocol for the provisioning and management of
-objects stored in a shared central repository. Specified in XML, the protocol
-defines generic object management operations and an extensible framework that
-maps protocol operations to objects. As of writing, its only well-developed
-application is the provisioning of Internet domain names, hosts, and related
-contact details.
+This module provides a high level interface to EPP. It hides all the boilerplate
+of connecting, logging in, building request frames and parsing response frames behind
+a simple, Perlish interface.
 
-This module provides a high level interface to the EPP protocol. It hides all
-the boilerplate of connecting, logging in, building request frames and parsing
-response frames behind a simple, Perlish interface.
-
-It is based on the C<Net::EPP::Client> module and uses C<Net::EPP::Frame>
+It is based on the L<Net::EPP::Client> module and uses L<Net::EPP::Frame>
 to build request frames.
 
 =head1 Constructor
 
 The constructor for C<Net::EPP::Simple> has the same general form as the
-one for C<Net::EPP::Client>, but with the following exceptions:
+one for L<Net::EPP::Client>, but with the following exceptions:
 
 =over
 
@@ -77,15 +70,35 @@ one for C<Net::EPP::Client>, but with the following exceptions:
 
 =item * Unless the C<no_ssl> parameter is set, SSL is always on
 
-=item * You can use the C<user> and C<pass> parameters to supply authentication information.
+=item * You can use the C<user> and C<pass> parameters to supply authentication
+information.
 
-=item * The C<timeout> parameter controls how long the client waits for a response from the server before returning an error.
+=item * You can use the C<newPW> parameter to specify a new password.
 
-=item * if C<debug> is set, C<Net::EPP::Simple> will output verbose debugging information on C<STDERR>, including all frames sent to and received from the server.
+=item * The C<login_security> parameter can be used to force the use of the
+Login Security Extension (see RFC8807). C<Net::EPP::Simple> will automatically
+use this extension if the server supports it, but clients may wish to force
+this behaviour to prevent downgrade attacks.
 
-=item * C<reconnect> can be used to disable automatic reconnection (it is enabled by default). Before sending a frame to the server, C<Net::EPP::Simple> will send a C<E<lt>helloE<gt>> to check that the connection is up, if not, it will try to reconnect, aborting after the I<n>th time, where I<n> is the value of C<reconnect> (the default is 3).
+=item * The C<appname> parameter can be used to specify the value of the
+C<E<lt>app<gt>> element in the Login Security extension (if used). Unless
+specified, the name and current version of C<Net::EPP::Simple> will be used.
 
-=item * C<login> can be used to disable automatic logins. If you set it to C<0>, you can manually log in using the C<$epp->_login()> method.
+=item * The C<timeout> parameter controls how long the client waits for a
+response from the server before returning an error.
+
+=item * if C<debug> is set, C<Net::EPP::Simple> will output verbose debugging
+information on C<STDERR>, including all frames sent to and received from the
+server.
+
+=item * C<reconnect> can be used to disable automatic reconnection (it is
+enabled by default). Before sending a frame to the server, C<Net::EPP::Simple>
+will send a C<E<lt>helloE<gt>> to check that the connection is up, if not, it
+will try to reconnect, aborting after the I<n>th time, where I<n> is the value
+of C<reconnect> (the default is 3).
+
+=item * C<login> can be used to disable automatic logins. If you set it
+to C<0>, you can manually log in using the C<$epp-E<gt>_login()> method.
 
 =item * C<objects> is a reference to an array of the EPP object schema
 URIs that the client requires.
@@ -105,11 +118,14 @@ standard EPP C<secDNS-1.1> DNSSEC extension schema.
 =item * If neither C<extensions> nor C<stdext> is specified then the
 client will echo the server's extension schema list.
 
+=item * The C<lang> parameter can be used to specify the language. The
+default is "C<en>".
+
 =back
 
 The constructor will establish a connection to the server and retrieve the
-greeting (which is available via $epp-E<gt>{greeting}) and then send a
-E<lt>loginE<gt> request.
+greeting (which is available via C<$epp-E<gt>{greeting}>) and then send a
+C<E<lt>loginE<gt>> request.
 
 If the login fails, the constructor will return C<undef> and set
 C<$Net::EPP::Simple::Error> and C<$Net::EPP::Simple::Code>.
@@ -160,14 +176,14 @@ If you are connecting to an EPP server which requires a client
 certificate, you can configure C<Net::EPP::Simple> to use one as
 follows:
 
-	my $epp = Net::EPP::Simple->new(
-		host		=> 'epp.nic.tld',
-		user		=> 'my-id',
-		pass		=> 'my-password',
-		key		=> '/path/to/my.key',
-		cert		=> '/path/to/my.crt',
-		passphrase	=> 'foobar123',
-	);
+    my $epp = Net::EPP::Simple->new(
+        host        => 'epp.nic.tld',
+        user        => 'my-id',
+        pass        => 'my-password',
+        key         => '/path/to/my.key',
+        cert        => '/path/to/my.crt',
+        passphrase  => 'foobar123',
+    );
 
 C<key> is the filename of the private key, C<cert> is the filename of
 the certificate. If the private key is encrypted, the C<passphrase>
@@ -175,11 +191,11 @@ parameter will be used to decrypt it.
 
 =head2 Configuration File
 
-C<Net::EPP::Simple> supports the use of a simple configuration file. To 
+C<Net::EPP::Simple> supports the use of a simple configuration file. To
 use this feature, you need to install the L<Config::Simple> module.
 
-When starting up, C<Net::EPP::Simple> will look for 
-C<$HOME/.net-epp-simple-rc>. This file is an ini-style configuration 
+When starting up, C<Net::EPP::Simple> will look for
+C<$HOME/.net-epp-simple-rc>. This file is an ini-style configuration
 file.
 
 =head3 Default Options
@@ -228,26 +244,30 @@ sub new {
 
 	my $self = $package->SUPER::new(%params);
 
-	$self->{user}		= $params{user};
-	$self->{pass}		= $params{pass};
-	$self->{debug} 		= (defined($params{debug}) ? int($params{debug}) : undef);
-	$self->{timeout}	= (defined($params{timeout}) && int($params{timeout}) > 0 ? $params{timeout} : 5);
-	$self->{reconnect}	= (defined($params{reconnect}) ? int($params{reconnect}) : 3);
-	$self->{connected}	= undef;
-	$self->{authenticated}	= undef;
-	$self->{connect}	= (exists($params{connect}) ? $params{connect} : 1);
-	$self->{login}		= (exists($params{login}) ? $params{login} : 1);
-	$self->{key}		= $params{key};
-	$self->{cert}		= $params{cert};
-	$self->{passphrase}	= $params{passphrase};
-	$self->{verify}		= $params{verify};
-	$self->{ca_file}	= $params{ca_file};
-	$self->{ca_path}	= $params{ca_path};
-	$self->{ciphers}	= $params{ciphers};
-	$self->{objects}	= $params{objects};
-	$self->{stdobj}		= $params{stdobj};
-	$self->{extensions}	= $params{extensions};
-	$self->{stdext}		= $params{stdext};
+	$self->{user}			= $params{user};
+	$self->{pass}			= $params{pass};
+	$self->{newPW}			= $params{newPW};
+	$self->{debug} 			= (defined($params{debug}) ? int($params{debug}) : undef);
+	$self->{timeout}		= (defined($params{timeout}) && int($params{timeout}) > 0 ? $params{timeout} : 5);
+	$self->{reconnect}		= (defined($params{reconnect}) ? int($params{reconnect}) : 3);
+	$self->{'connected'}		= undef;
+	$self->{'authenticated'}	= undef;
+	$self->{connect}		= (exists($params{connect}) ? $params{connect} : 1);
+	$self->{login}			= (exists($params{login}) ? $params{login} : 1);
+	$self->{key}			= $params{key};
+	$self->{cert}			= $params{cert};
+	$self->{passphrase}		= $params{passphrase};
+	$self->{verify}			= $params{verify};
+	$self->{ca_file}		= $params{ca_file};
+	$self->{ca_path}		= $params{ca_path};
+	$self->{ciphers}		= $params{ciphers};
+	$self->{objects}		= $params{objects};
+	$self->{stdobj}			= $params{stdobj};
+	$self->{extensions}		= $params{extensions};
+	$self->{stdext}			= $params{stdext};
+	$self->{lang}			= $params{lang} || 'en';
+	$self->{login_security}	= $params{login_security};
+	$self->{appname}	    = $params{appname};
 
 	bless($self, $package);
 
@@ -330,6 +350,8 @@ sub _connect {
 		return undef;
 
 	} else {
+		$self->{'connected'} = 1;
+
 		$self->debug('Connected OK, retrieving greeting frame');
 		$self->{greeting} = $self->get_frame;
 		if (ref($self->{greeting}) ne 'Net::EPP::Frame::Response') {
@@ -342,8 +364,6 @@ sub _connect {
 
 		}
 	}
-
-	$self->{connected} = 1;
 
 	map { $self->debug('S: '.$_) } split(/\n/, $self->{greeting}->toString(1));
 
@@ -361,7 +381,7 @@ sub _login {
 	my $self = shift;
 
 	$self->debug(sprintf("Attempting to login as client ID '%s'", $self->{user}));
-	my $response = $self->request( $self->_prepare_login_frame() );
+	my $response = $self->request($self->_prepare_login_frame());
 
 	if (!$response) {
 		$Error = $Message = "Error getting response to login request: ".$Error;
@@ -378,7 +398,7 @@ sub _login {
 			return undef;
 
 		} else {
-			$self->{authenticated} = 1;
+			$self->{'authenticated'} = 1;
 			return 1;
 
 		}
@@ -402,10 +422,73 @@ sub _prepare_login_frame {
 	$self->debug('preparing login frame');
 	my $login = Net::EPP::Frame::Command::Login->new;
 
-	$login->clID->appendText($self->{user});
-	$login->pw->appendText($self->{pass});
+    my @extensions;
+    if ($self->{'stdext'}) {
+        push(@extensions, (Net::EPP::Frame::ObjectSpec->spec('secDNS'))[1]);
+
+    } elsif ($self->{'extensions'}) {
+        @extensions = @{$self->{'extensions'}};
+
+    } else {
+        @extensions = @{$self->_get_option_uri_list('extURI')};
+
+    }
+
+	$login->clID->appendText($self->{'user'});
+
+    if ($self->{'login_security'} || any { LOGINSEC_XMLNS eq $_ } @extensions) {
+        push(@extensions, LOGINSEC_XMLNS) unless (any { LOGINSEC_XMLNS eq $_ } @extensions);
+
+    	$login->pw->appendText('[LOGIN-SECURITY]');
+
+        my $loginSec = $login->createElementNS(LOGINSEC_XMLNS, 'loginSec');
+
+        my $userAgent = $login->createElement('userAgent');
+        $loginSec->appendChild($userAgent);
+
+        my $app = $login->createElement('app');
+        $app->appendText($self->{'appname'} || sprintf('%s %s', __PACKAGE__, $Net::EPP::VERSION));
+        $userAgent->appendChild($app);
+
+        my $tech = $login->createElement('tech');
+        $tech->appendText(sprintf('Perl %s', $Config{'version'}));
+        $userAgent->appendChild($tech);
+
+        my $os = $login->createElement('os');
+        $os->appendText(sprintf('%s %s', ucfirst($Config{'osname'}), $Config{'osvers'}));
+        $userAgent->appendChild($os);
+
+        my $pw = $login->createElement('pw');
+        $pw->appendText($self->{'pass'});
+        $loginSec->appendChild($pw);
+
+    	if ($self->{'newPW'}) {
+    		my $newPW = $login->createElement('newPW');
+    		$newPW->appendText('[LOGIN-SECURITY]');
+    		$login->getNode('login')->insertAfter($newPW, $login->pw);
+
+            $newPW = $login->createElement('newPW');
+            $newPW->appendText($self->{'newPW'});
+            $loginSec->appendChild($newPW);
+        }
+
+        my $extension = $login->createElement('extension');
+        $extension->appendChild($loginSec);
+
+        $login->getCommandNode()->parentNode()->insertAfter($extension, $login->getCommandNode());
+
+    } else {
+    	$login->pw->appendText($self->{pass});
+
+    	if ($self->{newPW}) {
+    		my $newPW = $login->createElement('newPW');
+    		$newPW->appendText($self->{newPW});
+    		$login->getNode('login')->insertAfter($newPW, $login->pw);
+    	}
+    }
+
 	$login->version->appendText($self->{greeting}->getElementsByTagNameNS(EPP_XMLNS, 'version')->shift->firstChild->data);
-	$login->lang->appendText($self->{greeting}->getElementsByTagNameNS(EPP_XMLNS, 'lang')->shift->firstChild->data);
+	$login->lang->appendText($self->{lang});
 
 	my $objects = $self->{objects};
 	$objects = [map { (Net::EPP::Frame::ObjectSpec->spec($_))[1] }
@@ -413,15 +496,13 @@ sub _prepare_login_frame {
 	$objects = _get_option_uri_list($self,'objURI') if not $objects;
 	$login->svcs->appendTextChild('objURI', $_) for @$objects;
 
-	my $extensions = $self->{extensions};
-	$extensions = [map { (Net::EPP::Frame::ObjectSpec->spec($_))[1] }
-		       qw(secDNS)] if $self->{stdext};
-	$extensions = _get_option_uri_list($self,'extURI') if not $extensions;
-	if (@$extensions) {
+	if (scalar(@extensions) > 0) {
 		my $svcext = $login->createElement('svcExtension');
 		$login->svcs->appendChild($svcext);
-		$svcext->appendTextChild('extURI', $_) for @$extensions;
+		$svcext->appendTextChild('extURI', $_) for @extensions;
+
 	}
+
 	return $login;
 }
 
@@ -520,24 +601,17 @@ sub _check {
 
 =head1 Retrieving Object Information
 
-You can retrieve information about an object by using one of the following:
+=head2 Domain Objects
 
 	my $info = $epp->domain_info($domain, $authInfo, $follow);
 
-	my $info = $epp->host_info($host);
-
-	my $info = $epp->contact_info($contact, $authInfo);
-
-C<Net::EPP::Simple> will construct an C<E<lt>infoE<gt>> frame and send
-it to the server, then parse the response into a simple hash ref. The
-layout of the hash ref depends on the object in question. If there is an
-error, these methods will return C<undef>, and you can then check
-C<$Net::EPP::Simple::Error> and C<$Net::EPP::Simple::Code>.
+This method constructs an C<E<lt>infoE<gt>> frame and sends
+it to the server, then parses the response into a simple hash ref. If
+there is an error, this method will return C<undef>, and you can then
+check C<$Net::EPP::Simple::Error> and C<$Net::EPP::Simple::Code>.
 
 If C<$authInfo> is defined, it will be sent to the server as per RFC
-5731, Section 3.1.2 and RFC 5733, Section 3.1.2. If the supplied
-authInfo code is validated by the registry, additional information will
-appear in the response. If it is invalid, you should get an error.
+5731, Section 3.1.2.
 
 If the C<$follow> parameter is true, then C<Net::EPP::Simple> will also
 retrieve the relevant host and contact details for a domain: instead of
@@ -550,8 +624,10 @@ original object ID will be used instead).
 =cut
 
 sub domain_info {
-	my ($self, $domain, $authInfo, $follow) = @_;
-	my $result = $self->_info('domain', $domain, $authInfo);
+	my ($self, $domain, $authInfo, $follow, $hosts) = @_;
+	$hosts = $hosts || 'all';
+
+	my $result = $self->_info('domain', $domain, $authInfo, $hosts);
 	return $result if (ref($result) ne 'HASH' || !$follow);
 
 	if (defined($result->{'ns'}) && ref($result->{'ns'}) eq 'ARRAY') {
@@ -579,22 +655,56 @@ sub domain_info {
 	return $result;
 }
 
+=pod
+
+=head2 Host Objects
+
+	my $info = $epp->host_info($host);
+
+This method constructs an C<E<lt>infoE<gt>> frame and sends
+it to the server, then parses the response into a simple hash ref. If
+there is an error, this method will return C<undef>, and you can then
+check C<$Net::EPP::Simple::Error> and C<$Net::EPP::Simple::Code>.
+
+=cut
+
 sub host_info {
 	my ($self, $host) = @_;
 	return $self->_info('host', $host);
 }
 
+=pod
+
+=head2 Contact Objects
+
+	my $info = $epp->contact_info($contact, $authInfo, $roid);
+
+This method constructs an C<E<lt>infoE<gt>> frame and sends
+it to the server, then parses the response into a simple hash ref. If
+there is an error, this method will return C<undef>, and you can then
+check C<$Net::EPP::Simple::Error> and C<$Net::EPP::Simple::Code>.
+
+If C<$authInfo> is defined, it will be sent to the server as per RFC
+RFC 5733, Section 3.1.2.
+
+If the C<$roid> parameter to C<host_info()> is set, then the C<roid>
+attribute will be set on the C<E<lt>authInfoE<gt>> element.
+
+=cut
+
 sub contact_info {
-	my ($self, $contact, $authInfo) = @_;
-	return $self->_info('contact', $contact, $authInfo);
+	my ($self, $contact, $authInfo, $roid) = @_;
+	return $self->_info('contact', $contact, $authInfo, $roid);
 }
 
 sub _info {
-	my ($self, $type, $identifier, $authInfo) = @_;
+	# $opt is the "hosts" attribute value for domains or the "roid"
+	# attribute for contacts
+	my ($self, $type, $identifier, $authInfo, $opt) = @_;
 	my $frame;
 	if ($type eq 'domain') {
 		$frame = Net::EPP::Frame::Command::Info::Domain->new;
-		$frame->setDomain($identifier);
+		$frame->setDomain($identifier, $opt || 'all');
 
 	} elsif ($type eq 'contact') {
 		$frame = Net::EPP::Frame::Command::Info::Contact->new;
@@ -615,6 +725,7 @@ sub _info {
 		my $el = $frame->createElement((Net::EPP::Frame::ObjectSpec->spec($type))[0].':authInfo');
 		my $pw = $frame->createElement((Net::EPP::Frame::ObjectSpec->spec($type))[0].':pw');
 		$pw->appendChild($frame->createTextNode($authInfo));
+		$pw->setAttribute('roid', $opt) if ($type eq 'contact' && $opt);
 		$el->appendChild($pw);
 		$frame->getNode((Net::EPP::Frame::ObjectSpec->spec($type))[1], 'info')->appendChild($el);
 	}
@@ -648,14 +759,17 @@ sub parse_object_info {
 		# secDNS extension only applies to domain objects
 		my $secinfo = $response->getNode((Net::EPP::Frame::ObjectSpec->spec('secDNS'))[1], 'infData');
 		return $self->_domain_infData_to_hash($infData, $secinfo);
+
 	} elsif ($type eq 'contact') {
 		return $self->_contact_infData_to_hash($infData);
 
 	} elsif ($type eq 'host') {
 		return $self->_host_infData_to_hash($infData);
+
 	} else {
 		$Error = "Unknown object type '$type'";
 		return undef;
+
 	}
 }
 
@@ -716,28 +830,28 @@ like this:
 
 Members of the C<contacts> hash ref may be strings or, if there are
 multiple associations of the same type, an anonymous array of strings.
-If the server uses the "hostAttr" model instead of "hostObj", then the
-C<ns> member will look like this:
+If the server uses the Host Attribute model instead of the Host Object
+model, then the C<ns> member will look like this:
 
 	$info->{ns} = [
 	  {
 	    name => 'ns0.example.com',
 	    addrs => [
-	      type => 'v4',
+	      version => 'v4',
 	      addr => '10.0.0.1',
 	    ],
 	  },
 	  {
 	    name => 'ns1.example.com',
 	    addrs => [
-	      type => 'v4',
+	      version => 'v4',
 	      addr => '10.0.0.2',
 	    ],
 	  },
 	];
 
 Note that there may be multiple members in the C<addrs> section and that
-the C<type> attribute is optional.
+the C<version> attribute is optional.
 
 =cut
 
@@ -832,7 +946,7 @@ this:
 	  'roid' => 'tld-12345',
 	  'status' => [
 	    'linked',
-	    'serverDeleteProhibited',    
+	    'serverDeleteProhibited',
 	  ],
 	  'name' => 'ns0.example.tld',
 	  'addrs' => [
@@ -1176,11 +1290,11 @@ sub _prepare_create_domain_frame {
 
 	my $frame = Net::EPP::Frame::Command::Create::Domain->new;
 	$frame->setDomain($domain->{'name'});
-	$frame->setPeriod($domain->{'period'});
+	$frame->setPeriod($domain->{'period'}) if (defined($domain->{period}) && $domain->{period} > 0);
 	$frame->setNS(@{$domain->{'ns'}}) if $domain->{'ns'} and @{$domain->{'ns'}};
-	$frame->setRegistrant($domain->{'registrant'});
+	$frame->setRegistrant($domain->{'registrant'}) if (defined($domain->{registrant}) && $domain->{registrant} ne '');
 	$frame->setContacts($domain->{'contacts'});
-	$frame->setAuthInfo($domain->{authInfo}) if ($domain->{authInfo} ne '');
+	$frame->setAuthInfo($domain->{authInfo}) if (defined($domain->{authInfo}) && $domain->{authInfo} ne '');
 	return $frame;
 }
 
@@ -1245,10 +1359,10 @@ sub _prepare_create_contact_frame {
 		}
 	}
 
-	$frame->setVoice($contact->{voice}) if ($contact->{voice} ne '');
-	$frame->setFax($contact->{fax}) if ($contact->{fax} ne '');
+	$frame->setVoice($contact->{voice}) if (defined($contact->{voice}) && $contact->{voice} ne '');
+	$frame->setFax($contact->{fax}) if (defined($contact->{fax}) && $contact->{fax} ne '');
 	$frame->setEmail($contact->{email});
-	$frame->setAuthInfo($contact->{authInfo}) if ($contact->{authInfo} ne '');
+	$frame->setAuthInfo($contact->{authInfo}) if (defined($contact->{authInfo}) && $contact->{authInfo} ne '');
 
 	if (ref($contact->{status}) eq 'ARRAY') {
 		foreach my $status (grep { /^client/ } @{$contact->{status}}) {
@@ -1801,7 +1915,7 @@ sub message { $Message }
 
 	my $greeting = $epp->greeting;
 
-Returns the a C<Net::EPP::Frame::Greeting> object representing the greeting returned by the server.
+Returns the a L<Net::EPP::Frame::Greeting> object representing the greeting returned by the server.
 
 =cut
 
@@ -1821,7 +1935,16 @@ sub ping {
 	my $hello = Net::EPP::Frame::Hello->new;
 	my $response = $self->request($hello);
 
-	return (UNIVERSAL::isa($response, 'XML::LibXML::Document') ? 1 : undef);
+	if (UNIVERSAL::isa($response, 'XML::LibXML::Document')) {
+		$Code    = 1000;
+		$Message = 'Command completed successfully.';
+		return 1;
+
+	} else {
+		$Code    = 2400;
+		$Message = 'Error getting greeting from server.';
+		return undef;
+	}
 }
 
 sub _request {
@@ -1860,16 +1983,16 @@ sub _request {
 
 =pod
 
-=head1 Overridden Methods From C<Net::EPP::Client>
+=head1 Overridden Methods From L<Net::EPP::Client>
 
 C<Net::EPP::Simple> overrides some methods inherited from
-C<Net::EPP::Client>. These are described below:
+L<Net::EPP::Client>. These are described below:
 
 =head2 The C<request()> Method
 
 C<Net::EPP::Simple> overrides this method so it can automatically populate
 the C<E<lt>clTRIDE<gt>> element with a unique string. It then passes the
-frame back up to C<Net::EPP::Client>.
+frame back up to L<Net::EPP::Client>.
 
 =cut
 
@@ -1880,22 +2003,44 @@ sub request {
 	$Error		= '';
 	$Message	= '';
 
-	$frame->clTRID->appendText(sha1_hex(ref($self).time().$$)) if (UNIVERSAL::isa($frame, 'Net::EPP::Frame::Command'));
+	if (!$self->connected) {
+		$Code = COMMAND_FAILED;
+		$Error = $Message = 'Not connected';
+		$self->debug('cannot send frame if not connected');
+		return undef;
 
-	$self->debug(sprintf('sending a %s to the server', ref($frame) || (-e $frame ? 'file' : 'string')));
-	if (UNIVERSAL::isa($frame, 'XML::LibXML::Document')) {
-		map { $self->debug('C: '.$_) } split(/\n/, $frame->toString(2));
+	} elsif (!$frame) {
+		$Code = COMMAND_FAILED;
+		$Error = $Message = 'Invalid frame';
+		$self->debug($Message);
+		return undef;
 
 	} else {
-		map { $self->debug('C: '.$_) } split(/\n/, $frame);
+		$frame->clTRID->appendText(sha1_hex(ref($self).time().$$)) if (UNIVERSAL::isa($frame, 'Net::EPP::Frame::Command'));
 
+		my $type = ref($frame);
+		if ($frame =~ /^\//) {
+			$type = 'file';
+
+		} else {
+			$type = 'string';
+
+		}
+		$self->debug(sprintf('sending a %s to the server', $type));
+		if (UNIVERSAL::isa($frame, 'XML::LibXML::Document')) {
+			map { $self->debug('C: '.$_) } split(/\n/, $frame->toString(2));
+
+		} else {
+			map { $self->debug('C: '.$_) } split(/\n/, $frame);
+
+		}
+
+		my $response = $self->SUPER::request($frame);
+
+		map { $self->debug('S: '.$_) } split(/\n/, $response->toString(2)) if (UNIVERSAL::isa($response, 'XML::LibXML::Document'));
+
+		return $response;
 	}
-
-	my $response = $self->SUPER::request($frame);
-
-	map { $self->debug('S: '.$_) } split(/\n/, $response->toString(2)) if (UNIVERSAL::isa($response, 'XML::LibXML::Document'));
-
-	return $response;
 }
 
 =pod
@@ -1909,33 +2054,55 @@ network errors. If such an error occurs it will return C<undef>.
 
 sub get_frame {
 	my $self = shift;
-	my $frame;
-	$self->debug(sprintf('reading frame, waiting %d seconds before timeout', $self->{timeout}));
-	eval {
-		local $SIG{ALRM} = sub { die 'timeout' };
-		$self->debug('setting timeout alarm for receiving frame');
-		alarm($self->{timeout});
-		$frame = $self->SUPER::get_frame();
-		$self->debug('unsetting timeout alarm after successful receive');
-		alarm(0);
-	};
-	if ($@ ne '') {
-		chomp($@);
-		$@ =~ s/ at .+ line .+$//;
-		$self->debug("unsetting timeout alarm after alarm was triggered ($@)");
-		alarm(0);
+	if (!$self->connected) {
+		$self->debug('cannot send frame if not connected');
 		$Code = COMMAND_FAILED;
-		if ($@ =~ /^timeout/) {
-			$Error = $Message = "get_frame() timed out after $self->{timeout} seconds";
-
-		} else {
-			$Error = $Message = "get_frame() received an error: $@";
-
-		}
+		$Error = $Message = 'Not connected';
 		return undef;
 
 	} else {
-		return bless($frame, 'Net::EPP::Frame::Response');
+		my $frame;
+		$self->debug(sprintf('reading frame, waiting %d seconds before timeout', $self->{timeout}));
+		eval {
+			local $SIG{ALRM} = sub { die 'timeout' };
+			$self->debug('setting timeout alarm for receiving frame');
+			alarm($self->{timeout});
+			$frame = $self->SUPER::get_frame();
+			$self->debug('unsetting timeout alarm after successful receive');
+			alarm(0);
+		};
+		if ($@ ne '') {
+			chomp($@);
+			$@ =~ s/ at .+ line .+$//;
+			$self->debug("unsetting timeout alarm after alarm was triggered ($@)");
+			alarm(0);
+			$Code = COMMAND_FAILED;
+			if ($@ =~ /^timeout/) {
+				$Error = $Message = "get_frame() timed out after $self->{timeout} seconds";
+
+			} else {
+				$Error = $Message = "get_frame() received an error: $@";
+
+			}
+			return undef;
+
+		} else {
+			return bless($frame, 'Net::EPP::Frame::Response');
+
+		}
+	}
+}
+
+sub send_frame {
+	my ($self, $frame, $wfcheck) = @_;
+	if (!$self->connected) {
+		$self->debug('cannot get frame if not connected');
+		$Code = 2400;
+		$Message = 'Not connected';
+		return undef;
+
+	} else {
+		return $self->SUPER::send_frame($frame, $wfcheck);
 
 	}
 }
@@ -1962,11 +2129,11 @@ sub _get_error_message {
 
 sub _get_response_code {
 	my ($self, $doc) = @_;
-	my $els = $doc->getElementsByTagNameNS(EPP_XMLNS, 'result');
-	if (defined($els)) {
-		my $el = $els->shift;
-		if (defined($el)) {
-			return $el->getAttribute('code');
+	if ($doc->isa('XML::DOM::Document') || $doc->isa('Net::EPP::Frame::Response')) {
+		my $els = $doc->getElementsByTagNameNS(EPP_XMLNS, 'result');
+		if (defined($els)) {
+			my $el = $els->shift;
+			return $el->getAttribute('code') if (defined($el));
 		}
 	}
 	return 2400;
@@ -1974,11 +2141,11 @@ sub _get_response_code {
 
 sub _get_message {
 	my ($self, $doc) = @_;
-	my $msgs = $doc->getElementsByTagNameNS(EPP_XMLNS, 'msg');
-	if (defined($msgs)) {
-		my $msg = $msgs->shift;
-		if (defined($msg)) {
-			return $msg->textContent;
+	if ($doc->isa('XML::DOM::Document') || $doc->isa('Net::EPP::Frame::Response')) {
+		my $msgs = $doc->getElementsByTagNameNS(EPP_XMLNS, 'msg');
+		if (defined($msgs)) {
+			my $msg = $msgs->shift;
+			return $msg->textContent if (defined($msg));
 		}
 	}
 	return '';
@@ -1986,11 +2153,13 @@ sub _get_message {
 
 sub _get_reason {
 	my ($self, $doc) = @_;
-	my $reasons = $doc->getElementsByTagNameNS(EPP_XMLNS, 'reason');
-	if (defined($reasons)) {
-		my $reason = $reasons->shift;
-		if (defined($reason)) {
-			return $reason->textContent;
+	if ($doc->isa('XML::DOM::Document') || $doc->isa('Net::EPP::Frame::Response')) {
+		my $reasons = $doc->getElementsByTagNameNS(EPP_XMLNS, 'reason');
+		if (defined($reasons)) {
+			my $reason = $reasons->shift;
+			if (defined($reason)) {
+				return $reason->textContent;
+			}
 		}
 	}
         return '';
@@ -1998,21 +2167,31 @@ sub _get_reason {
 
 sub logout {
 	my $self = shift;
-	if (defined($self->{authenticated}) && 1 == $self->{authenticated}) {
+	if ($self->authenticated) {
 		$self->debug('logging out');
 		my $response = $self->request(Net::EPP::Frame::Command::Logout->new);
-		return undef if (!$response);
+		undef($self->{'authenticated'});
+		if (!$response) {
+			$Code = COMMAND_FAILED;
+			$Message = $Error = 'unknown error';
+			return undef
+
+		} else {
+			$Code = $self->_get_response_code($response);
+			$Message = $self->_get_message($response);
+
+		}
 	}
 	$self->debug('disconnecting from server');
 	$self->disconnect;
-	$self->{connected} = 0;
+	undef($self->{'connected'});
 	return 1;
 }
 
 sub DESTROY {
 	my $self = shift;
 	$self->debug('DESTROY() method called');
-	$self->logout if (defined($self->{connected}) && 1 == $self->{connected});
+	$self->logout if ($self->connected);
 }
 
 sub debug {
@@ -2020,6 +2199,33 @@ sub debug {
 	my $log = sprintf("%s (%d): %s", scalar(localtime()), $$, $msg);
 	push(@Log, $log);
 	print STDERR $log."\n" if (defined($self->{debug}) && $self->{debug} == 1);
+}
+
+=pod
+
+	$connected = $epp->connected;
+
+Returns a boolean if C<Net::EPP::Simple> has a connection to the server. Note that this
+connection might have dropped, use C<ping()> to test it.
+
+=cut
+
+sub connected {
+	my $self = shift;
+	return defined($self->{'connected'});
+}
+
+=pod
+
+	$authenticated = $epp->authenticated;
+
+Returns a boolean if C<Net::EPP::Simple> has successfully authenticated with the server.
+
+=cut
+
+sub authenticated {
+	my $self = shift;
+	return defined($self->{'authenticated'});
 }
 
 =pod
@@ -2047,31 +2253,6 @@ error code of 1999 or lower, for an unsuccessful transaction it will be
 parameters being passed to a method, or a network error) then this will
 be set to 2400 (C<COMMAND_FAILED>). See L<Net::EPP::ResponseCodes> for
 more information about thes codes.
-
-=head1 Author
-
-CentralNic Ltd (L<http://www.centralnic.com/>).
-
-=head1 Copyright
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Client>
-
-=item * L<Net::EPP::Frame>
-
-=item * L<Net::EPP::Proxy>
-
-=item * RFCs 5730 and RFC 4934, available from L<http://www.ietf.org/>.
-
-=item * The CentralNic EPP site at L<http://www.centralnic.com/registrars/epp>.
-
-=back
 
 =cut
 

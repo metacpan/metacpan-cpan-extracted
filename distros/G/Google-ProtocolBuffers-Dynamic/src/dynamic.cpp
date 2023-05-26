@@ -2,7 +2,7 @@
 #include "mapper.h"
 #include "servicedef.h"
 
-#include <google/protobuf/dynamic_message.h>
+#include "pb/gpb_mapping.h"
 
 #include <sstream>
 
@@ -20,8 +20,21 @@ using namespace upb::googlepb;
     #define newXS(a, b, c) Perl_newXS(aTHX_ const_cast<char *>(a), b, const_cast<char *>(c))
 #endif
 
-void Dynamic::CollectErrors::AddError(const string &filename, int line, int column, const string &message) {
-    croak("Error during protobuf parsing: %s:%d:%d: %s", filename.c_str(), line, column, message.c_str());
+namespace {
+    SV *get_stack_trace(pTHX) {
+        dSP;
+
+        PUSHMARK(SP);
+        PUTBACK;
+
+        call_pv("Google::ProtocolBuffers::Dynamic::_stack_trace", G_SCALAR);
+
+        SPAGAIN;
+        SV *stack_trace = POPs;
+        PUTBACK;
+
+        return stack_trace;
+    }
 }
 
 MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
@@ -37,8 +50,11 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
         no_redefine_perl_names(false),
         accessor_style(GetAndSet),
         client_services(Disable),
-        numeric_bool(false),
+        boolean_style(Perl),
+        default_decoder(Upb),
         fail_ref_coercion(false) {
+    stack_trace = get_stack_trace(aTHX);
+
     if (options_ref == NULL || !SvOK(options_ref))
         return;
     if (!SvROK(options_ref) || SvTYPE(SvRV(options_ref)) != SVt_PVHV)
@@ -64,51 +80,54 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
 
 #undef BOOLEAN_OPTION
 
-    if (SV **value = hv_fetchs(options, "accessor_style", 0)) {
-        const char *buf = SvPV_nolen(*value);
+#define START_STRING_VALUE(name) \
+    if (SV **value = hv_fetchs(options, #name, 0)) { \
+        const char *buf = SvPV_nolen(*value); \
+        \
+        if (0 == 1)
 
-        if (strEQ(buf, "get_and_set"))
-            accessor_style = GetAndSet;
-        else if (strEQ(buf, "plain_and_set"))
-            accessor_style = PlainAndSet;
-        else if (strEQ(buf, "single_accessor"))
-            accessor_style = SingleAccessor;
-        else if (strEQ(buf, "plain"))
-            accessor_style = Plain;
-        else
-            croak("Invalid value '%s' for 'accessor_style' option", buf);
+#define STRING_VALUE(field, string, value) \
+        else if (strEQ(buf, #string)) \
+            field = value
+
+#define END_STRING_VALUE(name) \
+        else \
+            croak("Invalid value '%s' for '" #name "' option", buf); \
     }
 
-    if (SV **value = hv_fetchs(options, "client_services", 0)) {
-        const char *buf = SvPV_nolen(*value);
+    START_STRING_VALUE(default_decoder);
+    STRING_VALUE(default_decoder, upb, Upb);
+    STRING_VALUE(default_decoder, bbpb, Bbpb);
+    END_STRING_VALUE(default_decoder);
 
-        if (strEQ(buf, "disable"))
-            client_services = Disable;
-        else if (strEQ(buf, "noop"))
-            client_services = Noop;
-        else if (strEQ(buf, "grpc_xs"))
-            client_services = GrpcXS;
-        else
-            croak("Invalid value '%s' for 'client_services' option", buf);
-    }
+    START_STRING_VALUE(accessor_style);
+    STRING_VALUE(accessor_style, get_and_set, GetAndSet);
+    STRING_VALUE(accessor_style, plain_and_set, PlainAndSet);
+    STRING_VALUE(accessor_style, single_accessor, SingleAccessor);
+    STRING_VALUE(accessor_style, plain, Plain);
+    END_STRING_VALUE(accessor_style);
 
-    if (SV **value = hv_fetchs(options, "boolean_values", 0)) {
-        const char *buf = SvPV_nolen(*value);
+    START_STRING_VALUE(client_services);
+    STRING_VALUE(client_services, disable, Disable);
+    STRING_VALUE(client_services, noop, Noop);
+    STRING_VALUE(client_services, grpc_xs, GrpcXS);
+    END_STRING_VALUE(client_services);
 
-        if (strEQ(buf, "perl"))
-            numeric_bool = false;
-        else if (strEQ(buf, "numeric"))
-            numeric_bool = true;
-        else
-            croak("Invalid value '%s' for 'boolean_values' option", buf);
-    }
+    START_STRING_VALUE(boolean_values);
+    STRING_VALUE(boolean_style, perl, Perl);
+    STRING_VALUE(boolean_style, numeric, Numeric);
+    STRING_VALUE(boolean_style, json, JSON);
+    END_STRING_VALUE(boolean_values);
+
+#undef START_STRING_VALUE
+#undef STRING_VALUE
+#undef END_STRING_VALUE
 }
 
 Dynamic::Dynamic(const string &root_directory) :
-        overlay_source_tree(&memory_source_tree, &disk_source_tree),
-        descriptor_loader(&overlay_source_tree, &die_on_error) {
+        descriptor_loader() {
     if (!root_directory.empty())
-        disk_source_tree.MapPath("", root_directory);
+        descriptor_loader.map_disk_path("", root_directory);
 }
 
 Dynamic::~Dynamic() {
@@ -127,6 +146,7 @@ void Dynamic::load_file(pTHX_ const string &file) {
 
     if (loaded)
         add_file_recursively(aTHX_ loaded);
+    descriptor_loader.maybe_croak();
 }
 
 void Dynamic::load_string(pTHX_ const string &file, SV *sv) {
@@ -134,7 +154,7 @@ void Dynamic::load_string(pTHX_ const string &file, SV *sv) {
     const char *data = SvPV(sv, len);
     string actual_file = file.empty() ? "<string>" : file;
 
-    memory_source_tree.AddFile(actual_file, data, len);
+    descriptor_loader.add_memory_file(actual_file, data, len);
     load_file(aTHX_ actual_file);
 }
 
@@ -145,6 +165,7 @@ void Dynamic::load_serialized_string(pTHX_ SV *sv) {
 
     for (vector<const FileDescriptor *>::const_iterator it = loaded.begin(), en = loaded.end(); it != en; ++it)
         add_file_recursively(aTHX_ *it);
+    descriptor_loader.maybe_croak();
 }
 
 void Dynamic::map_wkts(pTHX_ const MappingOptions &options) {
@@ -173,7 +194,7 @@ namespace {
         NULL, // local
     };
 
-    void copy_and_bind(pTHX_ const char *name, const char *target, const string &perl_package, Refcounted *refcounted) {
+    void copy_and_bind(pTHX_ const char *name, const char *target, const string &perl_package, Refcounted *refcounted, void *obj) {
         static const char prefix[] = "Google::ProtocolBuffers::Dynamic::Mapper::";
         size_t length = strlen(name);
         char buffer[sizeof(prefix) + length + 1];
@@ -184,15 +205,23 @@ namespace {
         CV *src = get_cv(buffer, 0);
         CV *new_xs = newXS((perl_package + "::" + target).c_str(), CvXSUB(src), __FILE__);
 
-        CvXSUBANY(new_xs).any_ptr = refcounted;
+        CvXSUBANY(new_xs).any_ptr = obj;
         sv_magicext((SV *) new_xs, NULL,
                     PERL_MAGIC_ext, &manage_refcounted,
                     (const char *) refcounted, 0);
         refcounted->ref();
     }
 
+    void copy_and_bind(pTHX_ const char *name, const char *target, const string &perl_package, Refcounted *refcounted) {
+        copy_and_bind(aTHX_ name, target, perl_package, refcounted, refcounted);
+    }
+
     void copy_and_bind(pTHX_ const char *name, const string &perl_package, Refcounted *refcounted) {
         copy_and_bind(aTHX_ name, name, perl_package, refcounted);
+    }
+
+    void copy_and_bind(pTHX_ const char *name, const string &perl_package, Refcounted *refcounted, void *obj) {
+        copy_and_bind(aTHX_ name, name, perl_package, refcounted, obj);
     }
 
     void copy_and_bind(pTHX_ const char *name, const char *prefix, const char *suffix, const string &perl_package, Mapper *mapper) {
@@ -427,36 +456,59 @@ void Dynamic::map_message_prefix_recursive(pTHX_ const Descriptor *descriptor, c
 }
 
 void Dynamic::check_package(pTHX_ const string &perl_package, const string &pb_name) {
-    if (used_packages.find(perl_package) == used_packages.end())
+    string marker_name = perl_package + "::mapped_from";
+    SV *marker_sv = get_sv(marker_name.c_str(), 0);
+
+    if (!marker_sv || !SvOK(marker_sv))
         return;
 
-    croak("Package '%s' has already been used in a mapping", perl_package.c_str());
+    croak("Package '%s' is being remapped from %" SVf " but has already been mapped from %" SVf,
+          perl_package.c_str(), get_stack_trace(aTHX), marker_sv);
+}
+
+void Dynamic::mark_package(pTHX_ const string &perl_package, SV *stack_trace) {
+    string marker_name = perl_package + "::mapped_from";
+#ifdef GV_ADDMULTI
+    const int get_sv_flags = GV_ADDMULTI;
+#else
+    const int get_sv_flags = GV_ADD;
+
+    // this is just to avoid the 'used only once' warning
+    get_sv(marker_name.c_str(), get_sv_flags);
+#endif
+
+    SV *marker_sv = get_sv(marker_name.c_str(), get_sv_flags);
+
+    sv_setsv(marker_sv, stack_trace);
 }
 
 void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl_package, const MappingOptions &options) {
-    check_package(aTHX_ perl_package, descriptor->full_name());
+    bool define_perl_names = !options.no_redefine_perl_names || gv_stashpvn(perl_package.data(), perl_package.size(), 0) == NULL;
+
+    if (define_perl_names)
+        check_package(aTHX_ perl_package, descriptor->full_name());
     if (descriptor_map.find(descriptor->full_name()) != descriptor_map.end())
         croak("Message '%s' has already been mapped", descriptor->full_name().c_str());
     if (options.use_bigints)
         load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Math::BigInt"), NULL);
-    bool define_perl_names = !options.no_redefine_perl_names || gv_stashpvn(perl_package.data(), perl_package.size(), 0) == NULL;
     HV *stash = gv_stashpvn(perl_package.data(), perl_package.size(), GV_ADD);
     const MessageDef *message_def = def_builder.GetMessageDef(descriptor);
+    const gpd::pb::Descriptor *gpd_descriptor = gpd::pb::map_pb_descriptor(&descriptor_set, descriptor, descriptor_loader.pool());
     if (is_map_entry(message_def, options.implicit_maps))
         // it's likely I will regret this const_cast<>
         upb_msgdef_setmapentry(const_cast<MessageDef *>(message_def), true);
-    Mapper *mapper = new Mapper(aTHX_ this, message_def, stash, options);
+    Mapper *mapper = new Mapper(aTHX_ this, message_def, gpd_descriptor, stash, options);
 
     // the map owns the reference from Mapper constructor, and is unreffed in ~Dynamic
     descriptor_map[message_def->full_name()] = mapper;
-    used_packages.insert(perl_package);
+    mark_package(aTHX_ perl_package, options.stack_trace);
     pending.push_back(mapper);
 
     if (define_perl_names)
-        bind_message(aTHX_ perl_package, mapper, stash, options);
+        bind_message(aTHX_ perl_package, mapper, descriptor, stash, options);
 }
 
-void Dynamic::bind_message(pTHX_ const string &perl_package, Mapper *mapper, HV *stash, const MappingOptions &options) {
+void Dynamic::bind_message(pTHX_ const string &perl_package, Mapper *mapper, const Descriptor *descriptor, HV *stash, const MappingOptions &options) {
     bool plain_accessor = false;
     const char *getter_prefix, *setter_prefix;
 
@@ -471,13 +523,20 @@ void Dynamic::bind_message(pTHX_ const string &perl_package, Mapper *mapper, HV 
         setter_prefix = "set_";
     }
 
-    copy_and_bind(aTHX_ "decode", perl_package, mapper);
+    copy_and_bind(aTHX_ "set_decoder_options", perl_package, mapper);
+    copy_and_bind(aTHX_ "decode_upb", perl_package, mapper);
+    copy_and_bind(aTHX_ "decode_bbpb", perl_package, mapper);
+    if (options.default_decoder == MappingOptions::Upb) {
+        copy_and_bind(aTHX_ "decode_upb", "decode", perl_package, mapper);
+    } else {
+        copy_and_bind(aTHX_ "decode_bbpb", "decode", perl_package, mapper);
+    }
     copy_and_bind(aTHX_ "encode", perl_package, mapper);
     copy_and_bind(aTHX_ "decode_json", perl_package, mapper);
     copy_and_bind(aTHX_ "encode_json", perl_package, mapper);
     copy_and_bind(aTHX_ "new", perl_package, mapper);
     copy_and_bind(aTHX_ "new_and_check", perl_package, mapper);
-    copy_and_bind(aTHX_ "message_descriptor", perl_package, mapper);
+    copy_and_bind(aTHX_ "message_descriptor", perl_package, this, const_cast<Descriptor *>(descriptor));
 
     // for Grpc::Client
     copy_and_bind(aTHX_ "static_decode", "_static_decode", perl_package, mapper);
@@ -569,19 +628,24 @@ void Dynamic::bind_message(pTHX_ const string &perl_package, Mapper *mapper, HV 
 }
 
 void Dynamic::map_enum(pTHX_ const EnumDescriptor *descriptor, const string &perl_package, const MappingOptions &options) {
-    check_package(aTHX_ perl_package, descriptor->full_name());
+    bool define_perl_names = !options.no_redefine_perl_names || gv_stashpvn(perl_package.data(), perl_package.size(), 0) == NULL;
+
+    if (define_perl_names)
+        check_package(aTHX_ perl_package, descriptor->full_name());
     if (mapped_enums.find(descriptor->full_name()) != mapped_enums.end())
         croak("Enum '%s' has already been mapped", descriptor->full_name().c_str());
 
-    const EnumDef *enum_def = def_builder.GetEnumDef(descriptor);
-    EnumMapper *mapper = new EnumMapper(aTHX_ this, enum_def);
-
     mapped_enums.insert(descriptor->full_name());
-    used_packages.insert(perl_package);
+    mark_package(aTHX_ perl_package, options.stack_trace);
 
+    if (define_perl_names)
+        bind_enum(aTHX_ perl_package, descriptor, options);
+}
+
+void Dynamic::bind_enum(pTHX_ const string &perl_package, const EnumDescriptor *descriptor, const MappingOptions &options) {
     HV *stash = gv_stashpvn(perl_package.data(), perl_package.size(), GV_ADD);
 
-    copy_and_bind(aTHX_ "enum_descriptor", perl_package, mapper);
+    copy_and_bind(aTHX_ "enum_descriptor", perl_package, this, const_cast<EnumDescriptor *>(descriptor));
 
     for (int i = 0, max = descriptor->value_count(); i < max; ++i) {
         const EnumValueDescriptor *value = descriptor->value(i);
@@ -595,13 +659,21 @@ void Dynamic::map_service(pTHX_ const ServiceDescriptor *descriptor, const strin
     if (options.client_services == MappingOptions::Disable)
         return;
 
-    check_package(aTHX_ perl_package, descriptor->full_name());
+    bool define_perl_names = !options.no_redefine_perl_names || gv_stashpvn(perl_package.data(), perl_package.size(), 0) == NULL;
+
+    if (define_perl_names)
+        check_package(aTHX_ perl_package, descriptor->full_name());
     if (mapped_services.find(descriptor->full_name()) != mapped_services.end())
         croak("Service '%s' has already been mapped", descriptor->full_name().c_str());
 
     mapped_services.insert(descriptor->full_name());
-    used_packages.insert(perl_package);
+    mark_package(aTHX_ perl_package, options.stack_trace);
 
+    if (define_perl_names)
+        bind_service(aTHX_ perl_package, descriptor, options);
+}
+
+void Dynamic::bind_service(pTHX_ const string &perl_package, const ServiceDescriptor *descriptor, const MappingOptions &options) {
     ServiceDef *service_def = new ServiceDef(descriptor->full_name());
 
     switch (options.client_services) {
@@ -615,9 +687,7 @@ void Dynamic::map_service(pTHX_ const ServiceDescriptor *descriptor, const strin
         croak("Unhandled client_service option %d", options.client_services);
     }
 
-    ServiceMapper *mapper = new ServiceMapper(aTHX_ this, service_def);
-
-    copy_and_bind(aTHX_ "service_descriptor", perl_package, mapper);
+    copy_and_bind(aTHX_ "service_descriptor", perl_package, this, const_cast<ServiceDescriptor *>(descriptor));
 }
 
 void Dynamic::map_service_noop(pTHX_ const ServiceDescriptor *descriptor, const string &perl_package, const MappingOptions &options, ServiceDef *service_def) {

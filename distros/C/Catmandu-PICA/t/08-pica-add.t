@@ -7,6 +7,7 @@ use Test::Exception;
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Importer::PICA;
+use Catmandu::Importer::JSON;
 
 my $pkg;
 
@@ -48,5 +49,9 @@ is $records->[0]->{'multi'}, 'barbaz', 'added multiple subfields to 001@';
 is $records->[0]->{'encoding1'}, 'utf16', '201U[01]0 set';
 is $records->[0]->{'empty'}, '', 'empty value added'; 
 
+$importer = Catmandu::Importer::JSON->new(file => \'{"x":1}');
+$fixer = Catmandu::Fix->new(fixes => ['pica_add(x,012X$a)']);
+my $rec = $fixer->fix($importer)->next;
+is_deeply $rec->{record}, [['012X',undef,'a','1']], 'pica_add creates missing record';
 
 done_testing;

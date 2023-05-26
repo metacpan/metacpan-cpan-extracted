@@ -2,6 +2,7 @@ bin/test-dwg-libredwg-dwgread
 Changes
 CONCEPT
 DwgRead.pm
+examples/test_dwg_file.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

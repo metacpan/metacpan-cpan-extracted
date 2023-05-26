@@ -1,0 +1,28 @@
+verbose = 8
+theme = community
+severity = brutal
+# severity choices: brutal(1), cruel(2), harsh(3), stern(4), gentle[5]
+
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[Variables::ProhibitEvilVariables]
+variables = $DB::single
+
+# Turn these off
+[-BuiltinFunctions::ProhibitStringyEval]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::RequirePodSections]
+[-InputOutput::ProhibitInteractiveTest]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::RequireExtendedFormatting]
+[-InputOutput::ProhibitTwoArgOpen]
+[-Modules::ProhibitEvilModules]
+
+# Turn this on
+[Lax::ProhibitStringyEval::ExceptForRequire]
+

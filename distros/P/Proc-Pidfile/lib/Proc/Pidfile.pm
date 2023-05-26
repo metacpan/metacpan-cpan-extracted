@@ -1,5 +1,5 @@
 package Proc::Pidfile;
-$Proc::Pidfile::VERSION = '1.09';
+$Proc::Pidfile::VERSION = '1.10';
 use 5.006;
 use strict;
 use warnings;
@@ -17,6 +17,7 @@ sub new
     my $self = bless \%args, $class;
 
     $self->{retries} = 2 unless defined($self->{retries});
+    $self->{backoff} = sub { 100 + rand(300) } unless defined($self->{backoff});
 
     unless ( $self->{pidfile} ) {
         my $basename = basename( $0 );
@@ -112,9 +113,9 @@ sub _create_pidfile
                 ++$attempt;
                 # TODO: let's try this. Guessing we don't have to
                 #       bother with increasing backoff times
-                my $backoff = 100 + rand(300);
+                my $backoff = $self->{backoff}->();
                 $self->_verbose("backing off for $backoff microseconds before trying again");
-                usleep(100 + rand(300));
+                usleep($backoff);
                 next;
             }
 
@@ -187,7 +188,7 @@ sub _destroy_pidfile
 =head1 NAME
 
 Proc::Pidfile - a simple OO Perl module for maintaining a process id file for
-the curent process
+the current process
 
 =head1 SYNOPSIS
 
@@ -236,7 +237,7 @@ with a random number of microseconds between each attempt.
 You can specify the number of retries, for example if you
 want to try more times for some reason:
 
- $pidfile = $pp->pidfile(retries => 4);
+ my $pp = Proc::Pidfile->new(retries => 4);
 
 By default this is set to 2,
 which means if the first attempt to set up a pidfile fails,
@@ -244,6 +245,12 @@ it will try 2 more times, so three attempts in total.
 
 Setting retries to 0 (zero) will disable this feature.
 
+If you want to generate the number of microseconds to wait yourself,
+you can pass a code reference generating it to the constructor.
+
+ my $backoff = 100;
+ my $pp = Proc::Pidfile->new(retries => 4,
+                             backoff => sub { $backoff *= 2 });
 
 =head1 SEE ALSO
 

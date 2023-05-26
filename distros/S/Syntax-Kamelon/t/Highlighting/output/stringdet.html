@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="defaultstyle.css" type="text/css">
+<title>Testfile stringdet</title>
+</head>
+<body>
+<font class="Normal">Testing&nbsp;stringdet</font></br>
+</br>
+<font class="Normal">Testing&nbsp;default&nbsp;without&nbsp;options</font></br>
+<font class="Keyword">&lt;StringDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;antimoon&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;Test&gt;</font></br>
+<font class="DataType">antimoon</font><font class="Others">&nbsp;dd</font><font class="DataType">antimoon</font><font class="Others">dd</font></br>
+<font class="Others">ANTIMOON&nbsp;DDANTIMOONDD</font></br>
+<font class="Others">&lt;Test&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;dynamic</font></br>
+</br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;TestDT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\s(a)ntimoo(n)&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;StringDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;dynamic=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;%1ntimoo%2&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+</br>
+<font class="Others">&lt;TestD&gt;</font></br>
+<font class="Comment">#should&nbsp;match</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="DataType">antimoon</font><font class="Others">&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestD&gt;</font></br>
+</br>
+<font class="Others">&lt;TestD&gt;</font></br>
+<font class="Comment">#should&nbsp;match</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="Others">dd</font><font class="DataType">antimoon</font><font class="Others">dd&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestD&gt;</font></br>
+</br>
+<font class="Others">&lt;TestD&gt;</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="Others">ANTIMOON&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestD&gt;</font></br>
+</br>
+<font class="Others">&lt;TestD&gt;</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="Others">DDANTIMOONDD&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestD&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;dynamic&nbsp;insensitive</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;TestDIT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\s(a)ntimoo(n)&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;StringDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;dynamic=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;%1ntimoo%2&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+</br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+<font class="Comment">#should&nbsp;match</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="DataType">antimoon</font><font class="Others">&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+</br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+<font class="Comment">#should&nbsp;match</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="Others">dd</font><font class="DataType">antimoon</font><font class="Others">dd&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+</br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+<font class="Comment">#should&nbsp;match</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="DataType">ANTIMOON</font><font class="Others">&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+</br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+<font class="Comment">#should&nbsp;match</font></br>
+<font class="Others">scoop</font><font class="DataType">&nbsp;antimoon</font></br>
+<font class="Others">DD</font><font class="DataType">ANTIMOON</font><font class="Others">DD&nbsp;%1ntimoo%2&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;insensitive</font></br>
+<font class="Keyword">&lt;StringDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;antimoon&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestI&gt;</font></br>
+<font class="DataType">antimoon</font><font class="Others">&nbsp;dd</font><font class="DataType">antimoon</font><font class="Others">dd</font></br>
+<font class="DataType">ANTIMOON</font><font class="Others">&nbsp;DD</font><font class="DataType">ANTIMOON</font><font class="Others">DD</font></br>
+<font class="Others">&lt;TestI&gt;</font></br>
+</body>
+</html>

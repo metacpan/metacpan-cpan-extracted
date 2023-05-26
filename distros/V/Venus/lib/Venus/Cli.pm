@@ -100,16 +100,8 @@ sub arg {
     my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
       'validate', $type_map{$_type}
     );
-    if ($caught) {
-      my $throw;
-      my $error = join ': ', 'Invalid argument', $name, $caught->message;
-      $throw = $self->throw;
-      $throw->name('on.arg');
-      $throw->message($error);
-      $throw->stash(name => $_name);
-      $throw->stash(type => $_type);
-      $throw->error;
-    }
+    $self->throw('error_on_arg_validation', $caught->message, $_name, $_type)->error
+      if $caught;
   }
 
   # return boolean values
@@ -127,18 +119,9 @@ sub cmd {
 
   my $data = $self->get('cmd', $name) or return undef;
 
-  my ($caught, $value) = $self->catch('arg', $data->{arg});
+  my $value = $self->try('arg')->maybe->result($data->{arg});
 
-  if ($caught) {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.cmd');
-    $throw->message($caught->message);
-    $throw->stash($_ => $caught->stash($_)) for keys %{$caught->stash};
-    $throw->error;
-  }
-
-  return ($value eq $name) ? true : false;
+  return (($value // '') eq $name) ? true : false;
 }
 
 sub exit {
@@ -783,16 +766,8 @@ sub opt {
     my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
       'validate', $type_map{$_type}
     );
-    if ($caught) {
-      my $throw;
-      my $error = join ': ', 'Invalid option', $name, $caught->message;
-      $throw = $self->throw;
-      $throw->name('on.opt');
-      $throw->message($error);
-      $throw->stash(name => $_name);
-      $throw->stash(type => $_type);
-      $throw->error;
-    }
+    $self->throw('error_on_opt_validation', $caught->message, $_name, $_type)->error
+      if $caught;
   }
 
   # return boolean values
@@ -1214,6 +1189,34 @@ sub _wrap_text {
     map {($indent ? (" " x $indent) : '') . join " ", @{$_}} @results;
 }
 
+# ERRORS
+
+sub error_on_arg_validation {
+  my ($self, $error, $name, $type) = @_;
+
+  return {
+    name => 'on.arg.validation',
+    message => (join ': ', 'Invalid argument', $name, $error),
+    stash => {
+      name => $name,
+      type => $type,
+    },
+  };
+}
+
+sub error_on_opt_validation {
+  my ($self, $error, $name, $type) = @_;
+
+  return {
+    name => 'on.opt.validation',
+    message => (join ': ', 'Invalid option', $name, $error),
+    stash => {
+      name => $name,
+      type => $type,
+    },
+  };
+}
+
 1;
 
 
@@ -1462,9 +1465,9 @@ I<Since C<2.55>>
 
   my ($name) = $cli->arg('name');
 
-  # Exception! (isa Venus::Cli::Error)
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
 
-  # Invalid option: name: received (undef), expected (string)
+  # Invalid argument: name: received (undef), expected (string)
 
 =back
 
@@ -1645,9 +1648,7 @@ I<Since C<2.55>>
 
   my ($is_execute) = $cli->cmd('execute');
 
-  # Exception! (isa Venus::Cli::Error)
-
-  # Invalid option: action: received (undef), expected (string)
+  # 0
 
 =back
 
@@ -2297,7 +2298,7 @@ I<Since C<2.55>>
 
   my ($name) = $cli->opt('name');
 
-  # Exception! (isa Venus::Cli::Error)
+  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
 
   # Invalid option: name: received (undef), expected (number)
 
@@ -2598,6 +2599,76 @@ I<Since C<2.55>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_arg_validation>
+
+This package may raise an error_on_arg_validation exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("...", "example", "string");
+
+  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_arg_validation"
+
+  # my $message = $error->message;
+
+  # "Invalid argument: example: ..."
+
+  # my $name = $error->stash('name');
+
+  # "example"
+
+  # my $type = $error->stash('type');
+
+  # "string"
+
+=back
+
+=over 4
+
+=item error: C<error_on_opt_validation>
+
+This package may raise an error_on_opt_validation exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("...", "example", "string");
+
+  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_opt_validation"
+
+  # my $message = $error->message;
+
+  # "Invalid option: example: ..."
+
+  # my $name = $error->stash('name');
+
+  # "example"
+
+  # my $type = $error->stash('type');
+
+  # "string"
+
+=back
 
 =head1 AUTHORS
 

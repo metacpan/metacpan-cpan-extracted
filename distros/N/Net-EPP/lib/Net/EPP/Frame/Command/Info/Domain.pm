@@ -1,8 +1,3 @@
-# Copyright (c) 2016 CentralNic Ltd. All rights reserved. This program is
-# free software; you can redistribute it and/or modify it under the same
-# terms as Perl itself.
-# 
-# $Id: Domain.pm,v 1.3 2011/12/03 11:44:52 gavin Exp $
 package Net::EPP::Frame::Command::Info::Domain;
 use base qw(Net::EPP::Frame::Command::Info);
 use Net::EPP::Frame::ObjectSpec;
@@ -69,42 +64,25 @@ sub new {
 
 =head1 METHODS
 
-	$frame->setDomain($domain_name);
+	$frame->setDomain($domain_name, $hosts);
 
-This specifies the domain name for which information is being requested.
+This specifies the domain name for which information is being requested. The
+C<$hosts> argument is the content of the C<hosts> attribute (set to C<all>
+by default).
 
 =cut
 
 sub setDomain {
-	my ($self, $domain) = @_;
+	my ($self, $domain, $hosts) = @_;
+	$hosts = ($hosts || 'all');
 
 	my $name = $self->createElement('domain:name');
 	$name->appendText($domain);
+	$name->setAttribute('hosts', $hosts);
 
 	$self->getNode('info')->getChildNodes->shift->appendChild($name);
 
 	return 1;
 }
-
-=pod
-
-=head1 AUTHOR
-
-CentralNic Ltd (http://www.centralnic.com/).
-
-=head1 COPYRIGHT
-
-This module is (c) 2016 CentralNic Ltd. This module is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Net::EPP::Frame>
-
-=back
-
-=cut
 
 1;

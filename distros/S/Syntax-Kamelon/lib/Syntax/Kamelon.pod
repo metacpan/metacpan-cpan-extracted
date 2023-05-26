@@ -158,17 +158,11 @@ Returns the Indexer object.
 Returns the lexer data structure from the pool of loaded lexers. If it is
 not found it will create and return it.
 
-=item B<IsDeliminator>(I<$char>);
+=item B<LastcharDeliminator>(I<$deliminator_reg>)
 
-Returns true if I<$char> is a deliminator.
-
-=item B<LastcharBoundary>
-
-Returns true if the last character that was parsed was a word boundary.
-
-=item B<LastcharDeliminator>
-
-Returns true if the last character that was parsed was a deliminator.
+Returns true if the last character that was parsed was a deliminator. It is
+tested against the regular expression in $deliminator_reg. $deliminator_reg
+should be a pre-compiled regular expression for execution speed.
 
 =item B<LastChar>
 

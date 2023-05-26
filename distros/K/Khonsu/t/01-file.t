@@ -120,7 +120,7 @@ $khonsu->add_text(
 	x => 20,
 	y => 120,
 	w => 100,
-	h => 120,
+	h => 150,
 );
 
 $khonsu->add_text( 
@@ -128,7 +128,7 @@ $khonsu->add_text(
 	x => 140,
 	y => 120,
 	w => 100,
-	h => 120,
+	h => 150,
 );
 
 $khonsu->add_text( 
@@ -136,7 +136,7 @@ $khonsu->add_text(
 	x => 260,
 	y => 120,
 	w => 100,
-	h => 120,
+	h => 150,
 );
 
 $khonsu->add_text( 
@@ -144,10 +144,11 @@ $khonsu->add_text(
 	x => 380,
 	y => 120,
 	w => 100,
-	h => 120,
+	h => 150,
 );
 
-for (0..50) {
+
+for (0..5) {
 	$khonsu->add_page();
 	$khonsu->add_h1(
 		text => 'This is a test',
@@ -156,11 +157,10 @@ for (0..50) {
 		w => 500,
 		toc => 1,
 	);
-
 	$khonsu->add_h2(
 		text => 'This is a test',
 		x => 20,
-		y => 270,
+		y => 280,
 		w => 500,
 		toc => 1,
 	);
@@ -168,7 +168,7 @@ for (0..50) {
 	$khonsu->add_h3(
 		text => 'This is a test',
 		x => 20,
-		y => 300,
+		y => 312,
 		w => 500,
 		toc => 1,
 	);
@@ -176,7 +176,7 @@ for (0..50) {
 	$khonsu->add_h4(
 		text => 'This is a test',
 		x => 20,
-		y => 325,
+		y => 335,
 		w => 500,
 		toc => 1
 	);
@@ -184,7 +184,7 @@ for (0..50) {
 	$khonsu->add_h5(
 		text => 'This is a test',
 		x => 20,
-		y => 342,
+		y => 354,
 		w => 500,
 		toc => 1,
 	);
@@ -192,7 +192,7 @@ for (0..50) {
 	$khonsu->add_h6(
 		text => 'This is a test',
 		x => 20,
-		y => 358,
+		y => 370,
 		w => 500,
 		h => 20,
 		toc => 1,
@@ -238,6 +238,7 @@ $khonsu->add_page(
 	w => $khonsu->page->w - 40,
 	h => $khonsu->page->h - 40,
 );
+
 
 $khonsu->save();
 

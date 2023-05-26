@@ -8,7 +8,7 @@ use Test::More;
 use English qw(-no_match_vars);
 
 BEGIN {
-    use_ok 'JIP::Spy::Events', 'v0.0.3';
+    use_ok 'JIP::Spy::Events', 'v0.0.4';
 }
 
 subtest 'Require some module' => sub {
@@ -286,6 +286,26 @@ subtest 'on_spy_event' => sub {
     is_deeply $sut->times(), { tratata => 1 };
 
     is $result, '100500';
+};
+
+subtest 'called()' => sub {
+    my $sut = JIP::Spy::Events->new();
+
+    is $sut->called(), 0;
+
+    $sut->tratata();
+
+    is $sut->called(), 1;
+};
+
+subtest 'not_called()' => sub {
+    my $sut = JIP::Spy::Events->new();
+
+    is $sut->not_called(), 1;
+
+    $sut->tratata();
+
+    is $sut->not_called(), 0;
 };
 
 done_testing();

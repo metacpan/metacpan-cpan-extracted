@@ -6,7 +6,7 @@ require Exporter::Extensible::Compat if "$]" < "5.012";
 require mro;
 
 # ABSTRACT: Create easy-to-extend modules which export symbols
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 our %EXPORT_FAST_SUB_CACHE;
 our %EXPORT_PKG_CACHE;
@@ -123,7 +123,7 @@ sub _exporter_build_install_set {
 	my $inventory= $EXPORT_PKG_CACHE{ref $self} ||= {};
 	while (@$todo) {
 		my $symbol= shift @$todo;
-		
+
 		# If it is a tag, then recursively call import on that list
 		if (ord $symbol == $colon) {
 			my $name= substr $symbol, 1;
@@ -150,7 +150,7 @@ sub _exporter_build_install_set {
 		# Check current package cache first, else do the full lookup.
 		my $ref= (exists $inventory->{$symbol}? $inventory->{$symbol} : $self->exporter_get_inherited($symbol))
 			or $croak->("'$symbol' is not exported by ".ref($self));
-		
+
 		# If it starts with '-', it is an option, and might consume additional args
 		if (ord $symbol == $hyphen) {
 			# back-compat for when opt was arrayref
@@ -619,7 +619,7 @@ sub _exporter_process_attribute {
 				push @export_names, $token;
 				${$class.'::EXPORT'}{$token}= $coderef;
 			}
-			elsif ($token =~ /^-(\w*)(?:\(([0-9]+|\*)\))?$/) {
+			elsif ($token =~ /^-(\w*)(?:\(([0-9]+|\*|\?)\))?$/) {
 				$subname ||= _exporter_get_coderef_name($coderef);
 				push @export_names, length $1? $token : "-$subname";
 				$class->exporter_register_option(substr($export_names[-1],1), $subname, $2);
@@ -758,21 +758,17 @@ __END__
 
 Exporter::Extensible - Create easy-to-extend modules which export symbols
 
-=head1 VERSION
-
-version 0.10
-
 =head1 SYNOPSIS
 
 Define a module with exports
 
   package My::Utils;
   use Exporter::Extensible -exporter_setup => 1;
-  
+
   export(qw( foo $x @STUFF -strict_and_warnings ), ':baz' => ['foo'] );
-  
+
   sub foo { ... }
-  
+
   sub strict_and_warnings {
     strict->import;
     warnings->import;
@@ -887,9 +883,8 @@ its L</import_into> method.
 
 This is the method that gets called when you C<use DerivedModule @list>.
 
-The user-facing API is mostly the same as L<Sub::Exporter> or L<Exporter::Tiny>, except that C<-foo>
-is not a group and there are no "collections" (though you could implement collections using
-options).
+The user-facing API is mostly the same as L<Sub::Exporter> or L<Exporter::Tiny>, except that C<-tag>
+is not an alias for C<:tag>.
 
 The elements of C<@list> are handled according to the following patterns:
 
@@ -922,7 +917,7 @@ Package name or hashref to which all symbols will be exported.  Defaults to C<ca
 
 Empty scalar-ref whose scope determines when to unimport the things just imported.
 After a successful import, this will be assigned a scope-guard object whose destructor
-un-imports those same symbols.  This saves you the hassle of calling "no MyModule @args".
+un-imports those same symbols.  This saves you the hassle of calling C<< no MyModule @args >>.
 You can also call C<< $scope->clean >> to trigger the unimport in a more direct manner.
 If you need the methods cleaned out at the end of compilation (i.e. before execution)
 you can wrap C<clean> in a C<BEGIN> block.
@@ -934,6 +929,10 @@ you can wrap C<clean> in a C<BEGIN> block.
 	# you could "BEGIN { $scope->clean }" if you want them removed sooner
   }
   # All those symbols are now neatly removed from your package
+
+This also works well when combined with C<< use B::Hooks::EndOfScope 'on_scope_end' >>.
+(I would have added a stronger integration with B::Hooks::EndOfScope but I didn't want to
+depend on an XS module)
 
 =item not
 
@@ -1278,20 +1277,20 @@ option decide how many arguments to consume.  So, the API is as follows:
     my $exporter= shift;
     ...
   }
-  
+
   # Ask for three arguments (regardless of whether they are refs)
   sub name : Export( -name(3) ) {
     my ($exporter, $arg1, $arg2, $arg3)= @_;
     ...
   }
-  
+
   # Ask for one argument but only if it is a ref of some kind.
   # If it is a hashref, this also processes import options like -prefix, -replace, etc.
   sub name : Export( -name(?) ) {
     my ($exporter, $maybe_arg)= @_;
     ...
   }
-  
+
   # Might need any number of arguments.  Return the number we consumed.
   sub name : Export( -name(*) ) {
     my $exporter = shift;
@@ -1341,7 +1340,7 @@ generator can retrieve the values from there.
     '-bar(1)' => sub { $_[0]{bar}= $_[1] },
     '=foobar' => sub { my $foobar= $_[0]{foo} . $_[0]{bar}; sub { $foobar } },
   );
-  
+
   package User;
   use MyModule qw/ -foo abc -bar def foobar -foo xyz foobar /, { -as => "x" };
   # This exports a sub as "foobar" which returns "abcdef", and a sub as "x" which
@@ -1377,21 +1376,33 @@ members of this tag.
 
 =head1 SEE ALSO
 
-L<Exporter::Tiny>
+=over
 
-L<Sub::Exporter>
+=item L<Exporter::Almighty>
 
-L<Export::Declare>
+=item L<Exporter::Tiny>
 
-L<Badger::Exporter>
+=item L<Sub::Exporter>
+
+=item L<Export::Declare>
+
+=item L<Badger::Exporter>
+
+=back
 
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Tabulo
+
+Tabulo <dev-git.perl@tabulo.net>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad.
+This software is copyright (c) 2023 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

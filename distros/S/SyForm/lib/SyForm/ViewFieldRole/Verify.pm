@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::ViewFieldRole::Verify::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: Trait for SyForm fields of SyForm::Results and SyForm::Values attributes
-$SyForm::ViewFieldRole::Verify::VERSION = '0.102';
+$SyForm::ViewFieldRole::Verify::VERSION = '0.103';
 use Moo::Role;
 
 has is_invalid => (
@@ -57,7 +57,7 @@ SyForm::ViewFieldRole::Verify - Trait for SyForm fields of SyForm::Results and S
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

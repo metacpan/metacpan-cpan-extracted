@@ -4,8 +4,6 @@ Changes
 LICENSE
 MANIFEST
 META.yml
-Testy-20190806_110240.jpg
-Testy_Hard_Link-20190806_110240.jpg
 dist.ini
 lib/File/Sticker.pm
 lib/File/Sticker/Database.pm

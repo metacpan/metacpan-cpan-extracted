@@ -1,0 +1,51 @@
+name: CI
+
+on:
+    push:
+      branches: '*'
+    pull_request:
+      branches: '*'
+    schedule:
+      - cron: '42 5 * * 0'
+    workflow_dispatch:
+ 
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        perl: ['5.12', '5.32', 'latest']
+
+    runs-on: ${{ matrix.os }}
+
+    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+
+      - name: Install dependencies
+        run: |
+            cpanm --notest Path::Tiny
+            cpanm Asm::Preproc Asm::Z80::Table Capture::Tiny Iterator::Array::Jagged Iterator::Simple::Lookahead Class::Struct Data::Dump File::Slurp File::Spec Regexp::Trie Test::More Text::Tabs
+      - name: Regular tests
+        run: |
+            perl Makefile.PL
+            make
+            make TEST_VERBOSE=1 test
+
+      - name: Prepare for release tests
+        run: |
+            cpanm Test::CheckManifest Test::Pod::Coverage Pod::Coverage Test::Pod
+
+      - name: Release tests
+        env:
+          RELEASE_TESTING: 1
+        run: |
+            perl Makefile.PL
+            make
+            make test

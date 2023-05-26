@@ -5,7 +5,7 @@ package IPC::XPA;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.16';
 
 use parent 'DynaLoader';
 
@@ -22,10 +22,38 @@ my %def_attrs = ( max_servers => 1000, mode => {} );
 sub _flatten_mode {
     my ( $mode ) = @_;
 
-    return '' unless keys %$mode;
+    return q{} unless keys %$mode;
 
-    join( ',', map { "$_=" . $mode->{$_} } keys %$mode );
+    join( q{,}, map { "$_=" . $mode->{$_} } keys %$mode );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub Open {
     my ( $class, $mode ) = @_;
@@ -37,6 +65,15 @@ sub Open {
     bless { xpa => $xpa }, $class;
 }
 
+
+
+
+
+
+
+
+
+
 sub Close {
     my $xpa = shift;
     _Close( $xpa->{xpa} ) if defined $xpa->{xpa};
@@ -46,6 +83,68 @@ sub Close {
 sub DESTROY {
     $_[0]->Close;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub Get {
@@ -64,9 +163,79 @@ sub Get {
     # create an essentially NULL pointer for pass to XPAGet
     my $xpa = ref( $obj ) ? $obj->{xpa} : nullXPA();
 
-    _Get( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ),
-        $attrs{max_servers} );
+    _Get( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ), $attrs{max_servers} );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub Set {
     my $obj = shift;
@@ -74,8 +243,7 @@ sub Set {
     my $attrs = 'HASH' eq ref $_[-1] ? pop @_ : {};
 
     @_ == 2 || @_ == 3
-      or croak(
-        'usage: IPC::XPA->Set( $template, $paramlist [, [$buf],[\%attrs]]' );
+      or croak( 'usage: IPC::XPA->Set( $template, $paramlist [, [$buf],[\%attrs]]' );
 
     my $template  = shift;
     my $paramlist = shift;
@@ -86,7 +254,7 @@ sub Set {
     # if it's already a reference, use that directly, else
     # make one.  also, if no buffer was passed, make an empty one.
     my $valref
-      = @_ && defined $_[0] ? ( ref( $_[0] ) ? $_[0] : \( $_[0] ) ) : \( '' );
+      = @_ && defined $_[0] ? ( ref( $_[0] ) ? $_[0] : \( $_[0] ) ) : \( q{} );
 
     $attrs{len} = length( $$valref ) unless defined $attrs{len};
 
@@ -97,6 +265,51 @@ sub Set {
     _Set( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ),
         $$valref, $attrs{len}, $attrs{max_servers} );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub Info {
@@ -115,9 +328,38 @@ sub Info {
     # create an essentially NULL pointer for pass to XPAGet
     my $xpa = ref( $obj ) ? $obj->{xpa} : nullXPA();
 
-    _Info( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ),
-        $attrs{max_servers} );
+    _Info( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ), $attrs{max_servers} );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub Access {
@@ -126,8 +368,7 @@ sub Access {
     my $attrs = 'HASH' eq ref $_[-1] ? pop @_ : {};
 
     @_ == 1 || @_ == 2
-      or
-      croak( 'usage: IPC::XPA->Access( $template, [,$paramlist] [,\%attrs]' );
+      or croak( 'usage: IPC::XPA->Access( $template, [,$paramlist] [,\%attrs]' );
 
     my ( $template, $paramlist ) = @_;
 
@@ -137,9 +378,39 @@ sub Access {
     # create an essentially NULL pointer for pass to XPAGet
     my $xpa = ref( $obj ) ? $obj->{xpa} : nullXPA();
 
-    _Access( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ),
-        $attrs{max_servers} );
+    _Access( $xpa, $template, $paramlist, _flatten_mode( $attrs{mode} ), $attrs{max_servers} );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub NSLookup {
     my $obj = shift;
@@ -178,7 +449,7 @@ IPC::XPA - Interface to the XPA messaging system
 
 =head1 VERSION
 
-version 0.13
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -216,19 +487,22 @@ via supplied user land programs.
 The method descriptions below do not duplicate the contents of the
 documentation provided with the C<xpa> library.
 
-Currently, only the client side routines are accessible.
+Only the client side routines are accessible.
 
-=head1 METHODS
+=head2 Methods
 
-Unless otherwise specified, the following methods are simple wrappers
-around the similarly named XPA routines (just prefix the Perl
+Unless otherwise specified, the class and instance methods are simple
+wrappers around the similarly named XPA routines (just prefix the Perl
 routines with C<XPA>).
 
-=head2 Class Methods
+=head2 The XPA Library
 
-=over 8
+The XPA library is available via the L<Alien::XPA> Perl module on CPAN,
+as well as at L<https://github.com/ericmandel/xpa>.
 
-=item nullXPA
+=head1 CONSTRUCTORS
+
+=head2 nullXPA
 
  $xpa = IPC::XPA->nullXPA;
 
@@ -237,7 +511,7 @@ far as the underlying XPA routines are concerned.  It can be used to
 create a default XPA object, as it it guaranteed to succeed (the
 B<Open()> method may fail).
 
-=item Open
+=head2 Open
 
  $xpa = IPC::XPA->Open();
  $xpa = IPC::XPA->Open( \%mode );
@@ -252,14 +526,39 @@ For example,
 
  $xpa = IPC::XPA->Open( { verify => 'true' } );
 
-=item Close
+=head1 CLASS METHODS
 
- $xpa->Close;
+=head2 Get
 
-Close the XPA object.  This is usually not necessary, as it will
-automatically be closed upon destruction.
+The B<Get> instance method (see L</METHODS>) can also be
+called as a class method, which is equivalent to calling
+B<XPAGet()> with a C<NULL> handle to the B<xpa> object.
 
-=item Access
+For example,
+
+ %res = IPC::XPA->Get( $template, $paramlist );
+
+=head2 Set
+
+The B<Set> instance method (see L</METHODS>) can also be
+called as a class method, which is equivalent to calling
+B<XPASet()> with a C<NULL> handle to the B<xpa> object.
+
+For example,
+
+ %res = IPC::XPA->Set( $template, $paramlist );
+
+=head2 Info
+
+The B<Info> instance method (see L</METHODS>) can also be
+called as a class method, which is equivalent to calling
+B<XPAInfo()> with a C<NULL> handle to the B<xpa> object.
+
+For example,
+
+ %res = IPC::XPA->Info( $template, $paramlist );
+
+=head2 Access
 
  %res = IPC::XPA->Access( $name [, $type] [, \%attr ] )
 
@@ -287,7 +586,7 @@ to 1000.
 See the XPA docs for more information.  This may also be called as an
 object method.
 
-=item NSLookup
+=head2 NSLookup
 
  @res = IPC::XPA->NSLookup( $template, $type )
 
@@ -316,43 +615,63 @@ which are essentially composites of the C<name> and C<method> keys.
 This may also be called as an object method.  See the XPA docs for
 more information the C<template> and C<type> specification.
 
-=item Set
+=head1 METHODS
 
-The B<Set> instance method (see L<Instance Methods>) can also be
-called as a class method, which is equivalent to calling
-B<XPASet()> with a C<NULL> handle to the B<xpa> object.
+=head2 Close
 
-For example,
+ $xpa->Close;
 
- %res = IPC::XPA->Set( $template, $paramlist );
+Close the XPA object.  This is usually not necessary, as it will
+automatically be closed upon destruction.
 
-=item Get
+=head2 Get
 
-The B<Get> instance method (see L<Instance Methods>) can also be
-called as a class method, which is equivalent to calling
-B<XPAGet()> with a C<NULL> handle to the B<xpa> object.
+ %res = $xpa->Get( $template, $paramlist );
+ %res = $xpa->Get( $template, $paramlist, \%attrs );
 
-For example,
-
- %res = IPC::XPA->Get( $template, $paramlist );
-
-=item Info
-
-The B<Info> instance method (see L<Instance Methods>) can also be
-called as a class method, which is equivalent to calling
-B<XPAInfo()> with a C<NULL> handle to the B<xpa> object.
-
-For example,
-
- %res = IPC::XPA->Info( $template, $paramlist );
-
-=back
-
-=head2 Instance Methods
+Retrieve data from the servers specified by the B<$template>
+parameter.  B<$xpa> is a reference to an XPA object created by
+C<Open()>.  The B<$paramlist> indicates which data to return.  The
+B<%attrs> hash specifies optional parameters and values to be sent.
+The following are available:
 
 =over 8
 
-=item Set
+=item max_servers
+
+The maximum number of servers to which the request should be sent. This
+defaults to C<1>.
+
+=item mode
+
+The value of this is a hash containing mode keywords and values, which
+will be translated into the string form used by B<XPAGet()>
+
+=back
+
+It returns a hash keyed off of the server names.  The hash values are
+references to hashes, which will have the keys C<name>, indicating the
+server's name, and C<buf> which will contain the returned data.  If
+there was an error, the hashes will also contain the key C<message>.
+See the B<XPAGet> documentation for more information on the C<name>
+and C<message> values.
+
+For example,
+
+ use Data::Dumper;
+ %res = $xpa->Get( 'ds9', '-help quit' );
+ print Dumper(\%res);
+
+might result in
+
+ $VAR1 = {
+          'DS9:ds9 838e2ab4:46529' => {
+             'name' => 'DS9:ds9 838e2ab4:46529',
+             'buf' => 'quit: -- exit application'
+           }
+         };
+
+=head2 Set
 
  %res = $xpa->Set( $template, $paramlist );
  %res = $xpa->Set( $template, $paramlist, $buf );
@@ -408,54 +727,7 @@ The latter might result in:
                                },
  };
 
-=item Get
-
- %res = $xpa->Get( $template, $paramlist );
- %res = $xpa->Get( $template, $paramlist, \%attrs );
-
-Retrieve data from the servers specified by the B<$template>
-parameter.  B<$xpa> is a reference to an XPA object created by
-C<Open()>.  The B<$paramlist> indicates which data to return.  The
-B<%attrs> hash specifies optional parameters and values to be sent.
-The following are available:
-
-=over 8
-
-=item max_servers
-
-The maximum number of servers to which the request should be sent. This
-defaults to C<1>.
-
-=item mode
-
-The value of this is a hash containing mode keywords and values, which
-will be translated into the string form used by B<XPAGet()>
-
-=back
-
-It returns a hash keyed off of the server names.  The hash values are
-references to hashes, which will have the keys C<name>, indicating the
-server's name, and C<buf> which will contain the returned data.  If
-there was an error, the hashes will also contain the key C<message>.
-See the B<XPAGet> documentation for more information on the C<name>
-and C<message> values.
-
-For example,
-
- use Data::Dumper;
- %res = $xpa->Get( 'ds9', '-help quit' );
- print Dumper(\%res);
-
-might result in
-
- $VAR1 = {
-          'DS9:ds9 838e2ab4:46529' => {
-             'name' => 'DS9:ds9 838e2ab4:46529',
-             'buf' => 'quit: -- exit application'
-           }
-         };
-
-=item Info
+=head2 Info
 
  %res = $xpa->Info( $template, $paramlist);
  %res = $xpa->Info( $template, $paramlist, \%attrs );
@@ -486,18 +758,11 @@ replied with a message, the hashes will also contain the key
 C<message>.  See the B<XPAGet> documentation for more information on
 the C<name> and C<message> values.
 
-=back
-
-=head1 The XPA Library
-
-The XPA library is available via the L<Alien::XPA> Perl module on CPAN,
-as well as at L<https://github.com/ericmandel/xpa>.
-
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-ipc-xpa@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-XPA
+Please report any bugs or feature requests to bug-ipc-xpa@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-XPA>
 
 =head2 Source
 

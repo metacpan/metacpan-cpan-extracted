@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 );
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 
-our $VERSION  = '0.38';
+our $VERSION  = '0.39';
 our @CARP_NOT = ('Crypt::URandom');
 
 sub CRYPT_SILENT      { return 64; }               # hex 40
@@ -193,7 +193,7 @@ Crypt::URandom - Provide non blocking randomness
 
 =head1 VERSION
 
-This document describes Crypt::URandom version 0.38
+This document describes Crypt::URandom version 0.39
 
 
 =head1 SYNOPSIS
@@ -227,7 +227,7 @@ or equal to Windows 2000.
 
 This function accepts an integer and returns a string of the same size
 filled with random data.  The first call will initialize the native
-cryptographic libraries (if necessary) and load all the required Perl libraries
+cryptographic libraries (if necessary) and load all the required Perl libraries.
 This call is a buffered read on non Win32 platforms.
 
 =item C<urandom_ub>
@@ -236,7 +236,7 @@ This call is a buffered read on non Win32 platforms.
 
 This function accepts an integer and returns a string of the same size
 filled with random data.  The first call will initialize the native
-cryptographic libraries (if necessary) and load all the required Perl libraries
+cryptographic libraries (if necessary) and load all the required Perl libraries.
 This call is a unbuffered sysread on non Win32 platforms.
 
 =back

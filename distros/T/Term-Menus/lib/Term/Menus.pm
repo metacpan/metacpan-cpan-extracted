@@ -2,7 +2,7 @@ package Term::Menus;
 
 #    Menus.pm
 #
-#    Copyright (C) 2000-2018
+#    Copyright (C) 2000-2023
 #
 #    by Brian M. Kelly. <Brian.Kelly@fullautosoftware.net>
 #
@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.024';
+our $VERSION = '3.026';
 
 
 use 5.006;
@@ -1001,10 +1001,12 @@ unless ($@) {
    ($termwidth,$termheight)=eval {
       no strict 'subs';
       my ($termwidth,$termheight)=('','');
-      ($termwidth, $termheight) =
-         Term::ReadKey::GetTerminalSize();
-      $termwidth||='';$termheight||='';
-      return $termwidth,$termheight;
+      my ($stdout_capture,$stderr_capture)=
+         Capture::Tiny::capture {
+            ($termwidth, $termheight) =
+               Term::ReadKey::GetTerminalSize();
+            $termwidth||='';$termheight||='';
+      }; return $termwidth,$termheight;
    };
    if ($@) {
       $termwidth='';$termheight='';
@@ -9035,7 +9037,7 @@ Brian M. Kelly <Brian.Kelly@fullautosoftware.net>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2000-2016
+Copyright (C) 2000-2023
 by Brian M. Kelly.
 
 This program is free software; you can redistribute it and/or

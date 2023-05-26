@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language>
-<language name="progress" version="7" kateversion="5.0" section="Database" extensions="*.p;*.w;*.i;*.cls;" author="Rares Stanciulescu (rstanciu@operamail.com)" license="GPL">
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="progress" version="3" kateversion="2.4" section="Database" extensions="*.p;*.w;*.i;*.cls;" author="Rares Stanciulescu (rstanciu@operamail.com)" license="GPL">
 
 <highlighting>
 
@@ -1592,6 +1592,8 @@
     <Detect2Chars attribute="Comment" context="MultiLineComment"
                   char="/" char1="*" beginRegion="Comment"/>
     <DetectChar attribute="Comment" context="Identifier" char='"'/>
+    <DetectChar attribute="String" context="#stay" char='"'/>
+    <DetectChar attribute="String" context="#stay" char="'"/>
     <AnyChar attribute="Symbol" context="#stay" String="+-*=/\?~{}[]():."/>
 
     <StringDetect attribute="Region Marker" context="#stay"
@@ -1668,8 +1670,7 @@
     <LineContinue attribute="Comment" context="#pop"/>
     <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/"
                   endRegion="Comment"/>
-    <DetectSpaces />
-    <IncludeRules context="##Comments" />
+    <IncludeRules context="##Alerts" />
   </context>
   <context name="Identifier" attribute="Identifier" lineEndContext="#pop">
     <DetectChar attribute="Identifier" context="#pop" char='"'/>
@@ -1685,6 +1686,7 @@
     <itemData name="Methods" defStyleNum="dsOthers"/>
     <itemData name="Function" defStyleNum="dsFunction"/>
     <itemData name="Normal Text" defStyleNum="dsNormal"/>
+    <itemData name="Decimal"  defStyleNum="dsDecVal"/>
     <itemData name="Integer"  defStyleNum="dsBaseN"/>
     <itemData name="String" defStyleNum="dsString"/>
     <itemData name="String Char" defStyleNum="dsChar"/>
@@ -1694,12 +1696,13 @@
     <itemData name="Data_Type" defStyleNum="dsDataType"/>
     <itemData name="Preprocvar" defStyleNum="dsChar"/>
     <itemData name="Operators" defStyleNum="dsDecVal"/>
+    <itemData name="Alert" defStyleNum="dsAlert"/>
     <itemData name="Region Marker" defStyleNum="dsRegionMarker"/>
   </itemDatas>
 </highlighting>
   <general>
     <comments>
-      <comment name="multiLine" start="/*" end="*/" region="Comment"/>
+      <comment name="multiLine" start="/*" end="*/"/>
     </comments>
     <keywords  casesensitive="0" weakDeliminator="-" />
   </general>

@@ -1,3 +1,4 @@
+---
 {
    "abstract" : "Aspose.Cells Cloud SDK for Perl",
    "author" : [
@@ -62,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "22.12"
+         "version" : "23.5"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -73,245 +74,20 @@
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
       },
-      "AsposeCellsCloud::Object::AboveAverage" : {
-         "file" : "lib/AsposeCellsCloud/Object/AboveAverage.pm"
-      },
-      "AsposeCellsCloud::Object::AccessTokenResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/AccessTokenResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Area" : {
-         "file" : "lib/AsposeCellsCloud/Object/Area.pm"
-      },      
-      "AsposeCellsCloud::Object::Axis" : {
-         "file" : "lib/AsposeCellsCloud/Object/Axis.pm"
-      },      
-      "AsposeCellsCloud::Object::AxisResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/AxisResponse.pm"
-      },
-      "AsposeCellsCloud::Object::AutoFilter" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoFilter.pm"
-      },
-      "AsposeCellsCloud::Object::AutoFilterResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoFilterResponse.pm"
-      },
-      "AsposeCellsCloud::Object::AutoFitterOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoFitterOptions.pm"
-      },
-      "AsposeCellsCloud::Object::AutoShape" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoShape.pm"
-      },
-      "AsposeCellsCloud::Object::AutoShapeResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoShapeResponse.pm"
-      },
-      "AsposeCellsCloud::Object::AutoShapes" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoShapes.pm"
-      },
-      "AsposeCellsCloud::Object::AutoShapesResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/AutoShapesResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Border" : {
-         "file" : "lib/AsposeCellsCloud/Object/Border.pm"
-      },
-      "AsposeCellsCloud::Object::BarcodeResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/BarcodeResponse.pm"
-      }, 
-      "AsposeCellsCloud::Object::BarcodeResponseList" : {
-         "file" : "lib/AsposeCellsCloud/Object/BarcodeResponseList.pm"
-      },       
-      "AsposeCellsCloud::Object::BatchConvertRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/BatchConvertRequest.pm"
-      },      
-      "AsposeCellsCloud::Object::CalculationOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/CalculationOptions.pm"
-      },
-      "AsposeCellsCloud::Object::Cell" : {
-         "file" : "lib/AsposeCellsCloud/Object/Cell.pm"
-      },
-      "AsposeCellsCloud::Object::CellArea" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellArea.pm"
-      },
-      "AsposeCellsCloud::Object::CellResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellResponse.pm"
-      },
-      "AsposeCellsCloud::Object::CellValue" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellValue.pm"
-      },
-      "AsposeCellsCloud::Object::Cells" : {
-         "file" : "lib/AsposeCellsCloud/Object/Cells.pm"
-      },
-      "AsposeCellsCloud::Object::CellsCloudResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsCloudResponse.pm"
-      },
-      "AsposeCellsCloud::Object::CellsCloudFileInfo" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsCloudFileInfo.pm"
-      },
-      "AsposeCellsCloud::Object::CellsColor" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsColor.pm"
-      },
-      "AsposeCellsCloud::Object::CellsDocumentProperties" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentProperties.pm"
-      },
-      "AsposeCellsCloud::Object::CellsDocumentPropertiesResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentPropertiesResponse.pm"
-      },
-      "AsposeCellsCloud::Object::CellsDocumentProperty" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentProperty.pm"
-      },
-      "AsposeCellsCloud::Object::CellsDocumentPropertyResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentPropertyResponse.pm"
-      },
-      "AsposeCellsCloud::Object::CellsError" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsError.pm"
-      },      
-      "AsposeCellsCloud::Object::CellsObjectOperateTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::WorksheetOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorksheetOperateParameter.pm"
-      },      
-      "AsposeCellsCloud::Object::ConvertWorksheetTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::CellsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Chart" : {
-         "file" : "lib/AsposeCellsCloud/Object/Chart.pm"
-      },
-      "AsposeCellsCloud::Object::ChartArea" : {
-         "file" : "lib/AsposeCellsCloud/Object/ChartArea.pm"
-      },
-      "AsposeCellsCloud::Object::ChartAreaResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ChartAreaResponse.pm"
-      },
-      "AsposeCellsCloud::Object::ChartFrame" : {
-         "file" : "lib/AsposeCellsCloud/Object/ChartFrame.pm"
-      },
-      "AsposeCellsCloud::Object::ChartOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ChartOperateParameter.pm"
-      },
-      "AsposeCellsCloud::Object::Charts" : {
-         "file" : "lib/AsposeCellsCloud/Object/Charts.pm"
-      },
-      "AsposeCellsCloud::Object::ChartsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ChartsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Color" : {
-         "file" : "lib/AsposeCellsCloud/Object/Color.pm"
-      },
-      "AsposeCellsCloud::Object::ColorFilter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ColorFilter.pm"
-      },
-      "AsposeCellsCloud::Object::ColorFilterRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/ColorFilterRequest.pm"
-      },
-      "AsposeCellsCloud::Object::ColorScale" : {
-         "file" : "lib/AsposeCellsCloud/Object/ColorScale.pm"
-      },
-      "AsposeCellsCloud::Object::Column" : {
-         "file" : "lib/AsposeCellsCloud/Object/Column.pm"
-      },
-      "AsposeCellsCloud::Object::ColumnResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ColumnResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Columns" : {
-         "file" : "lib/AsposeCellsCloud/Object/Columns.pm"
-      },
-      "AsposeCellsCloud::Object::ColumnsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ColumnsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Comment" : {
-         "file" : "lib/AsposeCellsCloud/Object/Comment.pm"
-      },
-      "AsposeCellsCloud::Object::CommentResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CommentResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Comments" : {
-         "file" : "lib/AsposeCellsCloud/Object/Comments.pm"
-      },
-      "AsposeCellsCloud::Object::CommentsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/CommentsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::ConditionalFormatting" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormatting.pm"
-      },
-      "AsposeCellsCloud::Object::ConditionalFormattingIcon" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingIcon.pm"
-      },
-      "AsposeCellsCloud::Object::ConditionalFormattingResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingResponse.pm"
-      },
-      "AsposeCellsCloud::Object::ConditionalFormattingValue" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingValue.pm"
-      },
-      "AsposeCellsCloud::Object::ConditionalFormattings" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattings.pm"
-      },
-      "AsposeCellsCloud::Object::ConditionalFormattingsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::ConvertTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ConvertTaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::CopyOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/CopyOptions.pm"
-      },
-      "AsposeCellsCloud::Object::CreatePivotTableRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm"
-      },
-      "AsposeCellsCloud::Object::CustomFilter" : {
-         "file" : "lib/AsposeCellsCloud/Object/CustomFilter.pm"
-      },
-      "AsposeCellsCloud::Object::CustomParserConfig" : {
-         "file" : "lib/AsposeCellsCloud/Object/CustomParserConfig.pm"
-      },
-      "AsposeCellsCloud::Object::DataBar" : {
-         "file" : "lib/AsposeCellsCloud/Object/DataBar.pm"
-      },
-      "AsposeCellsCloud::Object::DataBarBorder" : {
-         "file" : "lib/AsposeCellsCloud/Object/DataBarBorder.pm"
-      },
-      "AsposeCellsCloud::Object::DataSorter" : {
-         "file" : "lib/AsposeCellsCloud/Object/DataSorter.pm"
-      },
-      "AsposeCellsCloud::Object::DifSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/DifSaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::DocxSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/DocxSaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::JsonSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/JsonSaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::PptxSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/PptxSaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::SqlScriptSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/SqlScriptSaveOptions.pm"
-      },                        
       "AsposeCellsCloud::Object::DiscUsage" : {
          "file" : "lib/AsposeCellsCloud/Object/DiscUsage.pm"
       },
-      "AsposeCellsCloud::Object::DynamicFilter" : {
-         "file" : "lib/AsposeCellsCloud/Object/DynamicFilter.pm"
+      "AsposeCellsCloud::Object::ObjectExist" : {
+         "file" : "lib/AsposeCellsCloud/Object/ObjectExist.pm"
       },
-      "AsposeCellsCloud::Object::Error" : {
-         "file" : "lib/AsposeCellsCloud/Object/Error.pm"
-      },
-      "AsposeCellsCloud::Object::ErrorDetails" : {
-         "file" : "lib/AsposeCellsCloud/Object/ErrorDetails.pm"
-      },
-      "AsposeCellsCloud::Object::FilesResult" : {
-         "file" : "lib/AsposeCellsCloud/Object/FilesResult.pm"
-      },
-      "AsposeCellsCloud::Object::FileInfo" : {
-         "file" : "lib/AsposeCellsCloud/Object/FileInfo.pm"
-      },
-      "AsposeCellsCloud::Object::FileSource" : {
-         "file" : "lib/AsposeCellsCloud/Object/FileSource.pm"
+      "AsposeCellsCloud::Object::ObjectExistsExtensions" : {
+         "file" : "lib/AsposeCellsCloud/Object/ObjectExistsExtensions.pm"
       },
       "AsposeCellsCloud::Object::FileVersion" : {
          "file" : "lib/AsposeCellsCloud/Object/FileVersion.pm"
+      },
+      "AsposeCellsCloud::Object::StorageExist" : {
+         "file" : "lib/AsposeCellsCloud/Object/StorageExist.pm"
       },
       "AsposeCellsCloud::Object::FileVersions" : {
          "file" : "lib/AsposeCellsCloud/Object/FileVersions.pm"
@@ -322,11 +98,110 @@
       "AsposeCellsCloud::Object::FilesUploadResult" : {
          "file" : "lib/AsposeCellsCloud/Object/FilesUploadResult.pm"
       },
-      "AsposeCellsCloud::Object::FillFormat" : {
-         "file" : "lib/AsposeCellsCloud/Object/FillFormat.pm"
+      "AsposeCellsCloud::Object::StorageFile" : {
+         "file" : "lib/AsposeCellsCloud/Object/StorageFile.pm"
       },
-      "AsposeCellsCloud::Object::FillFormatResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/FillFormatResponse.pm"
+      "AsposeCellsCloud::Object::GoogleDriveStorageFile" : {
+         "file" : "lib/AsposeCellsCloud/Object/GoogleDriveStorageFile.pm"
+      },
+      "AsposeCellsCloud::Object::AboveAverage" : {
+         "file" : "lib/AsposeCellsCloud/Object/AboveAverage.pm"
+      },
+      "AsposeCellsCloud::Object::AutoFilter" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoFilter.pm"
+      },
+      "AsposeCellsCloud::Object::AutoFitterOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoFitterOptions.pm"
+      },
+      "AsposeCellsCloud::Object::Border" : {
+         "file" : "lib/AsposeCellsCloud/Object/Border.pm"
+      },
+      "AsposeCellsCloud::Object::CalculationOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/CalculationOptions.pm"
+      },
+      "AsposeCellsCloud::Object::Cell" : {
+         "file" : "lib/AsposeCellsCloud/Object/Cell.pm"
+      },
+      "AsposeCellsCloud::Object::CellArea" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellArea.pm"
+      },
+      "AsposeCellsCloud::Object::Cells" : {
+         "file" : "lib/AsposeCellsCloud/Object/Cells.pm"
+      },
+      "AsposeCellsCloud::Object::CellsCloudFileInfo" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsCloudFileInfo.pm"
+      },
+      "AsposeCellsCloud::Object::CellsColor" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsColor.pm"
+      },
+      "AsposeCellsCloud::Object::CellsDocumentProperties" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentProperties.pm"
+      },
+      "AsposeCellsCloud::Object::CellsDocumentProperty" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentProperty.pm"
+      },
+      "AsposeCellsCloud::Object::Color" : {
+         "file" : "lib/AsposeCellsCloud/Object/Color.pm"
+      },
+      "AsposeCellsCloud::Object::ColorFilter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ColorFilter.pm"
+      },
+      "AsposeCellsCloud::Object::ColorScale" : {
+         "file" : "lib/AsposeCellsCloud/Object/ColorScale.pm"
+      },
+      "AsposeCellsCloud::Object::Column" : {
+         "file" : "lib/AsposeCellsCloud/Object/Column.pm"
+      },
+      "AsposeCellsCloud::Object::Columns" : {
+         "file" : "lib/AsposeCellsCloud/Object/Columns.pm"
+      },
+      "AsposeCellsCloud::Object::Comment" : {
+         "file" : "lib/AsposeCellsCloud/Object/Comment.pm"
+      },
+      "AsposeCellsCloud::Object::Comments" : {
+         "file" : "lib/AsposeCellsCloud/Object/Comments.pm"
+      },
+      "AsposeCellsCloud::Object::ConditionalFormatting" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormatting.pm"
+      },
+      "AsposeCellsCloud::Object::ConditionalFormattingIcon" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingIcon.pm"
+      },
+      "AsposeCellsCloud::Object::ConditionalFormattings" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattings.pm"
+      },
+      "AsposeCellsCloud::Object::ConditionalFormattingValue" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingValue.pm"
+      },
+      "AsposeCellsCloud::Object::CopyOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/CopyOptions.pm"
+      },
+      "AsposeCellsCloud::Object::CriteriaMultipleFilter" : {
+         "file" : "lib/AsposeCellsCloud/Object/CriteriaMultipleFilter.pm"
+      },
+      "AsposeCellsCloud::Object::CustomFilter" : {
+         "file" : "lib/AsposeCellsCloud/Object/CustomFilter.pm"
+      },
+      "AsposeCellsCloud::Object::DataBar" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataBar.pm"
+      },
+      "AsposeCellsCloud::Object::DataBarBorder" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataBarBorder.pm"
+      },
+      "AsposeCellsCloud::Object::DataSorter" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataSorter.pm"
+      },
+      "AsposeCellsCloud::Object::DateTimeGroupItem" : {
+         "file" : "lib/AsposeCellsCloud/Object/DateTimeGroupItem.pm"
+      },
+      "AsposeCellsCloud::Object::DynamicFilter" : {
+         "file" : "lib/AsposeCellsCloud/Object/DynamicFilter.pm"
+      },
+      "AsposeCellsCloud::Object::FileInfo" : {
+         "file" : "lib/AsposeCellsCloud/Object/FileInfo.pm"
+      },
+      "AsposeCellsCloud::Object::FilesResult" : {
+         "file" : "lib/AsposeCellsCloud/Object/FilesResult.pm"
       },
       "AsposeCellsCloud::Object::FilterColumn" : {
          "file" : "lib/AsposeCellsCloud/Object/FilterColumn.pm"
@@ -340,38 +215,20 @@
       "AsposeCellsCloud::Object::FormatCondition" : {
          "file" : "lib/AsposeCellsCloud/Object/FormatCondition.pm"
       },
-      "AsposeCellsCloud::Object::GradientFill" : {
-         "file" : "lib/AsposeCellsCloud/Object/GradientFill.pm"
-      },
-      "AsposeCellsCloud::Object::GradientFillStop" : {
-         "file" : "lib/AsposeCellsCloud/Object/GradientFillStop.pm"
+      "AsposeCellsCloud::Object::FormulaFormatCondition" : {
+         "file" : "lib/AsposeCellsCloud/Object/FormulaFormatCondition.pm"
       },
       "AsposeCellsCloud::Object::HorizontalPageBreak" : {
          "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreak.pm"
       },
-      "AsposeCellsCloud::Object::HorizontalPageBreakResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreakResponse.pm"
-      },
       "AsposeCellsCloud::Object::HorizontalPageBreaks" : {
          "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreaks.pm"
-      },
-      "AsposeCellsCloud::Object::HorizontalPageBreaksResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreaksResponse.pm"
-      },
-      "AsposeCellsCloud::Object::HtmlSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/HtmlSaveOptions.pm"
       },
       "AsposeCellsCloud::Object::Hyperlink" : {
          "file" : "lib/AsposeCellsCloud/Object/Hyperlink.pm"
       },
-      "AsposeCellsCloud::Object::HyperlinkResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/HyperlinkResponse.pm"
-      },
       "AsposeCellsCloud::Object::Hyperlinks" : {
          "file" : "lib/AsposeCellsCloud/Object/Hyperlinks.pm"
-      },
-      "AsposeCellsCloud::Object::HyperlinksResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/HyperlinksResponse.pm"
       },
       "AsposeCellsCloud::Object::IconFilter" : {
          "file" : "lib/AsposeCellsCloud/Object/IconFilter.pm"
@@ -379,92 +236,20 @@
       "AsposeCellsCloud::Object::IconSet" : {
          "file" : "lib/AsposeCellsCloud/Object/IconSet.pm"
       },
-      "AsposeCellsCloud::Object::ImageSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImageSaveOptions.pm"
-      },      
-      "AsposeCellsCloud::Object::ImportBatchDataOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportBatchDataOption.pm"
-      },
-      "AsposeCellsCloud::Object::ImportPictureOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportPictureOption.pm"
-      },
-      "AsposeCellsCloud::Object::ImportCSVDataOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportCSVDataOption.pm"
-      },
-      "AsposeCellsCloud::Object::ImportDataTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportDataTaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::ImportDoubleArrayOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportDoubleArrayOption.pm"
-      },
-      "AsposeCellsCloud::Object::ImportIntArrayOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportIntArrayOption.pm"
-      },
-      "AsposeCellsCloud::Object::ImportOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportOption.pm"
-      },
-      "AsposeCellsCloud::Object::ImportStringArrayOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/ImportStringArrayOption.pm"
-      },
-      "AsposeCellsCloud::Object::Legend" : {
-         "file" : "lib/AsposeCellsCloud/Object/Legend.pm"
-      },
-      "AsposeCellsCloud::Object::LegendResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/LegendResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Line" : {
-         "file" : "lib/AsposeCellsCloud/Object/Line.pm"
-      },
-      "AsposeCellsCloud::Object::LineFormat" : {
-         "file" : "lib/AsposeCellsCloud/Object/LineFormat.pm"
-      },
-      "AsposeCellsCloud::Object::LineResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/LineResponse.pm"
-      },
       "AsposeCellsCloud::Object::Link" : {
          "file" : "lib/AsposeCellsCloud/Object/Link.pm"
       },
       "AsposeCellsCloud::Object::LinkElement" : {
          "file" : "lib/AsposeCellsCloud/Object/LinkElement.pm"
       },
-      "AsposeCellsCloud::Object::ListColumn" : {
-         "file" : "lib/AsposeCellsCloud/Object/ListColumn.pm"
-      },
-      "AsposeCellsCloud::Object::ListObject" : {
-         "file" : "lib/AsposeCellsCloud/Object/ListObject.pm"
-      },
-      "AsposeCellsCloud::Object::ListObjectOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ListObjectOperateParameter.pm"
-      },
-      "AsposeCellsCloud::Object::ListObjectResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ListObjectResponse.pm"
-      },
-      "AsposeCellsCloud::Object::ListObjects" : {
-         "file" : "lib/AsposeCellsCloud/Object/ListObjects.pm"
-      },
-      "AsposeCellsCloud::Object::ListObjectsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ListObjectsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::MHtmlSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/MHtmlSaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::MatchConditionRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/MatchConditionRequest.pm"
-      },      
-      "AsposeCellsCloud::Object::MarkdownSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/MarkdownSaveOptions.pm"
+      "AsposeCellsCloud::Object::LoadOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/LoadOptions.pm"
       },
       "AsposeCellsCloud::Object::MergedCell" : {
          "file" : "lib/AsposeCellsCloud/Object/MergedCell.pm"
       },
-      "AsposeCellsCloud::Object::MergedCellResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/MergedCellResponse.pm"
-      },
       "AsposeCellsCloud::Object::MergedCells" : {
          "file" : "lib/AsposeCellsCloud/Object/MergedCells.pm"
-      },
-      "AsposeCellsCloud::Object::MergedCellsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/MergedCellsResponse.pm"
       },
       "AsposeCellsCloud::Object::MultipleFilter" : {
          "file" : "lib/AsposeCellsCloud/Object/MultipleFilter.pm"
@@ -475,38 +260,161 @@
       "AsposeCellsCloud::Object::Name" : {
          "file" : "lib/AsposeCellsCloud/Object/Name.pm"
       },
-      "AsposeCellsCloud::Object::NameResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/NameResponse.pm"
-      },
       "AsposeCellsCloud::Object::Names" : {
          "file" : "lib/AsposeCellsCloud/Object/Names.pm"
-      },
-      "AsposeCellsCloud::Object::NamesResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/NamesResponse.pm"
       },
       "AsposeCellsCloud::Object::NegativeBarFormat" : {
          "file" : "lib/AsposeCellsCloud/Object/NegativeBarFormat.pm"
       },
-      "AsposeCellsCloud::Object::ObjectExist" : {
-         "file" : "lib/AsposeCellsCloud/Object/ObjectExist.pm"
+      "AsposeCellsCloud::Object::PageSection" : {
+         "file" : "lib/AsposeCellsCloud/Object/PageSection.pm"
       },
-      "AsposeCellsCloud::Object::OdsSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/OdsSaveOptions.pm"
+      "AsposeCellsCloud::Object::PageSetup" : {
+         "file" : "lib/AsposeCellsCloud/Object/PageSetup.pm"
       },
-      "AsposeCellsCloud::Object::OleObject" : {
-         "file" : "lib/AsposeCellsCloud/Object/OleObject.pm"
+      "AsposeCellsCloud::Object::PasteOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/PasteOptions.pm"
       },
-      "AsposeCellsCloud::Object::OleObjectResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/OleObjectResponse.pm"
+      "AsposeCellsCloud::Object::PdfSecurityOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/PdfSecurityOptions.pm"
       },
-      "AsposeCellsCloud::Object::OleObjects" : {
-         "file" : "lib/AsposeCellsCloud/Object/OleObjects.pm"
+      "AsposeCellsCloud::Object::ProtectSheetParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm"
       },
-      "AsposeCellsCloud::Object::OleObjectsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/OleObjectsResponse.pm"
+      "AsposeCellsCloud::Object::Range" : {
+         "file" : "lib/AsposeCellsCloud/Object/Range.pm"
       },
-      "AsposeCellsCloud::Object::OoxmlSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/OoxmlSaveOptions.pm"
+      "AsposeCellsCloud::Object::Ranges" : {
+         "file" : "lib/AsposeCellsCloud/Object/Ranges.pm"
+      },
+      "AsposeCellsCloud::Object::Row" : {
+         "file" : "lib/AsposeCellsCloud/Object/Row.pm"
+      },
+      "AsposeCellsCloud::Object::Rows" : {
+         "file" : "lib/AsposeCellsCloud/Object/Rows.pm"
+      },
+      "AsposeCellsCloud::Object::SaveResult" : {
+         "file" : "lib/AsposeCellsCloud/Object/SaveResult.pm"
+      },
+      "AsposeCellsCloud::Object::SingleValue" : {
+         "file" : "lib/AsposeCellsCloud/Object/SingleValue.pm"
+      },
+      "AsposeCellsCloud::Object::SortKey" : {
+         "file" : "lib/AsposeCellsCloud/Object/SortKey.pm"
+      },
+      "AsposeCellsCloud::Object::SplitResult" : {
+         "file" : "lib/AsposeCellsCloud/Object/SplitResult.pm"
+      },
+      "AsposeCellsCloud::Object::SplitResultDocument" : {
+         "file" : "lib/AsposeCellsCloud/Object/SplitResultDocument.pm"
+      },
+      "AsposeCellsCloud::Object::Style" : {
+         "file" : "lib/AsposeCellsCloud/Object/Style.pm"
+      },
+      "AsposeCellsCloud::Object::StyleFormatCondition" : {
+         "file" : "lib/AsposeCellsCloud/Object/StyleFormatCondition.pm"
+      },
+      "AsposeCellsCloud::Object::Styles" : {
+         "file" : "lib/AsposeCellsCloud/Object/Styles.pm"
+      },
+      "AsposeCellsCloud::Object::TextFormatCondition" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextFormatCondition.pm"
+      },
+      "AsposeCellsCloud::Object::TextItem" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextItem.pm"
+      },
+      "AsposeCellsCloud::Object::TextItems" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextItems.pm"
+      },
+      "AsposeCellsCloud::Object::TextOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextOptions.pm"
+      },
+      "AsposeCellsCloud::Object::ThemeColor" : {
+         "file" : "lib/AsposeCellsCloud/Object/ThemeColor.pm"
+      },
+      "AsposeCellsCloud::Object::TimePeriodFormatCondition" : {
+         "file" : "lib/AsposeCellsCloud/Object/TimePeriodFormatCondition.pm"
+      },
+      "AsposeCellsCloud::Object::Top10" : {
+         "file" : "lib/AsposeCellsCloud/Object/Top10.pm"
+      },
+      "AsposeCellsCloud::Object::Top10Filter" : {
+         "file" : "lib/AsposeCellsCloud/Object/Top10Filter.pm"
+      },
+      "AsposeCellsCloud::Object::Validation" : {
+         "file" : "lib/AsposeCellsCloud/Object/Validation.pm"
+      },
+      "AsposeCellsCloud::Object::Validations" : {
+         "file" : "lib/AsposeCellsCloud/Object/Validations.pm"
+      },
+      "AsposeCellsCloud::Object::VerticalPageBreak" : {
+         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreak.pm"
+      },
+      "AsposeCellsCloud::Object::VerticalPageBreaks" : {
+         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreaks.pm"
+      },
+      "AsposeCellsCloud::Object::Workbook" : {
+         "file" : "lib/AsposeCellsCloud/Object/Workbook.pm"
+      },
+      "AsposeCellsCloud::Object::WorkbookSettings" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookSettings.pm"
+      },
+      "AsposeCellsCloud::Object::Worksheet" : {
+         "file" : "lib/AsposeCellsCloud/Object/Worksheet.pm"
+      },
+      "AsposeCellsCloud::Object::Worksheets" : {
+         "file" : "lib/AsposeCellsCloud/Object/Worksheets.pm"
+      },
+      "AsposeCellsCloud::Object::CellsObjectOperateTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::ConvertTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConvertTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::ConvertWorksheetTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::FileSource" : {
+         "file" : "lib/AsposeCellsCloud/Object/FileSource.pm"
+      },
+      "AsposeCellsCloud::Object::ImportDataTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportDataTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::ResultDestination" : {
+         "file" : "lib/AsposeCellsCloud/Object/ResultDestination.pm"
+      },
+      "AsposeCellsCloud::Object::SaveFilesToCloudResult" : {
+         "file" : "lib/AsposeCellsCloud/Object/SaveFilesToCloudResult.pm"
+      },
+      "AsposeCellsCloud::Object::SaveResultTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/SaveResultTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::SmartMarkerTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/SmartMarkerTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::SplitWorkbookTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/SplitWorkbookTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::TaskData" : {
+         "file" : "lib/AsposeCellsCloud/Object/TaskData.pm"
+      },
+      "AsposeCellsCloud::Object::TaskDescription" : {
+         "file" : "lib/AsposeCellsCloud/Object/TaskDescription.pm"
+      },
+      "AsposeCellsCloud::Object::TaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/TaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::TaskResultParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/TaskResultParameter.pm"
+      },
+      "AsposeCellsCloud::Object::TaskRunResult" : {
+         "file" : "lib/AsposeCellsCloud/Object/TaskRunResult.pm"
+      },
+      "AsposeCellsCloud::Object::ChartOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartOperateParameter.pm"
+      },
+      "AsposeCellsCloud::Object::ListObjectOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListObjectOperateParameter.pm"
       },
       "AsposeCellsCloud::Object::OperateObject" : {
          "file" : "lib/AsposeCellsCloud/Object/OperateObject.pm"
@@ -520,59 +428,290 @@
       "AsposeCellsCloud::Object::PageBreakOperateParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/PageBreakOperateParameter.pm"
       },
-      "AsposeCellsCloud::Object::PageSection" : {
-         "file" : "lib/AsposeCellsCloud/Object/PageSection.pm"
-      },
-      "AsposeCellsCloud::Object::PageSectionsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/PageSectionsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::PageSetup" : {
-         "file" : "lib/AsposeCellsCloud/Object/PageSetup.pm"
-      },
       "AsposeCellsCloud::Object::PageSetupOperateParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/PageSetupOperateParameter.pm"
       },
-      "AsposeCellsCloud::Object::PageSetupResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/PageSetupResponse.pm"
+      "AsposeCellsCloud::Object::PivotTableOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotTableOperateParameter.pm"
       },
-      "AsposeCellsCloud::Object::PasswordRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/PasswordRequest.pm"
+      "AsposeCellsCloud::Object::ShapeOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ShapeOperateParameter.pm"
       },
-      "AsposeCellsCloud::Object::PasteOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/PasteOptions.pm"
+      "AsposeCellsCloud::Object::WorkbookOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookOperateParameter.pm"
       },
-      "AsposeCellsCloud::Object::PatternFill" : {
-         "file" : "lib/AsposeCellsCloud/Object/PatternFill.pm"
+      "AsposeCellsCloud::Object::WorkbookSettingsOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookSettingsOperateParameter.pm"
+      },
+      "AsposeCellsCloud::Object::WorksheetOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorksheetOperateParameter.pm"
+      },
+      "AsposeCellsCloud::Object::ListColumn" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListColumn.pm"
+      },
+      "AsposeCellsCloud::Object::ListObject" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListObject.pm"
+      },
+      "AsposeCellsCloud::Object::ListObjects" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListObjects.pm"
+      },
+      "AsposeCellsCloud::Object::DifSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/DifSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::DocxSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/DocxSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::HtmlSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/HtmlSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::ImageSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImageSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::JsonSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/JsonSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::MarkdownSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/MarkdownSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::MHtmlSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/MHtmlSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::OdsSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/OdsSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::OoxmlSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/OoxmlSaveOptions.pm"
       },
       "AsposeCellsCloud::Object::PdfSaveOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/PdfSaveOptions.pm"
       },
-      "AsposeCellsCloud::Object::PdfSecurityOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/PdfSecurityOptions.pm"
+      "AsposeCellsCloud::Object::PptxSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/PptxSaveOptions.pm"
       },
-      "AsposeCellsCloud::Object::PicFormatOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/PicFormatOption.pm"
+      "AsposeCellsCloud::Object::SaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/SaveOptions.pm"
       },
-      "AsposeCellsCloud::Object::Picture" : {
-         "file" : "lib/AsposeCellsCloud/Object/Picture.pm"
+      "AsposeCellsCloud::Object::SpreadsheetML2003SaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/SpreadsheetML2003SaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::SqlScriptSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/SqlScriptSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::SvgSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/SvgSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::TxtSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/TxtSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::XlsbSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/XlsbSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::XlsSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/XlsSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::XpsSaveOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/XpsSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::ArcShapeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ArcShapeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::AutoFilterResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoFilterResponse.pm"
+      },
+      "AsposeCellsCloud::Object::AutoShapeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoShapeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::AutoShapesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoShapesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::AxisResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/AxisResponse.pm"
+      },
+      "AsposeCellsCloud::Object::BarcodeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/BarcodeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::BarcodeResponseList" : {
+         "file" : "lib/AsposeCellsCloud/Object/BarcodeResponseList.pm"
+      },
+      "AsposeCellsCloud::Object::BorderResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/BorderResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ButtonResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ButtonResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CalculateFormulaResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CalculateFormulaResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsCloudFileInfoResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsCloudFileInfoResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsCloudResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsCloudResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsDocumentPropertiesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentPropertiesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsDocumentPropertyResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsDocumentPropertyResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsDrawingResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsDrawingResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ChartAreaResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartAreaResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ChartDataTableResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartDataTableResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ChartPointResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartPointResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ChartPointsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartPointsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ChartResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ChartsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CheckBoxResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CheckBoxResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ColumnResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ColumnResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ColumnsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ColumnsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ComboBoxResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ComboBoxResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CommentResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CommentResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CommentShapeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CommentShapeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CommentsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/CommentsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ConditionalFormattingResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ConditionalFormattingsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConditionalFormattingsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::DataLabelsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataLabelsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::DisplayUnitLabelResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/DisplayUnitLabelResponse.pm"
+      },
+      "AsposeCellsCloud::Object::DropBarsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/DropBarsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ErrorBarResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ErrorBarResponse.pm"
+      },
+      "AsposeCellsCloud::Object::FillFormatResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/FillFormatResponse.pm"
+      },
+      "AsposeCellsCloud::Object::FindResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/FindResponse.pm"
+      },
+      "AsposeCellsCloud::Object::FloorResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/FloorResponse.pm"
+      },
+      "AsposeCellsCloud::Object::FormResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/FormResponse.pm"
+      },
+      "AsposeCellsCloud::Object::FormsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/FormsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::GroupBoxResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/GroupBoxResponse.pm"
+      },
+      "AsposeCellsCloud::Object::HorizontalPageBreakResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreakResponse.pm"
+      },
+      "AsposeCellsCloud::Object::HorizontalPageBreaksResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreaksResponse.pm"
+      },
+      "AsposeCellsCloud::Object::HyperlinkResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/HyperlinkResponse.pm"
+      },
+      "AsposeCellsCloud::Object::HyperlinksResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/HyperlinksResponse.pm"
+      },
+      "AsposeCellsCloud::Object::LabelResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/LabelResponse.pm"
+      },
+      "AsposeCellsCloud::Object::LegendEntriesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/LegendEntriesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::LegendEntryResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/LegendEntryResponse.pm"
+      },
+      "AsposeCellsCloud::Object::LegendResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/LegendResponse.pm"
+      },
+      "AsposeCellsCloud::Object::LineResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/LineResponse.pm"
+      },
+      "AsposeCellsCloud::Object::LineShapeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/LineShapeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ListBoxResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListBoxResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ListObjectResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListObjectResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ListObjectsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListObjectsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::MergedCellResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/MergedCellResponse.pm"
+      },
+      "AsposeCellsCloud::Object::MergedCellsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/MergedCellsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::NameResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/NameResponse.pm"
+      },
+      "AsposeCellsCloud::Object::NamesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/NamesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::OleObjectResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/OleObjectResponse.pm"
+      },
+      "AsposeCellsCloud::Object::OleObjectsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/OleObjectsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::OvalResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/OvalResponse.pm"
+      },
+      "AsposeCellsCloud::Object::PageSectionsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/PageSectionsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::PageSetupResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/PageSetupResponse.pm"
       },
       "AsposeCellsCloud::Object::PictureResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PictureResponse.pm"
       },
-      "AsposeCellsCloud::Object::Pictures" : {
-         "file" : "lib/AsposeCellsCloud/Object/Pictures.pm"
-      },
       "AsposeCellsCloud::Object::PicturesResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PicturesResponse.pm"
       },
-      "AsposeCellsCloud::Object::PivotField" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotField.pm"
-      },
       "AsposeCellsCloud::Object::PivotFieldResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotFieldResponse.pm"
-      },
-      "AsposeCellsCloud::Object::PivotFilter" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotFilter.pm"
       },
       "AsposeCellsCloud::Object::PivotFilterResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotFilterResponse.pm"
@@ -580,32 +719,158 @@
       "AsposeCellsCloud::Object::PivotFiltersResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotFiltersResponse.pm"
       },
-      "AsposeCellsCloud::Object::PivotItem" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotItem.pm"
-      },
-      "AsposeCellsCloud::Object::PivotTable" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotTable.pm"
-      },
-      "AsposeCellsCloud::Object::PivotTableFieldRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm"
-      },
-      "AsposeCellsCloud::Object::PivotTableOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotTableOperateParameter.pm"
-      },
       "AsposeCellsCloud::Object::PivotTableResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotTableResponse.pm"
-      },
-      "AsposeCellsCloud::Object::PivotTables" : {
-         "file" : "lib/AsposeCellsCloud/Object/PivotTables.pm"
       },
       "AsposeCellsCloud::Object::PivotTablesResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotTablesResponse.pm"
       },
-      "AsposeCellsCloud::Object::ProtectSheetParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm"
+      "AsposeCellsCloud::Object::PlotAreaResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/PlotAreaResponse.pm"
       },
-      "AsposeCellsCloud::Object::Range" : {
-         "file" : "lib/AsposeCellsCloud/Object/Range.pm"
+      "AsposeCellsCloud::Object::RadioButtonResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RadioButtonResponse.pm"
+      },
+      "AsposeCellsCloud::Object::RangeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RangeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::RangesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RangesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::RangeValueResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RangeValueResponse.pm"
+      },
+      "AsposeCellsCloud::Object::RectangleShapeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RectangleShapeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::RowResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RowResponse.pm"
+      },
+      "AsposeCellsCloud::Object::RowsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/RowsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SaveFilesToCloudResultResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SaveFilesToCloudResultResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SaveResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SaveResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ScrollBarResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ScrollBarResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SeriesesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SeriesesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SeriesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SeriesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ShapeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ShapeResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ShapesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ShapesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SingleValueResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SingleValueResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroupResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroupResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroupsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroupsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SpinnerResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SpinnerResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SplitResultResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SplitResultResponse.pm"
+      },
+      "AsposeCellsCloud::Object::StyleResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/StyleResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TaskRunResultResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TaskRunResultResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TextBoxResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextBoxResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TextItemResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextItemResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TextItemsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextItemsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TickLabelsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TickLabelsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TitleResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TitleResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TrendlineResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TrendlineResponse.pm"
+      },
+      "AsposeCellsCloud::Object::TrendlinesResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/TrendlinesResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ValidationResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ValidationResponse.pm"
+      },
+      "AsposeCellsCloud::Object::ValidationsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/ValidationsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::VerticalPageBreakResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreakResponse.pm"
+      },
+      "AsposeCellsCloud::Object::VerticalPageBreaksResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreaksResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WallsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WallsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorkbookReplaceResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookReplaceResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorkbookResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorkbookSettingsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookSettingsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorkbooksResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbooksResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorksheetReplaceResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorksheetReplaceResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorksheetResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorksheetResponse.pm"
+      },
+      "AsposeCellsCloud::Object::WorksheetsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorksheetsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::BatchConvertRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/BatchConvertRequest.pm"
+      },
+      "AsposeCellsCloud::Object::ColorFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/ColorFilterRequest.pm"
+      },
+      "AsposeCellsCloud::Object::ConvertParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConvertParameter.pm"
+      },
+      "AsposeCellsCloud::Object::CreatePivotTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm"
+      },
+      "AsposeCellsCloud::Object::ImportXMLRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportXMLRequest.pm"
+      },
+      "AsposeCellsCloud::Object::MatchConditionRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/MatchConditionRequest.pm"
+      },
+      "AsposeCellsCloud::Object::PasswordRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/PasswordRequest.pm"
+      },
+      "AsposeCellsCloud::Object::PivotTableFieldRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm"
       },
       "AsposeCellsCloud::Object::RangeCopyRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/RangeCopyRequest.pm"
@@ -616,41 +881,170 @@
       "AsposeCellsCloud::Object::RangeSetStyleRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/RangeSetStyleRequest.pm"
       },
-      "AsposeCellsCloud::Object::RangeValueResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/RangeValueResponse.pm"
+      "AsposeCellsCloud::Object::TableTotalRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/TableTotalRequest.pm"
       },
-      "AsposeCellsCloud::Object::Ranges" : {
-         "file" : "lib/AsposeCellsCloud/Object/Ranges.pm"
+      "AsposeCellsCloud::Object::TextWaterMarkerRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextWaterMarkerRequest.pm"
       },
-      "AsposeCellsCloud::Object::RangesResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/RangesResponse.pm"
+      "AsposeCellsCloud::Object::TotalRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/TotalRequest.pm"
       },
-      "AsposeCellsCloud::Object::ResultDestination" : {
-         "file" : "lib/AsposeCellsCloud/Object/ResultDestination.pm"
+      "AsposeCellsCloud::Object::WorkbookEncryptionRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookEncryptionRequest.pm"
       },
-      "AsposeCellsCloud::Object::Row" : {
-         "file" : "lib/AsposeCellsCloud/Object/Row.pm"
+      "AsposeCellsCloud::Object::WorkbookProtectionRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorkbookProtectionRequest.pm"
       },
-      "AsposeCellsCloud::Object::RowResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/RowResponse.pm"
+      "AsposeCellsCloud::Object::WorksheetMovingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm"
       },
-      "AsposeCellsCloud::Object::Rows" : {
-         "file" : "lib/AsposeCellsCloud/Object/Rows.pm"
+      "AsposeCellsCloud::Object::PivotField" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotField.pm"
       },
-      "AsposeCellsCloud::Object::RowsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/RowsResponse.pm"
+      "AsposeCellsCloud::Object::PivotFilter" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotFilter.pm"
       },
-      "AsposeCellsCloud::Object::SaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/SaveOptions.pm"
+      "AsposeCellsCloud::Object::PivotItem" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotItem.pm"
       },
-      "AsposeCellsCloud::Object::SaveResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/SaveResponse.pm"
+      "AsposeCellsCloud::Object::PivotTable" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotTable.pm"
       },
-      "AsposeCellsCloud::Object::SaveResult" : {
-         "file" : "lib/AsposeCellsCloud/Object/SaveResult.pm"
+      "AsposeCellsCloud::Object::PivotTables" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotTables.pm"
       },
-      "AsposeCellsCloud::Object::SaveResultTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/SaveResultTaskParameter.pm"
+      "AsposeCellsCloud::Object::CustomParserConfig" : {
+         "file" : "lib/AsposeCellsCloud/Object/CustomParserConfig.pm"
+      },
+      "AsposeCellsCloud::Object::Import2DimensionDoubleArrayOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/Import2DimensionDoubleArrayOption.pm"
+      },
+      "AsposeCellsCloud::Object::Import2DimensionIntArrayOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/Import2DimensionIntArrayOption.pm"
+      },
+      "AsposeCellsCloud::Object::Import2DimensionStringArrayOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/Import2DimensionStringArrayOption.pm"
+      },
+      "AsposeCellsCloud::Object::CellValue" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellValue.pm"
+      },
+      "AsposeCellsCloud::Object::ImportBatchDataOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportBatchDataOption.pm"
+      },
+      "AsposeCellsCloud::Object::ImportCSVDataOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportCSVDataOption.pm"
+      },
+      "AsposeCellsCloud::Object::ImportDoubleArrayOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportDoubleArrayOption.pm"
+      },
+      "AsposeCellsCloud::Object::ImportIntArrayOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportIntArrayOption.pm"
+      },
+      "AsposeCellsCloud::Object::ImportOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportOption.pm"
+      },
+      "AsposeCellsCloud::Object::ImportPictureOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportPictureOption.pm"
+      },
+      "AsposeCellsCloud::Object::ImportPosition" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportPosition.pm"
+      },
+      "AsposeCellsCloud::Object::ImportStringArrayOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportStringArrayOption.pm"
+      },
+      "AsposeCellsCloud::Object::ArcShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/ArcShape.pm"
+      },
+      "AsposeCellsCloud::Object::Area" : {
+         "file" : "lib/AsposeCellsCloud/Object/Area.pm"
+      },
+      "AsposeCellsCloud::Object::AutoShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoShape.pm"
+      },
+      "AsposeCellsCloud::Object::AutoShapes" : {
+         "file" : "lib/AsposeCellsCloud/Object/AutoShapes.pm"
+      },
+      "AsposeCellsCloud::Object::Button" : {
+         "file" : "lib/AsposeCellsCloud/Object/Button.pm"
+      },
+      "AsposeCellsCloud::Object::CellsDrawing" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsDrawing.pm"
+      },
+      "AsposeCellsCloud::Object::CheckBox" : {
+         "file" : "lib/AsposeCellsCloud/Object/CheckBox.pm"
+      },
+      "AsposeCellsCloud::Object::ComboBox" : {
+         "file" : "lib/AsposeCellsCloud/Object/ComboBox.pm"
+      },
+      "AsposeCellsCloud::Object::CommentShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/CommentShape.pm"
+      },
+      "AsposeCellsCloud::Object::FillFormat" : {
+         "file" : "lib/AsposeCellsCloud/Object/FillFormat.pm"
+      },
+      "AsposeCellsCloud::Object::Form" : {
+         "file" : "lib/AsposeCellsCloud/Object/Form.pm"
+      },
+      "AsposeCellsCloud::Object::Forms" : {
+         "file" : "lib/AsposeCellsCloud/Object/Forms.pm"
+      },
+      "AsposeCellsCloud::Object::GradientFill" : {
+         "file" : "lib/AsposeCellsCloud/Object/GradientFill.pm"
+      },
+      "AsposeCellsCloud::Object::GradientFillStop" : {
+         "file" : "lib/AsposeCellsCloud/Object/GradientFillStop.pm"
+      },
+      "AsposeCellsCloud::Object::GroupBox" : {
+         "file" : "lib/AsposeCellsCloud/Object/GroupBox.pm"
+      },
+      "AsposeCellsCloud::Object::GroupShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/GroupShape.pm"
+      },
+      "AsposeCellsCloud::Object::Label" : {
+         "file" : "lib/AsposeCellsCloud/Object/Label.pm"
+      },
+      "AsposeCellsCloud::Object::Line" : {
+         "file" : "lib/AsposeCellsCloud/Object/Line.pm"
+      },
+      "AsposeCellsCloud::Object::LineFormat" : {
+         "file" : "lib/AsposeCellsCloud/Object/LineFormat.pm"
+      },
+      "AsposeCellsCloud::Object::LineShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/LineShape.pm"
+      },
+      "AsposeCellsCloud::Object::ListBox" : {
+         "file" : "lib/AsposeCellsCloud/Object/ListBox.pm"
+      },
+      "AsposeCellsCloud::Object::OleObject" : {
+         "file" : "lib/AsposeCellsCloud/Object/OleObject.pm"
+      },
+      "AsposeCellsCloud::Object::OleObjects" : {
+         "file" : "lib/AsposeCellsCloud/Object/OleObjects.pm"
+      },
+      "AsposeCellsCloud::Object::Oval" : {
+         "file" : "lib/AsposeCellsCloud/Object/Oval.pm"
+      },
+      "AsposeCellsCloud::Object::PatternFill" : {
+         "file" : "lib/AsposeCellsCloud/Object/PatternFill.pm"
+      },
+      "AsposeCellsCloud::Object::PicFormatOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/PicFormatOption.pm"
+      },
+      "AsposeCellsCloud::Object::Picture" : {
+         "file" : "lib/AsposeCellsCloud/Object/Picture.pm"
+      },
+      "AsposeCellsCloud::Object::Pictures" : {
+         "file" : "lib/AsposeCellsCloud/Object/Pictures.pm"
+      },
+      "AsposeCellsCloud::Object::RadioButton" : {
+         "file" : "lib/AsposeCellsCloud/Object/RadioButton.pm"
+      },
+      "AsposeCellsCloud::Object::RectangleShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/RectangleShape.pm"
+      },
+      "AsposeCellsCloud::Object::ScrollBar" : {
+         "file" : "lib/AsposeCellsCloud/Object/ScrollBar.pm"
       },
       "AsposeCellsCloud::Object::ShadowEffect" : {
          "file" : "lib/AsposeCellsCloud/Object/ShadowEffect.pm"
@@ -658,209 +1052,1064 @@
       "AsposeCellsCloud::Object::Shape" : {
          "file" : "lib/AsposeCellsCloud/Object/Shape.pm"
       },
-      "AsposeCellsCloud::Object::ShapeOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/ShapeOperateParameter.pm"
-      },
-      "AsposeCellsCloud::Object::ShapeResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ShapeResponse.pm"
-      },
       "AsposeCellsCloud::Object::Shapes" : {
          "file" : "lib/AsposeCellsCloud/Object/Shapes.pm"
-      },
-      "AsposeCellsCloud::Object::ShapesResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ShapesResponse.pm"
-      },
-      "AsposeCellsCloud::Object::SingleValue" : {
-         "file" : "lib/AsposeCellsCloud/Object/SingleValue.pm"
-      },
-      "AsposeCellsCloud::Object::SingleValueResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/SingleValueResponse.pm"
-      },
-      "AsposeCellsCloud::Object::SmartMarkerTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/SmartMarkerTaskParameter.pm"
       },
       "AsposeCellsCloud::Object::SolidFill" : {
          "file" : "lib/AsposeCellsCloud/Object/SolidFill.pm"
       },
-      "AsposeCellsCloud::Object::SortKey" : {
-         "file" : "lib/AsposeCellsCloud/Object/SortKey.pm"
+      "AsposeCellsCloud::Object::Spinner" : {
+         "file" : "lib/AsposeCellsCloud/Object/Spinner.pm"
       },
-      "AsposeCellsCloud::Object::SparklineGroup" : {
-         "file" : "lib/AsposeCellsCloud/Object/SparklineGroup.pm"
-      },
-      "AsposeCellsCloud::Object::SparklineGroupResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/SparklineGroupResponse.pm"
-      },
-      "AsposeCellsCloud::Object::SparklineGroups" : {
-         "file" : "lib/AsposeCellsCloud/Object/SparklineGroups.pm"
-      },
-      "AsposeCellsCloud::Object::SparklineGroupsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/SparklineGroupsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::Sparkline" : {
-         "file" : "lib/AsposeCellsCloud/Object/Sparkline.pm"
-      },
-      "AsposeCellsCloud::Object::SplitResult" : {
-         "file" : "lib/AsposeCellsCloud/Object/SplitResult.pm"
-      },
-      "AsposeCellsCloud::Object::SplitResultDocument" : {
-         "file" : "lib/AsposeCellsCloud/Object/SplitResultDocument.pm"
-      },
-      "AsposeCellsCloud::Object::SplitResultResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/SplitResultResponse.pm"
-      },
-      "AsposeCellsCloud::Object::SplitWorkbookTaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/SplitWorkbookTaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::SpreadsheetML2003SaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/SpreadsheetML2003SaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::StorageExist" : {
-         "file" : "lib/AsposeCellsCloud/Object/StorageExist.pm"
-      },
-      "AsposeCellsCloud::Object::StorageFile" : {
-         "file" : "lib/AsposeCellsCloud/Object/StorageFile.pm"
-      },
-      "AsposeCellsCloud::Object::Style" : {
-         "file" : "lib/AsposeCellsCloud/Object/Style.pm"
-      },
-      "AsposeCellsCloud::Object::StyleResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/StyleResponse.pm"
-      },
-      "AsposeCellsCloud::Object::SvgSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/SvgSaveOptions.pm"
-      },      
-      "AsposeCellsCloud::Object::TableTotalRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/TableTotalRequest.pm"
-      },
-      "AsposeCellsCloud::Object::TaskData" : {
-         "file" : "lib/AsposeCellsCloud/Object/TaskData.pm"
-      },
-      "AsposeCellsCloud::Object::TaskDescription" : {
-         "file" : "lib/AsposeCellsCloud/Object/TaskDescription.pm"
-      },
-      "AsposeCellsCloud::Object::TaskParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/TaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::TextItem" : {
-         "file" : "lib/AsposeCellsCloud/Object/TextItem.pm"
-      },
-      "AsposeCellsCloud::Object::TextItems" : {
-         "file" : "lib/AsposeCellsCloud/Object/TextItems.pm"
-      },
-      "AsposeCellsCloud::Object::TextItemsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/TextItemsResponse.pm"
-      },
-      "AsposeCellsCloud::Object::TextOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/TextOptions.pm"
+      "AsposeCellsCloud::Object::TextBox" : {
+         "file" : "lib/AsposeCellsCloud/Object/TextBox.pm"
       },
       "AsposeCellsCloud::Object::TextureFill" : {
          "file" : "lib/AsposeCellsCloud/Object/TextureFill.pm"
       },
-      "AsposeCellsCloud::Object::ThemeColor" : {
-         "file" : "lib/AsposeCellsCloud/Object/ThemeColor.pm"
+      "AsposeCellsCloud::Object::TilePicOption" : {
+         "file" : "lib/AsposeCellsCloud/Object/TilePicOption.pm"
+      },
+      "AsposeCellsCloud::Object::Axis" : {
+         "file" : "lib/AsposeCellsCloud/Object/Axis.pm"
+      },
+      "AsposeCellsCloud::Object::Chart" : {
+         "file" : "lib/AsposeCellsCloud/Object/Chart.pm"
+      },
+      "AsposeCellsCloud::Object::ChartArea" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartArea.pm"
+      },
+      "AsposeCellsCloud::Object::ChartDataTable" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartDataTable.pm"
+      },
+      "AsposeCellsCloud::Object::ChartFrame" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartFrame.pm"
+      },
+      "AsposeCellsCloud::Object::ChartPoint" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartPoint.pm"
+      },
+      "AsposeCellsCloud::Object::ChartPoints" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartPoints.pm"
+      },
+      "AsposeCellsCloud::Object::Charts" : {
+         "file" : "lib/AsposeCellsCloud/Object/Charts.pm"
+      },
+      "AsposeCellsCloud::Object::ChartShape" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartShape.pm"
+      },
+      "AsposeCellsCloud::Object::DataLabels" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataLabels.pm"
+      },
+      "AsposeCellsCloud::Object::DisplayUnitLabel" : {
+         "file" : "lib/AsposeCellsCloud/Object/DisplayUnitLabel.pm"
+      },
+      "AsposeCellsCloud::Object::DropBars" : {
+         "file" : "lib/AsposeCellsCloud/Object/DropBars.pm"
+      },
+      "AsposeCellsCloud::Object::ErrorBar" : {
+         "file" : "lib/AsposeCellsCloud/Object/ErrorBar.pm"
+      },
+      "AsposeCellsCloud::Object::Floor" : {
+         "file" : "lib/AsposeCellsCloud/Object/Floor.pm"
+      },
+      "AsposeCellsCloud::Object::Legend" : {
+         "file" : "lib/AsposeCellsCloud/Object/Legend.pm"
+      },
+      "AsposeCellsCloud::Object::LegendEntries" : {
+         "file" : "lib/AsposeCellsCloud/Object/LegendEntries.pm"
+      },
+      "AsposeCellsCloud::Object::LegendEntry" : {
+         "file" : "lib/AsposeCellsCloud/Object/LegendEntry.pm"
+      },
+      "AsposeCellsCloud::Object::Marker" : {
+         "file" : "lib/AsposeCellsCloud/Object/Marker.pm"
+      },
+      "AsposeCellsCloud::Object::PlotArea" : {
+         "file" : "lib/AsposeCellsCloud/Object/PlotArea.pm"
+      },
+      "AsposeCellsCloud::Object::Series" : {
+         "file" : "lib/AsposeCellsCloud/Object/Series.pm"
+      },
+      "AsposeCellsCloud::Object::SeriesItems" : {
+         "file" : "lib/AsposeCellsCloud/Object/SeriesItems.pm"
+      },
+      "AsposeCellsCloud::Object::Sparkline" : {
+         "file" : "lib/AsposeCellsCloud/Object/Sparkline.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroup" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroup.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroups" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroups.pm"
       },
       "AsposeCellsCloud::Object::TickLabels" : {
          "file" : "lib/AsposeCellsCloud/Object/TickLabels.pm"
       },
-      "AsposeCellsCloud::Object::TilePicOption" : {
-         "file" : "lib/AsposeCellsCloud/Object/TilePicOption.pm"
-      },
       "AsposeCellsCloud::Object::Title" : {
          "file" : "lib/AsposeCellsCloud/Object/Title.pm"
       },
-      "AsposeCellsCloud::Object::TitleResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/TitleResponse.pm"
+      "AsposeCellsCloud::Object::Trendline" : {
+         "file" : "lib/AsposeCellsCloud/Object/Trendline.pm"
       },
-      "AsposeCellsCloud::Object::Top10" : {
-         "file" : "lib/AsposeCellsCloud/Object/Top10.pm"
+      "AsposeCellsCloud::Object::Trendlines" : {
+         "file" : "lib/AsposeCellsCloud/Object/Trendlines.pm"
       },
-      "AsposeCellsCloud::Object::Top10Filter" : {
-         "file" : "lib/AsposeCellsCloud/Object/Top10Filter.pm"
+      "AsposeCellsCloud::Object::Walls" : {
+         "file" : "lib/AsposeCellsCloud/Object/Walls.pm"
       },
-      "AsposeCellsCloud::Object::TxtSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/TxtSaveOptions.pm"
+      "AsposeCellsCloud::Object::Error" : {
+         "file" : "lib/AsposeCellsCloud/Object/Error.pm"
       },
-      "AsposeCellsCloud::Object::Validation" : {
-         "file" : "lib/AsposeCellsCloud/Object/Validation.pm"
+      "AsposeCellsCloud::Object::ErrorDetails" : {
+         "file" : "lib/AsposeCellsCloud/Object/ErrorDetails.pm"
       },
-      "AsposeCellsCloud::Object::ValidationResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ValidationResponse.pm"
+      "AsposeCellsCloud::Request::GetWorksheetAutoFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetAutoFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::Validations" : {
-         "file" : "lib/AsposeCellsCloud/Object/Validations.pm"
+      "AsposeCellsCloud::Request::PutWorksheetDateFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetDateFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::ValidationsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/ValidationsResponse.pm"
+      "AsposeCellsCloud::Request::PutWorksheetFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::ValueType" : {
-         "file" : "lib/AsposeCellsCloud/Object/ValueType.pm"
+      "AsposeCellsCloud::Request::PutWorksheetIconFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetIconFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::VerticalPageBreak" : {
-         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreak.pm"
+      "AsposeCellsCloud::Request::PutWorksheetCustomFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetCustomFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::VerticalPageBreakResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreakResponse.pm"
+      "AsposeCellsCloud::Request::PutWorksheetDynamicFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetDynamicFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::VerticalPageBreaks" : {
-         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreaks.pm"
+      "AsposeCellsCloud::Request::PutWorksheetFilterTop10Request" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetFilterTop10Request.pm"
       },
-      "AsposeCellsCloud::Object::VerticalPageBreaksResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/VerticalPageBreaksResponse.pm"
+      "AsposeCellsCloud::Request::PutWorksheetColorFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetColorFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::Workbook" : {
-         "file" : "lib/AsposeCellsCloud/Object/Workbook.pm"
+      "AsposeCellsCloud::Request::PostWorksheetMatchBlanksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetMatchBlanksRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookEncryptionRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookEncryptionRequest.pm"
+      "AsposeCellsCloud::Request::PostWorksheetMatchNonBlanksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetMatchNonBlanksRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookOperateParameter.pm"
+      "AsposeCellsCloud::Request::PostWorksheetAutoFilterRefreshRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetAutoFilterRefreshRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookProtectionRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookProtectionRequest.pm"
+      "AsposeCellsCloud::Request::DeleteWorksheetDateFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetDateFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookReplaceResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookReplaceResponse.pm"
+      "AsposeCellsCloud::Request::DeleteWorksheetFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetFilterRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookResponse.pm"
+      "AsposeCellsCloud::Request::GetWorksheetAutoshapesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetAutoshapesRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookSettings" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookSettings.pm"
+      "AsposeCellsCloud::Request::GetWorksheetAutoshapeWithFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetAutoshapeWithFormatRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookSettingsOperateParameter" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookSettingsOperateParameter.pm"
+      "AsposeCellsCloud::Request::PostBatchConvertRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostBatchConvertRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorkbookSettingsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorkbookSettingsResponse.pm"
+      "AsposeCellsCloud::Request::GetExtractBarcodesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetExtractBarcodesRequest.pm"
       },
-      "AsposeCellsCloud::Object::Worksheet" : {
-         "file" : "lib/AsposeCellsCloud/Object/Worksheet.pm"
+      "AsposeCellsCloud::Request::PostClearContentsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorksheetMovingRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm"
+      "AsposeCellsCloud::Request::PostClearFormatsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostClearFormatsRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorksheetReplaceResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorksheetReplaceResponse.pm"
+      "AsposeCellsCloud::Request::PostUpdateWorksheetRangeStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUpdateWorksheetRangeStyleRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorksheetResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorksheetResponse.pm"
+      "AsposeCellsCloud::Request::PostWorksheetMergeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetMergeRequest.pm"
       },
-      "AsposeCellsCloud::Object::Worksheets" : {
-         "file" : "lib/AsposeCellsCloud/Object/Worksheets.pm"
+      "AsposeCellsCloud::Request::PostWorksheetUnmergeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetUnmergeRequest.pm"
       },
-      "AsposeCellsCloud::Object::WorksheetsResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/WorksheetsResponse.pm"
+      "AsposeCellsCloud::Request::GetWorksheetCellsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCellsRequest.pm"
       },
-      "AsposeCellsCloud::Object::XlsSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/XlsSaveOptions.pm"
+      "AsposeCellsCloud::Request::GetWorksheetCellRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCellRequest.pm"
       },
-      "AsposeCellsCloud::Object::XlsbSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/XlsbSaveOptions.pm"
+      "AsposeCellsCloud::Request::GetWorksheetCellStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCellStyleRequest.pm"
       },
-      "AsposeCellsCloud::Object::XpsSaveOptions" : {
-         "file" : "lib/AsposeCellsCloud/Object/XpsSaveOptions.pm"
+      "AsposeCellsCloud::Request::PostWorksheetCellSetValueRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellSetValueRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUpdateWorksheetCellStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUpdateWorksheetCellStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostSetCellRangeValueRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostSetCellRangeValueRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCopyCellIntoCellRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCopyCellIntoCellRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetCellHtmlStringRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetCellHtmlStringRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostSetCellHtmlStringRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostSetCellHtmlStringRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCellCalculateRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCellCalculateRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCellCharactersRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCellCharactersRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostSetWorksheetColumnWidthRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostSetWorksheetColumnWidthRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetColumnRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetColumnRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutInsertWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutInsertWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostHideWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostHideWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUnhideWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUnhideWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostGroupWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostGroupWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUngroupWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUngroupWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCopyWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCopyWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostColumnStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostColumnStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetRowRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetRowRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetRowRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetRowRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutInsertWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutInsertWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutInsertWorksheetRowRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutInsertWorksheetRowRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUpdateWorksheetRowRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUpdateWorksheetRowRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostHideWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostHideWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUnhideWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUnhideWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostGroupWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostGroupWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUngroupWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUngroupWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCopyWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCopyWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostRowStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostRowStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetCellsCloudServicesHealthCheckRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetCellsCloudServicesHealthCheckRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetCellsCloudServiceStatusRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetCellsCloudServiceStatusRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartAreaRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartAreaRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartAreaFillFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartAreaFillFormatRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartAreaBorderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartAreaBorderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetChartsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetChartsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetChartRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetChartRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetAddChartRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetAddChartRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetDeleteChartRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetDeleteChartRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetChartRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetChartRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetChartLegendRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetChartLegendRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetChartLegendRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetChartLegendRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetChartLegendRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetChartLegendRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetChartLegendRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetChartLegendRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetClearChartsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetClearChartsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetChartTitleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetChartTitleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetChartTitleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetChartTitleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetChartTitleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetChartTitleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetChartTitleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetChartTitleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartSeriesAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartSeriesAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartCategoryAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartCategoryAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartValueAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartValueAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartSecondCategoryAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartSecondCategoryAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetChartSecondValueAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetChartSecondValueAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostChartSeriesAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostChartSeriesAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostChartCategoryAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostChartCategoryAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostChartValueAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostChartValueAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostChartSecondCategoryAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostChartSecondCategoryAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostChartSecondValueAxisRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostChartSecondValueAxisRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetConditionalFormattingsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetConditionalFormattingsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetConditionalFormattingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetConditionalFormattingRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetConditionalFormattingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetConditionalFormattingRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetFormatConditionRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetFormatConditionRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetFormatConditionAreaRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetFormatConditionAreaRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetFormatConditionConditionRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetFormatConditionConditionRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetConditionalFormattingsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetConditionalFormattingsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetConditionalFormattingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetConditionalFormattingRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetConditionalFormattingAreaRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetConditionalFormattingAreaRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutConvertWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutConvertWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookSaveAsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookSaveAsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToPDFRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToPDFRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToPNGRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToPNGRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToDocxRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToDocxRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToPptxRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToPptxRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToHtmlRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToHtmlRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToMarkdownRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToMarkdownRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToJsonRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToJsonRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToSQLRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToSQLRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostConvertWorkbookToCSVRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToCSVRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetHyperlinksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetHyperlinksRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetHyperlinkRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetHyperlinkRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetHyperlinkRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetHyperlinkRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetHyperlinkRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetHyperlinkRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetHyperlinkRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetHyperlinkRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetHyperlinksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetHyperlinksRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAssembleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAssembleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCompressRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCompressRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostExportRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostExportRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostMergeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostMergeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUnlockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUnlockRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostProtectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostProtectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostSplitRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostSplitRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostSearchRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostSearchRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostReplaceRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostReplaceRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostImportRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostImportRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWatermarkRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWatermarkRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostClearObjectsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostClearObjectsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostReverseRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostReverseRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostRotateRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostRotateRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostMetadataRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostMetadataRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetMetadataRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetMetadataRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteMetadataRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteMetadataRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetListObjectsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetListObjectsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetListObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetListObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetListObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetListObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetListObjectsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetListObjectsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetListObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetListObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListObjectConvertToRangeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectConvertToRangeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListObjectSummarizeWithPivotTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectSummarizeWithPivotTableRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListObjectSortTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectSortTableRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListColumnRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListColumnRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListColumnsTotalRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListColumnsTotalRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetOleObjectsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetOleObjectsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetOleObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetOleObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetOleObjectsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetOleObjectsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetOleObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetOleObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUpdateWorksheetOleObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUpdateWorksheetOleObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetOleObjectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetOleObjectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetVerticalPageBreaksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetVerticalPageBreaksRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetHorizontalPageBreaksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetHorizontalPageBreaksRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetVerticalPageBreakRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetVerticalPageBreakRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetHorizontalPageBreakRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetHorizontalPageBreakRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutVerticalPageBreakRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutVerticalPageBreakRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutHorizontalPageBreakRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutHorizontalPageBreakRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteVerticalPageBreaksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteVerticalPageBreaksRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteHorizontalPageBreaksRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteHorizontalPageBreaksRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteVerticalPageBreakRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteVerticalPageBreakRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteHorizontalPageBreakRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteHorizontalPageBreakRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetPageSetupRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetPageSetupRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPageSetupRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPageSetupRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteHeaderFooterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteHeaderFooterRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetHeaderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetHeaderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostHeaderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostHeaderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetFooterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetFooterRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostFooterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostFooterRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPicturesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPicturesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPictureWithFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPictureWithFormatRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetAddPictureRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetAddPictureRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetPictureRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetPictureRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetPictureRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetPictureRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetPicturesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetPicturesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPivotTablesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPivotTablesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPivotTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPivotTableRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetPivotTableFieldRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetPivotTableFieldRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPivotTableFiltersRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPivotTableFiltersRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPivotTableFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPivotTableFilterRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetPivotTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetPivotTableRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutPivotTableFieldRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutPivotTableFieldRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetPivotTableFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetPivotTableFilterRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPivotTableFieldHideItemRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPivotTableFieldHideItemRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPivotTableFieldMoveToRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPivotTableFieldMoveToRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPivotTableCellStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPivotTableCellStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPivotTableStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPivotTableStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPivotTableUpdatePivotFieldsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPivotTableUpdatePivotFieldsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostPivotTableUpdatePivotFieldRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostPivotTableUpdatePivotFieldRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetPivotTableCalculateRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetPivotTableCalculateRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetPivotTableMoveRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetPivotTableMoveRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetPivotTablesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTablesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetPivotTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTableRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeletePivotTableFieldRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeletePivotTableFieldRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetPivotTableFiltersRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTableFiltersRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetPivotTableFilterRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTableFilterRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetDocumentPropertiesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetDocumentPropertiesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetDocumentPropertyRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutDocumentPropertyRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutDocumentPropertyRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteDocumentPropertyRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentPropertyRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteDocumentPropertiesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentPropertiesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeMergeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeMergeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeUnMergeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeUnMergeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetCellsRangeValueRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCellsRangeValueRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeValueRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeValueRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeMoveToRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeMoveToRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeOutlineBorderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeOutlineBorderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeColumnWidthRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeColumnWidthRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeRowHeightRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeRowHeightRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetCellsRangeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetCellsRangeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetCellsRangeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetCellsRangeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetShapesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetShapesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetShapeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetShapeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetShapeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetShapeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetShapesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetShapesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetShapeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetShapeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetShapeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetShapeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetGroupShapeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetGroupShapeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetUngroupShapeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetUngroupShapeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetSparklineGroupsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetSparklineGroupsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetSparklineGroupRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetSparklineGroupRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetSparklineGroupsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetSparklineGroupsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetSparklineGroupRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetSparklineGroupRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetSparklineGroupRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetSparklineGroupRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetSparklineGroupRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetSparklineGroupRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostRunTaskRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostRunTaskRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostDigitalSignatureRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDigitalSignatureRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostEncryptWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostEncryptWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteDecryptWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteDecryptWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostProtectWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostProtectWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteUnProtectWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteUnProtectWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookTextItemsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookTextItemsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookNamesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookNamesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorkbookNameRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorkbookNameRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookNameRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookNameRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookNameRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookNameRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookNameValueRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookNameValueRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorkbookNamesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorkbookNamesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorkbookNameRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorkbookNameRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutDocumentProtectFromChangesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutDocumentProtectFromChangesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteDocumentUnProtectFromChangesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentUnProtectFromChangesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbooksMergeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbooksMergeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbooksTextSearchRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbooksTextSearchRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookTextReplaceRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookTextReplaceRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookGetSmartMarkerResultRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookGetSmartMarkerResultRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorkbookCreateRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorkbookCreateRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookSplitRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookSplitRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostImportDataRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostImportDataRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookCalculateFormulaRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookCalculateFormulaRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAutofitWorkbookRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAutofitWorkbookRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAutofitWorkbookColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAutofitWorkbookColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorkbookSettingsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorkbookSettingsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookSettingsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookSettingsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorkbookBackgroundRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorkbookBackgroundRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorkbookBackgroundRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorkbookBackgroundRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorkbookWaterMarkerRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorkbookWaterMarkerRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetPageCountRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetPageCountRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetWithFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetWithFormatRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutChangeVisibilityWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutChangeVisibilityWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutActiveWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutActiveWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutInsertNewWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutInsertNewWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutAddNewWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutAddNewWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostMoveWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostMoveWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutProtectWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutProtectWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteUnprotectWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteUnprotectWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetTextItemsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetTextItemsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetCommentsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCommentsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetCommentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCommentRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetCommentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetCommentRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCommentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCommentRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetCommentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetCommentRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetCommentsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetCommentsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetMergedCellsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetMergedCellsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetMergedCellRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetMergedCellRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetCalculateFormulaRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetCalculateFormulaRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCalculateFormulaRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCalculateFormulaRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetTextSearchRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetTextSearchRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorsheetTextReplaceRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorsheetTextReplaceRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetRangeSortRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetRangeSortRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAutofitWorksheetRowRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAutofitWorksheetRowRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAutofitWorksheetRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAutofitWorksheetRowsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAutofitWorksheetColumnsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAutofitWorksheetColumnsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetBackgroundRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetBackgroundRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetBackgroundRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetBackgroundRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetFreezePanesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetFreezePanesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetFreezePanesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetFreezePanesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostCopyWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostCopyWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostRenameWorksheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostRenameWorksheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUpdateWorksheetPropertyRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUpdateWorksheetPropertyRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetNamedRangesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetNamedRangesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetNamedRangeValueRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetNamedRangeValueRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUpdateWorksheetZoomRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUpdateWorksheetZoomRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetPageCountRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetPageCountRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetValidationsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetValidationsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetWorksheetValidationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetWorksheetValidationRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutWorksheetValidationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutWorksheetValidationRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetValidationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetValidationRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetValidationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetValidationRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetValidationsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetValidationsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookExportXMLRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookImportXMLRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookImportXMLRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DownloadFileRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DownloadFileRequest.pm"
+      },
+      "AsposeCellsCloud::Request::UploadFileRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/UploadFileRequest.pm"
+      },
+      "AsposeCellsCloud::Request::CopyFileRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/CopyFileRequest.pm"
+      },
+      "AsposeCellsCloud::Request::MoveFileRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/MoveFileRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteFileRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteFileRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetFilesListRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetFilesListRequest.pm"
+      },
+      "AsposeCellsCloud::Request::CreateFolderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/CreateFolderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::CopyFolderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/CopyFolderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::MoveFolderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/MoveFolderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteFolderRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteFolderRequest.pm"
+      },
+      "AsposeCellsCloud::Request::StorageExistsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/StorageExistsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ObjectExistsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ObjectExistsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetDiscUsageRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetDiscUsageRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetFileVersionsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetFileVersionsRequest.pm"
       },
       "AsposeCellsCloud::Role" : {
          "file" : "lib/AsposeCellsCloud/Role.pm"
@@ -870,6 +2119,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "22.11",
+   "version" : "23.5",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

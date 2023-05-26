@@ -108,3 +108,10 @@ L<IO::Handle|SPVM::IO::Handle>.
 =head2 Perl's IO::File
 
 C<IO::File> is a Perl's L<IO::File|IO::File> porting to L<SPVM>.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

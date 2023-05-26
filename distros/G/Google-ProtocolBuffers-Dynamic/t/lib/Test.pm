@@ -29,6 +29,10 @@ our @EXPORT = (
           tied_hash
 
           tied_fetch_count
+
+          decode_eq_or_diff
+          decode_throws_ok
+          decoder_functions
     )
 );
 
@@ -92,6 +96,28 @@ sub tied_fetch_count {
     } else {
         return t::lib::DummyTiedScalar::inner_fetch_count($_[0]);
     }
+}
+
+sub decoder_functions {
+    return qw(decode_upb decode_bbpb);;
+}
+
+sub decode_eq_or_diff {
+    my ($package, $bytes, $expected, $description) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    eq_or_diff($package->decode_upb($bytes), $expected, $description ? "$description (decode_upb)" : '(decode_upb)');
+    eq_or_diff($package->decode_bbpb($bytes), $expected, $description ? "$description (decode_bbpb)" : '(decode_bbpb)');
+}
+
+sub decode_throws_ok {
+    my ($package, $bytes, $expected_upb, $expected_bbpb, $description) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    throws_ok(sub { $package->decode_upb($bytes) }, $expected_upb, $description ? "$description (decode_upb)" : '(decode_upb)');
+    throws_ok(sub { $package->decode_bbpb($bytes) }, $expected_bbpb, $description ? "$description (decode_bbpb)" : '(decode_bbpb)');
 }
 
 1;

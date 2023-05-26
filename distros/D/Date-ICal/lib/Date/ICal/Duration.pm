@@ -1,12 +1,15 @@
 package Date::ICal::Duration;
 
 use strict;
+use warnings;
 use Carp;
 
 use vars qw($VERSION );
-$VERSION = (qw'$Revision: 1.61 $')[1];
+$VERSION = '2.'.(qw'$Rev: 682 $')[1];
 
 # Documentation {{{
+
+=encoding utf8
 
 =head1 NAME
 
@@ -14,7 +17,7 @@ Date::ICal::Duration - durations in iCalendar format, for math purposes.
 
 =head1 VERSION
 
-$Revision: 1.61 $
+$Revision: 682 $
 
 =head1 SYNOPSIS
 
@@ -562,5 +565,16 @@ sub _wd  {
         return undef;
     }
 } # }}}
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2001-2022 Rich Bowen
+
+© 2022-2023 Michal Josef Špaček
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
 
 1;

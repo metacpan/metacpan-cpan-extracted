@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::Style;
 
 require 5.6.0;
@@ -36,13 +35,11 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::Border;
 use AsposeCellsCloud::Object::Color;
 use AsposeCellsCloud::Object::Font;
-use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement;
-use AsposeCellsCloud::Object::ThemeColor;
+use AsposeCellsCloud::Object::ThemeColor; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -58,12 +55,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -104,7 +101,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -112,7 +109,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -124,235 +121,226 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'Style',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'link' => {
-    	datatype => 'Link',
-    	base_name => 'link',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'pattern' => {
-    	datatype => 'string',
-    	base_name => 'Pattern',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'text_direction' => {
-    	datatype => 'string',
-    	base_name => 'TextDirection',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'custom' => {
-    	datatype => 'string',
-    	base_name => 'Custom',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'shrink_to_fit' => {
-    	datatype => 'boolean',
-    	base_name => 'ShrinkToFit',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_date_time' => {
-    	datatype => 'boolean',
-    	base_name => 'IsDateTime',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'culture_custom' => {
-    	datatype => 'string',
-    	base_name => 'CultureCustom',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'rotation_angle' => {
-    	datatype => 'int',
-    	base_name => 'RotationAngle',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'indent_level' => {
-    	datatype => 'int',
-    	base_name => 'IndentLevel',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_percent' => {
-    	datatype => 'boolean',
-    	base_name => 'IsPercent',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'foreground_color' => {
-    	datatype => 'Color',
-    	base_name => 'ForegroundColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'name' => {
-    	datatype => 'string',
-    	base_name => 'Name',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'foreground_theme_color' => {
-    	datatype => 'ThemeColor',
-    	base_name => 'ForegroundThemeColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'border_collection' => {
-    	datatype => 'ARRAY[Border]',
-    	base_name => 'BorderCollection',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_locked' => {
-    	datatype => 'boolean',
-    	base_name => 'IsLocked',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_alignment' => {
-    	datatype => 'string',
-    	base_name => 'VerticalAlignment',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'background_color' => {
-    	datatype => 'Color',
-    	base_name => 'BackgroundColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'background_theme_color' => {
-    	datatype => 'ThemeColor',
-    	base_name => 'BackgroundThemeColor',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_formula_hidden' => {
-    	datatype => 'boolean',
-    	base_name => 'IsFormulaHidden',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_gradient' => {
-    	datatype => 'boolean',
-    	base_name => 'IsGradient',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'number' => {
-    	datatype => 'int',
-    	base_name => 'Number',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'horizontal_alignment' => {
-    	datatype => 'string',
-    	base_name => 'HorizontalAlignment',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'is_text_wrapped' => {
-    	datatype => 'boolean',
-    	base_name => 'IsTextWrapped',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'font' => {
-    	datatype => 'Font',
-    	base_name => 'Font',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'font' => {
+     	datatype => 'Font',
+     	base_name => 'Font',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'name' => {
+     	datatype => 'string',
+     	base_name => 'Name',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'culture_custom' => {
+     	datatype => 'string',
+     	base_name => 'CultureCustom',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'custom' => {
+     	datatype => 'string',
+     	base_name => 'Custom',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'background_color' => {
+     	datatype => 'Color',
+     	base_name => 'BackgroundColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'foreground_color' => {
+     	datatype => 'Color',
+     	base_name => 'ForegroundColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_formula_hidden' => {
+     	datatype => 'boolean',
+     	base_name => 'IsFormulaHidden',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_date_time' => {
+     	datatype => 'boolean',
+     	base_name => 'IsDateTime',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_text_wrapped' => {
+     	datatype => 'boolean',
+     	base_name => 'IsTextWrapped',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_gradient' => {
+     	datatype => 'boolean',
+     	base_name => 'IsGradient',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_locked' => {
+     	datatype => 'boolean',
+     	base_name => 'IsLocked',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_percent' => {
+     	datatype => 'boolean',
+     	base_name => 'IsPercent',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'shrink_to_fit' => {
+     	datatype => 'boolean',
+     	base_name => 'ShrinkToFit',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'indent_level' => {
+     	datatype => 'int',
+     	base_name => 'IndentLevel',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'number' => {
+     	datatype => 'int',
+     	base_name => 'Number',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'rotation_angle' => {
+     	datatype => 'int',
+     	base_name => 'RotationAngle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'pattern' => {
+     	datatype => 'string',
+     	base_name => 'Pattern',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_direction' => {
+     	datatype => 'string',
+     	base_name => 'TextDirection',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_alignment' => {
+     	datatype => 'string',
+     	base_name => 'VerticalAlignment',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'horizontal_alignment' => {
+     	datatype => 'string',
+     	base_name => 'HorizontalAlignment',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'border_collection' => {
+     	datatype => 'ARRAY[Border]',
+     	base_name => 'BorderCollection',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'background_theme_color' => {
+     	datatype => 'ThemeColor',
+     	base_name => 'BackgroundThemeColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'foreground_theme_color' => {
+     	datatype => 'ThemeColor',
+     	base_name => 'ForegroundThemeColor',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'link' => 'Link',
+    'font' => 'Font',
+    'name' => 'string',
+    'culture_custom' => 'string',
+    'custom' => 'string',
+    'background_color' => 'Color',
+    'foreground_color' => 'Color',
+    'is_formula_hidden' => 'boolean',
+    'is_date_time' => 'boolean',
+    'is_text_wrapped' => 'boolean',
+    'is_gradient' => 'boolean',
+    'is_locked' => 'boolean',
+    'is_percent' => 'boolean',
+    'shrink_to_fit' => 'boolean',
+    'indent_level' => 'int',
+    'number' => 'int',
+    'rotation_angle' => 'int',
     'pattern' => 'string',
     'text_direction' => 'string',
-    'custom' => 'string',
-    'shrink_to_fit' => 'boolean',
-    'is_date_time' => 'boolean',
-    'culture_custom' => 'string',
-    'rotation_angle' => 'int',
-    'indent_level' => 'int',
-    'is_percent' => 'boolean',
-    'foreground_color' => 'Color',
-    'name' => 'string',
-    'foreground_theme_color' => 'ThemeColor',
-    'border_collection' => 'ARRAY[Border]',
-    'is_locked' => 'boolean',
     'vertical_alignment' => 'string',
-    'background_color' => 'Color',
-    'background_theme_color' => 'ThemeColor',
-    'is_formula_hidden' => 'boolean',
-    'is_gradient' => 'boolean',
-    'number' => 'int',
     'horizontal_alignment' => 'string',
-    'is_text_wrapped' => 'boolean',
-    'font' => 'Font'
+    'border_collection' => 'ARRAY[Border]',
+    'background_theme_color' => 'ThemeColor',
+    'foreground_theme_color' => 'ThemeColor' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'link' => 'link',
+    'font' => 'Font',
+    'name' => 'Name',
+    'culture_custom' => 'CultureCustom',
+    'custom' => 'Custom',
+    'background_color' => 'BackgroundColor',
+    'foreground_color' => 'ForegroundColor',
+    'is_formula_hidden' => 'IsFormulaHidden',
+    'is_date_time' => 'IsDateTime',
+    'is_text_wrapped' => 'IsTextWrapped',
+    'is_gradient' => 'IsGradient',
+    'is_locked' => 'IsLocked',
+    'is_percent' => 'IsPercent',
+    'shrink_to_fit' => 'ShrinkToFit',
+    'indent_level' => 'IndentLevel',
+    'number' => 'Number',
+    'rotation_angle' => 'RotationAngle',
     'pattern' => 'Pattern',
     'text_direction' => 'TextDirection',
-    'custom' => 'Custom',
-    'shrink_to_fit' => 'ShrinkToFit',
-    'is_date_time' => 'IsDateTime',
-    'culture_custom' => 'CultureCustom',
-    'rotation_angle' => 'RotationAngle',
-    'indent_level' => 'IndentLevel',
-    'is_percent' => 'IsPercent',
-    'foreground_color' => 'ForegroundColor',
-    'name' => 'Name',
-    'foreground_theme_color' => 'ForegroundThemeColor',
-    'border_collection' => 'BorderCollection',
-    'is_locked' => 'IsLocked',
     'vertical_alignment' => 'VerticalAlignment',
-    'background_color' => 'BackgroundColor',
-    'background_theme_color' => 'BackgroundThemeColor',
-    'is_formula_hidden' => 'IsFormulaHidden',
-    'is_gradient' => 'IsGradient',
-    'number' => 'Number',
     'horizontal_alignment' => 'HorizontalAlignment',
-    'is_text_wrapped' => 'IsTextWrapped',
-    'font' => 'Font'
+    'border_collection' => 'BorderCollection',
+    'background_theme_color' => 'BackgroundThemeColor',
+    'foreground_theme_color' => 'ForegroundThemeColor' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

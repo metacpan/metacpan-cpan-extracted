@@ -8,9 +8,9 @@ use Log::ger;
 use Expect;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-13'; # DATE
+our $DATE = '2023-02-24'; # DATE
 our $DIST = 'App-SQLiteUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -21,7 +21,7 @@ sub _connect {
     DBI->connect("dbi:SQLite:dbname=$args->{db_file}", undef, undef, {RaiseError=>1});
 }
 
-our %args_common = (
+our %argspec0_db_file = (
     db_file => {
         schema => 'filename*',
         req => 1,
@@ -29,7 +29,19 @@ our %args_common = (
     },
 );
 
-our %arg1_table = (
+our %argspec1_db_file = (
+    db_file => {
+        schema => 'filename*',
+        req => 1,
+        pos => 1,
+    },
+);
+
+our %argspecs_common = (
+    %argspec0_db_file,
+);
+
+our %argspec1_table = (
     table => {
         schema => ['str*', min_len=>1],
         req => 1,
@@ -37,7 +49,7 @@ our %arg1_table = (
     },
 );
 
-our %argopt_table = (
+our %argspecopt_table = (
     table => {
         schema => 'str*',
     },
@@ -51,7 +63,7 @@ See also the `.tables` meta-command of the `sqlite3` CLI.
 
 _
     args => {
-        %args_common,
+        %argspecs_common,
     },
     result_naked => 1,
 };
@@ -71,8 +83,8 @@ See also the `.schema` and `.fullschema` meta-command of the `sqlite3` CLI.
 
 _
     args => {
-        %args_common,
-        %arg1_table,
+        %argspecs_common,
+        %argspec1_table,
     },
     result_naked => 1,
 };
@@ -108,10 +120,10 @@ number, `t` prefix will be added. If table already exists, a suffix of `_2`,
     CSV filename          Table name         Note
     ------------          ----------         ----
     -                     stdin
-    -                     stdin_2            If 'stdin` already exists
+    -                     stdin_2            If 'stdin' already exists
     /path/to/t1.csv       t1
-    /path/to/t1.csv       t1_2               If 't1` already exists
-    /path/to/t1.csv       t1_3               If 't1` and `t1_2` already exist
+    /path/to/t1.csv       t1_2               If 't1' already exists
+    /path/to/t1.csv       t1_3               If 't1' and 't1_2' already exist
     ./2.csv               t2
     report 2021.csv       report_2021
     report 2021.rev1.csv  report_2021
@@ -125,13 +137,13 @@ But this utility gives you convenience of picking a table name automatically.
 
 _
     args => {
-        %args_common,
         csv_file => {
             schema => 'filename*',
             default => '-',
-            pos => 1,
+            pos => 0,
         },
-        %argopt_table,
+        %argspec1_db_file,
+        %argspecopt_table,
         # XXX allow customizing Expect timeout, for larger table
     },
     deps => {
@@ -173,7 +185,7 @@ sub import_csv_to_sqlite {
 
     if ($csv_file eq '-') {
         my ($tempfh, $tempfile) = File::Temp::tempfile();
-        print $tempfh while <STDIN>;
+        while (my $line = <STDIN>) { print $tempfh $line }
         close $tempfh;
         $csv_file = $tempfile;
     }
@@ -296,7 +308,7 @@ App::SQLiteUtils - Utilities related to SQLite
 
 =head1 VERSION
 
-This document describes version 0.005 of App::SQLiteUtils (from Perl distribution App-SQLiteUtils), released on 2021-09-13.
+This document describes version 0.006 of App::SQLiteUtils (from Perl distribution App-SQLiteUtils), released on 2023-02-24.
 
 =head1 DESCRIPTION
 
@@ -304,11 +316,13 @@ This distribution includes several utilities:
 
 =over
 
-=item * L<import-csv-to-sqlite>
+=item 1. L<csv2sqlite>
 
-=item * L<list-sqlite-columns>
+=item 2. L<import-csv-to-sqlite>
 
-=item * L<list-sqlite-tables>
+=item 3. L<list-sqlite-columns>
+
+=item 4. L<list-sqlite-tables>
 
 =back
 
@@ -342,10 +356,10 @@ C<_3>, and so on will be added. Some examples:
  CSV filename          Table name         Note
  ------------          ----------         ----
  -                     stdin
- -                     stdin_2            If 'stdinC<already exists
+ -                     stdin_2            If 'stdin' already exists
  /path/to/t1.csv       t1
- /path/to/t1.csv       t1_2               If 't1> already exists
- /path/to/t1.csv       t1_3               If 't1C<and>t1_2` already exist
+ /path/to/t1.csv       t1_2               If 't1' already exists
+ /path/to/t1.csv       t1_3               If 't1' and 't1_2' already exist
  ./2.csv               t2
  report 2021.csv       report_2021
  report 2021.rev1.csv  report_2021
@@ -365,9 +379,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<csv_file> => I<filename> (default: "-")
 
+(No description)
+
 =item * B<db_file>* => I<filename>
 
+(No description)
+
 =item * B<table> => I<str>
+
+(No description)
 
 
 =back
@@ -401,7 +421,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_file>* => I<filename>
 
+(No description)
+
 =item * B<table>* => I<str>
+
+(No description)
 
 
 =back
@@ -425,6 +449,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<db_file>* => I<filename>
+
+(No description)
 
 
 =back
@@ -460,13 +486,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

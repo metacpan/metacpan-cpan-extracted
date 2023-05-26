@@ -17,7 +17,7 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.66';
+our $VERSION = '1.67';
 
 sub new {
 	my ($class, %args) = @_;

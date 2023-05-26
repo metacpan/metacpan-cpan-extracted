@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::FieldRole::HTML::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: SyForm::ViewFieldRole::HTML configuration of the field
-$SyForm::FieldRole::HTML::VERSION = '0.102';
+$SyForm::FieldRole::HTML::VERSION = '0.103';
 use Moo::Role;
 
 has input => (
@@ -28,7 +28,7 @@ SyForm::FieldRole::HTML - SyForm::ViewFieldRole::HTML configuration of the field
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

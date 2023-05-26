@@ -164,6 +164,10 @@ use POSIX "errno_h";
   ok !defined($ret), "Undef for bad fd";
   ok $!==EBADF, "bad fd";
 
+
+
+
+
 }
 {
   eval {
@@ -183,5 +187,6 @@ use POSIX "errno_h";
   ok !defined($ret), "Undef for bad fd";
   ok $!==EBADF, "bad fd";
 }
+
 
 done_testing;

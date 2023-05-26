@@ -22,9 +22,10 @@ my %WriteMakefileArgs = (
     "Integer::Partition" => 0,
     "List::Util" => "1.33",
     "Math::Sequence::DeBruijn" => 0,
+    "Module::Load::Conditional" => 0,
     "Moo" => 2,
     "Music::AtonalUtil" => 0,
-    "OEIS" => 0,
+    "if" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0700",
+  "VERSION" => "0.0802",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,10 +53,11 @@ my %FallbackPrereqs = (
   "Integer::Partition" => 0,
   "List::Util" => "1.33",
   "Math::Sequence::DeBruijn" => 0,
+  "Module::Load::Conditional" => 0,
   "Moo" => 2,
   "Music::AtonalUtil" => 0,
-  "OEIS" => 0,
   "Test::More" => "0.88",
+  "if" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

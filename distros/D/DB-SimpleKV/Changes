@@ -11,3 +11,6 @@ Revision history for DB-SimpleKV
 
 0.04    2022-10-11
         Add file lock
+
+0.15    2023-05-22
+        Add META.json

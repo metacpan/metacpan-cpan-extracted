@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SQLiteUtils.pm'
 );
 
 my @scripts = (
+    'script/csv2sqlite',
     'script/import-csv-to-sqlite',
     'script/list-sqlite-columns',
     'script/list-sqlite-tables'

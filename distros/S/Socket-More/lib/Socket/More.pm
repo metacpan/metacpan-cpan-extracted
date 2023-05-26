@@ -205,9 +205,11 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.3.0';
+our $VERSION = 'v0.4.1';
 
 sub getifaddrs;
+sub string_to_family;
+sub string_to_sock;
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
     # XS function.
@@ -290,6 +292,7 @@ sub make_unix_interface {
 
 #main routine to return passive address structures
 sub sockaddr_passive{
+	require Scalar::Util;
 	my ($spec)=@_;
 	my $r={};
 	#my $sort_order=$spec->{sort}//$_default_sort_order;
@@ -312,6 +315,29 @@ sub sockaddr_passive{
 	$r->{port}=$spec->{port}//[];
 	$r->{path}=$spec->{path}//[];
 	
+  ######
+  #v0.4.0 adds string support for type and family
+  
+  # Convert to arrays for unified interface 
+  for($r->{type}, $r->{family}){
+    unless(ref eq "ARRAY"){
+      $_=[$_];
+    }
+  }
+
+  for($r->{type}->@*){
+    unless(Scalar::Util::looks_like_number $_){
+      ($_)=string_to_sock $_;
+    }
+  }
+
+  for($r->{family}->@*){
+    unless(Scalar::Util::looks_like_number $_){
+      ($_)=string_to_family $_;
+    }
+  }
+  # End
+  #####
 
 
 	#NOTE: Need to add an undef value to port and path arrays. Port and path are
@@ -571,6 +597,11 @@ sub parse_passive_spec {
 			die "Ambiguous field name: $key" if 2<=grep /^$key/i, @full;
 			($key)=grep /^$key/i, @full;
 
+      # The string to in constant lookup is also done in sockadd_passive in
+      # v0.4.0 onwards. The conversion below is to keep compatible with
+      # previous version. Also parsing to an actual value is useful outside of
+      # use of this module
+      # 
 			if($key eq "family"){
 				#Convert string to integer
 				@val=string_to_family($value);
@@ -579,27 +610,14 @@ sub parse_passive_spec {
 				#Convert string to integer
 				@val=string_to_sock($value);
 			}
-                        ###############################
-                        # elsif($key eq "data"){      #
-                        #         $spec{$key}=$value; #
-                        #         next;               #
-                        # }                           #
-                        ###############################
-                        #######################################
-                        # elsif($key eq "protocol"){          #
-                        #         #Convert string to integer  #
-                        #         #TODO: service name lookup? #
-                        # }                                   #
-                        #######################################
 			else{
 				@val=($value);
 
 			}
 			
-                        defined($spec{$key})
-                                ?  (push $spec{$key}->@*, @val)
-                                : ($spec{$key}=[@val]);
-				#($spec{$key}=[@val]);
+      defined($spec{$key})
+              ?  (push $spec{$key}->@*, @val)
+              : ($spec{$key}=[@val]);
 		}
 		PUSH:
 		push @output, \%spec;

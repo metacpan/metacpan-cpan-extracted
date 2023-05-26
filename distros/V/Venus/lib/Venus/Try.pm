@@ -71,13 +71,7 @@ sub callback {
     }
 
     if (!$method) {
-      my $throw;
-      my $error = sprintf(qq(Can't locate object method "%s" on package "%s"),
-        ($callback, $invocant ? ref($invocant) : ref($self)));
-      $throw = $self->throw;
-      $throw->name('on.callback');
-      $throw->message($error);
-      $throw->error;
+      $self->throw('error_on_callback', $invocant, $callback)->error;
     }
 
     $callback = sub {goto $method};
@@ -238,6 +232,18 @@ sub result {
   $@ = $dollarat;
 
   return wantarray ? (@returned) : $returned[0];
+}
+
+# ERRORS
+
+sub error_on_callback {
+  my ($self, $invocant, $callback) = @_;
+
+  return {
+    name => 'on.callback',
+    message => sprintf(qq(Can't locate object method "%s" on package "%s"),
+      ($callback, $invocant ? (ref($invocant) || $invocant) : (ref($self) || $self))),
+  };
 }
 
 1;
@@ -536,7 +542,7 @@ I<Since C<0.01>>
 
   my $callback = $try->callback('missing_method');
 
-  # Exception! Venus::Try::Error (isa Venus::Error)
+  # Exception! (isa Venus::Try::Error) (see error_on_callback)
 
 =back
 
@@ -1084,6 +1090,36 @@ I<Since C<0.01>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_callback>
+
+This package may raise an error_on_callback exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  @args = ("Example", "execute");
+
+  my $error = $try->throw('error_on_callback', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_callback"
+
+  # my $message = $error->message;
+
+  # "Can't locate object method \"execute\" on package \"Example\""
+
+=back
 
 =head1 AUTHORS
 

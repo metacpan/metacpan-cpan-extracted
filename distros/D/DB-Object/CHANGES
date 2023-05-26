@@ -1,5 +1,8 @@
 Revision history for Perl module DB::Object
 
+v0.11.3 2023-05-02T19:08:40+0900
+    - Added ANY and ALL array operator
+
 v0.11.2 2023-03-24T19:19:29+0900
     - Minor correction in method _opt_overload() in class DB::Object::IN
 

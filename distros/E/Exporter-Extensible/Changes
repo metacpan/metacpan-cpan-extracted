@@ -1,3 +1,7 @@
+0.11 - 2023-05-21:
+  - Fix bug using method attribute for option with parameter - #2
+  - More thorough unit tests for method attributes
+
 0.10 - 2021-01-25:
   - Changed internal representation of generators in %EXPORT to resolve an
     ambiguity for generated scalar exports.

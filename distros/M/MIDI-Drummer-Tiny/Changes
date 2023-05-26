@@ -1,5 +1,18 @@
 Revision history for MIDI-Drummer
 
+0.4303 2023-05-17 22:06:08
+    - Yank Music::CreatingRhythms!
+
+0.4302 2023-05-17 19:32:12
+    - Pin M::U prereq version.
+
+0.4301 2023-05-17 19:26:01
+    - Update the Quickstart tutorial.
+
+0.4300 2023-05-17 19:10:26
+    - Add the timidity_cfg() and play_with_timidity() methods.
+    - Improve documentation.
+
 0.4208 2023-05-08 14:43:40
     - Odd. A cpan smoker failed because the DeBruijn module
       was not installed via Music::CreatingRhythms. ...Ok.

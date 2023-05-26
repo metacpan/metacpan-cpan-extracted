@@ -1,5 +1,9 @@
 Revision history for JIP-Mock
 
+v0.0.4    2023-05-22
+  - Added called method.
+  - Added not_called method.
+
 v0.0.3    2023-04-02
   - Added call_original method.
 

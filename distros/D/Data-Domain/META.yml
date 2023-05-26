@@ -18,7 +18,7 @@ name: Data-Domain
 provides:
   Data::Domain:
     file: lib/Data/Domain.pm
-    version: '1.11'
+    version: '1.12'
   Data::Domain::All_of:
     file: lib/Data/Domain.pm
   Data::Domain::Date:
@@ -63,5 +63,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Data-Domain
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

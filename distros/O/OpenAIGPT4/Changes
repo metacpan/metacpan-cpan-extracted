@@ -1,0 +1,35 @@
+Revision history for Perl module OpenAIGPT4
+0.11 2023-05-22
+    - Edited POD.
+
+0.10 2023-05-22
+    - Edited POD.
+
+0.09 2023-05-22
+    - The open ai host url is optional, and can be used for running against a LocalAI API server.
+
+0.08 2023-05-22
+    - Edited Makefile.PL.
+
+0.07 2023-05-22
+    - Added ";".
+
+0.06 2023-05-22
+    - Add a new key named history within the object, which is used to keep track of previous messages.
+
+0.05 2023-05-22
+    - Added LWP::Protocol::https.
+
+0.04 2023-05-22
+    - Edited use 5.032;.
+
+0.03 2023-05-22
+    - Added use 5.034;.
+
+0.02 2023-05-22
+    - Improved document information.
+
+0.01 2023-05-22
+    - First version, released on an unsuspecting world.
+    - Implemented `new` method for creating a new OpenAIGPT4 object.
+    - Implemented `generate_text` method for generating text using the OpenAI GPT-4 API.

@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -111,11 +111,12 @@ sub Populate {
 
 	my $var = '';
 	$self->ConfigSpecs(
-		-width => [$entry],
-		-font => [$entry],
+		-background => ['SELF', 'DESCENDANTS'],
 		-command => ['CALLBACK', undef, undef, sub {}],
 		-entryerrorcolor => ['PASSIVE', undef, undef, '#FF0000'],
 		-entryforeground => ['PASSIVE', undef, undef, $self->Subwidget('Entry')->cget('-foreground')],
+		-font => [$entry],
+		-foreground => ['SELF', 'DESCENDANTS'],
 		-indborderwidth => [{
 			-borderwidth => $indicator,
 			-indborderwidth => $pop,
@@ -131,6 +132,7 @@ sub Populate {
 		-popborderwidth => [{-borderwidth => $pop}, undef, undef, 1],
 		-poprelief => [{-relief => $pop}, undef, undef, 'raised'],
 		-variable => [{-textvariable => $entry}, undef, undef, \$var],
+		-width => [$entry],
 		DEFAULT => [ $pop ],
 	);
 

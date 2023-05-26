@@ -1,3 +1,7 @@
+2023-05-25 1.12.3 DAVECORSS
+
+- Removed/fixed links (thanks Håkon Hægland)
+
 2021-01-25 1.12.2 DAVECROSS
 
 - Add details of bugtracker
@@ -11,7 +15,7 @@
 2020-09-08 1.12.0 DAVECROSS
 
 - Catch up on size years of changes
-- Mostly testing and packaging imporovments
+- Mostly testing and packaging improvements
 - Some work on CI
 - A couple of documentation typos fixed
 

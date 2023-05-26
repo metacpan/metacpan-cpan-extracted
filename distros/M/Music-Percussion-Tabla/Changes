@@ -1,0 +1,29 @@
+Revision history for Music-Percussion-Tabla
+
+0.0200 2023-05-17 19:57:40
+    - Use the timidity methods of the latest M::D::T.
+
+0.0106 2023-05-17 07:47:20
+    - Fix eg/* programs.
+    - Add a note-to-score test.
+
+0.0105 2023-05-17 06:55:30
+    - Improve documentation again.
+
+0.0104 2023-05-17 06:37:12
+    - Improve documentation.
+
+0.0103 2023-05-16 16:10:45
+    - Add the eg/play-all program.
+
+0.0102 2023-05-16 14:05:28
+    - Improve documentation.
+    - Clean-up code a bit.
+
+0.0101 2023-05-16 13:44:19
+    - Always set the channel to 0.
+
+0.0100 2023-05-16 13:31:25
+    - Tediously study and codify the instruction links in the SEE ALSO section.
+    - Make this magically work with timidity.
+    - Mint with Dist::Zilla.

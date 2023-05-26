@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::ViewFieldRole::Bootstrap::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: 
-$SyForm::ViewFieldRole::Bootstrap::VERSION = '0.102';
+$SyForm::ViewFieldRole::Bootstrap::VERSION = '0.103';
 use Moo::Role;
 
 1;
@@ -18,7 +18,7 @@ SyForm::ViewFieldRole::Bootstrap -
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

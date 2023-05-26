@@ -20,12 +20,12 @@ sub attributes {
 
 sub add {
 	my ($self, $file, %attributes) = @_;
-
+	
 	my $font = $self->font->load($file, %{ delete $attributes{font} || {} });
 
 	if (!$attributes{x} && !$attributes{align}) {
 		$attributes{x} = $file->page->x;
-		$attributes{y} = $file->page->y;
+		$attributes{y} = $attributes{y} || $file->page->y;
 		$attributes{h} = $file->page->remaining_height();
 		$attributes{w} = $file->page->width();
 	}
@@ -48,29 +48,36 @@ sub add {
 	my $ypos = $file->page->h - ($pos{y} + $pos{l});
 	
 	my $max_height = $ypos - $pos{h};
-
+	
 	my $xpos = $pos{x};
 
 	my $indent = $self->indent;
 	
 	my @paragraphs = split /\n/, $self->text;
-	
 	my $space = $text->advancewidth(" ");
 
-	my @words = split / /, shift @paragraphs;
-
-	if ($indent) {
-		unshift @words, map { " " } 0 .. $indent;
-	}
-
-	while ($ypos - $pos{l} >= $max_height && @words) {
-		my $word = shift @words;
+	my @words;	
+	while ($ypos - $pos{l} >= $max_height && (scalar @paragraphs || scalar @words)) {
+		unless (scalar @words) {
+			my $next_line = shift @paragraphs;
+			@words = split(/ /, $next_line);
+			push @words, $1 if $next_line !~ m/^\s+$/ && $next_line =~ m/(\s+)$/;
+			push @words, $next_line unless scalar @words;
+			if ($indent) {
+				unshift @words, map { "" } 0 .. $indent;
+			}
+		}
+		my $word = shift @words; 
+		$word =~ s/\t/         /g;		
 		my ($width, @line) = ($text->advancewidth($word), ());
-		while ($width <= $pos{w} && $word) {
-			$width += $space;
+		while ($width <= $pos{w} && defined $word) {
 			push @line, $word;
 			$word = shift @words;
-			$width += $text->advancewidth($word);
+			if (defined $word) {
+				$width += $space unless $word =~ m/^(\s+)$/;
+				$word =~ s/\t/        /g;		
+				$width += $text->advancewidth($word);
+			}
 		}
 		$self->end_w($xpos + $width);
 		if ($word) {
@@ -86,11 +93,11 @@ sub add {
 
 		my $align = $self->align;
 		if ($align eq 'center') {
-			$xpos = $xpos + ((($pos{w} - $width) / 2) -  ($width / 2));
+			$xpos = $xpos + (($pos{w} - $width) / 2);
 		} elsif ($align eq 'right') {
 			$xpos = $xpos + ($pos{w} - $width);
+			$self->end_w($xpos + $pos{w});
 		}
-
 		$text->translate($xpos, $ypos);
 		$text->text(join(" ", @line));
 		$ypos -= $pos{l};
@@ -98,9 +105,13 @@ sub add {
 
 	$file->page->y($file->page->h - (($ypos + $pos{l}) - $self->margin));
 
-	if (!$self->overflow && scalar @words) {
+	if (scalar @words) {
+		push @paragraphs, join " ", @words;
+	}
+
+	if (!$self->overflow && scalar @paragraphs) {
 		$file->page->next($file);
-		return $self->add($file, text => join " ", @words);
+		return $self->add($file, text => join "\n", @paragraphs);
 	}
 
 	return $file;

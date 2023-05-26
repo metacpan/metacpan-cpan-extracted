@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::DataSorter;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::SortKey; 
 
-use AsposeCellsCloud::Object::SortKey;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,55 +118,64 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'DataSorter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'case_sensitive' => {
-    	datatype => 'boolean',
-    	base_name => 'CaseSensitive',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'key_list' => {
-    	datatype => 'ARRAY[SortKey]',
-    	base_name => 'KeyList',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'has_headers' => {
-    	datatype => 'boolean',
-    	base_name => 'HasHeaders',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'sort_left_to_right' => {
-    	datatype => 'boolean',
-    	base_name => 'SortLeftToRight',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'case_sensitive' => {
+     	datatype => 'boolean',
+     	base_name => 'CaseSensitive',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'has_headers' => {
+     	datatype => 'boolean',
+     	base_name => 'HasHeaders',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'key_list' => {
+     	datatype => 'ARRAY[SortKey]',
+     	base_name => 'KeyList',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_left_to_right' => {
+     	datatype => 'boolean',
+     	base_name => 'SortLeftToRight',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_as_number' => {
+     	datatype => 'boolean',
+     	base_name => 'SortAsNumber',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'case_sensitive' => 'boolean',
-    'key_list' => 'ARRAY[SortKey]',
     'has_headers' => 'boolean',
-    'sort_left_to_right' => 'boolean'
+    'key_list' => 'ARRAY[SortKey]',
+    'sort_left_to_right' => 'boolean',
+    'sort_as_number' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
     'case_sensitive' => 'CaseSensitive',
-    'key_list' => 'KeyList',
     'has_headers' => 'HasHeaders',
-    'sort_left_to_right' => 'SortLeftToRight'
+    'key_list' => 'KeyList',
+    'sort_left_to_right' => 'SortLeftToRight',
+    'sort_as_number' => 'SortAsNumber' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

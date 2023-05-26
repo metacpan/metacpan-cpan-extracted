@@ -50,7 +50,7 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             var rpc = callbackery.data.Server.getInstance();
             var currentFormData = this._form.getData();
             var busy = callbackery.ui.Busy.getInstance();
-            busy.show(this.tr('Loading Card Data'));
+            busy.manifest(this.tr('Loading Card Data'));
             this._loading++;
             rpc.callAsync(function(data,exc){
                 if (!exc){
@@ -64,7 +64,7 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
                         callbackery.ui.MsgBox.getInstance().exc(exc);
                     }
                 }
-                busy.hide();
+                busy.vanish();
                 that._loading--;
             }, 'getPluginData', this._cfg.name, 'allCardData', currentFormData);
         },

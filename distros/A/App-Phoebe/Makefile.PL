@@ -94,7 +94,7 @@ dev:
 	  ./script/phoebe \
 	    --host localhost --host 127.0.0.1 --port=2020 \
 	    --wiki_space=127.0.0.1/alex --wiki_space=localhost/berta \
-	    --log_level=4 --wiki_main_page=Welcome \
+	    --log_level=debug --wiki_main_page=Welcome \
 	    --wiki_mime_type=image/jpeg
 
 # Update the README file.

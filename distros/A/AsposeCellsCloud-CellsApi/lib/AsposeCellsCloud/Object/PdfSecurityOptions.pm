@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::PdfSecurityOptions;
 
 require 5.6.0;
@@ -36,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -52,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -98,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -106,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -118,83 +118,83 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'PdfSecurityOptions',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'annotations_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'AnnotationsPermission',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'assemble_document_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'AssembleDocumentPermission',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'extract_content_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'ExtractContentPermission',
-    	description => 'Make the workbook empty after saving the file.',
-    	format => '',
-    	read_only => '',
-    		},
-    'extract_content_permission_obsolete' => {
-    	datatype => 'boolean',
-    	base_name => 'ExtractContentPermissionObsolete',
-    	description => 'The cached file folder is used to store some large data.',
-    	format => '',
-    	read_only => '',
-    		},
-    'fill_forms_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'FillFormsPermission',
-    	description => 'Indicates whether validate merged areas before saving the file. The default value is false.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'full_quality_print_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'FullQualityPrintPermission',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'modify_document_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'ModifyDocumentPermission',
-    	description => 'If true and the directory does not exist, the directory will be automatically created before saving the file.             ',
-    	format => '',
-    	read_only => '',
-    		},
-    'owner_password' => {
-    	datatype => 'string',
-    	base_name => 'OwnerPassword',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'print_permission' => {
-    	datatype => 'boolean',
-    	base_name => 'PrintPermission',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'user_password' => {
-    	datatype => 'string',
-    	base_name => 'UserPassword',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'annotations_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'AnnotationsPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'assemble_document_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'AssembleDocumentPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'extract_content_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'ExtractContentPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'extract_content_permission_obsolete' => {
+     	datatype => 'boolean',
+     	base_name => 'ExtractContentPermissionObsolete',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'fill_forms_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'FillFormsPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'full_quality_print_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'FullQualityPrintPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'modify_document_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'ModifyDocumentPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'owner_password' => {
+     	datatype => 'string',
+     	base_name => 'OwnerPassword',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'print_permission' => {
+     	datatype => 'boolean',
+     	base_name => 'PrintPermission',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'user_password' => {
+     	datatype => 'string',
+     	base_name => 'UserPassword',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
@@ -207,7 +207,7 @@ __PACKAGE__->swagger_types( {
     'modify_document_permission' => 'boolean',
     'owner_password' => 'string',
     'print_permission' => 'boolean',
-    'user_password' => 'string'
+    'user_password' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -220,7 +220,7 @@ __PACKAGE__->attribute_map( {
     'modify_document_permission' => 'ModifyDocumentPermission',
     'owner_password' => 'OwnerPassword',
     'print_permission' => 'PrintPermission',
-    'user_password' => 'UserPassword'
+    'user_password' => 'UserPassword' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

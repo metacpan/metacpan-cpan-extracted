@@ -2,7 +2,7 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, etc.
-use t_TestCommon ':silent', qw/bug $debug t_ok t_is t_like/; # Test::More etc.
+use t_TestCommon ':silent', qw/bug $debug t_ok t_is t_like/; # Test2::V0 etc.
 
 use Data::Dumper::Interp;
 $Data::Dumper::Interp::Debug = $debug if $debug;

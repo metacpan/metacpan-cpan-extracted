@@ -12,7 +12,7 @@ use parent 'Class::Accessor';
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.10';
+our $VERSION = '4.11';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -420,6 +420,7 @@ sub TO_JSON {
 			$ret->{$k} = $ret->{$k}->epoch;
 		}
 	}
+	$ret->{route} = [ map { $_->TO_JSON } $self->route ];
 
 	return $ret;
 }
@@ -460,7 +461,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.10
+version 4.11
 
 =head1 DESCRIPTION
 

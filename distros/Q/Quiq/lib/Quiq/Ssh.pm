@@ -54,7 +54,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.209';
+our $VERSION = '1.210';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -238,7 +238,11 @@ sub exec {
         $cmd = "/bin/bash -lc '$cmd'";
     }
 
+    # Wenn wir Encoden gibt es bei </dev/null folgende Meldung:
+    # "sysread() is deprecated on :utf8 handles. This will be a
+    # fatal error in Perl 5.30 at .../Net/SSH/Perl/Channel.pm line 156."
     $cmd = Encode::encode('utf-8',$cmd);
+    # $cmd = Encode::decode('utf-8',$cmd);
     my ($stdout,$stderr,$exit) = $self->obj->cmd($cmd);
     $stdout //= '';
     $stderr //= '';
@@ -256,7 +260,7 @@ sub exec {
 
 =head1 VERSION
 
-1.209
+1.210
 
 =head1 AUTHOR
 

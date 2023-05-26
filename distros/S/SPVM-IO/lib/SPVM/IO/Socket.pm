@@ -197,3 +197,10 @@ L<IO::Socket::INET|SPVM::IO::Socket::INET>
 =head2 Perl's IO::Socket
 
 C<IO::Socket> is a Perl's L<IO::Socket|IO::Socket> porting to L<SPVM>.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

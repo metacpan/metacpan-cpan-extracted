@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000633';
+our $VERSION='1.0000636';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1154,6 +1154,9 @@ END
    unless (-1<index $yins,'openssl-devel') {
       fa_system("sudo yum -y install 'openssl-devel'");
    }
+   unless (-1<index $yins,'zlib-devel') {
+      fa_system("sudo yum -y install 'zlib-devel'");
+   }
    if ((exists $amazon{'amazon_linux'}) ||
          (exists $amazon{'rhel'}) ||
          (exists $amazon{'centos'})) {
@@ -1180,6 +1183,9 @@ END
    my $yins=`yum list installed`;
    unless (-1<index $yins,'openssl-devel') {
       fa_system("sudo yum -y install 'openssl-devel'");
+   }
+   unless (-1<index $yins,'zlib-devel') {
+      fa_system("sudo yum -y install 'zlib-devel'");
    }
    unless (-1<index $yins,'wget') {
       fa_system("sudo yum -y install 'wget'");
@@ -1388,7 +1394,7 @@ sub fa_find_latest {
       }
       if ($diff<$temp) {
          $temp=$diff;
-         $new=$_;
+         $new=$CPAN::Config->{build_dir}.'/'.$_;
       }
    }
    close(DH);
@@ -1864,6 +1870,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('LWP::MediaTypes','install','Makefile');
    &fa_install_module('Encode::Locale','install','Makefile');
    &fa_install_module('IO::HTML','install','Makefile');
+   &fa_install_module('Clone','install','Makefile');
    &fa_install_module('HTTP::Message','install','Makefile');
    &fa_install_module('File::Listing','install','Makefile');
    &fa_install_module('HTTP::Cookies','install','Makefile');
@@ -2062,6 +2069,7 @@ END
    &fa_install_module('Net::SMTP','install','Makefile','','','','PERL_CORE=1');
    &fa_install_module('Email::Simple','install','Makefile');
    &fa_install_module('Email::Address','install','Makefile');
+   &fa_install_module('Email::Address::XS','install','Makefile');
    &fa_install_module('Module::Pluggable','install','Makefile');
    &fa_install_module('Email::Abstract','install','Makefile');
    &fa_install_module('Email::Sender','install','Makefile');

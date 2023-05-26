@@ -1,5 +1,15 @@
 Revision history for Music-CreatingRhythms
 
+0.0802 2023-05-20 09:56:57
+    - Comment-out tests that will fail without the Math::NumSeq::SqrtContinued module.
+
+0.0801 2023-05-20 01:21:49
+    - Use Module::Load::Conditional + if.
+
+0.0800 2023-05-20 01:02:59
+    - Require the superior Math::NumSeq::SqrtContinued instead of the limited OEIS lookup.
+    - But unfortunately it's done in a string eval, so dzil doesn't think it's a prereq!
+
 0.0700 2023-03-25 11:35:45
     - Remove the dependency on Math::libm.
     - Skip the cfsqrt() tests because oeis() is unmocked.

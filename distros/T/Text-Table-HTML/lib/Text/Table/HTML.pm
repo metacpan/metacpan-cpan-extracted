@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-05-22'; # DATE
 our $DIST = 'Text-Table-HTML'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
@@ -18,87 +18,91 @@ sub table {
     my %params = @_;
     my $rows = $params{rows} or die "Must provide rows!";
 
-    my $max_index = _max_array_index($rows);
-
     # here we go...
     my @table;
 
     push @table, "<table>\n";
 
     if (defined $params{caption}) {
-        require HTML::Entities;
-        push @table, "<caption>".HTML::Entities::encode_entities($params{caption})."</caption>\n";
+        push @table, "<caption>"._encode($params{caption})."</caption>\n";
     }
 
     # then the data
-    my $i = -1;
-    foreach my $row ( @{ $rows }[0..$#$rows] ) {
-        $i++;
-        my $in_header;
-        if ($params{header_row}) {
-            if ($i == 0) { push @table, "<thead>\n"; $in_header++ }
-            if ($i == 1) { push @table, "<tbody>\n" }
-        } else {
-            if ($i == 1) { push @table, "<tbody>\n" }
+    my $header_row   = $params{header_row} // 0;
+    my $needs_thead = !!$header_row;
+    my $needs_tbody = !!1;
+    foreach my $row ( @{$rows} ) {
+
+        my $coltag = 'td';
+
+        if ($header_row ) {
+            $coltag = 'th';
+
+            if ($needs_thead) {
+                push @table, "<thead>\n";
+                $needs_thead = !!0;
+            }
         }
 
-        my $has_bottom_border = grep { ref $_ eq 'HASH' && $_->{bottom_border} } @$row;
+        elsif ($needs_tbody) {
+            push @table, "<tbody>\n";
+            $needs_tbody = !!0;
+        }
 
-        push @table, "<tr".($has_bottom_border ? " class=has_bottom_border" : "").">";
+        my $bottom_border;
+
+        my @row;
+
         for my $cell (@$row) {
-            my ($text, $encode_text) = @_;
+
+            my $text;
+            my $attr = '';
+
             if (ref $cell eq 'HASH') {
+
+                # add a class attribute for bottom_border if
+                # any cell in the row has it set. once the attribute is set,
+                # no need to do the check again.
+                $bottom_border //=
+                  ($cell->{bottom_border} || undef) && " class=has_bottom_border";
+
                 if (defined $cell->{raw_html}) {
                     $text = $cell->{raw_html};
-                    $encode_text = 0;
                 } else {
-                    $text = $cell->{text};
-                    $encode_text = 1;
+                    $text = _encode( $cell->{text} // '' );
                 }
-            } else {
-                $text = $cell;
-                $encode_text = 1;
+
+                my $rowspan = int($cell->{rowspan}  // 1);
+                $attr .= " rowspan=$rowspan" if $rowspan > 1;
+
+                my $colspan = int($cell->{colspan}  // 1);
+                $attr .= " colspan=$colspan" if $colspan > 1;
+
+                $attr .= ' align="' . $cell->{align} . '"' if defined $cell->{align};
             }
-            $text //= '';
-            my $rowspan = int((ref $cell eq 'HASH' ? $cell->{rowspan} : undef) // 1);
-            my $colspan = int((ref $cell eq 'HASH' ? $cell->{colspan} : undef) // 1);
-            my $align   = ref $cell eq 'HASH' ? $cell->{align} : undef;
-            push @table,
-                ($in_header ? "<th" : "<td"),
-                ($rowspan > 1 ? " rowspan=$rowspan" : ""),
-                ($colspan > 1 ? " colspan=$colspan" : ""),
-                ($align       ? " align=\"$align\"" : ""),
-                ">",
-                $encode_text ? _encode($text) : $text,
-                $in_header ? "</th>" : "</td>";
+            else {
+                $text = _encode( $cell // '' );
+            }
+
+            push @row,
+              '<' . $coltag . $attr . '>', $text, '</' . $coltag . '>';
 	}
-        push @table, "</tr>\n";
-        if ($i == 0 && $params{header_row}) {
+
+        push @table,
+          "<tr". ( $bottom_border // '' ) .">",
+          @row,
+          "</tr>\n";
+
+        if ( $header_row && $header_row-- == 1 ) {
             push @table, "</thead>\n";
         }
     }
 
+    push @table, "<tbody>\n" if $needs_tbody;
     push @table, "</tbody>\n";
     push @table, "</table>\n";
 
     return join("", grep {$_} @table);
-}
-
-# FROM_MODULE: PERLANCAR::List::Util::PP
-# BEGIN_BLOCK: max
-sub max {
-    return undef unless @_; ## no critic: Subroutines::ProhibitExplicitReturnUndef
-    my $res = $_[0];
-    my $i = 0;
-    while (++$i < @_) { $res = $_[$i] if $_[$i] > $res }
-    $res;
-}
-# END_BLOCK: max
-
-# return highest top-index from all rows in case they're different lengths
-sub _max_array_index {
-    my $rows = shift;
-    return max( map { $#$_ } @$rows );
 }
 
 1;
@@ -116,7 +120,7 @@ Text::Table::HTML - Generate HTML table
 
 =head1 VERSION
 
-This document describes version 0.009 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2022-10-11.
+This document describes version 0.010 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2023-05-22.
 
 =head1 SYNOPSIS
 
@@ -135,7 +139,8 @@ This document describes version 0.009 of Text::Table::HTML (from Perl distributi
 =head1 DESCRIPTION
 
 This module provides a single function, C<table>, which formats a
-two-dimensional array of data as HTML table.
+two-dimensional array of data as HTML table. Its interface is modelled after
+L<Text::Table::Tiny> 0.03.
 
 The example shown in the SYNOPSIS generates the following table:
 
@@ -152,6 +157,13 @@ The example shown in the SYNOPSIS generates the following table:
 
 =for Pod::Coverage ^(max)$
 
+=head1 COMPATIBILITY NOTES WITH TEXT::TABLE::TINY
+
+In C<Text::Table::HTML>, C<header_row> is an integer instead of boolean. It
+supports multiple header rows.
+
+Cells in C<rows> can be hashrefs instead of scalars.
+
 =head1 FUNCTIONS
 
 =head2 table(%params) => str
@@ -162,18 +174,24 @@ The C<table> function understands these arguments, which are passed as a hash.
 
 =over
 
-=item * rows (aoaos)
+=item * rows
 
-Takes an array reference which should contain one or more rows of data, where
-each row is an array reference. And each array element is a string (cell
+Required. Array of array of (scalars or hashrefs). One or more rows of data,
+where each row is an array reference. And each array element is a string (cell
 content) or hashref (with key C<text> to contain the cell text or C<raw_html> to
 contain the cell's raw HTML which won't be escaped further), and optionally
-attributes too like C<rowspan>, C<colspan>).
+other attributes: C<rowspan>, C<colspan>, C<align>, C<bottom_border>).
 
 =item * caption
 
 Optional. Str. If set, will add an HTML C<< <caption> >> element to set the
 table caption.
+
+=item * header_row
+
+Optional. Integer. Default 0. Whether we should add header row(s) (rows inside
+C<< <thead> >> instead of C<< <tbody> >>). Support multiple header rows; you can
+set this argument to an integer larger than 1.
 
 =back
 
@@ -197,6 +215,12 @@ L<Bencher::Scenario::TextTableModules>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Diab Jerius
+
+Diab Jerius <djerius@cfa.harvard.edu>
+
 =head1 CONTRIBUTING
 
 
@@ -217,7 +241,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

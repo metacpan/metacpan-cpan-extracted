@@ -3,16 +3,18 @@ ext=*.desktop;*.kdelnk;*.desktop.cmake
 file=desktop.xml
 menu=Configuration
 mime=application/x-desktop
+priority=
 slcomment=#
-version=6
+version=2
 
 [4DOS BatchToMemory]
 ext=*.btm
 file=4dos.xml
 menu=Scripts
 mime=
-slcomment=rem 
-version=10
+priority=
+slcomment=::
+version=3
 
 [4GL]
 ext=*.4gl;*.4GL;*.err
@@ -21,7 +23,8 @@ menu=Database
 mime=text/x-4glsrc;text/x-4glerr
 mlcommentend=}
 mlcommentstart={
-version=9
+priority=
+version=2
 
 [4GL-PER]
 ext=*.per;*.PER;*.per.err
@@ -30,23 +33,28 @@ menu=Database
 mime=text/x-4glper;text/x-4glpererr
 mlcommentend=}
 mlcommentstart={
-version=9
+priority=
+version=2
 
 [ABAP]
 ext=*.abap;*.ABAP
 file=abap.xml
 menu=Sources
 mime=text/x-abap-src
+mlcommentend=
+mlcommentstart=*
+priority=5
 slcomment=*
-version=7
+version=2
 
 [ABC]
 ext=*.abc;*.ABC
 file=abc.xml
 menu=Other
 mime=text/vnd.abc
+priority=
 slcomment=%
-version=8
+version=3
 
 [AHDL]
 ext=*.ahdl;*.tdf
@@ -55,8 +63,9 @@ menu=Hardware
 mime=text/x-ahdl
 mlcommentend=%
 mlcommentstart=%
+priority=
 slcomment=--
-version=6
+version=3
 
 [AMPLE]
 ext=*.ample;*.menu;*.startup
@@ -65,8 +74,9 @@ menu=Scripts
 mime=text/x-amplesrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=10
+version=3
 
 [ANS-Forth94]
 ext=*.4th;*.4TH;*.f;*.F;*.frt;*.FRT;*.fs;*.FS;*.fth;*.FTH;*.seq;*.SEQ
@@ -75,8 +85,8 @@ menu=Sources
 mime=
 mlcommentend=)
 mlcommentstart=( 
-slcomment=\ 
-version=8
+priority=5
+version=3
 
 [ANSI C89]
 ext=*.c;*.C;*.h
@@ -85,35 +95,27 @@ menu=Sources
 mime=text/x-csrc;text/x-c++src;text/x-chdr
 mlcommentend=*/
 mlcommentstart=/*
-version=8
+priority=2
+version=4
 
 [ASN.1]
 ext=*.asn;*.asn1
 file=asn1.xml
 menu=Markup
 mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=--
-version=6
+priority=
+version=3
 
 [ASP]
 ext=*.asp;
 file=asp.xml
 menu=Markup
 mime=text/x-asp-src;text/x-asp-src
+mlcommentend=*/
+mlcommentstart=/*
+priority=
 slcomment='
-version=9
-
-[ATS]
-ext=*.dats;*.sats;*.hats
-file=ats.xml
-menu=Sources
-mime=
-mlcommentend=*)
-mlcommentstart=(*
-slcomment=//
-version=3
+version=2
 
 [AVR Assembler]
 ext=*.asm;*.ASM;*.asm-avr
@@ -122,16 +124,18 @@ menu=Assembler
 mime=text/x-asm;text/x-asm-avr
 mlcommentend=*/
 mlcommentstart=/*
-slcomment=;
-version=6
+priority=
+slcomment=@
+version=3
 
 [AWK]
 ext=*.awk
 file=awk.xml
 menu=Scripts
 mime=text/x-awk
+priority=
 slcomment=#
-version=6
+version=1
 
 [ActionScript 2.0]
 ext=*.as
@@ -140,24 +144,26 @@ menu=Sources
 mime=text/x-actionscript
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=9
+version=2
 
 [Ada]
 ext=*.adb;*.ads;*.ada;*.a
 file=ada.xml
 menu=Sources
 mime=text/x-adasrc
+priority=
 slcomment=--
-version=6
+version=2
 
 [Adblock Plus]
 ext=
 file=adblock.xml
 menu=Configuration
 mime=
-slcomment=!
-version=2
+priority=
+version=1
 
 [Agda]
 ext=*.agda
@@ -166,21 +172,24 @@ menu=Sources
 mime=text/x-agda
 mlcommentend=-}
 mlcommentstart={-
+priority=
 slcomment=--
-version=9
+version=2
 
 [Alerts]
 ext=
 file=alert.xml
 menu=Other
 mime=
-version=8
+priority=
+version=5
 
 [Alerts_indent]
 ext=
 file=alert_indent.xml
 menu=Other
 mime=
+priority=
 version=4
 
 [Ansys]
@@ -188,48 +197,45 @@ ext=*.ans
 file=ansys.xml
 menu=Scientific
 mime=
+priority=
 slcomment=!
-version=9
+version=3
 
 [Apache Configuration]
 ext=httpd.conf;httpd2.conf;apache.conf;apache2.conf;.htaccess*;.htpasswd*
 file=apache.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=6
+version=3
 
 [AppArmor Security Profile]
-ext=usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.lib32.*;usr.libx32.*;usr.libexec.*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*;snap.*;snap-update-ns.*;snap-confine.*
+ext=usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.libexec*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*
 file=apparmor.xml
 menu=Markup
 mime=
+priority=0
 slcomment=#
-version=16
-
-[AsciiDoc]
-ext=*.ad;*.adoc;*.asciidoc
-file=asciidoc.xml
-menu=Markup
-mime=text/asciidoc
-mlcommentend=////
-mlcommentstart=////
-slcomment=//
-version=9
+version=3
 
 [Asm6502]
 ext=*.asm
 file=asm6502.xml
 menu=Assembler
 mime=text/x-asm6502
+mlcommentend=*/
+mlcommentstart=/*
+priority=
 slcomment=;
-version=7
+version=2
 
 [Asterisk]
 ext=*asterisk/*.conf
 file=asterisk.xml
 menu=Configuration
 mime=
+priority=
 slcomment=;
 version=3
 
@@ -240,8 +246,9 @@ menu=Scripts
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=9
 slcomment=;
-version=7
+version=2
 
 [B-Method]
 ext=*.mch;*.imp;*.ref
@@ -250,46 +257,43 @@ menu=Scientific
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=3
+priority=
+version=1
 
 [Bash]
-ext=*.sh;*.bash;*.ebuild;*.eclass;*.exlib;*.exheres-0;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD
+ext=*.sh;*.bash;*.ebuild;*.eclass;*.nix;.bashrc;.bash_profile;.bash_login;.profile
 file=bash.xml
 menu=Scripts
 mime=application/x-shellscript
+priority=
 slcomment=#
-version=46
+version=4
 
 [BibTeX]
 ext=*.bib
 file=bibtex.xml
 menu=Markup
 mime=text/x-bib
-version=5
+priority=
+version=2
 
 [Bitbake]
 ext=*.bb;*.bbappend;*.bbclass;*.inc
 file=bitbake.xml
 menu=Sources
 mime=
+priority=
 slcomment=#
-version=12
+version=4
 
 [Boo]
 ext=*.boo
 file=boo.xml
 menu=Sources
 mime=text/x-boo
+priority=
 slcomment=#
-version=10
-
-[BrightScript]
-ext=*.brs
-file=brightscript.xml
-menu=Scripts
-mime=
-slcomment='
-version=11
+version=2
 
 [C]
 ext=*.c;*.C;*.h
@@ -298,28 +302,31 @@ menu=Sources
 mime=text/x-csrc;text/x-c++src;text/x-chdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=18
+version=3
 
 [C#]
-ext=*.cs;*.ashx
+ext=*.cs
 file=cs.xml
 menu=Sources
 mime=text/x-csharp-src;text/x-csharp-hde
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=13
+version=2
 
 [C++]
-ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.cu;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.cuh;*.inl;*.ino;*.pde;*.moc
+ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.ino;*.pde;*.moc
 file=cpp.xml
 menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=9
 slcomment=//
-version=15
+version=5
 
 [C++/Qt4]
 ext=*.moc
@@ -328,6 +335,7 @@ menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=6
 slcomment=//
 version=1.2
 
@@ -338,35 +346,18 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=9
-
-[CLIST]
-ext=*.clist;*.CLIST
-file=clist.xml
-menu=Scripts
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-version=4
+version=2
 
 [CMake]
 ext=CMakeLists.txt;*.cmake;*.cmake.in
 file=cmake.xml
 menu=Other
 mime=text/x-cmake
-mlcommentend=]]
-mlcommentstart=#[[
+priority=
 slcomment=#
-version=45
-
-[COBOL]
-ext=*.cob;*.cbl;*.cpy;*.copy;*.lst;*.pco;*.scb;*.sqb
-file=cobol.xml
-menu=Sources
-mime=
-slcomment=*>
-version=2
+version=4
 
 [CSS]
 ext=*.css
@@ -375,7 +366,8 @@ menu=Markup
 mime=text/css
 mlcommentend=*/
 mlcommentstart=/*
-version=14
+priority=10
+version=4
 
 [CSS/PHP]
 ext=
@@ -384,69 +376,28 @@ menu=Other
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=10
 version=4
-
-[CSV]
-ext=*.csv
-file=csv.xml
-menu=Other
-mime=text/csv
-version=1
-
-[CSV (pipe)]
-ext=*.csv
-file=csv-pipe.xml
-menu=Other
-mime=text/csv
-version=1
-
-[CSV (semicolon)]
-ext=*.csv
-file=csv-semicolon.xml
-menu=Other
-mime=text/csv
-version=1
-
-[CSV (whitespace)]
-ext=*.csv
-file=csv-whitespace.xml
-menu=Other
-mime=text/csv
-version=1
 
 [CUE Sheet]
 ext=*.cue
 file=cue.xml
 menu=Other
 mime=application/x-cue
+priority=
 slcomment=;
-version=3
-
-[Cabal]
-ext=*.cabal;cabal.config;cabal.project;cabal.project.freeze;cabal.project.local
-file=cabal.xml
-menu=Configuration
-mime=
-slcomment=--
 version=1
 
-[CartoCSS MML]
-ext=*.mml
-file=carto-css-mml.xml
-menu=Markup
-mime=
-slcomment=#
-version=2
-
-[CartoCSS MSS]
+[CartoCSS]
 ext=*.mss
 file=carto-css.xml
 menu=Markup
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=6
+version=1
 
 [Cg]
 ext=*.cg;*.cgfx
@@ -455,21 +406,24 @@ menu=Sources
 mime=text/x-cgsrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=10
+version=3
 
 [ChangeLog]
 ext=ChangeLog
 file=changelog.xml
 menu=Other
 mime=
-version=4
+priority=
+version=3
 
 [Chicken]
 ext=*.chicken;*.scm;*.ss;*.scheme;*.meta
 file=chicken.xml
 menu=Scripts
 mime=text/x-scheme
+priority=
 slcomment=;;
 version=3
 
@@ -478,16 +432,18 @@ ext=*.cis
 file=cisco.xml
 menu=Configuration
 mime=text/cisco
+priority=
 slcomment=!
-version=9
+version=2
 
 [CleanCSS]
 ext=*.ccss
 file=ccss.xml
 menu=Markup
 mime=
+priority=
 slcomment=//
-version=8
+version=2
 
 [Clipper]
 ext=*.prg;*.PRG;*.ch
@@ -496,62 +452,51 @@ menu=Sources
 mime=text/x-clipper-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=2
 slcomment=//
-version=8
+version=3
 
 [Clojure]
 ext=*.clj;*.cljs;*.cljc
 file=clojure.xml
 menu=Sources
 mime=
+priority=
 slcomment=;;
-version=16
+version=8
 
 [CoffeeScript]
-ext=Cakefile;*.coffee;*.coco;*.cson
+ext=Cakefile;*.coffee;*.coco
 file=coffee.xml
 menu=Scripts
-mime=text/x-coffeescript;application/x-coffeescript;application/vnd.coffeescript
+mime=text/x-coffeescript;application/x-coffeescript
 mlcommentend=###
 mlcommentstart=###
+priority=
 slcomment=#
-version=15
+version=2
 
 [ColdFusion]
 ext=*.cfm;*.cfc;*.cfml;*.dbm
 file=coldfusion.xml
 menu=Markup
 mime=text/x-coldfusion
-mlcommentend=--->
-mlcommentstart=<!---
-version=6
-
-[Comments]
-ext=
-file=comments.xml
-menu=Other
-mime=
-version=1
-
-[Common Intermediate Language (CIL)]
-ext=*.il
-file=cil.xml
-menu=Assembler
-mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
 version=3
 
 [Common Lisp]
-ext=*.lisp;*.cl;*.lsp;*.el
+ext=*.lisp;*.cl;*.lsp
 file=commonlisp.xml
 menu=Sources
 mime=
 mlcommentend=|#
 mlcommentstart=#|
+priority=
 slcomment=;;
-version=11
+version=5
 
 [Component-Pascal]
 ext=*.cp;*.bro
@@ -560,49 +505,35 @@ menu=Sources
 mime=text/x-component-pascal
 mlcommentend=*)
 mlcommentstart=(*
-version=5
+priority=
+version=2
 
 [ConTeXt]
-ext=*.ctx;*.mkiv;*.mkvi;*.mkxl;*.mklx
+ext=*.ctx
 file=context.xml
 menu=Markup
 mime=text/x-tex
+priority=8
 slcomment=%
-version=10
+version=2
 
 [Crack]
 ext=*.crk
 file=crk.xml
 menu=Sources
 mime=
-mlcommentend=*/
-mlcommentstart=/*
+priority=
 slcomment=#
-version=10
-
-[Crystal]
-ext=*.cr
-file=crystal.xml
-menu=Sources
-mime=application/x-crystal
-slcomment=#
-version=0
+version=3
 
 [CubeScript]
 ext=*.cfg
 file=cubescript.xml
 menu=Scripts
 mime=
+priority=
 slcomment=//
-version=5
-
-[Cucumber Gherkin feature]
-ext=*.feature
-file=gherkin.xml
-menu=Markup
-mime=text/x-gherkin
-slcomment=#
-version=3
+version=1
 
 [Curry]
 ext=*.curry
@@ -611,8 +542,9 @@ menu=Sources
 mime=text/x-curry
 mlcommentend=-}
 mlcommentstart={-
+priority=
 slcomment=--
-version=4
+version=1
 
 [D]
 ext=*.d;*.D;*.di;*.DI;
@@ -621,8 +553,9 @@ menu=Sources
 mime=text/x-dsrc
 mlcommentend=+/
 mlcommentstart=/+
+priority=
 slcomment=//
-version=13
+version=2
 
 [DTD]
 ext=*.dtd
@@ -631,38 +564,33 @@ menu=Markup
 mime=application/xml-dtd
 mlcommentend=-->
 mlcommentstart=<!--
-version=4
-
-[Dart]
-ext=*.dart
-file=dart.xml
-menu=Sources
-mime=text/x-dart
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=3
+priority=
+version=2
 
 [Debian Changelog]
-ext=changelog
+ext=
 file=debianchangelog.xml
 menu=Other
 mime=
-version=21
+priority=
+version=4
 
 [Debian Control]
 ext=control
 file=debiancontrol.xml
 menu=Other
 mime=
-version=4
+priority=
+slcomment=#
+version=1
 
 [Diff]
-ext=*.diff;*patch;*.rej
+ext=*.diff;*patch
 file=diff.xml
 menu=Other
 mime=text/x-patch
-version=9
+priority=
+version=3
 
 [Django HTML Template]
 ext=*.htm;*.html
@@ -671,30 +599,34 @@ menu=Markup
 mime=text/html
 mlcommentend={% endcomment %}
 mlcommentstart={% comment %}
-version=7
+priority=9
+version=3
 
 [Dockerfile]
-ext=Dockerfile;Containerfile
+ext=Dockerfile
 file=dockerfile.xml
 menu=Other
 mime=
+priority=
 slcomment=#
-version=11
+version=6
 
 [Doxyfile]
 ext=Doxyfile;Doxyfile.*
 file=doxyfile.xml
 menu=Configuration
 mime=
-slcomment=#
-version=3
+priority=
+slcomment=;
+version=1
 
 [Doxygen]
 ext=*.dox;*.doxygen
 file=doxygen.xml
 menu=Markup
 mime=text/x-doxygen
-version=14
+priority=9
+version=5
 
 [DoxygenLua]
 ext=*.dox;*.doxygen
@@ -703,6 +635,7 @@ menu=Markup
 mime=text/x-doxygen
 mlcommentend=]]
 mlcommentstart=--[[
+priority=
 slcomment=--
 version=4
 
@@ -711,71 +644,60 @@ ext=*.e
 file=e.xml
 menu=Sources
 mime=text/x-e-src
+priority=
 slcomment=//
-version=5
-
-[Earthfile]
-ext=Earthfile
-file=earthfile.xml
-menu=Other
-mime=
-slcomment=#
-version=1
+version=2
 
 [Eiffel]
 ext=*.e
 file=eiffel.xml
 menu=Sources
 mime=text/x-eiffel-src
+priority=
 slcomment=--
-version=5
+version=2
 
 [Elixir]
 ext=*.ex;*.exs;*.eex;*.xml.eex;*.js.eex
 file=elixir.xml
 menu=Sources
 mime=text/x-elixir
+priority=
 slcomment=#
-version=14
-
-[Elm]
-ext=*.elm
-file=elm.xml
-menu=Sources
-mime=
-mlcommentend=-}
-mlcommentstart={-
-slcomment=--
-version=8
+version=2
 
 [Email]
-ext=*.eml;*.email;*.emlx;*.mbox;*.mbx
+ext=*.eml;*.emlx;*.mbox;*.mbx
 file=email.xml
 menu=Other
 mime=message/rfc822
-version=7
+priority=
+version=3
 
 [Erlang]
 ext=*.erl
 file=erlang.xml
 menu=Scripts
 mime=
+priority=
 slcomment=%
-version=6
+version=3
 
 [Euphoria]
 ext=*.e;*.ex;*.exw;*.exu
 file=euphoria.xml
 menu=Scripts
 mime=text/x-euphoria
+priority=
 slcomment=--
-version=7
+version=4
 
 [FASTQ]
 ext=*.fastq;*.fq;*.fastq.gz;*.fq.gz
 file=fastq.xml
 menu=Scientific
 mime=text/x-fastq
+priority=
 version=2
 
 [FSharp]
@@ -785,8 +707,9 @@ menu=Sources
 mime=
 mlcommentend=*)
 mlcommentstart=(*
-slcomment=//
-version=10
+priority=10
+slcomment=///
+version=3
 
 [FTL]
 ext=*.ftl
@@ -795,112 +718,62 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<#--
-version=6
-
-[Fish]
-ext=*.fish;fishd.*
-file=fish.xml
-menu=Scripts
-mime=application/x-fish
-slcomment=#
-version=8
-
-[FlatBuffers]
-ext=*.fbs
-file=flatbuffers.xml
-menu=Sources
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=3
-
-[Fluent]
-ext=*.ftl
-file=fluent.xml
-menu=Markup
-mime=text/x-fluent-translation
-slcomment=#
-version=1
+priority=
+version=2
 
 [Fortran]
 ext=*.f;*.F;*.for;*.FOR;*.f90;*.F90;*.fpp;*.FPP;*.f95;*.F95;
 file=fortran.xml
 menu=Sources
 mime=text/x-fortran-src
+priority=9
 slcomment=!
 version=2
-
-[Fortran (Fixed Format)]
-ext=*.f;*.F;*.for;*.FOR;*.fpp;*.FPP;
-file=fortran-fixed.xml
-menu=Sources
-mime=text/x-fortran-src
-slcomment=c
-version=11
-
-[Fortran (Free Format)]
-ext=*.f90;*.F90;*.f95;*.F95;*.f03;*.F03;*.f08;*.F08;
-file=fortran-free.xml
-menu=Sources
-mime=text/x-fortran-src
-slcomment=!
-version=5
 
 [FreeBASIC]
 ext=*.bas;*.bi;*.BAS;*.BI
 file=freebasic.xml
 menu=Sources
 mime=text/x-freebasic
+priority=
 slcomment='
-version=6
+version=2
 
 [G-Code]
-ext=*.ngc;*.gcode
+ext=*.ngc
 file=gcode.xml
 menu=3D
 mime=text/ngc
-slcomment=;
-version=12
+mlcommentend=)
+mlcommentstart=(
+priority=
+version=4
 
 [GAP]
 ext=*.gd;*.gi;*.g
 file=gap.xml
 menu=Scientific
 mime=text/gap
+priority=
 slcomment=#
-version=5
+version=2
 
 [GCCExtensions]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;
 file=gcc.xml
 menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr;text/x-csrc
+priority=5
 slcomment=//
-version=5
-
-[GDB]
-ext=*.gdb
-file=gdb.xml
-menu=Other
-mime=
-slcomment=#
-version=6
+version=1
 
 [GDB Backtrace]
 ext=*.kcrash;*.crash;*.bt
-file=gdb-bt.xml
+file=gdb.xml
 menu=Other
 mime=
-version=3
-
-[GDB Init]
-ext=*.gdbinit
-file=gdbinit.xml
-menu=Other
-mime=
-slcomment=#
-version=3
+priority=
+version=2
 
 [GDL]
 ext=*.gdl;*.vcg;*.GDL;*.VCG
@@ -909,18 +782,20 @@ menu=Scientific
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=6
+version=2
 
 [GLSL]
-ext=*.glsl;*.vert;*.vs;*.frag;*.fs;*.geom;*.gs;*.tcs;*.tes
+ext=*.glsl;*.vert;*.frag;*.geom;*.tcs;*.tes
 file=glsl.xml
 menu=3D
 mime=text/x-glslsrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=11
+version=3
 
 [GNU Assembler]
 ext=*.s;*.S
@@ -929,16 +804,17 @@ menu=Assembler
 mime=text/x-asm
 mlcommentend=*/
 mlcommentstart=/*
-slcomment=#
-version=9
+priority=
+version=3
 
 [GNU Gettext]
 ext=*.po;*.pot
 file=gettext.xml
 menu=Markup
 mime=text/x-gettext-translation
+priority=
 slcomment=#
-version=9
+version=5
 
 [GNU Linker Script]
 ext=*.ld
@@ -947,55 +823,62 @@ menu=Scripts
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=6
+priority=
+version=2
 
 [GNU M4]
 ext=*.m4;
 file=m4.xml
 menu=Sources
 mime=
+priority=
 slcomment=#
-version=5
+version=2
 
 [Git Ignore]
 ext=.gitignore*;
 file=git-ignore.xml
 menu=Configuration
 mime=text/x-git-ignore
+priority=
 slcomment=#
-version=4
+version=2
 
 [Git Rebase]
 ext=git-rebase-todo
 file=git-rebase.xml
 menu=Other
 mime=text/vnd.git.rebase
+priority=
 slcomment=#
-version=4
+version=2
 
 [Gitolite]
 ext=gitolite.conf
 file=gitolite.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=6
+version=2
 
 [GlossTex]
 ext=*.gdf
 file=glosstex.xml
 menu=Markup
 mime=text/x-gdf
+priority=
 slcomment=%
-version=3
+version=1
 
 [Gnuplot]
-ext=*.gnuplot;*.gp;*.gplt;*.plt
+ext=*.gnuplot;*.gp;*.gplt,*.plt
 file=gnuplot.xml
 menu=Scientific
 mime=
+priority=
 slcomment=#
-version=10
+version=3
 
 [Go]
 ext=*.go
@@ -1004,58 +887,48 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=10
-
-[Godot]
-ext=*.gd
-file=gd-script.xml
-menu=Scripts
-mime=
-slcomment=#
-version=3
-
-[GraphQL]
-ext=*.graphql
-file=graphql.xml
-menu=Other
-mime=
-slcomment=#
 version=3
 
 [Groovy]
-ext=*.groovy;*.gradle;*.gvy;Jenkinsfile
+ext=*.groovy
 file=groovy.xml
 menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=11
+version=3
 
 [HTML]
-ext=*.htm;*.html;*.shtml;*.shtm;*.aspx
+ext=*.htm;*.html;*.shtml;*.shtm
 file=html.xml
 menu=Markup
 mime=text/html
 mlcommentend=-->
 mlcommentstart=<!--
-version=15
+priority=10
+version=5
 
 [Haml]
 ext=*.haml
 file=haml.xml
 menu=Markup
 mime=text/x-haml
+priority=
 slcomment=/
-version=14
+version=3
 
 [Hamlet]
 ext=*.hamlet
 file=hamlet.xml
 menu=Markup
 mime=
-version=6
+priority=
+slcomment=#
+version=3
 
 [Haskell]
 ext=*.hs;*.chs;*.hs-boot
@@ -1064,8 +937,9 @@ menu=Sources
 mime=text/x-haskell
 mlcommentend=-}
 mlcommentstart={-
+priority=
 slcomment=--
-version=20
+version=9
 
 [Haxe]
 ext=*.hx;*.Hx;*.hX;*.HX;
@@ -1074,30 +948,34 @@ menu=Sources
 mime=text/x-hxsrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=6
+version=2
 
 [Hunspell Affix File]
 ext=*.aff
 file=hunspell-aff.xml
 menu=Other
 mime=
+priority=-9
 slcomment=#
-version=4
+version=2
 
 [Hunspell Dictionary File]
 ext=*.dic
 file=hunspell-dic.xml
 menu=Other
 mime=
+priority=-9
 slcomment=#
-version=3
+version=1
 
 [Hunspell Thesaurus File]
 ext=*.dat
 file=hunspell-dat.xml
 menu=Other
 mime=
+priority=-9
 slcomment=#
 version=1
 
@@ -1106,6 +984,7 @@ ext=*.idx
 file=hunspell-idx.xml
 menu=Other
 mime=
+priority=-9
 slcomment=#
 version=1
 
@@ -1116,24 +995,26 @@ menu=Sources
 mime=text/x-idl-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=7
+version=2
 
 [ILERPG]
 ext=QRPG*.*;qrpg*.*
 file=ilerpg.xml
 menu=Sources
 mime=text/x-ilerpg-src
-slcomment=*
-version=11
+priority=
+version=3
 
 [INI Files]
-ext=*.ini;*.pls;*.kcfgc;.gitattributes*;.gitconfig*;.gitmodules*;.editorconfig*
+ext=*.ini;*.pls;*.kcfgc
 file=ini.xml
 menu=Configuration
 mime=
+priority=
 slcomment=;
-version=12
+version=2
 
 [ISO C++]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.moc
@@ -1142,57 +1023,44 @@ menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=6
 slcomment=//
-version=28
-
-[Idris]
-ext=*.idr
-file=idris.xml
-menu=Sources
-mime=
-mlcommentend=-}
-mlcommentstart={-
-slcomment=--
-version=7
+version=10
 
 [Inform]
 ext=*.inf;*.h
 file=inform.xml
 menu=Sources
 mime=text/x-inform-src
+priority=
 slcomment=!
-version=5
-
-[InnoSetup]
-ext=*.iss
-file=innosetup.xml
-menu=Other
-mime=
-slcomment=;
-version=3
+version=2
 
 [Intel HEX]
 ext=*.hex;*.ihx
 file=intelhex.xml
 menu=Other
 mime=
-version=2
+priority=
+version=1
 
 [Intel x86 (FASM)]
 ext=*.asm;*.inc;*.fasm
 file=fasm.xml
 menu=Assembler
 mime=
+priority=
 slcomment=;
-version=6
+version=1
 
 [Intel x86 (NASM)]
 ext=*.asm
 file=nasm.xml
 menu=Assembler
 mime=
+priority=
 slcomment=;
-version=8
+version=3
 
 [J]
 ext=*.ijs;*.ijt;*.IJS;*.IJT
@@ -1201,40 +1069,36 @@ menu=Scripts
 mime=text/x-j;text/x-jsrc
 mlcommentend=NB.)
 mlcommentstart=NB.(
+priority=
 slcomment=NB.
-version=5
-
-[JCL]
-ext=*.JCL;*.jcl
-file=jcl.xml
-menu=Scripts
-mime=
-slcomment=//*
-version=5
+version=2
 
 [JSON]
-ext=*.json;.kateproject;.arcconfig;*.geojson;*.gltf;*.theme
+ext=*.json;.kateproject;.arcconfig
 file=json.xml
 menu=Markup
 mime=application/json
-version=7
+priority=
+version=2
 
 [JSP]
 ext=*.jsp;*.JSP
 file=jsp.xml
 menu=Markup
 mime=text/html
-mlcommentend=--%>
-mlcommentstart=<%--
-version=9
+mlcommentend= --%>
+mlcommentstart=<%-- 
+priority=
+version=2
 
 [Jam]
 ext=Jam*;*.jam
 file=jam.xml
 menu=Other
 mime=text/x-jam;text/x-Jamfile;text/x-Jamrules;text/x-Jambase
+priority=
 slcomment=#
-version=13
+version=2
 
 [Java]
 ext=*.java
@@ -1243,36 +1107,20 @@ menu=Sources
 mime=text/x-java
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=11
-
-[Java Properties]
-ext=*.properties
-file=java-properties.xml
-menu=Other
-mime=
-slcomment=#
-version=5
+version=3
 
 [JavaScript]
-ext=*.js;*.mjs;*.cjs;*.kwinscript;*.julius
+ext=*.js;*.kwinscript;*.julius
 file=javascript.xml
 menu=Scripts
 mime=text/x-javascript;application/x-javascript;application/javascript;text/javascript
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=24
-
-[JavaScript React (JSX)]
-ext=*.jsx
-file=javascript-react.xml
-menu=Scripts
-mime=text/jsx;text/x-jsx;application/jsx;application/x-jsx;
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=10
+version=6
 
 [JavaScript/PHP]
 ext=
@@ -1281,6 +1129,7 @@ menu=Other
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
 version=2
 
@@ -1289,48 +1138,54 @@ ext=
 file=javadoc.xml
 menu=Markup
 mime=
-version=6
+priority=
+version=2
 
 [Jira]
 ext=*.jira
 file=jira.xml
 menu=Markup
 mime=
-version=13
+priority=
+version=4
 
 [Julia]
 ext=*.jl
 file=julia.xml
 menu=Sources
 mime=
-mlcommentend==#
-mlcommentstart=#=
+priority=5
 slcomment=#
-version=14
+version=3
 
 [KBasic]
 ext=*.kbasic
 file=kbasic.xml
 menu=Sources
 mime=text/x-kbasic-src
-slcomment='
-version=5
+mlcommentend=*/
+mlcommentstart=/*
+priority=
+slcomment=//
+version=2
 
 [KDev-PG[-Qt] Grammar]
 ext=*.g
 file=grammar.xml
 menu=Sources
 mime=
+priority=
 slcomment=--
-version=4
+version=2
 
 [Kconfig]
-ext=Kconfig*;Config.*
+ext=Kconfig*
 file=kconfig.xml
 menu=Configuration
 mime=
+priority=0
 slcomment=#
-version=12
+version=5
 
 [Kotlin]
 ext=*.kt;*.kts
@@ -1339,16 +1194,17 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=10
+version=2
 
 [LDIF]
 ext=*.ldif
 file=ldif.xml
 menu=Database
 mime=application/directory
-slcomment=#
-version=8
+priority=
+version=2
 
 [LESSCSS]
 ext=*.less
@@ -1357,16 +1213,8 @@ menu=Markup
 mime=text/css
 mlcommentend=*/
 mlcommentstart=/*
-slcomment=//
-version=8
-
-[LLVM]
-ext=*.ll
-file=llvm.xml
-menu=Sources
-mime=
-slcomment=;
-version=4
+priority=
+version=3
 
 [LPC]
 ext=*.c;*.h;*.inc;*.o
@@ -1375,24 +1223,27 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=4
+version=1
 
 [LSL]
 ext=*.lsl
 file=lsl.xml
 menu=Scripts
 mime=text/x-lsl
+priority=
 slcomment=//
-version=7
+version=3
 
 [LaTeX]
-ext=*.tex;*.ltx;*.dtx;*.sty;*.cls;*.bbx;*.cbx;*.lbx;*.tikz;*.pgf
+ext=*.tex;*.ltx;*.dtx;*.sty;*.cls;*.bbx;*.cbx;*.lbx;*.tikz
 file=latex.xml
 menu=Markup
 mime=text/x-tex
+priority=10
 slcomment=%
-version=21
+version=5
 
 [Lex/Flex]
 ext=*.l;*.lex;*.flex
@@ -1401,7 +1252,8 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=7
+priority=
+version=2
 
 [LilyPond]
 ext=*.ly;*.LY;*.ily;*.ILY;*.lyi;*.LYI
@@ -1410,84 +1262,64 @@ menu=Other
 mime=text/x-lilypond
 mlcommentend=%}
 mlcommentstart=%{
+priority=
 slcomment=%
-version=10
+version=4
 
 [Literate Curry]
 ext=*.lcurry
 file=literate-curry.xml
 menu=Sources
 mime=text/x-curry
-mlcommentend=-}
-mlcommentstart={-
-version=6
+priority=
+version=2
 
 [Literate Haskell]
 ext=*.lhs
 file=literate-haskell.xml
 menu=Sources
-mime=text/x-literate-haskell
-mlcommentend=-}
-mlcommentstart={-
-version=9
-
-[Log File (advanced)]
-ext=*.log
-file=logfile-advanced.xml
-menu=Other
-mime=
-version=2
-
-[Log File (simplified)]
-ext=*.log
-file=logfile.xml
-menu=Other
-mime=
-version=2
-
-[Logcat]
-ext=*.logcat
-file=logcat.xml
-menu=Other
-mime=text/x-logcat
-slcomment=#
-version=9
+mime=text/x-haskell
+priority=
+version=4
 
 [Logtalk]
-ext=*.lgt;.logtalk
+ext=*.lgt;*.config
 file=logtalk.xml
 menu=Sources
 mime=text/x-logtalk
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=%
-version=8
+version=2
 
 [Lua]
-ext=*.lua;*.rockspec
+ext=*.lua
 file=lua.xml
 menu=Scripts
 mime=text/x-lua
 mlcommentend=]]
 mlcommentstart=--[[
+priority=
 slcomment=--
-version=18
+version=2
 
 [M3U]
 ext=*.m3u
 file=m3u.xml
 menu=Other
 mime=audio/x-mpegurl
+priority=
 slcomment=#
-version=5
+version=2
 
 [MAB-DB]
 ext=*.mab;*.MAB;*.Mab
 file=mab.xml
 menu=Markup
 mime=text/x-mab
-slcomment=*X 
-version=5
+priority=
+version=2
 
 [MEL]
 ext=*.mel
@@ -1496,32 +1328,27 @@ menu=Scripts
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=6
-
-[MIB]
-ext=*.mib
-file=mib.xml
-menu=Other
-mime=
-slcomment=--
-version=4
+version=3
 
 [MIPS Assembler]
 ext=*.s;
 file=mips.xml
 menu=Assembler
 mime=text/x-mips
+priority=-1
 slcomment=#
-version=6
+version=3
 
 [MS-DOS Batch]
-ext=*.bat;*.cmd
+ext=*.bat
 file=dosbat.xml
 menu=Scripts
 mime=application/x-dos
+priority=
 slcomment=rem 
-version=8
+version=1
 
 [Magma]
 ext=*.m;*.mag
@@ -1530,36 +1357,29 @@ menu=Scientific
 mime=text/x-magma
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=5
+version=2
 
 [Makefile]
 ext=GNUmakefile;Makefile;makefile;GNUmakefile.*;Makefile.*;makefile.*;*.mk
 file=makefile.xml
 menu=Other
 mime=text/x-makefile
+priority=11
 slcomment=#
-version=13
+version=6
 
 [Mako]
 ext=*.mako;*.mak
 file=mako.xml
 menu=Markup
 mime=
-mlcommentend=-->
-mlcommentstart=<!--
-slcomment=#
-version=8
-
-[MapCSS]
-ext=*.mapcss
-file=mapcss.xml
-menu=Markup
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=1
+mlcommentend=</%doc>
+mlcommentstart=<%doc>
+priority=
+slcomment=##
+version=3
 
 [Markdown]
 ext=*.md;*.mmd;*.markdown
@@ -1568,7 +1388,8 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<!--
-version=25
+priority=15
+version=2
 
 [Mason]
 ext=*.html;
@@ -1577,25 +1398,28 @@ menu=Scripts
 mime=
 mlcommentend=<%doc>
 mlcommentstart=<%doc>
+priority=
 slcomment=#
-version=10
+version=2
 
 [Mathematica]
 ext=*.nb
 file=mathematica.xml
 menu=Scientific
-mime=application/mathematica;application/vnd.wolfram.mathematica
+mime=
 mlcommentend=*)
 mlcommentstart=(*
-version=12
+priority=3
+version=9
 
 [Matlab]
 ext=*.m;*.M
 file=matlab.xml
 menu=Scientific
 mime=text/mfile
-slcomment=%
-version=8
+priority=
+slcomment=% 
+version=2
 
 [Maxima]
 ext=*.mac;*.MAC;*.dem;*.DEM
@@ -1604,24 +1428,26 @@ menu=Scientific
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=7
+priority=
+version=3
 
 [MediaWiki]
 ext=*.mediawiki
 file=mediawiki.xml
 menu=Markup
 mime=
-mlcommentend=-->
+mlcommentend=//-->
 mlcommentstart=<!--
-version=13
+priority=
+version=4
 
 [Meson]
 ext=meson.build;meson_options.txt
 file=meson.xml
 menu=Other
 mime=text/x-meson
-slcomment=#
-version=5
+priority=5
+version=2
 
 [Metamath]
 ext=*.mm
@@ -1630,15 +1456,17 @@ menu=Scientific
 mime=
 mlcommentend=$)
 mlcommentstart=$(
-version=5
+priority=
+version=1
 
 [Metapost/Metafont]
 ext=*.mp;*.mps;*.mpost;*.mf
 file=metafont.xml
 menu=Markup
 mime=text/x-metapost
+priority=
 slcomment=%
-version=11
+version=1
 
 [Modelica]
 ext=*.mo
@@ -1647,118 +1475,81 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=9
+version=6
 
 [Modelines]
 ext=
 file=modelines.xml
 menu=Other
 mime=
-version=6
+priority=5
+version=3
 
 [Modula-2]
-ext=*.mod;*.def
+ext=*.mod;*.def;*.mi;*.md
 file=modula-2.xml
 menu=Sources
-mime=text/x-modula2
+mime=text/x-modula-2
 mlcommentend=*)
 mlcommentstart=(*
-version=8
-
-[Modula-2 (ISO only)]
-ext=*.mod;*.def
-file=modula-2-iso-only.xml
-menu=Sources
-mime=text/x-modula2
-mlcommentend=*)
-mlcommentstart=(*
-version=4
-
-[Modula-2 (PIM only)]
-ext=*.mod;*.def
-file=modula-2-pim-only.xml
-menu=Sources
-mime=text/x-modula2
-mlcommentend=*)
-mlcommentstart=(*
-version=4
-
-[Modula-2 (R10 only)]
-ext=*.mod;*.def
-file=modula-2-r10-only.xml
-menu=Sources
-mime=text/x-modula2
-mlcommentend=*)
-mlcommentstart=(*
-slcomment=!
-version=4
-
-[Modula-3]
-ext=*.m3;*.i3;*.ig;*.mg;
-file=modula-3.xml
-menu=Sources
-mime=text/x-modula-3
-mlcommentend=*)
-mlcommentstart=(*
-version=4
+priority=
+version=2
 
 [MonoBasic]
 ext=*.vb
 file=monobasic.xml
 menu=Sources
 mime=
+priority=
 slcomment='
-version=5
+version=3
 
 [Motorola 68k (VASM/Devpac)]
 ext=*.s;*.i;*.S;*.I
 file=asm-m68k.xml
 menu=Assembler
 mime=
-slcomment=;
-version=5
+priority=
+slcomment=*
+version=2
 
 [Motorola DSP56k]
 ext=*.asm;*.inc;*.ASM;*.INC
 file=asm-dsp56k.xml
 menu=Assembler
 mime=
+priority=
 slcomment=;
-version=5
+version=2
 
 [Music Publisher]
 ext=*.mup;*.not
 file=mup.xml
 menu=Other
 mime=text/x-mup;audio/x-mup;application/x-mup;audio/x-notes
+priority=
 slcomment=//
-version=9
-
-[Mustache/Handlebars (HTML)]
-ext=*.mustache;*.handlebars;*.hbs;*.ractive;*.hogan;*.hulk;*.html.mst;*.html.mu;*.html.rac
-file=mustache.xml
-menu=Markup
-mime=
-mlcommentend=--}}
-mlcommentstart={{!--
-version=8
+version=3
 
 [NSIS]
 ext=*.nsi
 file=nsis.xml
 menu=Scripts
 mime=text/x-nsis
+priority=
 slcomment=;
-version=7
+version=3
 
 [Nagios]
 ext=*.cfg
 file=nagios.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=5
+version=2
 
 [Nemerle]
 ext=*.n
@@ -1767,36 +1558,9 @@ menu=Sources
 mime=text/x-nemerle
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=6
-
-[Nim]
-ext=*.nim;*.nims;*.nimble
-file=nim.xml
-menu=Sources
-mime=text/x-nim
-mlcommentend=]#
-mlcommentstart=#[
-slcomment=#
-version=4
-
-[Ninja]
-ext=*.ninja
-file=ninja.xml
-menu=Other
-mime=
-slcomment=#
-version=3
-
-[Nix]
-ext=*.nix
-file=nix.xml
-menu=Scripts
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=#
-version=2
+version=1
 
 [OORS]
 ext=*.oors
@@ -1805,8 +1569,9 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=6
+version=2
 
 [OPAL]
 ext=*.impl;*.sign
@@ -1815,8 +1580,9 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=--
-version=4
+version=2
 
 [Objective Caml]
 ext=*.ml;*.mli
@@ -1825,7 +1591,8 @@ menu=Sources
 mime=text/x-ocaml
 mlcommentend=*)
 mlcommentstart=(*
-version=10
+priority=10
+version=6
 
 [Objective Caml Ocamllex]
 ext=*.mll
@@ -1834,16 +1601,18 @@ menu=Sources
 mime=
 mlcommentend=*)
 mlcommentstart=(*
-version=7
+priority=10
+version=3
 
 [Objective Caml Ocamlyacc]
 ext=*.mly
 file=ocamlyacc.xml
 menu=Sources
 mime=
-mlcommentend=*/
-mlcommentstart=/*
-version=6
+mlcommentend=*)
+mlcommentstart=(*
+priority=10
+version=3
 
 [Objective-C]
 ext=*.m;*.h
@@ -1852,26 +1621,29 @@ menu=Sources
 mime=text/x-objc-src;text/x-c-hdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=7
+version=2
 
 [Objective-C++]
 ext=*.mm;*.M;*.h
 file=objectivecpp.xml
 menu=Sources
-mime=text/x-objc++src;text/x-c-hdr
+mime=text/x-objcpp-src;text/x-c-hdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=11
+version=2
 
 [Octave]
 ext=*.octave;*.m;*.M
 file=octave.xml
 menu=Scientific
 mime=text/octave
+priority=
 slcomment=#
-version=12
+version=2
 
 [OpenCL]
 ext=*.cl
@@ -1880,36 +1652,9 @@ menu=Sources
 mime=text/x-clsrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=9
-
-[OpenSCAD]
-ext=*.scad
-file=openscad.xml
-menu=3D
-mime=text/x-openscad-src
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=6
-
-[Org Mode]
-ext=*.org
-file=orgmode.xml
-menu=Markup
-mime=
-slcomment=#
-version=4
-
-[Overpass QL]
-ext=*.overpassql
-file=overpassql.xml
-menu=Other
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=3
+version=2
 
 [PGN]
 ext=*.pgn;*.PGN
@@ -1918,7 +1663,8 @@ menu=Other
 mime=
 mlcommentend=}
 mlcommentstart={
-version=6
+priority=5
+version=4
 
 [PHP (HTML)]
 ext=*.php;*.php3;*.wml;*.phtml;*.phtm;*.inc
@@ -1927,6 +1673,7 @@ menu=Scripts
 mime=text/x-php4-src;text/x-php3-src;text/vnd.wap.wml;application/x-php
 mlcommentend=-->
 mlcommentstart=<!--
+priority=10
 version=5
 
 [PHP/PHP]
@@ -1936,25 +1683,28 @@ menu=Scripts
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=24
+version=7
 
 [PL/I]
-ext=*.pli;*.pl1
+ext=*.pli
 file=pli.xml
 menu=Sources
-mime=text/x-pli;text/x-pl1src
+mime=text/x-pli
 mlcommentend=*/
 mlcommentstart=/*
-version=8
+priority=8
+version=2
 
 [PLY]
 ext=*.ply
 file=ply.xml
 menu=3D
 mime=
+priority=
 slcomment=comment
-version=4
+version=2
 
 [POV-Ray]
 ext=*.inc;*.pov
@@ -1963,15 +1713,17 @@ menu=3D
 mime=text/x-povray-script;text/x-povray-include
 mlcommentend=*/
 mlcommentstart=/*
+priority=2
 slcomment=//
-version=8
+version=4
 
 [Pango]
 ext=
 file=pango.xml
 menu=Markup
 mime=
-version=7
+priority=10
+version=2
 
 [Pascal]
 ext=*.p;*.pas;*.pp
@@ -1980,24 +1732,27 @@ menu=Sources
 mime=text/x-pascal
 mlcommentend=}
 mlcommentstart={
+priority=8
 slcomment=//
-version=4
+version=2
 
 [Perl]
 ext=*.pl;*.PL;*.pm
 file=perl.xml
 menu=Scripts
 mime=application/x-perl;text/x-perl
+priority=5
 slcomment=#
-version=19
+version=4
 
 [PicAsm]
 ext=*.src;*.SRC;*.asm;*.ASM;*.pic;*.PIC
 file=picsrc.xml
 menu=Assembler
 mime=text/x-PicSrc;text/x-PicHdr
+priority=
 slcomment=;
-version=7
+version=3
 
 [Pig]
 ext=*.pig
@@ -2006,8 +1761,9 @@ menu=Scripts
 mime=application/x-pig;text/x-pig
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=--
-version=10
+version=6
 
 [Pike]
 ext=*.pike
@@ -2016,8 +1772,9 @@ menu=Scripts
 mime=application/x-pike;text/x-pike
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=4
+version=2
 
 [Pony]
 ext=*.pony
@@ -2026,42 +1783,47 @@ menu=Sources
 mime=text/x-pony
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=7
+version=1
 
 [PostScript]
 ext=*.ps;*.ai;*.eps
 file=postscript.xml
 menu=Markup
 mime=application/postscript
+priority=
 slcomment=%
-version=4
+version=2
 
 [PostScript Printer Description]
 ext=*.ppd
 file=ppd.xml
 menu=Markup
 mime=application/vnd.cups-ppd
+priority=
 slcomment=*%
-version=4
+version=2
 
 [PowerShell]
-ext=*.ps1;*.psm1;*.psd1
+ext=*.ps1;*.ps1m;*.ps1d
 file=powershell.xml
 menu=Scripts
 mime=
 mlcommentend=#>
 mlcommentstart=<#
+priority=
 slcomment=#
-version=13
+version=2
 
 [Praat]
 ext=*.Praat;*.praat;*.psc;*.praat-script;*.praatscript;*.proc
 file=praat.xml
 menu=Scripts
 mime=
+priority=
 slcomment=#
-version=6
+version=2
 
 [Prolog]
 ext=*.prolog;*.dcg;*.pro
@@ -2070,8 +1832,9 @@ menu=Sources
 mime=text/x-prolog
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=%
-version=17
+version=5
 
 [Protobuf]
 ext=*.proto
@@ -2080,16 +1843,18 @@ menu=Sources
 mime=text/x-protobuf
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=9
+version=4
 
 [Pug]
 ext=*.pug;*.jade
 file=pug.xml
 menu=Markup
 mime=
+priority=10
 slcomment=//
-version=8
+version=3
 
 [Puppet]
 ext=*.pp
@@ -2098,17 +1863,8 @@ menu=Scripts
 mime=application/x-puppet
 mlcommentend=*/
 mlcommentstart=/*
+priority=10
 slcomment=#
-version=12
-
-[Pure]
-ext=*.pure
-file=pure.xml
-menu=Sources
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
 version=5
 
 [PureBasic]
@@ -2116,34 +1872,27 @@ ext=*.pb;*.pbi
 file=purebasic.xml
 menu=Sources
 mime=text/x-purebasic
+priority=1
 slcomment=;
-version=10
-
-[PureScript]
-ext=*.purs
-file=purescript.xml
-menu=Sources
-mime=
-mlcommentend=-}
-mlcommentstart={-
-slcomment=--
-version=1
+version=6
 
 [Python]
-ext=*.py;*.pyw;*.pyi;SConstruct;SConscript;*.FCMacro
+ext=*.py;*.pyw;SConstruct;SConscript
 file=python.xml
 menu=Scripts
-mime=application/x-python;text/x-python;text/x-python3
+mime=application/x-python;text/x-python
+priority=
 slcomment=#
-version=26
+version=4
 
 [QDoc Configuration]
 ext=*.qdocconf
 file=qdocconf.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=3
+version=1
 
 [QML]
 ext=*.qml;*.qmltypes
@@ -2152,49 +1901,44 @@ menu=Scripts
 mime=text/x-qml;application/x-qml
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=10
+version=4
 
 [QMake]
 ext=*.pro;*.pri;*.prf;
 file=qmake.xml
 menu=Other
 mime=
+priority=2
 slcomment=#
-version=8
+version=5
 
 [Quake Script]
 ext=*.cfg
 file=idconsole.xml
 menu=Scripts
 mime=
+priority=
 slcomment=//
-version=7
+version=2
 
 [R Markdown]
 ext=*.rmd;*.Rmd;*.RMD
 file=rmarkdown.xml
 menu=Markup
 mime=text/x-r-markdown
-mlcommentend=-->
-mlcommentstart=<!--
-version=9
+priority=
+version=2
 
 [R Script]
 ext=*.R;*.r;*.S;*.s;*.q
 file=r.xml
 menu=Scientific
 mime=
+priority=
 slcomment=#
-version=13
-
-[R documentation]
-ext=*.Rd
-file=rdoc.xml
-menu=Markup
-mime=
-slcomment=%
-version=4
+version=7
 
 [RELAX NG]
 ext=*.rng;*.RNG
@@ -2203,103 +1947,78 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<!--
-version=6
-
-[RETRO]
-ext=*.retro
-file=retro.xml
-menu=Sources
-mime=
-version=1
+priority=
+version=2
 
 [REXX]
-ext=*.rex;*.rx;*.rexx
+ext=*.rex
 file=rexx.xml
 menu=Scripts
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=6
+priority=
+version=2
 
 [RPM Spec]
 ext=*.spec
 file=rpmspec.xml
 menu=Other
-mime=text/x-rpm-spec
+mime=
+priority=
 slcomment=#
-version=12
+version=4
 
 [RSI IDL]
 ext=*.pro
 file=rsiidl.xml
 menu=Sources
 mime=text/x-rsiidl-src
+priority=
 slcomment=;
-version=6
-
-[Racket]
-ext=*.rkt;*.scrbl
-file=racket.xml
-menu=Scripts
-mime=
-mlcommentend=|#
-mlcommentstart=#|
-slcomment=;;
 version=2
-
-[Raku]
-ext=*.raku;*.rakumod;*.rakudoc;*.rakutest;*.pl6;*.PL6;*.p6;*.pm6;*.pod6
-file=raku.xml
-menu=Scripts
-mime=
-slcomment=#
-version=8
 
 [RapidQ]
 ext=*.rqb
 file=rapidq.xml
 menu=Sources
 mime=
+priority=
 slcomment='
-version=4
+version=2
 
 [RelaxNG-Compact]
 ext=*.rnc
 file=relaxngcompact.xml
 menu=Markup
 mime=
-slcomment=#
-version=3
-
-[RenPy]
-ext=*.rpy
-file=renpy.xml
-menu=Sources
-mime=text/x-renpy
-slcomment=#
-version=3
+priority=
+version=1
 
 [RenderMan RIB]
 ext=*.rib
 file=rib.xml
 menu=3D
 mime=
+priority=
 slcomment=#
-version=5
+version=3
 
 [Replicode]
 ext=*.replicode
 file=replicode.xml
 menu=Scientific
 mime=
+priority=
 slcomment=;
-version=6
+version=3
 
 [Restructured Text]
 ext=*.rst
 file=restructuredtext.xml
 menu=Markup
 mime=
+priority=
 version=1.0
 
 [Rich Text Format]
@@ -2307,23 +2026,26 @@ ext=*.rtf
 file=rtf.xml
 menu=Markup
 mime=text/rtf;application/rtf
-version=3
+priority=
+version=2
 
 [Roff]
 ext=
 file=roff.xml
 menu=Markup
 mime=
+priority=
 slcomment=.\"
-version=9
+version=2
 
 [Ruby]
 ext=*.rb;*.rjs;*.rxml;*.xml.erb;*.js.erb;*.rake;Rakefile;Gemfile;*.gemspec;Vagrantfile
 file=ruby.xml
 menu=Scripts
 mime=application/x-ruby
+priority=
 slcomment=#
-version=17
+version=5
 
 [Ruby/Rails/RHTML]
 ext=*.rhtml;*.RHTML;*.html.erb
@@ -2332,7 +2054,8 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<!--
-version=14
+priority=
+version=6
 
 [Rust]
 ext=*.rs
@@ -2341,16 +2064,9 @@ menu=Sources
 mime=text/rust
 mlcommentend=*/
 mlcommentstart=/*
+priority=15
 slcomment=//
-version=14
-
-[SASS]
-ext=*.sass
-file=sass.xml
-menu=Markup
-mime=text/css
-slcomment=//
-version=7
+version=4
 
 [SCSS]
 ext=*.scss
@@ -2359,41 +2075,18 @@ menu=Markup
 mime=text/css
 mlcommentend=*/
 mlcommentstart=/*
-slcomment=//
-version=14
-
-[SELinux CIL Policy]
-ext=*.cil
-file=selinux-cil.xml
-menu=Sources
-mime=
-slcomment=;
-version=10
-
-[SELinux File Contexts]
-ext=*.fc;file_contexts;file_contexts_*;file_contexts.local;file_contexts.homedirs;file_contexts.template;homedir_template;property_contexts;service_contexts;hwservice_contexts;initial_sid_contexts;genfs_contexts;fs_use
-file=selinux-fc.xml
-menu=Other
-mime=
-slcomment=#
-version=9
-
-[SELinux Policy]
-ext=*.te;*.if;*.spt;policy.conf;access_vectors;mls;mcs;mls_macros;te_macros;policy_capabilities;seapp_contexts;port_contexts
-file=selinux.xml
-menu=Sources
-mime=
-slcomment=#
-version=9
+priority=10
+version=4
 
 [SGML]
 ext=*.sgml
 file=sgml.xml
 menu=Markup
 mime=text/sgml
-mlcommentend=-->
+mlcommentend=//-->
 mlcommentstart=<!--
-version=5
+priority=
+version=2
 
 [SML]
 ext=*.sml;*.ml
@@ -2402,14 +2095,8 @@ menu=Sources
 mime=
 mlcommentend=*)
 mlcommentstart=(*
-version=6
-
-[SPDX-Comments]
-ext=
-file=spdx-comments.xml
-menu=Other
-mime=
-version=6
+priority=
+version=2
 
 [SQL]
 ext=*.sql;*.SQL;*.ddl;*.DDL
@@ -2418,8 +2105,9 @@ menu=Database
 mime=text/x-sql
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=--
-version=9
+version=3
 
 [SQL (MySQL)]
 ext=*.sql;*.SQL;*.ddl;*.DDL
@@ -2428,8 +2116,9 @@ menu=Database
 mime=text/x-sql
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=--
-version=9
+version=3
 
 [SQL (Oracle)]
 ext=*.sql;*.SQL;*.ddl;*.DDL;*.trg;*.TRG;*.spc;*.SPC;*.bdy;*.DBY
@@ -2438,8 +2127,9 @@ menu=Database
 mime=text/x-sql
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=--
-version=8
+version=4
 
 [SQL (PostgreSQL)]
 ext=*.sql;*.SQL;*.ddl;*.DDL
@@ -2448,14 +2138,16 @@ menu=Database
 mime=text/x-sql
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=--
-version=16
+version=5
 
 [STL]
 ext=*.stl
 file=stl.xml
 menu=3D
 mime=application/sla
+priority=
 version=2
 
 [Sather]
@@ -2463,8 +2155,9 @@ ext=*.sa
 file=sather.xml
 menu=Sources
 mime=text/x-sather-src
+priority=
 slcomment=--
-version=4
+version=2
 
 [Scala]
 ext=*.scala;*.sbt
@@ -2473,26 +2166,29 @@ menu=Sources
 mime=text/x-scala
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=11
+version=4
 
 [Scheme]
-ext=*.scm;*.ss;*.scheme;*.guile;*.chicken;*.meta
+ext=*.scm;*.ss;*.scheme;*.guile
 file=scheme.xml
 menu=Scripts
 mime=text/x-scheme
-mlcommentend=|#
-mlcommentstart=#|
+mlcommentend=!#
+mlcommentstart=#!
+priority=9
 slcomment=;;
-version=12
+version=4
 
 [SiSU]
 ext=*.sst;*.ssm;*.ssi;*._sst;*.-sst;
 file=sisu.xml
 menu=Markup
 mime=
+priority=
 slcomment=%
-version=8
+version=2
 
 [Sieve]
 ext=*.siv;*.sieve
@@ -2501,79 +2197,29 @@ menu=Scripts
 mime=application/sieve
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=#
-version=10
-
-[Smali]
-ext=*.smali
-file=smali.xml
-menu=Sources
-mime=text/x-smali
-slcomment=#
-version=4
-
-[Snort/Suricata]
-ext=*.rules;*.snort;*.suricata
-file=snort_suricata.xml
-menu=Other
-mime=
-slcomment=#
-version=4
-
-[Solidity]
-ext=*.sol
-file=solidity.xml
-menu=Sources
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
 version=6
 
 [Spice]
-ext=*.sp;*.hsp;*.cir
+ext=*.sp;*.hsp
 file=spice.xml
 menu=Hardware
 mime=text/spice
+priority=
 slcomment=*
-version=7
-
-[Stan]
-ext=*.stan;*.stanfunctions
-file=stan.xml
-menu=Scientific
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=5
+version=3
 
 [Stata]
-ext=*.do;*.ado;*.doh;*.DO;*.ADO;*.DOH
+ext=*.do; *.ado; *.doh; *.DO; *.ADO; *.DOH
 file=stata.xml
 menu=Scientific
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=12
-
-[SubRip Subtitles]
-ext=*.srt
-file=subrip-subtitles.xml
-menu=Other
-mime=application/x-subrip
-version=3
-
-[Swift]
-ext=*.swift
-file=swift.xml
-menu=Sources
-mime=
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=1
+version=6
 
 [SystemC]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.moc
@@ -2582,8 +2228,9 @@ menu=Hardware
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
 mlcommentend=*/
 mlcommentstart=/*
+priority=1
 slcomment=//
-version=5
+version=2
 
 [SystemVerilog]
 ext=*.sv;*.svh
@@ -2592,8 +2239,9 @@ menu=Hardware
 mime=text/x-systemverilog-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=11
+version=4
 
 [TADS 3]
 ext=*.t;*.h
@@ -2602,40 +2250,37 @@ menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=0
 slcomment=//
-version=7
+version=3
 
 [TI Basic]
 ext=
 file=tibasic.xml
 menu=Scientific
 mime=
+priority=
 version=2
 
 [TOML]
 ext=*.toml
 file=toml.xml
 menu=Configuration
-mime=text/x-toml;application/toml
+mime=text/x-toml
+priority=
 slcomment=#
-version=11
-
-[TSV]
-ext=*.tsv;*.tab
-file=tsv.xml
-menu=Other
-mime=text/csv
-version=1
+version=5
 
 [TT2]
 ext=*.tt*;
 file=template-toolkit.xml
 menu=Markup
 mime=
-mlcommentend=-->
-mlcommentstart=<!--
+mlcommentend=%]
+mlcommentstart=[%#
+priority=
 slcomment=#
-version=10
+version=2
 
 [TaskJuggler]
 ext=*.tjp;*.tji
@@ -2644,32 +2289,27 @@ menu=Scripts
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=#
-version=7
+version=4
 
 [Tcl/Tk]
 ext=*.tcl;*.tk
 file=tcl.xml
 menu=Scripts
 mime=text/x-tcl
+priority=
 slcomment=#
-version=8
+version=3
 
 [Tcsh]
 ext=*.csh;*.tcsh;csh.cshrc;csh.login;.tcshrc;.cshrc;.login
 file=tcsh.xml
 menu=Scripts
 mime=application/x-csh
+priority=
 slcomment=#
-version=10
-
-[Terraform]
-ext=*.tf;*.tfvars
-file=terraform.xml
-menu=Sources
-mime=text/x-terraform
-slcomment=#
-version=3
+version=1
 
 [Texinfo]
 ext=*.texi
@@ -2677,9 +2317,10 @@ file=texinfo.xml
 menu=Markup
 mime=application/x-texinfo
 mlcommentend=@end ignore
-mlcommentstart=@ignore 
-slcomment=@c 
-version=3
+mlcommentstart=@ignore
+priority=
+slcomment=@comment 
+version=1
 
 [Textile]
 ext=*.textile
@@ -2688,7 +2329,8 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<!--
-version=6
+priority=15
+version=3
 
 [Tiger]
 ext=*.tig
@@ -2697,42 +2339,17 @@ menu=Other
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=3
-
-[Todo.txt]
-ext=todo.txt
-file=todo.xml
-menu=Other
-mime=
-version=2
+priority=
+version=1
 
 [Troff Mandoc]
 ext=*.1;*.2;*.3;*.4;*.5;*.6;*.7;*.8;*.1m;*.3x;*.tmac
 file=mandoc.xml
 menu=Markup
 mime=
+priority=
 slcomment=.\"
-version=2
-
-[TypeScript]
-ext=*.ts;*.mts;*.cts
-file=typescript.xml
-menu=Scripts
-mime=text/typescript;application/typescript;text/x-typescript;application/x-typescript
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=16
-
-[TypeScript React (TSX)]
-ext=*.tsx
-file=typescript-react.xml
-menu=Scripts
-mime=text/tsx;text/x-tsx;application/tsx;application/x-tsx;
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=11
+version=1
 
 [UnrealScript]
 ext=*.uc
@@ -2741,16 +2358,7 @@ menu=Scripts
 mime=text/x-uscript
 mlcommentend=*/
 mlcommentstart=/*
-slcomment=//
-version=6
-
-[V]
-ext=*.v;*.vh;*.vsh
-file=v.xml
-menu=Sources
-mime=text/x-vlang
-mlcommentend=*/
-mlcommentstart=/*
+priority=
 slcomment=//
 version=1
 
@@ -2759,16 +2367,18 @@ ext=*.vhdl;*.vhd
 file=vhdl.xml
 menu=Hardware
 mime=text/x-vhdl
+priority=
 slcomment=--
-version=16
+version=3
 
 [VRML]
 ext=*.wrl
 file=vrml.xml
 menu=3D
 mime=model/vrml
+priority=
 slcomment=#
-version=7
+version=4
 
 [Vala]
 ext=*.vala
@@ -2777,22 +2387,34 @@ menu=Sources
 mime=text/x-vala
 mlcommentend=*/
 mlcommentstart=/*
+priority=15
 slcomment=//
-version=10
+version=3
 
 [Valgrind Suppression]
 ext=*.supp;
 file=valgrind-suppression.xml
 menu=Other
 mime=
+priority=
 slcomment=#
-version=4
+version=2
+
+[Varnish 3 module spec file]
+ext=*.vcc;
+file=varnishcc.xml
+menu=Sources
+mime=
+priority=3
+slcomment=#
+version=1
 
 [Varnish 4 Configuration Language]
 ext=*.vcl;
 file=varnish4.xml
 menu=Configuration
 mime=
+priority=4
 slcomment=#
 version=2
 
@@ -2801,6 +2423,7 @@ ext=*.vtc;
 file=varnishtest4.xml
 menu=Configuration
 mime=
+priority=4
 slcomment=#
 version=1
 
@@ -2809,34 +2432,27 @@ ext=*.vcc;
 file=varnishcc4.xml
 menu=Sources
 mime=
+priority=4
 slcomment=#
 version=1
 
 [Varnish Configuration Language]
-ext=*.vcl
+ext=*.vcl;
 file=varnish.xml
 menu=Configuration
 mime=
-mlcommentend=*/
-mlcommentstart=/*
+priority=
 slcomment=#
-version=12
+version=2
 
 [Varnish Test Case language]
-ext=*.vtc
+ext=*.vtc;
 file=varnishtest.xml
 menu=Configuration
 mime=
+priority=3
 slcomment=#
-version=14
-
-[Varnish module spec file]
-ext=*.vcc
-file=varnishcc.xml
-menu=Sources
-mime=
-slcomment=#
-version=6
+version=1
 
 [Velocity]
 ext=*.vm;
@@ -2845,8 +2461,9 @@ menu=Scripts
 mime=text/x-velocity-src;text/x-vm-src
 mlcommentend=*#
 mlcommentstart=#*
+priority=
 slcomment=##
-version=5
+version=2
 
 [Vera]
 ext=*.vr;*.vri;*.vrh
@@ -2855,8 +2472,9 @@ menu=Hardware
 mime=text/x-vera-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=10
+version=4
 
 [Verilog]
 ext=*.v;*.V;*.vl
@@ -2865,30 +2483,25 @@ menu=Hardware
 mime=text/x-verilog-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=8
+version=2
 
 [WINE Config]
 ext=*.reg
 file=winehq.xml
 menu=Configuration
 mime=
-slcomment=;
-version=8
+priority=
+version=3
 
 [Wavefront OBJ]
 ext=*.obj
 file=wavefront-obj.xml
 menu=3D
 mime=
+priority=
 slcomment=#
-version=4
-
-[Wayland Trace]
-ext=
-file=wayland-trace.xml
-menu=Other
-mime=
 version=2
 
 [Wesnoth Markup Language]
@@ -2896,17 +2509,19 @@ ext=*.cfg;*.pbl;*.CFG;*.PBL
 file=wml.xml
 menu=Markup
 mime=
+priority=
 slcomment=#
-version=8
+version=1
 
 [XML]
-ext=*.page;*.docbook;*.xml;*.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd
+ext=*.docbook;*.xml;*.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel
 file=xml.xml
 menu=Markup
-mime=text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml
+mime=text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml
 mlcommentend=-->
 mlcommentstart=<!--
-version=19
+priority=
+version=6
 
 [XML (Debug)]
 ext=
@@ -2915,32 +2530,37 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<!--
-version=13
+priority=
+version=3
 
 [XUL]
 ext=*.xul;*.xbl
 file=xul.xml
 menu=Markup
 mime=text/xul
-mlcommentend=-->
-mlcommentstart=<!--
-version=10
+mlcommentend=*/
+mlcommentstart=/*
+priority=
+slcomment=//
+version=2
 
 [Xonotic Script]
 ext=*.cfg
 file=xonotic-console.xml
 menu=Scripts
 mime=
+priority=
 slcomment=//
-version=7
+version=1
 
 [YAML]
 ext=*.yaml;*.yml
 file=yaml.xml
 menu=Markup
 mime=text/yaml
+priority=
 slcomment=#
-version=11
+version=3
 
 [YANG]
 ext=*.yang
@@ -2949,36 +2569,19 @@ menu=Markup
 mime=
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=3
+version=1
 
-[YARA]
-ext=*.yar;*.yara
-file=yara.xml
-menu=Other
+[Yacc/Bison]
+ext=*.y;*.yy
+file=yacc.xml
+menu=Sources
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-slcomment=//
-version=5
-
-[Yacc/Bison]
-ext=*.y;*.yy;*.ypp;*.y++
-file=yacc.xml
-menu=Sources
-mime=text/x-yacc;text/x-bison
-mlcommentend=*/
-mlcommentstart=/*
-slcomment=//
-version=9
-
-[Zig]
-ext=*.zig
-file=zig.xml
-menu=Sources
-mime=text/x-zig
-slcomment=//
-version=2
+priority=
+version=3
 
 [Zonnon]
 ext=*.znn
@@ -2987,15 +2590,17 @@ menu=Sources
 mime=text/x-zonnon
 mlcommentend=*)
 mlcommentstart=(*
-version=4
+priority=
+version=2
 
 [Zsh]
 ext=*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile
 file=zsh.xml
 menu=Scripts
 mime=application/x-shellscript
+priority=
 slcomment=#
-version=31
+version=2
 
 [dot]
 ext=*.dot
@@ -3004,8 +2609,9 @@ menu=Scientific
 mime=text/x-dot
 mlcommentend=*/
 mlcommentstart=/*
+priority=0
 slcomment=//
-version=5
+version=2
 
 [ferite]
 ext=*.fe;*.feh
@@ -3014,32 +2620,38 @@ menu=Scripts
 mime=text/x-ferite-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=7
+version=2
 
 [fstab]
 ext=fstab;mtab
 file=fstab.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=5
+version=2
 
 [k]
 ext=*.k
 file=k.xml
 menu=Scripts
 mime=
+mlcommentend=\
+mlcommentstart=/
+priority=
 slcomment=/
-version=6
+version=3
 
 [kdesrc-buildrc]
 ext=.kdesrc-buildrc;kdesrc-buildrc
 file=kdesrc-buildrc.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=3
+version=1
 
 [mergetag text]
 ext=*.mtt;
@@ -3048,7 +2660,8 @@ menu=Configuration
 mime=
 mlcommentend=}
 mlcommentstart=!{
-version=5
+priority=
+version=2
 
 [nesC]
 ext=*.nc
@@ -3057,25 +2670,17 @@ menu=Sources
 mime=text/x-ncsrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=7
-
-[nginx Configuration]
-ext=nginx.conf;*.nginx
-file=nginx.xml
-menu=Configuration
-mime=
-slcomment=#
-version=1
+version=2
 
 [noweb]
 ext=*.w;*.nw
 file=noweb.xml
 menu=Sources
 mime=
-mlcommentend=-->
-mlcommentstart=<!--
-version=5
+priority=
+version=2
 
 [progress]
 ext=*.p;*.w;*.i;*.cls;
@@ -3084,61 +2689,61 @@ menu=Database
 mime=
 mlcommentend=*/
 mlcommentstart=/*
-version=7
+priority=
+version=3
 
 [q]
 ext=*.q
 file=q.xml
 menu=Scripts
 mime=
+mlcommentend=\
+mlcommentstart=/
+priority=
 slcomment=/
-version=4
+version=3
 
 [reStructuredText]
 ext=*.rst
 file=rest.xml
 menu=Markup
 mime=text/x-rst
+priority=
 slcomment=..
-version=9
+version=3
 
 [scilab]
 ext=*.sci;*.sce
 file=sci.xml
 menu=Scientific
 mime=text/x-sci
+priority=
 slcomment=//
-version=6
+version=3
 
 [sed]
 ext=*.sed
 file=sed.xml
 menu=Scripts
 mime=text/x-sed
+priority=
 slcomment=#
-version=8
-
-[systemd unit]
-ext=*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer
-file=systemd-unit.xml
-menu=Configuration
-mime=text/x-systemd-unit
-slcomment=#
-version=12
+version=2
 
 [txt2tags]
 ext=*.t2t
 file=txt2tags.xml
 menu=Markup
 mime=text/txt2tags
-slcomment=%
-version=9
+priority=
+version=3
 
 [vCard, vCalendar, iCalendar]
 ext=*.iCal;*.iCalendar;.ics;*.ifb;*.iFBf;*.vcal;*.vcalendar;*.vcard;*.vcf;
 file=vcard.xml
 menu=Markup
 mime=text/calendar;text/vcard
+priority=
 version=2
 
 [x.org Configuration]
@@ -3146,8 +2751,9 @@ ext=xorg.conf
 file=xorg.xml
 menu=Configuration
 mime=
+priority=
 slcomment=#
-version=4
+version=2
 
 [xHarbour]
 ext=*.prg;*.PRG;*.ch
@@ -3156,8 +2762,9 @@ menu=Sources
 mime=text/x-xharbour-src
 mlcommentend=*/
 mlcommentstart=/*
+priority=5
 slcomment=//
-version=6
+version=2
 
 [xslt]
 ext=*.xsl;*.xslt
@@ -3166,7 +2773,8 @@ menu=Markup
 mime=
 mlcommentend=-->
 mlcommentstart=<!--
-version=10
+priority=
+version=4
 
 [yacas]
 ext=*.ys
@@ -3175,6 +2783,7 @@ menu=Scientific
 mime=text/x-yacassrc
 mlcommentend=*/
 mlcommentstart=/*
+priority=
 slcomment=//
-version=5
+version=2
 

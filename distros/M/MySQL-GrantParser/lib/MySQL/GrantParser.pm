@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_005;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 use DBI;
 use Carp;
@@ -145,7 +145,6 @@ sub parse_stmts {
             while ($stmt =~ s/\A(MAX_\w+ \d+)\s*//g) {
                 push @with, $1;
                 $parsed->{object} ||= '*.*';
-                $parsed->{privs} = ['USAGE'] unless @{ $parsed->{privs} };
             }
             $parsed->{with} = join ' ', @with;
         }
@@ -179,7 +178,24 @@ sub pack_grants {
                 },
             };
         }
-        $packed->{$user_host}{objects}{$object}  = $grant if $object;
+
+        if ($object) {
+            if (exists $packed->{$user_host}{objects}{$object}) {
+                if (@{ $grant->{privs} }) {
+                    push @{$packed->{$user_host}{objects}{$object}{privs}}, @{ $grant->{privs} };
+                }
+                if ($grant->{with}) {
+                    if ($packed->{$user_host}{objects}{$object}{with}) {
+                        $packed->{$user_host}{objects}{$object}{with} .= ' ' . $grant->{with};
+                    } else {
+                        $packed->{$user_host}{objects}{$object}{with} = $grant->{with};
+                    }
+                }
+            } else {
+                $packed->{$user_host}{objects}{$object}  = $grant;
+            }
+        }
+
         $packed->{$user_host}{options}{required} = $required if $required;
 
         if ($identified) {

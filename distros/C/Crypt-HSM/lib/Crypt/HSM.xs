@@ -1472,10 +1472,7 @@ static SV* S_trimmed_value(pTHX_ const CK_BYTE* ptr, size_t max) {
 #define trimmed_value(ptr, max) S_trimmed_value(aTHX_ ptr, max)
 
 static SV* S_version_to_sv(pTHX_ CK_VERSION* version) {
-	SV* string = newSVpvf("%d.%02d", version->major, version->minor);
-	SV* result = new_version(string);
-	SvREFCNT_dec(string);
-	return result;
+	return newSVpvf("%d.%02d", version->major, version->minor);
 }
 #define version_to_sv(version) S_version_to_sv(aTHX_ version)
 

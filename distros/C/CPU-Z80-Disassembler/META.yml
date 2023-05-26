@@ -1,14 +1,14 @@
 ---
 abstract: 'Disassemble the flow of a Z80 program'
 author:
-  - 'Paulo Custodio <pscust@cpan.org'
+  - 'Paulo Custodio <pscust@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -23,11 +23,14 @@ requires:
   CPU::Z80::Assembler: '2.18'
   Class::Accessor: '0.51'
   File::Slurp: '9999.26'
-  Path::Tiny: '0.108'
+  Path::Tiny: '0.122'
   Test::More: '1.302162'
   Test::Output: '1.031'
   Tie::File: '1'
-  perl: '5.01'
-resources: {}
-version: '0.07'
+  perl: '5.012'
+resources:
+  repository: https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler.git
+version: '0.09'
+x_bugtracker:
+  web: https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

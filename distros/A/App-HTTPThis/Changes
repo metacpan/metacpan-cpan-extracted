@@ -1,5 +1,11 @@
 # Changes for App-HTTPThis
 
+0.006 Thu May 25 17:35:00 UTC 2023
+     * Add bugtracker URL
+
+0.005 Thu May 25 17:05:00 UTC 2023
+     * Various admin fixes
+
 0.004 Mon May 15 16:42:00 UTC 2023
      * Fix prereqs
 

@@ -1,5 +1,10 @@
 Changes file for Log::Log4perl::Layout::JSON
 
+0.60  2023-05-16
+  - Fix attempted use of non-hash references as hash references when using
+    complex fields [github #10]
+  - Replace potentially unsave usages of each %hash with for loops
+
 0.59  2021-09-20
   - Fix possible "uninitialized" warning
   - Add "maxkb.$field" option to truncate specific fields at specified maximum

@@ -3,7 +3,7 @@
 This perl module helps you write modules which export things.
 It's main feature is that the modules based on this design can
 be extended and combined with eachother in ways not possible
-with other exporters.  It is also offers a rich feature set,
+with other exporters.  It also offers a rich feature set,
 efficient operation, and no non-core dependencies.
 
 You can install the latest stable release of this module from CPAN:

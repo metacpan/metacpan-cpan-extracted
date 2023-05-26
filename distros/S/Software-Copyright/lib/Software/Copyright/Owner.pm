@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Owner;
-$Software::Copyright::Owner::VERSION = '0.007';
+$Software::Copyright::Owner::VERSION = '0.009';
 use warnings;
 use 5.20.0;
 use utf8;
@@ -68,7 +68,7 @@ sub BUILD ($self, $args) {
 }
 
 sub identifier ($self) {
-    return $self->name // $self->record ;
+    return $self->name // $self->record // '';
 }
 
 sub stringify ($self, $=1, $=1) {
@@ -97,7 +97,7 @@ Software::Copyright::Owner - Copyright owner class
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 

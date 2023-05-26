@@ -1,0 +1,131 @@
+NAME
+    WQS::SPARQL - Simple SPARQL query for Wikidata Query Service.
+
+SYNOPSIS
+     use WQS::SPARQL;
+
+     my $obj = WQS::SPARQL->new;
+     my $ret_hr = $obj->query($sparql);
+     my $count = $obj->query_count($sparql_count);
+
+METHODS
+  "new"
+     my $obj = WQS::SPARQL->new;
+
+    Constructor.
+
+    Returns instance of class.
+
+  "query"
+     my $ret_hr = $obj->query($sparql);
+
+    Do SPARQL query and returns result.
+
+    Returns reference to hash with result.
+
+  "query_count"
+     my $count = $obj->query_count($sparql_count);
+
+    Get count value for $sparql_count SPARQL query.
+
+    Returns number.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             Parameter 'lwp_user_agent' must be a 'LWP::UserAgent' instance.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use WQS::SPARQL;
+     use WQS::SPARQL::Query::Count;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 ccnb\n";
+             exit 1;
+     }
+     my $ccnb = $ARGV[0];
+
+     my $q = WQS::SPARQL->new;
+     my $sparql = WQS::SPARQL::Query::Count->new->count_simple('P3184',
+             $ccnb);
+     my $ret_hr = $q->query($sparql);
+
+     # Dump structure to output.
+     p $ret_hr;
+ 
+     # Output for cnb002826100:
+     # \ {
+     #     head      {
+     #         vars   [
+     #             [0] "count"
+     #         ]
+     #     },
+     #     results   {
+     #         bindings   [
+     #             [0] {
+     #                 count   {
+     #                     datatype   "http://www.w3.org/2001/XMLSchema#integer",
+     #                     type       "literal",
+     #                     value      1
+     #                 }
+     #             }
+     #         ]
+     #     }
+     # }
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use WQS::SPARQL;
+     use WQS::SPARQL::Query::Count;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 ccnb\n";
+             exit 1;
+     }
+     my $ccnb = $ARGV[0];
+
+     my $q = WQS::SPARQL->new;
+     my $sparql = WQS::SPARQL::Query::Count->new->count_simple('P3184',
+             $ccnb);
+     my $ret = $q->query_count($sparql);
+
+     # Print count.
+     print "Count: $ret\n";
+ 
+     # Output for 'cnb002826100':
+     # Count: 1
+
+     # Output for 'bad':
+     # Count: 0
+
+DEPENDENCIES
+    Class::Utils, Error::Pure. HTTP::Request, JSON::XS, LWP::UserAgent, URI,
+    URI::QueryParam.
+
+SEE ALSO
+    WQS::SPARQL::Query
+        Usefull Wikdata Query Service SPARQL queries.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/WQS-SPARQL>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020-2023
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -18,6 +18,8 @@
 #include "ppport.h"
 
 #include "thx_member.h"
+#include "transform.h"
+#include "pb/decoder.h"
 
 #include <list>
 #include <vector>
@@ -28,10 +30,17 @@ class Dynamic;
 class MappingOptions;
 class MapperField;
 class WarnContext;
-class ServiceDef;
 
 class Mapper : public Refcounted {
 public:
+    enum FieldTarget {
+        TARGET_MAP_KEY          = 1,
+        TARGET_MAP_VALUE        = 2,
+        TARGET_ARRAY_ITEM       = 3,
+        TARGET_HASH_ITEM        = 4,
+        TARGET_FIELDTABLE_ITEM  = 5,
+    };
+
     struct Field {
         const upb::FieldDef *field_def;
         struct {
@@ -54,9 +63,9 @@ public:
         U32 name_hash;
         bool has_default;
         bool is_map;
-        bool is_key;
-        bool is_value;
+        FieldTarget field_target;
         const Mapper *mapper; // for Message/Group fields
+        gpd::transform::DecoderTransform *decoder_transform;
         STD_TR1::unordered_set<int32_t> enum_values;
         int oneof_index;
         union {
@@ -75,34 +84,62 @@ public:
         std::string full_name() const;
         upb::FieldDef::Type map_value_type() const;
         const STD_TR1::unordered_set<int32_t> &map_enum_values() const;
+
+        bool is_map_key() const { return field_target == TARGET_MAP_KEY; }
+        bool is_map_value() const { return field_target == TARGET_MAP_VALUE; }
+    };
+
+    struct MapKey {
+        SV *key_sv;
+        const char *key_buffer;
+        size_t key_len;
+
+        MapKey(SV * _key_sv) : key_sv(_key_sv), key_buffer(NULL) { }
+
+        void set_buffer(const char *_key_buffer, size_t _key_len) {
+            key_buffer = _key_buffer;
+            key_len = _key_len;
+        }
     };
 
     struct DecoderHandlers {
         DECL_THX_MEMBER;
+        SV *target_ref;
         std::vector<SV *> items;
+        std::vector<MapKey> map_keys;
         std::vector<const Mapper *> mappers;
         std::vector<std::vector<bool> > seen_fields;
         std::vector<std::vector<int32_t> > seen_oneof;
+        gpd::transform::DecoderTransformQueue pending_transforms;
+        gpd::transform::DecoderTransform *decoder_transform;
+        bool transform_fieldtable;
         std::string error;
         SV *string;
+        bool track_seen_fields;
+        std::vector<gpd::transform::Fieldtable::Entry> fieldtable_entries;
 
         DecoderHandlers(pTHX_ const Mapper *mapper);
+        ~DecoderHandlers();
 
         void prepare(HV *target);
-        SV *get_target();
-        void clear();
+        void finish();
+        SV *get_and_mortalize_target();
+        static void static_clear(DecoderHandlers *cxt);
 
         static bool on_end_message(DecoderHandlers *cxt, upb::Status *status);
         static DecoderHandlers *on_start_string(DecoderHandlers *cxt, const int *field_index, size_t size_hint);
-        static size_t on_string(DecoderHandlers *cxt, const int *field_index, const char *buf, size_t len);
+        static size_t on_append_string(DecoderHandlers *cxt, const int *field_index, const char *buf, size_t len);
         static bool on_end_string(DecoderHandlers *cxt, const int *field_index);
+        static void on_string(DecoderHandlers *cxt, const int *field_index, const char *buf, size_t len, bool is_utf8);
         static DecoderHandlers *on_start_sequence(DecoderHandlers *cxt, const int *field_index);
+        static size_t on_string_key(DecoderHandlers *cxt, const int *field_index, const char *buf, size_t len);
         static bool on_end_sequence(DecoderHandlers *cxt, const int *field_index);
         static DecoderHandlers *on_start_map(DecoderHandlers *cxt, const int *field_index);
         static bool on_end_map(DecoderHandlers *cxt, const int *field_index);
         static DecoderHandlers *on_start_sub_message(DecoderHandlers *cxt, const int *field_index);
         static bool on_end_sub_message(DecoderHandlers *cxt, const int *field_index);
         static bool on_end_map_entry(DecoderHandlers *cxt, const int *field_index);
+        static bool on_end_string_map_entry(DecoderHandlers *cxt, const int *field_index);
 
         template<class T>
         static bool on_nv(DecoderHandlers *cxt, const int *field_index, T val);
@@ -119,14 +156,32 @@ public:
 
         static bool on_perl_bool(DecoderHandlers *cxt, const int *field_index, bool val);
         static bool on_numeric_bool(DecoderHandlers *cxt, const int *field_index, bool val);
+        static bool on_json_bool(DecoderHandlers *cxt, const int *field_index, bool val);
+
+        void push_mapper(const Mapper *mapper);
+        void pop_mapper();
 
         bool apply_defaults_and_check();
         SV *get_target(const int *field_index);
-        void mark_seen(const int *field_index);
+        SV *get_hash_item_target(const int *field_index);
+        void mark_seen(const int *field_index) {
+            if (track_seen_fields)
+                seen_fields.back()[*field_index] = true;
+        }
+
+        void maybe_add_transform(SV *target, const gpd::transform::DecoderTransform *message_transform, const gpd::transform::DecoderTransform *field_transform) {
+            if (message_transform || field_transform)
+                pending_transforms.add_transform(target, message_transform, field_transform);
+        }
+        void add_transform_fieldtable(SV *target, const gpd::transform::DecoderTransform *message_transform, const gpd::transform::DecoderTransform *field_transform);
+        void finish_add_transform_fieldtable();
+        void apply_transforms() {
+            pending_transforms.apply_transforms();
+        }
     };
 
 public:
-    Mapper(pTHX_ Dynamic *registry, const upb::MessageDef *message_def, HV *stash, const MappingOptions &options);
+    Mapper(pTHX_ Dynamic *registry, const upb::MessageDef *message_def, const gpd::pb::Descriptor *gpd_descriptor, HV *stash, const MappingOptions &options);
     ~Mapper();
 
     const char *full_name() const;
@@ -134,9 +189,11 @@ public:
 
     void resolve_mappers();
     void create_encoder_decoder();
+    void set_decoder_options(HV *options);
 
     SV *encode(SV *ref);
-    SV *decode(const char *buffer, STRLEN bufsize);
+    SV *decode_upb(const char *buffer, STRLEN bufsize);
+    SV *decode_bbpb(const char *buffer, STRLEN bufsize);
     SV *encode_json(SV *ref);
     SV *decode_json(const char *buffer, STRLEN bufsize);
     bool check(SV *ref);
@@ -151,10 +208,13 @@ public:
     SV *message_descriptor() const;
     SV *make_object(SV *data) const;
     bool get_decode_blessed() const;
+    bool get_track_seen_fields() const;
 
     void set_bool(SV *target, bool value) const;
 
 private:
+    static bool run_bbpb_decoder(Mapper *root_mapper, const char *buffer, STRLEN bufsize);
+
     bool encode_value(upb::Sink *sink, upb::Status *status, SV *ref) const;
     bool encode_field(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
     bool encode_field_nodefaults(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
@@ -173,9 +233,52 @@ private:
     bool check_from_message_array(upb::Status *status, const Mapper::Field &fd, AV *source) const;
     bool check_from_enum_array(upb::Status *status, const Mapper::Field &fd, AV *source) const;
 
+    void apply_default(const Field &field, SV *target) const;
+    void apply_map_value_default(SV *target) const;
+
+    void set_json_bool(SV *target, bool value) const;
+
+    struct FieldData {
+        enum RepeatedType {
+            SCALAR_FIELD       = 0,
+            REPEATED_FIELD     = 1,
+            MAP_FIELD          = 2,
+        };
+
+        enum Action {
+            STORE_FLOAT                 = 1,
+            STORE_DOUBLE                = 2,
+            STORE_STRING                = 3,
+            STORE_MESSAGE               = 4,
+            STORE_INT32                 = 5,
+            STORE_INT64                 = 6,
+            STORE_UINT32                = 7,
+            STORE_UINT64                = 8,
+            STORE_ZIGZAG                = 9,
+            STORE_PERL_BOOL             = 10,
+            STORE_ENUM                  = 11,
+            STORE_NUMERIC_BOOL          = 12,
+            STORE_MAP_MESSAGE           = 13,
+            STORE_BIG_INT64             = 14,
+            STORE_BIG_UINT64            = 15,
+            STORE_BIG_ZIGZAG            = 16,
+            STORE_STRING_MAP_MESSAGE    = 17,
+            STORE_STRING_KEY            = 18,
+            STORE_BYTES                 = 19,
+            STORE_JSON_BOOL             = 20,
+        };
+
+        int index;
+        RepeatedType repeated_type;
+        Action action;
+    };
+    typedef gpd::pb::DecoderFieldData<FieldData>::Entry FieldDataEntry;
+
     DECL_THX_MEMBER;
     Dynamic *registry;
     const upb::MessageDef *message_def;
+    const gpd::pb::Descriptor *gpd_descriptor;
+    int oneof_count; // cached here for performance
     HV *stash;
     upb::reffed_ptr<const upb::Handlers> pb_encoder_handlers, json_encoder_handlers;
     upb::reffed_ptr<upb::Handlers> decoder_handlers;
@@ -186,10 +289,13 @@ private:
     STD_TR1::unordered_map<std::string, Field *> field_map;
     upb::Status status;
     DecoderHandlers decoder_callbacks;
+    gpd::pb::DecoderFieldData<FieldData> decoder_field_data;
     upb::Sink encoder_sink, decoder_sink;
     std::string output_buffer;
     upb::StringSink string_sink;
-    bool check_required_fields, decode_explicit_defaults, encode_defaults, check_enum_values, decode_blessed, fail_ref_coercion, numeric_bool;
+    bool check_required_fields, decode_explicit_defaults, encode_defaults, check_enum_values, decode_blessed, fail_ref_coercion;
+    int boolean_style;
+    GV *json_false, *json_true;
     WarnContext *warn_context;
 };
 
@@ -245,33 +351,6 @@ private:
 
     const Mapper::Field *field;
     const Mapper *mapper;
-};
-
-class EnumMapper : public Refcounted {
-public:
-    EnumMapper(pTHX_ Dynamic *registry, const upb::EnumDef *enum_def);
-    ~EnumMapper();
-
-    SV *enum_descriptor() const;
-
-private:
-    DECL_THX_MEMBER;
-    Dynamic *registry;
-    const upb::EnumDef *enum_def;
-};
-
-// for introspection only
-class ServiceMapper : public Refcounted {
-public:
-    ServiceMapper(pTHX_ Dynamic *registry, const gpd::ServiceDef *service_def);
-    ~ServiceMapper();
-
-    SV *service_descriptor() const;
-
-private:
-    DECL_THX_MEMBER;
-    Dynamic *registry;
-    const gpd::ServiceDef *service_def;
 };
 
 class MethodMapper : public Refcounted {

@@ -1,14 +1,21 @@
-0.030   2019-02-08 (PERLANCAR)
+0.031   2023-03-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add 'ordered' configuration like in DZP:InsertExecsList.
+
+        - Sort list.
+
+
+0.030   2019-02-08  Released-By: PERLANCAR
 
 	- [bugfix] Need to work around FileFinderUser to also list .pod's.
 
 
-0.02    2016-03-25 (PERLANCAR)
+0.02    2016-03-25  Released-By: PERLANCAR
 
 	- Allow excluding/including only certain modules (using -Mod Mod
 	  -/RE/ /RE/ syntax).
 
 
-0.01    2015-03-21 (PERLANCAR)
+0.01    2015-03-21  Released-By: PERLANCAR
 
          - First release.

@@ -24,7 +24,7 @@ use Config;
 use Getopt::ArgvFile default=>1;
 use Getopt::Long qw / GetOptionsFromArray :config pass_through /;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 use constant CASE_INSENSITIVE_OS => ($^O eq 'MSWin32');
 
@@ -140,17 +140,23 @@ sub get_autolink_list {
         #  blank entries
         #  and no longer extant folders 
         my $system_root = $ENV{SystemRoot} || $ENV{WINDIR};
-        @system_paths = grep {$_ and $_ =~ m|^\Q$system_root\E|i} @exe_path;
-        @exe_path     = grep {$_ and (-e $_) and $_ !~ m|^\Q$system_root\E|i} @exe_path;
+        @system_paths
+          = map {path($_)->stringify}  #  otherwise we hit issues on SP5.36
+            grep {$_ and $_ =~ m|^\Q$system_root\E|i}
+            @exe_path;
+        @exe_path
+          = map {path($_)->stringify}
+            grep {$_ and (-e $_) and $_ !~ m|^\Q$system_root\E|i}
+            @exe_path;
         #say "PATHS: " . join ' ', @exe_path;
     }
     #  what to skip for linux or mac?
     
     #  get all the DLLs in the path - saves repeated searching lower down
-    my @dll_files = File::Find::Rule->file()
-                            ->name( "*.$Config::Config{so}" )
-                            ->maxdepth(1)
-                            ->in( @exe_path );
+    my @dll_files
+      = map {$_->stringify}
+        map {path($_)->children ( qr /$Config::Config{so}$/)}
+        @exe_path;
 
     if (CASE_INSENSITIVE_OS) {
         @dll_files = map {lc $_} @dll_files;
@@ -172,7 +178,7 @@ sub get_autolink_list {
       $self->get_dep_dlls;
 
     if (CASE_INSENSITIVE_OS) {
-        @dlls = map {lc $_} @dlls;
+        @dlls = map {path ($_)->stringify} map {lc $_} @dlls;
     }
     #say join "\n", @dlls;
     
@@ -215,7 +221,7 @@ sub get_autolink_list {
             say 'no more DLLs';
             last DLL_CHECK;
         }
-                
+
         my @dll2;
         foreach my $file (@dlls) {
             next if $searched_for{$file};
@@ -244,7 +250,7 @@ sub get_autolink_list {
       MISSING:
         foreach my $file (uniq @missing) {
             next MISSING
-              if any {-e "$_/$file"} @system_paths;
+              if any {; -e "$_/$file"} @system_paths;
             push @missing2, $file;
         }
         
@@ -497,7 +503,7 @@ sub get_dep_dlls {
         execute => !$no_execute_flag,
         cache_file => $cache_file,
     );
-    
+
     #my @lib_paths 
     #  = map {path($_)->absolute}
     #    grep {defined}  #  needed?
@@ -508,7 +514,7 @@ sub get_dep_dlls {
         map {path($_)->absolute}
         @INC;
 
-    my $paths = join '|', map {quotemeta} @lib_paths;
+    my $paths = join '|', map {quotemeta} map {path($_)->stringify} @lib_paths;
     my $inc_path_re = qr /^($paths)/i;
     #say $inc_path_re;
 
@@ -528,15 +534,24 @@ sub get_dep_dlls {
         next if !@uses;
         
         foreach my $dll (grep {$_ =~ $RE_DLL_EXT} @uses) {
-            my $dll_path = $deps_hash->{$package}{file};
-            #  Remove trailing component of path after /lib/
+            my $dll_path = path($deps_hash->{$package}{file})->stringify;
+            my $inc_path;
             if ($dll_path =~ m/$inc_path_re/) {
-                $dll_path = $1 . '/' . $dll;
+                $inc_path = $1;
             }
             else {
-                #  fallback, get everything after /lib/
-                $dll_path =~ s|(?<=/lib/).+?$||;
-                $dll_path .= $dll;
+                #  fallback, get inc_path as all before /lib/
+                $inc_path = ($dll_path =~ s|(?<=/lib/).+?$||r);
+            }
+            #  if the path is relative then we need to prepend the inc_path
+            $dll_path = path($dll)->is_absolute
+                ? $dll
+                : path ($inc_path, $dll)->stringify;
+            #  We were getting double paths under SP 5.36.
+            #  It should be fixed now but leave here just in case.
+            if ($dll_path =~ /^\w:.+:/){
+                warn "Fixing double dir path: $dll_path}";
+                $dll_path =~ s/^.+(.):/$1:/;
             }
             #say $dll_path;
             croak "either cannot find or cannot read $dll_path "
@@ -564,14 +579,15 @@ sub get_dep_dlls {
         next ALIEN if !$package->isa ('Alien::Base');  
         say "Finding dynamic libs for $package";
         foreach my $path ($package->dynamic_libs) {
+    # warn $path;
             $dll_hash{$path}++;
         }
         if ($package->install_type eq 'system') {
             push @$alien_sys_installs, $package->dynamic_libs;
         }
         push @{$self->{alien_deps}}, $package;
-    } 
-    
+    }
+
     my @dll_list = sort keys %dll_hash;
     return wantarray ? @dll_list : \@dll_list;
 }

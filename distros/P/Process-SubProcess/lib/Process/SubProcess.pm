@@ -44,7 +44,7 @@ use IO::Select;
 use IPC::Open3;
 use Symbol qw(gensym);
 
-our $VERSION = '2.0';
+our $VERSION = '2.0.1';
 
 =head1 DESCRIPTION
 
@@ -57,11 +57,9 @@ This allows an easy aggregation and thus the creation of Sub Process Groups and 
 for simultaneous execution of multiple Sub Processes while keeping the execution logs
 separated.
 
-=head1 OVERVIEW
-
-
-
 =cut
+# =head1 OVERVIEW
+
 
 #----------------------------------------------------------------------------
 #Static Methods
@@ -77,7 +75,7 @@ use constant FLAG_ANYOUT => 3;
 
 =item runSubProcess ( [ COMMAND | OPTIONS ] )
 
-This creates adhoc an <Process::SubProcess> Object and runs the command given as string.
+This creates adhoc an C<Process::SubProcess> Object and runs the command given as string.
 
 C<COMMAND> a single scalar parameter will be interpreted as command to execute
 without any additional options.
@@ -221,6 +219,19 @@ This Method will asign Values to physically Data Fields.
 
 C<CONFIGURATIONS> is a list are passed in a hash like fashion, using key and value pairs.
 
+B<Recognized Configurations:>
+
+C<command> - The command that has to be executed. It only can be set if the process is not
+running yet
+
+C<timeout> - Time in seconds to wait for the process to finish. After this time the process will
+be terminated
+
+C<check | read | readtimeout> - Time in seconds to wait for the process output.
+If the process is expected to run longer it is useful to set it to avoid excessive checks.
+It is also important for multiple process execusions, because other processes will not
+be checked before the read has not timed out.
+
 =back
 
 =cut
@@ -249,11 +260,42 @@ sub setArrProcess {
     }    #unless($self->isRunning)
 }
 
+=pod
+
+=over 4
+
+=item set ( CONFIGURATIONS )
+
+Shorthand for C<setArrProcess()>
+
+See L<Method C<setArrProcess()>>
+
+=back
+
+=cut
+
+
 sub set {
 
     #Pass the Parameters on to Process::SubProcess::setArrProcess()
     Process::SubProcess::setArrProcess(@_);
 }
+
+=pod
+
+=over 4
+
+=item setName ( NAME )
+
+This Method will asign a Name to the process.
+
+C<NAME> is a string that will be assigned as the process name.
+This is useful when there are several processes with the same command running and
+a more prettier readable name is desired.
+
+=back
+
+=cut
 
 sub setName {
     my $self = $_[0];

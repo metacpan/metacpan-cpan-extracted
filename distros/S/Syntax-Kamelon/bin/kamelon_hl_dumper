@@ -29,7 +29,7 @@ if (defined $xmldir) {
 	unless (-d $xmldir) { die "$xmldir is not a folder" }
 	push @o, 'xmlfolder', $xmldir;
 }
-unless (defined $syntax) { die "you must specify the -syntax option" }
+die "you must specify the -syntax option" unless defined $syntax;
 
 my $highlighter = Syntax::Kamelon->new(@o);
 

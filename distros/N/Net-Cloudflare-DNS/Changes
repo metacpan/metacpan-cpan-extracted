@@ -6,3 +6,18 @@ Revision history for Net-Cloudflare-DNS
 0.02    2020-12-19
         Change the returned content to perl's structure
 
+0.15    2023-05-18
+        add proxy option
+
+0.16    2023-05-19
+        add META.json
+
+0.17    2023-05-19
+        Change license to gpl_2
+
+0.18    2023-05-19
+        Fix version conflict
+
+0.19    2023-05-26
+        Add bearer token authentication
+

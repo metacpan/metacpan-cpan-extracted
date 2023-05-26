@@ -35,7 +35,7 @@
    "provides" : {
       "Tie::Hash::Cannabinol" : {
          "file" : "lib/Tie/Hash/Cannabinol.pm",
-         "version" : "v1.12.2"
+         "version" : "v1.12.3"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/davorg/tie-hash-cannabinol"
       }
    },
-   "version" : "v1.12.2",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v1.12.3",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

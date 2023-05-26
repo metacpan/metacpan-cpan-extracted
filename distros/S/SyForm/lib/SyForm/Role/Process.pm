@@ -3,7 +3,7 @@ BEGIN {
   $SyForm::Role::Process::AUTHORITY = 'cpan:GETTY';
 }
 # ABSTRACT: SyForm role for processing
-$SyForm::Role::Process::VERSION = '0.102';
+$SyForm::Role::Process::VERSION = '0.103';
 use Moo::Role;
 use Module::Runtime qw( use_module );
 
@@ -164,7 +164,7 @@ SyForm::Role::Process - SyForm role for processing
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

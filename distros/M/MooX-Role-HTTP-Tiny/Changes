@@ -1,0 +1,19 @@
+Changes on 2021-12-19 for repository at:
+  Fetch URL: ssh://git@source.test-smoke.org:9999/~/MooX-Role-HTTP-Tiny
+  Push  URL: ssh://git@source.test-smoke.org:9999/~/MooX-Role-HTTP-Tiny
+
+Enjoy!
+
+0.93 2021-12-19T15:25:20+01:00 (9c719a8 => Abe Timmerman)
+ - (Abe Timmerman, 1 second ago) Autocommit for distribution
+   MooX::Role::HTTP::Tiny 0.93 (same)
+
+0.00_00 2021-12-18T16:56:06+01:00 (18d93cf => Abe Timmerman)
+ - (Abe Timmerman, 22 hours ago) New module: MooX::Role::HTTP::Tiny
+ -     A Moo::Role for implementing specific http-based clients (eg. for
+   protocols like
+ -     JSONRPC or XMLRPC)
+
+ - (Abe Timmerman, 5 minutes ago) Update MANIFEST(.SKIP)
+
+ - (Abe Timmerman, 87 seconds ago) Update MANIFEST(.SKIP)

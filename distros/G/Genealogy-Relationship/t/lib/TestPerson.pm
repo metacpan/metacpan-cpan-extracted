@@ -4,7 +4,7 @@ use Types::Standard qw[Str Int InstanceOf Enum];
 
 has id => (
   is => 'ro',
-  isa => Int,
+  isa => Str,
 );
 
 has name => (

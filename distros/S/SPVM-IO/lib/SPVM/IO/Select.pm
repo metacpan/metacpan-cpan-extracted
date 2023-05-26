@@ -66,3 +66,10 @@ L<SPVM::IO::Select> provides select utilities.
 =head2 Perl's IO::Select
 
 C<IO::Select> is a Perl's L<IO::Select|IO::Select> porting to L<SPVM>.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

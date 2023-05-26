@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "a Z80 assembler",
    "author" : [
-      "unknown"
+      "Paulo Custodio <pscust@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,16 +34,18 @@
          "requires" : {
             "Asm::Preproc" : "1",
             "Asm::Z80::Table" : "0.02",
+            "Capture::Tiny" : "0.48",
             "Class::Struct" : "0",
             "Data::Dump" : "1.08",
             "File::Slurp" : "9999.13",
             "File::Spec" : "0",
             "Iterator::Array::Jagged" : "0.05",
             "Iterator::Simple::Lookahead" : "0.04",
+            "Path::Tiny" : "0.122",
             "Regexp::Trie" : "0.02",
             "Test::More" : "0.96",
             "Text::Tabs" : "2006.1117",
-            "perl" : "5.01"
+            "perl" : "5.012"
          }
       }
    },
@@ -51,10 +53,13 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/pauloscustodio/perl-CPU-Z80-Assembler.git",
+         "url" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler.git",
          "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler"
       }
    },
-   "version" : "2.18",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.22",
+   "x_bugtracker" : {
+      "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::SplitWorkbookTaskParameter;
 
 require 5.6.0;
@@ -36,9 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-
 use AsposeCellsCloud::Object::FileSource;
-use AsposeCellsCloud::Object::TaskParameter;
+use AsposeCellsCloud::Object::TaskParameter; 
+
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -54,12 +53,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,7 +99,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -108,7 +107,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -120,73 +119,73 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'SplitWorkbookTaskParameter',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'destination_file_format' => {
-    	datatype => 'string',
-    	base_name => 'DestinationFileFormat',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'destination_file_position' => {
-    	datatype => 'FileSource',
-    	base_name => 'DestinationFilePosition',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'vertical_resolution' => {
-    	datatype => 'int',
-    	base_name => 'VerticalResolution',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'horizontal_resolution' => {
-    	datatype => 'int',
-    	base_name => 'HorizontalResolution',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'split_name_rule' => {
-    	datatype => 'string',
-    	base_name => 'SplitNameRule',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'workbook' => {
-    	datatype => 'FileSource',
-    	base_name => 'Workbook',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'workbook' => {
+     	datatype => 'FileSource',
+     	base_name => 'Workbook',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'destination_file_position' => {
+     	datatype => 'FileSource',
+     	base_name => 'DestinationFilePosition',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'destination_file_format' => {
+     	datatype => 'string',
+     	base_name => 'DestinationFileFormat',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'split_name_rule' => {
+     	datatype => 'string',
+     	base_name => 'SplitNameRule',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'vertical_resolution' => {
+     	datatype => 'int',
+     	base_name => 'VerticalResolution',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'horizontal_resolution' => {
+     	datatype => 'int',
+     	base_name => 'HorizontalResolution',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'destination_file_format' => 'string',
+    'workbook' => 'FileSource',
     'destination_file_position' => 'FileSource',
-    'vertical_resolution' => 'int',
-    'horizontal_resolution' => 'int',
+    'destination_file_format' => 'string',
     'split_name_rule' => 'string',
-    'workbook' => 'FileSource'
+    'vertical_resolution' => 'int',
+    'horizontal_resolution' => 'int' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'destination_file_format' => 'DestinationFileFormat',
+    'workbook' => 'Workbook',
     'destination_file_position' => 'DestinationFilePosition',
-    'vertical_resolution' => 'VerticalResolution',
-    'horizontal_resolution' => 'HorizontalResolution',
+    'destination_file_format' => 'DestinationFileFormat',
     'split_name_rule' => 'SplitNameRule',
-    'workbook' => 'Workbook'
+    'vertical_resolution' => 'VerticalResolution',
+    'horizontal_resolution' => 'HorizontalResolution' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

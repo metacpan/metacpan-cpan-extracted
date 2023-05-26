@@ -2,26 +2,33 @@
 
 use strict;
 use warnings;
-use Syntax::Kamelon::XMLData;
 use Syntax::Kamelon::Diagnostics;
 
+my $help = <<__EOF;
+This program analyzes a syntax definition.
+Available options: -help, -xmlfolder, -noindex, -syntax.
+You must specify the syntax option.
+__EOF
+
 my $noindex = 0;
-my $section;
 my $syntax;
 my $xmldir;
 
 while (@ARGV) {
 	my $o = shift @ARGV;
-	if ($o eq '-xmlfolder') {
+	if ($o eq '-help') {
+		print $help
+	} elsif ($o eq '-xmlfolder') {
 		$xmldir = shift @ARGV;
-	} elsif ($o eq '-section') {
-		$section = shift @ARGV
+	} elsif ($o eq '-noindex') {
+		$noindex = 1
 	} elsif ($o eq '-syntax') {
 		$syntax = shift @ARGV
 	} else {
-		die "available options: -xmlfolder, -section, -syntax";
+		die "Invalid option $o. Available options: -help, -xmlfolder, -noindex, -syntax";
 	}
 }
+die 'you must specify the -syntax option' unless defined $syntax;
 
 my @o = (noindex => $noindex);
 if (defined $xmldir) {
@@ -30,12 +37,8 @@ if (defined $xmldir) {
 	push @o, 'xmlfolder', $xmldir;
 }
 
+my $diag = Syntax::Kamelon::Diagnostics->new(@o);
 
-my $highlighter = Syntax::Kamelon::Diagnostics->new(@o);
-
-my @s = ();
-if (defined $syntax) { push @s, $syntax }
-
-$highlighter->ListDetails(@s);
+$diag->Diagnoze($syntax);
 
 

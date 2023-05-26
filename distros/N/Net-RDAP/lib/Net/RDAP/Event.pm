@@ -21,7 +21,7 @@ L<Net::RDAP::Event> objects.
 
 =head2 Event Action
 
-	$action = $event->action;
+    $action = $event->action;
 
 Returns a string containing the event action. The list
 of possible values is defined by an IANA registry, see:
@@ -40,7 +40,7 @@ sub action { $_[0]->{'eventAction'} }
 
 =head2 Event Actor
 
-	$actor = $event->actor;
+    $actor = $event->actor;
 
 Returns a string containing the handle of the entity
 responsible for causing the event.
@@ -53,7 +53,7 @@ sub actor { $_[0]->{'eventActor'} }
 
 =head2 Event Date
 
-	$date = $event->date;
+    $date = $event->date;
 
 Returns a L<DateTime> object corresponding to the date and time of the
 event.
@@ -84,7 +84,7 @@ sub date {
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

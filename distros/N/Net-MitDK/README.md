@@ -184,3 +184,9 @@ originated from `noreply@mit.dk` and f.ex. Gmail won't accept that due to
 the sender as in `examples/procmail.forward.srs` helps.
 
 Enjoy!
+
+Thanks to:
+----------
+
+Morten Helmstedt
+

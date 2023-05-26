@@ -10,9 +10,7 @@ SPVM::File::Find::Handler - Handler for File::Find
 
 =head1 Description
 
-C<SPVM::File::Find::Handler> is the C<File::Find::Handler> class in L<SPVM> language.
-
-This class is the handler for L<find|SPVM::File::Find/"find"> method in the L<File::Find|SPVM::File::Find>.
+The File::Find::Handler class of L<SPVM> has interface methods for the handler of L<File::Find|SPVM::File::Find>.
 
 =head1 Usage
 
@@ -24,7 +22,7 @@ This class is the handler for L<find|SPVM::File::Find/"find"> method in the L<Fi
 
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
+

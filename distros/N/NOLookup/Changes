@@ -1,5 +1,8 @@
 Revision history for Perl extension NOLookup
 
+1.37.20 2023-05-23
+     - Fix tests to work better from cpan.
+
 1.37.19 2023-05-03
      - Correct color option in POD for no_rdap.pl
 

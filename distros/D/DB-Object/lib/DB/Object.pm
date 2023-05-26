@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.11.2
+## Version v0.11.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/03/24
+## Modified 2023/05/02
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -32,7 +32,7 @@ BEGIN
     use Module::Generic::File qw( sys_tmpdir );
     use POSIX ();
     use Want;
-    $VERSION     = 'v0.11.2';
+    $VERSION     = 'v0.11.3';
     use Devel::Confess;
 };
 
@@ -97,7 +97,11 @@ sub allow_bulk_delete { return( shift->_set_get_scalar( 'allow_bulk_delete', @_ 
 
 sub allow_bulk_update { return( shift->_set_get_scalar( 'allow_bulk_update', @_ ) ); }
 
+sub ALL { return( DB::Object::ALL->new( splice( @_, 1 ) ) ); }
+
 sub AND { shift( @_ ); return( DB::Object::AND->new( @_ ) ); }
+
+sub ANY { return( DB::Object::ANY->new( splice( @_, 1 ) ) ); }
 
 sub auto_convert_datetime_to_object { return( shift->_set_get_scalar( 'auto_convert_datetime_to_object', @_ ) ); }
 
@@ -2142,6 +2146,68 @@ sub operator { return( '' ); }
 
 sub value { return( wantarray() ? @{$_[0]->{value}} : $_[0]->{value} ); }
 
+# Ref:
+# <https://www.postgresql.org/docs/12/arrays.html#ARRAYS-SEARCHING>
+# NOTE: package DB::Object::ALL
+package DB::Object::ALL;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( DB::Object::Operator );
+    use Scalar::Util ();
+    use overload (
+        '""'    => 'as_string',
+        'bool'  => sub{1},
+        '=='    => sub{ &_opt_overload( @_, '==' ) },
+        '!='    => sub{ &_opt_overload( @_, '!=' ) },
+        fallback => 1,
+    );
+};
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $vals = $self->value;
+    my @list = ();
+    foreach my $elem ( @$vals )
+    {
+        next unless( defined( $elem ) );
+        if( Scalar::Util::blessed( $elem ) &&
+            $elem->isa( 'DB::Object::Statement' ) )
+        {
+            push( @list, $elem->as_string );
+        }
+        else
+        {
+            push( @list, $elem );
+        }
+    }
+    local $" = ',';
+    my $sql = "ALL (@list)";
+    return( $sql );
+}
+
+sub operator { return( 'ALL' ); }
+
+sub _opt_overload
+{
+    my( $self, $val, $swap, $op ) = @_;
+    my $map =
+    {
+    '!=' => '!= ',
+    '==' => '= ',
+    };
+    my $not = $map->{ $op };
+    my $in = $self->as_string;
+    my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
+        ? $val->name
+        : ( $val eq '?' || $self->_is_number( $val ) )
+            ? $val
+            : qq{'${val}'};
+    return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
+}
+
 # NOTE: package DB::Object::AND
 package DB::Object::AND;
 BEGIN
@@ -2151,6 +2217,68 @@ BEGIN
 };
 
 sub operator { return( 'AND' ); }
+
+# Ref:
+# <https://www.postgresql.org/docs/12/arrays.html#ARRAYS-SEARCHING>
+# NOTE: package DB::Object::ANY
+package DB::Object::ANY;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( DB::Object::Operator );
+    use Scalar::Util ();
+    use overload (
+        '""'    => 'as_string',
+        'bool'  => sub{1},
+        '=='    => sub{ &_opt_overload( @_, '==' ) },
+        '!='    => sub{ &_opt_overload( @_, '!=' ) },
+        fallback => 1,
+    );
+};
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $vals = $self->value;
+    my @list = ();
+    foreach my $elem ( @$vals )
+    {
+        next unless( defined( $elem ) );
+        if( Scalar::Util::blessed( $elem ) &&
+            $elem->isa( 'DB::Object::Statement' ) )
+        {
+            push( @list, $elem->as_string );
+        }
+        else
+        {
+            push( @list, $elem );
+        }
+    }
+    local $" = ',';
+    my $sql = "ANY (@list)";
+    return( $sql );
+}
+
+sub operator { return( 'ANY' ); }
+
+sub _opt_overload
+{
+    my( $self, $val, $swap, $op ) = @_;
+    my $map =
+    {
+    '!=' => '!= ',
+    '==' => '= ',
+    };
+    my $not = $map->{ $op };
+    my $in = $self->as_string;
+    my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
+        ? $val->name
+        : ( $val eq '?' || $self->_is_number( $val ) )
+            ? $val
+            : qq{'${val}'};
+    return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
+}
 
 # NOTE: package DB::Object::Expression
 package DB::Object::Expression;
@@ -2486,7 +2614,7 @@ Sometimes, having placeholders in expression makes it difficult to work, so you 
 
 =head1 VERSION
 
-    v0.11.2
+    v0.11.3
 
 =head1 DESCRIPTION
 
@@ -3523,6 +3651,20 @@ If it has been already reset, this will return the value for L</_query_object_cu
 
 =head1 OPERATORS
 
+=head2 ALL( VALUES )
+
+This operator is used to query an array where all elements must match.
+
+    my $tbl = $dbh->hosts || die( "Uable to get table object 'hosts'." );
+    $tbl->where( $dbh->OR(
+        $tbl->fo->name == 'example.com',
+        'example.com' == $dbh->ALL( $tbl->fo->alias )
+    ));
+    my $sth = $tbl->select || die( "Failed to prepare query to get host information: ", $tbl->error );
+    my $ref = $sth->fetchrow_hashref;
+
+See L<PostgreSQL documentation|https://www.postgresql.org/docs/current/arrays.html>
+
 =head2 AND( VALUES )
 
 Given a value, this returns a L<DB::Object::AND> object. You can retrieve the value with L<DB::Object::AND/value>
@@ -3532,6 +3674,52 @@ This is used by L</where>
     my $op = $dbh->AND( login => 'joe', status => 'active' );
     # will produce:
     WHERE login = 'joe' AND status = 'active'
+
+=head2 ANY( VALUES )
+
+This operator is used to query an array where all elements must match.
+
+    my $tbl = $dbh->hosts || die( "Uable to get table object 'hosts'." );
+    $tbl->where( $dbh->OR(
+        $tbl->fo->name == 'example.com',
+        'example.com' == $dbh->ANY( $tbl->fo->alias )
+    ));
+    my $sth = $tbl->select || die( "Failed to prepare query to get host information: ", $tbl->error );
+    my $ref = $sth->fetchrow_hashref;
+
+See L<PostgreSQL documentation|https://www.postgresql.org/docs/current/arrays.html>
+
+=head2 IN
+
+For example:
+
+    SELECT
+        c.code, c.name, c.name_l10n, c.locale
+    FROM country_locale AS c
+    WHERE
+        c.locale = 'fr_FR' OR
+        ('fr_FR' NOT IN (SELECT DISTINCT l.locale FROM country_locale AS l ORDER BY l.locale) AND 
+        c.locale = 'en_GB')
+    ORDER BY c.code
+
+    my $tbl = $dbh->country_locale || die( $dbh->error );
+    my $tbl2 = $dbh->country_locale || die( $dbh->error );
+    $tbl2->as( 'l' );
+    $tbl2->order( 'locale' );
+    my $sth2 = $tbl2->select( 'DISTINCT locale' ) || die( $tbl2->error );
+
+    $tbl->as( 'c' );
+    $tbl->where( $dbh->OR(
+        $tbl->fo->locale == 'fr_FR',
+        $dbh->AND(
+            'fr_FR' != $dbh->IN( $sth2 ),
+            $tbl->fo->locale == 'en_GB'
+        )
+    ) );
+
+    $tbl->order( $tbl->fo->code );
+    my $sth = $tbl->select( qw( code name name_l10n locale ) ) || die( $tbl->error );
+    say $sth->as_string;
 
 =head2 NOT( VALUES )
 

@@ -1,5 +1,35 @@
 # Change Log
 
+## [0.2.0 - 2023-05-24]
+
+### Fixed
+
+- Pod error
+- IDs no longer need to be numbers
+
+### Added
+
+- Added `get_relationship_ancestors()` method
+- Added `abbr` attribute
+
+## [0.1.2] - 2023-05-23
+
+### Fixed
+
+- Fixed the previous fix
+
+## [0.1.1] - 2023-05-23
+
+### Fixed
+
+- Missing pre-req module (CI is great - but you have to actually use it!)
+
+## [0.1.0] - 2023-05-23
+
+### Added
+
+- We now support arbitrarily distant relationships (by synthesising descriptions)
+
 ## [0.0.5] - 2021-01-12
 
 ### Added

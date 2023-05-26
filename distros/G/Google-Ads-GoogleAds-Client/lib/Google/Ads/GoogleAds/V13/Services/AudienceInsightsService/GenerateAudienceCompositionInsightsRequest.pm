@@ -24,6 +24,7 @@ sub new {
   my ($class, $args) = @_;
   my $self = {
     audience              => $args->{audience},
+    baselineAudience      => $args->{baselineAudience},
     customerId            => $args->{customerId},
     customerInsightsGroup => $args->{customerInsightsGroup},
     dataMonth             => $args->{dataMonth},

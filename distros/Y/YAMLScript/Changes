@@ -1,3 +1,19 @@
+0.1.2 Thu May 25 04:20:21 PM PDT 2023
+ - Support '!' tag for loading a node as data
+
+0.1.1 Thu May 25 09:11:07 AM PDT 2023
+ - Parse a scalar with multiple Lingy forms
+ - Support loading .ys modules
+ - Renumber test files
+ - Fix quasiquote bug in YAMLScript::Reader
+ - Allow a top level plain or literal to be a ysexpr
+ - More functionality and tests
+ - Rewrite the documentation
+ - Improve the example programs
+
+0.1.0 Wed May 17 08:32:21 AM PDT 2023
+ - Refactor to work on top of new Lingy (0.1.4)
+
 0.0.16 Fri 29 Jul 2022 02:05:31 PM PDT
  - Add def fn and defn support
 

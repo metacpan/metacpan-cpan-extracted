@@ -1,5 +1,5 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.59';
+$Log::Log4perl::Layout::JSON::VERSION = '0.60';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
 use 5.010;
@@ -150,7 +150,9 @@ sub _process_field_values {
     $fields //= $self->field;
     $layed_out //= {};
 
-    while (my($field, $value) = each %$fields) {
+    for my $field (keys %$fields) {
+        my $value = $fields->{$field};
+
         if (blessed($value) and blessed($value) eq 'Log::Log4perl::Layout::PatternLayout') {
             $layed_out->{$field} = $value->render($m, $category, $priority, $caller_level);
         }
@@ -170,7 +172,10 @@ sub _build_field_values {
 
     my($self, $field_hash) = @_;
 
-    while (my($key, $value) = each %$field_hash) {
+    for my $key (keys %$field_hash) {
+        my $value = $field_hash->{$key};
+        next unless ref $value eq 'HASH';
+
         if (exists $value->{value} && !ref($value->{value})) {
             $field_hash->{$key} = Log::Log4perl::Layout::PatternLayout->new($value->{value})
         }
@@ -186,7 +191,8 @@ sub _build_field_values {
 sub _build_maxkb_values {
     my($self, $maxkb_hash) = @_;
 
-    while (my($key, $value) = each %$maxkb_hash) {
+    for my $key (keys %$maxkb_hash) {
+        my $value = $maxkb_hash->{$key};
         if (exists $value->{value} && !ref($value->{value})) {
             $maxkb_hash->{$key} = $value->{value};
         }
@@ -203,7 +209,8 @@ sub _truncate_value {
     return if !$maxkb;
 
     if (ref(${$value_ref}) eq 'HASH' && ref($maxkb) eq 'HASH') {
-        while (my($maxkb_key, $maxkb_val) = each %$maxkb) {
+        for my $maxkb_key (keys %$maxkb) {
+            my $maxkb_val = $maxkb->{$maxkb_key};
             next unless ${$value_ref}->{$maxkb_key};
 
             $self->_truncate_value(\${$value_ref}->{$maxkb_key}, $maxkb_val)
@@ -379,7 +386,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

@@ -163,3 +163,10 @@ L<IO::Socket::INET|SPVM::IO::Socket::INET>
 =head2 IO::Handle
 
 C<SPVM::IO::Handle> is the Perl's L<IO::Handle> porting to L<SPVM>.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

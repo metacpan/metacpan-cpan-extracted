@@ -35423,991 +35423,6 @@ sub cells_worksheets_put_worksheet_freeze_panes {
     return $_response_object;
 }
 
-#
-# copy_file
-#
-# Copy file
-# 
-# @param string $src_path Source file path e.g. &#39;/folder/file.ext&#39; (required)
-# @param string $dest_path Destination file path (required)
-# @param string $src_storage_name Source storage name (optional)
-# @param string $dest_storage_name Destination storage name (optional)
-# @param string $version_id File version ID to copy (optional)
-{
-    my $params = {
-    'src_path' => {
-        data_type => 'string',
-        description => 'Source file path e.g. &#39;/folder/file.ext&#39;',
-        required => '1',
-    },
-    'dest_path' => {
-        data_type => 'string',
-        description => 'Destination file path',
-        required => '1',
-    },
-    'src_storage_name' => {
-        data_type => 'string',
-        description => 'Source storage name',
-        required => '0',
-    },
-    'dest_storage_name' => {
-        data_type => 'string',
-        description => 'Destination storage name',
-        required => '0',
-    },
-    'version_id' => {
-        data_type => 'string',
-        description => 'File version ID to copy',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'copy_file' } = { 
-    	summary => 'Copy file',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub copy_file {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
-      croak("Missing the required parameter 'src_path' when calling copy_file");
-    }
-
-    # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
-      croak("Missing the required parameter 'dest_path' when calling copy_file");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/file/copy/{srcPath}';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'dest_path'}) {
-        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
-    }
-
-    # query params
-    if ( exists $args{'src_storage_name'}) {
-        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'dest_storage_name'}) {
-        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'version_id'}) {
-        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
-    }
-
-    # path params
-    if ( exists $args{'src_path'}) {
-        my $_base_variable = "{" . "srcPath" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
-
-#
-# copy_folder
-#
-# Copy folder
-# 
-# @param string $src_path Source folder path e.g. &#39;/src&#39; (required)
-# @param string $dest_path Destination folder path e.g. &#39;/dst&#39; (required)
-# @param string $src_storage_name Source storage name (optional)
-# @param string $dest_storage_name Destination storage name (optional)
-{
-    my $params = {
-    'src_path' => {
-        data_type => 'string',
-        description => 'Source folder path e.g. &#39;/src&#39;',
-        required => '1',
-    },
-    'dest_path' => {
-        data_type => 'string',
-        description => 'Destination folder path e.g. &#39;/dst&#39;',
-        required => '1',
-    },
-    'src_storage_name' => {
-        data_type => 'string',
-        description => 'Source storage name',
-        required => '0',
-    },
-    'dest_storage_name' => {
-        data_type => 'string',
-        description => 'Destination storage name',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'copy_folder' } = { 
-    	summary => 'Copy folder',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub copy_folder {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
-      croak("Missing the required parameter 'src_path' when calling copy_folder");
-    }
-
-    # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
-      croak("Missing the required parameter 'dest_path' when calling copy_folder");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/folder/copy/{srcPath}';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'dest_path'}) {
-        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
-    }
-
-    # query params
-    if ( exists $args{'src_storage_name'}) {
-        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'dest_storage_name'}) {
-        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
-    }
-
-    # path params
-    if ( exists $args{'src_path'}) {
-        my $_base_variable = "{" . "srcPath" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
-
-#
-# create_folder
-#
-# Create the folder
-# 
-# @param string $path Folder path to create e.g. &#39;folder_1/folder_2/&#39; (required)
-# @param string $storage_name Storage name (optional)
-{
-    my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'Folder path to create e.g. &#39;folder_1/folder_2/&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'create_folder' } = { 
-    	summary => 'Create the folder',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub create_folder {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling create_folder");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/folder/{path}';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
-
-#
-# delete_file
-#
-# Delete file
-# 
-# @param string $path File path e.g. &#39;/folder/file.ext&#39; (required)
-# @param string $storage_name Storage name (optional)
-# @param string $version_id File version ID to delete (optional)
-{
-    my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'File path e.g. &#39;/folder/file.ext&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    'version_id' => {
-        data_type => 'string',
-        description => 'File version ID to delete',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'delete_file' } = { 
-    	summary => 'Delete file',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub delete_file {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_file");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/file/{path}';
-
-    my $_method = 'DELETE';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'version_id'}) {
-        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
-
-#
-# delete_folder
-#
-# Delete folder
-# 
-# @param string $path Folder path e.g. &#39;/folder&#39; (required)
-# @param string $storage_name Storage name (optional)
-# @param boolean $recursive Enable to delete folders, subfolders and files (optional, default to false)
-{
-    my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'Folder path e.g. &#39;/folder&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    'recursive' => {
-        data_type => 'boolean',
-        description => 'Enable to delete folders, subfolders and files',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'delete_folder' } = { 
-    	summary => 'Delete folder',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub delete_folder {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_folder");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/folder/{path}';
-
-    my $_method = 'DELETE';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'recursive'}) {
-        $query_params->{'recursive'} = $self->{api_client}->to_query_value($args{'recursive'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
-
-#
-# download_file
-#
-# Download file
-# 
-# @param string $path File path e.g. &#39;/folder/file.ext&#39; (required)
-# @param string $storage_name Storage name (optional)
-# @param string $version_id File version ID to download (optional)
-{
-    my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'File path e.g. &#39;/folder/file.ext&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    'version_id' => {
-        data_type => 'string',
-        description => 'File version ID to download',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'download_file' } = { 
-    	summary => 'Download file',
-        params => $params,
-        returns => 'string',
-        };
-}
-# @return string
-#
-sub download_file {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling download_file");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/file/{path}';
-
-    my $_method = 'GET';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'version_id'}) {
-        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
-    return $_response_object;
-}
-
-#
-# get_disc_usage
-#
-# Get disc usage
-# 
-# @param string $storage_name Storage name (optional)
-{
-    my $params = {
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'get_disc_usage' } = { 
-    	summary => 'Get disc usage',
-        params => $params,
-        returns => 'DiscUsage',
-        };
-}
-# @return DiscUsage
-#
-sub get_disc_usage {
-    my ($self, %args) = @_;
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/disc';
-
-    my $_method = 'GET';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('DiscUsage', $response);
-    return $_response_object;
-}
-
-#
-# get_file_versions
-#
-# Get file versions
-# 
-# @param string $path File path e.g. &#39;/file.ext&#39; (required)
-# @param string $storage_name Storage name (optional)
-{
-    my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'File path e.g. &#39;/file.ext&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'get_file_versions' } = { 
-    	summary => 'Get file versions',
-        params => $params,
-        returns => 'FileVersions',
-        };
-}
-# @return FileVersions
-#
-sub get_file_versions {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_file_versions");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/version/{path}';
-
-    my $_method = 'GET';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('FileVersions', $response);
-    return $_response_object;
-}
-
-#
-# get_files_list
-#
-# Get all files and folders within a folder
-# 
-# @param string $path Folder path e.g. &#39;/folder&#39; (required)
-# @param string $storage_name Storage name (optional)
-{
-    my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'Folder path e.g. &#39;/folder&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'get_files_list' } = { 
-    	summary => 'Get all files and folders within a folder',
-        params => $params,
-        returns => 'FilesList',
-        };
-}
-# @return FilesList
-#
-sub get_files_list {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_files_list");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/folder/{path}';
-
-    my $_method = 'GET';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('FilesList', $response);
-    return $_response_object;
-}
-
-#
-# move_file
-#
-# Move file
-# 
-# @param string $src_path Source file path e.g. &#39;/src.ext&#39; (required)
-# @param string $dest_path Destination file path e.g. &#39;/dest.ext&#39; (required)
-# @param string $src_storage_name Source storage name (optional)
-# @param string $dest_storage_name Destination storage name (optional)
-# @param string $version_id File version ID to move (optional)
-{
-    my $params = {
-    'src_path' => {
-        data_type => 'string',
-        description => 'Source file path e.g. &#39;/src.ext&#39;',
-        required => '1',
-    },
-    'dest_path' => {
-        data_type => 'string',
-        description => 'Destination file path e.g. &#39;/dest.ext&#39;',
-        required => '1',
-    },
-    'src_storage_name' => {
-        data_type => 'string',
-        description => 'Source storage name',
-        required => '0',
-    },
-    'dest_storage_name' => {
-        data_type => 'string',
-        description => 'Destination storage name',
-        required => '0',
-    },
-    'version_id' => {
-        data_type => 'string',
-        description => 'File version ID to move',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'move_file' } = { 
-    	summary => 'Move file',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub move_file {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
-      croak("Missing the required parameter 'src_path' when calling move_file");
-    }
-
-    # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
-      croak("Missing the required parameter 'dest_path' when calling move_file");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/file/move/{srcPath}';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'dest_path'}) {
-        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
-    }
-
-    # query params
-    if ( exists $args{'src_storage_name'}) {
-        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'dest_storage_name'}) {
-        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'version_id'}) {
-        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
-    }
-
-    # path params
-    if ( exists $args{'src_path'}) {
-        my $_base_variable = "{" . "srcPath" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
-
-#
-# move_folder
-#
-# Move folder
-# 
-# @param string $src_path Folder path to move e.g. &#39;/folder&#39; (required)
-# @param string $dest_path Destination folder path to move to e.g &#39;/dst&#39; (required)
-# @param string $src_storage_name Source storage name (optional)
-# @param string $dest_storage_name Destination storage name (optional)
-{
-    my $params = {
-    'src_path' => {
-        data_type => 'string',
-        description => 'Folder path to move e.g. &#39;/folder&#39;',
-        required => '1',
-    },
-    'dest_path' => {
-        data_type => 'string',
-        description => 'Destination folder path to move to e.g &#39;/dst&#39;',
-        required => '1',
-    },
-    'src_storage_name' => {
-        data_type => 'string',
-        description => 'Source storage name',
-        required => '0',
-    },
-    'dest_storage_name' => {
-        data_type => 'string',
-        description => 'Destination storage name',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'move_folder' } = { 
-    	summary => 'Move folder',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub move_folder {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
-      croak("Missing the required parameter 'src_path' when calling move_folder");
-    }
-
-    # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
-      croak("Missing the required parameter 'dest_path' when calling move_folder");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/folder/move/{srcPath}';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'dest_path'}) {
-        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
-    }
-
-    # query params
-    if ( exists $args{'src_storage_name'}) {
-        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'dest_storage_name'}) {
-        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
-    }
-
-    # path params
-    if ( exists $args{'src_path'}) {
-        my $_base_variable = "{" . "srcPath" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    return;
-}
 
 #
 # o_auth_post
@@ -36507,121 +35522,680 @@ sub o_auth_post {
     return $_response_object;
 }
 
+
+
 #
-# object_exists
+# GetWorksheetAutoFilterRequest
 #
-# Check if file or folder exists
 # 
-# @param string $path File or folder path e.g. &#39;/file.ext&#39; or &#39;/folder&#39; (required)
-# @param string $storage_name Storage name (optional)
-# @param string $version_id File version ID (optional)
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
 {
     my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'File or folder path e.g. &#39;/file.ext&#39; or &#39;/folder&#39;',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
-    'version_id' => {
-        data_type => 'string',
-        description => 'File version ID',
-        required => '0',
-    },
+       'request' =>{
+            data_type => 'GetWorksheetAutoFilterRequest',
+            description => 'GetWorksheetAutoFilter Request.',
+            required => '0',
+       }
     };
-    __PACKAGE__->method_documentation->{ 'object_exists' } = { 
-    	summary => 'Check if file or folder exists',
+    __PACKAGE__->method_documentation->{ 'get_worksheet_auto_filter' } = { 
+    	summary => '',
         params => $params,
-        returns => 'ObjectExist',
-        };
+        returns => 'AutoFilterResponse',
+    };
 }
-# @return ObjectExist
 #
-sub object_exists {
+# @return AutoFilterResponse
+#
+sub get_worksheet_auto_filter{
     my ($self, %args) = @_;
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling object_exists");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/storage/exist/{path}';
-
-    my $_method = 'GET';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # query params
-    if ( exists $args{'version_id'}) {
-        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ObjectExist', $response);
+    my $_response_object = $self->{api_client}->deserialize('AutoFilterResponse', $response);
     return $_response_object;
 }
 
 #
-# post_batch_convert
+# PutWorksheetDateFilterRequest
 #
 # 
 # 
-# @param BatchConvertRequest $batch_convert_request  (required)
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @dateTimeGroupingType  string (required)    
+# @year  int     
+# @month  int     
+# @day  int     
+# @hour  int     
+# @minute  int     
+# @second  int     
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
 {
     my $params = {
-    'batch_convert_request' => {
-        data_type => 'BatchConvertRequest',
-        description => '',
-        required => '1',
-    },
+       'request' =>{
+            data_type => 'PutWorksheetDateFilterRequest',
+            description => 'PutWorksheetDateFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_date_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_date_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @criteria  string (required)    
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetFilterRequest',
+            description => 'PutWorksheetFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetIconFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @iconSetType  string (required)    
+# @iconId  int (required)    
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetIconFilterRequest',
+            description => 'PutWorksheetIconFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_icon_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_icon_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetCustomFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @operatorType1  string (required)    
+# @criteria1  string (required)    
+# @isAnd  boolean     
+# @operatorType2  string     
+# @criteria2  string     
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetCustomFilterRequest',
+            description => 'PutWorksheetCustomFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_custom_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_custom_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetDynamicFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @dynamicFilterType  string (required)    
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetDynamicFilterRequest',
+            description => 'PutWorksheetDynamicFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_dynamic_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_dynamic_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetFilterTop10Request
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @isTop  boolean (required)    
+# @isPercent  boolean (required)    
+# @itemCount  int (required)    
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetFilterTop10Request',
+            description => 'PutWorksheetFilterTop10 Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_filter_top10' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_filter_top10{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetColorFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @fieldIndex  int (required)    
+# @colorFilter  ColorFilterRequest (required)    
+# @matchBlanks  boolean     
+# @refresh  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetColorFilterRequest',
+            description => 'PutWorksheetColorFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_color_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_color_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetMatchBlanksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @fieldIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetMatchBlanksRequest',
+            description => 'PostWorksheetMatchBlanks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_match_blanks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_match_blanks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetMatchNonBlanksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @fieldIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetMatchNonBlanksRequest',
+            description => 'PostWorksheetMatchNonBlanks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_match_non_blanks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_match_non_blanks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetAutoFilterRefreshRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetAutoFilterRefreshRequest',
+            description => 'PostWorksheetAutoFilterRefresh Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_auto_filter_refresh' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_auto_filter_refresh{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetDateFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @fieldIndex  int (required)    
+# @dateTimeGroupingType  string (required)    
+# @year  int     
+# @month  int     
+# @day  int     
+# @hour  int     
+# @minute  int     
+# @second  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetDateFilterRequest',
+            description => 'DeleteWorksheetDateFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_date_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_date_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @fieldIndex  int (required)    
+# @criteria  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetFilterRequest',
+            description => 'DeleteWorksheetFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetAutoshapesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetAutoshapesRequest',
+            description => 'GetWorksheetAutoshapes Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_autoshapes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'AutoShapesResponse',
+    };
+}
+#
+# @return AutoShapesResponse
+#
+sub get_worksheet_autoshapes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AutoShapesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetAutoshapeWithFormatRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @autoshapeNumber  int (required)    
+# @format  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetAutoshapeWithFormatRequest',
+            description => 'GetWorksheetAutoshapeWithFormat Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_autoshape_with_format' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_autoshape_with_format{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostBatchConvertRequest
+#
+# 
+# 
+# @batchConvertRequest  BatchConvertRequest (required)     
+#
+{
+    my $params = {
+        'batch_convert_request' => {
+            data_type => 'BatchConvertRequest',
+            description => '',
+            required => '1',
+        },        
+       'request' =>{
+            data_type => 'PostBatchConvertRequest',
+            description => 'PostBatchConvert Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_convert' } = { 
     	summary => '',
         params => $params,
         returns => 'string',
-        };
+    };
 }
+#
 # @return string
 #
-sub post_batch_convert {
+sub post_batch_convert{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('string', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'batch_convert_request' is set
     unless (exists $args{'batch_convert_request'}) {
       croak("Missing the required parameter 'batch_convert_request' when calling post_batch_convert");
@@ -36661,133 +36235,3358 @@ sub post_batch_convert {
     }
     my $_response_object = $self->{api_client}->deserialize('string', $response);
     return $_response_object;
+
 }
+
 #
-# post_convert_workbook_to_docx
+# GetExtractBarcodesRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pictureIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+       'request' =>{
+            data_type => 'GetExtractBarcodesRequest',
+            description => 'GetExtractBarcodes Request.',
+            required => '0',
+       }
     };
-    __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_docx' } = { 
+    __PACKAGE__->method_documentation->{ 'get_extract_barcodes' } = { 
     	summary => '',
         params => $params,
-        returns => 'FileInfo',
-        };
+        returns => 'BarcodeResponseList',
+    };
 }
-# @return FileInfo
 #
-sub post_convert_workbook_to_docx {
+# @return BarcodeResponseList
+#
+sub get_extract_barcodes{
     my ($self, %args) = @_;
-
-    # verify the required parameter 'workbook' is set
-    unless (exists $args{'workbook'}) {
-      croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_docx");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/convert/docx';
-
-    my $_method = 'POST';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
-    # query params
-    if ( exists $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
-    if ( exists $args{'check_excel_restriction'}) {
-        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # body params
-    # if ( exists $args{'workbook'}) {
-    #     $_body_data = $args{'workbook'};
-    # }
-    if ( exists $args{'workbook'} ) {   
-        $form_params->{'file'} = [ $args{'workbook'} ,'file','application/octet-stream'];
-    }
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    my $_response_object = $self->{api_client}->deserialize('BarcodeResponseList', $response);
     return $_response_object;
 }
 
 #
-# post_convert_workbook_to_pdf
+# PostClearContentsRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string     
+# @startRow  int     
+# @startColumn  int     
+# @endRow  int     
+# @endColumn  int     
+# @folder  string     
+# @storageName  string      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+       'request' =>{
+            data_type => 'PostClearContentsRequest',
+            description => 'PostClearContents Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_clear_contents' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_clear_contents{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostClearFormatsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string     
+# @startRow  int     
+# @startColumn  int     
+# @endRow  int     
+# @endColumn  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostClearFormatsRequest',
+            description => 'PostClearFormats Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_clear_formats' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_clear_formats{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUpdateWorksheetRangeStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @style  Style (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWorksheetRangeStyleRequest',
+            description => 'PostUpdateWorksheetRangeStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_worksheet_range_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_update_worksheet_range_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetMergeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startRow  int (required)    
+# @startColumn  int (required)    
+# @totalRows  int (required)    
+# @totalColumns  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetMergeRequest',
+            description => 'PostWorksheetMerge Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_merge' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_merge{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetUnmergeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startRow  int (required)    
+# @startColumn  int (required)    
+# @totalRows  int (required)    
+# @totalColumns  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetUnmergeRequest',
+            description => 'PostWorksheetUnmerge Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_unmerge' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_unmerge{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCellsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @offest  int     
+# @count  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCellsRequest',
+            description => 'GetWorksheetCells Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_cells' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsResponse',
+    };
+}
+#
+# @return CellsResponse
+#
+sub get_worksheet_cells{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCellRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellOrMethodName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCellRequest',
+            description => 'GetWorksheetCell Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_cell' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_cell{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCellStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCellStyleRequest',
+            description => 'GetWorksheetCellStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_cell_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'StyleResponse',
+    };
+}
+#
+# @return StyleResponse
+#
+sub get_worksheet_cell_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('StyleResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellSetValueRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @value  string     
+# @type  string     
+# @formula  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellSetValueRequest',
+            description => 'PostWorksheetCellSetValue Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cell_set_value' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellResponse',
+    };
+}
+#
+# @return CellResponse
+#
+sub post_worksheet_cell_set_value{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUpdateWorksheetCellStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @style  Style (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWorksheetCellStyleRequest',
+            description => 'PostUpdateWorksheetCellStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_worksheet_cell_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_update_worksheet_cell_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostSetCellRangeValueRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellarea  string (required)    
+# @value  string (required)    
+# @type  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostSetCellRangeValueRequest',
+            description => 'PostSetCellRangeValue Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_set_cell_range_value' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_set_cell_range_value{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostCopyCellIntoCellRequest
+#
+# 
+# 
+# @name  string (required)    
+# @destCellName  string (required)    
+# @sheetName  string (required)    
+# @worksheet  string (required)    
+# @cellname  string     
+# @row  int     
+# @column  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCopyCellIntoCellRequest',
+            description => 'PostCopyCellIntoCell Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_copy_cell_into_cell' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_copy_cell_into_cell{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetCellHtmlStringRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetCellHtmlStringRequest',
+            description => 'GetCellHtmlString Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_cell_html_string' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_cell_html_string{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostSetCellHtmlStringRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostSetCellHtmlStringRequest',
+            description => 'PostSetCellHtmlString Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_set_cell_html_string' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_set_cell_html_string{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostCellCalculateRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @options  CalculationOptions     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCellCalculateRequest',
+            description => 'PostCellCalculate Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_cell_calculate' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_cell_calculate{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostCellCharactersRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @options  ARRAY[FontSetting]     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCellCharactersRequest',
+            description => 'PostCellCharacters Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_cell_characters' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_cell_characters{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string     
+# @sheetName  string     
+# @offset  int     
+# @count  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetColumnsRequest',
+            description => 'GetWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ColumnsResponse',
+    };
+}
+#
+# @return ColumnsResponse
+#
+sub get_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ColumnsResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostSetWorksheetColumnWidthRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @columnIndex  int (required)    
+# @width  double (required)    
+# @count  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostSetWorksheetColumnWidthRequest',
+            description => 'PostSetWorksheetColumnWidth Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_set_worksheet_column_width' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_set_worksheet_column_width{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetColumnRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @columnIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetColumnRequest',
+            description => 'GetWorksheetColumn Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_column' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ColumnResponse',
+    };
+}
+#
+# @return ColumnResponse
+#
+sub get_worksheet_column{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ColumnResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutInsertWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @columnIndex  int (required)    
+# @columns  int (required)    
+# @updateReference  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutInsertWorksheetColumnsRequest',
+            description => 'PutInsertWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_insert_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_insert_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @columnIndex  int (required)    
+# @columns  int (required)    
+# @updateReference  boolean (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetColumnsRequest',
+            description => 'DeleteWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostHideWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startColumn  int (required)    
+# @totalColumns  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostHideWorksheetColumnsRequest',
+            description => 'PostHideWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_hide_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_hide_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUnhideWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startColumn  int (required)    
+# @totalColumns  int (required)    
+# @width  double     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUnhideWorksheetColumnsRequest',
+            description => 'PostUnhideWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_unhide_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_unhide_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostGroupWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @firstIndex  int (required)    
+# @lastIndex  int (required)    
+# @hide  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostGroupWorksheetColumnsRequest',
+            description => 'PostGroupWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_group_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_group_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUngroupWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @firstIndex  int (required)    
+# @lastIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUngroupWorksheetColumnsRequest',
+            description => 'PostUngroupWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_ungroup_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_ungroup_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostCopyWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sourceColumnIndex  int (required)    
+# @destinationColumnIndex  int (required)    
+# @columnNumber  int (required)    
+# @worksheet  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCopyWorksheetColumnsRequest',
+            description => 'PostCopyWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_copy_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_copy_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostColumnStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @columnIndex  int (required)    
+# @style  Style (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostColumnStyleRequest',
+            description => 'PostColumnStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_column_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_column_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @offset  int     
+# @count  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetRowsRequest',
+            description => 'GetWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'RowsResponse',
+    };
+}
+#
+# @return RowsResponse
+#
+sub get_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RowsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetRowRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rowIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetRowRequest',
+            description => 'GetWorksheetRow Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_row' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'RowResponse',
+    };
+}
+#
+# @return RowResponse
+#
+sub get_worksheet_row{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RowResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetRowRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rowIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetRowRequest',
+            description => 'DeleteWorksheetRow Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_row' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_row{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startrow  int (required)    
+# @totalRows  int     
+# @updateReference  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetRowsRequest',
+            description => 'DeleteWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutInsertWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startrow  int (required)    
+# @totalRows  int     
+# @updateReference  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutInsertWorksheetRowsRequest',
+            description => 'PutInsertWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_insert_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_insert_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutInsertWorksheetRowRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rowIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutInsertWorksheetRowRequest',
+            description => 'PutInsertWorksheetRow Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_insert_worksheet_row' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_insert_worksheet_row{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUpdateWorksheetRowRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rowIndex  int (required)    
+# @height  double     
+# @count  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWorksheetRowRequest',
+            description => 'PostUpdateWorksheetRow Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_worksheet_row' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_update_worksheet_row{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostHideWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startrow  int (required)    
+# @totalRows  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostHideWorksheetRowsRequest',
+            description => 'PostHideWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_hide_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_hide_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUnhideWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startrow  int (required)    
+# @totalRows  int (required)    
+# @height  double     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUnhideWorksheetRowsRequest',
+            description => 'PostUnhideWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_unhide_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_unhide_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostGroupWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @firstIndex  int (required)    
+# @lastIndex  int (required)    
+# @hide  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostGroupWorksheetRowsRequest',
+            description => 'PostGroupWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_group_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_group_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUngroupWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @firstIndex  int (required)    
+# @lastIndex  int (required)    
+# @isAll  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUngroupWorksheetRowsRequest',
+            description => 'PostUngroupWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_ungroup_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_ungroup_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostCopyWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sourceRowIndex  int (required)    
+# @destinationRowIndex  int (required)    
+# @rowNumber  int (required)    
+# @worksheet  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCopyWorksheetRowsRequest',
+            description => 'PostCopyWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_copy_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_copy_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostRowStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rowIndex  int (required)    
+# @style  Style (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRowStyleRequest',
+            description => 'PostRowStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_row_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_row_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetCellsCloudServicesHealthCheckRequest
+#
+# 
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetCellsCloudServicesHealthCheckRequest',
+            description => 'GetCellsCloudServicesHealthCheck Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_cells_cloud_services_health_check' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_cells_cloud_services_health_check{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# GetCellsCloudServiceStatusRequest
+#
+# 
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetCellsCloudServiceStatusRequest',
+            description => 'GetCellsCloudServiceStatus Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_cells_cloud_service_status' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_cells_cloud_service_status{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# GetChartAreaRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartAreaRequest',
+            description => 'GetChartArea Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_area' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ChartAreaResponse',
+    };
+}
+#
+# @return ChartAreaResponse
+#
+sub get_chart_area{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ChartAreaResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartAreaFillFormatRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartAreaFillFormatRequest',
+            description => 'GetChartAreaFillFormat Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_area_fill_format' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FillFormatResponse',
+    };
+}
+#
+# @return FillFormatResponse
+#
+sub get_chart_area_fill_format{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FillFormatResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartAreaBorderRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartAreaBorderRequest',
+            description => 'GetChartAreaBorder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_area_border' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'LineResponse',
+    };
+}
+#
+# @return LineResponse
+#
+sub get_chart_area_border{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('LineResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetChartsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetChartsRequest',
+            description => 'GetWorksheetCharts Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_charts' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ChartsResponse',
+    };
+}
+#
+# @return ChartsResponse
+#
+sub get_worksheet_charts{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ChartsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetChartRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartNumber  int (required)    
+# @format  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetChartRequest',
+            description => 'GetWorksheetChart Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_chart' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_chart{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetAddChartRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartType  string (required)    
+# @upperLeftRow  int     
+# @upperLeftColumn  int     
+# @lowerRightRow  int     
+# @lowerRightColumn  int     
+# @area  string     
+# @isVertical  boolean     
+# @categoryData  string     
+# @isAutoGetSerialName  boolean     
+# @title  string     
+# @folder  string     
+# @dataLabels  boolean     
+# @dataLabelsPosition  string     
+# @pivotTableSheet  string     
+# @pivotTableName  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetAddChartRequest',
+            description => 'PutWorksheetAddChart Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_add_chart' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_add_chart{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetDeleteChartRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetDeleteChartRequest',
+            description => 'DeleteWorksheetDeleteChart Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_delete_chart' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_delete_chart{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetChartRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @chart  Chart (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetChartRequest',
+            description => 'PostWorksheetChart Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_chart' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_chart{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetChartLegendRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetChartLegendRequest',
+            description => 'GetWorksheetChartLegend Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_chart_legend' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'LegendResponse',
+    };
+}
+#
+# @return LegendResponse
+#
+sub get_worksheet_chart_legend{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('LegendResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetChartLegendRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @legend  Legend (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetChartLegendRequest',
+            description => 'PostWorksheetChartLegend Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_chart_legend' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_chart_legend{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetChartLegendRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetChartLegendRequest',
+            description => 'PutWorksheetChartLegend Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_chart_legend' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_chart_legend{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetChartLegendRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetChartLegendRequest',
+            description => 'DeleteWorksheetChartLegend Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_chart_legend' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_chart_legend{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetClearChartsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetClearChartsRequest',
+            description => 'DeleteWorksheetClearCharts Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_clear_charts' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_clear_charts{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetChartTitleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetChartTitleRequest',
+            description => 'GetWorksheetChartTitle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_chart_title' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'TitleResponse',
+    };
+}
+#
+# @return TitleResponse
+#
+sub get_worksheet_chart_title{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TitleResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetChartTitleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @title  Title (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetChartTitleRequest',
+            description => 'PostWorksheetChartTitle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_chart_title' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_chart_title{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetChartTitleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @title  Title     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetChartTitleRequest',
+            description => 'PutWorksheetChartTitle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_chart_title' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_chart_title{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetChartTitleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetChartTitleRequest',
+            description => 'DeleteWorksheetChartTitle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_chart_title' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_chart_title{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartSeriesAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartSeriesAxisRequest',
+            description => 'GetChartSeriesAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_series_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'AxisResponse',
+    };
+}
+#
+# @return AxisResponse
+#
+sub get_chart_series_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartCategoryAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartCategoryAxisRequest',
+            description => 'GetChartCategoryAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_category_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'AxisResponse',
+    };
+}
+#
+# @return AxisResponse
+#
+sub get_chart_category_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartValueAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartValueAxisRequest',
+            description => 'GetChartValueAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_value_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'AxisResponse',
+    };
+}
+#
+# @return AxisResponse
+#
+sub get_chart_value_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartSecondCategoryAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartSecondCategoryAxisRequest',
+            description => 'GetChartSecondCategoryAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_second_category_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'AxisResponse',
+    };
+}
+#
+# @return AxisResponse
+#
+sub get_chart_second_category_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetChartSecondValueAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetChartSecondValueAxisRequest',
+            description => 'GetChartSecondValueAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_chart_second_value_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'AxisResponse',
+    };
+}
+#
+# @return AxisResponse
+#
+sub get_chart_second_value_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostChartSeriesAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @axis  Axis (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostChartSeriesAxisRequest',
+            description => 'PostChartSeriesAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_series_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_chart_series_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostChartCategoryAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @axis  Axis (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostChartCategoryAxisRequest',
+            description => 'PostChartCategoryAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_category_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_chart_category_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostChartValueAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @axis  Axis (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostChartValueAxisRequest',
+            description => 'PostChartValueAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_value_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_chart_value_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostChartSecondCategoryAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @axis  Axis (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostChartSecondCategoryAxisRequest',
+            description => 'PostChartSecondCategoryAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_second_category_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_chart_second_category_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostChartSecondValueAxisRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @chartIndex  int (required)    
+# @axis  Axis (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostChartSecondValueAxisRequest',
+            description => 'PostChartSecondValueAxis Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_second_value_axis' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_chart_second_value_axis{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetConditionalFormattingsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetConditionalFormattingsRequest',
+            description => 'GetWorksheetConditionalFormattings Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_conditional_formattings' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ConditionalFormattingsResponse',
+    };
+}
+#
+# @return ConditionalFormattingsResponse
+#
+sub get_worksheet_conditional_formattings{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ConditionalFormattingsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetConditionalFormattingRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetConditionalFormattingRequest',
+            description => 'GetWorksheetConditionalFormatting Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_conditional_formatting' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ConditionalFormattingResponse',
+    };
+}
+#
+# @return ConditionalFormattingResponse
+#
+sub get_worksheet_conditional_formatting{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ConditionalFormattingResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetConditionalFormattingRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @formatcondition  FormatCondition (required)    
+# @cellArea  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetConditionalFormattingRequest',
+            description => 'PutWorksheetConditionalFormatting Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_conditional_formatting' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_conditional_formatting{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetFormatConditionRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @cellArea  string (required)    
+# @type  string (required)    
+# @operatorType  string (required)    
+# @formula1  string (required)    
+# @formula2  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetFormatConditionRequest',
+            description => 'PutWorksheetFormatCondition Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_format_condition' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_format_condition{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetFormatConditionAreaRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @cellArea  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetFormatConditionAreaRequest',
+            description => 'PutWorksheetFormatConditionArea Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_format_condition_area' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_format_condition_area{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetFormatConditionConditionRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @type  string (required)    
+# @operatorType  string (required)    
+# @formula1  string (required)    
+# @formula2  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetFormatConditionConditionRequest',
+            description => 'PutWorksheetFormatConditionCondition Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_format_condition_condition' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_format_condition_condition{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetConditionalFormattingsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetConditionalFormattingsRequest',
+            description => 'DeleteWorksheetConditionalFormattings Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_conditional_formattings' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_conditional_formattings{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetConditionalFormattingRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetConditionalFormattingRequest',
+            description => 'DeleteWorksheetConditionalFormatting Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_conditional_formatting' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_conditional_formatting{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetConditionalFormattingAreaRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startRow  int (required)    
+# @startColumn  int (required)    
+# @totalRows  int (required)    
+# @totalColumns  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetConditionalFormattingAreaRequest',
+            description => 'DeleteWorksheetConditionalFormattingArea Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_conditional_formatting_area' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_conditional_formatting_area{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookRequest
+#
+# 
+# 
+# @name  string (required)    
+# @format  string     
+# @password  string     
+# @isAutoFit  boolean     
+# @onlySaveTable  boolean     
+# @folder  string     
+# @outPath  string     
+# @storageName  string     
+# @outStorageName  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookRequest',
+            description => 'GetWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PutConvertWorkbookRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @format  string     
+# @password  string     
+# @outPath  string     
+# @storageName  string     
+# @checkExcelRestriction  boolean     
+# @streamFormat  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutConvertWorkbookRequest',
+            description => 'PutConvertWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_convert_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub put_convert_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookSaveAsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @newfilename  string (required)    
+# @saveOptions  SaveOptions     
+# @isAutoFitRows  boolean     
+# @isAutoFitColumns  boolean     
+# @folder  string     
+# @storageName  string     
+# @outStorageName  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookSaveAsRequest',
+            description => 'PostWorkbookSaveAs Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_save_as' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SaveResponse',
+    };
+}
+#
+# @return SaveResponse
+#
+sub post_workbook_save_as{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SaveResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostConvertWorkbookToPDFRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToPDFRequest',
+            description => 'PostConvertWorkbookToPDF Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_pdf' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_pdf {
+sub post_convert_workbook_to_pdf{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_pdf");
@@ -36838,46 +39637,61 @@ sub post_convert_workbook_to_pdf {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
-    return $_response_object;
+    return $_response_object;    
 }
 
 #
-# post_convert_workbook_to_png
+# PostConvertWorkbookToPNGRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToPNGRequest',
+            description => 'PostConvertWorkbookToPNG Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_png' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_png {
+sub post_convert_workbook_to_png{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_png");
@@ -36929,19 +39743,21 @@ sub post_convert_workbook_to_png {
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
     return $_response_object;
+
 }
 
 #
-# post_convert_workbook_to_pptx
+# PostConvertWorkbookToDocxRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
+   'workbook' => {
         data_type => 'string',
         description => 'File to upload',
         required => '1',
@@ -36956,18 +39772,137 @@ sub post_convert_workbook_to_png {
         description => '',
         required => '0',
     },
+   'request' =>{
+            data_type => 'PostConvertWorkbookToDocxRequest',
+            description => 'PostConvertWorkbookToDocx Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_docx' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_convert_workbook_to_docx{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined()){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'workbook' is set
+    unless (exists $args{'workbook'}) {
+      croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_docx");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/convert/docx';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+    # query params
+    if ( exists $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    # if ( exists $args{'workbook'}) {
+    #     $_body_data = $args{'workbook'};
+    # }
+    if ( exists $args{'workbook'} ) {   
+        $form_params->{'file'} = [ $args{'workbook'} ,'file','application/octet-stream'];
+    }
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+
+}
+
+#
+# PostConvertWorkbookToPptxRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToPptxRequest',
+            description => 'PostConvertWorkbookToPptx Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_pptx' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_pptx {
+sub post_convert_workbook_to_pptx{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_pptx");
@@ -37019,45 +39954,61 @@ sub post_convert_workbook_to_pptx {
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
     return $_response_object;
+
 }
 
 #
-# post_convert_workbook_to_html
+# PostConvertWorkbookToHtmlRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToHtmlRequest',
+            description => 'PostConvertWorkbookToHtml Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_html' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_html {
+sub post_convert_workbook_to_html{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_html");
@@ -37109,45 +40060,61 @@ sub post_convert_workbook_to_html {
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
     return $_response_object;
+
 }
 
 #
-# post_convert_workbook_to_markdown
+# PostConvertWorkbookToMarkdownRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToMarkdownRequest',
+            description => 'PostConvertWorkbookToMarkdown Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_markdown' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_markdown {
+sub post_convert_workbook_to_markdown{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_markdown");
@@ -37202,42 +40169,57 @@ sub post_convert_workbook_to_markdown {
 }
 
 #
-# post_convert_workbook_to_json
+# PostConvertWorkbookToJsonRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToJsonRequest',
+            description => 'PostConvertWorkbookToJson Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_json' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_json {
+sub post_convert_workbook_to_json{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_json");
@@ -37289,44 +40271,61 @@ sub post_convert_workbook_to_json {
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
     return $_response_object;
+
 }
+
 #
-# post_convert_workbook_to_sql
+# PostConvertWorkbookToSQLRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToSQLRequest',
+            description => 'PostConvertWorkbookToSQL Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_sql' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_sql {
+sub post_convert_workbook_to_sql{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_sql");
@@ -37378,45 +40377,61 @@ sub post_convert_workbook_to_sql {
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
     return $_response_object;
+
 }
 
 #
-# post_convert_workbook_to_csv
+# PostConvertWorkbookToCSVRequest
 #
 # 
 # 
-# @param string $workbook File to upload (required)
-# @param string $password  (optional)
-# @param boolean $check_excel_restriction  (optional, default to true)
+# @File  string (required)  File to upload  
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
 {
     my $params = {
-    'workbook' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => '',
-        required => '0',
-    },
-    'check_excel_restriction' => {
-        data_type => 'boolean',
-        description => '',
-        required => '0',
-    },
+        'workbook' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'password' => {
+            data_type => 'string',
+            description => '',
+            required => '0',
+        },
+        'check_excel_restriction' => {
+            data_type => 'boolean',
+            description => '',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'PostConvertWorkbookToCSVRequest',
+            description => 'PostConvertWorkbookToCSV Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_csv' } = { 
     	summary => '',
         params => $params,
         returns => 'FileInfo',
-        };
+    };
 }
+#
 # @return FileInfo
 #
-sub post_convert_workbook_to_csv {
+sub post_convert_workbook_to_csv{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+        return $_response_object;
+    }
     # verify the required parameter 'workbook' is set
     unless (exists $args{'workbook'}) {
       croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_csv");
@@ -37468,40 +40483,7741 @@ sub post_convert_workbook_to_csv {
     }
     my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
     return $_response_object;
+
 }
 
 #
-# storage_exists
+# GetWorksheetHyperlinksRequest
 #
-# Check if storage exists
 # 
-# @param string $storage_name Storage name (required)
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
 {
     my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetHyperlinksRequest',
+            description => 'GetWorksheetHyperlinks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_hyperlinks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'HyperlinksResponse',
+    };
+}
+#
+# @return HyperlinksResponse
+#
+sub get_worksheet_hyperlinks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('HyperlinksResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetHyperlinkRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @hyperlinkIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetHyperlinkRequest',
+            description => 'GetWorksheetHyperlink Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_hyperlink' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'HyperlinkResponse',
+    };
+}
+#
+# @return HyperlinkResponse
+#
+sub get_worksheet_hyperlink{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('HyperlinkResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetHyperlinkRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @hyperlinkIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetHyperlinkRequest',
+            description => 'DeleteWorksheetHyperlink Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_hyperlink' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_hyperlink{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetHyperlinkRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @hyperlinkIndex  int (required)    
+# @hyperlink  Hyperlink (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetHyperlinkRequest',
+            description => 'PostWorksheetHyperlink Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_hyperlink' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_hyperlink{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetHyperlinkRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @firstRow  int (required)    
+# @firstColumn  int (required)    
+# @totalRows  int (required)    
+# @totalColumns  int (required)    
+# @address  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetHyperlinkRequest',
+            description => 'PutWorksheetHyperlink Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_hyperlink' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_hyperlink{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetHyperlinksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetHyperlinksRequest',
+            description => 'DeleteWorksheetHyperlinks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_hyperlinks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_hyperlinks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostAssembleRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @datasource  string (required)    
+# @format  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAssembleRequest',
+            description => 'PostAssemble Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_assemble' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_assemble{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostCompressRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @CompressLevel  int     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCompressRequest',
+            description => 'PostCompress Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_compress' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_compress{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostExportRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @objectType  string     
+# @format  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostExportRequest',
+            description => 'PostExport Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_export' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_export{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostMergeRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @format  string     
+# @mergeToOneSheet  boolean     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostMergeRequest',
+            description => 'PostMerge Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_merge' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_merge{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostUnlockRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @password  string (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUnlockRequest',
+            description => 'PostUnlock Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_unlock' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_unlock{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostProtectRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @password  string (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostProtectRequest',
+            description => 'PostProtect Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_protect' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_protect{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostSplitRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @format  string (required)    
+# @password  string     
+# @from  int     
+# @to  int     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostSplitRequest',
+            description => 'PostSplit Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_split' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_split{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostSearchRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @text  string (required)    
+# @password  string     
+# @sheetname  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostSearchRequest',
+            description => 'PostSearch Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_search' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ARRAY[TextItem]',
+    };
+}
+#
+# @return ARRAY[TextItem]
+#
+sub post_search{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ARRAY[TextItem]', $response);
+    return $_response_object;
+}
+
+#
+# PostReplaceRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @text  string (required)    
+# @newtext  string (required)    
+# @password  string     
+# @sheetname  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostReplaceRequest',
+            description => 'PostReplace Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_replace' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_replace{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostImportRequest
+#
+# 
+# 
+# @File  string (required)  File to upload   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostImportRequest',
+            description => 'PostImport Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_import' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_import{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostWatermarkRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @text  string (required)    
+# @color  string (required)    
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWatermarkRequest',
+            description => 'PostWatermark Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_watermark' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_watermark{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostClearObjectsRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @objecttype  string (required)    
+# @sheetname  string     
+# @outFormat  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostClearObjectsRequest',
+            description => 'PostClearObjects Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_clear_objects' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_clear_objects{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostReverseRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @rotateType  string (required)    
+# @format  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostReverseRequest',
+            description => 'PostReverse Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_reverse' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_reverse{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostRotateRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @rotateType  string (required)    
+# @format  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRotateRequest',
+            description => 'PostRotate Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_rotate' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_rotate{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostMetadataRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @cellsDocuments  ARRAY[CellsDocumentProperty] (required)    
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostMetadataRequest',
+            description => 'PostMetadata Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_metadata' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_metadata{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# GetMetadataRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @type  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetMetadataRequest',
+            description => 'GetMetadata Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_metadata' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ARRAY[CellsDocumentProperty]',
+    };
+}
+#
+# @return ARRAY[CellsDocumentProperty]
+#
+sub get_metadata{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ARRAY[CellsDocumentProperty]', $response);
+    return $_response_object;
+}
+
+#
+# DeleteMetadataRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @type  string     
+# @password  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteMetadataRequest',
+            description => 'DeleteMetadata Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_metadata' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub delete_metadata{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetListObjectsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetListObjectsRequest',
+            description => 'GetWorksheetListObjects Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_list_objects' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ListObjectsResponse',
+    };
+}
+#
+# @return ListObjectsResponse
+#
+sub get_worksheet_list_objects{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ListObjectsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetListObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listobjectindex  int (required)    
+# @format  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetListObjectRequest',
+            description => 'GetWorksheetListObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_list_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_list_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetListObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startRow  int     
+# @startColumn  int     
+# @endRow  int     
+# @endColumn  int     
+# @folder  string     
+# @hasHeaders  boolean     
+# @displayName  string     
+# @showTotals  boolean     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetListObjectRequest',
+            description => 'PutWorksheetListObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_list_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_list_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetListObjectsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetListObjectsRequest',
+            description => 'DeleteWorksheetListObjects Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_list_objects' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_list_objects{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetListObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetListObjectRequest',
+            description => 'DeleteWorksheetListObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_list_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_list_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @listObject  ListObject (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListObjectRequest',
+            description => 'PostWorksheetListObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListObjectConvertToRangeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListObjectConvertToRangeRequest',
+            description => 'PostWorksheetListObjectConvertToRange Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_convert_to_range' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_object_convert_to_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListObjectSummarizeWithPivotTableRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @destsheetName  string (required)    
+# @createPivotTableRequest  CreatePivotTableRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListObjectSummarizeWithPivotTableRequest',
+            description => 'PostWorksheetListObjectSummarizeWithPivotTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_summarize_with_pivot_table' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_object_summarize_with_pivot_table{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListObjectSortTableRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @dataSorter  DataSorter (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListObjectSortTableRequest',
+            description => 'PostWorksheetListObjectSortTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_sort_table' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_object_sort_table{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListColumnRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @columnIndex  int (required)    
+# @listColumn  ListColumn (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListColumnRequest',
+            description => 'PostWorksheetListColumn Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_column' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_column{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListColumnsTotalRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @tableTotalRequests  ARRAY[TableTotalRequest] (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListColumnsTotalRequest',
+            description => 'PostWorksheetListColumnsTotal Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_columns_total' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_columns_total{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetOleObjectsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetOleObjectsRequest',
+            description => 'GetWorksheetOleObjects Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_ole_objects' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'OleObjectsResponse',
+    };
+}
+#
+# @return OleObjectsResponse
+#
+sub get_worksheet_ole_objects{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('OleObjectsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetOleObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @objectNumber  int (required)    
+# @format  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetOleObjectRequest',
+            description => 'GetWorksheetOleObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_ole_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_ole_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetOleObjectsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetOleObjectsRequest',
+            description => 'DeleteWorksheetOleObjects Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_ole_objects' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_ole_objects{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetOleObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @oleObjectIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetOleObjectRequest',
+            description => 'DeleteWorksheetOleObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_ole_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_ole_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUpdateWorksheetOleObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @oleObjectIndex  int (required)    
+# @ole  OleObject (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWorksheetOleObjectRequest',
+            description => 'PostUpdateWorksheetOleObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_worksheet_ole_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_update_worksheet_ole_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetOleObjectRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @upperLeftRow  int     
+# @upperLeftColumn  int     
+# @height  int     
+# @width  int     
+# @oleFile  string     
+# @imageFile  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetOleObjectRequest',
+            description => 'PutWorksheetOleObject Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_ole_object' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_ole_object{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetVerticalPageBreaksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetVerticalPageBreaksRequest',
+            description => 'GetVerticalPageBreaks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_vertical_page_breaks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'VerticalPageBreaksResponse',
+    };
+}
+#
+# @return VerticalPageBreaksResponse
+#
+sub get_vertical_page_breaks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VerticalPageBreaksResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetHorizontalPageBreaksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetHorizontalPageBreaksRequest',
+            description => 'GetHorizontalPageBreaks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_horizontal_page_breaks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'HorizontalPageBreaksResponse',
+    };
+}
+#
+# @return HorizontalPageBreaksResponse
+#
+sub get_horizontal_page_breaks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('HorizontalPageBreaksResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetVerticalPageBreakRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetVerticalPageBreakRequest',
+            description => 'GetVerticalPageBreak Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_vertical_page_break' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'VerticalPageBreakResponse',
+    };
+}
+#
+# @return VerticalPageBreakResponse
+#
+sub get_vertical_page_break{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VerticalPageBreakResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetHorizontalPageBreakRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetHorizontalPageBreakRequest',
+            description => 'GetHorizontalPageBreak Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_horizontal_page_break' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'HorizontalPageBreakResponse',
+    };
+}
+#
+# @return HorizontalPageBreakResponse
+#
+sub get_horizontal_page_break{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('HorizontalPageBreakResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutVerticalPageBreakRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellname  string     
+# @column  int     
+# @row  int     
+# @startRow  int     
+# @endRow  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutVerticalPageBreakRequest',
+            description => 'PutVerticalPageBreak Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_vertical_page_break' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_vertical_page_break{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutHorizontalPageBreakRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellname  string     
+# @row  int     
+# @column  int     
+# @startColumn  int     
+# @endColumn  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutHorizontalPageBreakRequest',
+            description => 'PutHorizontalPageBreak Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_horizontal_page_break' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_horizontal_page_break{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteVerticalPageBreaksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @column  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteVerticalPageBreaksRequest',
+            description => 'DeleteVerticalPageBreaks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_vertical_page_breaks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_vertical_page_breaks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteHorizontalPageBreaksRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @row  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteHorizontalPageBreaksRequest',
+            description => 'DeleteHorizontalPageBreaks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_horizontal_page_breaks' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_horizontal_page_breaks{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteVerticalPageBreakRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteVerticalPageBreakRequest',
+            description => 'DeleteVerticalPageBreak Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_vertical_page_break' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_vertical_page_break{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteHorizontalPageBreakRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteHorizontalPageBreakRequest',
+            description => 'DeleteHorizontalPageBreak Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_horizontal_page_break' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_horizontal_page_break{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetPageSetupRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetPageSetupRequest',
+            description => 'GetPageSetup Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_page_setup' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PageSetupResponse',
+    };
+}
+#
+# @return PageSetupResponse
+#
+sub get_page_setup{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PageSetupResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPageSetupRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pageSetup  PageSetup (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPageSetupRequest',
+            description => 'PostPageSetup Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_page_setup' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_page_setup{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteHeaderFooterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteHeaderFooterRequest',
+            description => 'DeleteHeaderFooter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_header_footer' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_header_footer{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetHeaderRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetHeaderRequest',
+            description => 'GetHeader Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_header' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PageSectionsResponse',
+    };
+}
+#
+# @return PageSectionsResponse
+#
+sub get_header{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PageSectionsResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostHeaderRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @section  int (required)    
+# @script  string (required)    
+# @isFirstPage  boolean (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostHeaderRequest',
+            description => 'PostHeader Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_header' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_header{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetFooterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetFooterRequest',
+            description => 'GetFooter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_footer' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PageSectionsResponse',
+    };
+}
+#
+# @return PageSectionsResponse
+#
+sub get_footer{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PageSectionsResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostFooterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @section  int (required)    
+# @script  string (required)    
+# @isFirstPage  boolean (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostFooterRequest',
+            description => 'PostFooter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_footer' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_footer{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPicturesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPicturesRequest',
+            description => 'GetWorksheetPictures Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_pictures' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PicturesResponse',
+    };
+}
+#
+# @return PicturesResponse
+#
+sub get_worksheet_pictures{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PicturesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPictureWithFormatRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pictureNumber  int (required)    
+# @format  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPictureWithFormatRequest',
+            description => 'GetWorksheetPictureWithFormat Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_picture_with_format' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_picture_with_format{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetAddPictureRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @picture  Picture     
+# @upperLeftRow  int     
+# @upperLeftColumn  int     
+# @lowerRightRow  int     
+# @lowerRightColumn  int     
+# @picturePath  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetAddPictureRequest',
+            description => 'PutWorksheetAddPicture Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_add_picture' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_add_picture{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetPictureRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pictureIndex  int (required)    
+# @picture  Picture (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetPictureRequest',
+            description => 'PostWorksheetPicture Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_picture' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_picture{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetPictureRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pictureIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetPictureRequest',
+            description => 'DeleteWorksheetPicture Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_picture' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_picture{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetPicturesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetPicturesRequest',
+            description => 'DeleteWorksheetPictures Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_pictures' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_pictures{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPivotTablesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPivotTablesRequest',
+            description => 'GetWorksheetPivotTables Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_tables' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PivotTablesResponse',
+    };
+}
+#
+# @return PivotTablesResponse
+#
+sub get_worksheet_pivot_tables{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PivotTablesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPivotTableRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivottableIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPivotTableRequest',
+            description => 'GetWorksheetPivotTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_table' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PivotTableResponse',
+    };
+}
+#
+# @return PivotTableResponse
+#
+sub get_worksheet_pivot_table{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PivotTableResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetPivotTableFieldRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @pivotFieldIndex  int (required)    
+# @pivotFieldType  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetPivotTableFieldRequest',
+            description => 'GetPivotTableField Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_pivot_table_field' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PivotFieldResponse',
+    };
+}
+#
+# @return PivotFieldResponse
+#
+sub get_pivot_table_field{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PivotFieldResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPivotTableFiltersRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPivotTableFiltersRequest',
+            description => 'GetWorksheetPivotTableFilters Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_table_filters' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PivotFiltersResponse',
+    };
+}
+#
+# @return PivotFiltersResponse
+#
+sub get_worksheet_pivot_table_filters{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PivotFiltersResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPivotTableFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @filterIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPivotTableFilterRequest',
+            description => 'GetWorksheetPivotTableFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_table_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'PivotFilterResponse',
+    };
+}
+#
+# @return PivotFilterResponse
+#
+sub get_worksheet_pivot_table_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('PivotFilterResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetPivotTableRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @sourceData  string     
+# @destCellName  string     
+# @tableName  string     
+# @useSameSource  boolean     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetPivotTableRequest',
+            description => 'PutWorksheetPivotTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_pivot_table' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_pivot_table{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutPivotTableFieldRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @pivotFieldType  string (required)    
+# @pivotTableFieldRequest  PivotTableFieldRequest (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutPivotTableFieldRequest',
+            description => 'PutPivotTableField Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_pivot_table_field' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_pivot_table_field{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetPivotTableFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @filter  PivotFilter (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetPivotTableFilterRequest',
+            description => 'PutWorksheetPivotTableFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_pivot_table_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_pivot_table_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPivotTableFieldHideItemRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @pivotFieldType  string (required)    
+# @fieldIndex  int (required)    
+# @itemIndex  int (required)    
+# @isHide  boolean (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPivotTableFieldHideItemRequest',
+            description => 'PostPivotTableFieldHideItem Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_pivot_table_field_hide_item' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_pivot_table_field_hide_item{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPivotTableFieldMoveToRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @fieldIndex  int (required)    
+# @from  string (required)    
+# @to  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPivotTableFieldMoveToRequest',
+            description => 'PostPivotTableFieldMoveTo Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_pivot_table_field_move_to' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_pivot_table_field_move_to{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPivotTableCellStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @column  int (required)    
+# @row  int (required)    
+# @style  Style (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPivotTableCellStyleRequest',
+            description => 'PostPivotTableCellStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_pivot_table_cell_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_pivot_table_cell_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPivotTableStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @style  Style (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPivotTableStyleRequest',
+            description => 'PostPivotTableStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_pivot_table_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_pivot_table_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPivotTableUpdatePivotFieldsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @pivotFieldType  string (required)    
+# @pivotField  PivotField (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPivotTableUpdatePivotFieldsRequest',
+            description => 'PostPivotTableUpdatePivotFields Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_pivot_table_update_pivot_fields' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_pivot_table_update_pivot_fields{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostPivotTableUpdatePivotFieldRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @pivotFieldIndex  int (required)    
+# @pivotFieldType  string (required)    
+# @pivotField  PivotField (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostPivotTableUpdatePivotFieldRequest',
+            description => 'PostPivotTableUpdatePivotField Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_pivot_table_update_pivot_field' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_pivot_table_update_pivot_field{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetPivotTableCalculateRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetPivotTableCalculateRequest',
+            description => 'PostWorksheetPivotTableCalculate Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_pivot_table_calculate' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_pivot_table_calculate{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetPivotTableMoveRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @row  int     
+# @column  int     
+# @destCellName  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetPivotTableMoveRequest',
+            description => 'PostWorksheetPivotTableMove Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_pivot_table_move' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_pivot_table_move{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetPivotTablesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetPivotTablesRequest',
+            description => 'DeleteWorksheetPivotTables Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_pivot_tables' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_pivot_tables{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetPivotTableRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetPivotTableRequest',
+            description => 'DeleteWorksheetPivotTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_pivot_table' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_pivot_table{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeletePivotTableFieldRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @pivotFieldType  string (required)    
+# @pivotTableFieldRequest  PivotTableFieldRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeletePivotTableFieldRequest',
+            description => 'DeletePivotTableField Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_pivot_table_field' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_pivot_table_field{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetPivotTableFiltersRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetPivotTableFiltersRequest',
+            description => 'DeleteWorksheetPivotTableFilters Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_pivot_table_filters' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_pivot_table_filters{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetPivotTableFilterRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @pivotTableIndex  int (required)    
+# @fieldIndex  int (required)    
+# @needReCalculate  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetPivotTableFilterRequest',
+            description => 'DeleteWorksheetPivotTableFilter Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_pivot_table_filter' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_pivot_table_filter{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetDocumentPropertiesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @type  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetDocumentPropertiesRequest',
+            description => 'GetDocumentProperties Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_document_properties' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsDocumentPropertiesResponse',
+    };
+}
+#
+# @return CellsDocumentPropertiesResponse
+#
+sub get_document_properties{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsDocumentPropertiesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetDocumentPropertyRequest
+#
+# 
+# 
+# @name  string (required)    
+# @propertyName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetDocumentPropertyRequest',
+            description => 'GetDocumentProperty Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_document_property' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsDocumentPropertyResponse',
+    };
+}
+#
+# @return CellsDocumentPropertyResponse
+#
+sub get_document_property{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsDocumentPropertyResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutDocumentPropertyRequest
+#
+# 
+# 
+# @name  string (required)    
+# @property  CellsDocumentProperty (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutDocumentPropertyRequest',
+            description => 'PutDocumentProperty Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_document_property' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_document_property{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteDocumentPropertyRequest
+#
+# 
+# 
+# @name  string (required)    
+# @propertyName  string (required)    
+# @type  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteDocumentPropertyRequest',
+            description => 'DeleteDocumentProperty Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_document_property' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_document_property{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteDocumentPropertiesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteDocumentPropertiesRequest',
+            description => 'DeleteDocumentProperties Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_document_properties' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_document_properties{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rangeOperate  RangeCopyRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangesRequest',
+            description => 'PostWorksheetCellsRanges Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_ranges' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_ranges{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeMergeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  Range (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeMergeRequest',
+            description => 'PostWorksheetCellsRangeMerge Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_merge' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_merge{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeUnMergeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  Range (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeUnMergeRequest',
+            description => 'PostWorksheetCellsRangeUnMerge Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_un_merge' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_un_merge{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rangeOperate  RangeSetStyleRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeStyleRequest',
+            description => 'PostWorksheetCellsRangeStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCellsRangeValueRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @namerange  string     
+# @firstRow  int     
+# @firstColumn  int     
+# @rowCount  int     
+# @columnCount  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCellsRangeValueRequest',
+            description => 'GetWorksheetCellsRangeValue Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_cells_range_value' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'RangeValueResponse',
+    };
+}
+#
+# @return RangeValueResponse
+#
+sub get_worksheet_cells_range_value{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RangeValueResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeValueRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  Range (required)    
+# @Value  string (required)    
+# @isConverted  boolean     
+# @setStyle  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeValueRequest',
+            description => 'PostWorksheetCellsRangeValue Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_value' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_value{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeMoveToRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  Range (required)    
+# @destRow  int (required)    
+# @destColumn  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeMoveToRequest',
+            description => 'PostWorksheetCellsRangeMoveTo Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_move_to' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_move_to{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeOutlineBorderRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rangeOperate  RangeSetOutlineBorderRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeOutlineBorderRequest',
+            description => 'PostWorksheetCellsRangeOutlineBorder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_outline_border' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_outline_border{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeColumnWidthRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  Range (required)    
+# @value  double (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeColumnWidthRequest',
+            description => 'PostWorksheetCellsRangeColumnWidth Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_column_width' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_column_width{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCellsRangeRowHeightRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  Range (required)    
+# @value  double (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeRowHeightRequest',
+            description => 'PostWorksheetCellsRangeRowHeight Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_row_height' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_row_height{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetCellsRangeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @shift  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetCellsRangeRequest',
+            description => 'PutWorksheetCellsRange Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_cells_range' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_cells_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetCellsRangeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string (required)    
+# @shift  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetCellsRangeRequest',
+            description => 'DeleteWorksheetCellsRange Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_cells_range' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_cells_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetShapesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetShapesRequest',
+            description => 'GetWorksheetShapes Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_shapes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ShapesResponse',
+    };
+}
+#
+# @return ShapesResponse
+#
+sub get_worksheet_shapes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetShapeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @shapeindex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetShapeRequest',
+            description => 'GetWorksheetShape Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_shape' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ShapeResponse',
+    };
+}
+#
+# @return ShapeResponse
+#
+sub get_worksheet_shape{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetShapeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @shapeDTO  Shape     
+# @DrawingType  string     
+# @upperLeftRow  int     
+# @upperLeftColumn  int     
+# @top  int     
+# @left  int     
+# @width  int     
+# @height  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetShapeRequest',
+            description => 'PutWorksheetShape Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_shape' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_shape{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetShapesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetShapesRequest',
+            description => 'DeleteWorksheetShapes Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_shapes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_shapes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetShapeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @shapeindex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetShapeRequest',
+            description => 'DeleteWorksheetShape Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_shape' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_shape{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetShapeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @shapeindex  int (required)    
+# @dto  Shape (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetShapeRequest',
+            description => 'PostWorksheetShape Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_shape' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_shape{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetGroupShapeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listShape  ARRAY[int?] (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetGroupShapeRequest',
+            description => 'PostWorksheetGroupShape Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_group_shape' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_group_shape{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetUngroupShapeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @shapeindex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetUngroupShapeRequest',
+            description => 'PostWorksheetUngroupShape Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_ungroup_shape' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_ungroup_shape{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetSparklineGroupsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetSparklineGroupsRequest',
+            description => 'GetWorksheetSparklineGroups Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_sparkline_groups' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SparklineGroupsResponse',
+    };
+}
+#
+# @return SparklineGroupsResponse
+#
+sub get_worksheet_sparkline_groups{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SparklineGroupsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetSparklineGroupRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sparklineIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetSparklineGroupRequest',
+            description => 'GetWorksheetSparklineGroup Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SparklineGroupResponse',
+    };
+}
+#
+# @return SparklineGroupResponse
+#
+sub get_worksheet_sparkline_group{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SparklineGroupResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetSparklineGroupsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetSparklineGroupsRequest',
+            description => 'DeleteWorksheetSparklineGroups Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_sparkline_groups' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_sparkline_groups{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetSparklineGroupRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sparklineIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetSparklineGroupRequest',
+            description => 'DeleteWorksheetSparklineGroup Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_sparkline_group{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetSparklineGroupRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @type  string (required)    
+# @dataRange  string (required)    
+# @isVertical  boolean (required)    
+# @locationRange  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetSparklineGroupRequest',
+            description => 'PutWorksheetSparklineGroup Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_sparkline_group{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetSparklineGroupRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sparklineGroupIndex  int (required)    
+# @sparklineGroup  SparklineGroup (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetSparklineGroupRequest',
+            description => 'PostWorksheetSparklineGroup Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_sparkline_group{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostRunTaskRequest
+#
+# 
+# 
+# @TaskData  TaskData (required)  Task Data Descrition   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRunTaskRequest',
+            description => 'PostRunTask Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_run_task' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_run_task{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostDigitalSignatureRequest
+#
+# 
+# 
+# @name  string (required)    
+# @digitalsignaturefile  string (required)    
+# @password  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostDigitalSignatureRequest',
+            description => 'PostDigitalSignature Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_digital_signature' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_digital_signature{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostEncryptWorkbookRequest
+#
+# 
+# 
+# @name  string (required)    
+# @encryption  WorkbookEncryptionRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostEncryptWorkbookRequest',
+            description => 'PostEncryptWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_encrypt_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_encrypt_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteDecryptWorkbookRequest
+#
+# 
+# 
+# @name  string (required)    
+# @encryption  WorkbookEncryptionRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteDecryptWorkbookRequest',
+            description => 'DeleteDecryptWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_decrypt_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_decrypt_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostProtectWorkbookRequest
+#
+# 
+# 
+# @name  string (required)    
+# @protection  WorkbookProtectionRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostProtectWorkbookRequest',
+            description => 'PostProtectWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_protect_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_protect_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteUnProtectWorkbookRequest
+#
+# 
+# 
+# @name  string (required)    
+# @protection  WorkbookProtectionRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteUnProtectWorkbookRequest',
+            description => 'DeleteUnProtectWorkbook Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_un_protect_workbook' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_un_protect_workbook{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookDefaultStyleRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookDefaultStyleRequest',
+            description => 'GetWorkbookDefaultStyle Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook_default_style' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'StyleResponse',
+    };
+}
+#
+# @return StyleResponse
+#
+sub get_workbook_default_style{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('StyleResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookTextItemsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookTextItemsRequest',
+            description => 'GetWorkbookTextItems Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook_text_items' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'TextItemsResponse',
+    };
+}
+#
+# @return TextItemsResponse
+#
+sub get_workbook_text_items{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TextItemsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookNamesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookNamesRequest',
+            description => 'GetWorkbookNames Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook_names' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'NamesResponse',
+    };
+}
+#
+# @return NamesResponse
+#
+sub get_workbook_names{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('NamesResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorkbookNameRequest
+#
+# 
+# 
+# @name  string (required)    
+# @newName  Name (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorkbookNameRequest',
+            description => 'PutWorkbookName Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_workbook_name' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_workbook_name{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookNameRequest
+#
+# 
+# 
+# @name  string (required)    
+# @nameName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookNameRequest',
+            description => 'GetWorkbookName Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook_name' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'NameResponse',
+    };
+}
+#
+# @return NameResponse
+#
+sub get_workbook_name{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('NameResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookNameRequest
+#
+# 
+# 
+# @name  string (required)    
+# @nameName  string (required)    
+# @newName  Name (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookNameRequest',
+            description => 'PostWorkbookName Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_name' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_workbook_name{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookNameValueRequest
+#
+# 
+# 
+# @name  string (required)    
+# @nameName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookNameValueRequest',
+            description => 'GetWorkbookNameValue Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook_name_value' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'RangeValueResponse',
+    };
+}
+#
+# @return RangeValueResponse
+#
+sub get_workbook_name_value{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RangeValueResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorkbookNamesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorkbookNamesRequest',
+            description => 'DeleteWorkbookNames Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_workbook_names' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_workbook_names{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorkbookNameRequest
+#
+# 
+# 
+# @name  string (required)    
+# @nameName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorkbookNameRequest',
+            description => 'DeleteWorkbookName Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_workbook_name' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_workbook_name{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutDocumentProtectFromChangesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @password  PasswordRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutDocumentProtectFromChangesRequest',
+            description => 'PutDocumentProtectFromChanges Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_document_protect_from_changes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_document_protect_from_changes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteDocumentUnProtectFromChangesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteDocumentUnProtectFromChangesRequest',
+            description => 'DeleteDocumentUnProtectFromChanges Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_document_un_protect_from_changes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_document_un_protect_from_changes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbooksMergeRequest
+#
+# 
+# 
+# @name  string (required)    
+# @mergeWith  string (required)    
+# @folder  string     
+# @storageName  string     
+# @mergedStorageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbooksMergeRequest',
+            description => 'PostWorkbooksMerge Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbooks_merge' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'WorkbookResponse',
+    };
+}
+#
+# @return WorkbookResponse
+#
+sub post_workbooks_merge{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('WorkbookResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbooksTextSearchRequest
+#
+# 
+# 
+# @name  string (required)    
+# @text  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbooksTextSearchRequest',
+            description => 'PostWorkbooksTextSearch Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbooks_text_search' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'TextItemsResponse',
+    };
+}
+#
+# @return TextItemsResponse
+#
+sub post_workbooks_text_search{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TextItemsResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookTextReplaceRequest
+#
+# 
+# 
+# @name  string (required)    
+# @oldValue  string (required)    
+# @newValue  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookTextReplaceRequest',
+            description => 'PostWorkbookTextReplace Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_text_replace' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'WorkbookReplaceResponse',
+    };
+}
+#
+# @return WorkbookReplaceResponse
+#
+sub post_workbook_text_replace{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('WorkbookReplaceResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookGetSmartMarkerResultRequest
+#
+# 
+# 
+# @name  string (required)    
+# @xmlFile  string     
+# @folder  string     
+# @outPath  string     
+# @storageName  string     
+# @outStorageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookGetSmartMarkerResultRequest',
+            description => 'PostWorkbookGetSmartMarkerResult Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_get_smart_marker_result' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_workbook_get_smart_marker_result{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PutWorkbookCreateRequest
+#
+# 
+# 
+# @name  string (required)    
+# @templateFile  string     
+# @dataFile  string     
+# @isWriteOver  boolean     
+# @folder  string     
+# @storageName  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorkbookCreateRequest',
+            description => 'PutWorkbookCreate Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_workbook_create' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_workbook_create{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookSplitRequest
+#
+# 
+# 
+# @name  string (required)    
+# @format  string     
+# @outFolder  string     
+# @from  int     
+# @to  int     
+# @horizontalResolution  int     
+# @verticalResolution  int     
+# @splitNameRule  string     
+# @folder  string     
+# @storageName  string     
+# @outStorageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookSplitRequest',
+            description => 'PostWorkbookSplit Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_split' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SplitResultResponse',
+    };
+}
+#
+# @return SplitResultResponse
+#
+sub post_workbook_split{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SplitResultResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostImportDataRequest
+#
+# 
+# 
+# @name  string (required)    
+# @importOption  ImportOption     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostImportDataRequest',
+            description => 'PostImportData Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_import_data' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_import_data{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookCalculateFormulaRequest
+#
+# 
+# 
+# @name  string (required)    
+# @options  CalculationOptions     
+# @ignoreError  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookCalculateFormulaRequest',
+            description => 'PostWorkbookCalculateFormula Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_calculate_formula' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_workbook_calculate_formula{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostAutofitWorkbookRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @startRow  int     
+# @endRow  int     
+# @onlyAuto  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAutofitWorkbookRowsRequest',
+            description => 'PostAutofitWorkbookRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_autofit_workbook_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_autofit_workbook_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostAutofitWorkbookColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @startColumn  int     
+# @endColumn  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAutofitWorkbookColumnsRequest',
+            description => 'PostAutofitWorkbookColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_autofit_workbook_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_autofit_workbook_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorkbookSettingsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorkbookSettingsRequest',
+            description => 'GetWorkbookSettings Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_workbook_settings' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'WorkbookSettingsResponse',
+    };
+}
+#
+# @return WorkbookSettingsResponse
+#
+sub get_workbook_settings{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('WorkbookSettingsResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookSettingsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @settings  WorkbookSettings (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookSettingsRequest',
+            description => 'PostWorkbookSettings Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_settings' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_workbook_settings{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorkbookBackgroundRequest
+#
+# 
+# 
+# @name  string (required)    
+# @picPath  string     
+# @folder  string     
+# @storageName  string     
+# @File  string   File to upload   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorkbookBackgroundRequest',
+            description => 'PutWorkbookBackground Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_workbook_background' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_workbook_background{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorkbookBackgroundRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorkbookBackgroundRequest',
+            description => 'DeleteWorkbookBackground Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_workbook_background' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_workbook_background{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorkbookWaterMarkerRequest
+#
+# 
+# 
+# @name  string (required)    
+# @textWaterMarkerRequest  TextWaterMarkerRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorkbookWaterMarkerRequest',
+            description => 'PutWorkbookWaterMarker Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_workbook_water_marker' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_workbook_water_marker{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetPageCountRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetPageCountRequest',
+            description => 'GetPageCount Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_page_count' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'int',
+    };
+}
+#
+# @return int
+#
+sub get_page_count{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('int', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetsRequest',
+            description => 'GetWorksheets Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheets' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'WorksheetsResponse',
+    };
+}
+#
+# @return WorksheetsResponse
+#
+sub get_worksheets{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('WorksheetsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetWithFormatRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @format  string     
+# @verticalResolution  int     
+# @horizontalResolution  int     
+# @area  string     
+# @pageIndex  int     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetWithFormatRequest',
+            description => 'GetWorksheetWithFormat Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_with_format' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_worksheet_with_format{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PutChangeVisibilityWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @isVisible  boolean (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutChangeVisibilityWorksheetRequest',
+            description => 'PutChangeVisibilityWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_change_visibility_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_change_visibility_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutActiveWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutActiveWorksheetRequest',
+            description => 'PutActiveWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_active_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_active_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutInsertNewWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @index  int (required)    
+# @sheettype  string (required)    
+# @newsheetname  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutInsertNewWorksheetRequest',
+            description => 'PutInsertNewWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_insert_new_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_insert_new_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutAddNewWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @position  int     
+# @sheettype  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutAddNewWorksheetRequest',
+            description => 'PutAddNewWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_add_new_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_add_new_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetRequest',
+            description => 'DeleteWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @matchCondition  MatchConditionRequest     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetsRequest',
+            description => 'DeleteWorksheets Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheets' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheets{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostMoveWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @moving  WorksheetMovingRequest (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostMoveWorksheetRequest',
+            description => 'PostMoveWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_move_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_move_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutProtectWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @protectParameter  ProtectSheetParameter (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutProtectWorksheetRequest',
+            description => 'PutProtectWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_protect_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_protect_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteUnprotectWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @protectParameter  ProtectSheetParameter (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteUnprotectWorksheetRequest',
+            description => 'DeleteUnprotectWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_unprotect_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_unprotect_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetTextItemsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetTextItemsRequest',
+            description => 'GetWorksheetTextItems Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_text_items' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'TextItemsResponse',
+    };
+}
+#
+# @return TextItemsResponse
+#
+sub get_worksheet_text_items{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TextItemsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCommentsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCommentsRequest',
+            description => 'GetWorksheetComments Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_comments' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CommentsResponse',
+    };
+}
+#
+# @return CommentsResponse
+#
+sub get_worksheet_comments{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CommentsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCommentRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCommentRequest',
+            description => 'GetWorksheetComment Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_comment' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CommentResponse',
+    };
+}
+#
+# @return CommentResponse
+#
+sub get_worksheet_comment{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CommentResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetCommentRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @comment  Comment (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetCommentRequest',
+            description => 'PutWorksheetComment Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_comment' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CommentResponse',
+    };
+}
+#
+# @return CommentResponse
+#
+sub put_worksheet_comment{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CommentResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCommentRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @comment  Comment (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCommentRequest',
+            description => 'PostWorksheetComment Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_comment' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_comment{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetCommentRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetCommentRequest',
+            description => 'DeleteWorksheetComment Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_comment' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_comment{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetCommentsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetCommentsRequest',
+            description => 'DeleteWorksheetComments Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_comments' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_comments{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetMergedCellsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetMergedCellsRequest',
+            description => 'GetWorksheetMergedCells Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_merged_cells' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'MergedCellsResponse',
+    };
+}
+#
+# @return MergedCellsResponse
+#
+sub get_worksheet_merged_cells{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('MergedCellsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetMergedCellRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @mergedCellIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetMergedCellRequest',
+            description => 'GetWorksheetMergedCell Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_merged_cell' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'MergedCellResponse',
+    };
+}
+#
+# @return MergedCellResponse
+#
+sub get_worksheet_merged_cell{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('MergedCellResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetCalculateFormulaRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @formula  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetCalculateFormulaRequest',
+            description => 'GetWorksheetCalculateFormula Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_calculate_formula' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SingleValueResponse',
+    };
+}
+#
+# @return SingleValueResponse
+#
+sub get_worksheet_calculate_formula{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SingleValueResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetCalculateFormulaRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @formula  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCalculateFormulaRequest',
+            description => 'PostWorksheetCalculateFormula Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_calculate_formula' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SingleValueResponse',
+    };
+}
+#
+# @return SingleValueResponse
+#
+sub post_worksheet_calculate_formula{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SingleValueResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetTextSearchRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @text  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetTextSearchRequest',
+            description => 'PostWorksheetTextSearch Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_text_search' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'TextItemsResponse',
+    };
+}
+#
+# @return TextItemsResponse
+#
+sub post_worksheet_text_search{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TextItemsResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorsheetTextReplaceRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @oldValue  string (required)    
+# @newValue  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorsheetTextReplaceRequest',
+            description => 'PostWorsheetTextReplace Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worsheet_text_replace' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'WorksheetReplaceResponse',
+    };
+}
+#
+# @return WorksheetReplaceResponse
+#
+sub post_worsheet_text_replace{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('WorksheetReplaceResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetRangeSortRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @cellArea  string (required)    
+# @dataSorter  DataSorter (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetRangeSortRequest',
+            description => 'PostWorksheetRangeSort Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_range_sort' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_range_sort{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostAutofitWorksheetRowRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @rowIndex  int (required)    
+# @firstColumn  int (required)    
+# @lastColumn  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAutofitWorksheetRowRequest',
+            description => 'PostAutofitWorksheetRow Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_row' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_autofit_worksheet_row{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostAutofitWorksheetRowsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startRow  int     
+# @endRow  int     
+# @onlyAuto  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAutofitWorksheetRowsRequest',
+            description => 'PostAutofitWorksheetRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_rows' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_autofit_worksheet_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostAutofitWorksheetColumnsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @startColumn  int     
+# @endColumn  int     
+# @onlyAuto  boolean     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAutofitWorksheetColumnsRequest',
+            description => 'PostAutofitWorksheetColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_columns' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_autofit_worksheet_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetBackgroundRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @picPath  string     
+# @folder  string     
+# @storageName  string     
+# @File  string   File to upload   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetBackgroundRequest',
+            description => 'PutWorksheetBackground Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_background' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_background{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetBackgroundRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetBackgroundRequest',
+            description => 'DeleteWorksheetBackground Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_background' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_background{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetFreezePanesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @row  int (required)    
+# @column  int (required)    
+# @freezedRows  int (required)    
+# @freezedColumns  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetFreezePanesRequest',
+            description => 'PutWorksheetFreezePanes Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_freeze_panes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_freeze_panes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetFreezePanesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @row  int (required)    
+# @column  int (required)    
+# @freezedRows  int (required)    
+# @freezedColumns  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetFreezePanesRequest',
+            description => 'DeleteWorksheetFreezePanes Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_freeze_panes' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_freeze_panes{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostCopyWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sourceSheet  string (required)    
+# @options  CopyOptions (required)    
+# @sourceWorkbook  string     
+# @sourceFolder  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostCopyWorksheetRequest',
+            description => 'PostCopyWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_copy_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_copy_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostRenameWorksheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @newname  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRenameWorksheetRequest',
+            description => 'PostRenameWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_rename_worksheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_rename_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUpdateWorksheetPropertyRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @sheet  Worksheet (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWorksheetPropertyRequest',
+            description => 'PostUpdateWorksheetProperty Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_worksheet_property' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_update_worksheet_property{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetNamedRangesRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetNamedRangesRequest',
+            description => 'GetNamedRanges Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_named_ranges' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'RangesResponse',
+    };
+}
+#
+# @return RangesResponse
+#
+sub get_named_ranges{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RangesResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetNamedRangeValueRequest
+#
+# 
+# 
+# @name  string (required)    
+# @namerange  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetNamedRangeValueRequest',
+            description => 'GetNamedRangeValue Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_named_range_value' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'RangeValueResponse',
+    };
+}
+#
+# @return RangeValueResponse
+#
+sub get_named_range_value{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RangeValueResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostUpdateWorksheetZoomRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @value  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWorksheetZoomRequest',
+            description => 'PostUpdateWorksheetZoom Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_worksheet_zoom' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_update_worksheet_zoom{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetPageCountRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetPageCountRequest',
+            description => 'GetWorksheetPageCount Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_page_count' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'int',
+    };
+}
+#
+# @return int
+#
+sub get_worksheet_page_count{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('int', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetValidationsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetValidationsRequest',
+            description => 'GetWorksheetValidations Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_validations' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ValidationsResponse',
+    };
+}
+#
+# @return ValidationsResponse
+#
+sub get_worksheet_validations{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ValidationsResponse', $response);
+    return $_response_object;
+}
+
+#
+# GetWorksheetValidationRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @validationIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetWorksheetValidationRequest',
+            description => 'GetWorksheetValidation Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_worksheet_validation' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ValidationResponse',
+    };
+}
+#
+# @return ValidationResponse
+#
+sub get_worksheet_validation{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ValidationResponse', $response);
+    return $_response_object;
+}
+
+#
+# PutWorksheetValidationRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @range  string     
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PutWorksheetValidationRequest',
+            description => 'PutWorksheetValidation Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'put_worksheet_validation' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub put_worksheet_validation{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetValidationRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @validationIndex  int (required)    
+# @validation  Validation (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetValidationRequest',
+            description => 'PostWorksheetValidation Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_validation' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_validation{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetValidationRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @validationIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetValidationRequest',
+            description => 'DeleteWorksheetValidation Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_validation' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_validation{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# DeleteWorksheetValidationsRequest
+#
+# 
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteWorksheetValidationsRequest',
+            description => 'DeleteWorksheetValidations Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_worksheet_validations' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub delete_worksheet_validations{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookExportXMLRequest
+#
+# 
+# 
+# @name  string (required)    
+# @password  string     
+# @folder  string     
+# @storageName  string     
+# @outPath  string     
+# @outStorageName  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookExportXMLRequest',
+            description => 'PostWorkbookExportXML Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_export_xml' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_workbook_export_xml{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookImportXMLRequest
+#
+# 
+# 
+# @name  string (required)    
+# @importXMLRequest  ImportXMLRequest (required)    
+# @password  string     
+# @folder  string     
+# @storageName  string     
+# @outPath  string     
+# @outStorageName  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookImportXMLRequest',
+            description => 'PostWorkbookImportXML Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_import_xml' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_workbook_import_xml{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# DownloadFileRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DownloadFileRequest',
+            description => 'DownloadFile Request.',
+            required => '0',
+       },
+       'path' => {
+        data_type => 'string',
+        description => 'File path e.g. &#39;/folder/file.ext&#39;',
+        required => '1',
+    },
     'storage_name' => {
         data_type => 'string',
         description => 'Storage name',
-        required => '1',
+        required => '0',
+    },
+    'version_id' => {
+        data_type => 'string',
+        description => 'File version ID to download',
+        required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'storage_exists' } = { 
-    	summary => 'Check if storage exists',
+    __PACKAGE__->method_documentation->{ 'download_file' } = { 
+    	summary => '',
         params => $params,
-        returns => 'StorageExist',
-        };
+        returns => 'string',
+    };
 }
-# @return StorageExist
 #
-sub storage_exists {
+# @return string
+#
+sub download_file{
     my ($self, %args) = @_;
-
-    # verify the required parameter 'storage_name' is set
-    unless (exists $args{'storage_name'}) {
-      croak("Missing the required parameter 'storage_name' when calling storage_exists");
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('string', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling download_file");
     }
 
     # parse inputs
-    my $_resource_path = '/cells/storage/{storageName}/exist';
+    my $_resource_path = '/cells/storage/file/{path}';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -37509,16 +48225,26 @@ sub storage_exists {
     my $form_params = {};
 
     # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
-    # path params
+    # query params
     if ( exists $args{'storage_name'}) {
-        my $_base_variable = "{" . "storageName" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'storage_name'});
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'version_id'}) {
+        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -37534,47 +48260,64 @@ sub storage_exists {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('StorageExist', $response);
-    return $_response_object;
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;    
 }
 
 #
-# upload_file
+# UploadFileRequest
 #
-# Upload file
 # 
-# @param string $path Path where to upload including filename and extension e.g. /file.ext or /Folder 1/file.ext             If the content is multipart and path does not contains the file name it tries to get them from filename parameter             from Content-Disposition header.              (required)
-# @param string $file File to upload (required)
-# @param string $storage_name Storage name (optional)
+# 
+# @UploadFiles  string (required)  Upload files to cloud storage.  
+# @path  string (required)    
+# @storageName  string      
+#
 {
     my $params = {
-    'path' => {
-        data_type => 'string',
-        description => 'Path where to upload including filename and extension e.g. /file.ext or /Folder 1/file.ext             If the content is multipart and path does not contains the file name it tries to get them from filename parameter             from Content-Disposition header.             ',
-        required => '1',
-    },
-    'file' => {
-        data_type => 'string',
-        description => 'File to upload',
-        required => '1',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'Storage name',
-        required => '0',
-    },
+        'path' => {
+            data_type => 'string',
+            description => 'Path where to upload including filename and extension e.g. /file.ext or /Folder 1/file.ext             If the content is multipart and path does not contains the file name it tries to get them from filename parameter             from Content-Disposition header.             ',
+            required => '1',
+        },
+        'file' => {
+            data_type => 'string',
+            description => 'File to upload',
+            required => '1',
+        },
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'UploadFileRequest',
+            description => 'UploadFile Request.',
+            required => '0',
+       }
     };
     __PACKAGE__->method_documentation->{ 'upload_file' } = { 
-    	summary => 'Upload file',
+    	summary => '',
         params => $params,
         returns => 'FilesUploadResult',
-        };
+    };
 }
+#
 # @return FilesUploadResult
 #
-sub upload_file {
+sub upload_file{
     my ($self, %args) = @_;
-
+    my $request = $args{'request'};
+    if(defined( $request)){
+        print("upload_file\n");
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FilesUploadResult', $response);
+        return $_response_object;
+    }
+     print("old upload_file\n");
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
       croak("Missing the required parameter 'path' when calling upload_file");
@@ -37630,6 +48373,1245 @@ sub upload_file {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('FilesUploadResult', $response);
+    return $_response_object;
+
+}
+
+#
+# CopyFileRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+        'src_path' => {
+            data_type => 'string',
+            description => 'Source file path e.g. &#39;/folder/file.ext&#39;',
+            required => '1',
+        },
+        'dest_path' => {
+            data_type => 'string',
+            description => 'Destination file path',
+            required => '1',
+        },
+        'src_storage_name' => {
+            data_type => 'string',
+            description => 'Source storage name',
+            required => '0',
+        },
+        'dest_storage_name' => {
+            data_type => 'string',
+            description => 'Destination storage name',
+            required => '0',
+        },
+        'version_id' => {
+            data_type => 'string',
+            description => 'File version ID to copy',
+            required => '0',
+        },
+        'request' =>{
+        data_type => 'CopyFileRequest',
+        description => 'CopyFile Request.',
+        required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'copy_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub copy_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'src_path' is set
+    unless (exists $args{'src_path'}) {
+      croak("Missing the required parameter 'src_path' when calling copy_file");
+    }
+
+    # verify the required parameter 'dest_path' is set
+    unless (exists $args{'dest_path'}) {
+      croak("Missing the required parameter 'dest_path' when calling copy_file");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/file/copy/{srcPath}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'dest_path'}) {
+        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
+    }
+
+    # query params
+    if ( exists $args{'src_storage_name'}) {
+        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'dest_storage_name'}) {
+        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'version_id'}) {
+        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
+    }
+
+    # path params
+    if ( exists $args{'src_path'}) {
+        my $_base_variable = "{" . "srcPath" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;
+}
+
+#
+# MoveFileRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+        'src_path' => {
+        data_type => 'string',
+        description => 'Source file path e.g. &#39;/src.ext&#39;',
+        required => '1',
+    },
+    'dest_path' => {
+        data_type => 'string',
+        description => 'Destination file path e.g. &#39;/dest.ext&#39;',
+        required => '1',
+    },
+    'src_storage_name' => {
+        data_type => 'string',
+        description => 'Source storage name',
+        required => '0',
+    },
+    'dest_storage_name' => {
+        data_type => 'string',
+        description => 'Destination storage name',
+        required => '0',
+    },
+    'version_id' => {
+        data_type => 'string',
+        description => 'File version ID to move',
+        required => '0',
+    },
+       'request' =>{
+            data_type => 'MoveFileRequest',
+            description => 'MoveFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'move_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub move_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'src_path' is set
+    unless (exists $args{'src_path'}) {
+      croak("Missing the required parameter 'src_path' when calling move_file");
+    }
+
+    # verify the required parameter 'dest_path' is set
+    unless (exists $args{'dest_path'}) {
+      croak("Missing the required parameter 'dest_path' when calling move_file");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/file/move/{srcPath}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'dest_path'}) {
+        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
+    }
+
+    # query params
+    if ( exists $args{'src_storage_name'}) {
+        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'dest_storage_name'}) {
+        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'version_id'}) {
+        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
+    }
+
+    # path params
+    if ( exists $args{'src_path'}) {
+        my $_base_variable = "{" . "srcPath" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;    
+}
+
+#
+# DeleteFileRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+        'path' => {
+            data_type => 'string',
+            description => 'File path e.g. &#39;/folder/file.ext&#39;',
+            required => '1',
+        },
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '0',
+        },
+        'version_id' => {
+            data_type => 'string',
+            description => 'File version ID to delete',
+            required => '0',
+        },
+        'request' =>{
+        data_type => 'DeleteFileRequest',
+        description => 'DeleteFile Request.',
+        required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub delete_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling delete_file");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/file/{path}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'version_id'}) {
+        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;    
+}
+
+#
+# GetFilesListRequest
+#
+# 
+# 
+# @path  string     
+# @storageName  string      
+#
+{
+    my $params = {
+    'path' => {
+        data_type => 'string',
+        description => 'Folder path e.g. &#39;/folder&#39;',
+        required => '1',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'Storage name',
+        required => '0',
+    },
+       'request' =>{
+            data_type => 'GetFilesListRequest',
+            description => 'GetFilesList Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_files_list' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesList',
+    };
+}
+#
+# @return FilesList
+#
+sub get_files_list{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FilesList', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling get_files_list");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/folder/{path}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesList', $response);
+    return $_response_object;    
+}
+
+#
+# CreateFolderRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string      
+#
+{
+    my $params = {
+        'path' => {
+            data_type => 'string',
+            description => 'Folder path to create e.g. &#39;folder_1/folder_2/&#39;',
+            required => '1',
+        },
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'CreateFolderRequest',
+            description => 'CreateFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'create_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub create_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling create_folder");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/folder/{path}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;
+}
+
+#
+# CopyFolderRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string      
+#
+{
+    my $params = {
+        'src_path' => {
+            data_type => 'string',
+            description => 'Source folder path e.g. &#39;/src&#39;',
+            required => '1',
+        },
+        'dest_path' => {
+            data_type => 'string',
+            description => 'Destination folder path e.g. &#39;/dst&#39;',
+            required => '1',
+        },
+        'src_storage_name' => {
+            data_type => 'string',
+            description => 'Source storage name',
+            required => '0',
+        },
+        'dest_storage_name' => {
+            data_type => 'string',
+            description => 'Destination storage name',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'CopyFolderRequest',
+            description => 'CopyFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'copy_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub copy_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'src_path' is set
+    unless (exists $args{'src_path'}) {
+      croak("Missing the required parameter 'src_path' when calling copy_folder");
+    }
+
+    # verify the required parameter 'dest_path' is set
+    unless (exists $args{'dest_path'}) {
+      croak("Missing the required parameter 'dest_path' when calling copy_folder");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/folder/copy/{srcPath}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'dest_path'}) {
+        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
+    }
+
+    # query params
+    if ( exists $args{'src_storage_name'}) {
+        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'dest_storage_name'}) {
+        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'src_path'}) {
+        my $_base_variable = "{" . "srcPath" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;    
+}
+
+#
+# MoveFolderRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string      
+#
+{
+    my $params = {
+        'src_path' => {
+            data_type => 'string',
+            description => 'Folder path to move e.g. &#39;/folder&#39;',
+            required => '1',
+        },
+        'dest_path' => {
+            data_type => 'string',
+            description => 'Destination folder path to move to e.g &#39;/dst&#39;',
+            required => '1',
+        },
+        'src_storage_name' => {
+            data_type => 'string',
+            description => 'Source storage name',
+            required => '0',
+        },
+        'dest_storage_name' => {
+            data_type => 'string',
+            description => 'Destination storage name',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'MoveFolderRequest',
+            description => 'MoveFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'move_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub move_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'src_path' is set
+    unless (exists $args{'src_path'}) {
+      croak("Missing the required parameter 'src_path' when calling move_folder");
+    }
+
+    # verify the required parameter 'dest_path' is set
+    unless (exists $args{'dest_path'}) {
+      croak("Missing the required parameter 'dest_path' when calling move_folder");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/folder/move/{srcPath}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'dest_path'}) {
+        $query_params->{'destPath'} = $self->{api_client}->to_query_value($args{'dest_path'});
+    }
+
+    # query params
+    if ( exists $args{'src_storage_name'}) {
+        $query_params->{'srcStorageName'} = $self->{api_client}->to_query_value($args{'src_storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'dest_storage_name'}) {
+        $query_params->{'destStorageName'} = $self->{api_client}->to_query_value($args{'dest_storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'src_path'}) {
+        my $_base_variable = "{" . "srcPath" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'src_path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;
+}
+
+#
+# DeleteFolderRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @recursive  boolean      
+#
+{
+    my $params = {
+        'path' => {
+            data_type => 'string',
+            description => 'File path e.g. &#39;/folder/file.ext&#39;',
+            required => '1',
+        },
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '0',
+        },
+        'recursive' => {
+            data_type => 'boolean',
+            description => 'Enable to delete folders, subfolders and files',
+            required => '0',
+        },       
+       'request' =>{
+            data_type => 'DeleteFolderRequest',
+            description => 'DeleteFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub delete_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling delete_folder");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/folder/{path}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'recursive'}) {
+        $query_params->{'recursive'} = $self->{api_client}->to_query_value($args{'recursive'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;
+}
+
+#
+# StorageExistsRequest
+#
+# 
+# 
+# @storageName  string (required)     
+#
+{
+    my $params = {
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '1',
+        },       
+       'request' =>{
+            data_type => 'StorageExistsRequest',
+            description => 'StorageExists Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'storage_exists' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'StorageExist',
+    };
+}
+#
+# @return StorageExist
+#
+sub storage_exists{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('StorageExist', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'storage_name' is set
+    unless (exists $args{'storage_name'}) {
+      croak("Missing the required parameter 'storage_name' when calling storage_exists");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/{storageName}/exist';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # path params
+    if ( exists $args{'storage_name'}) {
+        my $_base_variable = "{" . "storageName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'storage_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('StorageExist', $response);
+    return $_response_object;    
+}
+
+#
+# ObjectExistsRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+        'path' => {
+            data_type => 'string',
+            description => 'File or folder path e.g. &#39;/file.ext&#39; or &#39;/folder&#39;',
+            required => '1',
+        },
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '0',
+        },
+        'version_id' => {
+            data_type => 'string',
+            description => 'File version ID',
+            required => '0',
+        },
+       'request' =>{
+            data_type => 'ObjectExistsRequest',
+            description => 'ObjectExists Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'object_exists' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ObjectExist',
+    };
+}
+#
+# @return ObjectExist
+#
+sub object_exists{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('ObjectExist', $response);
+        return $_response_object;
+    }
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling object_exists");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/exist/{path}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'version_id'}) {
+        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ObjectExist', $response);
+    return $_response_object;
+
+}
+
+#
+# GetDiscUsageRequest
+#
+# 
+# 
+# @storageName  string      
+#
+{
+    my $params = {
+    'storage_name' => {
+        data_type => 'string',
+        description => 'Storage name',
+        required => '0',
+        },
+       'request' =>{
+            data_type => 'GetDiscUsageRequest',
+            description => 'GetDiscUsage Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_disc_usage' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'DiscUsage',
+    };
+}
+#
+# @return DiscUsage
+#
+sub get_disc_usage{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    if(defined($request)){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('DiscUsage', $response);
+        return $_response_object;
+    }
+    # parse inputs
+    my $_resource_path = '/cells/storage/disc';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('DiscUsage', $response);
+    return $_response_object;
+
+}
+
+#
+# GetFileVersionsRequest
+#
+# Get file versions
+# 
+# @path  string (required)    
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetFileVersionsRequest',
+            description => 'GetFileVersions Request.',
+            required => '0',
+       }, 
+       'path' => {
+        data_type => 'string',
+        description => 'File path e.g. &#39;/file.ext&#39;',
+        required => '1',
+        },
+        'storage_name' => {
+            data_type => 'string',
+            description => 'Storage name',
+            required => '0',
+        },
+    };
+    __PACKAGE__->method_documentation->{ 'get_file_versions' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileVersions',
+    };
+}
+#
+# @return FileVersions
+#
+sub get_file_versions{
+    my ($self, %args) = @_;
+
+    my $request = $args{'request'};
+
+    if( defined($request) ){
+        my $response = $request->run_http_request('client' => $self->{api_client} );
+        if (!$response) {
+            return;
+        }
+        my $_response_object = $self->{api_client}->deserialize('FileVersions', $response);
+        return $_response_object;
+    }
+     # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling get_file_versions");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/storage/version/{path}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileVersions', $response);
     return $_response_object;
 }
 

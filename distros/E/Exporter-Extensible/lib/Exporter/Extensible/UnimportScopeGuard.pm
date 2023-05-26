@@ -13,10 +13,6 @@ __END__
 
 Exporter::Extensible::UnimportScopeGuard - Unimport set of symbols when object is destroyed
 
-=head1 VERSION
-
-version 0.10
-
 =head1 DESCRIPTION
 
 This is an implementation detail of how Exporter::Extensible removes symbols at the
@@ -28,7 +24,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad.
+This software is copyright (c) 2023 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

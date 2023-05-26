@@ -8,7 +8,7 @@ use alienfile;
 use Path::Tiny;
 use Cwd;
 
-our $VERSION = 'v2.1.20.4';
+our $VERSION = 'v2.1.20.7';
 
 use constant PACKAGE_VERSION => '2.1.20';
 use constant PACKAGE_NAME => 'xpa';
@@ -42,7 +42,7 @@ share {
     plugin 'Build::Autoconf';
 
     build [ '%{configure}',
-            qq[$^X -MFile::Copy=cp -e 'cp q{config.log}, q(%{.meta.my_topdir})'],
+            qq[$^X -MFile::Copy=cp -e "cp q{config.log}, q(%{.meta.my_topdir})"],
             '%{make} CFLAGS=-fPIC',
             '%{make} install' ];
 

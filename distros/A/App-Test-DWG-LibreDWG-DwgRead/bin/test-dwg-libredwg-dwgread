@@ -5,7 +5,7 @@ use warnings;
 
 use App::Test::DWG::LibreDWG::DwgRead;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Run.
 exit App::Test::DWG::LibreDWG::DwgRead->new->run;
@@ -28,7 +28,15 @@ test-dwg-libredwg-dwgread - Script to test DWG files by LibreDWG dwgread command
 
 =head1 SYNOPSIS
 
- test-dwg-libredwg-dwgread [-d test_dir] [-h] [-v level] [--version] directory
+ test-dwg-libredwg-dwgread [-d test_dir] [-h] [-m match_string] [-v level] [--version] directory
+
+=head1 DESCRIPTION
+
+This tool is used to test libredwg dwgread command on directory with DWG files.
+
+The process is to find all DWG files in a directory and run dwgread on them.
+If dwgread exits with code different than 0, report it. If dwgread returns some ERROR,
+report number of ERRORS in run.
 
 =head1 ARGUMENTS
 
@@ -41,6 +49,12 @@ Test directory. If doesn't exist, create dir in system tmp.
 =item * C<-h>
 
 Print help.
+
+=item * C<-m match_string>
+
+Match string from dwgread stderr.
+
+Default value is not defined.
 
 =item * C<-v level>
 
@@ -90,6 +104,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

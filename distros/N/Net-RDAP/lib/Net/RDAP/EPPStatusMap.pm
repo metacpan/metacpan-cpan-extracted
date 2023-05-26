@@ -8,30 +8,30 @@ our @EXPORT = qw(epp2rdap rdap2epp);
 # EPP status => RDAP status mapping, see RFC 8056, Section 2, Page 6:
 #
 my %MAP = (
-	'addPeriod'			=> 'add period',
-	'autoRenewPeriod'		=> 'auto renew period',
-	'clientDeleteProhibited'	=> 'client delete prohibited',
-	'clientHold'			=> 'client hold',
-	'clientRenewProhibited'		=> 'client renew prohibited',
-	'clientTransferProhibited'	=> 'client transfer prohibited',
-	'clientUpdateProhibited'	=> 'client update prohibited',
-	'inactive'			=> 'inactive',
-	'linked'			=> 'associated',
-	'ok'				=> 'active',
-	'pendingCreate'			=> 'pending create',
-	'pendingDelete'			=> 'pending delete',
-	'pendingRenew'			=> 'pending renew',
-	'pendingRestore'		=> 'pending restore',
-	'pendingTransfer'		=> 'pending transfer',
-	'pendingUpdate'			=> 'pending update',
-	'redemptionPeriod'		=> 'redemption period',
-	'renewPeriod'			=> 'renew period',
-	'serverDeleteProhibited'	=> 'server delete prohibited',
-	'serverRenewProhibited'		=> 'server renew prohibited',
-	'serverTransferProhibited'	=> 'server transfer prohibited',
-	'serverUpdateProhibited'	=> 'server update prohibited',
-	'serverHold'			=> 'server hold',
-	'transferPeriod'		=> 'transfer period',
+    'addPeriod'                 => 'add period',
+    'autoRenewPeriod'           => 'auto renew period',
+    'clientDeleteProhibited'    => 'client delete prohibited',
+    'clientHold'                => 'client hold',
+    'clientRenewProhibited'     => 'client renew prohibited',
+    'clientTransferProhibited'  => 'client transfer prohibited',
+    'clientUpdateProhibited'    => 'client update prohibited',
+    'inactive'                  => 'inactive',
+    'linked'                    => 'associated',
+    'ok'                        => 'active',
+    'pendingCreate'             => 'pending create',
+    'pendingDelete'             => 'pending delete',
+    'pendingRenew'              => 'pending renew',
+    'pendingRestore'            => 'pending restore',
+    'pendingTransfer'           => 'pending transfer',
+    'pendingUpdate'             => 'pending update',
+    'redemptionPeriod'          => 'redemption period',
+    'renewPeriod'               => 'renew period',
+    'serverDeleteProhibited'    => 'server delete prohibited',
+    'serverRenewProhibited'     => 'server renew prohibited',
+    'serverTransferProhibited'  => 'server transfer prohibited',
+    'serverUpdateProhibited'    => 'server update prohibited',
+    'serverHold'                => 'server hold',
+    'transferPeriod'            => 'transfer period',
 );
 
 #
@@ -39,10 +39,10 @@ my %MAP = (
 #
 my %RMAP;
 foreach my $eppStatus (keys(%MAP)) {
-	$RMAP{$MAP{$eppStatus}} = $eppStatus;
+    $RMAP{$MAP{$eppStatus}} = $eppStatus;
 }
 
-sub epp2rdap { $MAP  {$_[0]}  }
+sub epp2rdap { $MAP  {$_[0]} }
 sub rdap2epp { $RMAP {$_[0]} }
 
 =pod
@@ -54,13 +54,13 @@ EPP and RDAP status values.
 
 =head1 SYNOPSIS
 
-	use Net::RDAP::EPPStatusMap;
+    use Net::RDAP::EPPStatusMap;
 
-	# prints 'client delete prohibited'
-	print epp2rdap('clientDeleteProhibited');
+    # prints 'client delete prohibited'
+    print epp2rdap('clientDeleteProhibited');
 
-	# prints 'clientDeleteProhibited'
-	print rdap2epp('client delete prohibited');
+    # prints 'clientDeleteProhibited'
+    print rdap2epp('client delete prohibited');
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ it returns C<undef>.
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

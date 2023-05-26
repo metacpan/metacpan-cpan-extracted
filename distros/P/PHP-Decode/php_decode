@@ -1,0 +1,295 @@
+#!/usr/bin/env perl
+#
+# decode obfuscated php code
+#
+my $usage = <<USAGE;
+usage: $0 [-v] <php-malware-file>]
+   -v: verbose
+   -d: debug
+   -w: show warnings
+   -q: quiet (suppress '>> WARN') (default)
+   -p: parse only
+   -u: unified with #str/#num
+   -m: max strlen for expanded result strings
+   -f: use checked filename for __FILE__
+   -G: eval getenv()
+   -D: pass additional 'key=val ..' vars
+   -M <str>: mask eval in strings with <str> on output
+   -E: escape control characters in output strings
+   -L <limit>: limit loops to max iterations (default: 10000)
+   -C: translate self-contained funcs to native code (experimental)
+   -B: optimize block vars (remove intermediate values)
+   -I: invalidate vars after tainted calls (experimental)
+   -N: dont' assume null for undefined vars (for debugging)
+   -S: skip function calls (for debugging) 
+   -X: skip loop execution (for debugging) 
+   -F: don't format output (for debugging) 
+   -O: don't read file all-at-once (for debugging) 
+   -Q: don't include STDOUT
+   -T: test mode
+USAGE
+
+use strict;
+use warnings;
+# treat input and output as php byte streams
+# - utf-8 sequences are not converted to the internal perl
+#   wide string representation as with ':encoding(UTF-8)'.
+#
+use open ':std', OUT => ':raw'; # treat input and output as php byte streams
+#use open ':std', OUT => ':encoding(UTF-8)'; # treat output streams as utf8
+use Encode;
+use IO::File;
+use Getopt::Std;
+use FindBin qw($Bin);
+use lib ("$Bin/../plib", "$Bin/lib"); # search modules in local lib dir
+use PHP::Decode;
+my %opt;
+
+$|=1;
+
+getopts("huvdwqpm:f:GTSXFOM:L:ND:QECBI", \%opt);
+
+if ($opt{h}) {
+	print $usage;
+	exit 1;
+}
+$opt{q} = 1 unless $opt{q} || $opt{w};
+
+my $fh = *STDIN;
+
+my %dummy_env = (
+	REMOTE_ADDR => '192.168.0.1',
+	HTTP_HOST => 'example.com',
+	TZ => 'MET',
+	DOCUMENT_ROOT => '/home/example/htdocs',
+	SCRIPT_FILENAME => '/home/example/htdocs/test.php',
+	UNIQUE_ID => 'VJTLlMCoKE0AAF27ZdoAAAAf',
+	SCRIPT_URL => '/test.php',
+	SCRIPT_URI => 'http://example.com/test.php',
+	HTTP_USER_AGENT => 'Mozilla/5.0',
+	HTTP_ACCEPT => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+	HTTP_ACCEPT_LANGUAGE =>	'en-US,en;q=0.5',
+	HTTP_ACCEPT_ENCODING =>	'gzip, deflate',
+	HTTP_CONNECTION => 'keep-alive',
+	PATH =>	'/usr/bin:/bin',
+	SERVER_SOFTWARE => 'Apache/2 (Unix)',
+	SERVER_NAME => 'example.com',
+	SERVER_PORT => '80',
+	SERVER_ADMIN =>	'service@example.com',
+	REMOTE_PORT => '42000',
+	GATEWAY_INTERFACE => 'CGI/1.1',
+	SERVER_PROTOCOL => 'HTTP/1.1',
+	REQUEST_METHOD => 'POST',
+	QUERY_STRING =>	'',
+	REQUEST_URI => '/test.php',
+	SCRIPT_NAME => '/test.php',
+);
+
+sub log_msg {
+	my ($action, $fmt) = (shift, shift);
+
+	my $msg = sprintf $fmt, @_;
+	print ">> ", $action, ": ", $msg, "\n";
+}
+
+sub warn_msg {
+	my ($action, $fmt) = (shift, shift);
+
+	unless ($opt{q}) {
+		my $msg = sprintf $fmt, @_;
+		print ">> WARN: ", $action, ": ", $msg, "\n";
+	}
+}
+
+sub run_decode {
+	my ($line) = @_;
+	
+	unless (defined $line) {
+		return '';
+	}
+	my (%skip, %with);
+	$skip{call} = 1 if $opt{S};
+	$skip{loop} = 1 if $opt{X};
+	$skip{null} = 1 if $opt{N};
+	$skip{stdout} = 1 if $opt{Q};
+	$with{getenv} = \%dummy_env if $opt{G};
+	$with{translate} = 1 if $opt{C};
+	$with{optimize_block_vars} = 1 if $opt{B};
+	$with{invalidate_tainted_vars} = 1 if $opt{I};
+
+	my $php = PHP::Decode->new(
+		skip => \%skip,
+		with => \%with,
+		$opt{L} ? (max_loop => $opt{L}) : (),
+		$opt{m} ? (max_strlen => $opt{m}) : (),
+		$opt{f} ? (filename => $opt{f}) : (),
+		$opt{v} ? (log => \&log_msg) : (),
+		$opt{d} ? (debug => \&log_msg) : (),
+		warn => \&warn_msg);
+
+	my $stmt = $php->parse($line);
+	unless ($opt{p}) {
+		$stmt = $php->exec($stmt);
+	}
+	print ">> got: $stmt\n" if $opt{v};
+
+	my %fmt;
+	$fmt{indent} = 1 unless $opt{F};
+	$fmt{unified} = $opt{u} if $opt{u};
+	$fmt{mask_eval} = $opt{M} if $opt{M};
+	$fmt{escape_ctrl} = $opt{E} if $opt{E};
+	$fmt{max_strlen} = $opt{m} if $opt{m};
+
+	my $code = $php->format($stmt, \%fmt);
+
+	if ($code ne $line) {
+		#print ">> line changed: $code\n" if $opt{v};
+	}		
+	return '<?php ' . $code . ' ?>';
+}
+
+sub decode_input {
+	my ($line) = @_;
+
+	# guess encoding by trying to decode utf-8 to perl string
+	# - converts utf-8 strings to the internal perl wide string representation
+	# - use binmode($fh, "encoding(UTF-8)") to convert them back to utf-8 bytes
+	#
+	my $utf8line = eval { decode("utf-8", $line, Encode::FB_CROAK | Encode::LEAVE_SRC); };
+	if ($@) {
+		return $line; # probably iso8859
+	}
+	return $utf8line;
+}
+
+sub test_strings {
+	require PHP::Decode::Test;
+	@PHP::Decode::Test::tests if 0; # prevent used once warning
+
+	my $i = 0;
+	my @failed = ();
+	while (my ($desc, $script, $want) = splice(@PHP::Decode::Test::tests, 0, 3)) {
+		next if ($desc =~ /^for/ && $opt{X});
+		next if ($desc =~ /^G:/ && !$opt{G});
+		next if ($desc =~ /^N:/ && !$opt{N});
+		next if ($desc =~ /^n:/ && $opt{N});
+		next if ($desc =~ /^I:/ && !$opt{I});
+		next if ($desc =~ /^i:/ && $opt{I});
+
+		print "Test $desc .. ";
+		my (%skip, %with);
+		$skip{null} = 1 if $opt{N};
+		$with{getenv} = \%dummy_env if $opt{G};
+		$with{translate} = 1 if $opt{C};
+		$with{optimize_block_vars} = 1 if $opt{B};
+		$with{invalidate_tainted_vars} = 1 if $opt{I};
+
+		my $php = PHP::Decode->new(inscript => 1,
+			skip => \%skip,
+			with => \%with,
+			$opt{v} ? (log => \&log_msg) : (),
+			$opt{d} ? (debug => \&log_msg) : (),
+			warn => \&warn_msg);
+
+		my $stmt = $php->parse($script);
+		unless ($opt{p}) {
+			$stmt = $php->exec($stmt);
+		}
+		my $res = $php->format($stmt);
+
+		if ($res ne $want) {
+			print "failed [got: $res, want: $want]\n";
+			push (@failed, $desc);
+		} else {
+			print "OK\n";
+		}
+		$i++;
+	}
+	if ((my $f = scalar @failed) > 0) {
+		print "$f of $i tests failed\n";
+		return 1;
+	}
+	printf "All $i tests successful\n";
+	return 0;
+}
+
+if ($opt{T}) {
+	my $res = test_strings();
+	exit $res;
+}
+
+if (scalar @ARGV > 0) {
+	if ($opt{f}) {
+		$opt{f} = $ARGV[0];
+	}
+	unless (open($fh, "<", $ARGV[0])) {
+		warn "open $ARGV[0] failed: $!";
+		exit 1;
+	}
+}
+if ($opt{D}) {
+	my @list = split(' ', $opt{D});
+	foreach my $elem (@list) {
+		my ($k, $v) = $elem =~ /^([^=]+)=(.+)$/;
+		next unless defined $v;
+		$dummy_env{$k} = $v;
+		print ">> env: $k = $v\n" if $opt{v};
+	}
+}
+unless ($opt{O}) {
+	# set line separator to undef to read whole file at once
+	#
+	local $/;
+	my $line = <$fh>;
+	#$line = decode_input($line);
+	my $res = run_decode($line);
+	print "$res\n";
+} else {
+	while (<$fh>) {
+		my $line = $_;
+		#$line = decode_input($line);
+		my $res = run_decode($line);
+		print "$res\n";
+	}
+}
+if ($fh ne *STDIN) {
+	close $fh;
+}
+
+__END__
+
+=head1 NAME
+
+php_decode
+
+=head1 SYNOPSIS
+
+   To decode an obfuscated php script:
+   > php_decode <php-file>
+
+   To show warnings regarding partial execution:
+   > php_decode -w <php-file>
+
+=head1 DESCRIPTION
+
+The php_decode tool parses php code files and tries to apply all
+possible static transformations for php variables and values defined
+in the script. The decoded file is formatted and printed to stdout.
+It includes a '$STDOUT' variable for any script output from echo or
+print statements.
+
+The decoder uses a custom php parser which does not depend on a special php
+version. It supports most php syntax of interpreters from php5 to php8.
+
+The tool was mainly written for for php malware analysis. It does
+not implement php functions with any kind of side-effect.
+
+=head1 SEE ALSO
+
+Requires the L<PHP::Decode> Module.
+
+=head1 AUTHORS
+
+Barnim Dzwillo @ Strato AG
+
+=cut

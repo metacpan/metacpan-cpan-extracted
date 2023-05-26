@@ -24,7 +24,7 @@ no_index:
 provides:
   MySQL::GrantParser:
     file: lib/MySQL/GrantParser.pm
-    version: '1.004'
+    version: '1.005'
 requires:
   DBI: '0'
   perl: '5.008005'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/hirose31/MySQL-GrantParser/issues
   homepage: https://github.com/hirose31/MySQL-GrantParser
   repository: https://github.com/hirose31/MySQL-GrantParser.git
-version: '1.004'
+version: '1.005'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

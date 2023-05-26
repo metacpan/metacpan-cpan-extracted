@@ -341,7 +341,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 parentFormData = this._getParentFormData();
             }
             var busy = callbackery.ui.Busy.getInstance();
-            busy.show(this.tr('Loading Form Data'));
+            busy.manifest(this.tr('Loading Form Data'));
             rpc.callAsync(function(data,exc){
                 if (!exc){
                     if (mergeUrlData) {
@@ -365,7 +365,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                         callbackery.ui.MsgBox.getInstance().exc(exc);
                     }
                 }
-                busy.hide();
+                busy.vanish();
                 that._loading--;
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         }

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2022 Aspose.Cells Cloud
+Copyright (c) 2023 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,7 +23,6 @@ SOFTWARE.
 
 =cut
 
-
 package AsposeCellsCloud::Object::CellValue;
 
 require 5.6.0;
@@ -36,8 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::Style; 
 
-use AsposeCellsCloud::Object::Style;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -53,12 +52,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -99,7 +98,7 @@ sub from_hash {
         	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -107,7 +106,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -119,73 +118,73 @@ sub _deserialize {
 }
 
 
-
 __PACKAGE__->class_documentation({description => '',
                                   class => 'CellValue',
                                   required => [], # TODO
 }                                 );
 
+
 __PACKAGE__->method_documentation({
-    'row_index' => {
-    	datatype => 'int',
-    	base_name => 'rowIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'column_index' => {
-    	datatype => 'int',
-    	base_name => 'columnIndex',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'style' => {
-    	datatype => 'Style',
-    	base_name => 'style',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'type' => {
-    	datatype => 'string',
-    	base_name => 'type',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'value' => {
-    	datatype => 'string',
-    	base_name => 'value',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'formula' => {
-    	datatype => 'string',
-    	base_name => 'formula',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
+     'row_index' => {
+     	datatype => 'int',
+     	base_name => 'rowIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'column_index' => {
+     	datatype => 'int',
+     	base_name => 'columnIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'type' => {
+     	datatype => 'string',
+     	base_name => 'type',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'value' => {
+     	datatype => 'string',
+     	base_name => 'value',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'formula' => {
+     	datatype => 'string',
+     	base_name => 'formula',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'style' => {
+     	datatype => 'Style',
+     	base_name => 'style',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
     'row_index' => 'int',
     'column_index' => 'int',
-    'style' => 'Style',
     'type' => 'string',
     'value' => 'string',
-    'formula' => 'string'
+    'formula' => 'string',
+    'style' => 'Style' 
 } );
 
 __PACKAGE__->attribute_map( {
     'row_index' => 'rowIndex',
     'column_index' => 'columnIndex',
-    'style' => 'style',
     'type' => 'type',
     'value' => 'value',
-    'formula' => 'formula'
+    'formula' => 'formula',
+    'style' => 'style' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

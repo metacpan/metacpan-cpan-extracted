@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Dummy;
 #ABSTRACT: Dummy sweep
-$Lab::XPRESS::Sweep::Dummy::VERSION = '3.860';
+$Lab::XPRESS::Sweep::Dummy::VERSION = '3.872';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -45,7 +45,7 @@ Lab::XPRESS::Sweep::Dummy - Dummy sweep
 
 =head1 VERSION
 
-version 3.860
+version 3.872
 
 =head1 COPYRIGHT AND LICENSE
 

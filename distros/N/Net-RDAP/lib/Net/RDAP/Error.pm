@@ -17,32 +17,32 @@ access to all that module's methods.
 
 =head1 METHODS
 
-	$code = $error->errorCode;
+    $code = $error->errorCode;
 
 Returns the error code number (corresponding to the HTTP response
 code). Internally generated errors are usually C<400> if the arguments
 passed to L<Net::RDAP> are invalid in some way, and C<500> if the
 response from the server is invalid or cannot be reached.
 
-	$title = $error->title;
+    $title = $error->title;
 
 Returns a string containing a short summary of the error.
 
-	@description = $error->description;
+    @description = $error->description;
 
 Returns a (potentially empty) array of lines of descriptive text.
 
 =cut
 
-sub errorCode		{ $_[0]->{'errorCode'}						}
-sub title		{ $_[0]->{'title'}						}
-sub description		{ $_[0]->{'description'} ? @{$_[0]->{'description'}} : ()	}
+sub errorCode   { $_[0]->{'errorCode'} }
+sub title       { $_[0]->{'title'} }
+sub description { $_[0]->{'description'} ? @{$_[0]->{'description'}} : () }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2022 CentralNic Ltd. All rights reserved.
+Copyright CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

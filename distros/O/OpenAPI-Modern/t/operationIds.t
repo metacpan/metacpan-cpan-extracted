@@ -15,10 +15,13 @@ use Test::Deep;
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 use JSON::Schema::Modern::Utilities 'jsonp';
+use YAML::PP;
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 
 # the document where most constraints are defined
 use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
+
+my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest 'extract operationIds and identify duplicates' => sub {
   my $yaml = <<'YAML';
@@ -65,7 +68,7 @@ YAML
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new,
-    schema => yaml($yaml),
+    schema => $yamlpp->load_string($yaml),
   );
 
   ok(!$doc->errors, 'no errors when parsing this document');
@@ -87,7 +90,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js = JSON::Schema::Modern->new,
-    schema => yaml($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
+    schema => $yamlpp->load_string($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
   );
 
   cmp_deeply(

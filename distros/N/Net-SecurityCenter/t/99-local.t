@@ -187,6 +187,7 @@ sub _test {
             ok( $sc->scan_result->pause( id => 86 ),  'Pause scan' );
             ok( $sc->scan_result->resume( id => 86 ), 'Resume scan' );
             ok( $sc->scan_result->stop( id => 86 ),   'Stop scan' );
+            ok( $sc->scan_result->delete( id => 86 ), 'Delete scan' );
         }
     );
 
@@ -226,6 +227,10 @@ sub _test {
             ok( $sc->policy->list, 'Get List' );
 
             ok( $sc->policy->get( id => 1, raw => 1 ), 'Get Policy ID=1' );    #TODO REMOVE RAW
+
+            ok( $sc->policy->delete( id => 1 ), 'Delete Policy ID=1' );
+
+            ok( $sc->policy->create( name => 'DOCtest', policy_template => 1 ), 'Create Policy' );
 
         }
     );

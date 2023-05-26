@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.231100';
+$App::RouterColorizer::VERSION = '1.231460';
 use Moose;
 
 use feature 'signatures';
@@ -221,7 +221,7 @@ s/^ ( \Q  Configured maximum total number of routes is \E \d+ (?: \Q, warning li
     #
 
     # We look for information lines
-    if ( $line =~ m/^     ((?:$INT [^,]+, )*$INT [^,]+)$/ ) {
+    if ( $line =~ m/^     ((?:$INT [^, ][^,]+, )*$INT [^, ][^,]+)$/ ) {
         my (%values) =
           map { reverse split / /, $_, 2 } split ', ', $1;
 
@@ -771,7 +771,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.231100
+version 1.231460
 
 =head1 DESCRIPTION
 

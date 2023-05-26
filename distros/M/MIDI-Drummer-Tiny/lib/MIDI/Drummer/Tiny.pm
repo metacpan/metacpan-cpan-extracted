@@ -3,15 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4208';
+our $VERSION = '0.4303';
 
 use Moo;
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::Util qw(sum0);
 use Math::Bezier ();
-use MIDI::Util qw(dura_size reverse_dump set_time_signature);
-use Music::CreatingRhythms ();
+use MIDI::Util qw(dura_size reverse_dump set_time_signature timidity_conf play_timidity);
 use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
 use namespace::clean;
@@ -24,10 +23,10 @@ sub BUILD {
 
     $self->score->noop( 'c' . $self->channel, 'V' . $self->volume );
 
-    if ($self->kit) {
-      $self->score->control_change($self->channel, 0, 120);
-      $self->score->patch_change($self->channel, $self->kit)
-    }
+#    if ($self->kit) {
+#      $self->score->control_change($self->channel, 0, 120);
+#      $self->score->patch_change($self->channel, $self->kit)
+#    }
 
     $self->score->set_tempo( int( 60_000_000 / $self->bpm ) );
 
@@ -38,8 +37,8 @@ sub BUILD {
 }
 
 
+has soundfont => ( is => 'rw');
 has verbose   => ( is => 'ro', default => sub { 0 } );
-has kit       => ( is => 'ro', default => sub { 0 } );
 has reverb    => ( is => 'ro', default => sub { 15 } );
 has channel   => ( is => 'rw', default => sub { 9 } );
 has volume    => ( is => 'rw', default => sub { 100 } );
@@ -560,15 +559,6 @@ sub add_fill {
 }
 
 
-sub euclidean {
-    my ($self, $p, $n) = @_;
-    return '' unless $n;
-    my $mcr = Music::CreatingRhythms->new;
-    my $sequence = $mcr->euclid($p, $n);
-    return join '', @$sequence;
-}
-
-
 sub set_time_sig {
     my ($self, $signature, $set) = @_;
     $self->signature($signature) if $signature;
@@ -616,6 +606,30 @@ sub write {
     $self->score->write_score( $self->file );
 }
 
+
+sub timidity_cfg {
+    my ($self, $config_file) = @_;
+    die 'No soundfont defined' unless $self->soundfont;
+    my $cfg = timidity_conf($self->soundfont, $config_file);
+    return $cfg;
+}
+
+
+sub play_with_timidity {
+    my ($self, $config) = @_;
+    $self->write;
+    my @cmd;
+    if ($self->soundfont) {
+        $config ||= 'timidity-midi-util.cfg';
+        timidity_conf($self->soundfont, $config);
+        @cmd = ('timidity', '-c', $config, $self->file);
+    }
+    else {
+        @cmd = ('timidity', $self->file);
+    }
+    system(@cmd) == 0 or die "system(@cmd) failed: $?";
+}
+
 # lifted from https://www.perlmonks.org/?node_id=56906
 sub _gcf {
     my ($x, $y) = @_;
@@ -645,7 +659,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4208
+version 0.4303
 
 =head1 SYNOPSIS
 
@@ -658,7 +672,7 @@ version 0.4208
     signature => '5/4',
     bars      => 8,
     reverb    => 0,
-    #kit   => 25, # TR-808 if using GM Level 2
+    soundfont => '/you/soundfonts/TR808.sf2', # option
     #kick  => 36, # Override default patch
     #snare => 40, # "
   );
@@ -678,7 +692,7 @@ version 0.4208
   $d->note($d->sixteenth, $d->crash1);
   $d->accent_note(127, $d->sixteenth, $d->crash2);
 
-  my $patterns = [ $d->euclidean(5, 16), $d->euclidean(7, 16) ];
+  my $patterns = [ your_function(5, 16), your_function(7, 16) ];
   $d->pattern( instrument => $d->kick, patterns => $patterns );
 
   # Alternate kick and snare
@@ -700,7 +714,13 @@ version 0.4208
   $d->set_bpm(200); # handy for tempo changes
   $d->set_channel;  # reset back to 9 if ever changed
 
+  $d->timidity_cfg('timidity-drummer.cfg');
+
   $d->write;
+
+  # OR:
+
+  $d->play_with_timidity;
 
 =head1 DESCRIPTION
 
@@ -726,21 +746,11 @@ Default: C<MIDI-Drummer.mid>
 
 Default: C<MIDI::Simple-E<gt>new_score>
 
-=head2 kit
+=head2 soundfont
 
-Default: C<1> (Standard)
+  $soundfont = $tabla->soundfont;
 
-If you are going to play the MIDI file with a "General MIDI Level 2"
-soundfont, you can change kits.
-
-   8: Room
-  16: Power
-  24: Electronic
-  25: TR-808
-  26: ?
-  32: Jazz
-  40: Brush
-  48: Orchestra
+The file location, where a soundfont lives.
 
 =head2 reverb
 
@@ -1087,12 +1097,6 @@ beat-string phrase with a fill.  The fill is given as the first
 argument and should be a coderef that returns a hashref.  The default
 is a three-note, eighth-note snare fill.
 
-=head2 euclidean
-
-  $pattern = $d->euclidean($p, $n);
-
-Return the Euclidean bitstring pattern for B<p> onsets over B<n> beats.
-
 =head2 set_time_sig
 
   $d->set_time_sig;
@@ -1143,6 +1147,27 @@ references.
 Output the score as a MIDI file with the module L</file> attribute as
 the file name.
 
+=head2 timidity_cfg
+
+  $timidity_conf = $d->timidity_cfg;
+  $d->timidity_cfg($config_file);
+
+Return a timidity.cfg paragraph to use a defined B<soundfont>
+attribute. If a B<config_file> is given, the timidity configuration is
+written to that file.
+
+=head2 play_with_timidity
+
+  $d->play_with_timidity;
+  $d->play_with_timidity($config_file);
+
+Play the score with C<timidity>.
+
+If there is a B<soundfont> attribute, either the given B<config_file>
+or C<timidity-midi-util.cfg> is used for the timidity configuration.
+If a soundfont is not defined, a timidity configuration file is not
+rendered.
+
 =head1 SEE ALSO
 
 The F<t/*> test file and the F<eg/*> programs in this distribution.
@@ -1161,8 +1186,6 @@ L<Math::Bezier>
 L<MIDI::Util>
 
 L<Moo>
-
-L<Music::CreatingRhythms>
 
 L<Music::Duration>
 
