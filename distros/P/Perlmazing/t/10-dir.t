@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 3;
-use Perlmazing;
+use Perlmazing qw(dir);
 use File::Spec;
 
 my $path;

@@ -1,56 +1,26 @@
 package Plack::App::Login;
 
-use base qw(Plack::Component);
+use base qw(Plack::Component::Tags::HTML);
 use strict;
 use warnings;
 
-use CSS::Struct::Output::Raw;
-use Error::Pure qw(err);
-use Plack::Util::Accessor qw(css generator login_link login_title tags title);
-use Scalar::Util qw(blessed);
+use Plack::Util::Accessor qw(generator login_link login_title title);
 use Tags::HTML::Login::Button;
-use Tags::HTML::Page::Begin;
-use Tags::HTML::Page::End;
-use Tags::Output::Raw;
-use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
-sub call {
-	my ($self, $env) = @_;
-
-	$self->_tags;
-	$self->tags->finalize;
-	my $content = encode_utf8($self->tags->flush(1));
-
-	return [
-		200,
-		[
-			'content-type' => 'text/html; charset=utf-8',
-		],
-		[$content],
-	];
-}
-
-sub prepare_app {
+sub _css {
 	my $self = shift;
 
-	if ($self->css) {
-		if (! blessed($self->css) || ! $self->css->isa('CSS::Struct::Output')) {
-			err "Bad 'CSS::Struct::Output' object.";
-		}
-	} else {
-		$self->css(CSS::Struct::Output::Raw->new);
-	}
+	$self->{'_login_button'}->process_css;
 
-	if ($self->tags) {
-		if (! blessed($self->tags) || ! $self->tags->isa('Tags::Output')) {
-			err "Bad 'Tags::Output' object.";
-		}
-	} else {
-		$self->tags(Tags::Output::Raw->new('xml' => 1));
-	}
+	return;
+}
 
+sub _prepare_app {
+	my $self = shift;
+
+	# Defaults which rewrite defaults in module which I am inheriting.
 	if (! $self->generator) {
 		$self->generator(__PACKAGE__.'; Version: '.$VERSION);
 	}
@@ -59,6 +29,10 @@ sub prepare_app {
 		$self->title('Login page');
 	}
 
+	# Inherite defaults.
+	$self->SUPER::_prepare_app;
+
+	# Defaults from this module.
 	if (! $self->login_link) {
 		$self->login_link('login');
 	}
@@ -67,46 +41,21 @@ sub prepare_app {
 		$self->login_title('LOGIN');
 	}
 
-	# Tags helper for begin of page.
-	$self->{'_page_begin'} = Tags::HTML::Page::Begin->new(
-		'css' => $self->css,
-		'generator' => $self->generator,
-		'lang' => {
-			'title' => $self->title,
-		},
-		'tags' => $self->tags,
-	);
-
 	# Tags helper for login button.
 	$self->{'_login_button'} = Tags::HTML::Login::Button->new(
-		'css' => $self->css,
+		'css' => $self->{'css'},
 		'link' => $self->login_link,
-		'tags' => $self->tags,
+		'tags' => $self->{'tags'},
 		'title' => $self->login_title,
 	);
 
 	return;
 }
 
-sub _css {
+sub _tags_middle {
 	my $self = shift;
 
-	$self->{'_page_begin'}->process_css;
-	$self->{'_login_button'}->process_css;
-
-	return;
-}
-
-sub _tags {
-	my $self = shift;
-
-	$self->_css;
-
-	$self->{'_page_begin'}->process;
 	$self->{'_login_button'}->process;
-	Tags::HTML::Page::End->new(
-		'tags' => $self->tags,
-	)->process;
 
 	return;
 }
@@ -208,10 +157,13 @@ Returns Plack::Component object.
  use Plack::App::Login;
  use Plack::Runner;
  use Tags::Output::Indent;
+ use Unicode::UTF8 qw(decode_utf8);
 
  # Run application.
  my $app = Plack::App::Login->new(
          'css' => CSS::Struct::Output::Indent->new,
+         'generator' => 'Plack::App::Login',
+         'login_title' => decode_utf8('Přihlašovací stránka'),
          'tags' => Tags::Output::Indent->new(
                  'preserved' => ['style'],
                  'xml' => 1,
@@ -226,9 +178,9 @@ Returns Plack::Component object.
  # <!DOCTYPE html>
  # <html>
  #   <head>
- #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
- #     <meta charset="UTF-8" />
- #     <meta name="generator" content="Plack::App::Login; Version: 0.07" />
+ #     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ #     <meta name="generator" content="Plack::App::Login" />
+ #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  #     <title>
  #       Login page
  #     </title>
@@ -246,20 +198,27 @@ Returns Plack::Component object.
  # }
  # .login {
  #         text-align: center;
- #         background-color: blue;
- #         padding: 1em;
  # }
  # .login a {
  #         text-decoration: none;
- #         color: white;
- #         font-size: 3em;
+ #         background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
+ #         background-repeat: repeat-x;
+ #         border: 1px solid #adadad;
+ #         border-radius: 4px;
+ #         color: black;
+ #         font-family: sans-serif!important;
+ #         padding: 15px 40px;
+ # }
+ # .login a:hover {
+ #         background-color: #e0e0e0;
+ #         background-image: none;
  # }
  # </style>
  #   </head>
  #   <body class="outer">
  #     <div class="login">
  #       <a href="login">
- #         LOGIN
+ #         Přihlašovací stránka
  #       </a>
  #     </div>
  #   </body>
@@ -267,15 +226,19 @@ Returns Plack::Component object.
 
 =head1 DEPENDENCIES
 
-L<CSS::Struct::Output::Raw>,
-L<Error::Pure>,
+L<Plack::Component::Tags::HTML>,
 L<Plack::Util::Accessor>,
-L<Scalar::Util>,
-L<Tags::HTML::Login::Button>,
-L<Tags::HTML::Page::Begin>,
-L<Tags::HTML::Page::End>,
-L<Tags::Output::Raw>,
-L<Unicode::UTF8>.
+L<Tags::HTML::Login::Button>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Plack::App::Login::Password>
+
+Plack login/password application.
+
+=back
 
 =head1 REPOSITORY
 
@@ -295,6 +258,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

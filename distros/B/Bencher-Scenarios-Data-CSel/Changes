@@ -1,0 +1,29 @@
+0.041   2023-01-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Bencher-Scenarios-{DataCSel,Data-CSel}.
+
+
+0.04    2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.03    2016-04-12  Released-By: PERLANCAR
+
+	- Adjust to PERLANCAR::Tree::Examples 1.0.4+.
+
+	- Fix participant syntax.
+
+
+0.02    2016-04-01  Released-By: PERLANCAR
+
+        - Add scenarios: DataCSel::Parsing, DataCSel::Selection.
+
+
+0.01    2016-03-22  Released-By: PERLANCAR
+
+        - First release.

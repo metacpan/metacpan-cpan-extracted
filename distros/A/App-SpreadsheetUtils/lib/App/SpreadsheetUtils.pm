@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-29'; # DATE
+our $DATE = '2023-03-19'; # DATE
 our $DIST = 'App-SpreadsheetUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_ss_util
@@ -315,7 +315,7 @@ sub _select_fields {
     [100, "Continue", [\@selected_fields, \@selected_field_idxs_array]];
 }
 
-our $xcomp_spreadsheet_files = [filename => {file_ext_filter => qr/\.(?:sxc|ods|xls|xlsx|xlsm|csv)$/i}];
+our $xcomp_spreadsheet_files = [filename => {file_ext_filter => qr/\A(?:sxc|ods|xls|xlsx|xlsm|csv)\z/i}];
 
 our %argspecs_csv_input = (
     # input_format?
@@ -1649,7 +1649,7 @@ App::SpreadsheetUtils - CLI utilities related to spreadsheet (XLS, XLSX, ODS, ..
 
 =head1 VERSION
 
-This document describes version 0.003 of App::SpreadsheetUtils (from Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+This document describes version 0.004 of App::SpreadsheetUtils (from Perl distribution App-SpreadsheetUtils), released on 2023-03-19.
 
 =head1 DESCRIPTION
 

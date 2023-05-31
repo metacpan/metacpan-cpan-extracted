@@ -128,7 +128,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.161';
+our $VERSION = '0.162';
 our @EXPORT_OK = qw{
     shell
 
@@ -405,37 +405,37 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    name	=> 'Classified TLE file',
 	    member	=> undef,	# classfd.tle
 	    spacetrack_type	=> 'orbit',
-	    url		=> 'http://www.prismnet.com/~mmccants/tles/classfd.zip',
+	    url		=> 'https://www.mmccants.org/tles/classfd.zip',
 	},
 	integrated	=> {
 	    name	=> 'Integrated TLE file',
 	    member	=> undef,	# inttles.tle
 	    spacetrack_type	=> 'orbit',
-	    url		=> 'http://www.prismnet.com/~mmccants/tles/inttles.zip',
+	    url		=> 'https://www.mmccants.org/tles/inttles.zip',
 	},
 	mcnames	=> {
 	    name	=> 'Molczan-format magnitude file',
 	    member	=> undef,	# mcnames
 	    spacetrack_type	=> 'molczan',
-	    url		=> 'http://www.prismnet.com/~mmccants/tles/mcnames.zip',
+	    url		=> 'https://www.mmccants.org/tles/mcnames.zip',
 	},
 	quicksat	=> {
 	    name	=> 'Quicksat-format magnitude file',
 	    member	=> undef,	# qs.mag
 	    spacetrack_type	=> 'quicksat',
-	    url		=> 'http://www.prismnet.com/~mmccants/programs/qsmag.zip',
+	    url		=> 'https://www.mmccants.org/programs/qsmag.zip',
 	},
 	rcs	=> {
 	    name	=> 'McCants-format RCS data',
 	    member	=> undef,	# rcs
 	    spacetrack_type	=> 'rcs.mccants',
-	    url		=> 'http://www.prismnet.com/~mmccants/catalogs/rcs.zip',
+	    url		=> 'https://www.mmccants.org/catalogs/rcs.zip',
 	},
 	vsnames	=> {
 	    name	=> 'Molczan-format magnitude file (visual only)',
 	    member	=> undef,	# vsnames
 	    spacetrack_type	=> 'molczan',
-	    url		=> 'http://www.prismnet.com/~mmccants/tles/vsnames.zip',
+	    url		=> 'https://www.mmccants.org/tles/vsnames.zip',
 	},
     },
     spacetrack => [	# Numbered by space_track_version

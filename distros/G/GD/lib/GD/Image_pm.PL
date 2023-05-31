@@ -29,7 +29,7 @@ use strict;
 use GD;
 use Symbol 'gensym','qualify_to_ref';
 use vars '$VERSION';
-$VERSION = '2.75';
+$VERSION = '2.77';
 
 =head1 NAME
 
@@ -54,10 +54,11 @@ print OUT "=item Jpeg\n\n" if $DEFINES =~ /HAVE_JPEG/;
 print OUT "=item Tiff\n\n" if $DEFINES =~ /HAVE_TIFF/;
 print OUT "=item Xpm\n\n" if $DEFINES =~ /HAVE_XPM/;
 print OUT "=item WBMP\n\n" if 1 or $DEFINES =~ /HAVE_WBMP/;
-print OUT "=item GifAnim\n\n" if $DEFINES =~ /HAVE_ANIMGIF/;
+print OUT "=item GifAnim\n\n" if $DEFINES =~ /HAVE_GIFANIM/;
 print OUT "=item Webp\n\n" if $DEFINES =~ /HAVE_WEBP/;
 print OUT "=item Heif\n\n" if $DEFINES =~ /HAVE_HEIF/;
 print OUT "=item Avif\n\n" if $DEFINES =~ /HAVE_AVIF/;
+print OUT "=item BMP\n\n" if $DEFINES =~ /HAVE_BMP/;
 
 print OUT << '!NO!SUBS!';
 =back
@@ -74,10 +75,11 @@ print OUT "=item Gd\n\n=item Gd2\n\n" if $DEFINES !~ /HAVE_GD2/;
 print OUT "=item Jpeg\n\n" if $DEFINES !~ /HAVE_JPEG/;
 print OUT "=item Tiff\n\n" if $DEFINES !~ /HAVE_TIFF/;
 print OUT "=item Xpm\n\n" if $DEFINES !~ /HAVE_XPM/;
-print OUT "=item GifAnim\n\n" if $DEFINES !~ /HAVE_ANIMGIF/;
+print OUT "=item GifAnim\n\n" if $DEFINES !~ /HAVE_GIFANIM/;
 print OUT "=item Webp\n\n" if $DEFINES !~ /HAVE_WEBP/;
 print OUT "=item Heif\n\n" if $DEFINES !~ /HAVE_HEIF/;
 print OUT "=item Avif\n\n" if $DEFINES !~ /HAVE_AVIF/;
+print OUT "=item BMP\n\n" if $DEFINES !~ /HAVE_BMP/;
 
 print OUT << '!NO!SUBS!';
 =back
@@ -367,6 +369,20 @@ sub newFromWBMP {
     my $fh = $class->_make_filehandle($f);
     binmode($fh);
     $class->_newFromWBMP($fh,@_);
+}
+
+!NO!SUBS!
+}
+
+if ($DEFINES =~ /HAVE_BMP/) {
+  print OUT <<'!NO!SUBS!';
+sub newFromBmp {
+    croak("Usage: newFromBmp(class,filehandle)") unless @_==2;
+    my($class) = shift;
+    my($f)     = shift;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromBmp($fh,@_);
 }
 
 !NO!SUBS!

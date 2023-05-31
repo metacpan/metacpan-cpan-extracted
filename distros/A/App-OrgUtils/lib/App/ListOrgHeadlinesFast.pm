@@ -8,9 +8,9 @@ use App::FilterOrgByHeadlines;
 use Function::Fallback::CoreOrPP qw(clone);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-04-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our %SPEC;
 
@@ -100,7 +100,7 @@ App::ListOrgHeadlinesFast - List & count Org headlines & todos
 
 =head1 VERSION
 
-This document describes version 0.484 of App::ListOrgHeadlinesFast (from Perl distribution App-OrgUtils), released on 2023-01-19.
+This document describes version 0.485 of App::ListOrgHeadlinesFast (from Perl distribution App-OrgUtils), released on 2023-04-06.
 
 =head1 FUNCTIONS
 

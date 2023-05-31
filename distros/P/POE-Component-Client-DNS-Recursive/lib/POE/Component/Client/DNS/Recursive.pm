@@ -1,5 +1,5 @@
 package POE::Component::Client::DNS::Recursive;
-$POE::Component::Client::DNS::Recursive::VERSION = '1.12';
+$POE::Component::Client::DNS::Recursive::VERSION = '1.14';
 #ABSTRACT: A recursive DNS client for POE
 
 use strict;
@@ -155,7 +155,7 @@ sub _hints {
         if ($rr->name =~ /^\.?$/ and
             $rr->type eq "NS") {
           # Found root authority
-          my $server = lc $rr->rdatastr;
+          my $server = lc $rr->rdstring;
           $server =~ s/\.$//;
           $hints{$server} = [];
         }
@@ -164,7 +164,7 @@ sub _hints {
         if (my $server = lc $rr->name){
           if ( $rr->type eq "A") {
             if ($hints{$server}) {
-              push @{ $hints{$server} }, $rr->rdatastr;
+              push @{ $hints{$server} }, $rr->rdstring;
             }
           }
         }
@@ -224,7 +224,7 @@ sub _query {
         return;
      }
      # Okay we have queries pending.
-     push @ns, $_->rdatastr for grep { $_->type eq 'A' } @ans;
+     push @ns, $_->rdstring for grep { $_->type eq 'A' } @ans;
      $runstate->{current} = pop @{ $runstate->{qstack} };
   }
   else {
@@ -338,14 +338,14 @@ sub _authority {
       foreach my $rr (@ans) {
             if ( $rr->type eq 'NS') {
           # Found root authority
-          my $server = lc $rr->rdatastr;
+          my $server = lc $rr->rdstring;
           $server =~ s/\.$//;
           $hints{$server} = [];
         }
       }
       foreach my $rr ($packet->additional) {
         if (my $server = lc $rr->name){
-              push @{ $hints{$server} }, $rr->rdatastr if $rr->type eq 'A' and $hints{$server};
+              push @{ $hints{$server} }, $rr->rdstring if $rr->type eq 'A' and $hints{$server};
         }
       }
     }
@@ -395,7 +395,7 @@ POE::Component::Client::DNS::Recursive - A recursive DNS client for POE
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 SYNOPSIS
 
@@ -530,7 +530,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

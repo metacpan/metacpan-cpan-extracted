@@ -1,5 +1,4 @@
 use ExtUtils::MakeMaker;
-use 5.032;
 
 WriteMakefile(
     NAME                => 'OpenAIGPT4',
@@ -8,10 +7,11 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/OpenAIGPT4.pm',
     LICENSE             => 'artistic_2',
     PREREQ_PM           => {
-        'LWP::UserAgent'    => 0,
+        'perl'                => '5.032',
+        'LWP::UserAgent'     => 0,
         'HTTP::Request::Common' => 0,
         'LWP::Protocol::https' => 0,
-        'JSON' => 0,
+        'JSON'                => 0,
     },
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
      ? ('LICENSE'=> 'perl')

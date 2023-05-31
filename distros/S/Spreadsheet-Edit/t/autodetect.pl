@@ -2,21 +2,20 @@
 # *** DO NOT USE Test2 FEATURES becuase this is a sub-script ***
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
+use t_Common qw/oops/; # strict, warnings, Carp etc.
 use t_TestCommon  # Test2::V0 etc.
          qw/$verbose $silent $debug dprint dprintf
             bug mycheckeq_literal expect1 mycheck 
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
-            string_to_tempfile
             @quotes/;
 
 use t_SSUtils;
 
 use Spreadsheet::Edit qw(:all);
 
-my $inpath = create_testdata(
+my $inpath_obj = create_testdata(
     rows => [
       [ "Rowx 0 pre-title-row with only one non-empty column" ], # [0] B..E missing
       [ "A title1", "bee title", "Ctitle", "Dtitle" ],           # [1] cell E missing
@@ -31,8 +30,9 @@ my $inpath = create_testdata(
     ],
     gen_rows => 4,  # some more data rows
 );
+my $inpath = $inpath_obj->stringify;
 #warn dvis '### $debug $verbose $silent $Spreadsheet::Edit::Verbose';
-read_spreadsheet $inpath;
+read_spreadsheet { debug => $debug }, $inpath;
 defined(sheet()) or die "read_spreadsheet did not create current_sheet";
 ! ${sheet()}->{cmd_nesting} or die "non-zero cmd_nesting";
 my @saved_data = (@rows); # for construct-from-memory tests
@@ -106,13 +106,10 @@ sub test_autodetect($$;$) {
   
   # sheet();
 
-  my (@rsargs);
   $@ = "should never see this #2";
   if ($have_opthash) {
-    @rsargs = ($rs_opthash, $inpath);
     eval{ read_spreadsheet($rs_opthash, $inpath) }; verif_eval_err($expected_err_re) if $error_expected;
   } else {
-    @rsargs = ($inpath);
     eval{ read_spreadsheet(             $inpath) }; verif_eval_err($expected_err_re) if $error_expected;
   }
   $ex = $@;

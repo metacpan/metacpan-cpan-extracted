@@ -5,14 +5,18 @@ class Regex::ReplaceInfo {
   # Fields
   has replaced_count : ro int;
   
+  has match : ro Regex::Match;
+  
   # Class Methods
-  static method new : Regex::ReplaceInfo ($options = undef : object[]) {
+  static method new : Regex::ReplaceInfo ($options : object[] = undef) {
     
     my $self = new Regex::ReplaceInfo;
     
     my $options_h = Hash->new($options);
     
     $self->{replaced_count} = $options_h->delete_or_default_int("replaced_count", 0);
+    
+    $self->{match} = (Regex::Match)$options_h->delete_or_default("match", undef);
     
     for my $name (@{$options_h->keys}) {
       die "The \"$name\" option is not supported";

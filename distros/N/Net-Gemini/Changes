@@ -1,5 +1,10 @@
 Revision history for Net-Gemini
 
+0.06    2023-05-29
+        Break the verify_ssl callback interface; the certificate
+        notBefore date is now also passed. With 'tofu' set no hostname
+        verification is done.
+
 0.05    2023-04-11
         Somehow Encode.pm had gone AWOL, and other bugfixes. Parse for
         charset and encode to UTF-8 by default in gmitool, and add a

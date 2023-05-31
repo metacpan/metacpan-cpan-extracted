@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -49,9 +49,8 @@ my %WriteMakefileArgs = (
     "MooseX::NonMoose" => 0,
     "MooseX::Role::Parameterized" => 0,
     "Net::Async::HTTP" => "0.43",
-    "Net::OAuth" => "0.25",
-    "Net::Twitter::Lite::WithAPIv1_1" => 0,
     "POE" => 0,
+    "Twitter::API" => 0,
     "URI::Escape" => 0,
     "namespace::autoclean" => 0,
     "open" => 0,
@@ -68,7 +67,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -99,13 +98,12 @@ my %FallbackPrereqs = (
   "MooseX::NonMoose" => 0,
   "MooseX::Role::Parameterized" => 0,
   "Net::Async::HTTP" => "0.43",
-  "Net::OAuth" => "0.25",
-  "Net::Twitter::Lite::WithAPIv1_1" => 0,
   "POE" => 0,
   "Test::More" => 0,
   "Test::NoWarnings" => 0,
   "Test::Output" => 0,
   "Test::Trap" => 0,
+  "Twitter::API" => 0,
   "URI::Escape" => 0,
   "namespace::autoclean" => 0,
   "open" => 0,

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Render markdown using GitHub API",
+   "author" : [
+      "BIGFOOT <bigfoot@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Markdown-Render",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.51",
+            "Config::Tiny" : "2.28",
+            "Date::Format" : "2.24",
+            "HTTP::Request" : "6.37",
+            "IO::Scalar" : "2.111",
+            "JSON" : "4.07",
+            "LWP::UserAgent" : "6.67",
+            "Readonly" : "2.05",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "provides" : {
+      "Markdown::Render" : {
+         "file" : "lib/Markdown/Render.pm",
+         "version" : "1.02"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

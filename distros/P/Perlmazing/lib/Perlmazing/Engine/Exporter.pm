@@ -7,7 +7,7 @@ my $package = __PACKAGE__;
 my $imports;
 
 sub import {
-	my $self = shift;
+    my $self = shift;
 	my @call = caller 0;
 	my $pack = $call[0];
 	no strict 'refs';
@@ -30,11 +30,22 @@ sub export {
 	my $self = shift;
 	my ($from, $symbol, $to) = (shift, shift, shift);
 	my $sigil = '&';
-	$symbol =~ s/^(\&|\$|\%|\@|\*)/$sigil = $1; ''/e;
+	$symbol =~ s/^(:|\&|\$|\%|\@|\*)/$sigil = $1; ''/e;
 	croak "Unknown symbol type for expression '$symbol' in EXPORT" if $symbol =~ /^\W/;
 	no strict 'refs';
 	no warnings 'once';
-	if ($sigil eq '&') {
+    if ($sigil eq ':') {
+        my $tags = \%{"${from}::EXPORT_TAGS"};
+        if (not exists $tags->{$symbol}) {
+            croak "Export tag '$symbol' is not defined in package $from";
+        }
+        unless (ref($tags->{$symbol}) eq 'ARRAY') {
+            croak "Export tags should contain array refs";
+        }
+        for my $i (@{$tags->{$symbol}}) {
+            $self->export($from, $i, $to);
+        }
+    } elsif ($sigil eq '&') {
 		if (not defined *{"${from}::$symbol"}{CODE}) {
 			eval "sub ${from}::$symbol"; ## no critic
 			croak "Cannot create symbol for sub ${from}::$symbol: $@" if $@;

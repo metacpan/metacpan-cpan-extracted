@@ -8,7 +8,7 @@ use t_TestCommon ':silent',
                     show_white show_empty_string
                     fmt_codestring 
                     timed_run
-                    checkeq_literal check _check_end
+                    mycheckeq_literal mycheck _mycheck_end
                   /;
 use ODF::lpOD;
 use ODF::lpOD_Helper qw/:chars :DEFAULT fmt_node fmt_match fmt_tree/;
@@ -39,7 +39,7 @@ use Carp;
 use Data::Dumper::Interp;
 use Encode qw(encode decode);
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
-use Test::More; #for 'note' and 'diag'
+use Test2::V0; #for 'note' and 'diag'
 
 use constant DEFAULT_MEMBER_NAME => "content.xml";
 

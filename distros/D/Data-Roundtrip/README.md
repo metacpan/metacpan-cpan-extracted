@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.14
+Version 0.16
 
 # SYNOPSIS
 
@@ -354,10 +354,6 @@ on success or `undef` on failure.
 It uses [Data::Dump::Filtered](https://metacpan.org/pod/Data%3A%3ADump%3A%3AFiltered) to add a filter to
 [Data::Dump](https://metacpan.org/pod/Data%3A%3ADump).
 
-head3 CAVEAT
-
-In order to xxx
-
 ## `perl2dump_homebrew`
 
     my $ret = perl2dump_homebrew($perlvar, $optional_paramshashref)
@@ -431,7 +427,11 @@ to create a Data::Dump filter like,
     then be fed back to ["dump2perl"](#dump2perl).
 
 ## `dump2perl`
-
+    # CAVEAT: it will eval($dumpstring) internally, so
+    #         check $dumpstring for malicious code beforehand
+    #         it is a security risk if you don't.
+    #         Don't use it if $dumpstring comes from
+    #         untrusted sources (user input for example).
     my $ret = dump2perl($dumpstring)
 
 Arguments:
@@ -445,6 +445,11 @@ Escaped, or unescaped.
 Return value:
 
 - `$ret`, the Perl data structure on success or `undef` on failure.
+
+CAVEAT: it **eval()**'s the input `$dumpstring` in order to create the Perl data structure.
+**eval()**'ing unknown or unchecked input is a security risk. Always check input to **eval()**
+which comes from untrusted sources, like user input, scraped documents, email content.
+Anything really.
 
 ## `json2perl`
 

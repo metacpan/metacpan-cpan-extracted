@@ -4,16 +4,17 @@ use strict;
 use warnings;
 use namespace::autoclean 0.19 -except => ['import'];
 
+use DateTime::Locale::Data;
+
 use Exporter qw( import );
 
-our $VERSION = '1.38';
+our $VERSION = '1.39';
 
 our @EXPORT_OK = 'parse_locale_code';
 
-# It might be better to redo this as something that looks up each piece in a
-# catalog of codes. In particular, attempting to distinguish variants from
-# scripts is basically impossible without hard-coding (see 'tarask' below) or
-# by looking the codes up in a catalog.
+# This could probably all be done in a cleaner way starting with _just_
+# checking the known codes first and only then falling back to heuristics. But
+# for now it's good enough to handle oddballs like be-tarask and en-polyton.
 sub parse_locale_code {
     my @pieces = split /-/, $_[0];
 
@@ -21,14 +22,22 @@ sub parse_locale_code {
 
     my %codes = ( language => lc shift @pieces );
     if ( @pieces == 1 ) {
-        if ( length $pieces[0] == 2 || $pieces[0] =~ /^\d\d\d$/ ) {
+        ## no critic (ControlStructures::ProhibitCascadingIfElse, Variables::ProhibitPackageVars)
+        if ( exists $DateTime::Locale::Data::VariantCodes{ uc $pieces[0] } ) {
+            $codes{variant} = uc shift @pieces;
+        }
+        elsif (
+            exists $DateTime::Locale::Data::TerritoryCodes{ uc $pieces[0] } )
+        {
             $codes{territory} = uc shift @pieces;
         }
-
-        # The "be-Tarask" locale appears to be the only locale with a variant
-        # and no territory or script.
-        elsif ( lc $pieces[0] eq 'tarask' ) {
-            $codes{variant} = uc shift @pieces;
+        elsif (
+            exists $DateTime::Locale::Data::ScriptCodes{ _tc( $pieces[0] ) } )
+        {
+            $codes{script} = _tc( shift @pieces );
+        }
+        elsif ( length $pieces[0] == 2 || $pieces[0] =~ /^\d\d\d$/ ) {
+            $codes{territory} = uc shift @pieces;
         }
         else {
             $codes{script} = _tc( shift @pieces );
@@ -76,7 +85,7 @@ DateTime::Locale::Util - Utility code for DateTime::Locale
 
 =head1 VERSION
 
-version 1.38
+version 1.39
 
 =head1 DESCRIPTION
 

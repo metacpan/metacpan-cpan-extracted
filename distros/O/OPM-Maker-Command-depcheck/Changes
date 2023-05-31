@@ -1,6 +1,11 @@
 History for OPM::Maker::Command::depcheck
 =========================================
 
+1.0.1 2023-05-31 07:17:00
+
+    * Fixed some test failures (thanks to the CPANTesters!)
+    * Added some documentation
+
 1.0.0 2023-05-26 11:56:00
 
     Initial release

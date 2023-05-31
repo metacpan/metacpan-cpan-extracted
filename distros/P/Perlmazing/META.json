@@ -4,7 +4,7 @@
       "Francisco Zarabozo <zarabozo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,11 +34,15 @@
             "File::Copy::Recursive" : "0",
             "File::Path" : "2.08",
             "List::Util" : "0",
+            "Math::Round" : "0",
+            "Moo" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0015",
             "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
+            "Win32::Symlinks" : "0.10",
+            "namespace::clean" : "0",
             "strict" : "0",
             "version" : "0",
             "warnings" : "0"
@@ -58,11 +62,15 @@
             "File::Copy::Recursive" : "0",
             "File::Path" : "2.08",
             "List::Util" : "0",
+            "Math::Round" : "0",
+            "Moo" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0015",
             "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
+            "Win32::Symlinks" : "0.10",
+            "namespace::clean" : "0",
             "strict" : "0",
             "version" : "0",
             "warnings" : "0"
@@ -82,11 +90,15 @@
             "File::Copy::Recursive" : "0",
             "File::Path" : "2.08",
             "List::Util" : "0",
+            "Math::Round" : "0",
+            "Moo" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0015",
             "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
+            "Win32::Symlinks" : "0.10",
+            "namespace::clean" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "version" : "0",
@@ -107,11 +119,15 @@
             "File::Copy::Recursive" : "0",
             "File::Path" : "2.08",
             "List::Util" : "0",
+            "Math::Round" : "0",
+            "Moo" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0015",
             "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
+            "Win32::Symlinks" : "0.10",
+            "namespace::clean" : "0",
             "strict" : "0",
             "version" : "0",
             "warnings" : "0"
@@ -119,6 +135,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.2816",
-   "x_serialization_backend" : "JSON version 4.02"
+   "version" : "2.0006",
+   "x_serialization_backend" : "JSON version 4.10"
 }

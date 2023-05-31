@@ -4,11 +4,13 @@ use 5.10.1;
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.46;
 
 my %parms = (
     NAME                => 'Carp::Assert::More',
     VERSION_FROM        => 'More.pm', # finds $VERSION
+    LICENSE             => 'artistic_2',
+    MIN_PERL_VERSION    => '5.10.1',
 
     PM => {
         'More.pm'       => '$(INST_LIB)/Carp/Assert/More.pm',
@@ -26,21 +28,16 @@ my %parms = (
         SUFFIX          => '.gz',
         DIST_DEFAULT    => 'all tardist',
     },
-);
 
-if ( $ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/ and $ExtUtils::MakeMaker::VERSION > 6.30 ) {
-    $parms{LICENSE} = 'artistic_2';
-}
-
-if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
-    $parms{META_MERGE} = {
+    META_MERGE => {
         resources => {
+            homepage    => 'https://github.com/petdance/carp-assert-more',
             bugtracker  => 'https://github.com/petdance/carp-assert-more/issues',
             repository  => 'git@github.com:petdance/carp-assert-more.git',
             license     => 'https://opensource.org/licenses/artistic-license-2.0.php',
         }
-    };
-}
+    },
+);
 
 WriteMakefile( %parms );
 

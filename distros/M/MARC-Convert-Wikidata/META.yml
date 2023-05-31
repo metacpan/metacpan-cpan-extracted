@@ -23,6 +23,7 @@ meta-spec:
 name: MARC-Convert-Wikidata
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
@@ -35,6 +36,7 @@ requires:
   MARC::Convert::Wikidata::Object: 0
   Readonly: 0
   Roman: 0
+  URI: 0
   Unicode::UTF8: 0
   Wikibase::Datatype: 0
   perl: 5.6.2
@@ -43,4 +45,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata
-version: '0.01'
+version: '0.02'

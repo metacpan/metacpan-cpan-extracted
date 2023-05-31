@@ -3,7 +3,7 @@ use open ':std', ':encoding(UTF-8)'; ## WHY DOES NOT t_Setup PROVIDE THIS?
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/;    # strict, warnings, Carp, Data::Dumper::Interp, etc.
-use t_TestCommon; # Test::More
+use t_TestCommon; # Test2::V0 etc.
 
 use Mydump qw/mydump/;
 

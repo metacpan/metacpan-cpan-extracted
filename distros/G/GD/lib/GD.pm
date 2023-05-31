@@ -16,7 +16,7 @@ use GD::Polygon;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-$VERSION = '2.76';
+$VERSION = '2.77';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -300,7 +300,7 @@ compatibility with older versions of libgd.
 Alternatively, you may create a GD::Image object based on an existing
 image by providing an open filehandle, a filename, or the image data
 itself.  The image formats automatically recognized and accepted are:
-GIF, PNG, JPEG, XBM, XPM, GD2, TIFF, WEBP, HEIF or AVIF. Other formats,
+GIF, PNG, JPEG, XBM, XPM, BMP, GD2, TIFF, WEBP, HEIF or AVIF. Other formats,
 including WBMP, and GD version 1, cannot be recognized automatically
 at this time.
 
@@ -407,16 +407,28 @@ contents of an X Bitmap (black & white) file:
 There is no newFromXbmData() function, because there is no
 corresponding function in the gd library.
 
-=item B<$image = GD::Image-E<gt>newFromWBMP($file, [$truecolor])>
+=item B<$image = GD::Image-E<gt>newFromWBMP($file)>
 
 This works in exactly the same way as C<newFromPng>, but reads the
-contents of an Windows BMP Bitmap file:
+contents of a Wireless Application Protocol Bitmap (WBMP) file:
 
-	open (BMP,"coredump.bmp") || die;
-	$myImage = GD::Image->newFromWBMP(\*BMP) || die;
-	close BMP;
+	open (WBMP,"coredump.wbmp") || die;
+	$myImage = GD::Image->newFromWBMP(\*WBMP) || die;
+	close WBMP;
 
 There is no newFromWBMPData() function, because there is no
+corresponding function in the gd library.
+
+=item B<$image = GD::Image-E<gt>newFromBmp($file)>
+
+This works in exactly the same way as C<newFromPng>, but reads the
+contents of a Windows Bitmap (BMP) file:
+
+	open (BMP,"coredump.bmp") || die;
+	$myImage = GD::Image->newFromBmp(\*BMP) || die;
+	close BMP;
+
+There is no newFromBmpData() function, because there is no
 corresponding function in the gd library.
 
 =item B<$image = GD::Image-E<gt>newFromGd($file)>
@@ -615,6 +627,13 @@ pipe it to a display program, or write it to a file.  Example:
 
 Same as gd(), except that it returns the data in compressed GD2
 format.
+
+=item B<$bmpdata = $image-E<gt>bmp([$compression])>
+
+This returns the image data in BMP format, which is a Windows Bitmap.
+If compression is set to 1, it will use RLE compression on the pixel
+data; otherwise, setting it to 0 (the default) will leave the BMP 
+pixel data uncompressed.
 
 =item B<$wbmpdata = $image-E<gt>wbmp([$foreground])>
 

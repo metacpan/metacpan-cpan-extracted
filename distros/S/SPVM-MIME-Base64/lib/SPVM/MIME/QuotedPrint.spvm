@@ -2,7 +2,7 @@
 # MIT License
 
 class MIME::QuotedPrint  {
-  native static method encode_qp : string ($string : string, $eol = undef : string, $binmode = 0 : int);
+  native static method encode_qp : string ($string : string, $eol : string = undef, $binmode : int = 0);
   
   native static method decode_qp : string ($string : string);
 }

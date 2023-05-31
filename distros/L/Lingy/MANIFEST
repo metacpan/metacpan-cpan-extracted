@@ -14,6 +14,7 @@ example/fizzbuzz.ly
 lib/Lingy.pm
 lib/Lingy.pod
 lib/Lingy/CLI.pm
+lib/Lingy/ClojureREPL.pm
 lib/Lingy/Common.pm
 lib/Lingy/Env.pm
 lib/Lingy/Eval.pm
@@ -24,12 +25,14 @@ lib/Lingy/Lang/Class.pm
 lib/Lingy/Lang/Function.pm
 lib/Lingy/Lang/HashMap.pm
 lib/Lingy/Lang/Keyword.pm
+lib/Lingy/Lang/LazySeq.pm
 lib/Lingy/Lang/List.pm
 lib/Lingy/Lang/ListClass.pm
 lib/Lingy/Lang/Macro.pm
 lib/Lingy/Lang/Nil.pm
 lib/Lingy/Lang/Number.pm
 lib/Lingy/Lang/Numbers.pm
+lib/Lingy/Lang/Object.pm
 lib/Lingy/Lang/RT.pm
 lib/Lingy/Lang/Regex.pm
 lib/Lingy/Lang/ScalarClass.pm

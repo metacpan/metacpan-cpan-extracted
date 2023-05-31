@@ -39,7 +39,7 @@ class IO::Socket::INET extends IO::Socket {
     return $socket_address;
   }
   
-  static method new : IO::Socket::INET ($options = undef : object[]) {
+  static method new : IO::Socket::INET ($options : object[] = undef) {
     my $self = new IO::Socket::INET;
     
     $self->init($options);
@@ -72,7 +72,7 @@ class IO::Socket::INET extends IO::Socket {
   }
   
   # Instance Methods
-  method new_instance : IO::Socket::INET ($options = undef : object[]) {
+  method new_instance : IO::Socket::INET ($options : object[] = undef) {
     {
       my $self = IO::Socket::INET->new($options);
       
@@ -80,7 +80,7 @@ class IO::Socket::INET extends IO::Socket {
     }
   }
   
-  protected method init : void ($options = undef : object[]) {
+  protected method init : void ($options : object[] = undef) {
     
     my $options_h = Hash->new($options);
     

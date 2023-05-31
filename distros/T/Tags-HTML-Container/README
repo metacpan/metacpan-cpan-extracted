@@ -1,0 +1,159 @@
+NAME
+    Tags::HTML::Container - Tags helper for container.
+
+SYNOPSIS
+     use Tags::HTML::Container;
+
+     my $obj = Tags::HTML::Container->new(%params);
+     $obj->process($tags_cb);
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Container->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_container"
+
+            CSS class for container box.
+
+            Default value is 'container'.
+
+    *       "css_inner"
+
+            CSS class for inner box in container.
+
+            Default value is 'inner'.
+
+    *       "horiz_align"
+
+            Horizontal align.
+
+            Possible values are: center left right
+
+            Default value is 'center'.
+
+    *       "vert_align"
+
+            Vertical align.
+
+            Possible values are: base bottom center fit top
+
+            Default value is 'center'.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+  "process"
+     $obj->process($tags_cb);
+
+    Process Tags structure for container with code defined in $tags_cb
+    callback. This callback has one argument and this is $self of container
+    object.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for output.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+             Parameter 'horiz_align' is required.
+             Parameter 'horiz_align' have a bad value.
+                     Value: %s
+             Parameter 'vert_align' is required.
+             Parameter 'vert_align' have a bad value.
+                     Value: %s
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+             There is no contained callback with Tags code.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Container;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Container->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process container with text.
+     $obj->process(sub {
+             my $self = shift;
+             $self->{'tags'}->put(
+                     ['d', 'Hello World!'],
+             );
+             return;
+     });
+     $obj->process_css;
+
+     # Print out.
+     print $tags->flush;
+     print "\n\n";
+     print $css->flush;
+
+     # Output:
+     # <div class="container">
+     #   <div class="inner">
+     #     Hello World!
+     #   </div>
+     # </div>
+     # 
+     # .container {
+     #         display: flex;
+     #         align-items: center;
+     #         justify-content: center;
+     #         height: 100vh;
+     # }
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::Util, Readonly, Tags::HTML,
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Container>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

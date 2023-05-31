@@ -20,19 +20,28 @@ no_index:
     - xt
 requires:
   Capture::Tiny: '0.48'
+  File::Path: '2.18'
+  File::Spec: '3.75'
+  File::Temp: '0.2311'
+  File::Which: '1.27'
+  Getopt::Long: '2.54'
+  IO::Select: '1.51'
+  Scalar::Util: '1.63'
   Sub::Identify: '0.14'
   Sub::Name: '0.27'
   Term::ReadLine: '1.17'
   Term::ReadLine::Gnu: '1.45'
+  Test::Simple: '1.302195'
   Tie::IxHash: '1.23'
+  Time::HiRes: '1.9764'
   XXX: '0.38'
   YAML::PP: '0.036'
-  perl: v5.12.0
+  perl: v5.16.0
 resources:
   bugtracker: https://github.com/ingydotnet/lingy/issues
   homepage: https://github.com/ingydotnet/lingy
   repository: https://github.com/ingydotnet/lingy.git
-version: 0.1.7
+version: 0.1.8
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

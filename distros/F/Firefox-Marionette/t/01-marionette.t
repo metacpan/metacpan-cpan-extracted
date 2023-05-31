@@ -797,6 +797,12 @@ SKIP: {
 			diag("Unable to determine the number of updates available");
 			ok(1, "Unable to determine the number of updates available");
 		}
+		$update = Firefox::Marionette::UpdateStatus->new(elevation_failure => 0, unsupported => undef, is_complete_update => 1, install_date => undef);
+		ok(ref $update eq 'Firefox::Marionette::UpdateStatus', "Firefox::Marionette::UpdateStatus->new() produces a Firefox::Marionette::UpdateStatus object");
+		ok($update->elevation_failure() == 0, "\$update->elevation_failure() == 0 when parameter is 0");
+		ok(!defined $update->unsupported(), "\$update->unsupported() is not defined when parameter is not defined");
+		ok($update->is_complete_update() == 1, "\$update->is_complete_update() == 1 when parameter is 1");
+		ok(!defined $update->install_date(), "\$update->install_date() is not defined when parameter is not defined");
 	}
 	if ($ENV{FIREFOX_HOST}) {
 		ok(-d $firefox->ssh_local_directory(), "Firefox::Marionette->ssh_local_directory() returns the existing ssh local directory:" . $firefox->ssh_local_directory());
@@ -1460,6 +1466,59 @@ SKIP: {
 			ok($hash->{value} == 2, "Value returned from script is the numeric 2 in a hash");
 		}
 	}
+	if (($tls_tests_ok) && ($ENV{RELEASE_TESTING})) {
+		if ($major_version < 63) {
+			diag("Not attempting to do cache operations for Firefox $major_version");
+		} else {
+			ok($firefox->go('https://github.com'), "\$firefox->go('https://github.com') succeeded");
+			my $old_session_cookie = github_session_cookie($firefox);
+			ok($old_session_cookie, "Found github session cookie");
+			ok($firefox->go('about:blank'), "\$firefox->go('about:blank') succeeded");
+			my $cookie_count = 0;
+			foreach my $cookie ($firefox->cookies()) {
+				$cookie_count += 1;
+				diag("Should not have found cookie " . $cookie->name() . " for about:blank");
+			}
+			ok($cookie_count == 0, "There are no availabe cookies for about:blank");
+			ok(ref $firefox->clear_cache() eq $class, "\$firefox->clear_cache() produces a $class object");
+			ok($firefox->go('https://github.com'), "\$firefox->go('https://github.com') succeeded");
+			my $new_session_cookie = github_session_cookie($firefox);
+			ok(defined $new_session_cookie, "The session cookie was found after clearing cache");
+			ok($old_session_cookie ne $new_session_cookie, "Different session cookie found after clearing everything in the cache");
+			$old_session_cookie = $new_session_cookie;
+			ok($firefox->go('about:blank'), "\$firefox->go('about:blank') succeeded");
+			ok(ref $firefox->clear_cache(Firefox::Marionette::Cache::CLEAR_COOKIES()) eq $class, "\$firefox->clear_cache(Firefox::Marionette::Cache::CLEAR_COOKIES()) produces a $class object");
+			ok($firefox->go('https://github.com'), "\$firefox->go('https://github.com') succeeded");
+			$new_session_cookie = github_session_cookie($firefox);
+			ok(defined $new_session_cookie, "The session cookie was found after clearing cache");
+			ok($old_session_cookie ne $new_session_cookie, "Different session cookie found after clearing cookie cache");
+			$old_session_cookie = $new_session_cookie;
+			ok($firefox->go('about:blank'), "\$firefox->go('about:blank') succeeded");
+			ok(ref $firefox->clear_cache(Firefox::Marionette::Cache::CLEAR_NETWORK_CACHE()) eq $class, "\$firefox->clear_cache(Firefox::Marionette::Cache::CLEAR_NETWORK_CACHE()) produces a $class object");
+			ok($firefox->go('https://github.com'), "\$firefox->go('https://github.com') succeeded");
+			$new_session_cookie = github_session_cookie($firefox);
+			ok(defined $new_session_cookie, "The session cookie was found after clearing cache");
+			ok($old_session_cookie eq $new_session_cookie, "The same session cookie found after clearing network cache");
+		}
+	}
+	Firefox::Marionette::Cache->import(qw(:all));
+	my $clear_data_service_is_ok = 1;
+	eval { $firefox->check_cache_key('CLEAR_COOKIES'); } or do { $clear_data_service_is_ok = 0; chomp $@; diag("Unable to check cache values:$@"); };
+	if ($clear_data_service_is_ok) {
+		foreach my $name ($firefox->cache_keys()) {
+			no strict;
+			TODO: {
+				local $TODO = ($major_version < 113 && $name !~ /(^CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox can have different values for Firefox::Marionette::Cache constants" : q[];
+				ok($firefox->check_cache_key($name) eq &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which is " . &$name());
+			}
+			use strict;
+		}
+	}
+	eval { $firefox->check_cache_key(); };
+	ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->check_cache_key() throws an exception");
+	eval { $firefox->check_cache_key("123!#"); };
+	ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->check_cache_key(\"123!#\") throws an exception");
+	ok($firefox->content(), "\$firefox->content() is called in case of previous exceptions getting the context out of sync");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
@@ -1579,6 +1638,18 @@ SKIP: {
 		};
 		ok($result == 0, "Correctly throws exception for unknown pdf key:$@");
 	}
+}
+
+sub github_session_cookie {
+	my ($firefox) = @_;
+	my $session_name = '_gh_sess';
+	my $session_value;
+	foreach my $cookie ($firefox->cookies()) {
+		if ($cookie->name() eq $session_name) {
+			$session_value = $cookie->value();
+		}
+	}
+	return $session_value;
 }
 
 sub centimetres_to_points {
@@ -2374,7 +2445,7 @@ SKIP: {
 		}
 		ok($count, "Link from metacpan.org has $count attributes");
 		my @scroll_arguments = test_scroll_arguments($number_of_links++);
-		ok($firefox->scroll($link, @scroll_arguments), "Firefox scrolled to the link with arguments of:" . join q[, ], stringify_scroll_arguments(@scroll_arguments));
+		ok($link->scroll(@scroll_arguments), "Firefox scrolled to the link with arguments of:" . join q[, ], stringify_scroll_arguments(@scroll_arguments));
 	}
 	my @images = $firefox->images();
 	foreach my $image (@images) {
@@ -3033,8 +3104,10 @@ SKIP: {
 			}
 		}
 		ok($count == 1, "Downloaded 1 files:$count");
-		my $handle = $firefox->download($download_path);
-		ok($handle->isa('GLOB'), "Obtained GLOB from \$firefox->download(\$path)");
+		my $deprecated_handle = $firefox->download($download_path);
+		ok($deprecated_handle->isa('GLOB'), "Obtained GLOB from \$firefox->downloaded('$download_path')");
+		my $handle = $firefox->downloaded($download_path);
+		ok($handle->isa('GLOB'), "Obtained GLOB from \$firefox->downloaded('$download_path')");
 		my $gz = Compress::Zlib::gzopen($handle, 'rb') or die "Failed to open gzip stream";
 		my $bytes_read = 0;
 		while($gz->gzread(my $buffer, 4096)) {

@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.38';
+our $VERSION = '1.39';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.38
+version 1.39
 
 =head1 DESCRIPTION
 
@@ -241,7 +241,7 @@ The available locales are:
  el               Greek                                             Ελληνικά
  el-CY            Greek Cyprus                                      Ελληνικά Κύπρος
  el-GR            Greek Greece                                      Ελληνικά Ελλάδα
- el-polyton       Greek                                             Ἑλληνικά
+ el-polyton       Greek Polytonic                                   Ἑλληνικά Πολυτονικό
  en               English                                           English
  en-001           English world                                     English world
  en-150           English Europe                                    English Europe

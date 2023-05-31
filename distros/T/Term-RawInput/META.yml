@@ -12,10 +12,10 @@ name: Term-RawInput
 provides:
   Term::RawInput:
     file: lib/Term/RawInput.pm
-    version: 1.23
+    version: 1.25
 requires:
   Term::ReadKey: 0
   IO::Handle: 0
 resources:
   license: http://www.gnu.org/licenses/agpl.html
-version: 1.23
+version: 1.25

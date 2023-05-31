@@ -11,18 +11,18 @@ Gmail::Mailbox::Validate - Find if the username has a valid mailbox in gmail
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 
 =head1 SYNOPSIS
 
 This module just checks if the given username has a valid mailbox in gmail.
 
-If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
+If you find any issues in using the module, please don't hesitate to email me: pyh@pobox.com
 
 
     use Gmail::Mailbox::Validate;

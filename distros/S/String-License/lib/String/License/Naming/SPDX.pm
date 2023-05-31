@@ -10,7 +10,7 @@ String::License::Naming::SPDX - licenses as named by SPDX
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.5
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ or as fallback by an internal name.
 
 =cut
 
-package String::License::Naming::SPDX v0.0.4;
+package String::License::Naming::SPDX v0.0.5;
 
 use Carp            qw(croak);
 use Log::Any        ();

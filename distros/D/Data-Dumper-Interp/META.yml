@@ -3,8 +3,10 @@ abstract: 'interpolate Data::Dumper output into strings for human consumption'
 author:
   - 'Jim Avera'
 build_requires:
+  Clone: '0'
   Cwd: '0'
   Data::Compare: '0'
+  Encode: '0'
   English: '0'
   File::Basename: '0'
   File::Path: '0'
@@ -18,6 +20,8 @@ build_requires:
   Math::BigFloat: '1.999837'
   Math::BigInt: '1.999837'
   Math::BigRat: '0.2624'
+  Path::Tiny: '0'
+  Test2::Plugin::BailOnFail: '0'
   Test2::V0: '0'
   Tie::Array: '0'
   Tie::Handle: '0'
@@ -44,11 +48,11 @@ meta-spec:
 name: Data-Dumper-Interp
 requires:
   Carp: '0'
-  Clone: '0'
   Data::Dumper: '0'
-  Encode: '0'
+  Data::Visitor: '0'
   Exporter: '0'
   List::Util: '1.33'
+  Moose: '0'
   POSIX: '0'
   Regexp::Common: '0'
   Scalar::Util: '0'
@@ -64,7 +68,7 @@ resources:
   bugtracker: https://github.com/jimav/Data-Dumper-Interp/issues
   homepage: https://github.com/jimav/Data-Dumper-Interp
   repository: https://github.com/jimav/Data-Dumper-Interp.git
-version: '5.021'
+version: '5.023'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

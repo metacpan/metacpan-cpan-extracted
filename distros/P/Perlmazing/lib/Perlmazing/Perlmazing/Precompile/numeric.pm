@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(is_number to_number);
 
 sub main ($$) {
 	my ($aa, $bb) = ($_[0], $_[1]);

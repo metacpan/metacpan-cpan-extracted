@@ -2,9 +2,10 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::Text;
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
-use Exporter::Shiny qw( lines_utf8_from strip_comments);
+use Text::Trim qw(trim);
+use Exporter::Shiny qw( docstr lines_utf8_from strip_comments trim undent);
 
 #region: #== UTILITY FUNCTIONS (EXPORT_OK) ==
 
@@ -41,6 +42,21 @@ sub strip_comments { # function
     @res;
 }
 
+# [TAU]: Shamelessly copied from: [Filter::Undent](https://metacpan.org/release/KILNA/Filter-Undent-v1.0.3/view/lib/Filter/Undent.pm)
+sub undent ($) { ## no critic
+    no warnings 'uninitialized';
+    if ( $_[0] =~ m/^(\r?\n)*([ \t]+)/ ) {
+        my $i = $2;
+        return join '', map { s/^\Q$i\E/$1/g; $_ } grep { $_ ne '' }
+            split /(.*?\n)/, $_[0];
+    }
+    return $_[0];
+}
+
+sub docstr {
+    trim(undent(join("\n", @_)))
+}
+
 
 #endregion (UTILITY FUNCTIONS)
 
@@ -58,9 +74,9 @@ Zest::Author::TABULO::Util::Text - DZIL-related utility functions used by TABULO
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
-=for Pod::Coverage lines_utf8_from strip_comments
+=for Pod::Coverage docstr lines_utf8_from strip_comments trim undent
 
 =head1 AUTHORS
 

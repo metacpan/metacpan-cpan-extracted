@@ -1,3 +1,8 @@
+0.010   2023-03-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add script: rename-add-prefix-number.
+
+
 0.009   2023-03-02  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Alias so rename-* commands have mv-* as well.

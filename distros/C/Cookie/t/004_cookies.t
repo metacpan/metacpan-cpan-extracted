@@ -41,6 +41,7 @@ subtest 'methods' => sub
     can_ok( $jar, "exists" );
     can_ok( $jar, "extract" );
     can_ok( $jar, "extract_cookies" );
+    can_ok( $jar, "extract_one" );
     can_ok( $jar, "fetch" );
     can_ok( $jar, "get" );
     can_ok( $jar, "get_by_domain" );
@@ -374,6 +375,27 @@ subtest 'cookie jar' => sub
         # should not be here anymore
         unlike( $h, qr/csrf_token=${csrf}/ );
         like( $h, qr/site_prefs=lang%3Den-GB/ );
+    };
+};
+
+subtest 'extract one cookie' => sub
+{
+    my $jar = Cookie::Jar->new( debug => $DEBUG );
+    my $cookie_str = q{session_token=fe3fc36d-4104-4cd1-8f07-56cb96b2c78b; path=/ ; expires=Monday, 01-Nov-2021 17:12:40 GMT};
+    my $co = $jar->extract_one( $cookie_str, { port => 443, host => 'www.example.com' } );
+    ok( $co );
+    SKIP:
+    {
+        if( !defined( $co ) )
+        {
+            skip( "Cannot parse cookie string.", 1 );
+        }
+        is( $co->name, 'session_token', 'name' );
+        is( $co->value, 'fe3fc36d-4104-4cd1-8f07-56cb96b2c78b', 'value' );
+        is( $co->path, '/', 'path' );
+        is( $co->expires->iso8601, '2021-11-01T17:12:40', 'expires' );
+        is( $co->port, 443, 'port' );
+        is( $co->domain, 'example.com', 'domain' );
     };
 };
 

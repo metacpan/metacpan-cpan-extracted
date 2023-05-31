@@ -1,56 +1,19 @@
 ==================================================
-Changes from 2012-03-02 00:00:00 +0000 to present.
+Changes from 2018-05-30 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1.12 at 2017-03-01 12:11:15 +0000
+version 1.14 at 2023-05-29 12:46:03 +0000
 -----------------------------------------
 
-  Change: 338a5e2913a4ec5cbd077a4c2f1c8b37cf8c5ff5
+  Change: 15b5610d57105cf36e6f238964e23ea646975856
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-03-01 12:11:15 +0000
+  Date : 2023-05-29 13:46:03 +0000
 
-    Split nameservers test into ipv4 and ipv6 tests 
+    Latest Net::DNS has deprecated rdatastr so switch to rdstring
 
------------------------------------------
-version 1.10 at 2017-02-28 13:37:38 +0000
------------------------------------------
+    Up the required version of Net::DNS accordingly. 
 
-  Change: 11a26f976801103bb2bc022696d8ff4cef935e60
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-02-28 13:37:38 +0000
-
-    Add better diagnostics to narrow down tester failures 
-
------------------------------------------
-version 1.08 at 2014-06-03 13:56:03 +0000
------------------------------------------
-
-  Change: 2c2e43580f6799121bf843b927adc7e2ef0a134a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-06-03 14:56:03 +0000
-
-    Added IPv6 support (hopefully) 
-
------------------------------------------
-version 1.06 at 2012-12-13 12:37:53 +0000
------------------------------------------
-
-  Change: 1bddf1c24e4dfaeb62b688e00d85b4a32828aa17
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-12-13 12:37:53 +0000
-
-    Resolve issue with API change in Net::DNS::Packet
-
-    0.68_01 of Net::DNS changed the API for passing a scalar ref to
-    Net::DNS::Packet->new().
-
-    Errors are now in $@ and the length is in the second returned value.
-
-    At least passing a false value as the second parameter actually
-    surpresses debug output now, so removed the hacks to shut that shit
-    up. 
-
-================================================
-Plus 9 releases after 2012-03-02 00:00:00 +0000.
-================================================
+=================================================
+Plus 13 releases after 2018-05-30 00:00:00 +0000.
+=================================================

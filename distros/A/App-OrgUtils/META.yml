@@ -19,22 +19,22 @@ name: App-OrgUtils
 provides:
   App::FilterOrgByHeadlines:
     file: lib/App/FilterOrgByHeadlines.pm
-    version: '0.484'
+    version: '0.485'
   App::ListOrgAnniversaries:
     file: lib/App/ListOrgAnniversaries.pm
-    version: '0.484'
+    version: '0.485'
   App::ListOrgHeadlines:
     file: lib/App/ListOrgHeadlines.pm
-    version: '0.484'
+    version: '0.485'
   App::ListOrgHeadlinesFast:
     file: lib/App/ListOrgHeadlinesFast.pm
-    version: '0.484'
+    version: '0.485'
   App::ListOrgTodos:
     file: lib/App/ListOrgTodos.pm
-    version: '0.484'
+    version: '0.485'
   App::OrgUtils:
     file: lib/App/OrgUtils.pm
-    version: '0.484'
+    version: '0.485'
 requires:
   Browser::Open: '0'
   Complete::Util: '0.616'
@@ -91,7 +91,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils
   homepage: https://metacpan.org/release/App-OrgUtils
   repository: git://github.com/perlancar/perl-App-OrgUtils.git
-version: '0.484'
+version: '0.485'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -99,7 +99,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.02'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript count-org-headlines-fast'
@@ -313,7 +313,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -425,7 +425,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

@@ -61,5 +61,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/firefox-marionette/issues
   repository: https://github.com/david-dick/firefox-marionette
-version: '1.37'
+version: '1.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

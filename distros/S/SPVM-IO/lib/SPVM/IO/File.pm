@@ -29,11 +29,11 @@ L<IO::Handle|SPVM::IO::Handle>.
 
 =head2 new
 
-  static method new : IO::File ($file_name = undef : string, $open_mode = undef : string);
+  static method new : IO::File ($file_name : string = undef, $open_mode : string = undef);
 
 =head2 new_from_fd
 
-  static method new_from_fd : IO::Handle ($fd : int, $open_mode = undef : string);
+  static method new_from_fd : IO::Handle ($fd : int, $open_mode : string = undef);
 
 =head2 open
 
@@ -97,11 +97,11 @@ L<IO::Handle|SPVM::IO::Handle>.
 
 =head2 syswrite
 
-  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int);
+  method syswrite : int ($buffer : string, $length : int, $offset : int = 0);
 
 =head2 sysread
 
-  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int);
+  method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0);
 
 =head1 See Also
 

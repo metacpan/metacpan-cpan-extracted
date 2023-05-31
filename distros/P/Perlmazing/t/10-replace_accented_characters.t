@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 4;
-use Perlmazing;
+use Perlmazing qw(replace_accented_characters);
 
 my $accented = 'El niño está hablando español y sé que sí logró resultados únicos.';
 my $shouldbe = 'El nino esta hablando espanol y se que si logro resultados unicos.';

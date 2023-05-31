@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use WQS::SPARQL::Result;
 
 # Test.
-is($WQS::SPARQL::Result::VERSION, 0.01, 'Version.');
+is($WQS::SPARQL::Result::VERSION, 0.03, 'Version.');

@@ -1,3 +1,7 @@
+0.004 - 2023-05-31, H.Merijn Brand
+    * Skip unreadable test for root
+    * Require Net::Socket::SSL 1.42 for https
+
 0.003 - 2023-05-24, H.Merijn Brand
     * Shortcuts
     * Use existing CVE in SYNOPSIS (szabgab, issue#1)

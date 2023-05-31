@@ -19,7 +19,7 @@ use Bit::Vector;
 use CPU::Z80::Disassembler::Label;
 use CPU::Z80::Disassembler::Format;
 
-our $VERSION = '0.09';
+our $VERSION = '1.02';
 
 #------------------------------------------------------------------------------
 

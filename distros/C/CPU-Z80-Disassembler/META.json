@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -47,15 +47,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler.git",
          "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler"
       }
    },
-   "version" : "0.09",
-   "x_bugtracker" : {
-      "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler/issues"
-   },
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

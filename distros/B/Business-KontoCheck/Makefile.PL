@@ -272,7 +272,7 @@ sub write_makefile
                            'Test::Pod' => '0', # or a minimum working version
                            },
       ABSTRACT_FROM => 'lib/Business/KontoCheck.pm', # retrieve abstract from module
-      AUTHOR        => 'Michael Plugge <m.plugge@hs-mannheim.de>',
+      AUTHOR        => 'Michael Plugge <konto_check@yahoo.com>',
       LIBS          => ['-L.','-lz'],
       LDFLAGS       => '-L.',
       DEFINE        => $define,

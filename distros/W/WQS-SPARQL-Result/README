@@ -17,6 +17,13 @@ METHODS
 
     Constructor.
 
+    *       "verbose"
+
+            Verbose module flag. If enabled dumps result JSON structure to
+            STDERR.
+
+            Default value is 0.
+
     Returns instance of class.
 
   "result"
@@ -24,10 +31,13 @@ METHODS
 
     Select variables from structures and return list.
 
-    Variables:
+    Method arguments:
 
-     C<$result_hr> - Structure converted from JSON string.
-     C<$vars_ar> - Reference to array with keys, which we need to return.
+    $result_hr
+            Structure converted from JSON string.
+
+    $vars_ar
+            Reference to array with keys, which we need to return.
 
     Returns list of structures with key => value pairs.
 
@@ -36,8 +46,48 @@ ERRORS
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
 
+     result():
+             Type '%s' doesn't supported.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use WQS::SPARQL::Result;
+
+     my $result_hr = {
+             'head' => {
+                     'vars' => ['item'],
+             },
+             'results' => {
+                     'bindings' => [{
+                             'item' => {
+                                     'type' => 'uri',
+                                     'value' => 'http://www.wikidata.org/entity/Q27954834',
+                             },
+                     }],
+             },
+     };
+
+     my $obj = WQS::SPARQL::Result->new;
+     my @ret = $obj->result($result_hr, ['item']);
+
+     # Dump out.
+     foreach my $ret_hr (@ret) {
+             print "{\n";
+             foreach my $key (keys %{$ret_hr}) {
+                     print "  $key => ".$ret_hr->{$key}.",\n";
+             }
+             print "},\n";
+     }
+
+     # Output:
+     # {
+     #   item => Q27954834,
+     # },
+
 DEPENDENCIES
-    Class::Utils, Error::Pure, URI.
+    Class::Utils, Data::Printer, Error::Pure, URI.
 
 SEE ALSO
     WQS::SPARQL::Query::Count
@@ -60,5 +110,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.03
 

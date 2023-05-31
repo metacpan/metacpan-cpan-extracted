@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(croak);
 
 # Mainly ripped from Crypt::Rijndael::MySQL
 sub main {

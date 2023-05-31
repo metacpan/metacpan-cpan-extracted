@@ -1,5 +1,8 @@
 Revision history for psort.
 
+0.12	2023-05-31
+	- add -X option
+
 0.11	2023-02-09
 	- fix --rx option without capture groups
 	- warn if --rx was used wrongly (i.e. with /.../)

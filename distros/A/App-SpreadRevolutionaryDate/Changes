@@ -1,6 +1,11 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.32 2022-12-15T07:06:09
+0.33 2023-05-28T20:40:25
+ - Upgrade copyright year
+ - Upgrade to Twitter API v2
+ - Remove tests for Freenode and Liberachat
+
+0.32 2022-12-15T07:06:09Z
  - Update author's name and copyright years
  - Sync Changes
 

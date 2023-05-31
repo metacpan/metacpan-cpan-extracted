@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.2.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/09/24
+## Modified 2023/05/30
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -555,7 +555,7 @@ sub extract
             $c_dom =~ s/^\.//g;
             # "Convert the cookie-domain to lower case."
             $c_dom = lc( $c_dom );
-            # Check the domain name is legitimate, i.e.s ent from a host that has authority
+            # Check the domain name is legitimate, i.e. sent from a host that has authority
             # "The user agent will reject cookies unless the Domain attribute specifies a scope for the cookie that would include the origin server.  For example, the user agent will accept a cookie with a Domain attribute of "example.com" or of "foo.example.com" from foo.example.com, but the user agent will not accept a cookie with a Domain attribute of "bar.example.com" or of "baz.foo.example.com"."
             # <https://tools.ietf.org/html/rfc6265#section-4.1.2.3>
             if( CORE::length( $c_dom ) >= CORE::length( $root ) && 
@@ -625,6 +625,109 @@ sub extract
 }
 
 sub extract_cookies { return( shift->extract( @_ ) ); }
+
+sub extract_one
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{path} //= '/';
+    return( $self->error( "No cookie data was provided." ) ) if( !length( "$str" ) );
+    
+    my( $host, $root );
+    if( defined( $opts->{host} ) && CORE::length( $opts->{host} ) )
+    {
+        $host = $opts->{host};
+        if( $self->_is_ip( $host ) )
+        {
+            $root = $host;
+        }
+        else
+        {
+            my $dom = Cookie::Domain->new || return( $self->pass_error( Cookie::Domain->error ) );
+            my $res = $dom->stat( $host );
+            if( !defined( $res ) )
+            {
+                return( $self->pass_error( $dom->error ) );
+            }
+            # Possibly empty
+            $root = $res ? $res->domain : '';
+        }
+    }
+
+    my $o = Module::Generic::HeaderValue->new_from_header( "$str" ) ||
+        return( $self->pass_error( Module::Generic::HeaderValue->error ) );
+    my( $name, $value ) = $o->value->list;
+    my $c = Cookie->new( name => $name, value => $value ) || 
+        return( $self->pass_error( Cookie->error ) );
+    if( CORE::length( $o->param( 'expires' ) ) )
+    {
+        my $dt = $self->_parse_timestamp( $o->param( 'expire' ) );
+        if( $dt )
+        {
+            $c->expires( $dt );
+        }
+        else
+        {
+            $c->expires( $o->param( 'expires' ) );
+        }
+    }
+    elsif( CORE::length( $o->param( 'max-age' ) ) )
+    {
+        $c->max_age( $o->param( 'max-age' ) );
+    }
+    
+    if( $o->param( 'domain' ) )
+    {
+        # rfc6265, section 5.2.3:
+        # "If the first character of the attribute-value string is %x2E ("."): Let cookie-domain be the attribute-value without the leading %x2E (".") character."
+        # Ref: <https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.3>
+        my $c_dom = $o->param( 'domain' );
+        # Remove leading dot as per rfc specifications
+        $c_dom =~ s/^\.//g;
+        # "Convert the cookie-domain to lower case."
+        $c_dom = lc( $c_dom );
+        $c->domain( $c_dom );
+    }
+    # "If omitted, defaults to the host of the current document URL, not including subdomains."
+    # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie>
+    else
+    {
+        if( $root )
+        {
+            $c->domain( $root );
+            $c->implicit(1);
+        }
+        else
+        {
+        }
+    }
+    
+    # rfc6265: "If the server omits the Path attribute, the user agent will use the "directory" of the request-uri's path component as the default value."
+    if( defined( $o->param( 'path' ) ) && CORE::length( $o->param( 'path' ) ) )
+    {
+        $c->path( $o->param( 'path' ) );
+    }
+    else
+    {
+        my $frag = $self->new_array( [split( /\//, $opts->{path} )] );
+        # Not perfect
+        if( $opts->{path} eq '/' || substr( $opts->{path}, -1, 1 ) eq '/' )
+        {
+            $c->path( $opts->{path} );
+        }
+        else
+        {
+            $frag->pop;
+            $c->path( $frag->join( '/' )->scalar );
+        }
+    }
+    $c->port( $opts->{port} ) if( defined( $opts->{port} ) && $self->_is_integer( $opts->{port} ) );
+    $c->http_only(1) if( $o->param( 'httponly' ) );
+    $c->secure(1) if( $o->param( 'secure' ) );
+    $c->same_site(1) if( $o->param( 'samesite' ) );
+    return( $c );
+}
 
 # From server point of view
 sub fetch
@@ -1866,14 +1969,17 @@ EOT
         # open( $fh, '-|', $sqlite_bin, "SELECT sqlite_version()" ) ||
         open( $fh, '-|', $sqlite_bin, "--version" ) ||
             return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to get its version number: $!" ) );
-        chomp( my $sqlite_version = <$fh> );
-        $sqlite_version = [split( /[[:blank:]\h]+/, $sqlite_version )]->[0];
-        my $sql_v = version->parse( $sqlite_version );
-        close( $fh );
+        my $sqlite_version = <$fh>;
+        my $sql_v;
+        if( defined( $sqlite_version ) )
+        {
+            chomp( $sqlite_version );
+            $sqlite_version = [split( /[[:blank:]\h]+/, $sqlite_version )]->[0];
+            $sql_v = version->parse( $sqlite_version );
+            close( $fh );
+        }
         
         # Check if table moz_cookies exists
-        # open( $fh, '-|', $sqlite_bin, ' --bail --batch', "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
-        # open( $fh, '-|', $sqlite_bin, " --bail", "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
         open( $fh, '-|', $sqlite_bin, "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
             return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to check if table moz_cookies exists: $!" ) );
         # chomp( $table_moz_cookies_exists = <$fh> );
@@ -1883,9 +1989,7 @@ EOT
         close( $fh );
         
         # Now, get the data to save
-        # open( $fh, '|-', $sqlite_bin, '--bail', '--echo', "${sqldb}" ) ||
         open( $fh, '|-', $sqlite_bin, '--bail', "${sqldb}" ) ||
-        # open( $fh, '|-', $sqlite_bin, " --bail --echo ${sqldb}" ) ||
             return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
         $fh->autoflush;
         if( $opts->{log_sql} )
@@ -1915,7 +2019,7 @@ EOT
         }
         else
         {
-            $can_do_upsert = ( $sql_v >= $req_v ) ? 1 : 0;
+            $can_do_upsert = ( defined( $sql_v ) && $sql_v >= $req_v ) ? 1 : 0;
             # if version is greater or equal to 3.24.0 we can do upsert, otherwise we do insert replace
             if( $can_do_upsert )
             {
@@ -2114,6 +2218,7 @@ sub DESTROY
         {
         json => \&save,
         lwp  => \&save_as_lwp,
+        mozilla => \&save_as_mozilla,
         netscape => \&save_as_netscape,
         };
         if( !CORE::exists( $type2sub->{ $type } ) )
@@ -2260,10 +2365,13 @@ Cookie::Jar - Cookie Jar Class for Server & Client
     ) || die( Cookie::Jar->error );
 
     say "There are ", $jar->length, " cookies in the repository.";
+    
+    # Take a string from a Set-Cookie header and get a Cookie object
+    my $c = $jar->extract_one( $cookie_string );
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -2299,7 +2407,7 @@ This initiates the package and takes the following parameters:
 
 =over 4
 
-=item I<request>
+=item C<request>
 
 This is an optional parameter to provide a L<Apache2::RequestRec> object. When provided, it will be used in various methods to get or set cookies from or onto http headers.
 
@@ -2331,7 +2439,7 @@ This is an optional parameter to provide a L<Apache2::RequestRec> object. When p
         return( Apache2::Const::OK );
     }
 
-=item I<debug>
+=item C<debug>
 
 Optional. If set with a positive integer, this will activate verbose debugging message
 
@@ -2351,7 +2459,7 @@ This is an alias for L</add_request_header> for backward compatibility with L<HT
 
 =head2 add_request_header
 
-Provided with a request object, such as, but not limited to L<HTTP::Request> and this will add all relevant cookies in the repository into the C<Cookie> http request header.
+Provided with a request object, such as, but not limited to L<HTTP::Request> and this will add all relevant cookies in the repository into the C<Cookie> http request header. The object method needs to have the C<header> method in order to get, or set the C<Cookie> or C<Set-Cookie> headers and the C<uri> method.
 
 As long as the object provided supports the C<uri> and C<header> method, you can provide any class of object you want.
 
@@ -2483,6 +2591,30 @@ If the cookie received does not contain any C<Domain> specification, then, in li
 
 This is an alias for L</extract> for backward compatibility with L<HTTP::Cookies>
 
+=head2 extract_one
+
+This method takes a cookie string, which can be found in the C<Set-Cookie> header, parse it, and returns a L<Cookie> object if successful, or sets an L<error|Module::Generic/error> and return C<undef> or an empty list depending on the context.
+
+It also takes an hash or hash reference of options.
+
+The following options are supported:
+
+=over 4
+
+=item * C<host>
+
+If provided, it will be used to find out the host's root domain, and to set the cookie object C<domain> property if none is specified in the cookie string.
+
+=item * C<path>
+
+If provided, it will be used to set the cookie object C<path> property.
+
+=item * C<port>
+
+If provided, it will be used to set the cookie object C<port> property.
+
+=back
+
 =head2 fetch
 
 This method does the equivalent of L</extract>, but for the server.
@@ -2491,7 +2623,7 @@ It retrieves all possible cookies from the http request received from the web br
 
 It takes an optional hash or hash reference of parameters, such as C<host>. If it is not provided, the value set with L</host> is used instead.
 
-If the parameter C<request> containing an http request object, such as, but not limited to L<HTTP::Request>, is provided, it will use it to get the C<Cookie> header value.
+If the parameter C<request> containing an http request object, such as, but not limited to L<HTTP::Request>, is provided, it will use it to get the C<Cookie> header value. The object method needs to have the C<header> method in order to get, or set the C<Cookie> or C<Set-Cookie> headers.
 
 Alternatively, if a value for L</request> has been set, it will use it to get the C<Cookie> header value from Apache modperl.
 
@@ -2502,7 +2634,7 @@ You can also provide the C<Cookie> string to parse by providing the C<string> op
 
 Ultimately, if none of those are available, it will use the environment variable C<HTTP_COOKIE>
 
-If the option I<store> is true, this method will add the fetched cookies to the L<repository|/repo>.
+If the option C<store> is true (by default it is true), this method will add the fetched cookies to the L<repository|/repo>.
 
 It returns an hash reference of cookie key => L<cookie object|Cookie>
 
@@ -2523,13 +2655,13 @@ If L</autosave> is set to a true, C<Cookie::Jar> will automatically save all coo
 
 =head2 get
 
-Given a cookie name, an optional host and an optional path, this will retrieve its value and return it.
+Given a cookie name, an optional host and an optional path, this will retrieve its corresponding L<cookie object|Cookie> and return it.
 
 If not found, it will try to return a value with just the cookie name.
 
 If nothing is found, this will return and empty list in list context or C<undef> in scalar context.
 
-You can C<get> multiple cookies and this method will return a list in list context and the first cookie found in scalar context.
+You can C<get> multiple cookie object and this method will return a list in list context and the first cookie object found in scalar context.
 
     # Wrong, an undefined returned value here only means there is no such cookie
     my $c = $jar->get( 'my-cookie' );

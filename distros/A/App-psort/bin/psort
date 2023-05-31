@@ -16,7 +16,7 @@ use strict;
 use Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION = "0.11";
+$VERSION = "0.12";
 
 
 sub _has_capture_groups {
@@ -36,6 +36,7 @@ my $ignore_nonprinting;
 my $perlscript;
 my $rx;
 my @modules;
+my $no_warnings;
 my $cmp_perlscript;
 
 Getopt::Long::Configure("bundling");
@@ -56,6 +57,7 @@ GetOptions(
 	   'm=s@'                 => sub {
                push @modules, $_[1] =~ /=/ ? $_[1] : "$_[1]=";
            },
+	   "X|no-warnings"        => \$no_warnings,
 	   "v|version"            => sub {
 	       print "psort version $VERSION\n";
 	       exit 0;
@@ -141,7 +143,7 @@ if (defined $perlscript) {
 
 if (@ARGV) {
     for my $file (@ARGV) {
-	add_psort(do { open my $fh, $file or die "Can't open $file: $!"; $fh });
+	add_psort($file);
     }
 } else {
     add_psort(\*STDIN);
@@ -212,10 +214,30 @@ if ($check) {
 }
 
 sub add_psort {
-    my($fh) = @_;
+    my($file_or_fh) = @_;
+    my($fh, $diag);
+    if (ref $file_or_fh eq 'GLOB') {
+	$fh = $file_or_fh;
+	if ($file_or_fh == \*STDIN) {
+	    $diag = 'standard input';
+	} else {
+	    $diag = 'provided file handle'; # currently cannot happen
+	}
+    } else {
+	my $file = $file_or_fh;
+	$diag = $file;
+	open $fh, '<', $file or die "Can't open $file: $!";
+    }
+
     while(<$fh>) {
 	my $line = $_;
 	my $res = $cb->($_); # force scalar context
+	if (!defined $res) {
+	    if (!$no_warnings) {
+		warn "Uninitialized value returned in psort eval or regexp at $diag line $.\n";
+	    }
+	    $res = '';
+	}
 	$res = uc $res            if $ignore_case;
 	$res =~ s{^\s+}{}         if $ignore_leading_blanks;
 	$res =~ s{[[:^print:]]}{}g if $ignore_nonprinting;
@@ -370,6 +392,11 @@ Print psort's version.
 
 Sort versions using L<CPAN::Version>, if available.
 
+=item -X, --no-warnings
+
+By default psort warns if a custom field function or rx returns an
+undefined value. These warnings may be suppressed with this option.
+
 =back
 
 =head2 COMPATIBILITY
@@ -430,7 +457,7 @@ Slaven ReziE<x0107>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009,2011,2013,2015,2016 by Slaven ReziE<x0107>
+Copyright (C) 2009,2011,2013,2015,2016,2018,2019,2022,2023 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

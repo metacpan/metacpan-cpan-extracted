@@ -1,3 +1,11 @@
+0.004   2023-03-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix Rinci metadata: schema for input_filenames:
+          file_ext_filter.
+
+        - Fix example.
+
+
 0.003   2023-01-29  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -51,15 +51,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler.git",
          "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler"
       }
    },
-   "version" : "2.22",
-   "x_bugtracker" : {
-      "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues"
-   },
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "2.25",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

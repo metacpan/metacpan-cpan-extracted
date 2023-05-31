@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(croak);
 
 sub main {
 	my $file = shift;

@@ -74,10 +74,13 @@ EXAMPLE
      use Plack::App::Login;
      use Plack::Runner;
      use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8);
 
      # Run application.
      my $app = Plack::App::Login->new(
              'css' => CSS::Struct::Output::Indent->new,
+             'generator' => 'Plack::App::Login',
+             'login_title' => decode_utf8('Přihlašovací stránka'),
              'tags' => Tags::Output::Indent->new(
                      'preserved' => ['style'],
                      'xml' => 1,
@@ -92,9 +95,9 @@ EXAMPLE
      # <!DOCTYPE html>
      # <html>
      #   <head>
-     #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-     #     <meta charset="UTF-8" />
-     #     <meta name="generator" content="Plack::App::Login; Version: 0.07" />
+     #     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     #     <meta name="generator" content="Plack::App::Login" />
+     #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      #     <title>
      #       Login page
      #     </title>
@@ -112,29 +115,39 @@ EXAMPLE
      # }
      # .login {
      #         text-align: center;
-     #         background-color: blue;
-     #         padding: 1em;
      # }
      # .login a {
      #         text-decoration: none;
-     #         color: white;
-     #         font-size: 3em;
+     #         background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
+     #         background-repeat: repeat-x;
+     #         border: 1px solid #adadad;
+     #         border-radius: 4px;
+     #         color: black;
+     #         font-family: sans-serif!important;
+     #         padding: 15px 40px;
+     # }
+     # .login a:hover {
+     #         background-color: #e0e0e0;
+     #         background-image: none;
      # }
      # </style>
      #   </head>
      #   <body class="outer">
      #     <div class="login">
      #       <a href="login">
-     #         LOGIN
+     #         Přihlašovací stránka
      #       </a>
      #     </div>
      #   </body>
      # </html>
 
 DEPENDENCIES
-    CSS::Struct::Output::Raw, Error::Pure, Plack::Util::Accessor,
-    Scalar::Util, Tags::HTML::Login::Button, Tags::HTML::Page::Begin,
-    Tags::HTML::Page::End, Tags::Output::Raw, Unicode::UTF8.
+    Plack::Component::Tags::HTML, Plack::Util::Accessor,
+    Tags::HTML::Login::Button.
+
+SEE ALSO
+    Plack::App::Login::Password
+        Plack login/password application.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Plack-App-Login>
@@ -150,5 +163,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

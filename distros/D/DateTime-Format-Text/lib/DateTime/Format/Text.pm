@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @month_names = (
 	'january',
@@ -158,27 +158,28 @@ sub parse {
 		if(wantarray) {
 			# Return an array with all of the dates which match
 			my @rc;
-		
+
+			# Ensure that the result includes the dates in the
+			# same order that they are in the string
 			while($string =~ /([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/g) {
 				# Match dates: 01/01/2012 or 30-12-11 or 1 2 1985
-				my $r = $self->parse("$1 $2 $3");
-				push @rc, $r;
+				$rc[pos $string] = $self->parse("$1 $2 $3");
 			}
 			while($string =~ /($d|$sd)[\s,\-_\/]*?(\d?\d)[,\-\/]*($o)?[\s,\-\/]*($m|$sm)[\s,\-\/]+(\d{4})/ig) {
 				#  Match dates: Sunday 1st March 2015; Sunday, 1 March 2015; Sun 1 Mar 2015; Sun-1-March-2015
-				my $r = $self->parse("$2 $4 $5");
-				push @rc, $r;
+				$rc[pos $string] = $self->parse("$2 $4 $5");
+			}
+			while($string =~ /(\d{1,2})\s($m|$sm)\s(\d{4})/ig) {
+				$rc[pos $string] = $self->parse("$1 $2 $3");
 			}
 			while($string =~ /($m|$sm)[\s,\-_\/]*?(\d?\d)[,\-\/]*($o)?[\s,\-\/]+(\d{4})/ig) {
-				my $r = $self->parse("$1 $2 $4");
-				push @rc, $r;
+				$rc[pos $string] = $self->parse("$1 $2 $4");
 			}
-			return @rc if(scalar(@rc));
-			while($string =~ /(\d{1,2})\s($m|$sm)\s(\d{4})/ig) {
-				my $r = $self->parse("$1 $2 $3");	# Force scalar context
-				push @rc, $r;
+			if(scalar(@rc)) {
+				# Remove empty items and create a well-ordered
+				# array to return
+				return grep { defined($_) } @rc;
 			}
-			return @rc if(scalar(@rc));
 		}
 
 		# !wantarray
@@ -272,8 +273,6 @@ Here's the author information from that:
     version  0.2.0
 
 =head1 BUGS
-
-In array mode, it would be good to find more than one date in the string
 
 =head1 SEE ALSO
 

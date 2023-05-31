@@ -1,0 +1,69 @@
+{
+   "abstract" : "Tie-able array that allows only unique values",
+   "author" : [
+      "Gabor Szabo <gabor@pti.co.il>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4232",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Array-Unique",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Array::Unique" : {
+         "file" : "lib/Array/Unique.pm",
+         "version" : "0.09"
+      },
+      "Array::Unique::Hash" : {
+         "file" : "lib/Array/Unique/Hash.pm",
+         "version" : "0.09"
+      },
+      "Array::Unique::IxHash" : {
+         "file" : "lib/Array/Unique/IxHash.pm",
+         "version" : "0.09"
+      },
+      "Array::Unique::Quick" : {
+         "file" : "lib/Array/Unique/Quick.pm",
+         "version" : "0.09"
+      },
+      "Array::Unique::Std" : {
+         "file" : "lib/Array/Unique/Std.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/Array-Unique/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/szabgab/Array-Unique/"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

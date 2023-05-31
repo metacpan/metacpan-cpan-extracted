@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 2;
-use Perlmazing;
+use Perlmazing qw(slurp md5);
 
 my $content = slurp $0;
 my $content_binary = slurp $0, 1;

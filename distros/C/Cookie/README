@@ -1,10 +1,10 @@
 NAME
-    Cookie::Jar - Cookies API for Server & Client
+    Cookie::Jar - Cookie Jar Class for Server & Client
 
 SYNOPSIS
         use Cookie::Jar;
         my $jar = Cookie::Jar->new( request => $r ) ||
-        return( $self->error( "An error occurred while trying to get the cookie jar." ) );
+            die( "An error occurred while trying to get the cookie jar:", Cookie::Jar->error );
         # set the default host
         $jar->host( 'www.example.com' );
         $jar->fetch;
@@ -94,9 +94,24 @@ SYNOPSIS
 
         # Merge repository
         $jar->merge( $jar2 ) || die( $jar->error );
+    
+        # For autosave
+        my $jar = Cookie::Jar->new(
+            file => '/some/where/cookies.json',
+            # True by default
+            autosave => 1,
+            encrypt => 1,
+            secret => 'My big secret',
+            algo => 'AES',
+        ) || die( Cookie::Jar->error );
+
+        say "There are ", $jar->length, " cookies in the repository.";
+    
+        # Take a string from a Set-Cookie header and get a Cookie object
+        my $c = $jar->extract_one( $cookie_string );
 
 VERSION
-        v0.1.1
+        v0.3.0
 
 DESCRIPTION
     This is a module to handle cookies, according to the latest standard as
@@ -132,6 +147,11 @@ DESCRIPTION
             cookie_jar => Cookie::Jar->new
         );
 
+    It is also compatible with HTTP::Promise, such as:
+
+        use HTTP::Promise;
+        my $ua = HTTP::Promise->new( cookie_jar => Cookie::Jar->new );
+
     This module does not die upon error, but instead returns "undef" and
     sets an error, so you should always check the return value of a method.
 
@@ -139,7 +159,7 @@ METHODS
   new
     This initiates the package and takes the following parameters:
 
-    *request*
+    "request"
         This is an optional parameter to provide a Apache2::RequestRec
         object. When provided, it will be used in various methods to get or
         set cookies from or onto http headers.
@@ -172,7 +192,7 @@ METHODS
                 return( Apache2::Const::OK );
             }
 
-    *debug*
+    "debug"
         Optional. If set with a positive integer, this will activate verbose
         debugging message
 
@@ -192,7 +212,9 @@ METHODS
   add_request_header
     Provided with a request object, such as, but not limited to
     HTTP::Request and this will add all relevant cookies in the repository
-    into the "Cookie" http request header.
+    into the "Cookie" http request header. The object method needs to have
+    the "header" method in order to get, or set the "Cookie" or "Set-Cookie"
+    headers and the "uri" method.
 
     As long as the object provided supports the "uri" and "header" method,
     you can provide any class of object you want.
@@ -268,12 +290,20 @@ METHODS
     So you can create a repository and use it to store the cookies sent by
     the http client using "fetch", but in preparation of the server
     response, either use a separate repository with, for example, "my
-    $jar_out = Cookie::Jar-"new> or use "set" which will not add the cookie
+    $jar_out = Cookie::Jar->new" or use "set" which will not add the cookie
     to the repository, but rather only set the "Set-Cookie" header for that
     cookie.
 
         # Add Set-Cookie header for that cookie, but do not add cookie to repository
         $jar->set( $cookie_object );
+
+  algo
+    String. Sets or gets the algorithm to use when loading or saving the
+    cookie jar.
+
+  autosave
+    Boolean. Sets or gets the boolean value for automatically saving the
+    cookie jar to the given file specified with "file"
 
   delete
     Given a cookie name, an optional host and optional path or a Cookie
@@ -319,7 +349,7 @@ METHODS
     cookie object as the sole argument. Also, that cookie object is
     accessible using $_.
 
-    If the code return "undef", it will end the loop, and it the code
+    If the code return "undef", it will end the loop, and if the code
     returns true, this will have the current cookie object added to an array
     object returned upon completion of the loop.
 
@@ -333,6 +363,13 @@ METHODS
             return(0);
         });
         print( "Found cookies: ", $found->map(sub{$_->name})->join( ',' ), "\n" );
+
+  encrypt
+    Boolean. Sets or gets the boolean value for whether to encrypt or not
+    the cookie jar when saving it, or whether to decrypt it when loading
+    cookies from it.
+
+    This defaults to false.
 
   exists
     Given a cookie name, this will check if it exists.
@@ -359,6 +396,32 @@ METHODS
     This is an alias for "extract" for backward compatibility with
     HTTP::Cookies
 
+  extract_one
+    This method takes a cookie string, which can be found in the
+    "Set-Cookie" header, parse it, and returns a Cookie object if
+    successful, or sets an error and return "undef" or an empty list
+    depending on the context.
+
+    It also takes an hash or hash reference of options.
+
+    The following options are supported:
+
+    *   "host"
+
+        If provided, it will be used to find out the host's root domain, and
+        to set the cookie object "domain" property if none is specified in
+        the cookie string.
+
+    *   "path"
+
+        If provided, it will be used to set the cookie object "path"
+        property.
+
+    *   "port"
+
+        If provided, it will be used to set the cookie object "port"
+        property.
+
   fetch
     This method does the equivalent of "extract", but for the server.
 
@@ -371,7 +434,8 @@ METHODS
 
     If the parameter "request" containing an http request object, such as,
     but not limited to HTTP::Request, is provided, it will use it to get the
-    "Cookie" header value.
+    "Cookie" header value. The object method needs to have the "header"
+    method in order to get, or set the "Cookie" or "Set-Cookie" headers.
 
     Alternatively, if a value for "request" has been set, it will use it to
     get the "Cookie" header value from Apache modperl.
@@ -385,8 +449,8 @@ METHODS
     Ultimately, if none of those are available, it will use the environment
     variable "HTTP_COOKIE"
 
-    If the option *store* is true, this method will add the fetched cookies
-    to the repository.
+    If the option "store" is true (by default it is true), this method will
+    add the fetched cookies to the repository.
 
     It returns an hash reference of cookie key => cookie object
 
@@ -398,17 +462,27 @@ METHODS
         # Cookies returned, but NOT added to the repository
         my $cookies = $jar->fetch || die( $jar->error );
 
+  file
+    Sets or gets the file path to the cookie jar file.
+
+    If provided upon instantiation, and if the file exists on the filesystem
+    and is not empty, "Cookie::Jar" will load all the cookies from it.
+
+    If "autosave" is set to a true, "Cookie::Jar" will automatically save
+    all cookies to the specified cookie jar file, possibly encrypting it if
+    "algo" and "secret" are set.
+
   get
     Given a cookie name, an optional host and an optional path, this will
-    retrieve its value and return it.
+    retrieve its corresponding cookie object and return it.
 
     If not found, it will try to return a value with just the cookie name.
 
     If nothing is found, this will return and empty list in list context or
     "undef" in scalar context.
 
-    You can "get" multiple cookies and this method will return a list in
-    list context and the first cookie found in scalar context.
+    You can "get" multiple cookie object and this method will return a list
+    in list context and the first cookie object found in scalar context.
 
         # Wrong, an undefined returned value here only means there is no such cookie
         my $c = $jar->get( 'my-cookie' );
@@ -521,6 +595,46 @@ METHODS
 
     It returns the current object upon success, or "undef" and sets an error
     upon error.
+
+  load_as_mozilla
+        $jar->load_as_mozilla( '/home/joe/cookies.sqlite' ) ||
+            die( "Unable to load cookies from mozilla cookies.sqlite file: ", $jar->error );
+
+    Given a file path to a mozilla SQLite database file, and an hash or hash
+    reference of options, and this method will attempt to read the cookies
+    from the SQLite database file and add them to our repository, possibly
+    overwriting previous cookies with the same name and domain name.
+
+    To read the SQLite database file, this will try first to load DBI and
+    DBD::SQLite and use them if they are available, otherwise it will resort
+    to using the "sqlite3" binary if it can find it, using "which" in
+    File::Which
+
+    If none of those 2 methods succeeded, it will return "undef" with an
+    error
+
+    Note that contrary to other loading method, this method does not support
+    encryption.
+
+    It returns the current object upon success, or "undef" and sets an error
+    upon error.
+
+    Supported options are:
+
+    *   "use_dbi"
+
+        Boolean. If true, this will require the use of DBI and DBD::SQLite
+        and if it cannot load them, it will return an error without trying
+        to alternatively use the "sqlite3" binary. Default to false.
+
+    *   "sqlite"
+
+        String. The file path to a "sqlite3" binary. If the file path does
+        not exist, or is lacking sufficient permission, this will return an
+        error.
+
+        If it is not provided, and using DBI and DBD::SQLite failed, it will
+        try to find the "sqlite3" using "which" in File::Which
 
   load_as_netscape
         $jar->save_as_netscape( '/home/joe/cookies_netscape.txt' ) ||
@@ -697,7 +811,7 @@ METHODS
         exists Crypt::Cipher::<NAME>
 
     *encrypt* boolean
-        Must be set to true to enable decryption.
+        Must be set to true to enable encryption.
 
     *iv* string
         Set the Initialisation Vector
@@ -723,7 +837,7 @@ METHODS
 
             perl -MCrypt::Cipher::AES -lE 'say Crypt::Cipher::AES->keysize'
 
-        In this case, it will yield 32. Replace above "AES", byt whatever
+        In this case, it will yield 32. Replace above "AES", by whatever
         algorithm you have chosen.
 
             perl -MCrypt::Cipher::Blowfish -lE 'say Crypt::Cipher::Blowfish->keysize'
@@ -760,8 +874,113 @@ METHODS
     It returns the current object. If an error occurred, it will return
     "undef" and set an error
 
+  save_as_mozilla
+        $jar->save_as_mozilla( '/home/joe/cookies.sqlite' ) ||
+            die( "Unable to save cookies as mozilla SQLite database: ", $jar->error );
+
+        # or
+        $jar->save_as_mozilla( '/home/joe/cookies.sqlite',
+        {
+            # force use of DBI/DBD::SQLite
+            use_dbi => 1,
+            # or specify the path of the sqlite3 binary
+            # sqlite => '/some/where/sqlite3',
+            # Enable logging of SQL queries maybe?
+            # log_sql => '/some/where/sql.log',
+            # Overwrite previous data
+            overwrite => 1,
+            # abort if an error occurred
+            rollback => 1,
+        }) || die( "Unable to save cookies as mozilla SQLite database: ", $jar->error );
+
+    Provided with a file path to a SQLite database and this saves the
+    cookies repository as a mozilla SQLite database.
+
+    The structure of the mozilla SQLite database
+    <http://kb.mozillazine.org/Cookies> is:
+
+        CREATE TABLE moz_cookies(
+          id INTEGER PRIMARY KEY,
+          originAttributes TEXT NOT NULL DEFAULT '',
+          name TEXT,
+          value TEXT,
+          host TEXT,
+          path TEXT,
+          expiry INTEGER,
+          lastAccessed INTEGER,
+          creationTime INTEGER,
+          isSecure INTEGER,
+          isHttpOnly INTEGER,
+          inBrowserElement INTEGER DEFAULT 0,
+          sameSite INTEGER DEFAULT 0,
+          rawSameSite INTEGER DEFAULT 0,
+          schemeMap INTEGER DEFAULT 0,
+          CONSTRAINT moz_uniqueid UNIQUE(name, host, path, originAttributes)
+        );
+
+    This method will attempt loading DBI and DBD::SQLite, and if it fails,
+    it will alternatively try to use the "sqlite3" binary.
+
+    Note that, contrary to other save methods, this method does not allow
+    encrypting the SQLite database.
+
+    It returns the current object. If an error occurred, it will return
+    "undef" and set an error
+
+    Supported options are:
+
+    *   "log_sql"
+
+        String. This specifies a file name that will be opened in append
+        mode and to which the SQL statements issued will be logged.
+
+    *   "overwrite"
+
+        Boolean. If true, this will overwrite any existing data if the
+        specified SQLite database file already exists.
+
+        And if false, this will issue sql queries to perform upsert
+        <https://www.sqlite.org/lang_UPSERT.html> if the SQLite version is
+        greater or equal to 3.24.0 (2018-06-04), or otherwise it will issue
+        INSERT OR REPLACE <https://www.sqlite.org/lang_insert.html> queries.
+
+        Default false.
+
+    *   "rollback"
+
+        Boolean. If true, this will cancel, i.e. rollback, any change mad to
+        the SQLite database upon error, otherwise, any change made will be
+        kept up to the point of when the error occurred. Default to false.
+
+    *   "skip_discard"
+
+        Boolean. If true, this will not save cookies that have been marked
+        as being discarded, such as session cookies. Default false.
+
+    *   "skip_expired"
+
+        Boolean. If true, this will not save the cookies that have already
+        expired. Default false.
+
+    *   "sqlite"
+
+        String. The file path to a "sqlite3" binary. If the file path does
+        not exist, or is lacking sufficient permission, this will return an
+        error.
+
+        If it is not provided, and using DBI and DBD::SQLite failed, it will
+        try to find the "sqlite3" using "which" in File::Which
+
+    *   "use_dbi"
+
+        Boolean. Requires the use of DBI and DBD::SQLite and it will return
+        an error if those are not installed.
+
+        If you want to let this method try also to use "sqlite3" binary if
+        necessary, then do not set this option.
+
   save_as_netscape
-    Provided with a file and this save the cookies repository as a
+    Provided with a file and this saves the cookies repository as a
     Netscape-style data.
 
     It returns the current object. If an error occurred, it will return
@@ -769,6 +988,11 @@ METHODS
 
   scan
     This is an alias for "do"
+
+  secret
+    String. Sets or gets the secret string to use for decrypting or
+    encrypting the cookie jar. This is used in conjonction with "file",
+    "encrypt" and "algo"
 
   set
     Given a cookie object, and an optional hash or hash reference of
@@ -789,6 +1013,10 @@ METHODS
 
     Unless the latter, this method returns the current object.
 
+  type
+    String. Sets or gets the cookie jar file format type. The supported
+    formats are: "json", "lwp" and "netscape"
+
 IMPORTING COOKIES
     To import cookies, you can either use the methods scan from
     HTTP::Cookies, such as:
@@ -796,7 +1024,7 @@ IMPORTING COOKIES
         use Cookie::Jar;
         use HTTP::Cookies;
         my $jar = Cookie::Jar->new;
-        my $old = HTTP::Cookies;
+        my $old = HTTP::Cookies->new;
         $old->load( '/home/joe/old_cookies_file.txt' );
         my @keys = qw( version key val path domain port path_spec secure expires discard hash );
         $old->scan(sub
@@ -861,8 +1089,7 @@ INSTALLATION
     <https://perl.apache.org/docs/general/testing/testing.html>
 
     But, if for some reason, you do not want to perform the mod_perl tests,
-    you can call use "NO_MOD_PERL=1" when calling "perl Makefile.PL", such
-    as:
+    you can use "NO_MOD_PERL=1" when calling "perl Makefile.PL", such as:
 
         NO_MOD_PERL=1 perl Makefile.PL
         make

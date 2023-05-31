@@ -12,7 +12,7 @@ our @EXPORT = qw( fmtsheet
                 );
 
 use t_Common;
-use t_TestCommon qw/bug string_to_tempfile
+use t_TestCommon qw/bug
                     verif_eval_err insert_loc_in_evalstr
                     dprint dprintf/;
 use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
@@ -48,7 +48,8 @@ sub check_no_sheet() {
   }
 }
 
-# Returns ($testdata, $csvpath)
+# Returns ($testdata, $csvpath Path::Tiny object)
+#   WARNING: When $csvpath goes out of scope the file will be deleted!
 #
 sub create_testdata(@) {
   my %args = @_;
@@ -61,7 +62,8 @@ sub create_testdata(@) {
     }
   }
   my $td = join("", map{ join(",",map{/[\s'",]/ ? quotekey : $_} @$_)."\n" } @rows);
-  my $path = string_to_tempfile($td, "td_".($args{name}//"")."_XXXXX", SUFFIX => ".csv");
+
+  (my $path = Path::Tiny->tempfile("td_".($args{name}//"")."_XXXXX", SUFFIX=>".csv"))->spew($td);
   wantarray ? ($td, $path) : $path
 }
 

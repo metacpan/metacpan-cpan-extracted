@@ -1,6 +1,6 @@
 package SPVM::File::Copy;
 
-our $VERSION = '0.02';
+our $VERSION = "0.021";
 
 1;
 
@@ -29,7 +29,7 @@ C<File::Copy> providdes the features to copy and move files.
 
 =head2 copy
 
-  static method copy : int ($from : string, $to : string, $size = 0 : int);
+  static method copy : int ($from : string, $to : string, $size : int = 0);
 
 Copies the file specified $from to $to. The $size is the buffer size to be used file copy. If the $size is C<0>, the size is decided automatically.
 
@@ -55,7 +55,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
+

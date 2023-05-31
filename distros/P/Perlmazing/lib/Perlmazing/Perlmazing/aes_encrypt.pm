@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(get_aes_cipher);
 
 # Mainly ripped from Crypt::Rijndael::MySQL
 sub main {

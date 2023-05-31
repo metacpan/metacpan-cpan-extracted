@@ -18,11 +18,11 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.9691');
+my %configure_and_runtime_requires = ('SPVM' => '0.986');
 WriteMakefile(
   NAME              => 'SPVM::File::Path',
   VERSION_FROM      => 'lib/SPVM/File/Path.pm',
-  LICENSE           => 'perl_5',
+  LICENSE           => 'mit',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/File/Path.pm',
      AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),

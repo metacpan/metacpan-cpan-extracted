@@ -5,7 +5,7 @@ use strict;
 use GD;
 use Symbol 'gensym','qualify_to_ref';
 use vars '$VERSION';
-$VERSION = '2.75';
+$VERSION = '2.77';
 
 =head1 NAME
 
@@ -29,17 +29,15 @@ Supported Image formats:
 
 =item Tiff
 
-=item Xpm
-
 =item WBMP
-
-=item GifAnim
 
 =item Webp
 
 =item Heif
 
 =item Avif
+
+=item BMP
 
 =back
 
@@ -50,6 +48,10 @@ Unsupported Image formats:
 =item Gd
 
 =item Gd2
+
+=item Xpm
+
+=item GifAnim
 
 =back
 
@@ -268,6 +270,15 @@ sub newFromWBMP {
     my $fh = $class->_make_filehandle($f);
     binmode($fh);
     $class->_newFromWBMP($fh,@_);
+}
+
+sub newFromBmp {
+    croak("Usage: newFromBmp(class,filehandle)") unless @_==2;
+    my($class) = shift;
+    my($f)     = shift;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromBmp($fh,@_);
 }
 
 # Autoload methods go after __END__, and are processed by the autosplit program.

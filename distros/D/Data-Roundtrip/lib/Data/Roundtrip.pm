@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.16';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -167,8 +167,9 @@ sub	perl2yaml {
 			# this does not work :( no pretty printing for yaml
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
 		#} else {
+			# intercepting a die by wrapping in an eval
 			$yaml_string = eval { YAML::Dump($pv) };
-			if( $@ ){ warn "error, call to ".'YAML::Dump()'." has failed with this exception:\n".$@; return undef }
+			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		#}
 		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
 		if( _has_utf8($yaml_string) ){
@@ -181,7 +182,7 @@ sub	perl2yaml {
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
 		#} else {
 			$yaml_string = YAML::Dump($pv);
-			if( $@ ){ warn "error, call to ".'YAML::Dump()'." has failed with this exception:\n".$@; return undef }
+			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		#}
 		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
 	}
@@ -190,8 +191,9 @@ sub	perl2yaml {
 sub	yaml2perl {
 	my $yaml_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
+	# intercepting a die by wrapping in an eval
 	my $pv = eval { YAML::Load($yaml_string) };
-	if( $@ || ! $pv ){ warn "yaml2perl() : error, call to YAML::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+	if( $@ || ! defined($pv) ){ warn "yaml2perl() : error, call to YAML::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 	return $pv
 }
 sub	json2perl {
@@ -199,11 +201,13 @@ sub	json2perl {
 	#my $params = defined($_[1]) ? $_[1] : {};
 	my $pv;
 	if( _has_utf8($json_string) ){
+		# intercepting a die by wrapping in an eval
 		$pv = eval { JSON::decode_json(Encode::encode_utf8($json_string)) };
-		if( $@ || ! $pv ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
+		if( $@ || ! defined($pv) ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
 	} else {
+		# intercepting a die by wrapping in an eval
 		$pv = eval { JSON::decode_json($json_string) };
-		if( $@ || ! $pv ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
+		if( $@ || ! defined($pv) ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
 	}
 	return $pv;
 }
@@ -303,12 +307,19 @@ sub	json2yaml {
 	return $yaml_string
 }
 sub	dump2perl {
+	# WARNING: we eval() input string with alleged
+	# output from Data::Dump. Are you sure you trust
+	# the input string ($dump_string) for an eval() ?
+	# WARNING-2: I am considering removing this sub in future releases because of the eval()
 	my $dump_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
 
 	$dump_string =~ s/^\$VAR1\s*=\s*//g;
+	warn "dump2perl() : WARNING, eval()'ing input string, are you sure you did check its content ?\n";
+	warn "dump2perl() : WARNING, this sub will be removed in future releases.\n";
+	# WARNING: eval() of unknown input:
 	my $pv = eval($dump_string);
-	if( $@ || ! defined $pv ){ warn "error, failed to eval() input string alledgedly a perl variable: $@"; return undef }
+	if( $@ || ! defined($pv) ){ warn "input string:${pv}\nend input string.\ndump2perl() : error, eval() of input string (alledgedly a perl variable, see above) has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 	return $pv
 }
 # this bypasses Data::Dumper's obsession with escaping
@@ -587,7 +598,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.14
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -999,9 +1010,6 @@ on success or C<undef> on failure.
 It uses L<Data::Dump::Filtered> to add a filter to
 L<Data::Dump>.
 
-head3 CAVEAT
-
-In order to xxx
 
 =head2 C<perl2dump_homebrew>
 
@@ -1098,7 +1106,11 @@ then be fed back to L</dump2perl>.
 =back
 
 =head2 C<dump2perl>
-
+    # CAVEAT: it will eval($dumpstring) internally, so
+    #         check $dumpstring for malicious code beforehand
+    #         it is a security risk if you don't.
+    #         Don't use it if $dumpstring comes from
+    #         untrusted sources (user input for example).
     my $ret = dump2perl($dumpstring)
 
 Arguments:
@@ -1120,6 +1132,11 @@ Return value:
 =item * C<$ret>, the Perl data structure on success or C<undef> on failure.
 
 =back
+
+CAVEAT: it B<eval()>'s the input C<$dumpstring> in order to create the Perl data structure.
+B<eval()>'ing unknown or unchecked input is a security risk. Always check input to B<eval()>
+which comes from untrusted sources, like user input, scraped documents, email content.
+Anything really.
 
 =head2 C<json2perl>
 

@@ -40,7 +40,7 @@ if ($meta) {
 # http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.981',
+  'SPVM' => '0.986',
   'SPVM::Resource::SocketUtil' => '1.001',
 );
 WriteMakefile(

@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,15 +10,14 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Twitter;
-$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.32';
+$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.33';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Twitter.
 
 use Moose;
 with 'App::SpreadRevolutionaryDate::Target'
-  => {worker => 'Net::Twitter::Lite::WithAPIv1_1'};
+  => {worker => 'Twitter::API__WITH__Twitter::API::Trait::ApiMethods'};
 
-use Net::Twitter::Lite::WithAPIv1_1;
-use Net::OAuth 0.25;
+use Twitter::API;
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -52,14 +51,18 @@ around BUILDARGS => sub {
   my ($orig, $class) = @_;
 
   my $args = $class->$orig(@_);
+  my $api_1 = $args->{api} && $args->{api} eq 1 || 0;
 
-  $args->{obj} = Net::Twitter::Lite::WithAPIv1_1->new(
+  $args->{obj} = Twitter::API->new_with_traits(
+                  traits              => 'ApiMethods',
+                  $api_1 ?
+                    () :
+                    (api_version => '2', api_ext => ''),
                   consumer_key        => $args->{consumer_key},
                   consumer_secret     => $args->{consumer_secret},
                   access_token        => $args->{access_token},
                   access_token_secret => $args->{access_token_secret},
-                  user_agent          => 'RevolutionaryDate',
-                  ssl                 => 1);
+                  agent               => 'RevolutionaryDate');
   return $args;
 };
 
@@ -84,7 +87,7 @@ sub spread {
 
     $io->say($msg);
   } else {
-    $self->obj->update($msg);
+    $self->obj->post('https://api.twitter.com/2/tweets', {'-to_json' => {"text" => $msg}});
   }
 }
 
@@ -111,7 +114,7 @@ App::SpreadRevolutionaryDate::Target::Twitter - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 
@@ -171,7 +174,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl interface to the gd2 graphics library",
+   "abstract" : "Perl interface to the libgd graphics library",
    "author" : [
       "Lincoln Stein <lincoln.stein@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,14 +31,18 @@
             "ExtUtils::PkgConfig" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Algorithm::Diff" : "0",
+            "Class::XSAccessor" : "0",
+            "List::MoreUtils" : "0",
+            "Pod::Spell::CommonMistakes" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Pod" : "1.00",
+            "Text::CSV_XS" : "0"
+         }
+      },
       "runtime" : {
-         "recommends" : {
-            "ExtUtils::Constant" : "0.23",
-            "ExtUtils::PkgConfig" : "0",
-            "Math::Trig" : "0",
-            "Test::Fork" : "0.02",
-            "Test::More" : "0.88"
-         },
          "requires" : {
             "Math::Trig" : "0"
          }
@@ -53,12 +57,14 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/lstein/Perl-GD"
+         "type" : "git",
+         "url" : "git://github.com/lstein/Perl-GD.git",
+         "web" : "https://github.com/lstein/Perl-GD"
       }
    },
-   "version" : "2.76",
+   "version" : "2.77",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -47,3 +47,22 @@ Revision history for Perlmazing
 	Fixed warning in dir, which pointed to the dir file instad of the user file.
 1.2816  2021-04-18
 	Updated Makefile.PL to require Submodules 1.0015, which resolves issues with this update.
+2.0002  2023-03-16
+    Very important change: Perlmazing no longer exports everything by default. Only 'pl', 'dumped', 'define' are default now.
+        Also, all functions that match a CORE function name, are also automatically imported.
+        You now need to explicitly import the symbols you want, or import the tag ':all'. For 'pl', 'dumped' and 'define',
+        if you don't want them imported, you either need to "use Perlmazing ()" to avoid any imports, or explicitly say "!symbol".
+    Updated list of dependencies that were causing installation problems in some platforms.
+    Important change: Perlmazing previously would enable all the latest features of the Perl version it was running on. That
+    was a terrible idea from the start. It now has a version limit, that can be changed, set by default to 5.028.
+    Important change: rmdir was previously using File::Path::remove_tree, but we are now using our own implementation, since
+    File::Path is deleting the contents of symlinked directories, at least on Win32. This implementation correctly removes
+    symlinks on any OS instead of parsing its contents to delete them.
+    Added stat function. Works the same as CORE::stat, except it will give you an object you can call methods on when assigned
+        to a scalar.
+    Fixed some issues in the POD, related to links containing ->, which wasn't properly escaped.
+2.0004
+    Small changes in POD and stat t file.
+2.0006
+    Missing update in this file.
+    Missing update in MANIFEST for stat.pm

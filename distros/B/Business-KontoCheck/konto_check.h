@@ -10,7 +10,7 @@
  * #  Verwendung in anderen Programmen bzw. Programmiersprachen benutzt     #
  * #  werden.                                                               #
  * #                                                                        #
- * #  Copyright (C) 2002-2020 Michael Plugge <m.plugge@hs-mannheim.de>      #
+ * #  Copyright (C) 2002-2023 Michael Plugge <konto_check@yahoo.com>        #
  * #                                                                        #
  * #  Dieses Programm ist freie Software; Sie dürfen es unter den           #
  * #  Bedingungen der GNU Lesser General Public License, wie von der Free   #
@@ -294,6 +294,7 @@
 #define LUT2_SCL_BIC                 29
 #define LUT2_SCL_NAME                30
 #define LUT2_SCL_FLAGS               31
+#define LUT2_SCL_FLAGS_ORIG          32
 
 #define LUT2_2_BLZ                  101
 #define LUT2_2_FILIALEN             102
@@ -326,6 +327,7 @@
 #define LUT2_2_SCL_BIC              129
 #define LUT2_2_SCL_NAME             130
 #define LUT2_2_SCL_FLAGS            131
+#define LUT2_2_SCL_FLAGS_ORIG       132
 
 #define LUT2_DEFAULT                501
 
@@ -671,7 +673,7 @@ DLL_EXPORT const char *kto_check_str(char *x_blz,char *kto,char *lut_name);
  * #    blz:        Bankleitzahl (immer 8-stellig)                           #
  * #    kto:        Kontonummer                                              #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -693,7 +695,7 @@ DLL_EXPORT int kto_check_blz_dbg(char *blz,char *kto,RETVAL *retvals);
  * #    blz:        Bankleitzahl (immer 8-stellig)                           #
  * #    kto:        Kontonummer                                              #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -729,7 +731,7 @@ DLL_EXPORT int kto_check_pz_dbg(char *pz,char *kto,char *blz,RETVAL *retvals);
  * #    retvals:    Struktur, in der die benutzte Prüfziffermethode und die  #
  * #                berechnete Prüfziffer zurückgegeben werden               #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int kto_check_regel(char *blz,char *kto);

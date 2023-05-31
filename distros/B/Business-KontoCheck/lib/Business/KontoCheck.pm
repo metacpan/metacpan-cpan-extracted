@@ -47,7 +47,7 @@ our @EXPORT_OK = qw(kto_check kto_check_str kto_check_blz
 
 our @EXPORT = qw( lut_init kto_check kto_check_blz kto_check_at %kto_retval );
 
-our $VERSION = '6.13';
+our $VERSION = '6.15';
 
 require XSLoader;
 XSLoader::load('Business::KontoCheck', $VERSION);
@@ -2737,7 +2737,7 @@ Bugfixes zu finden sind.
 
 =head1 AUTHOR
 
-Michael Plugge, E<lt>m.plugge@hs-mannheim.deE<gt>
+Michael Plugge, E<lt>konto_check@yahoo.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

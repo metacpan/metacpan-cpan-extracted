@@ -1,0 +1,52 @@
+{
+  "queryCost": 1,
+  "latitude": 42.4738,
+  "longitude": -83.5505,
+  "resolvedAddress": "AU419",
+  "address": "AU419",
+  "timezone": "America/Detroit",
+  "tzoffset": -4.0,
+  "days": [
+    {
+      "datetime": "2023-05-25",
+      "datetimeEpoch": 1684987200,
+      "tempmax": 63.9,
+      "tempmin": 40.0,
+      "temp": 51.4,
+      "feelslikemax": 63.9,
+      "feelslikemin": 34.0,
+      "feelslike": 49.0,
+      "dew": 31.7,
+      "humidity": 48.5,
+      "precip": 0.0,
+      "precipprob": 0.0,
+      "precipcover": 0.0,
+      "preciptype": null,
+      "snow": 0.0,
+      "snowdepth": 0.0,
+      "windgust": 21.9,
+      "windspeed": 12.8,
+      "winddir": 48.3,
+      "pressure": 1025.0,
+      "cloudcover": 14.9,
+      "visibility": 10.1,
+      "solarradiation": 359.9,
+      "solarenergy": 31.2,
+      "uvindex": 10.0,
+      "severerisk": 10.0,
+      "sunrise": "06:03:59",
+      "sunriseEpoch": 1685009039,
+      "sunset": "20:58:55",
+      "sunsetEpoch": 1685062735,
+      "moonphase": 0.19,
+      "conditions": "Clear",
+      "description": "Clear conditions throughout the day.",
+      "icon": "clear-day",
+      "stations": [
+        "remote"
+      ],
+      "source": "obs"
+    }
+  ],
+  "downloaded": "into test dir"
+}

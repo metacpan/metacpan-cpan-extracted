@@ -4,7 +4,7 @@ use utf8;
 
 my $mypkg = __PACKAGE__;
 
-use Test::More 0.98;
+use Test2::V0;
 use Carp;
 use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 

@@ -40,6 +40,7 @@ WriteMakefile(
         ? (MIN_PERL_VERSION => 5.012)
         : ()
     ),
+    ($mm_ver >= 6.31 ? (LICENSE => 'perl_5') : ()),
     ($mm_ver <= 6.45
         ? ()
         : (META_MERGE => {
@@ -50,10 +51,10 @@ WriteMakefile(
                     url  => 'https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler.git',
                     web  => 'https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler',
                 },
+				bugtracker => {
+					web => 'https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler/issues',
+				},
 			},
-			bugtracker => {
-				web => 'https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler/issues',
-            },
           })
     ),
     clean               => { FILES => 'CPU-Z80-Disassembler-*' },

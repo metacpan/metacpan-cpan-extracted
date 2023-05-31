@@ -13,7 +13,7 @@ class Regex::Match {
   has match_length : ro int;
   
   # Class Method
-  static method new : Regex::Match ($options = undef : object[]) {
+  static method new : Regex::Match ($options : object[] = undef) {
     
     my $self = new Regex::Match;
     

@@ -43,7 +43,7 @@ sub check_rvis($) {
   } else {
     # item is not a reference
     confess "mal-formed addrvis(non-ref) result ($abbr_addr)" 
-      unless !defined($item) || $abbr_addr =~ /^\d{3,99}:[\da-f]{3,99}$/;
+      unless !defined($item) || $abbr_addr =~ /^\<\d{3,99}:[\da-f]{3,99}\>$/;
     $exp = $vis_result;
     $desc = sprintf "NON-ref: rvis(%s) eq vis eq %s", u($item), vis($exp);
     #FIXME: what about addrvis(non-ref) ??
@@ -68,9 +68,10 @@ check_rvis(undef);
 ##################################################
 BEGIN {
   *addrvis_ndigits = *Data::Dumper::Interp::addrvis_ndigits;
-  *addrvis_a2abv = *Data::Dumper::Interp::addrvis_a2abv;
+  *addrvis_a2abv   = *Data::Dumper::Interp::addrvis_a2abv;
+  *addrvis_abbrevs = *Data::Dumper::Interp::addrvis_abbrevs;
 }
-use vars qw/$addrvis_ndigits $addrvis_a2abv/;
+use vars qw/$addrvis_ndigits $addrvis_a2abv $addrvis_abbrevs/;
 
 # How is addrvis() implemented today?
 my $hexordec = "dec";  # maxdigits applies to hex or decimal
@@ -81,19 +82,17 @@ sub check_addrvis() {
   for my $n (@addresses) {
     my $hexchars = substr(sprintf("%09x",$n),-$ndigits);
     my $decchars = substr(sprintf("%09d",$n),-$ndigits);
-    my $re = qr/^${decchars}:${hexchars}$/;
+    my $re = qr/^\<${decchars}:${hexchars}\>$/;
     my $act = addrvis($n); 
     unless ($act =~ /$re/) {
-#      for my $addr (sort { $a <=> $b } keys %$addrvis_a2abv) {
-#        diag sprintf "  addrvis_a2abv{%x}=%s", 
-#                     $addr, vis($addrvis_a2abv->{$addr}) ;
-#      }
       croak 
         sprintf("addrvis(%d = 0x%x) wrong Got:%s re: %s\n", $n,$n, $act, $re),
           "Expecting $ndigits ($hexordec) digits\n",
           "addrvis_ndigits = ", $addrvis_ndigits, "\n",
-          "Cache contains ", scalar(keys %$addrvis_a2abv), " entries:\n",
-          avisl(sort { $a <=> $b } keys %$addrvis_a2abv),"\n ";
+          "Cache a2abv contains ", scalar(keys %$addrvis_a2abv), " entries:  \n",
+          alvis(sort { $a <=> $b } keys %$addrvis_a2abv),"\n ",
+          "Cache abbrevs contains ", scalar(keys %$addrvis_abbrevs), " entries:  \n",
+          alvis(sort { $a <=> $b } keys %$addrvis_abbrevs),"\n ";
     }
   }
 }

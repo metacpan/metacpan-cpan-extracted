@@ -9,10 +9,10 @@ use SQL::Load::Util qw/
 /;
 use SQL::Load::Method;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
-    my ($class, $path) = @_;
+    my ($class, $path, $end) = @_;
     
     # valid if path exists
     croak "Path not defined!" unless $path;
@@ -20,6 +20,7 @@ sub new {
     
     my $self = {
         _path => $path,
+        _end  => $end,
         _data => {},
         _keys => {}
     };    
@@ -66,8 +67,8 @@ sub load {
         $self->_set_tmp($content, $file, $name_list);
         
         return $name 
-             ? SQL::Load::Method->new($content)->name($name)
-             : SQL::Load::Method->new($content);
+             ? SQL::Load::Method->new($content, $self->{_end})->name($name)
+             : SQL::Load::Method->new($content, $self->{_end});
     }
     
     croak "the name '$file_name' is invalid!";
@@ -203,9 +204,18 @@ Intended to separate SQL from Perl code, this module provides some functions tha
 
 =head2 new
 
-    my $sql_load = SQL::Load->new($path);
+    my $sql_load = SQL::Load->new($path, $end);
 
-Construct a new L<SQL::Load>, passing the folder path is required.
+Construct a new L<SQL::Load>, passing the folder path param is required.
+The end param is optional, default returns SQLs with a semicolon in the end, for example using break line:
+
+    my $sql = SQL::Load->new('/home/user/sql/directory/path', "\n");
+
+    my $users = $sql->load('users');
+     
+    print $users->name('find');     # SELECT * FROM users WHERE id = ?\n
+    print $users->name('find-all'); # SELECT * FROM users ORDER BY id DESC\n
+    print $users->name('insert');   # INSERT INTO users (name, login, password) VALUES (?, ?, ?)\n
 
 =head2 load
 

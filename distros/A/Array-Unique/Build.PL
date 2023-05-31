@@ -17,6 +17,12 @@ my $builder = Module::Build->new(
     build_requires      => {
 		'Test::More'       => 0.47,
 	},
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/szabgab/Array-Unique/',
+            bugtracker => 'https://github.com/szabgab/Array-Unique/issues'
+        }
+    },
 );
 
 $builder->create_build_script();

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 1;
-use Perlmazing;
+use Perlmazing qw(sort_by_key);
 
 my @values = (
 	'3'			=> '001000',

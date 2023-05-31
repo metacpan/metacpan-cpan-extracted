@@ -37,7 +37,7 @@ class Cwd {
   
   static method abs_path : string ($file :string) { return &realpath($file); }
   
-  static method getdcwd : string ($drive = undef : string) {
+  static method getdcwd : string ($drive : string = undef) {
     unless (Sys::OS->is_windows) {
       set_error_code class_id Error::NotSupported;
       die "The getdcwd is not supported on this system(_WIN32)";

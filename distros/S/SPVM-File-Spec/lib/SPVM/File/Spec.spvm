@@ -2,14 +2,13 @@
 # MIT License
 
 class File::Spec {
-  version "0.080001";
+  version "0.081001";
   
   use File::Spec::Instance;
   
   our $SINGLETON : File::Spec::Instance;
   
   INIT {
-    File::Spec::Instance->INIT;
     $SINGLETON = File::Spec::Instance->new;
   }
   
@@ -66,7 +65,7 @@ class File::Spec {
     return $SINGLETON->join($directories, $filename);
   }
   
-  static method splitpath : string[] ($path : string, $no_file = 0 : int) {
+  static method splitpath : string[] ($path : string, $no_file : int = 0) {
     return $SINGLETON->splitpath($path, $no_file);
   }
   
@@ -78,11 +77,11 @@ class File::Spec {
     return $SINGLETON->catpath($volume, $directory, $file);
   }
   
-  static method abs2rel : string ($path : string, $base = undef : string) {
+  static method abs2rel : string ($path : string, $base : string = undef) {
     return $SINGLETON->abs2rel($path, $base);
   }
   
-  static method rel2abs : string ($path : string, $base = undef : string) {
+  static method rel2abs : string ($path : string, $base : string = undef) {
     return $SINGLETON->rel2abs($path, $base);
   }
 }

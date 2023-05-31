@@ -3,9 +3,9 @@ package App::FileMoveUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-19'; # DATE
 our $DIST = 'App-FileRenameUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to renaming/moving files
@@ -22,7 +22,7 @@ App::FileMoveUtils - Utilities related to renaming/moving files
 
 =head1 VERSION
 
-This document describes version 0.009 of App::FileMoveUtils (from Perl distribution App-FileRenameUtils), released on 2023-03-02.
+This document describes version 0.010 of App::FileMoveUtils (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
 
 =head1 DESCRIPTION
 

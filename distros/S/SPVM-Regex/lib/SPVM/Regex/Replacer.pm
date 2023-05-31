@@ -26,7 +26,7 @@ The Regex::Replacer interface of L<SPVM> has an interface method for the regex r
 
 =head1 Interface Methods
 
-  required method : string ($re : Regex, $match = undef : Regex::Match);
+  required method : string ($re : Regex, $match : Regex::Match = undef);
 
 Receives a L<Regex|SPVM::Regex> object and a L<Regex::Match|SPVM::Regex::Match> object, and returns a replacement string.
 

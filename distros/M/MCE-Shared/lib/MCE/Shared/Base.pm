@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric );
 
 package MCE::Shared::Base;
 
-our $VERSION = '1.880';
+our $VERSION = '1.881';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -307,7 +307,7 @@ MCE::Shared::Base - Base package for helper classes
 
 =head1 VERSION
 
-This document describes MCE::Shared::Base version 1.880
+This document describes MCE::Shared::Base version 1.881
 
 =head1 DESCRIPTION
 

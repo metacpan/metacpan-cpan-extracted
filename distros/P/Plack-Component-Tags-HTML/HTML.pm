@@ -15,7 +15,7 @@ use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 sub call {
 	my ($self, $env) = @_;
@@ -51,6 +51,32 @@ sub call {
 }
 
 sub prepare_app {
+	my $self = shift;
+
+	$self->_prepare_app;
+
+	return;
+}
+
+sub _cleanup {
+	my $self = shift;
+
+	return;
+}
+
+sub _css {
+	my $self = shift;
+
+	return;
+}
+
+sub _encode {
+	my ($self, $string) = @_;
+
+	return encode($self->encoding, $string);
+}
+
+sub _prepare_app {
 	my $self = shift;
 
 	if ($self->tags) {
@@ -119,32 +145,6 @@ sub prepare_app {
 			'tags' => $self->tags,
 		);
 	}
-
-	$self->_prepare_app;
-
-	return;
-}
-
-sub _cleanup {
-	my $self = shift;
-
-	return;
-}
-
-sub _css {
-	my $self = shift;
-
-	return;
-}
-
-sub _encode {
-	my ($self, $string) = @_;
-
-	return encode($self->encoding, $string);
-}
-
-sub _prepare_app {
-	my $self = shift;
 
 	return;
 }
@@ -345,6 +345,21 @@ Argument is C<$self> only.
 Method to set app preparation part. Called only once on start.
 Argument is C<$self> only.
 
+There are defaults for:
+
+ css()
+ encoding()
+ flag_begin()
+ flag_end()
+ content_type()
+ script_js()
+ script_js_src()
+ status_code()
+ tags()
+
+When you are rewriting C<_prepare_app()> and want to use this defaults must place
+C<$self->SUPER::_prepare_app()> to this.
+
 =head2 C<_process_actions>
 
 Method to set app processing part. Called in each call before creating of
@@ -373,15 +388,7 @@ defined by C<content_type> method.
 
 =head2 C<prepare_app>
 
-Initialize default values for:
-
- tags()
- css()
- encoding()
- content_type()
- status_code()
-
-and run _prepare_app().
+Call C<_prepare_app()>.
 
 =head1 ERRORS
 
@@ -524,6 +531,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

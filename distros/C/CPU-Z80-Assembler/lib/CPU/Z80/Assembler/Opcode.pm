@@ -15,7 +15,7 @@ CPU::Z80::Assembler::Opcode - Represents one assembly expression to be computed 
 use strict;
 use warnings;
 
-our $VERSION = '2.22';
+our $VERSION = '2.25';
 
 use Asm::Preproc::Line;
 

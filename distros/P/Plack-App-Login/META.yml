@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,19 +29,13 @@ no_index:
     - t
     - xt
 requires:
-  CSS::Struct::Output::Raw: 0
-  Error::Pure: 0
+  Plack::Component::Tags::HTML: 0.13
   Plack::Util::Accessor: 0
-  Scalar::Util: 0
   Tags::HTML::Login::Button: 0.02
-  Tags::HTML::Page::Begin: 0.16
-  Tags::HTML::Page::End: 0.04
-  Tags::Output::Raw: 0
-  Unicode::UTF8: 0
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Plack-App-Login/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-Login
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Login
-version: '0.07'
+version: '0.08'

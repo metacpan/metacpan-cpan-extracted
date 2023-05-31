@@ -47,6 +47,6 @@
          "web" : "https://github.com/bodo-hugo-barwich/Process"
       }
    },
-   "version" : "v2.0.1",
+   "version" : "v2.0.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

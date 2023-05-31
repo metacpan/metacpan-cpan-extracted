@@ -18,6 +18,7 @@ meta-spec:
 name: Wikidata-Reconcilation
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
@@ -27,11 +28,11 @@ requires:
   LWP::UserAgent: 0
   Unicode::UTf8: 0
   WQS::SPARQL: 0
-  WQS::SPARQL::Result: 0
+  WQS::SPARQL::Result: 0.02
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Wikidata-Reconcilation/issues
   homepage: https://github.com/michal-josef-spacek/Wikidata-Reconcilation
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikidata-Reconcilation
-version: '0.01'
+version: '0.02'

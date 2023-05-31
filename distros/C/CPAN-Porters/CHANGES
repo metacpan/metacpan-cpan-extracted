@@ -1,13 +1,16 @@
+v0.04 2023.05.30
+    Move to GitHub
+    Move to Makefile.PL (from Build.PL)
+    Add links to GitHub
+    Replace some http links by https
 
 v0.03 2008.03.09
-
- More links and info about Fedora
+    More links and info about Fedora
 
 v0.02 2008.03.07
-
- Adding CHANGES file to satisfy CPANTS....
- Adding pod coverage testing to make CPANTS happy
- Adding wishlist created by the Debian Perl packager team
+    Adding CHANGES file to satisfy CPANTS....
+    Adding pod coverage testing to make CPANTS happy
+    Adding wishlist created by the Debian Perl packager team
 
 v0.01  2007.05.18
 

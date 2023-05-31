@@ -1,5 +1,10 @@
 Revision history for DateTime-Format-Text
 
+0.04	Fri May 26 14:07:19 EDT 2023
+	Remove errant return statement
+	In array context, ensure that the array is in the same order as the
+		dates in the string
+
 0.03	Sat Apr 29 16:46:07 EDT 2023
 	Calling new on an object now returns a clone rather than setting the defaults in the new object
 	Try harder to match random text

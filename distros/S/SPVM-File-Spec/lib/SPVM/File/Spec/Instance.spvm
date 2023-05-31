@@ -52,13 +52,13 @@ class File::Spec::Instance {
   
   method join : string ($directories : string[], $filename : string) { die "Not implemented"; }
   
-  method splitpath : string[] ($path : string, $no_file = 0 : int) { die "Not implemented"; }
+  method splitpath : string[] ($path : string, $no_file : int = 0) { die "Not implemented"; }
   
   method splitdir : string[] ($path : string) { die "Not implemented"; }
    
   method catpath : string ($volume : string, $directory : string, $file : string) { die "Not implemented"; }
   
-  method abs2rel : string ($path : string, $base = undef : string) { die "Not implemented"; }
+  method abs2rel : string ($path : string, $base : string = undef) { die "Not implemented"; }
   
-  method rel2abs : string ($path : string, $base = undef : string) { die "Not implemented"; }
+  method rel2abs : string ($path : string, $base : string = undef) { die "Not implemented"; }
 }

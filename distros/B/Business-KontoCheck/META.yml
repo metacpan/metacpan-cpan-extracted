@@ -1,9 +1,9 @@
 --- #YAML:1.0
 name:         Business-KontoCheck
 abstract:     check german and austrian bank account numbers
-version:      6.13
+version:      6.15
 author:
-   - Michael Plugge <m.plugge@hs-mannheim.de>
+   - Michael Plugge <konto_check@yahoo.com>
 license:      lgpl
 distribution_type: module
 installdirs:  site

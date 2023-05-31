@@ -5,6 +5,10 @@ use warnings;
 
 use Test::More;
 use Capture::Tiny ':all';
+
+use File::Basename;
+use lib dirname(__FILE__) . '/../';
+
 use t::lib::depcheck;
 
 use_ok 'OPM::Maker::Command::depcheck';

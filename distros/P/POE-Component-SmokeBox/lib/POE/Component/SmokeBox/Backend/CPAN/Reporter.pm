@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::CPAN::Reporter;
-$POE::Component::SmokeBox::Backend::CPAN::Reporter::VERSION = '0.56';
+$POE::Component::SmokeBox::Backend::CPAN::Reporter::VERSION = '0.58';
 #ABSTRACT: a backend for CPAN/CPAN::Reporter smokers.
 
 use strict;
@@ -31,7 +31,7 @@ POE::Component::SmokeBox::Backend::CPAN::Reporter - a backend for CPAN/CPAN::Rep
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 DESCRIPTION
 

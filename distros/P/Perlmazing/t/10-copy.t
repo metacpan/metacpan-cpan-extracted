@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 3;
-use Perlmazing;
+use Perlmazing qw(copy dir);
 
 my $file = 'test_file.txt';
 my $copy = 'test_copy.txt';

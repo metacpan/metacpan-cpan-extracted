@@ -9,8 +9,10 @@
 #   Everything not specifically test-related is in the separate
 #   module t_Common (which is not necessairly just for tests).
 #
-#   Loads Test2::V0, which sets UTF-8 encoding/decoding for all file handles
-#   (and imports 'utf8').
+#   Loads Test2::V0, which sets UTF-8 encoding/decoding for test-harnes
+#   streasm (but *not* STD* or new filehandles).  And imports 'utf8'.
+#
+#   Makes STDIN, STDOUT & STDERR UTF-8 auto de/encode
 #
 #   warnings are *not* imported, to avoid clobbering 'no warnings ...'
 #   settings done beforehand (e.g. via t_Common).
@@ -39,15 +41,16 @@ BEGIN{
   confess "Test::More already loaded!" if defined( &Test::More::ok );
   confess "Test2::V0 already loaded!" if defined( &Test2::V0::import );
 
-  # Now redundant with Test2::V0
-  ## Maybe we should just call binmode(encoding...) on STDOUT & STDERR?
-  #use open IO => ':encoding(UTF-8)', ':std';
+  binmode(STDIN, ":encoding(UTF-8)");
+  binmode(STDOUT, ":encoding(UTF-8)");
+  binmode(STDERR, ":encoding(UTF-8)");
 
   # Disable buffering
   STDERR->autoflush(1);
   STDOUT->autoflush(1);
 }
 use Test2::V0 (); # a huge collection of tools
+require Test2::Plugin::BailOnFail; 
 use POSIX ();
 
 require Exporter;
@@ -129,6 +132,9 @@ sub import {
     (map{ "!$_" } "A".."AAZ")
   );
 
+  # Stop on the first error
+  Test2::Plugin::BailOnFail->import::into($target);
+
   if (grep{ $_ eq ':silent' } @_) {
     @_ = grep{ $_ ne ':silent' } @_;
     _start_silent() unless $debug;
@@ -173,8 +179,13 @@ sub string_to_tempfile($@) {
 # Run a Perl script in a sub-process.
 # Plain 'system  path/to/script.pl' does not work in a test environment
 # where the correct Perl executable is not at the front of PATH,
-# and also where -I options might supply library paths.
-# This is usually enclosed in Capture { ... }
+# and also where -I options might have supplied library paths.
+#
+# This is usually enclosed in Tiny::Capture::capture { ... }
+#    ==> IMPORTANT: Be sure STDOUT/ERR has :encoding(...) set beforehand
+#        because Tiny::Capture will decode captured output the same way.
+#        Otherwise wide chars will be corrupted
+#
 sub run_perlscript(@) {
   my @perlargs = @_;  # might be ('-e', 'perlcode...')
   unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
@@ -336,7 +347,7 @@ our @quotes = ("«", "»");
 sub rawstr(_) { # just the characters in French Quotes (truncated)
   # Show spaces visibly
   my $text = $_[0];
-  $text =~ s/ /\N{MIDDLE DOT}/gs;
+  ##$text =~ s/ /\N{MIDDLE DOT}/gs;
   $quotes[0].(length($text)>$showstr_maxlen ? substr($text,0,$showstr_maxlen-3)."..." : $text).$quotes[1]
 }
 
@@ -360,20 +371,23 @@ sub showstr(_) {
   }
 }
 
-# Show both the raw string in French Quotes, and with hex escapes
+# Show the raw string in French Quotes.
+# If STDOUT is not UTF-8 encoded, also show D::D hex escapes 
 # so we can still see something useful in output from non-Unicode platforms.
 sub displaystr($) {
   my ($input) = @_;
   return "undef" if ! defined($input);
-  # Data::Dumper will show 'wide' characters as hex escapes
-  my $dd = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump;
-  chomp $dd;
-  if ($dd eq $input || $dd eq "\"$input\"") {
-    # No special characters, so omit the hex-escaped form
-    return rawstr($input)
-  } else {
-    return rawstr($input)."($dd)"
+  local $_;
+  state $utf8_output = grep /utf.?8/i, PerlIO::get_layers(*STDOUT, output=>1);
+  my $r = rawstr($input);
+  if (! $utf8_output && $input =~ /[^[:print:]]/a) {
+    # Data::Dumper will show 'wide' characters as hex escapes
+    my $dd = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump;
+    if ($dd ne $input && $dd ne "\"$input\"") {
+      $r .= "\nD::D->$dd";
+    }
   }
+  $r
 }
 
 sub fmt_codestring($;$) { # returns list of lines
@@ -459,12 +473,9 @@ sub expect1($$) {
 # into a regex which works with all versions.
 # As of 1/1/23 the input string is expected to be what Perl v5.34 produces.
 our $bs = '\\';  # a single backslash
-sub expstr2re($) {
+sub _expstr2restr($) {
   local $_ = shift;
   confess "bug" if ref($_);
-  unless (m#qr/|"::#) {
-    return $_; # doesn't contain variable-representation items
-  }
   # In \Q *string* \E the *string* may not end in a backslash because
   # it would be parsed as (\\)(E) instead of (\)(\E).
   # So change them to a unique token and later replace problematic
@@ -479,7 +490,7 @@ sub expstr2re($) {
     # Alternate: qr/(?^MODIFIERS:STUFF)/
     # Alternate: qr/(?^uMODIFIERS:STUFF)/
 #say "#XX qr BEFORE: $_";
-    s#qr/([^\/]+)/([msixpodualngcer]*)
+    s#qr/((?:\\.|[^\/])+)/([msixpodualngcer]*)
      #\\E\(\\Qqr/$1/\\Eu?\\Q$2\\E|\\Qqr/(?^\\Eu?\\Q$2:$1)/\\E\)\\Q#xg
       or confess "Problem with qr/.../ in input string: $_";
 #say "#XX qr AFTER : $_";
@@ -503,10 +514,26 @@ sub expstr2re($) {
   s/<BS>/\\/g;
 #say "#XX    FINAL : $_";
 
-  my $saved_dollarat = $@;
-  my $re = eval "qr{${_}}"; die "$@ " if $@;
-  $@ = $saved_dollarat;
-  $re
+  $_
+}
+sub expstr2re($) { 
+  my $input = shift;
+  my $xdesc; # extra debug description of intermediates
+  my $output;
+  if ($input !~ m#qr/|"::#) {
+    # doesn't contain variable-representation items
+    $output = $input;
+    $xdesc = ""; 
+  } else {
+    my $s = _expstr2restr($input);
+    my $saved_dollarat = $@;
+    my $re = eval "qr{$s}"; die "$@ " if $@;
+    $@ = $saved_dollarat;
+    $xdesc = "**Orig match str  :".displaystr($input)."\n"
+            ."**Generated re str:".displaystr($s)."\n" ;
+    $output = $re;
+  }
+  wantarray ? ($xdesc, $output) : $output
 }
 
 # check $test_desc, string_or_regex, result
@@ -530,15 +557,18 @@ sub mycheck($$@) {
   foreach my $i (0..$#actual) {
     my $actual = $actual[$i];
     my $expected = $expected[$i];
+    my $xdesc = "";
     if (!ref($expected)) {
       # Work around different Perl versions stringifying regexes differently
-      $expected = expstr2re($expected);
+      #$expected = expstr2re($expected);
+      ($xdesc, $expected) = expstr2re($expected);
     }
     if (ref($expected) eq "Regexp") {
       unless ($actual =~ $expected) {
         @_ = ( "\n**************************************\n"
               ."TESTb FAILED: ".$desc."\n"
               ."Expected (Regexp):\n".${expected}."<<end>>\n"
+              .$xdesc
               ."Got:\n".displaystr($actual)."<<end>>\n"
              ) ;
         Carp::confess(@_); #goto &Carp::confess;

@@ -221,12 +221,12 @@
     "\N{U+039d}\N{U+03bf}\N{U+03ad}\N{U+03bc}\N{U+03b2}\N{U+03c1}\N{U+03b9}\N{U+03bf}\N{U+03c2}",
     "\N{U+0394}\N{U+03b5}\N{U+03ba}\N{U+03ad}\N{U+03bc}\N{U+03b2}\N{U+03c1}\N{U+03b9}\N{U+03bf}\N{U+03c2}",
   ],
-  name => "Greek",
+  name => "Greek Polytonic",
   native_language => "\N{U+1f19}\N{U+03bb}\N{U+03bb}\N{U+03b7}\N{U+03bd}\N{U+03b9}\N{U+03ba}\N{U+03ac}",
-  native_name => "\N{U+1f19}\N{U+03bb}\N{U+03bb}\N{U+03b7}\N{U+03bd}\N{U+03b9}\N{U+03ba}\N{U+03ac}",
+  native_name => "\N{U+1f19}\N{U+03bb}\N{U+03bb}\N{U+03b7}\N{U+03bd}\N{U+03b9}\N{U+03ba}\N{U+03ac} \N{U+03a0}\N{U+03bf}\N{U+03bb}\N{U+03c5}\N{U+03c4}\N{U+03bf}\N{U+03bd}\N{U+03b9}\N{U+03ba}\N{U+03cc}",
   native_script => undef,
   native_territory => undef,
-  native_variant => undef,
+  native_variant => "\N{U+03a0}\N{U+03bf}\N{U+03bb}\N{U+03c5}\N{U+03c4}\N{U+03bf}\N{U+03bd}\N{U+03b9}\N{U+03ba}\N{U+03cc}",
   quarter_format_abbreviated => [
     "\N{U+03a4}1",
     "\N{U+03a4}2",
@@ -269,6 +269,6 @@
   time_format_long => "h:mm:ss\N{U+202f}a z",
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
-  variant => undef,
+  variant => "Polytonic",
   version => 43,
 }

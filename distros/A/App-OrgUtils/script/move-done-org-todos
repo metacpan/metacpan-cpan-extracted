@@ -9,9 +9,9 @@ use Scalar::Util qw(refaddr);
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-04-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our %SPEC;
 
@@ -263,7 +263,7 @@ move-done-org-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.484 of move-done-org-todos (from Perl distribution App-OrgUtils), released on 2023-01-19.
+This document describes version 0.485 of move-done-org-todos (from Perl distribution App-OrgUtils), released on 2023-04-06.
 
 =head1 SYNOPSIS
 

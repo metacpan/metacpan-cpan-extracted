@@ -10,9 +10,9 @@ use Org::Parser::Tiny;
 use Sort::Sub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-04-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our %SPEC;
 
@@ -287,7 +287,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.484 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2023-01-19.
+This document describes version 0.485 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2023-04-06.
 
 =head1 DESCRIPTION
 
@@ -297,43 +297,43 @@ following are the included scripts:
 
 =over
 
-=item * L<browse-org>
+=item 1. L<browse-org>
 
-=item * L<count-done-org-todos>
+=item 2. L<count-done-org-todos>
 
-=item * L<count-org-todos>
+=item 3. L<count-org-todos>
 
-=item * L<count-undone-org-todos>
+=item 4. L<count-undone-org-todos>
 
-=item * L<dump-org-structure>
+=item 5. L<dump-org-structure>
 
-=item * L<dump-org-structure-tiny>
+=item 6. L<dump-org-structure-tiny>
 
-=item * L<list-org-anniversaries>
+=item 7. L<list-org-anniversaries>
 
-=item * L<list-org-headlines>
+=item 8. L<list-org-headlines>
 
-=item * L<list-org-priorities>
+=item 9. L<list-org-priorities>
 
-=item * L<list-org-tags>
+=item 10. L<list-org-tags>
 
-=item * L<list-org-todo-states>
+=item 11. L<list-org-todo-states>
 
-=item * L<list-org-todos>
+=item 12. L<list-org-todos>
 
-=item * L<move-done-org-todos>
+=item 13. L<move-done-org-todos>
 
-=item * L<org2html>
+=item 14. L<org2html>
 
-=item * L<org2html-wp>
+=item 15. L<org2html-wp>
 
-=item * L<orgdump>
+=item 16. L<orgdump>
 
-=item * L<orgdump-tiny>
+=item 17. L<orgdump-tiny>
 
-=item * L<orgstat>
+=item 18. L<orgstat>
 
-=item * L<stat-org-document>
+=item 19. L<stat-org-document>
 
 =back
 

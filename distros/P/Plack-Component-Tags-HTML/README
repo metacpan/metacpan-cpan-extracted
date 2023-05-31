@@ -120,6 +120,21 @@ METHODS TO OVERWRITE
     Method to set app preparation part. Called only once on start. Argument
     is $self only.
 
+    There are defaults for:
+
+     css()
+     encoding()
+     flag_begin()
+     flag_end()
+     content_type()
+     script_js()
+     script_js_src()
+     status_code()
+     tags()
+
+    When you are rewriting "_prepare_app()" and want to use this defaults
+    must place "$self-"SUPER::_prepare_app()> to this.
+
   "_process_actions"
     Method to set app processing part. Called in each call before creating
     of output. Argument is $self and $env.
@@ -141,15 +156,7 @@ METHODS IMPLEMENTED
     is defined by "content_type" method.
 
   "prepare_app"
-    Initialize default values for:
-
-     tags()
-     css()
-     encoding()
-     content_type()
-     status_code()
-
-    and run _prepare_app().
+    Call "_prepare_app()".
 
 ERRORS
      prepare_app():
@@ -269,5 +276,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

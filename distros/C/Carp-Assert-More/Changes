@@ -1,6 +1,15 @@
 Revision history for Perl extension Carp::Assert::More.
 
 
+2.3.0   Tue May 30 21:52:20 CDT 2023
+        [ENHANCEMENTS]
+        Added assert_arrayref_of() to verify that all of the elements
+        in an arrayref are of a given type. For example:
+
+            my $users = get_users();
+            assert_arrayref_of( $users, 'My::User' );
+
+
 2.2.0   Sun Jan 29 20:23:59 CST 2023
         [ENHANCEMENTS]
         Added assert_cmp( $x, $op, $y [, $msg] ), analogous to cmp_ok in Test::More, so you can do

@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(is_blessed define _is_ref);
 
 sub main {
 	my ($type, $val) = @_;

@@ -90,8 +90,8 @@ warnings (L<https://rt.cpan.org/Public/Bug/Display.html?id=97977>)
 
 package ODF::lpOD_Helper;
 
-our $VERSION = '3.010'; # VERSION
-our $DATE = '2023-04-28'; # DATE
+our $VERSION = '5.011'; # VERSION
+our $DATE = '2023-05-30'; # DATE
 
 our @EXPORT = qw(
   Hautomatic_style Hcommon_style
@@ -140,7 +140,10 @@ use Carp;
 sub oops(@) { unshift @_, "oops! "; goto &Carp::confess; }
 #sub btw(@) { local $_=join("",@_); s/\n\z//s; say "$_  \@ ".(caller(0))[2]; }
 sub btw(@) { local $_=join("",@_); s/\n\z//s; say '##'.(caller(0))[2].": $_"; }
-use Data::Dumper::Interp qw/visnew ivis ivisq vis visq avis avisq addrvis refvis dvis u/;
+use Data::Dumper::Interp qw/visnew
+                    vis  viso  avis  alvis  ivis  dvis  hvis  hlvis
+                    visq visoq avisq alvisq ivisq dvisq hvisq hlvisq
+                    addrvis rvis rvisq u quotekey qsh qshlist qshpath/;
 use Scalar::Util qw/refaddr blessed reftype weaken isweak/;
 use List::Util qw/min max first any all none reduce max sum0/;
 

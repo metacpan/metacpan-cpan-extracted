@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => 'v5.14.0'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -26,16 +26,16 @@ do { my $x = {
                                       'Test::Pod' => '1.41',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Version' => '1'
+                                      'Test::Version' => '1',
+                                      'perl' => '5.006'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Data::Printer' => '0',
                                       'Exporter::Extensible' => '0',
-                                      'List::Util' => '0',
+                                      'List::Util::MaybeXS' => '0',
                                       'feature' => '0',
-                                      'perl' => 'v5.14.0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
@@ -46,11 +46,13 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Printer' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'List::Util' => '0',
                                    'Scalar::Util' => '0',
                                    'Test::More' => '0',
-                                   'perl' => 'v5.14.0'
+                                   'perl' => '5.010'
                                  }
                  }
      };

@@ -57,7 +57,7 @@ sub import {
   use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
   use 5.018;  # lexical_subs
   require feature;
-  feature->import::into($target, qw/state say current_sub lexical_subs/);
+  feature->import::into($target, qw/state say current_sub lexical_subs fc/);
   warnings->unimport::out_of($target, "experimental::lexical_subs");
 
   # die if obsolete or dangerous syntax is used
@@ -92,10 +92,6 @@ sub import {
   require File::Basename;
   File::Basename->import::into($target, qw/basename dirname/);
 
-  # NO. use mytempfile or mytempdir
-  #require File::Temp;
-  #File::Temp->import::into($target, qw/tempfile tempdir/);
-
   require File::Path;
   File::Path->import::into($target, qw/make_path rmtree/);
 
@@ -105,6 +101,9 @@ sub import {
     canonpath catdir catfile curdir rootdir updir
     no_upwards file_name_is_absolute devnull tmpdir splitpath splitdir 
     abs2rel rel2abs case_tolerant/);
+
+  require Path::Tiny;
+  Path::Tiny->import::into($target, qw/path/);
 
   require List::Util;
   List::Util->import::into($target, qw/reduce min max first any all none sum0/);
@@ -134,36 +133,16 @@ sub import {
 
 use File::Temp 0.23 ();
 
-# These wrappers provide sane defaults:
-#   TMPDIR set and the appropriate clean-up option enabled.
-# In addition, if a single "template" argument is a full filename including
-# suffix (i.e. does not end in ...XXX), then it is split into separate
-# TEMPLATE and SUFFIX arguments for File::Temp
-sub _process_tfargs(@) {
-  return @_ if (scalar(@_) % 2 == 0); # already key => value, ....
-  (local $_, my @rest) = @_;
-  if (s/X([^X]+)$/X/) { unshift @rest, SUFFIX => $1; }
-  (TEMPLATE => $_, @rest)
+sub mytempfile { ##DEPRECATED
+  Path::Tiny->tempfile(@_); # does everything we used to do
 }
-sub mytempfile {
-  my @tfargs = _process_tfargs(@_);
-  File::Temp::tempfile(
-    TMPDIR => File::Spec->tmpdir(),
-    UNLINK  =>  1,
-    @tfargs
-  )
+sub mytempdir {  ##DEPRECATED
+  Path::Tiny->tempdir(@_); # does everything we used to do
 }
-sub mytempdir {
-  my @tfargs = _process_tfargs(@_);
-  File::Temp::tempdir(
-    TMPDIR => File::Spec->tmpdir(),
-    CLEANUP =>  1,
-    @tfargs
-  )
-}
-# prevent direct use of File::Temp by exporting these conflicting stubs
-# ?? Maybe just name our wrappers without the "my" and let them be imported explicitly?
-sub tempfile { confess "call mytempfile instead" }
-sub tempdir  { confess "call mytempdir instead" }
+
+# prevent direct use of File::Temp with it's confusing arguments
+# by exporting these conflicting stubs
+sub tempfile { confess "use Path::Tiny->tempfile(...) instead" }
+sub tempdir  { confess "use Path::Tiny->tempdir(...) instead" }
 
 1;

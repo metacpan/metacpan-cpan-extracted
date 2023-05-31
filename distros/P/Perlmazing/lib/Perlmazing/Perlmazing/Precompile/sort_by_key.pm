@@ -15,7 +15,7 @@ BEGIN {
 	}
 }
 
-use Perlmazing;
+use Perlmazing qw(isa_hash void_context isa_array numeric list_context scalar_context);
 
 sub main_code {
 	my $list = $_[0];

@@ -17,11 +17,13 @@ my %WriteMakefileArgs = (
     "script/move-files-here",
     "script/mv-add-prefix",
     "script/mv-add-prefix-datestamp",
+    "script/mv-add-prefix-number",
     "script/mv-reverse",
     "script/mv-swap",
     "script/mv-to-from",
     "script/rename-add-prefix",
     "script/rename-add-prefix-datestamp",
+    "script/rename-add-prefix-number",
     "script/rename-swap",
     "script/rename-to-from"
   ],
@@ -49,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

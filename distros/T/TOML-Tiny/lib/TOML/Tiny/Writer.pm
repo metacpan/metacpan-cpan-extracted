@@ -1,13 +1,13 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.15';
+$TOML::Tiny::Writer::VERSION = '0.16';
 use strict;
 use warnings;
 no warnings qw(experimental);
 use v5.18;
 
-use B qw(svref_2object SVf_IOK SVf_NOK);
-use Data::Dumper;
-use TOML::Tiny::Grammar;
+use B qw(SVf_IOK SVf_NOK svref_2object);
+use Data::Dumper qw(Dumper);
+use TOML::Tiny::Grammar qw($BareKey $DateTime $SpecialFloat);
 use TOML::Tiny::Util qw(is_strict_array);
 
 my @KEYS;
@@ -16,70 +16,67 @@ sub to_toml {
   my $data  = shift;
   my $param = ref($_[1]) eq 'HASH' ? $_[1] : undef;
 
-  for (ref $data) {
-    when ('HASH') {
-      return to_toml_table($data, $param);
-    }
+  my $ref = ref $data;
+  if ($ref eq 'HASH') {
+    return to_toml_table($data, $param);
+  }
 
-    when ('ARRAY') {
-      return to_toml_array($data, $param);
-    }
+  if ($ref eq 'ARRAY') {
+    return to_toml_array($data, $param);
+  }
 
-    when ('SCALAR') {
-      if ($$data eq '1') {
-        return 'true';
-      } elsif ($$data eq '0') {
-        return 'false';
-      } else {
-        return to_toml($$_, $param);
-      }
-    }
-
-    when ('JSON::PP::Boolean') {
-      return $$data ? 'true' : 'false';
-    }
-
-    when ('Types::Serializer::Boolean') {
-      return $data ? 'true' : 'false';
-    }
-
-    when ('DateTime') {
-      return strftime_rfc3339($data);
-    }
-
-    when ('Math::BigInt') {
-      return $data->bstr;
-    }
-
-    when ('Math::BigFloat') {
-      if ($data->is_inf || $data->is_nan) {
-        return lc $data->bstr;
-      } else {
-        return $data->bstr;
-      }
-    }
-
-    when ('') {
-      # Thanks to ikegami on Stack Overflow for the trick!
-      # https://stackoverflow.com/questions/12686335/how-to-tell-apart-numeric-scalars-and-string-scalars-in-perl/12693984#12693984
-      # note: this must come before any regex can flip this flag off
-      if (svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK)) {
-        return 'inf'  if Math::BigFloat->new($data)->is_inf;
-        return '-inf' if Math::BigFloat->new($data)->is_inf('-');
-        return 'nan'  if Math::BigFloat->new($data)->is_nan;
-        return $data;
-      }
-      #return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
-      return $data if $data =~ /$DateTime/;
-      return lc($data) if $data =~ /^$SpecialFloat$/;
-
-      return to_toml_string($data);
-    }
-
-    default{
-      die 'unhandled: '.Dumper($_);
+  if ($ref eq 'SCALAR') {
+    if ($$data eq '1') {
+      return 'true';
+    } elsif ($$data eq '0') {
+      return 'false';
+    } else {
+      return to_toml($$_, $param);
     }
   }
+
+  if ($ref eq 'JSON::PP::Boolean') {
+    return $$data ? 'true' : 'false';
+  }
+
+  if ($ref eq 'Types::Serializer::Boolean') {
+    return $data ? 'true' : 'false';
+  }
+
+  if ($ref eq 'DateTime') {
+    return strftime_rfc3339($data);
+  }
+
+  if ($ref eq 'Math::BigInt') {
+    return $data->bstr;
+  }
+
+  if ($ref eq 'Math::BigFloat') {
+    if ($data->is_inf || $data->is_nan) {
+      return lc $data->bstr;
+    } else {
+      return $data->bstr;
+    }
+  }
+
+  if ($ref eq '') {
+    # Thanks to ikegami on Stack Overflow for the trick!
+    # https://stackoverflow.com/questions/12686335/how-to-tell-apart-numeric-scalars-and-string-scalars-in-perl/12693984#12693984
+    # note: this must come before any regex can flip this flag off
+    if (svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK)) {
+      return 'inf'  if Math::BigFloat->new($data)->is_inf;
+      return '-inf' if Math::BigFloat->new($data)->is_inf('-');
+      return 'nan'  if Math::BigFloat->new($data)->is_nan;
+      return $data;
+    }
+    #return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
+    return $data if $data =~ /$DateTime/;
+    return lc($data) if $data =~ /^$SpecialFloat$/;
+
+    return to_toml_string($data);
+  }
+
+  die 'unhandled: '.Dumper($ref);
 }
 
 sub to_toml_inline_table {
@@ -278,7 +275,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 AUTHOR
 
@@ -286,7 +283,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Jeff Ober.
+This software is copyright (c) 2023 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

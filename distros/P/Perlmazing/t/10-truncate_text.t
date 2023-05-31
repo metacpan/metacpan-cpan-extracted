@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 39;
-use Perlmazing;
+use Perlmazing qw(truncate_text);
 
 my $string = 'This is an awesome string for testing.';
 

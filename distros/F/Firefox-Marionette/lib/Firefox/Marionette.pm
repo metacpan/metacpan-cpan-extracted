@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use Firefox::Marionette::Response();
 use Firefox::Marionette::Element();
+use Firefox::Marionette::Cache();
 use Firefox::Marionette::Cookie();
 use Firefox::Marionette::Display();
 use Firefox::Marionette::Window::Rect();
@@ -63,7 +64,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -256,6 +257,77 @@ _JS_
     return $self;
 }
 
+sub _clear_data_service_interface_preamble {
+    my ($self) = @_;
+    return <<'_JS_';    # toolkit/components/cleardata/nsIClearDataService.idl
+let clearDataService = Components.classes["@mozilla.org/clear-data-service;1"].getService(Components.interfaces.nsIClearDataService);
+_JS_
+}
+
+sub cache_keys {
+    my ($self) = @_;
+    my @names;
+    foreach my $name (@Firefox::Marionette::Cache::EXPORT_OK) {
+        if ( defined $self->check_cache_key($name) ) {
+            push @names, $name;
+        }
+    }
+    return @names;
+}
+
+sub check_cache_key {
+    my ( $self, $name ) = @_;
+    my $class = ref $self;
+    defined $name
+      or Firefox::Marionette::Exception->throw(
+        "$class->check_cache_value() must be passed an argument.");
+    $name =~ /^[[:upper:]_]+$/smx
+      or Firefox::Marionette::Exception->throw(
+"$class->check_cache_key() must be passed an argument consisting of uppercase characters and underscores."
+      );
+    my $script = <<"_JS_";
+if (typeof clearDataService.$name === undefined) {
+  return;
+} else {
+  return clearDataService.$name;
+}
+_JS_
+    my $old    = $self->_context('chrome');
+    my $result = $self->script(
+        $self->_compress_script(
+            $self->_clear_data_service_interface_preamble() . $script
+        )
+    );
+    $self->_context($old);
+    return $result;
+}
+
+sub clear_cache {
+    my ( $self, $flags ) = @_;
+    $flags = defined $flags ? $flags : Firefox::Marionette::Cache::CLEAR_ALL();
+    my $script = <<'_JS_';
+let argument_flags = arguments[0];
+let clearCache = function(flags) {
+  return new Promise((resolve) => {
+    clearDataService.deleteData(flags, function() { resolve(); });
+  })};
+let result = (async function() {
+  let awaitResult = await clearCache(argument_flags);
+  return awaitResult;
+})();
+return arguments[0];
+_JS_
+    my $old    = $self->_context('chrome');
+    my $result = $self->script(
+        $self->_compress_script(
+            $self->_clear_data_service_interface_preamble() . $script
+        ),
+        args => [$flags]
+    );
+    $self->_context($old);
+    return $self;
+}
+
 sub clear_pref {
     my ( $self, $name ) = @_;
     my $script = <<'_JS_';
@@ -287,6 +359,14 @@ sub mime_types {
 }
 
 sub download {
+    my ( $self, $path ) = @_;
+    Carp::carp( '**** DEPRECATED - The download(' . q[$]
+          . 'path) method HAS BEEN REPLACED BY downloaded(' . q[$]
+          . 'path) ****' );
+    return $self->downloaded($path);
+}
+
+sub downloaded {
     my ( $self, $path ) = @_;
     my $handle;
     if ( my $ssh = $self->_ssh() ) {
@@ -339,7 +419,7 @@ sub _directory_listing {
     else {
         my $handle = DirHandle->new($directory);
         if ($handle) {
-            while ( my $entry = $handle->read() ) {
+            while ( defined( my $entry = $handle->read() ) ) {
                 next if ( $entry eq File::Spec->updir() );
                 next if ( $entry eq File::Spec->curdir() );
                 if ($short) {
@@ -349,7 +429,7 @@ sub _directory_listing {
                     push @entries, File::Spec->catfile( $directory, $entry );
                 }
             }
-            $handle->close()
+            closedir $handle
               or Firefox::Marionette::Exception->throw(
                 "Failed to close directory '$directory':$EXTENDED_OS_ERROR");
         }
@@ -448,7 +528,7 @@ sub _get_max_scp_file_index {
             }
         }
     }
-    $directory_handle->close()
+    closedir $directory_handle
       or Firefox::Marionette::Exception->throw(
         "Failed to close directory '$directory_path':$EXTENDED_OS_ERROR");
     return $maximum_index;
@@ -536,7 +616,7 @@ sub _setup_ssh_with_reconnect {
             }
         }
     }
-    $temp_handle->close()
+    closedir $temp_handle
       or Firefox::Marionette::Exception->throw(
         "Failed to close directory '$temp_directory':$EXTENDED_OS_ERROR");
     if ( $self->_ssh() ) {
@@ -880,27 +960,32 @@ sub _get_local_reconnect_pid {
             }
             $self->{_initial_version} = $local_proxy->{firefox}->{version};
             $self->{_root_directory}  = $possible_root_directory;
-            if ( $self->{profile_name} ) {
-                $self->{_profile_directory} =
-                  Firefox::Marionette::Profile->directory(
-                    $self->{profile_name} );
-                $self->{profile_path} =
-                  File::Spec->catfile( $self->{_profile_directory},
-                    'prefs.js' );
-            }
-            else {
-                $self->{_profile_directory} =
-                  File::Spec->catfile( $self->{_root_directory}, 'profile' );
-                $self->{_download_directory} =
-                  File::Spec->catfile( $self->{_root_directory}, 'downloads' );
-                $self->{profile_path} =
-                  File::Spec->catfile( $self->{_profile_directory},
-                    'prefs.js' );
-            }
+            $self->_setup_profile();
         }
     }
-    $temp_handle->close();
+    closedir $temp_handle
+      or Firefox::Marionette::Exception->throw(
+        "Failed to close directory '$temp_directory':$EXTENDED_OS_ERROR");
     return $alive_pid;
+}
+
+sub _setup_profile {
+    my ($self) = @_;
+    if ( $self->{profile_name} ) {
+        $self->{_profile_directory} =
+          Firefox::Marionette::Profile->directory( $self->{profile_name} );
+        $self->{profile_path} =
+          File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' );
+    }
+    else {
+        $self->{_profile_directory} =
+          File::Spec->catfile( $self->{_root_directory}, 'profile' );
+        $self->{_download_directory} =
+          File::Spec->catfile( $self->{_root_directory}, 'downloads' );
+        $self->{profile_path} =
+          File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' );
+    }
+    return;
 }
 
 sub _reconnect {
@@ -1138,18 +1223,18 @@ sub _import_profile_paths {
                     $read_handle->read( my $buffer, _LOCAL_READ_BUFFER_SIZE() )
                   )
                 {
-                    $write_handle->print($buffer)
+                    print {$write_handle} $buffer
                       or Firefox::Marionette::Exception->throw(
                         "Failed to write to '$write_path':$EXTENDED_OS_ERROR");
                 }
                 defined $result
                   or Firefox::Marionette::Exception->throw(
                     "Failed to read from '$path':$EXTENDED_OS_ERROR");
-                $write_handle->close()
+                close $write_handle
                   or Firefox::Marionette::Exception->throw(
                     "Failed to close '$write_path':$EXTENDED_OS_ERROR");
             }
-            $read_handle->close()
+            close $read_handle
               or Firefox::Marionette::Exception->throw(
                 "Failed to close '$path':$EXTENDED_OS_ERROR");
         }
@@ -1799,7 +1884,7 @@ sub _get_update_status {
         }
         else {
             Firefox::Marionette::Exception->throw(
-"Failed to open $updates_status_path for reading:$EXTENDED_OS_ERROR"
+"Failed to open '$updates_status_path' for reading:$EXTENDED_OS_ERROR"
             );
         }
     }
@@ -2727,14 +2812,12 @@ sub _post_launch_checks_and_setup {
           or Firefox::Marionette::Exception->throw(
             "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
         binmode $handle;
-        $handle->print(
-            MIME::Base64::decode_base64(
-                Firefox::Marionette::Extension::HarExportTrigger->as_string()
-            )
-          )
+        print {$handle}
+          MIME::Base64::decode_base64(
+            Firefox::Marionette::Extension::HarExportTrigger->as_string() )
           or Firefox::Marionette::Exception->throw(
             "Failed to write to '$path':$EXTENDED_OS_ERROR");
-        $handle->close()
+        close $handle
           or Firefox::Marionette::Exception->throw(
             "Failed to close '$path':$EXTENDED_OS_ERROR");
         $self->install( $path, 0 );
@@ -2810,7 +2893,7 @@ sub _clean_local_extension_directory {
                 $entry );
             unlink $path or $cleaned = 0;
         }
-        $handle->close()
+        closedir $handle
           or Firefox::Marionette::Exception->throw(
 "Failed to close directory '$self->{_local_extension_directory}':$EXTENDED_OS_ERROR"
           );
@@ -3101,10 +3184,10 @@ sub _profile_arguments {
               )
               or Firefox::Marionette::Exception->throw(
                 "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
-            $handle->print($mime_types_content)
+            print {$handle} $mime_types_content
               or Firefox::Marionette::Exception->throw(
                 "Failed to write to '$path':$EXTENDED_OS_ERROR");
-            $handle->close
+            close $handle
               or Firefox::Marionette::Exception->throw(
                 "Failed to close '$path':$EXTENDED_OS_ERROR");
         }
@@ -3466,7 +3549,7 @@ sub _read_and_close_handle {
     defined $result
       or Firefox::Marionette::Exception->throw(
         "Failed to read from '$path':$EXTENDED_OS_ERROR");
-    $handle->close()
+    close $handle
       or Firefox::Marionette::Exception->throw(
         "Failed to close '$path':$EXTENDED_OS_ERROR");
     return $content;
@@ -3708,7 +3791,7 @@ sub _active_update_version {
             $active_update_handle =
               FileHandle->new( $active_update_path, Fcntl::O_RDONLY() )
               or Firefox::Marionette::Exception->throw(
-"Failed to open $active_update_path for reading:$EXTENDED_OS_ERROR"
+"Failed to open '$active_update_path' for reading:$EXTENDED_OS_ERROR"
               );
         }
         if ($active_update_handle) {
@@ -4245,7 +4328,11 @@ sub _launch {
 
 sub _launch_win32 {
     my ( $self, @arguments ) = @_;
-    my $binary  = $self->_binary();
+    my $binary = $self->_binary();
+    if ( $binary =~ /[.]pl$/smx ) {
+        unshift @arguments, $binary;
+        $binary = $EXECUTABLE_NAME;
+    }
     my $process = $self->_start_win32_process( $binary, @arguments );
     $self->{_win32_firefox_process} = $process;
     return $process->GetProcessID();
@@ -4257,9 +4344,11 @@ sub _xvfb_binary {
 
 sub _dev_fd_works {
     my ($self) = @_;
-    my $test_handle =
-      File::Temp::tempfile( File::Spec->tmpdir(),
-        'firefox_marionette_dev_fd_test_XXXXXXXXXXX' )
+    my $test_handle = File::Temp::tempfile(
+        File::Spec->catfile(
+            File::Spec->tmpdir(), 'firefox_marionette_dev_fd_test_XXXXXXXXXXX'
+        )
+      )
       or Firefox::Marionette::Exception->throw(
         "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
     my @stats = stat '/dev/fd/' . fileno $test_handle;
@@ -4337,14 +4426,16 @@ sub _launch_xauth {
       )
       or Firefox::Marionette::Exception->throw(
         "Failed to open '$ENV{XAUTHORITY}' for writing:$EXTENDED_OS_ERROR");
-    $auth_handle->close()
+    close $auth_handle
       or Firefox::Marionette::Exception->throw(
         "Failed to close '$ENV{XAUTHORITY}':$EXTENDED_OS_ERROR");
     my $mcookie = unpack 'H*',
       Crypt::URandom::urandom( _NUMBER_OF_MCOOKIE_BYTES() );
-    my $source_handle =
-      File::Temp::tempfile( File::Spec->tmpdir(),
-        'firefox_marionette_xauth_source_XXXXXXXXXXX' )
+    my $source_handle = File::Temp::tempfile(
+        File::Spec->catfile(
+            File::Spec->tmpdir(), 'firefox_marionette_xauth_source_XXXXXXXXXXX'
+        )
+      )
       or Firefox::Marionette::Exception->throw(
         "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
     fcntl $source_handle, Fcntl::F_SETFD(), 0
@@ -4352,7 +4443,9 @@ sub _launch_xauth {
 "Failed to clear the close-on-exec flag on a temporary file:$EXTENDED_OS_ERROR"
       );
     my $xauth_proto = q[.];
-    $source_handle->print("add :$display_number $xauth_proto $mcookie\n");
+    print {$source_handle} "add :$display_number $xauth_proto $mcookie\n"
+      or Firefox::Marionette::Exception->throw(
+        "Failed to write to temporary file:$EXTENDED_OS_ERROR");
     seek $source_handle, 0, Fcntl::SEEK_SET()
       or Firefox::Marionette::Exception->throw(
         "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
@@ -5604,8 +5697,13 @@ sub _network_connection_and_initial_read_from_marionette {
         if ($number_of_bytes) {
             $connected = 1;
         }
-        else {
+        elsif ( defined $number_of_bytes ) {
             sleep 1;
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+"Failed to read from connection to $host on port $port:$EXTENDED_OS_ERROR"
+            );
         }
     }
     elsif ( $EXTENDED_OS_ERROR == POSIX::ECONNREFUSED() ) {
@@ -5830,7 +5928,7 @@ sub _write_local_proxy {
       FileHandle->new( $local_proxy_path,
         Fcntl::O_CREAT() | Fcntl::O_EXCL() | Fcntl::O_WRONLY() )
       or Firefox::Marionette::Exception->throw(
-        "Failed to open $local_proxy_path for writing:$EXTENDED_OS_ERROR");
+        "Failed to open '$local_proxy_path' for writing:$EXTENDED_OS_ERROR");
     my $local_proxy = {};
     if ( defined $local_proxy->{version} ) {
         foreach my $key (qw(major minor patch)) {
@@ -5859,10 +5957,10 @@ sub _write_local_proxy {
         $local_proxy->{firefox}->{binary}  = $self->_binary();
         $local_proxy->{firefox}->{version} = $self->{_initial_version};
     }
-    $local_proxy_handle->print( JSON::encode_json($local_proxy) )
+    print {$local_proxy_handle} JSON::encode_json($local_proxy)
       or Firefox::Marionette::Exception->throw(
         "Failed to write to $local_proxy_path:$EXTENDED_OS_ERROR");
-    $local_proxy_handle->close()
+    close $local_proxy_handle
       or Firefox::Marionette::Exception->throw(
         "Failed to close '$local_proxy_path':$EXTENDED_OS_ERROR");
     return;
@@ -6143,11 +6241,11 @@ sub _copy_content_to_profile_directory {
           FileHandle->new( $path,
             Fcntl::O_CREAT() | Fcntl::O_EXCL() | Fcntl::O_WRONLY() )
           or Firefox::Marionette::Exception->throw(
-            "Failed to open $path for writing:$EXTENDED_OS_ERROR");
-        $handle->print($content)
+            "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
+        print {$handle} $content
           or Firefox::Marionette::Exception->throw(
             "Failed to write to $path:$EXTENDED_OS_ERROR");
-        $handle->close()
+        close $handle
           or Firefox::Marionette::Exception->throw(
             "Failed to close '$path':$EXTENDED_OS_ERROR");
         if ( $OSNAME eq 'cygwin' ) {
@@ -6264,7 +6362,7 @@ sub _get_local_command_output {
       or Firefox::Marionette::Exception->throw( "Failed to read from $binary "
           . ( join q[ ], @arguments )
           . ":$EXTENDED_OS_ERROR" );
-         $handle->close()
+    close $handle
       or $parameters->{ignore_exit_status}
       or $parameters->{return_exit_status}
       or Firefox::Marionette::Exception->throw( q[Command ']
@@ -6506,7 +6604,7 @@ sub _put_file_via_scp {
     while ( $result =
         $original_handle->read( my $buffer, _LOCAL_READ_BUFFER_SIZE() ) )
     {
-        $temp_handle->print($buffer)
+        print {$temp_handle} $buffer
           or Firefox::Marionette::Exception->throw(
             "Failed to write to '$local_path':$EXTENDED_OS_ERROR");
     }
@@ -6610,10 +6708,10 @@ sub _search_file_via_ssh {
       )
       or Firefox::Marionette::Exception->throw(
         "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
-    $handle->print($output)
+    print {$handle} $output
       or Firefox::Marionette::Exception->throw(
         "Failed to write to temporary file:$EXTENDED_OS_ERROR");
-    $handle->seek( 0, Fcntl::SEEK_SET() )
+    seek $handle, 0, Fcntl::SEEK_SET()
       or Firefox::Marionette::Exception->throw(
         "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
     return $handle;
@@ -6642,7 +6740,7 @@ sub _get_marionette_port {
                     $port = $1;
                 }
             }
-            $profile_handle->close()
+            close $profile_handle
               or Firefox::Marionette::Exception->throw(
                 "Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
         }
@@ -8229,10 +8327,10 @@ sub pdf {
             "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
         binmode $handle;
         my $content = $self->_response_result_value($response);
-        $handle->print( MIME::Base64::decode_base64($content) )
+        print {$handle} MIME::Base64::decode_base64($content)
           or Firefox::Marionette::Exception->throw(
             "Failed to write to temporary file:$EXTENDED_OS_ERROR");
-        $handle->seek( 0, Fcntl::SEEK_SET() )
+        seek $handle, 0, Fcntl::SEEK_SET()
           or Firefox::Marionette::Exception->throw(
             "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
         return $handle;
@@ -8322,10 +8420,10 @@ sub selfie {
         binmode $handle;
         my $content = $self->_response_result_value($response);
         $content =~ s/^data:image\/png;base64,//smx;
-        $handle->print( MIME::Base64::decode_base64($content) )
+        print {$handle} MIME::Base64::decode_base64($content)
           or Firefox::Marionette::Exception->throw(
             "Failed to write to temporary file:$EXTENDED_OS_ERROR");
-        $handle->seek( 0, Fcntl::SEEK_SET() )
+        seek $handle, 0, Fcntl::SEEK_SET()
           or Firefox::Marionette::Exception->throw(
             "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
         return $handle;
@@ -8995,10 +9093,14 @@ sub quit {
         $self->_terminate_xvfb();
     }
     elsif ( $self->_socket() ) {
-        if ( $self->_session_id() ) {
-            $self->_quit_over_marionette($flags);
-            delete $self->{session_id};
-        }
+        eval {
+            if ( $self->_session_id() ) {
+                $self->_quit_over_marionette($flags);
+                delete $self->{session_id};
+            }
+        } or do {
+            warn "Caught an exception while quitting:$EVAL_ERROR\n";
+        };
         $self->_terminate_process();
     }
     else {
@@ -9043,9 +9145,12 @@ sub _quit_over_marionette {
         $self->_wait_for_firefox_to_exit();
     }
     else {
-        close $socket
-          or Firefox::Marionette::Exception->throw(
-            "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+        if ( !close $socket ) {
+            my $error = $EXTENDED_OS_ERROR;
+            $self->_terminate_xvfb();
+            Firefox::Marionette::Exception->throw(
+                "Failed to close socket to firefox:$error");
+        }
         $socket = undef;
         $self->_wait_for_firefox_to_exit();
     }
@@ -10002,7 +10107,7 @@ sub install {
           File::Spec->splitpath("$xpi_path");
         my $handle = FileHandle->new( $xpi_path, Fcntl::O_RDONLY() )
           or Firefox::Marionette::Exception->throw(
-            "Failed to open $xpi_path for reading:$EXTENDED_OS_ERROR");
+            "Failed to open '$xpi_path' for reading:$EXTENDED_OS_ERROR");
         binmode $handle;
         my $addons_directory = $self->{_addons_directory};
         $actual_path = $self->_remote_catfile( $addons_directory, $name );
@@ -10313,7 +10418,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.37
+Version 1.38
 
 =head1 SYNOPSIS
 
@@ -10549,6 +10654,21 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->bye(sub { $firefox->find_name('metacpan_search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
+=head2 cache_keys
+
+returns the set of all cache keys from L<Firefox::Marionette::Cache|Firefox::Marionette::Cache>.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+    foreach my $key_name ($firefox->cache_keys()) {
+      my $key_value = $firefox->check_cache_key($key_name);
+      if (Firefox::Marionette::Cache->$key_name() != $key_value) {
+        warn "This module this the value of $key_name is " . Firefox::Marionette::Cache->$key_name();
+        warn "Firefox thinks the value of   $key_name is $key_value";
+      }
+    }
+
 =head2 capabilities
 
 returns the L<capabilities|Firefox::Marionette::Capabilities> of the current firefox binary.  You can retrieve L<timeouts|Firefox::Marionette::Timeouts> or a L<proxy|Firefox::Marionette::Proxy> with this method.
@@ -10588,6 +10708,23 @@ returns a list of all known L<certificates in the Firefox database|Firefox::Mari
 
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
+=head2 check_cache_key
+
+accepts a L<cache_key|Firefox::Marionette::Cache> as a parameter.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+    foreach my $key_name ($firefox->cache_keys()) {
+      my $key_value = $firefox->check_cache_key($key_name);
+      if (Firefox::Marionette::Cache->$key_name() != $key_value) {
+        warn "This module this the value of $key_name is " . Firefox::Marionette::Cache->$key_name();
+        warn "Firefox thinks the value of   $key_name is $key_value";
+      }
+    }
+
+This method returns the L<cache_key|Firefox::Marionette::Cache>'s actual value from firefox as a number.  This may differ from the current value of the key from L<Firefox::Marionette::Cache|Firefox::Marionette::Cache> as these values have changed as firefox has evolved.
+
 =head2 child_error
 
 This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
@@ -10616,6 +10753,19 @@ returns identifiers for each open chrome window for tests interested in managing
 =head2 clear
 
 accepts a L<element|Firefox::Marionette::Element> as the first parameter and clears any user supplied input
+
+=head2 clear_cache
+
+accepts a single flag parameter, which can be an ORed set of keys from L<Firefox::Marionette::Cache|Firefox::Marionette::Cache> and clears the appropriate sections of the cache.  If no flags parameter is supplied, the default is L<CLEAR_ALL|Firefox::Marionette::Cache#CLEAR_ALL>.  Note that this method, unlike L<delete_cookies|/delete_cookies> will actually delete all cookies for all hosts, not just the current webpage.
+
+    use Firefox::Marionette();
+    use Firefox::Marionette::Cache qw(:all);
+
+    my $firefox = Firefox::Marionette->new()->go('https://do.lots.of.evil/')->clear_cache(); # default clear all
+
+    $firefox->go('https://cookies.r.us')->clear_cache(CLEAR_COOKIES());
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 clear_pref
 
@@ -10744,7 +10894,7 @@ deletes a single cookie by name.  Accepts a scalar containing the cookie name as
 
 =head2 delete_cookies
 
-here be cookie monsters! This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+Here be cookie monsters! Note that this method will only delete cookies for the current site.  See L<clear_cache|/clear_cache> for an alternative.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods. 
 
 =head2 delete_header
 
@@ -10833,7 +10983,7 @@ accepts an optional regex to filter against the L<usage for the display|Firefox:
         }
     }
 
-=head2 download
+=head2 downloaded
 
 accepts a filesystem path and returns a matching filehandle.  This is trivial for locally running firefox, but sufficiently complex to justify the method for a remote firefox running over ssh.
 
@@ -10852,7 +11002,7 @@ accepts a filesystem path and returns a matching filehandle.  This is trivial fo
 
     foreach my $path ($firefox->downloads()) {
 
-        my $handle = $firefox->download($path);
+        my $handle = $firefox->downloaded($path);
 
         # do something with downloaded file handle
 

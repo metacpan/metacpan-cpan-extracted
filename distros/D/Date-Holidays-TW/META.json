@@ -5,7 +5,7 @@
       "Wei-Hon Chen"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "generated_by" : "App::ModuleBuildTiny version 0.041",
    "license" : [
       "mit"
    ],
@@ -17,12 +17,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.029"
+            "App::ModuleBuildTiny" : "0.041"
          }
       },
       "runtime" : {
@@ -33,6 +33,7 @@
       },
       "test" : {
          "requires" : {
+            "App::Yath" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -40,7 +41,7 @@
    "provides" : {
       "Date::Holidays::TW" : {
          "file" : "lib/Date/Holidays/TW.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       }
    },
    "release_status" : "stable",
@@ -54,8 +55,8 @@
          "web" : "https://github.com/perltaiwan/Date-Holidays-TW"
       }
    },
-   "version" : "v0.4.0",
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "version" : "v0.5.0",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"
 }

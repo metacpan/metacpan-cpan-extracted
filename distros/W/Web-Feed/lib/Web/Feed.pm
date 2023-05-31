@@ -6,7 +6,7 @@ use DateTime::Tiny;
 use Time::Local qw(timegm);
 use POSIX ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
 	my ($class, %data) = @_;

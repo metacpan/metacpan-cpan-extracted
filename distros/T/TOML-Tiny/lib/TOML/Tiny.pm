@@ -1,13 +1,13 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.15';
+$TOML::Tiny::VERSION = '0.16';
 use strict;
 use warnings;
 no warnings qw(experimental);
 use v5.18;
 
-use TOML::Tiny::Parser;
-use TOML::Tiny::Writer;
+use TOML::Tiny::Parser ();
+use TOML::Tiny::Writer ();
 
 use parent 'Exporter';
 
@@ -92,7 +92,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -365,7 +365,7 @@ C<TOML::Tiny> differs in a few significant ways from the L<TOML> module,
 particularly in adding support for newer C<TOML> features and strictness.
 
 L<TOML> defaults to lax parsing and provides C<strict_mode> to (slightly)
-tighten things up. C<TOML::Tiny> defaults to (somehwat) stricter parsing,
+tighten things up. C<TOML::Tiny> defaults to (somewhat) stricter parsing,
 enabling some extra strictures with L</strict>.
 
 C<TOML::Tiny> supports a number of options which do not exist in L<TOML>:
@@ -431,7 +431,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Jeff Ober.
+This software is copyright (c) 2023 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

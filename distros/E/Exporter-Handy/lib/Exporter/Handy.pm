@@ -1,19 +1,38 @@
 package Exporter::Handy;
 
+# ABSTRACT: An EXPERIMENTAL subclass of <Exporter::Extensible>, which helps create easy-to-extend modules that export symbols
+our $VERSION = '1.000004';
+
 use utf8;
 use strict;
 use warnings;
 
-# ABSTRACT: An EXPERIMENTAL subclass of <Exporter::Extensible>, which helps create easy-to-extend modules that export symbols
-our $VERSION = '0.200000';
-
+use Exporter::Handy::Util qw(xtags);
 use Exporter::Extensible -exporter_setup => 1;
 
-sub xtags : Export {
-  require Exporter::Handy::Util;
-  Exporter::Handy::Util::xtags({ sig => ':' }, @_)
+#=== OVERRIDES
+sub exporter_export {
+  my $self = shift;
+  my @args = $self->_exporter_preprocess_export_args(@_);
+  $self->SUPER::exporter_export(@args)
 }
 
+sub _exporter_preprocess_export_args {
+  my $self = shift;
+  my @args;
+  while (@_) {
+    my $arg = shift;
+    if ($arg eq ':') {
+      push @args, xtags( { sig => ':'}, '' => shift )
+    } else {
+      push @args, $arg
+    }
+  }
+  @args
+}
+
+
+# === EXPORT OPTIONS ====
 
 # PRAGMATA
 # Remember: Pragmas effect the current compilation context.
@@ -35,9 +54,8 @@ sub sane : Export(-) {
   warnings->import;
 }
 
-
 # use Exporter::Handy qw(-sane -features), exporter_setup => 1;
-sub features {  # :Export(-?) syntax was not working before version 0.11 of Exporter::Extensible
+sub features {
   my ($exporter, $arg)= @_;
 
   # default features to turn on/off
@@ -86,6 +104,9 @@ sub features {  # :Export(-?) syntax was not working before version 0.11 of Expo
   feature->import(@on) if @on;
   feature->unimport(@off) if @off;
 }
+
+# Note that attribute syntax, i.e. :Export(-?), was not working before version 0.11 of <Exporter::Extensible>.
+# So we take the more verbose approach, as below:
 __PACKAGE__->exporter_register_option('features', \&features, '?');
 
 1;
@@ -105,7 +126,7 @@ Exporter::Handy - An EXPERIMENTAL subclass of <Exporter::Extensible>, which help
 
 =head1 VERSION
 
-version 0.200000
+version 1.000004
 
 =head1 SYNOPSIS
 

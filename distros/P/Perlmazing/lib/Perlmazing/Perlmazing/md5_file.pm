@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(croak slurp);
 use Digest::MD5;
 
 sub main {

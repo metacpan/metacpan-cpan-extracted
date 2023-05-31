@@ -84,7 +84,7 @@ class TestCase::Regex {
     return 1;
   }
   
-  static method replace : int () {
+  static method replace_common : int () {
     # Replace
     {
       my $re = Regex->new("abc");
@@ -101,7 +101,7 @@ class TestCase::Regex {
         return 0;
       }
     }
-
+    
     # Replace offset
     {
       my $re = Regex->new("abc");
@@ -118,7 +118,7 @@ class TestCase::Regex {
         return 0;
       }
     }
-
+    
     # Replace with number
     {
       my $re = Regex->new("a\d+b");
@@ -135,7 +135,7 @@ class TestCase::Regex {
         return 0;
       }
     }
-
+    
     # Replace - Not replaced
     {
       my $re = Regex->new("a\d+b");
@@ -152,10 +152,59 @@ class TestCase::Regex {
         return 0;
       }
     }
-
+    
     return 1;
   }
-
+  
+  static method replace : int () {
+    # Replace
+    {
+      my $re = Regex->new("abc");
+      my $target = "ppzabcz";
+      my $result = $re->replace($target, "ABC");
+      
+      unless ($result eq "ppzABCz") {
+        return 0;
+      }
+    }
+    
+    # Replace offset
+    {
+      my $re = Regex->new("abc");
+      my $target = "ppzabczabczabcz";
+      my $offset = 6;
+      my $result = $re->replace($target, "ABC", $offset);
+      
+      unless ($result eq "ppzabczABCzabcz") {
+        return 0;
+      }
+    }
+    
+    # Replace - capture
+    {
+      my $re = Regex->new("^(\d+)a(\d+)$");
+      my $target = "123a456";
+      my $offset = 0;
+      my $length = -1;
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      my $result = $re->replace($target, "", $offset, $length, {info => $replace_info_ref});
+      
+      unless ($replace_info_ref->[0]->match->cap1 eq "123") {
+        return 0;
+      }
+      
+      unless ($replace_info_ref->[0]->match->cap2 eq "456") {
+        return 0;
+      }
+      
+      unless ($result eq "") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
   static method replace_cb : int () {
     # Replace callback with capture
     {

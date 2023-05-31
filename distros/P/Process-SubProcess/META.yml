@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/bodo-hugo-barwich/Process/issues
   repository: https://github.com/bodo-hugo-barwich/Process.git
-version: v2.0.1
+version: v2.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

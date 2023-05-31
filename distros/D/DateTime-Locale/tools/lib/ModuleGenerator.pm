@@ -188,6 +188,8 @@ sub _write_data_pm ($self) {
         $self->_locales->[0]->version, 1, \$data_pm
     );
 
+    $self->_insert_all_codes( \$data_pm );
+
     $self->_insert_var_in_code( 'Codes',       \%codes,        1, \$data_pm );
     $self->_insert_var_in_code( 'Names',       \%names,        1, \$data_pm );
     $self->_insert_var_in_code( 'NativeNames', \%native_names, 1, \$data_pm );
@@ -207,6 +209,56 @@ sub _write_data_pm ($self) {
     $data_pm_file->spew_utf8($data_pm);
 
     return %raw_locales;
+}
+
+sub _insert_all_codes ( $self, $data_pm ) {
+
+    # AFACIT, the only way to get all the codes is to get them from a names
+    # file like this. I think "en" is pretty much guaranteed to always have a
+    # full list of the codes.
+    my $en_languages = decode_json(
+        $self->_cldr_root->child(
+            qw( cldr-localenames-full main en languages.json  ))->slurp_raw
+    );
+    $self->_insert_var_in_code(
+        'LanguageCodes',
+        $en_languages->{main}{en}{localeDisplayNames}{languages},
+        1,
+        $data_pm,
+    );
+
+    my $en_territories = decode_json(
+        $self->_cldr_root->child(
+            qw( cldr-localenames-full main en territories.json  ))->slurp_raw
+    );
+    $self->_insert_var_in_code(
+        'TerritoryCodes',
+        $en_territories->{main}{en}{localeDisplayNames}{territories},
+        1,
+        $data_pm,
+    );
+
+    my $en_scripts = decode_json(
+        $self->_cldr_root->child(
+            qw( cldr-localenames-full main en scripts.json  ))->slurp_raw
+    );
+    $self->_insert_var_in_code(
+        'ScriptCodes',
+        $en_scripts->{main}{en}{localeDisplayNames}{scripts},
+        1,
+        $data_pm,
+    );
+
+    my $en_variants = decode_json(
+        $self->_cldr_root->child(
+            qw( cldr-localenames-full main en variants.json  ))->slurp_raw
+    );
+    $self->_insert_var_in_code(
+        'VariantCodes',
+        $en_variants->{main}{en}{localeDisplayNames}{variants},
+        1,
+        $data_pm,
+    );
 }
 
 sub _iso_639_aliases ($self) {

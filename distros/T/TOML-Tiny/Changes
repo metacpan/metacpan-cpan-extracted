@@ -1,3 +1,9 @@
+0.16 2023-05-31
+- Remove when (GH#25) (Olaf Alders)
+- Test strict mode in to_toml_array() (GH#26) (Olaf Alders)
+- Replace @Author::BLUEFEET with equivalent config (GH#23) (Olaf Alders)
+- Make some imports explicit (GH#19) (Olaf Alders)
+
 0.15 2021-08-13
 - bugfix: strings with "inf" or "nan" in them no longer treated as special
   floats

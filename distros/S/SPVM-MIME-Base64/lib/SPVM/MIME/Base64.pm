@@ -1,6 +1,6 @@
 package SPVM::MIME::Base64;
 
-our $VERSION = "1.001001";
+our $VERSION = "1.001002";
 
 1;
 
@@ -23,7 +23,7 @@ The MIME::Base64 class of L<SPVM> has methods for L<Base64|https://en.wikipedia.
 
 =head2 encode_base64
 
-  static method encode_base64 : string ($string : string, $eol = undef : string);
+  static method encode_base64 : string ($string : string, $eol : string = undef);
 
 Encodes the string $string to a Base64 string, and returns it.
 
@@ -55,7 +55,7 @@ The $string must be defined. Otherwise an exception is thrown.
 
 =head2 encoded_base64_length
 
-  static method encoded_base64_length : int ($string : string, $eol = undef : string);
+  static method encoded_base64_length : int ($string : string, $eol : string = undef);
 
 Returns the length that the encoded string would have without actually
 encoding it.

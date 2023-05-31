@@ -8,6 +8,7 @@ bin/diff_spreadsheets
 dist.ini
 lib/App/diff_spreadsheets.pm
 t/00_prelim.t
+t/10_csvonly.t
 t/20_diff.t
 t/30_git.t
 t/60_native.t
@@ -16,10 +17,13 @@ t/author-pod-syntax.t
 t/t_Common.pm
 t/t_TestCommon.pm
 t/t_dsUtils.pm
+tlib/Addrlist.csv
 tlib/Addrlist.xlsx
+tlib/Addrlist_mod1.csv
 tlib/Addrlist_mod1.xlsx
 tlib/Multisheet.xlsx
 tlib/Multisheet2.xlsx
+tlib/Multisheet_AddrListSheet.csv
 tlib/presidents.csv
 tlib/presidents.xlsx
 tlib/presidents_AltSheetName.xlsx

@@ -8,9 +8,9 @@ use App::OrgUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-04-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our %SPEC;
 
@@ -21,6 +21,7 @@ $SPEC{list_org_todo_states} = {
         %App::OrgUtils::common_args1,
         detail => {
             schema => 'bool',
+            cmdline_aliases => {l=>{}},
         },
         done => {
             summary => 'Only show done states',
@@ -87,7 +88,7 @@ list-org-todo-states - List all todo states in all Org files
 
 =head1 VERSION
 
-This document describes version 0.484 of list-org-todo-states (from Perl distribution App-OrgUtils), released on 2023-01-19.
+This document describes version 0.485 of list-org-todo-states (from Perl distribution App-OrgUtils), released on 2023-04-06.
 
 =head1 SYNOPSIS
 
@@ -99,7 +100,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--detail>
+=item B<--detail>, B<-l>
 
 (No description)
 

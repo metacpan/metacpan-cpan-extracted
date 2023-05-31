@@ -1,0 +1,52 @@
+{
+   "abstract" : "CGI class for handling browser file uploads",
+   "author" : [
+      "Rob Casey <rob.casey@bluebottle.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4232",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CGI-Upload",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "2.47",
+            "Carp" : "0",
+            "File::MMagic" : "1.16",
+            "HTTP::BrowserDetect" : "0.97",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Upload" : {
+         "file" : "lib/CGI/Upload.pm",
+         "version" : "1.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/CGI-Upload/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/szabgab/CGI-Upload/"
+      }
+   },
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

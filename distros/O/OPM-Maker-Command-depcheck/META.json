@@ -48,7 +48,7 @@
    "provides" : {
       "OPM::Maker::Command::depcheck" : {
          "file" : "lib/OPM/Maker/Command/depcheck.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlservices/OPM-Maker-Command-depcheck"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

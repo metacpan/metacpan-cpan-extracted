@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.880';
+our $VERSION = '1.881';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -1114,17 +1114,16 @@ sub _loop {
       # The normal loop hangs on Windows when processes/threads start/exit.
       # Using ioctl() properly, https://www.perlmonks.org/?node_id=780083
 
-      my $_val_bytes = "\x00\x00\x00\x00";
-      my $_ptr_bytes = unpack( 'I', pack('P', $_val_bytes) );
+      my $_val_bytes = pack('L', 0);
       my ($_count, $_nbytes, $_start);
 
       while (!$_done) {
          $_start = time, $_count = 1;
 
          # MSWin32 FIONREAD
-         IOCTL: ioctl($_DAT_R_SOCK, 0x4004667f, $_ptr_bytes);
+         IOCTL: ioctl($_DAT_R_SOCK, 0x4004667f, $_val_bytes);
 
-         unless ($_nbytes = unpack('I', $_val_bytes)) {
+         unless ($_nbytes = unpack('L', $_val_bytes)) {
             if ($_count) {
                 # delay after a while to not consume a CPU core
                 $_count = 0 if ++$_count % 50 == 0 && time - $_start > 0.030;
@@ -1934,7 +1933,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.880
+This document describes MCE::Shared::Server version 1.881
 
 =head1 DESCRIPTION
 

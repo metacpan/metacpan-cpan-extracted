@@ -1,4 +1,10 @@
 Revision history for Perl module OpenAIGPT4
+0.13 2023-05-28
+    - Edited Makefile.PL.
+
+0.12 2023-05-28
+    - Add how to use gpt-4 in POD.
+
 0.11 2023-05-22
     - Edited POD.
 

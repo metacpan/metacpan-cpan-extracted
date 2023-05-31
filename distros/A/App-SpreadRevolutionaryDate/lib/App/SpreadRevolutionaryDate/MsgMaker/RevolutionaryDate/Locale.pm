@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.32';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.33';
 # ABSTRACT: Role providing interface for localization of revolutionary date built by L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>.
 
 use Moose::Role;
@@ -116,7 +116,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale - Role providi
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 DESCRIPTION
 
@@ -281,7 +281,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

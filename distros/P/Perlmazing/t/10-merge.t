@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 9;
-use Perlmazing;
+use Perlmazing qw(merge);
 
 my %hash = (
 	name        => 'Francisco',

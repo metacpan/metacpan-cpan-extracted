@@ -20,7 +20,7 @@ WriteMakefile(
     VERSION_FROM 	=> 'lib/CPU/Z80/Assembler.pm',
     ABSTRACT_FROM   => 'lib/CPU/Z80/Assembler.pm',
     DISTNAME        => 'CPU-Z80-Assembler',
-    depend 			=> { Makefile => '$(VERSION_FROM)' },
+    PL_FILES            => {},
     PREREQ_PM 		=> {
 		'Asm::Preproc'					=> 1.00,	# no Asm::Preproc::Stream
 		'Asm::Z80::Table'				=> 0.02,
@@ -55,10 +55,10 @@ WriteMakefile(
                     url  => 'https://github.com/pauloscustodio/perl-CPU-Z80-Assembler.git',
                     web  => 'https://github.com/pauloscustodio/perl-CPU-Z80-Assembler',
                 },
+				bugtracker => {
+					web => 'https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues',
+				},
 			},
-			bugtracker => {
-				web => 'https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues',
-            },
           })
     ),
     clean               => { FILES => 'CPU-Z80-Assembler-*' },

@@ -4,13 +4,11 @@ use strict;
 use warnings;
 use utf8;
 
-use PDF::API2;
-
 use lib "../lib";
+use PDF::API2;
 use Text::Layout;
 use Text::Layout::FontConfig;
-eval { require HarfBuzz::Shaper }
-  or warn("HarfBuzz::Shaper not found. Expect incorrect results!\n");
+use HarfBuzz::Shaper 0.026;
 
 # Create document and graphics environment.
 my $pdf = PDF::API2->new();
@@ -112,7 +110,7 @@ sub main {
       "\N{DEVANAGARI LETTER NGA}".
       "\N{DEVANAGARI SIGN VIRAMA}".
       "\N{DEVANAGARI LETTER GA}".
-      qq{ <span font="sans 20"> this should look like THIS};
+      qq{ <span font="sans 20"> this should look like THIS</span>};
     $layout->set_markup($phrase);
     showlayout( $x, $y );
 
@@ -129,20 +127,17 @@ sub showlayout {
 }
 
 sub setup_fonts {
+    $^O =~ /mswin/i ? setup_fonts_windows() : setup_fonts_linux();
+}
+
+sub setup_fonts_linux {
     # Register all corefonts. Useful for fallback.
     # Not required, skip if you have your own fonts.
     my $fd = Text::Layout::FontConfig->new;
     # $fd->register_corefonts;
 
     # Add font dir and register fonts.
-    $fd->add_fontdirs( $ENV{HOME}."/.fonts", "/usr/share/fonts/" );
-    $fd->register_font( "ITCGaramond-Light.ttf",       "Garamond"               );
-    $fd->register_font( "ITCGaramond-Bold.ttf",        "Garamond", "Bold"       );
-    $fd->register_font( "ITCGaramond-LightItalic.ttf", "Garamond", "Italic"     );
-    $fd->register_font( "ITCGaramond-BoldItalic.ttf",  "Garamond", "BoldItalic" );
-
-    # Make Serif alias for Garamond.
-    $fd->register_aliases( "Garamond", "Serif" );
+    $fd->add_fontdirs( ".", $ENV{HOME}."/.fonts", "/usr/share/fonts/" );
 
     # Add a Sans family.
     $fd->register_font( "DejaVuSans.ttf",             "Sans"               );
@@ -152,16 +147,35 @@ sub setup_fonts {
 
     # Add Devanagari. Requires shaping.
     # Note that Nepali is a LTR language.
-    $fd->register_font( "lohit-devanagari/Lohit-Devanagari.ttf",
+    $fd->register_font( "Lohit-Devanagari.ttf",
 			"Deva", "", "",
 			{ shaping => 1,
 			  language => 'nepali'
 			} );
 
-    my $o = { interline => 1 };
-    $fd->register_font( "Helvetica", "Sanss", "", "", $o );
-    $fd->register_font( "HelveticaOblique", "Sanss", "Italic", "", $o );
-    $fd->register_font( "HelveticaBold", "Sanss", "Bold", "", $o );
+}
+
+sub setup_fonts_windows {
+    # Register all corefonts. Useful for fallback.
+    # Not required, skip if you have your own fonts.
+    my $fd = Text::Layout::FontConfig->new;
+    # $fd->register_corefonts;
+
+    # Add font dir and register fonts.
+    $fd->add_fontdirs( ".", "C:\\Windows\\Fonts" );
+    $fd->register_font( "arial.ttf",   "sans", "" );
+    $fd->register_font( "arialbd.ttf",  "sans", "bold" );
+    $fd->register_font( "ariali.ttf",  "sans", "italic" );
+    $fd->register_font( "arialbi.ttf", "sans", "bolditalic" );
+
+    # Add Devanagari. Requires shaping.
+    # Note that Nepali is a LTR language.
+    $fd->register_font( "Lohit-Devanagari.ttf",
+			"Deva", "", "",
+			{ shaping => 1,
+			  language => 'nepali'
+			} );
+
 }
 
 ################ Main entry point ################

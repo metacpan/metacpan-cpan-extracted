@@ -1,5 +1,11 @@
 Revision history for Perl extension Array::Unique.
 
+0.09 2023.05.29
+    - Move to GitHub
+    - Add GitHub Actions
+    - Add links to GitHub
+    - Add version number to each module
+
 0.08 2008 June 4
 
     Mostly CPANTS gaming

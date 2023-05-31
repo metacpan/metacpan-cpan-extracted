@@ -3,14 +3,16 @@ abstract: 'An EXPERIMENTAL subclass of <Exporter::Extensible>, which helps creat
 author:
   - 'Tabulo[n] <dev@tabulo.net>'
 build_requires:
+  Data::Printer: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  List::Util: '0'
   Scalar::Util: '0'
   Test::More: '0'
-  perl: v5.14.0
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.14.0
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -36,16 +38,15 @@ no_index:
 provides:
   Exporter::Handy:
     file: lib/Exporter/Handy.pm
-    version: '0.200000'
+    version: '1.000004'
   Exporter::Handy::Util:
     file: lib/Exporter/Handy/Util.pm
-    version: '0.200000'
+    version: '1.000004'
 requires:
-  Data::Printer: '0'
   Exporter::Extensible: '0'
-  List::Util: '0'
+  List::Util::MaybeXS: '0'
   feature: '0'
-  perl: v5.14.0
+  perl: '5.010'
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -53,7 +54,7 @@ resources:
   bugtracker: https://github.com/tabulon-perl/p5-Exporter-Handy/issues
   homepage: https://github.com/tabulon-perl/p5-Exporter-Handy
   repository: https://github.com/tabulon-perl/p5-Exporter-Handy.git
-version: '0.200000'
+version: '1.000004'
 x_authority: cpan:TABULO
 x_contributors:
   - 'Tabulo <dev-git.perl@tabulo.net>'

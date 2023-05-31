@@ -36,6 +36,7 @@ sub name_list {
 
 sub parse {
     my $content = shift;
+    my $end = shift;
     
     # get all sql by name
     my (@data) = $content =~ /--\s*(?:#|\[|\()\s*([\w-]+)\s*(?:|]|\))\n([^;]+;)/g;
@@ -55,6 +56,12 @@ sub parse {
             push(@data, 'default');
             push(@data, trim($content));
         }        
+    }
+    
+    if (defined $end) {
+        for my $sql (@data) {
+            $sql =~ s/;$/${end}/s;
+        }
     }
     
     return wantarray ? @data : \@data;    

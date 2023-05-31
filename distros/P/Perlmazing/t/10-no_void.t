@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 4;
-use Perlmazing;
+use Perlmazing qw(no_void);
 
 my $r = testing();
 is $r, 1, 'scalar';

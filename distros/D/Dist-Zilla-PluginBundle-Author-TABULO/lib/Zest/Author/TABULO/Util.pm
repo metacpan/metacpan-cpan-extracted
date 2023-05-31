@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util;
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 
 #region: #== UTILITY FUNCTIONS (EXPORT_OK) ==
@@ -23,7 +23,7 @@ Zest::Author::TABULO::Util - Utility functions used by TABULO's authoring dist
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =head1 AUTHORS
 

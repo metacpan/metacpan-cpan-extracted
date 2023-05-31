@@ -212,27 +212,27 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::TABULO" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/TABULO.pm",
-         "version" : "1.000013"
+         "version" : "1.000014"
       },
       "Dist::Zilla::PluginBundle::Author::TABULO" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/TABULO.pm",
-         "version" : "1.000013"
+         "version" : "1.000014"
       },
       "Pod::Weaver::PluginBundle::Author::TABULO" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/TABULO.pm",
-         "version" : "1.000013"
+         "version" : "1.000014"
       },
       "Pod::Wordlist::Author::TABULO" : {
          "file" : "lib/Pod/Wordlist/Author/TABULO.pm",
-         "version" : "1.000013"
+         "version" : "1.000014"
       },
       "Zest::Author::TABULO::Util::List" : {
          "file" : "lib/Zest/Author/TABULO/Util/List.pm",
-         "version" : "1.000013"
+         "version" : "1.000014"
       },
       "Zest::Author::TABULO::Util::Mayhap" : {
          "file" : "lib/Zest/Author/TABULO/Util/Mayhap.pm",
-         "version" : "1.000013"
+         "version" : "1.000014"
       }
    },
    "release_status" : "stable",
@@ -247,7 +247,7 @@
          "web" : "https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO"
       }
    },
-   "version" : "1.000013",
+   "version" : "1.000014",
    "x_authority" : "cpan:TABULO",
    "x_contributors" : [
       "Tabulo <dev-git.perl@tabulo.net>"

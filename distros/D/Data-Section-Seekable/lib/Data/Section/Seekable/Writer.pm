@@ -9,9 +9,9 @@ use overload
     ;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2023-03-24'; # DATE
 our $DIST = 'Data-Section-Seekable'; # DIST
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 sub new {
     my $class = shift;
@@ -91,7 +91,7 @@ Data::Section::Seekable::Writer - Generate data section with multiple parts
 
 =head1 VERSION
 
-This document describes version 0.091 of Data::Section::Seekable::Writer (from Perl distribution Data-Section-Seekable), released on 2023-01-20.
+This document describes version 0.092 of Data::Section::Seekable::Writer (from Perl distribution Data-Section-Seekable), released on 2023-03-24.
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ In your script:
  my $writer = Data::Section::Seekable::Writer->new;
 
  $writer->add_part(part1 => "This is part1\n");
- $writer->add_part(part2 => This is part\ntwo\n", "very,important");
+ $writer->add_part(part2 => "This is part\ntwo\n", "very,important");
  print "__DATA__\n", $writer;
 
 will print:
@@ -113,6 +113,24 @@ will print:
  part2,14,17,very,important
 
  This is part1
+ This is part
+ two
+
+If we add a header before printing:
+
+ $writer->header(sub { my ($writer, $name, $content, $extra) = @_; "### $name ###\n"});
+ print "__DATA__\n", $writer;
+
+then the output will be:
+
+ __DATA__
+ Data::Section::Seekable v1
+ part1,14,14
+ part2,42,17,very,important
+
+ ### part1 ###
+ This is part1
+ ### part2 ###
  This is part
  two
 

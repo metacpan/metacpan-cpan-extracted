@@ -35,5 +35,7 @@ tests/tl_p_03.pl
 tests/strikes.pl
 tests/underline.pl
 tests/md1.pl
+tests/Lohit-Devanagari.ttf
+tests/fontbb.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

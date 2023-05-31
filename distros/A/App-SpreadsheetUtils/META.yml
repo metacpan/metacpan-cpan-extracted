@@ -19,7 +19,7 @@ name: App-SpreadsheetUtils
 provides:
   App::SpreadsheetUtils:
     file: lib/App/SpreadsheetUtils.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Complete::Util: '0.616'
   Exporter: '5.57'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SpreadsheetUtils
   homepage: https://metacpan.org/release/App-SpreadsheetUtils
   repository: git://github.com/perlancar/perl-App-SpreadsheetUtils.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -43,7 +43,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.02'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -213,7 +213,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -325,7 +325,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

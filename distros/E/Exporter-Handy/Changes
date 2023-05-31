@@ -1,5 +1,47 @@
 Revision history for Exporter-Handy
 
+1.000004                2023-05-29 07:41:48+00:00 UTC TABULO
+
+   [MINOR]
+    - exporter_export() now accepts an alternate notation for defining tags
+        export(
+            ...,
+            ':' => { tag1 => [qw(bla blo)], tag2 => [qw(bar baz)] },
+            ...
+        )
+
+    - expand_tags() now accepts a shorthand for expanding ALL tags.
+        expand_tags(\%EXPORT_TAGS, \'*')
+
+1.000003                2023-05-28 21:33:04+00:00 UTC TABULO
+
+   [MINOR]
+
+    - Avoid exporting xtags() and friends directly from <Exporter::Handy> (which was previously the case, though undocumented)
+
+    [REVISION]
+
+    - Code and POD clean-up.
+
+1.000002                2023-05-28 02:28:03+00:00 UTC TABULO
+s
+    [REVISION]
+    - Avoid ambiguity between curried and raw versions of xtags() and expand_xtags()
+
+1.000001                2023-05-28 02:20:11+00:00 UTC TABULO
+
+    - Allow import options for xtags() and expand_xtags() when exported from Exporter::Handy
+
+1.000000                2023-05-28 01:31:39+00:00 UTC TABULO
+
+    [MAJOR]
+    - Bump version to 1.0 (because of a previous typo that gave way to "0.200.1" which is kind of odd)
+
+0.200001                2023-05-28 01:27:39+00:00 UTC TABULO
+
+    [REVISION]
+    - Replace <List::Util> with <List::Util::MaybeXS>,  which allows atomatic fallback to latest pure perl versions of some functions on older versions of Perl
+
 0.200000                2023-05-25 21:53:21+00:00 UTC TABULO
 
     [MAJOR]

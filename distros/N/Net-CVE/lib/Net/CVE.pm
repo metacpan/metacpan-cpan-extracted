@@ -5,7 +5,7 @@ package Net::CVE;
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.003"; # 20230524
+our $VERSION = "0.004"; # 20230524
 
 use Carp;
 use HTTP::Tiny;
@@ -69,7 +69,7 @@ sub get {
 	    # the content field will contain the text of the error
 	    my $status = $r->{status};
 	    my $reason = join ": " => grep { length }
-		$r->{reason}, $status eq "599" ? $r->{content} : "";
+		$r->{reason}, $status =~ m/^5[0-9][0-9]$/ ? $r->{content} : "";
 	    $self->{diag} = {
 		status => $status,
 		reason => $reason,

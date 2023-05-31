@@ -8,6 +8,9 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use File::Temp;
 
+use SPVM 'Fn';
+use SPVM::File::Path;
+
 use SPVM 'File::Path';
 use SPVM 'Int';
 
@@ -211,5 +214,11 @@ my $api = SPVM::api();
     is($removed_count, 6);
   }
 }
+
+# Version
+{
+  is($SPVM::File::Path::VERSION, SPVM::Fn->get_version_string('File::Path'));
+}
+
 
 done_testing;

@@ -4,7 +4,7 @@
       "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -56,15 +56,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/hadjiprocopis/data-roundtrip/issues"
+         "web" : "https://github.com/hadjiprocopis/app-appupdater/issues"
       },
-      "homepage" : "https://metacpan.org/module/Data::Roundtrip",
+      "homepage" : "https://metacpan.org/module/App::Appupdater",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/hadjiprocopis/data-roundtrip",
-         "web" : "https://github.com/hadjiprocopis/data-roundtrip"
+         "url" : "https://github.com/hadjiprocopis/app-appupdater",
+         "web" : "https://github.com/hadjiprocopis/app-appupdater"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.32';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.33';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
@@ -56,13 +56,13 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 DESCRIPTION
 
 This role defines the interface for any target which L<App::SpreadRevolutionaryDate> should spread the revolutionary date to.
 
-Any consuming class can parameterize this role (through L<MooseX::Role::Parameterized>) with a C<worker> type set to the effective Perl module implementing any protocol needed by this target (eg. L<Net::Twitter::Lite::WithAPIv1_1>, L<Mastodon::Client>). Then, this role provides an C<obj> required attribute with type constraint defined by the C<worker> parameter. If no C<worker> parameter is given, the C<obj> type defaults to C<Any>. Constructors of consuming classes should instanciate C<obj> (with L<Moose> C<BUILDARGS> or C<BUILD>, see L<Moose::Manual::Construction>).
+Any consuming class can parameterize this role (through L<MooseX::Role::Parameterized>) with a C<worker> type set to the effective Perl module implementing any protocol needed by this target (eg. L<Twitter::API>, L<Mastodon::Client>). Then, this role provides an C<obj> required attribute with type constraint defined by the C<worker> parameter. If no C<worker> parameter is given, the C<obj> type defaults to C<Any>. Constructors of consuming classes should instanciate C<obj> (with L<Moose> C<BUILDARGS> or C<BUILD>, see L<Moose::Manual::Construction>).
 
 Any class consuming this role is required to implement a C<spread> method, which is called with two parameters: C<msg>, the message as a string to be spread, and C<test>, an optional boolean which informs this method to actually spread the message if this parameter is C<false> (that should be the default), or to just test without spreading.
 
@@ -116,7 +116,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

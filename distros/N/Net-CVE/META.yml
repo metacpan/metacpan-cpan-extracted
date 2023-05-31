@@ -16,14 +16,16 @@ name: Net-CVE
 provides: 
   Net::CVE: 
     file: lib/Net/CVE.pm
-    version: '0.003'
+    version: '0.004'
 recommends: 
   Data::Peek: '0.52'
   HTTP::Tiny: '0.082'
+  IO::Socket::SSL: '2.083'
   Test::More: '1.302195'
 requires: 
   Carp: 0
   HTTP::Tiny: '0.009'
+  IO::Socket::SSL: '1.42'
   JSON::MaybeXS: '1.004005'
   List::Util: 0
   Test::More: '0.90'
@@ -34,4 +36,4 @@ resources:
   bugtracker: https://github.com/Tux/Net-CVE/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Net-CVE
-version: '0.003'
+version: '0.004'

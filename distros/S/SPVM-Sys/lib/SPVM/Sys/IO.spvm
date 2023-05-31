@@ -30,11 +30,11 @@ class Sys::IO {
   static method stdout : Sys::IO::FileStream () { return $STDOUT; }
   static method stderr : Sys::IO::FileStream () { return $STDERR; }
   
-  native static method open : int ($path : string, $flags : int, $mode = 0 : int);
+  native static method open : int ($path : string, $flags : int, $mode : int = 0);
   
-  native static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset = 0 : int);
+  native static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset : int = 0);
   
-  native static method write : int ($fd : int, $buf : string, $count : int, $buf_offset = 0 : int);
+  native static method write : int ($fd : int, $buf : string, $count : int, $buf_offset : int = 0);
 
   native static method lseek : long ($fd : int, $offset : long, $whence : int);
   
@@ -46,7 +46,7 @@ class Sys::IO {
   
   native static method fileno : int ($stream : Sys::IO::FileStream);
   
-  native static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset = 0 : int);
+  native static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset : int = 0);
   
   native static method feof : int ($stream : Sys::IO::FileStream);
   
@@ -56,9 +56,9 @@ class Sys::IO {
   
   native static method getc : int ($stream : Sys::IO::FileStream);
   
-  native static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream, $s_offset = 0 : int);
+  native static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream, $s_offset : int = 0);
   
-  native static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset = 0 : int);
+  native static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset : int = 0);
   
   native static method fseek : int ($stream : Sys::IO::FileStream, $offset : long, $whence : int);
   
@@ -142,7 +142,7 @@ class Sys::IO {
     return $status;
   }
   
-  native static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object);
+  native static method fcntl : int ($fd : int, $command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef);
 
   native static method readline : mutable string ($stream : Sys::IO::FileStream);
   

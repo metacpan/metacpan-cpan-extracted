@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -25,7 +25,7 @@ Dist::Zilla::MintingProfile::Author::TABULO - A minimal Dist::Zilla minting prof
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =head1 FOREWORD
 

@@ -2,7 +2,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -33,7 +33,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 DESCRIPTION
 
@@ -403,7 +403,7 @@ Such a target class is actually just a wrapper. Usually a target has to use an e
 
 To perform authentication and to post a message, there is a strong likelihood that the new target requires specific parameters (e.g.: tokens, keys, account name, password, channels, etc.). These parameters should be defined as required attributes of the target class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the target in lower case (C<[mytarget]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the target in lower case, followed by an underscore (C<--mytarget_myparam>).
 
-Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Net::Twitter::Lite::WithAPIv1_1> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. Both are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third and fourth default targets, C<App::SpreadRevolutionaryDate::Target::Freenode> <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
+Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. Both are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third and fourth default targets, C<App::SpreadRevolutionaryDate::Target::Freenode> <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
 
 =head1 EXTENDING TO NEW MESSAGE MAKERS
 
@@ -495,7 +495,7 @@ Because of the trick on prefix and suffix for feasts and the needed mapping for 
 
 =item L<AppConfig>
 
-=item L<Net::Twitter::Lite::WithAPIv1_1>
+=item L<Twitter::API>
 
 =item L<Mastodon::Client>
 
@@ -509,7 +509,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

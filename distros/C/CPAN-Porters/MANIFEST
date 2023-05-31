@@ -1,11 +1,10 @@
-Build.PL
-MANIFEST			This list of files
-t/pod.t
-t/pod-coverage.t
-t/use.t
-
+CHANGES
 lib/CPAN/Porters.pm
 Makefile.PL
-README
-META.yml
-CHANGES
+MANIFEST			This list of files
+README.md
+t/pod-coverage.t
+t/pod.t
+t/use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

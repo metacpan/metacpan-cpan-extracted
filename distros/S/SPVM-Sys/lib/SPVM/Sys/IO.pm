@@ -18,7 +18,7 @@ C<Sys::IO> is the class for the file IO.
 
 =head2 open
 
-  static method open : int ($path : string, $flags : int, $mode = 0 : int);
+  static method open : int ($path : string, $flags : int, $mode : int = 0);
 
 Given a pathname for a file, open() returns a file descriptor, a small, nonnegative integer for use in subsequent system calls (read(2), write(2), lseek(2), fcntl(2), etc.). The file descriptor returned by a successful call will be the lowest-numbered file descriptor not currently open for the process.
 
@@ -28,7 +28,7 @@ See L<Sys::IO::Constant|SPVM::Sys::IO::Constant> about the constant value for th
 
 =head2 read
 
-  static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset = 0 : int);
+  static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset : int = 0);
 
 read() attempts to read up to count bytes from file descriptor fd into the buf starting at buf + buf_offset.
 
@@ -36,7 +36,7 @@ See the L<read|https://linux.die.net/man/2/read> function in Linux.
 
 =head2 write
 
-  static method write : int ($fd : int, $buf : string, $count : int, $buf_offset = 0 : int);
+  static method write : int ($fd : int, $buf : string, $count : int, $buf_offset : int = 0);
 
 write() writes up to count bytes from the buf pointed buf + buf_offset to the file referred to by the file descriptor fd.
 
@@ -92,7 +92,7 @@ The file stream is a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object.
 
 =head2 fread
 
-  static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset = 0 : int);
+  static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset : int = 0);
 
 The function fread() reads nmemb elements of data, each size bytes long, from the stream pointed to by stream, storing them at the location given by ptr + ptr_offset.
 
@@ -140,7 +140,7 @@ The file stream is a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object.
 
 =head2 fgets
 
-  static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream, $s_offset = 0 : int);
+  static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream, $s_offset : int = 0);
 
 fgets() reads in at most one less than size characters from stream and stores them into the buf pointed to by s + s_offset. Reading stops after an EOF or a newline. If a newline is read, it is stored into the buf. A terminating null byte (aq\0aq) is stored after the last character in the buf.
 
@@ -148,7 +148,7 @@ See the L<fgets|https://linux.die.net/man/3/fgets> function in Linux.
 
 =head2 fwrite
 
-  static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset = 0 : int);
+  static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset : int = 0);
 
 The function fwrite() writes nmemb elements of data, each size bytes long, to the stream pointed to by stream, obtaining them from the location given by ptr + ptr_offset.
 
@@ -489,7 +489,7 @@ The stat is L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
 
 =head2 fcntl
 
-  static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object);
+  static method fcntl : int ($fd : int, $command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef);
 
 fcntl() performs one of the operations described below on the open file descriptor fd. The operation is determined by cmd.
 

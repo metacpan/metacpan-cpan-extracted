@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(isa_array list_context scalar_context);
 
 sub main (\@) {
 	my $arr = shift;

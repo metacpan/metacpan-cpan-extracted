@@ -118,6 +118,7 @@ typedef PerlIO          * InputStream;
 #define GDIMAGECREATEFROMJPEG(x) gdImageCreateFromJpeg((FILE*)x)
 #define GDIMAGECREATEFROMGIF(x)  gdImageCreateFromGif((FILE*)x)
 #define GDIMAGECREATEFROMWBMP(x) gdImageCreateFromWBMP((FILE*)x)
+#define GDIMAGECREATEFROMBMP(x)  gdImageCreateFromBmp((FILE*)x)
 #define GDIMAGECREATEFROMTIFF(x) gdImageCreateFromTiff((FILE*)x)
 #define GDIMAGECREATEFROMGD(x)   gdImageCreateFromGd((FILE*)x)
 #define GDIMAGECREATEFROMGD2(x)  gdImageCreateFromGd2((FILE*)x)
@@ -133,6 +134,7 @@ typedef PerlIO          * InputStream;
 #define GDIMAGECREATEFROMJPEG(x) gdImageCreateFromJpeg(PerlIO_findFILE(x))
 #define GDIMAGECREATEFROMGIF(x)  gdImageCreateFromGif(PerlIO_findFILE(x))
 #define GDIMAGECREATEFROMWBMP(x) gdImageCreateFromWBMP(PerlIO_findFILE(x))
+#define GDIMAGECREATEFROMBMP(x)  gdImageCreateFromBmp(PerlIO_findFILE(x))
 #define GDIMAGECREATEFROMTIFF(x) gdImageCreateFromTiff(PerlIO_findFILE(x))
 #define GDIMAGECREATEFROMGD(x) gdImageCreateFromGd(PerlIO_findFILE(x))
 #define GDIMAGECREATEFROMGD2(x) gdImageCreateFromGd2(PerlIO_findFILE(x))
@@ -146,6 +148,7 @@ typedef PerlIO          * InputStream;
 #define GDIMAGECREATEFROMJPEG(x) gdImageCreateFromJpeg(x)
 #define GDIMAGECREATEFROMGIF(x) gdImageCreateFromGif(x)
 #define GDIMAGECREATEFROMWBMP(x) gdImageCreateFromWBMP(x)
+#define GDIMAGECREATEFROMBMP(x)  gdImageCreateFromBmp(x)
 #define GDIMAGECREATEFROMTIFF(x) gdImageCreateFromTiff(x)
 #define GDIMAGECREATEFROMGD(x) gdImageCreateFromGd(x)
 #define GDIMAGECREATEFROMGD2(x) gdImageCreateFromGd2(x)
@@ -523,6 +526,33 @@ gdnewFromJpegData(packname="GD::Image", imageData, ...)
 
 #endif
 
+#ifdef HAVE_BMP
+GD::Image
+gdnewFromBmpData(packname="GD::Image", imageData, ...)
+	char *	packname
+	SV *    imageData
+  PROTOTYPE: $$;$
+  PREINIT:
+	gdIOCtx* ctx;
+        char*    data;
+        STRLEN   len;
+	dMY_CXT;
+	int      truecolor = truecolor_default;
+  CODE:
+	PERL_UNUSED_ARG(packname);
+	data = SvPV(imageData,len);
+        ctx = newDynamicCtx(data,len);
+	RETVAL = (GD__Image) gdImageCreateFromBmpCtx(ctx);
+        (ctx->gd_free)(ctx);
+        if (!RETVAL)
+          croak("gdImageCreateFromBmpCtx error");
+        if (items > 2) truecolor = (int)SvIV(ST(2));
+	gd_chkimagefmt(RETVAL, truecolor);
+  OUTPUT:
+	RETVAL
+
+#endif
+
 GD::Image
 gdnewFromWBMPData(packname="GD::Image", imageData, ...)
 	char *	packname
@@ -648,6 +678,32 @@ gd_newFromTiff(packname="GD::Image", filehandle, ...)
 
 #endif
 
+#ifdef HAVE_BMP
+GD::Image
+gd_newFromBmp(packname="GD::Image", filehandle)
+	char *	packname
+	InputStream	filehandle
+  PROTOTYPE: $$
+  PREINIT:
+	gdImagePtr img;
+	SV* errormsg;
+  CODE:
+	PERL_UNUSED_ARG(packname);
+	img = GDIMAGECREATEFROMBMP(filehandle);
+        if (img == NULL) {
+          errormsg = perl_get_sv("@",0);
+	  if (errormsg != NULL)
+	    sv_setpv(errormsg,"libgd was not built with BMP support\n");
+          else
+            croak("gdImageCreateFromBmp error");
+	  XSRETURN_EMPTY;
+        }
+        RETVAL = img;
+  OUTPUT:
+        RETVAL
+
+#endif
+
 GD::Image
 gd_newFromWBMP(packname="GD::Image", filehandle)
 	char *	packname
@@ -695,6 +751,7 @@ gdnewFromXpm(packname="GD::Image", filename)
         }
         RETVAL = img;
 #else
+	PERL_UNUSED_ARG(filename);
         errormsg = perl_get_sv("@",0);
         sv_setpv(errormsg,"libgd was not built with xpm support\n");
         XSRETURN_EMPTY;
@@ -956,13 +1013,18 @@ gdgifanimbegin(image,globalcm=-1,loops=-1)
 	void*         data;
 	int           size;
   CODE:
-#ifdef HAVE_ANIMGIF
+#ifdef HAVE_GIFANIM
     data = (void *) gdImageGifAnimBeginPtr(image,&size,globalcm,loops);
     if (!data)
       croak("gdImageGifAnimBeginPtr error");
     RETVAL = newSVpvn((char*) data,size);
     gdFree(data);
 #else
+    PERL_UNUSED_ARG(data);
+    PERL_UNUSED_ARG(size);
+    PERL_UNUSED_ARG(image);
+    PERL_UNUSED_ARG(globalcm);
+    PERL_UNUSED_ARG(loops);
     die("libgd 2.0.33 or higher required for animated GIF support");
 #endif
   OUTPUT:
@@ -982,7 +1044,7 @@ gdgifanimadd(image,localcm=-1,leftofs=-1,topofs=-1,delay=-1,disposal=-1,previm=0
 	void*         data;
 	int           size;
   CODE:
-#ifdef HAVE_ANIMGIF
+#ifdef HAVE_GIFANIM
     data = (void *) gdImageGifAnimAddPtr(image,&size,localcm,leftofs,topofs,
                                              delay,disposal,previm);
     if (!data)
@@ -990,6 +1052,15 @@ gdgifanimadd(image,localcm=-1,leftofs=-1,topofs=-1,delay=-1,disposal=-1,previm=0
     RETVAL = newSVpvn((char*) data,size);
     gdFree(data);
 #else
+    PERL_UNUSED_ARG(data);
+    PERL_UNUSED_ARG(size);
+    PERL_UNUSED_ARG(image);
+    PERL_UNUSED_ARG(localcm);
+    PERL_UNUSED_ARG(leftofs);
+    PERL_UNUSED_ARG(topofs);
+    PERL_UNUSED_ARG(delay);
+    PERL_UNUSED_ARG(disposal);
+    PERL_UNUSED_ARG(previm);
     die("libgd 2.0.33 or higher required for animated GIF support");
 #endif
   OUTPUT:
@@ -1004,17 +1075,46 @@ gdgifanimend(image)
 	int           size;
   CODE:
     PERL_UNUSED_ARG(image);
-#ifdef HAVE_ANIMGIF
+#ifdef HAVE_GIFANIM
     data = (void *) gdImageGifAnimEndPtr(&size);
     if (!data)
       croak("gdImageGifAnimEndPtr error");
     RETVAL = newSVpvn((char*) data,size);
     gdFree(data);
 #else
+    PERL_UNUSED_ARG(data);
+    PERL_UNUSED_ARG(size);
     die("libgd 2.0.33 or higher required for animated GIF support");
 #endif
   OUTPUT:
     RETVAL
+
+#ifdef HAVE_BMP
+SV*
+gdbmp(image,compression=0)
+  GD::Image	image
+  int           compression
+  PROTOTYPE: $
+  PREINIT:
+	SV* errormsg;
+	void*         data;
+	int           size;
+  CODE:
+    data = (void *) gdImageBmpPtr(image,&size,compression);
+    if (data == NULL) {
+      errormsg = perl_get_sv("@",0);
+      if (errormsg != NULL)
+        sv_setpv(errormsg,"libgd was not built with WBMP support\n");
+      else
+        croak("gdImageBmpPtr error");
+      XSRETURN_EMPTY;
+    }
+    RETVAL = newSVpvn((char*) data,size);
+    gdFree(data);
+  OUTPUT:
+    RETVAL
+
+#endif
 
 SV*
 gdwbmp(image,fg)
@@ -1535,6 +1635,15 @@ gdcopyRotated(dst,src,dstX,dstY,srcX,srcY,srcW,srcH,angle)
 #ifdef VERSION_33
         gdImageCopyRotated(dst,src,dstX,dstY,srcX,srcY,srcW,srcH,angle);
 #else
+        PERL_UNUSED_ARG(dst);
+        PERL_UNUSED_ARG(src);
+        PERL_UNUSED_ARG(dstX);
+        PERL_UNUSED_ARG(dstY);
+        PERL_UNUSED_ARG(srcX);
+        PERL_UNUSED_ARG(srcY);
+        PERL_UNUSED_ARG(srcW);
+        PERL_UNUSED_ARG(srcH);
+        PERL_UNUSED_ARG(angle);
         die("libgd 2.0.33 or higher required for copyRotated support");
 #endif
     }
@@ -2316,11 +2425,35 @@ gdstringFTCircle(image,cx,cy,radius,textRadius,fillPortion,fontname,points,top,b
             RETVAL = 1;
 	  }
 #else
+        /* if we have FT but not FTCIRCLE, this is all that's compiled */
+        PERL_UNUSED_ARG(image);
+        PERL_UNUSED_ARG(cx);
+        PERL_UNUSED_ARG(cy);
+        PERL_UNUSED_ARG(radius);
+        PERL_UNUSED_ARG(textRadius);
+        PERL_UNUSED_ARG(fillPortion);
+        PERL_UNUSED_ARG(fontname);
+        PERL_UNUSED_ARG(points);
+        PERL_UNUSED_ARG(top);
+        PERL_UNUSED_ARG(bottom);
+        PERL_UNUSED_ARG(fgcolor);
   	errormsg = perl_get_sv("@",0);
 	sv_setpv(errormsg,"libgd must be version 2.0.33 or higher to use this function\n");
 	XSRETURN_EMPTY;
 #endif
 #else
+        /* if we don't have FT, this is all that's compiled */
+        PERL_UNUSED_ARG(image);
+        PERL_UNUSED_ARG(cx);
+        PERL_UNUSED_ARG(cy);
+        PERL_UNUSED_ARG(radius);
+        PERL_UNUSED_ARG(textRadius);
+        PERL_UNUSED_ARG(fillPortion);
+        PERL_UNUSED_ARG(fontname);
+        PERL_UNUSED_ARG(points);
+        PERL_UNUSED_ARG(top);
+        PERL_UNUSED_ARG(bottom);
+        PERL_UNUSED_ARG(fgcolor);
   	errormsg = perl_get_sv("@",0);
 	sv_setpv(errormsg,"libgd was not built with FreeType support\n");
 	XSRETURN_EMPTY;
@@ -2336,12 +2469,12 @@ gduseFontConfig(image,flag)
   PROTOTYPE: $$
   CODE:
   {
-#ifdef HAVE_FONTCONFIG
     PERL_UNUSED_ARG(image);
+#ifdef HAVE_FONTCONFIG
     RETVAL = gdFTUseFontConfig(flag);
 #else
     SV* errormsg;
-    PERL_UNUSED_ARG(image);
+    PERL_UNUSED_ARG(flag);
     errormsg = perl_get_sv("@",0);
     sv_setpv(errormsg,"libgd was not built with fontconfig support\n");
     XSRETURN_EMPTY;

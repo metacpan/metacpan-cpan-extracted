@@ -8,9 +8,9 @@ use SQL::Load::Util qw/
 /;
 
 sub new {
-    my ($class, $content) = @_;  
+    my ($class, $content, $end) = @_;
     
-    my ($data, $hash, $keys, $list) = $class->_parse($content);
+    my ($data, $hash, $keys, $list) = $class->_parse($content, $end);
     
     my $self = {
         _data => $data,
@@ -121,9 +121,9 @@ sub reset {
 }
 
 sub _parse {
-    my ($self, $content) = @_;
+    my ($self, $content, $end) = @_;
     
-    my @data = parse($content);
+    my @data = parse($content, $end);
     my %hash = @data;
     my %keys;
     my @list;
@@ -256,7 +256,3 @@ This software is copyright (c) 2022 by Lucas Tiago de Moraes.
 This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
  
 =cut
-
-
-    
-    

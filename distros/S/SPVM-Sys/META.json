@@ -27,13 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.981",
+            "SPVM" : "0.986",
             "SPVM::Resource::SocketUtil" : "1.001"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.981",
+            "SPVM" : "0.986",
             "SPVM::Errno" : "0.06",
             "SPVM::Resource::SocketUtil" : "1.001"
          }
@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Sys"
       }
    },
-   "version" : "0.481003",
+   "version" : "0.481004",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

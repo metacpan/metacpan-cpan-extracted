@@ -1,5 +1,9 @@
 Revision history for Perl module Cookie
 
+v0.3.0 2023-05-30T18:21:26+0900
+    - Added method extract_one() in Cookie::Jar
+    - Minor documentation improvements to Cookie::Jar for method fetch and add_cookie_header
+
 v0.2.3 2022-11-11T18:39:37+0900
     - Another minor correction of unit test file 006_cookies_sqlite.t
 

@@ -18,7 +18,7 @@
 
 =head1 NAME
 
-news - a read-only web fron-end to a local news server
+news - a web fron-end to a local news server
 
 =head1 SYNOPSIS
 
@@ -26,18 +26,20 @@ B<news>
 
 =head1 DESCRIPTION
 
-C<news> connects to the local news server via NNTP on port 119, lists all the
-groups and allows read-only access.
+C<news> connects to the local news server via NNTP on port 119 and offers a
+web interface for it.
 
-An optional B<message-id> can be provided on the command line. A link to this
-article serves as the "start here" link on the front page.
-
-For each group, only posts made in the last seven days are shown. The From field
-is stripped of anything in angled brackets in an effort to remove email
-addresses: \s*<.*>
+For each group, only the most recent posts are shown. The From field is stripped
+of anything in angled brackets in an effort to remove email addresses:
+C<\s*<.*>> and C<\s*"\S+@\S+">.
 
 For each article, an attempt is made to scrip email addresses by removing
-anything in angled brackets: \s*<\S*?@.*?>
+anything in angled brackets: C<\s*<\S*?@.*?>> and  C<\s*"\S*?@.*?">.
+
+=head2 Authentication
+
+When posting or replying, the username and password provided by the user are
+passed along to the news server. If that allows the user to post, it just works.
 
 =head2 Environment variables
 
@@ -45,7 +47,13 @@ The news server is determined by L<Net::NNTP>: If no host is passed then two
 environment variables are checked C<NNTPSERVER> then C<NEWSHOST>, then
 L<Net::Config> is checked, and if a host is not found then C<news> is used.
 
-C<NEWS_INTRO_ID> can be set to a message id for a "start here" message.
+C<NEWS_INTRO_ID> can be set to a message id for a "start here" message. By
+default, no such link is shown. This must be a message-id and cannot be a
+message number (that would require a group, too).
+
+C<NEWS_MODE> can be set to "NOAUTH" in order to hide username and password on
+the post form in case your newsserver isn't public and requires no
+authorisation; if set to "NOPOST" then posting links are hidden.
 
 =head2 Systemd
 
@@ -67,6 +75,22 @@ To install as a service, use a C<news.service> file like the following:
     Environment="NEWS_INTRO_ID=<u4d0i0$n72d$1@sibirocobombus.campaignwiki>"
     ExecStart=/home/alex/perl5/perlbrew/perls/perl-5.32.0/bin/perl /home/alex/perl5/perlbrew/perls/perl-5.32.0/bin/news daemon
 
+=head1 EXAMPLES
+
+The local news server requires no authorisation.
+
+    NNTPSERVER=localhost NEWS_MODE=NOAUTH news daemon
+
+As a developer, run it under C<morbo> so that we can make changes to the script.
+Provide the path to the script. This time with regular authorisation.
+
+    NNTPSERVER=localhost morbo script/news
+
+The remote news server requires authorisation and we want to point visitors to a
+first post. We assume that NNTPSERVER or NEWSHOST is set.
+
+    NEWS_INTRO_ID='<u4d0i0$n72d$1@sibirocobombus.campaignwiki>' news daemon
+
 =head1 SEE ALSO
 
 The Tildeverse also runs news.
@@ -80,10 +104,15 @@ GNU Affero General Public License
 
 # corelist
 use Net::NNTP;
-use Encode qw(decode);
+use Encode qw(encode decode);
 # not core
 use Mojolicious::Lite;      # Mojolicious
+use Mojo::Cache;
 use DateTime::Format::Mail;
+use List::Util qw(first);
+use utf8;
+
+my $cache = Mojo::Cache->new;
 
 get '/' => sub {
   shift->redirect_to('index');
@@ -93,102 +122,238 @@ under 'news';
 
 get '/' => sub {
   my $c = shift;
-  my $nntp = Net::NNTP->new() or die "No news server found";
-  my $list = $nntp->list();
-  $nntp->quit;
+  my $list = cached("list", sub {
+    my $nntp = Net::NNTP->new() or return 'error';
+    my $value = $nntp->list();
+    $nntp->quit;
+    return $value });
+  return $c->render(template => 'noserver') if $list eq 'error';
   $c->render(template => 'index', list => $list,
              id => $ENV{NEWS_INTRO_ID},
              address => $c->tx->req->url->to_abs->host);
 } => 'index';
 
+sub cached {
+  my ($key, $sub) = @_;
+  my $cached = $cache->get($key);
+  my $value;
+  if (defined $cached) {
+    my ($ts, $data) = @$cached;
+    my $age = time - $ts;
+    app->log->debug("Cache age of $key: ${age}s");
+    $value = $data if $age <= 5 * 60; # cached for five minutes
+  }
+  if (not defined $value) {
+    app->log->debug("Getting a fresh copy of $key");
+    $value = $sub->();
+    $cache->set($key => [time, $value]);
+  }
+  return $value;
+}
+
+my $per_page = 50;
+
 get '/group/#group' => sub {
   my $c = shift;
   my $group = $c->param('group');
-  my $nntp = Net::NNTP->new() or die "No news server found";
-  my $ids = $nntp->newnews(time() - 7 * 24 * 60 * 60, , $group);
-  my $list = [];
-  for my $id (reverse @$ids) {
-    my $headers = Mojo::Headers->new;
-    $headers->parse("$_\r\n") for @{$nntp->head($id)};
-    my $data = {
-      id => $id,
-      from => from_header($headers),
-      subject => subject_header($headers),
-      date => date_header($headers),
+  my $edit = $c->param('edit');
+  my $page = $c->param('page') || "";
+  my $nntp; # only created on demand
+  my $description = cached("$group description", sub {
+    $nntp ||= Net::NNTP->new() or return 'error';
+    my $newsgroups = $nntp->newsgroups($group);
+    return $newsgroups && $newsgroups->{$group} || "" });
+  return $c->render(template => 'noserver') if 'error' eq $description;
+  my $data = cached("$group list $page", sub {
+    $nntp ||= Net::NNTP->new() or return 'error';
+    my ($nums, $first, $last) = $nntp->group($group) or return [];
+    my $last_page = int($last / $per_page) + 1;
+    $page ||= $last_page;
+    my $to = $page * $per_page;
+    $to = $last if $to > $last;
+    my $from = ($page - 1) * $per_page;
+    $from = $first if $from < $first;
+    my $fmt = $nntp->overview_fmt;
+    app->log->debug("Getting $group $from-$to");
+    my $messages = $nntp->xover("$from-$to");
+    my $articles = [];
+    for my $num (sort { $b <=> $a } keys %$messages) {
+      my ($subject, $from, $date, $id, $references) = @{$messages->{$num}};
+      $subject = decode("MIME-Header", $subject) || "?";
+      $from = decode("MIME-Header", $from) || "Anonymous";
+      $from =~ s/\s*<.*>//; # remove email addresses
+      $from =~ s/\s*"\S+@\S+"//; # remove email addresses
+      $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
+      my $dt = DateTime::Format::Mail->parse_datetime($date);
+      push(@$articles, {
+        id => $id,
+        num => $num,
+        from => $from,
+        subject => $subject,
+        date => [$dt->ymd, sprintf("%02d:%02d", $dt->hour, $dt->minute)],
+        references => [split(/\s+/, decode("MIME-Header", $references))],
+        replies => [] })
     };
-    push(@$list, $data);
-  }
-  $nntp->quit;
-  $c->render(template => 'group', group => $group, list => $list);
+    # link replies based on references but only the articles on the same pages (!)
+    for my $article (@$articles) {
+      for my $reference (@{$article->{references}}) {
+        my $original = first { $reference eq $_->{id} } @$articles;
+        next unless $original;
+        push(@{$original->{replies}}, $article->{id});
+        app->log->debug("$article->{id} is a reply to $original->{id}");
+      }
+    }
+    return {
+      articles => $articles,
+      pagination => {page => $page, last_page => $last_page}}});
+  return $c->render(template => 'noserver') if 'error' eq $data;
+  $nntp->quit if $nntp;
+  $c->render(template => 'group', group => $group, edit => $edit, description => $description,
+             list => $data->{articles}, pagination => $data->{pagination});
 } => 'group';
 
+# This only works for message-ids, not for message numbers (since they require a
+# group).
 get '/article/#id' => sub {
   my $c = shift;
-  my $id = $c->param('id');
-  my $nntp = Net::NNTP->new() or die "No news server found";
-  my $body = $nntp->body($id);
-  return $c->render(template => 'unknown') unless $body;
-  my $headers = Mojo::Headers->new;
-  $headers->parse("$_\r\n") for @{$nntp->head($id)};
-  my $data = {
-    id => $id,
-    from => from_header($headers),
-    subject => subject_header($headers),
-    date => date_header($headers),
-    newsgroups => newsgroups_header($headers),
-    references => references_header($headers),
-    body => article_body(join("", @$body), $headers),
-  };
-  $nntp->quit;
-  $c->render(template => 'article', article => $data);
+  show_article($c, $c->param('id'));
+} => 'article_id';
+
+get '/article/#group/#id' => sub {
+  my $c = shift;
+  show_article($c, $c->param('id'), $c->param('group'));
 } => 'article';
 
-sub from_header {
-  my ($headers) = @_;
-  my $value = $headers->header("from");
-  return "Anonymous" unless $value = decode("MIME-Header", $value); # decode non-ASCII
-  $value =~ s/\s*<.*>//; # remove email addresses
-  return $value;
+sub show_article {
+  # When following a link from the group, $id_or_num is a num and $group is
+  # important. When following a reference from an article, $id_or_num is a
+  # message-id and $group is only used for the reply form.
+  my ($c, $id_or_num, $group) = @_;
+  my $article = cached("$group article $id_or_num", sub {
+    my $nntp = Net::NNTP->new() or return 'error';
+    $nntp->group($group) if $group;
+    my $article = $nntp->article($id_or_num);
+    return $c->render(template => 'unknown') unless $article;
+    # app->log->trace(join("", @$article));
+    # $article is header lines, an empty line, and body lines
+    my $headers = Mojo::Headers->new;
+    while ($_ = shift(@$article) and /\S/) {
+      $headers->parse("$_\r\n");
+    }
+    my $id = $headers->header("message-id");
+    my $subject = decode("MIME-Header", $headers->header("subject")) || "?";
+    my $from = decode("MIME-Header", $headers->header("from")) || "Anonymous";
+    $from =~ s/\s*<.*>//; # remove email addresses
+    $from =~ s/\s*"\S+@\S+"//; # remove email addresses
+    my $date = $headers->header("date");
+    $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
+    my $dt = DateTime::Format::Mail->parse_datetime($date);
+    $date = [$dt->ymd, sprintf("%02d:%02d", $dt->hour, $dt->minute)];
+    my $newsgroups = [split(/\s*,\s*/, decode("MIME-Header", $headers->header("newsgroups")) || "")];
+    $group ||= "@$newsgroups";
+    my $references = [split(/\s+/, decode("MIME-Header", $headers->header("references")) || "")];
+    my $body = join("", @$article);
+    $body =~ s/\s*<\S*?@\S*?>//g; # remove email addresses
+    $body =~ s/\s*"\S*?@\S*?"//g; # remove email addresses
+    if ($headers->header('content-type')) {
+      my ($charset) = $headers->header('content-type') =~ /charset=['"]?([^;'"]*)/;
+      $body = decode($charset, $body) if $charset;
+    }
+    my $value = {
+      id => $id,
+      group => $group,
+      from => $from,
+      subject => $subject,
+      date => $date,
+      newsgroups => $newsgroups,
+      references => $references,
+      body => $body,
+    };
+    # perhaps we have cached replies from looking at the group (space and no page number at the end)
+    my $cached_group = cached("$group list ", sub {}) || {};
+    my $cached_article = (first { $_->{id} eq $id } @{$cached_group->{articles}}) || {};
+    $value->{replies} = $cached_article->{replies} || [];
+    app->log->debug("$id replies: @{$value->{replies}}");
+    $nntp->quit;
+    # If $id_or_num was a number, add a second key to the cache in case we need
+    # the same article but following a reference.
+    $cache->set("$group article $id" => [time, $value]) if $id_or_num ne $id;
+    return $value });
+  return $c->render(template => 'noserver') if 'error' eq $article;
+  $c->render(template => 'article', article => $article, edit => $c->param('edit'));
 }
 
-sub subject_header {
-  my ($headers) = @_;
-  return "?" unless my $value = $headers->header("subject");
-  $value = decode("MIME-Header", $value); # decode non-ASCII
-  return $value;
-}
+post '/post/#group' => sub {
+  my $c = shift;
+  $c->param(username => $c->session->{username});
+  $c->param(password => $c->session->{password});
+  $c->param(name => $c->session->{name});
+  $c->render(template => 'post',
+             subject => '',
+             references => '');
+} => 'post_group';
 
-sub date_header {
-  my ($headers) = @_;
-  my $value = $headers->header("date");
-  $value = decode("MIME-Header", $value); # decode non-ASCII
-  $value =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
-  my $dt = DateTime::Format::Mail->parse_datetime($value);
-  return $dt->ymd . " " . $dt->hms;
-}
+post '/reply' => sub {
+  my $c = shift;
+  $c->param(username => $c->session->{username});
+  $c->param(password => $c->session->{password});
+  $c->param(name => $c->session->{name});
+  $c->render(template => 'post',
+             id => $c->param('id'),
+             group => $c->param('group'),
+             subject => $c->param('subject'),
+             references => $c->param('references'));
+} => 'post_reply';
 
-sub newsgroups_header {
-  my ($headers) = @_;
-  return [] unless my $value = $headers->header("newsgroups");
-  $value = decode("MIME-Header", $value); # decode non-ASCII
-  return [split(/\s*,\s*/, $value)];
-}
+post '/post' => sub {
+  my $c = shift;
+  $c->session(expiration => 7 * 24 * 60 * 60); # one week
 
-sub references_header {
-  my ($headers) = @_;
-  return [] unless my $value = $headers->header("references");
-  $value = decode("MIME-Header", $value); # decode non-ASCII
-  return [split(/\s*,\s*/, $value)];
-}
+  my $username = $c->param('username');
+  return $c->error("No username") unless $username or $ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOAUTH";
+  $c->session->{username} = $username;
 
-sub article_body {
-  my ($body, $headers) = @_;
-  $body =~ s/\s*<\S*?@.*?>//; # remove email addresses
-  return $body unless $headers->header('content-type');
-  my ($charset) = $headers->header('content-type') =~ /charset=(.*)/;
-  return $body unless $charset;
-  return decode($charset, $body);
-}
+  my $password = $c->param('password');
+  return $c->error("No password") unless $password or $ENV{NEWS_MODE} and $ENV{NEWS_MODE}eq "NOAUTH";
+  $c->session->{password} = $password;
+
+  my $name = $c->param('name');
+  $name =~ s/[^[:graph:] ]//g;
+  return $c->error("No from address specified") unless $name;
+  return $c->error("From address does not have the format 'Your Name <mail\@example.org>'") unless $name =~ /<\S+@\S+\.\S+>/;
+  $c->session->{name} = $name;
+
+  my $group = $c->param('group');
+  $group =~ s/[^[:graph:]]//g;
+  return $c->error("No group") unless $group;
+
+  my $references = $c->param('references');
+
+  my $subject = $c->param('subject');
+  return $c->error("No subject") unless $subject;
+  # $subject = encode("MIME-Header", $subject);
+
+  my $body = $c->param('body');
+  return $c->error("No body") unless $body;
+
+  my $nntp = Net::NNTP->new() or return $c->render(template => 'noserver');
+  $nntp->authinfo($username, $password) if $username and $password;
+  my $article = [];
+  push(@$article, "From: $name\r\n");
+  push(@$article, "Subject: $subject\r\n");
+  push(@$article, "Newsgroups: $group\r\n");
+  push(@$article, "References: $references\r\n") if $references;
+  push(@$article, "MIME-Version: 1.0\r\n");
+  push(@$article, "Content-Type: text/plain; charset=UTF-8\r\n");
+  push(@$article, "Content-Transfer-Encoding: 8bit\r\n");
+  push(@$article, "\r\n");
+  push(@$article, map { "$_\r\n" } split(/\r?\n/, encode('UTF-8', $body)));
+  app->log->debug(join("", @$article));
+  my $ok = $nntp->post($article);
+  $cache->set("$group list " => undef) if $ok; # includes space and no page number
+  $nntp->quit;
+  $c->render('posted', group => $group, ok => $ok);
+} => 'post';
 
 app->start;
 
@@ -199,39 +364,104 @@ __DATA__
 % title 'News';
 <h1>News</h1>
 <p>
-This is a read-only forum. The groups and posts it shows are from a <a
+This is a forum. The groups and posts it shows are from a <a
 href="https://en.wikipedia.org/wiki/News_server">news server</a>. If you have a
 web browser that knows how to handle news URLs, like <tt>lynx</tt>, you can
 visit the news server <a href="news://<%= $address %>/">directly</a>.
 
 % if ($id) {
 <p>
-<%= link_to url_for('article', id => $id) => begin %>Start here<% end %>.
+<%= link_to url_for('article_id', id => $id) => begin %>Start here<% end %>.
 % }
 
-<ul>
+<table>
+<tr><th class="status">Post</th><th>Group</th></tr>
+% my @seen;
 % for my $group (sort keys %$list) {
-<li><%= link_to url_for('group', group => $group) => begin %><%= $group %><% end %>
+%   my ($last, $first, $flag) = @{$list->{$group}};
+%   my $status = "";
+%   my $edit = 0;
+%   if ($flag eq "y") { $status = "OK"; $edit = 1 }
+%   elsif ($flag eq "m") { $status = "Moderated"; $edit = 1 }
+%   elsif ($flag eq "n") { $status = "Remote" }
+%   elsif ($flag eq "j") { $status = "Junked" }
+%   elsif ($flag eq "x") { $status = "Archived" }
+%   else { $status = "Renamed" }
+%   push(@seen, $flag) unless grep { $_ eq $flag } @seen;
+%   if ($edit) {
+<tr><td class="status"><%= $status %></td><td><%= link_to url_for('group', group => $group)->fragment($last) => begin %><%= $group %><% end %><br></td></tr>
+%   } else {
+<tr><td class="status"><%= $status %></td><td><%= link_to url_for('group', group => $group)->query(edit => 'no')->fragment($last) => begin %><%= $group %><% end %><br></td></tr>
+%   }
 % }
-</ul>
+</table>
+<p>
+% for my $flag (@seen) {
+%   if ($flag eq "y") {
+OK: Posting is possible and probably requires an account.
+%   } elsif ($flag eq "m") {
+Moderated: Posts aren't published unless approved by a moderator.
+%   } elsif ($flag eq "n") {
+Remote: Posts from a peer are shown but you cannot post.
+%   } elsif ($flag eq "j") {
+Junked: All posts are immediately moved to the junk group.
+%   } elsif ($flag eq "x") {
+Archived: No new posts.
+%   } else {
+Renamed: Posts will get moved to a different group.
+%   }
+% }
 
 @@ group.html.ep
 % layout "default";
 % title "$group";
 <h1><%= $group %></h1>
-<table>
-<tr><th>Date</th><th>From</th><th>Subject</th></tr>
-% for my $article (@$list) {
-<tr><td><%= link_to url_for('article', id => $article->{id}) => begin %><%= $article->{date} %><% end %></td><td><%= $article->{from} %></td><td><%= $article->{subject} %></td></tr>
+% if ($description) {
+<p><%= $description %>
 % }
+<p>
+<%= link_to url_for('index') => begin %>List all groups<% end %>
+% if ($pagination->{page} > 1) {
+<%= link_to url_for('group', group => $group)->query(page => 1) => begin %>First<% end %>
+% }
+% if ($pagination->{page} > 2) {
+<%= link_to url_for('group', group => $group)->query(page => $pagination->{page} - 1) => begin %>Older<% end %>
+% }
+% if ($pagination->{page} < $pagination->{last_page} - 1) {
+<%= link_to url_for('group', group => $group)->query(page => $pagination->{page} + 1) => begin %>Newer<% end %>
+% }
+% if ($pagination->{page} < $pagination->{last_page}) {
+<%= link_to url_for('group', group => $group) => begin %>Last<% end %>
+% }
+% unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOPOST" or $edit and $edit eq "no") {
+<%= link_to url_for('post_group', group => $group) => begin %>Add post<% end %> (requires account)
+% }
+% if (@$list) {
+<table>
+<tr><th class="date">Date</th><th class="from">From</th><th class="subject">Subject</th></tr>
+%   my $date = "";
+%   for my $article (@$list) {
+%     if ($article->{date}->[0] ne $date) {
+%       $date = $article->{date}->[0];
+<tr><td class="day"><%= $date %></td><td></td><td></td></tr>
+%     }
+%     if ($edit and $edit eq "no") {
+<tr><td class="time"><%= link_to url_for('article', group => $group, id => $article->{num})->query(edit => $edit) => begin %><%= $article->{date}->[1] %><% end %></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
+%     } else {
+<tr><td class="time"><%= link_to url_for('article', group => $group, id => $article->{num}) => begin %><%= $article->{date}->[1] %><% end %></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
+%     }
+%   }
 </table>
+% } else {
+<p>This group is empty.
+% }
 
 @@ article.html.ep
 % layout "default";
 % title "$article->{subject}";
 <h1><%= $article->{subject} %></h1>
 <p class="headers"><span class="value from"><%= $article->{from} %></span>,
-<span class="date"><%= $article->{date} %></span>,
+<span class="date"><%= "@{$article->{date}}" %></span>,
 % for my $newsgroup (@{$article->{newsgroups}}) {
 <%= link_to url_for('group', group => $newsgroup) => (class => "value newsgroups") => begin %><%= $newsgroup %><% end %>
 % }
@@ -240,8 +470,30 @@ visit the news server <a href="news://<%= $address %>/">directly</a>.
 <%= link_to url_for('article', id => $id) => (class => "value references") => begin %>ref<% end %>
 %   }
 % }
-
+% if (@{$article->{replies}}) {
+%   for my $id (reverse @{$article->{replies}}) {
+<%= link_to url_for('article', id => $id) => (class => "value replies") => begin %>reply<% end %>
+%   }
+% }
 <pre class="body"><%= $article->{body} %></pre>
+% unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOPOST" or $edit and $edit eq "no") {
+% my $subject = $article->{subject};
+% $subject = "Re: $subject" unless $subject =~ /^Re:/i;
+% my $body = "$article->{from}, @{$article->{date}}:\n$article->{body}";
+% $body =~ s/\s+$//;
+% $body =~ s/\n(>*)/\n>$1 /g;
+% $body .= "\n";
+% my @references = (@{$article->{references}}, $article->{id});
+%= form_for post_reply => begin
+%= hidden_field id => $article->{id}
+%= hidden_field group => "@{$article->{newsgroups}}"
+%= hidden_field references => "@references"
+%= hidden_field subject => $subject
+%= hidden_field body => $body
+%= submit_button 'Reply'
+(Requires account.)
+%= end
+% }
 
 @@ unknown.html.ep
 % layout "default";
@@ -250,6 +502,56 @@ visit the news server <a href="news://<%= $address %>/">directly</a>.
 <p>Either the message id is wrong or the article has expired on this news
 server.
 
+@@ noserver.html.ep
+% layout "default";
+% title "No News Server";
+<h1>No News Server</h1>
+<p>The administrator needs to specify the news server to use.
+<p>One way to do this is to set the environment variable <code>NNTPSERVER</code>.
+
+@@ post.html.ep
+% layout 'default';
+% title 'Post';
+% if ($subject) {
+<h1><%= $subject %></h1>
+<p>(This is a <%= link_to url_for('article', group => $group, id => $id) => begin %>reply<% end %>.)
+% } else {
+<h1>New post for <%= $group %></h1>
+% }
+%= form_for post => begin
+%= hidden_field group => $group
+%= hidden_field references => $references
+% unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOAUTH") {
+%= label_for username => 'Username'
+%= text_field 'username', required => undef
+<br>
+%= label_for password => 'Password'
+%= password_field 'password', required => undef
+<br>
+% }
+%= label_for name => 'From'
+%= text_field 'name', required => undef, pattern => '.*<\S+@\S+\.\S+>', title => 'Must end with an email address in angled brackets, e.g. <you@example.org>', placeholder => 'Your Name <you@example.org>'
+<br>
+%= label_for subject => 'Subject'
+%= text_field 'subject', required => undef
+<p>
+%= label_for body => 'Article'
+%= text_area 'body', required => undef
+<p>
+%= submit_button 'Post'
+% end
+
+@@ posted.html.ep
+% layout 'default';
+% title 'Posted';
+% if ($ok) {
+<h1>Posted!</h1>
+<p>The article was posted to <%= link_to url_for('group', group => $group) => begin %><%= $group %><% end %>.
+% } else {
+<h1>Error</h1>
+<p>Oops. Looks like posting to <%= link_to url_for('group', group => $group) => begin %><%= $group %><% end %> failed!
+% }
+
 @@ layouts/default.html.ep
 <!DOCTYPE html>
 <html>
@@ -257,16 +559,30 @@ server.
 <title><%= title %></title>
 %= stylesheet begin
 body {
+  color: #111;
+  background-color: #fffff8;
   padding: 1ch;
   max-width: 80ch;
   font-size: 12pt;
-  font-family: "DejaVu Mono", mono;
+  font-family: Lucida Console,Lucida Sans Typewriter,monaco,DejaVu Mono,Bitstream Vera Sans Mono,monospace;
   hyphens: auto;
 }
-td {
-  padding: 0 0.5ch;
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #7f7;
+    background-color: #010;
+  }
+  a:link { color: #99f; }
+  a:visited { color: #86f; }
+  a:hover { color: #eef; }
 }
-
+.day { padding-top: 1ch; }
+.time, .status { text-align: center; }
+td { min-width: 10ch; padding: 0 0.5ch; }
+label { display: inline-block; min-width: 10ch; }
+input[type=password], input[type=text] { width: 30ch; }
+textarea { width: 100%; height: 20ch; }
+pre { white-space: pre-wrap; }
 % end
 <meta name="viewport" content="width=device-width">
 </head>

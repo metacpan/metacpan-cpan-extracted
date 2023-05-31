@@ -1,0 +1,80 @@
+---
+abstract: 'Perl interface to the OpenSky Network API'
+author:
+  - 'Curtis "Ovid" Poe <curtis.poe@gmail.com>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Plugin::BailOnFail: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::PerlTidy: '0'
+  lib: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenSky-API
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  OpenSky::API:
+    file: lib/OpenSky/API.pm
+    version: '0.004'
+  OpenSky::API::Core::Flight:
+    file: lib/OpenSky/API/Core/Flight.pm
+    version: '0.004'
+  OpenSky::API::Core::StateVector:
+    file: lib/OpenSky/API/Core/StateVector.pm
+    version: '0.004'
+  OpenSky::API::Flights:
+    file: lib/OpenSky/API/Flights.pm
+    version: '0.004'
+  OpenSky::API::States:
+    file: lib/OpenSky/API/States.pm
+    version: '0.004'
+  OpenSky::API::Types:
+    file: lib/OpenSky/API/Types.pm
+    version: '0.004'
+  OpenSky::API::Utils::Iterator:
+    file: lib/OpenSky/API/Utils/Iterator.pm
+    version: '0.004'
+requires:
+  Carp: '0'
+  Config::INI::Reader: '0'
+  Mojo::JSON: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  Moose: '0'
+  PerlX::Maybe: '0'
+  Type::Library: '0'
+  Type::Params: '0'
+  Type::Utils: '0'
+  Types::Common::Numeric: '0'
+  Types::Common::String: '0'
+  Types::Standard: '0'
+  experimental: '0'
+resources:
+  bugtracker: https://github.com/Ovid/opensky-api/issues
+  homepage: https://github.com/Ovid/opensky-api
+  repository: https://github.com/Ovid/opensky-api.git
+version: '0.004'
+x_contributors:
+  - 'Ovid <ovid@cpan.org>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

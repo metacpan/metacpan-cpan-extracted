@@ -2,8 +2,8 @@ NAME
     Data::Section::Seekable - Read and write parts from data section
 
 VERSION
-    This document describes version 0.091 of Data::Section::Seekable (from
-    Perl distribution Data-Section-Seekable), released on 2023-01-20.
+    This document describes version 0.092 of Data::Section::Seekable (from
+    Perl distribution Data-Section-Seekable), released on 2023-03-24.
 
 DESCRIPTION
     This module defines a simple format to let you store and read parts from
@@ -23,7 +23,7 @@ FORMAT
 
      Data::Section::Seekable v1
 
-    Actually, the header line need not be the first line of data. Previous
+    Actually, the header line needs not be the first line of data. Previous
     lines not matching the header line will be ignored (so you can put other
     stuffs here).
 

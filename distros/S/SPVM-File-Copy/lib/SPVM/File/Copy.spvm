@@ -1,9 +1,14 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Copy {
+  version "0.021";
+  
   use Sys::IO::Stat;
   use Sys::IO;
   use IO::File;
   
-  static method copy : int ($from : string, $to : string, $size = 0 : int) {
+  static method copy : int ($from : string, $to : string, $size : int = 0) {
     
     my $from_io_file = IO::File->new($from, "<");
     

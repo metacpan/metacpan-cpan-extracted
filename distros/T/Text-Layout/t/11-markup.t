@@ -24,7 +24,7 @@ $xp =
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      text => 'The quick ',
    },
-   { font => 'Times-Roman(times,normal,normal,10)', size => 8,
+   { font => 'Times-Roman(times,normal,normal,10)', size => '8.333',
      text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
@@ -32,7 +32,7 @@ $xp =
    },
   ];
 
-$layout->set_markup("The quick <span size=8>brown</span> fox");
+$layout->set_markup("The quick <span size='8.333'>brown</span> fox");
 is_deeply( $layout->_debug_text, $xp );
 $layout->set_markup("The quick <small>brown</small> fox");
 is_deeply( $layout->_debug_text, $xp );

@@ -1,3 +1,7 @@
+0.12 2023.05.29
+    - Add link to bugtracker
+    - Replace Travis-CI by GitHub Actions
+
 0.11 2016.09.11
     - Minor changes
 
@@ -6,7 +10,7 @@
 
 0.09 2016.09.03
     - Demand prerequisites added in 0.08.
- 
+
 0.08 2016.09.03
     - pubDate format is now "Wed, 03 Nov 2015 19:18:00 GMT"
       https://github.com/szabgab/code-maven.com/issues/39

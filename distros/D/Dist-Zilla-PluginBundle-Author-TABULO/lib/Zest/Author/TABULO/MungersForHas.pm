@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::MungersForHas;
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use Exporter::Shiny qw(
     hm_tabulo
@@ -70,7 +70,7 @@ Zest::Author::TABULO::MungersForHas - Utility functions used by TABULO's authori
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =for Pod::Coverage hm_enhance_documentation  hm_lazy_if_possible  hm_strip_nonstandard_opts  hm_tabulo
 

@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::SmokeInABox;
-$POE::Component::SmokeBox::Backend::SmokeInABox::VERSION = '0.56';
+$POE::Component::SmokeBox::Backend::SmokeInABox::VERSION = '0.58';
 #ABSTRACT: a backend for Smoke In A Box smokers.
 
 use strict;
@@ -31,7 +31,7 @@ POE::Component::SmokeBox::Backend::SmokeInABox - a backend for Smoke In A Box sm
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 DESCRIPTION
 

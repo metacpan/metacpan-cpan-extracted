@@ -28,7 +28,10 @@ if (eval { ExtUtils::MakeMaker->VERSION(6.46) }) {
 				type => 'git',
 				url  => 'https://github.com/szabgab/CAM-PDF-Annot.git',
 				web  => 'https://github.com/szabgab/CAM-PDF-Annot',
-			}
+			},
+            bugtracker => {
+                web => 'https://github.com/szabgab/CAM-PDF-Annot/issues'
+            },
 		}
 	};
 }

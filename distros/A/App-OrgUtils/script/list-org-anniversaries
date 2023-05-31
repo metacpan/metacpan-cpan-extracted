@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-04-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 binmode STDOUT, ":encoding(utf8)";
 Perinci::CmdLine::Any->new(
@@ -31,7 +31,7 @@ list-org-anniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.484 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2023-01-19.
+This document describes version 0.485 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2023-04-06.
 
 =head1 SYNOPSIS
 

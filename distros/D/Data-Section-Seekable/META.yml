@@ -22,13 +22,13 @@ name: Data-Section-Seekable
 provides:
   Data::Section::Seekable:
     file: lib/Data/Section/Seekable.pm
-    version: '0.091'
+    version: '0.092'
   Data::Section::Seekable::Reader:
     file: lib/Data/Section/Seekable/Reader.pm
-    version: '0.091'
+    version: '0.092'
   Data::Section::Seekable::Writer:
     file: lib/Data/Section/Seekable/Writer.pm
-    version: '0.091'
+    version: '0.092'
 requires:
   overload: '0'
   perl: '5.010001'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Section-Seekable
   homepage: https://metacpan.org/release/Data-Section-Seekable
   repository: git://github.com/perlancar/perl-Data-Section-Seekable.git
-version: '0.091'
+version: '0.092'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -212,7 +212,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -324,7 +324,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

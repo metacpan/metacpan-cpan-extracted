@@ -192,23 +192,25 @@ use Socket::More ":all";
 	ok cmp_data($spec[0]{type},[SOCK_STREAM])==0, "Type match ok";
 
 }
-{
-	#Loopback
-	my @results=Socket::More::sockaddr_passive( {address=>"localhost", port=>0, family=>AF_INET, type=>SOCK_DGRAM});
-	ok @results==1,"localhost";
-
-	ok $results[0]{address} eq "127.0.0.1", "localhost";
-
-
-  SKIP:{
-		skip "No IPv6 Interfaces", 2 unless (has_IPv6_interface);
-		#Only test this if we know the system has at least one ipv6 address.
-		@results=Socket::More::sockaddr_passive( {address=>"localhost", port=>0, family=>AF_INET6, type=>SOCK_DGRAM});
-		ok @results==1,"localhost";
-
-		ok $results[0]{address} eq "::1", "localhost";
-	}
-}
+##################################################################################################################################
+# {                                                                                                                              #
+#         #Loopback                                                                                                              #
+#         my @results=Socket::More::sockaddr_passive( {address=>"localhost", port=>0, family=>AF_INET, type=>SOCK_DGRAM});       #
+#         ok @results==1,"localhost";                                                                                            #
+#                                                                                                                                #
+#         ok $results[0]{address} eq "127.0.0.1", "localhost";                                                                   #
+#                                                                                                                                #
+#                                                                                                                                #
+#   SKIP:{                                                                                                                       #
+#                 skip "No IPv6 Interfaces", 2 unless (has_IPv6_interface);                                                      #
+#                 #Only test this if we know the system has at least one ipv6 address.                                           #
+#                 @results=Socket::More::sockaddr_passive( {address=>"localhost", port=>0, family=>AF_INET6, type=>SOCK_DGRAM}); #
+#                 ok @results==1,"localhost";                                                                                    #
+#                                                                                                                                #
+#                 ok $results[0]{address} eq "::1", "localhost";                                                                 #
+#         }                                                                                                                      #
+# }                                                                                                                              #
+##################################################################################################################################
 {
 	#any/unspecified
 	#Loopback

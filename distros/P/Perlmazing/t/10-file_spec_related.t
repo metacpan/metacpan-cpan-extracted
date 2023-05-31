@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 24;
-use Perlmazing;
+use Perlmazing qw(catdir catfile devnull splitpath splitdir catpath abs2rel rel2abs);
 use File::Spec ();
 
 my $path_1 = '/usr/bin/perl';

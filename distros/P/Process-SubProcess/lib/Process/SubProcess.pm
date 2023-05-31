@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # @author Bodo (Hugo) Barwich
-# @version 2020-09-29
+# @version 2023-05-30
 # @package SubProcess Management
 # @subpackage Process/SubProcess.pm
 
@@ -44,7 +44,7 @@ use IO::Select;
 use IPC::Open3;
 use Symbol qw(gensym);
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.2';
 
 =head1 DESCRIPTION
 
@@ -77,12 +77,13 @@ use constant FLAG_ANYOUT => 3;
 
 This creates adhoc an C<Process::SubProcess> Object and runs the command given as string.
 
-C<COMMAND> a single scalar parameter will be interpreted as command to execute
+C<COMMAND> - is a single scalar parameter will be interpreted as command to execute
 without any additional options.
 
-C<OPTIONS> are passed in a hash like fashion, using key and value pairs.
-Combining the command with additional C<OPTIONS> also requires the C<COMMAND> to be part of
-the hash.
+C<OPTIONS> - are passed in a hash like fashion, using key and value pairs.
+Combining the command with additional C<OPTIONS> also requires the hash key C<command> to be set.
+
+See L<Method C<setArrProcess()>>
 
 =back
 
@@ -140,7 +141,11 @@ sub runSubProcess {
 
 This is the constructor for a new SubProcess.
 
+B<Parameters:>
+
 C<CONFIGURATIONS> are passed in a hash like fashion, using key and value pairs.
+
+See L<Method C<setArrProcess()>>
 
 =back
 
@@ -217,9 +222,15 @@ sub DESTROY {
 
 This Method will asign Values to physically Data Fields.
 
-C<CONFIGURATIONS> is a list are passed in a hash like fashion, using key and value pairs.
+B<Parameters:>
+
+C<CONFIGURATIONS> - is a list are passed in a hash like fashion, using key and value pairs.
 
 B<Recognized Configurations:>
+
+C<name> - is a string that will be assigned as the process name.
+This is useful when there are several processes with the same command running and
+a more prettier readable name is desired.
 
 C<command> - The command that has to be executed. It only can be set if the process is not
 running yet
@@ -231,6 +242,12 @@ C<check | read | readtimeout> - Time in seconds to wait for the process output.
 If the process is expected to run longer it is useful to set it to avoid excessive checks.
 It is also important for multiple process execusions, because other processes will not
 be checked before the read has not timed out.
+
+See L<Method C<setName()>>
+
+See L<Method C<setCommand()>>
+
+See L<Method C<setReadTimeout()>>
 
 =back
 
@@ -274,7 +291,6 @@ See L<Method C<setArrProcess()>>
 
 =cut
 
-
 sub set {
 
     #Pass the Parameters on to Process::SubProcess::setArrProcess()
@@ -289,7 +305,9 @@ sub set {
 
 This Method will asign a Name to the process.
 
-C<NAME> is a string that will be assigned as the process name.
+B<Parameters:>
+
+C<NAME> - is a string that will be assigned as the process name.
 This is useful when there are several processes with the same command running and
 a more prettier readable name is desired.
 
@@ -308,6 +326,22 @@ sub setName {
     }
 }
 
+=pod
+
+=over 4
+
+=item setCommand ( COMMAND )
+
+This method sets the C<COMMAND> property as string that represents the command to be executed.
+
+It can only be set when the Sub Process is not running.
+
+See L<Method C<Launch()>>
+
+=back
+
+=cut
+
 sub setCommand {
     my $self = $_[0];
 
@@ -323,6 +357,25 @@ sub setCommand {
         $self->{'_process_status'} = -1;
     }    #unless($self->isRunning)
 }
+
+=pod
+
+=over 4
+
+=item setReadTimeout ( TIMEOUT )
+
+This method sets the C<READTIMEOUT> property as numeric value that represents
+the Time in seconds to wait for the process output.
+If the process is expected to run longer it is useful to set it to avoid excessive checks.
+It is also important for multiple process execusions, because other processes will not
+be checked before the read has not timed out.
+It can only be set when the Sub Process is not running.
+
+See L<Method C<Launch()>>
+
+=back
+
+=cut
 
 sub setReadTimeout {
     my $self = $_[0];
@@ -350,6 +403,25 @@ sub setReadTimeout {
         $self->{'_read_timeout'} = 0;
     }
 }
+
+=pod
+
+=over 4
+
+=item setTimeout ( TIMEOUT )
+
+This method sets the C<EXECUTIONTIMEOUT> property as numeric value that represents
+the Time in seconds to wait for the process to finish. After this time the process will
+be terminated.
+
+The C<EXECUTIONTIMEOUT> property must be a positive numeric value. Setting it to a
+negative value C< -1 > will disable the Execution Timeout
+
+See L<Method C<Launch()>>
+
+=back
+
+=cut
 
 sub setTimeout {
     my $self = $_[0];
@@ -416,6 +488,27 @@ sub setDebug {
         $self->{"_debug"} = 0;
     }
 }
+
+=pod
+
+=over 4
+
+=item Launch ()
+
+This method starts the process. It will create a Sub Process from the defined C<COMMAND>
+Property.
+
+Per default this the process runs asynchronously. The L<Wait()> method is used to
+monitor its execution and read its outputs
+
+B<Returns:> It returns C< 1 > when the indices and aliases are created and verified as correct.
+Otherwise it returns C< 0 >.
+
+See L<Method C<Wait()>>
+
+=back
+
+=cut
 
 sub Launch {
     my $self = $_[0];

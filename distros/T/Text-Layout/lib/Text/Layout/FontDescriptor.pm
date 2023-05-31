@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.030";
+our $VERSION = "0.031";
 
 =head1 NAME
 
@@ -189,6 +189,31 @@ sub set_interline {
 sub get_interline {
     my ( $self ) = @_;
     $self->{interline};
+}
+
+# Not documented -- internal use only.
+
+# Note that the ascender/descender values are filled in at load time,
+# unless overridden by a set_... call.
+
+sub set_ascender {
+    my ( $self, $asc ) = @_;
+    $self->{ascender} = $asc;
+}
+
+sub get_ascender {
+    my ( $self ) = @_;
+    $self->{ascender};
+}
+
+sub set_descender {
+    my ( $self, $desc ) = @_;
+    $self->{descender} = $desc;
+}
+
+sub get_descender {
+    my ( $self ) = @_;
+    $self->{descender};
 }
 
 =over

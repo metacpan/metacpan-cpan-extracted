@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.030";
+our $VERSION = "0.031";
 
 =head1 NAME
 
@@ -485,7 +485,7 @@ Implementation note: Although all markup is parsed, not all is implemented.
 =cut
 
 use Text::ParseWords;
-use constant STEP => 0.8;	# TODO: Optimal value?
+use constant STEP => 0.83333125;	# Cf. Pango
 
 my %magstep =
   ( "xx-small"	=> 1.0*STEP*STEP*STEP,

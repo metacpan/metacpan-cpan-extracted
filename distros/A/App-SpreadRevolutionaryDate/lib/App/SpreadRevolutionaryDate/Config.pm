@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.32';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.33';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -168,6 +168,7 @@ sub new {
     'twitter_consumer_secret' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tcs'},
     'twitter_access_token' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tat'},
     'twitter_access_token_secret' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tats'},
+    'twitter_api' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tapi'},
     'mastodon_instance' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'mi'},
     'mastodon_client_id' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'mci'},
     'mastodon_client_secret' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'mcs'},
@@ -382,7 +383,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 
@@ -462,7 +463,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

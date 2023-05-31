@@ -3,4 +3,5 @@ requires 'DateTime::Calendar::Chinese';
 
 on 'test' => sub {
    requires 'Test2::V0';
+   requires 'App::Yath';
 };

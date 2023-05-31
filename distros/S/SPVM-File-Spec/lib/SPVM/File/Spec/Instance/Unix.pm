@@ -83,11 +83,11 @@ The File::Spec::Instance::Unix class of L<SPVM> is an implementation of L<File::
 
 =head2 splitpath
 
-  method splitpath : string[] ($path : string, $no_file = 0 : int);
+  method splitpath : string[] ($path : string, $no_file : int = 0);
 
 =head2 rel2abs
 
-  method rel2abs : string ($path : string, $base = undef : string);
+  method rel2abs : string ($path : string, $base : string = undef);
 
 =head2 splitdir
 
@@ -95,7 +95,7 @@ The File::Spec::Instance::Unix class of L<SPVM> is an implementation of L<File::
 
 =head2 abs2rel
 
-  method abs2rel : string ($path : string, $base = undef : string);
+  method abs2rel : string ($path : string, $base : string = undef);
 
 =head2 path
 

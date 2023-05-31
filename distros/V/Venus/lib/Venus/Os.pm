@@ -961,7 +961,7 @@ I<Since C<2.80>>
   my $paths = $os->paths;
 
   # [
-  #   "/root/.local/bin",
+  #   "/root/local/bin",
   #   "/root/bin",
   #   "/usr/local/sbin",
   #   "/usr/local/bin",
@@ -1134,7 +1134,7 @@ I<Since C<2.80>>
   my $where = $os->where('cmd');
 
   # [
-  #   "t/path/user/.local/bin/cmd",
+  #   "t/path/user/local/bin/cmd",
   #   "t/path/user/bin/cmd",
   #   "t/path/usr/bin/cmd",
   #   "t/path/usr/local/bin/cmd",
@@ -1155,7 +1155,7 @@ I<Since C<2.80>>
   my $where = $os->where('app1');
 
   # [
-  #   "t/path/user/.local/bin/app1",
+  #   "t/path/user/local/bin/app1",
   #   "t/path/usr/bin/app1",
   #   "t/path/usr/sbin/app1"
   # ]
@@ -1173,7 +1173,7 @@ I<Since C<2.80>>
   my $where = $os->where('app2');
 
   # [
-  #   "t/path/user/.local/bin/app2",
+  #   "t/path/user/local/bin/app2",
   #   "t/path/usr/bin/app2",
   # ]
 
@@ -1207,7 +1207,7 @@ I<Since C<2.80>>
   my $where = $os->where('app4');
 
   # [
-  #   "t/path/user/.local/bin/app4",
+  #   "t/path/user/local/bin/app4",
   #   "t/path/usr/local/bin/app4",
   #   "t/path/usr/local/sbin/app4",
   # ]
@@ -1249,7 +1249,7 @@ I<Since C<2.80>>
 
   my $which = $os->which('cmd');
 
-  # "t/path/user/.local/bin/cmd",
+  # "t/path/user/local/bin/cmd",
 
 =back
 
@@ -1263,7 +1263,7 @@ I<Since C<2.80>>
 
   my $which = $os->which('app1');
 
-  # "t/path/user/.local/bin/app1"
+  # "t/path/user/local/bin/app1"
 
 =back
 
@@ -1277,7 +1277,7 @@ I<Since C<2.80>>
 
   my $which = $os->which('app2');
 
-  # "t/path/user/.local/bin/app2"
+  # "t/path/user/local/bin/app2"
 
 =back
 
@@ -1305,7 +1305,7 @@ I<Since C<2.80>>
 
   my $which = $os->which('app4');
 
-  # "t/path/user/.local/bin/app4"
+  # "t/path/user/local/bin/app4"
 
 =back
 

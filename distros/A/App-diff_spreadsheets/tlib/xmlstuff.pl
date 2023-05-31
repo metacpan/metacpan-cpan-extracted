@@ -12,7 +12,7 @@ use Encode qw(encode decode);
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use XML::Twig ();
 
-use Test::More; #for 'note' and 'diag'
+use Test2::V0; #for 'note' and 'diag'
 
 use constant DEFAULT_MEMBER_NAME => "content.xml";
 

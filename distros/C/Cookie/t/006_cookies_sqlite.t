@@ -14,6 +14,7 @@ BEGIN
     use Module::Generic::File qw( file );
     our $CRYPTX_REQUIRED_VERSION = '0.074';
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    $DEBUG ||= 4 if( exists( $ENV{AUTOMATED_TESTING} ) );
 };
 
 BEGIN
@@ -66,13 +67,15 @@ $jar->add({
 });
 
 is( $jar->length, 2, 'total cookies in jar' );
+diag( "SQLite binary is '$SQLITE_BIN' and do we have DBI? ", ( $HAS_DBI ? 'yes' : 'no' ) ) if( $DEBUG );
 my $db = file( __FILE__ )->parent->child( 'cookies.sqlite' );
 $rv = $jar->save_as_mozilla( $db );
-diag( ( $rv ? 'Successfully created' : 'Failed to create' ), " SQLite database ${db}" ) if( $DEBUG );
+diag( ( $rv ? 'Successfully created' : 'Failed to create' ), " SQLite database ${db}" . ( !defined( $rv ) ? ( ': ' . $jar->error ) : '' ) ) if( $DEBUG );
 ok( $rv, "SQLite database ${db} created" );
 
 my $jar2 = Cookie::Jar->new( debug => $DEBUG );
 $rv = $jar2->load_as_mozilla( $db );
+diag( ( $rv ? 'Successfully loaded' : 'Failed to load' ), " SQLite database ${db}" . ( !defined( $rv ) ? ( ': ' . $jar2->error ) : '' ) ) if( $DEBUG );
 ok( $rv, "load_as_mozilla" );
 is( $jar2->length, 2, 'number of cookies in repository' );
 if( $db->exists )

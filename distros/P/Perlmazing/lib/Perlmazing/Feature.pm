@@ -4,16 +4,20 @@ use warnings;
 use version;
 our $VERSION = '1.2812';
 our @ISA = qw(feature);
+our $MAX_VERSION = '5.028000';
 
 sub import {
-	my $self = shift;
-	strict->import;
-	warnings->import;
-	eval {
-		require feature;
-		$Perlmazing::Feature::{unknown_feature_bundle} = sub {} unless defined $Perlmazing::Feature::{unknown_feature_bundle};
-		$self->SUPER::import(':'.substr version->new($])->normal, 1);
-	};
+    my $self = shift;
+    my $version = $];
+    $MAX_VERSION = $] if $MAX_VERSION > $];
+    $version = $MAX_VERSION if $version > $MAX_VERSION;
+    strict->import;
+    warnings->import;
+    eval {
+        require feature;
+        $Perlmazing::Feature::{unknown_feature_bundle} = sub {} unless defined $Perlmazing::Feature::{unknown_feature_bundle};
+        $self->SUPER::import(':'.substr version->new($version)->normal, 1);
+    };
 }
 
 1;
@@ -22,7 +26,9 @@ __END__
 =pod
 =head1 NAME
 
-Perlmazing::Feature - Use strict and warnigns and enable all modern features from your Perl version in a single call.
+Perlmazing::Feature - Use strict and warnigns and enable all modern features from your Perl version in a single call. Currently, the maximum version features we
+enable here is 5.028, as some of the later versions of Perl have features that can cause unexpected compatibility problems. You can change the value of
+$Perlmazing::Feature::VERSION to $] or to any other limit.
 
 
 =head1 SYNOPSIS

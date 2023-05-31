@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 63;
+use Test::Most tests => 69;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -36,8 +36,18 @@ TEXT: {
 	cmp_deeply(DateTime::Format::Text->parse_datetime({ string => 'Today is 10/1/19' }), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
 	# cmp_deeply(DateTime::Format::Text->parse_datetime("Ernest Newton  (12 September 1856 \x{2013} 25 January 1922) was an English architect and President of Royal Institute of British Architects."), methods('day' => num(12), 'month' => num(9), 'year' => num(1856)), '->');
 	my @dates = DateTime::Format::Text->parse_datetime("Ernest Newton  (12 September 1856 \x{2013} 25 January 1922) was an English architect and President of Royal Institute of British Architects.");
+	cmp_ok(scalar(@dates), '==', 2, 'Matches exactly two dates');
 	cmp_deeply($dates[0], methods('day' => num(12), 'month' => num(9), 'year' => num(1856)), '->');
 	cmp_deeply($dates[1], methods('day' => num(25), 'month' => num(1), 'year' => num(1922)), '->');
+
+	# Mix of international and US format
+	@dates = DateTime::Format::Text->parse_datetime("Francis Eric Irving Bloy (17 December 1904 - 23 May 1993) served as the third Episcopal Bishop of Los Angeles from April 21, 1948 until December 31, 1973.");
+	cmp_ok(scalar(@dates), '==', 4, 'Matches exactly four dates');
+
+	cmp_deeply($dates[0], methods('day' => num(17), 'month' => num(12), 'year' => num(1904)), '->');
+	cmp_deeply($dates[1], methods('day' => num(23), 'month' => num(5), 'year' => num(1993)), '->');
+	cmp_deeply($dates[2], methods('day' => num(21), 'month' => num(4), 'year' => num(1948)), '->');
+	cmp_deeply($dates[3], methods('day' => num(31), 'month' => num(12), 'year' => num(1973)), '->');
 
 	for my $test (
 		'Sunday, 1 March 2015',

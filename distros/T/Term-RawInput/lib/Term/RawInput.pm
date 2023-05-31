@@ -2,7 +2,7 @@ package Term::RawInput;
 
 #    RawInput.pm
 #
-#    Copyright (C) 2011-2014
+#    Copyright (C) 2011-2023
 #
 #    by Brian M. Kelly. <Brian.Kelly@fullautosoftware.net>
 #
@@ -15,7 +15,7 @@ package Term::RawInput;
 ## See user documentation at the end of this file.  Search for =head
 
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 
 use 5.006;
@@ -363,7 +363,7 @@ Brian M. Kelly <Brian.Kelly@fullautosoftware.net>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011-2014
+Copyright (C) 2011-2023
 by Brian M. Kelly.
 
 This program is free software; you can redistribute it and/or

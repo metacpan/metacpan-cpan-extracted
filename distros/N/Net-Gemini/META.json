@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "bsd"
    ],
@@ -44,11 +44,11 @@
    "provides" : {
       "Net::Gemini" : {
          "file" : "lib/Net/Gemini.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Net::Gemini::Server" : {
          "file" : "lib/Net/Gemini/Server.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "URI::gemini" : {
          "file" : "lib/Net/Gemini.pm"
@@ -63,6 +63,6 @@
          "url" : "https://thrig.me/src/Net-Gemini.git"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -31,7 +31,7 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
 =head2 new
 
-  static method new : Sys::IO::Stat ($path = undef : string, $options = undef : object[]);
+  static method new : Sys::IO::Stat ($path : string = undef, $options : object[] = undef);
 
 Creates a new C<Sys::IO::Stat> object.
 

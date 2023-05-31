@@ -46,7 +46,7 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 init
 
-  method init : void ($options = undef : object[]);
+  method init : void ($options : object[] = undef);
 
 =head2 close
 
@@ -102,7 +102,7 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 ioctl
 
-  method ioctl : int ($request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object);
+  method ioctl : int ($request : int, $request_arg : object = undef of Byte|Short|Int|Long|Float|Double|object);
 
 =head2 sync
 
@@ -122,7 +122,7 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 fcntl
 
-  method fcntl : int ($command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object);
+  method fcntl : int ($command : int, $command_arg : object = undef of Int|Sys::IO::Flock|object);
 
 =head2 blocking
 
@@ -130,19 +130,19 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 write
 
-  method write : int ($buffer : string, $length : int, $offset = 0 : int);
+  method write : int ($buffer : string, $length : int, $offset : int = 0);
 
 =head2 read
 
-  method read : int ($buffer : mutable string, $length : int, $offset = 0 : int);
+  method read : int ($buffer : mutable string, $length : int, $offset : int = 0);
 
 =head2 syswrite
 
-  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int);
+  method syswrite : int ($buffer : string, $length : int, $offset : int = 0);
 
 =head2 sysread
 
-  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int);
+  method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0);
 
 =head1 Well Known Child Classes
 

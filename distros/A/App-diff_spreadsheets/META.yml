@@ -1,5 +1,5 @@
 ---
-abstract: 'Diff spreadsheets (or CSVs) showing changed cells'
+abstract: 'Diff spreadsheets or CSVs showing changed cells'
 author:
   - 'Jim Avera'
 build_requires:
@@ -10,15 +10,19 @@ build_requires:
   Exporter: '0'
   File::Spec: '0'
   File::Temp: '0.23'
+  File::Which: '0'
   Import::Into: '0'
-  Scalar::Util: '0'
-  Test::More: '0.98'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Test2::Plugin::BailOnFail: '0'
+  Test2::V0: '0'
   Time::HiRes: '0'
   autovivification: '0'
   indirect: '0'
+  lib: '0'
   multidimensional: '0'
   parent: '0'
-  perl: '5.018'
+  perl: v5.22.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -31,7 +35,7 @@ name: App-diff_spreadsheets
 requires:
   Algorithm::Diff: '0'
   Carp: '0'
-  Data::Dumper::Interp: '5.010'
+  Data::Dumper::Interp: '5.022'
   Encode: '0'
   File::Basename: '0'
   File::Copy: '0'
@@ -46,13 +50,14 @@ requires:
   PerlIO: '0'
   Pod::Find: '0'
   Pod::Usage: '0'
-  Spreadsheet::Edit: '3.005'
+  Scalar::Util: '0'
+  Spreadsheet::Edit: '3.010'
   Spreadsheet::Edit::IO: '0'
   Term::ReadKey: '0'
+  constant: '0'
   feature: '0'
-  lib: '0'
   open: '0'
-  perl: '5.018'
+  perl: v5.22.0
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -60,7 +65,7 @@ resources:
   bugtracker: https://github.com/jimav/App-diff_spreadsheets/issues
   homepage: https://github.com/jimav/App-diff_spreadsheets
   repository: https://github.com/jimav/App-diff_spreadsheets.git
-version: '1.005'
+version: '1.008'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

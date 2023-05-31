@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Liberachat;
-$App::SpreadRevolutionaryDate::Target::Liberachat::VERSION = '0.32';
+$App::SpreadRevolutionaryDate::Target::Liberachat::VERSION = '0.33';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Liberachat.
 
 use Moose;
@@ -111,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Liberachat - Target class for L<App::Sprea
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 
@@ -171,7 +171,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

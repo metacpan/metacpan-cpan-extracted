@@ -14,6 +14,12 @@ my $build = Module::Build->new
 		'Test::More'            => 0,
 		'Carp'                  => 0,
 	},
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/szabgab/CGI-Upload/',
+            bugtracker => 'https://github.com/szabgab/CGI-Upload/issues'
+        }
+    },
 );
 
 $build->create_build_script;

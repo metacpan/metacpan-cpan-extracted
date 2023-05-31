@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Find {
-  version "0.021";
+  version "0.021001";
   
   use StringList;
   use File::Spec;
@@ -13,7 +13,7 @@ class File::Find {
   use File::Find::Handler;
   use Sys::OS;
   
-  static method find : void ($cb : File::Find::Handler, $top_dir : string, $options = undef : object[]) {
+  static method find : void ($cb : File::Find::Handler, $top_dir : string, $options : object[] = undef) {
     
     unless ($cb) {
       die "The \$cb must be defined";

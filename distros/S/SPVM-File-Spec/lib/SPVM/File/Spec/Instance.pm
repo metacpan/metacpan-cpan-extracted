@@ -81,7 +81,7 @@ The File::Spec::Instance class of L<SPVM> is an Object-Oriented L<File::Spec|SPV
 
 =head2 splitpath
 
-  method splitpath : string[] ($path : string, $no_file = 0 : int);
+  method splitpath : string[] ($path : string, $no_file : int = 0);
 
 =head2 splitdir
 
@@ -93,11 +93,11 @@ The File::Spec::Instance class of L<SPVM> is an Object-Oriented L<File::Spec|SPV
 
 =head2 abs2rel
 
-  method abs2rel : string ($path : string, $base = undef : string);
+  method abs2rel : string ($path : string, $base : string = undef);
 
 =head2 rel2abs
 
-  method rel2abs : string ($path : string, $base = undef : string);
+  method rel2abs : string ($path : string, $base : string = undef);
 
 =head1 Well Known Child Classes
 

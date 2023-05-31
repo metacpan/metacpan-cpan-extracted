@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +24,7 @@ requires:
   Time::Local: '0'
   perl: '5.010'
 resources:
-  repository: http://github.com/szabgab/Web-Feed.git
-version: '0.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  bugtracker: https://github.com/szabgab/Web-Feed/issues
+  repository: https://github.com/szabgab/Web-Feed.git
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

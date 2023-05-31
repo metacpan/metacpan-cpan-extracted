@@ -2,51 +2,33 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    This document describes version 0.484 of App::OrgUtils (from Perl
-    distribution App-OrgUtils), released on 2023-01-19.
+    This document describes version 0.485 of App::OrgUtils (from Perl
+    distribution App-OrgUtils), released on 2023-04-06.
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
     documents; some originally created as examples/demos for Org::Parser.
     The following are the included scripts:
 
-    *   browse-org
-
-    *   count-done-org-todos
-
-    *   count-org-todos
-
-    *   count-undone-org-todos
-
-    *   dump-org-structure
-
-    *   dump-org-structure-tiny
-
-    *   list-org-anniversaries
-
-    *   list-org-headlines
-
-    *   list-org-priorities
-
-    *   list-org-tags
-
-    *   list-org-todo-states
-
-    *   list-org-todos
-
-    *   move-done-org-todos
-
-    *   org2html
-
-    *   org2html-wp
-
-    *   orgdump
-
-    *   orgdump-tiny
-
-    *   orgstat
-
-    *   stat-org-document
+    1. browse-org
+    2. count-done-org-todos
+    3. count-org-todos
+    4. count-undone-org-todos
+    5. dump-org-structure
+    6. dump-org-structure-tiny
+    7. list-org-anniversaries
+    8. list-org-headlines
+    9. list-org-priorities
+    10. list-org-tags
+    11. list-org-todo-states
+    12. list-org-todos
+    13. move-done-org-todos
+    14. org2html
+    15. org2html-wp
+    16. orgdump
+    17. orgdump-tiny
+    18. orgstat
+    19. stat-org-document
 
 FUNCTIONS
   reverse_org_headlines

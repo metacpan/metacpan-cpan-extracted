@@ -21,7 +21,7 @@ The MIME::QuotedPrint class of L<SPVM> has methods for Quoted-Printable encoding
 
 =head2 encode_qp
 
-  static method encode_qp : string ($string : string, $eol = undef : string, $binmode = 0 : int)
+  static method encode_qp : string ($string : string, $eol : string = undef, $binmode : int = 0)
 
 Returns an Quoted-Printable encoded version of the string $string.
 

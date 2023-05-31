@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 5;
-use Perlmazing;
+use Perlmazing qw(is_empty);
 
 my @cases = (
 	[undef, 1, 'undef'],

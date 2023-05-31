@@ -9,9 +9,9 @@ use Cwd;
 use File::Find;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-19'; # DATE
 our $DIST = 'App-FileRenameUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cwd = getcwd;
 
@@ -39,7 +39,7 @@ move-files-here - Move files in subdirectories to the current directory
 
 =head1 VERSION
 
-This document describes version 0.009 of move-files-here (from Perl distribution App-FileRenameUtils), released on 2023-03-02.
+This document describes version 0.010 of move-files-here (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
 
 =head1 DESCRIPTION
 

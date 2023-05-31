@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode::Bot;
-$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.32';
+$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.33';
 # ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Freenode channels
 
 use Moose;
@@ -121,7 +121,7 @@ App::SpreadRevolutionaryDate::Target::Freenode::Bot - Subclass overloading L<Bot
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SEE ALSO
 
@@ -171,7 +171,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
 This is free software, licensed under:
 

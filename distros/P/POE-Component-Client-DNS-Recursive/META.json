@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::IP" : "0.29",
-            "Net::DNS" : "0.69",
+            "Net::DNS" : "1.38",
             "Net::DNS::Packet" : "0",
             "Net::IP::Minimal" : "0",
             "POE" : "1.004",
@@ -60,7 +60,9 @@
          "web" : "https://github.com/bingos/poe-component-client-dns-recursive"
       }
    },
-   "version" : "1.12",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "1.14",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

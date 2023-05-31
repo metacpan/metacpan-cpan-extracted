@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::TABULO;
 ### ex: set ft=perl noai ts=4 sw=4:
 
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use 5.026; # Indented HEREDOC.
 use Data::Printer qw(p np);
@@ -18,6 +18,7 @@ use Zest::Author::TABULO::MungersForHas qw(hm_tabulo);
 use Zest::Author::TABULO::Util::List qw(flat uniq_sort_flat);
 use Zest::Author::TABULO::Util::Mayhap qw(mayhap);
 use Zest::Author::TABULO::Util::Dzil qw(grok_plugins);
+use Zest::Author::TABULO::Util::Text qw(docstr);
 
 use Moose;
 with
@@ -89,13 +90,13 @@ sub mvp_aliases {
 has archive_dir => (
     isa     => 'Str',
     default => 'releases',
-    -doc    => <<~"__EOT__"
+    -doc    => docstr("
         Passed as the 'directory' option, to [ArchiveRelease] whose docs are quoted below:
 
         * The 'directory' [name] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
         * If the directory doesn't exist, it will be created during the BeforeRelease phase.
         * All files inside this directory will be pruned from the distribution.
-        __EOT__
+        "),
     );
 
 has authority => (
@@ -119,17 +120,20 @@ has auto_version => (
 has copy => (
     isa     => 'ArrayRef',
     default => sub { [] },
-    -doc    =>
-      "Additional files to copy (or regenerate) in addition to those that are already harvested by default. [May be repeated]. Note that the copying may be done from the build or the release, depending on the 'copy_mode' setting. See 'copy_mode'.",
-      );
+    -doc    => docstr("
+        Additional files to copy (or regenerate) in addition to those that are already harvested by default. [May be repeated]. Note that the copying may be done from the build or the release, depending on the 'copy_mode' setting. See 'copy_mode'.
+        "),
+    );
 
 has copy_mode => (
     isa     => 'Maybe[Str]',
     default => 'Release',
-    -doc    => "Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  ["
-      . join( ', ', @allowed_copy_modes )
-      . "]. dzil 'regenerate' command will still work. ",
-      );
+    -doc    => docstr("
+        Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  ["
+        . join( ', ', @allowed_copy_modes )
+        . "]. dzil 'regenerate' command will still work.
+        "),
+    );
 
 has copy_not => (
     isa     => 'ArrayRef',
@@ -146,14 +150,14 @@ has darkpan => (
 has dist_genre => (
     isa     => 'Str',
     default => 'standard',
-    -doc    => <<~"__EOT__"
+    -doc    => docstr("
         Specifies the 'genre' of the distro. Currently allowed values are: 'standard' (the default) and 'task'.
 
         This may be used in the future to associate a set behaviours/settings to given genres.
 
         Currently, the only distinction made is for the 'task' genre, which will result in [TaskWeaver] being used
         instead of [SurgicalPodWeaver].
-        __EOT__
+        "),
     );
 
 has exclude_filenames => (
@@ -171,28 +175,38 @@ has exclude_match => (
 has exec_dir => (
     isa     => 'Maybe[Str]',
     default => sub { $_[0]->installer =~ /Module::Build::Tiny/ ? 'script' : undef },
-    -doc    =>
-      "If defined, passed to [ExecDir] as its 'dir' option.  Defaults to 'script' when the installer is [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default will be in effect, and that is 'bin' as of this writing.",
-      );
+    -doc    => docstr("
+        If defined, passed to [ExecDir] as its 'dir' option.
+        Defaults to 'script' when the installer is [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default will be in effect, and that is 'bin' as of this writing.,
+        "),
+    );
 
 has fake_release => (
     isa     => 'Bool',
     default => 0,
-    -doc    =>
-      "Swaps [FakeRelease] for [UploadToCPAN]. Mostly useful for testing a dist.ini without risking a real release. Note that this can also be achieved by setting the FAKE_RELEASE environment variable (which will have precedence over this option).",
-      );
+    -doc    => docstr("
+        Swaps [FakeRelease] for [UploadToCPAN]. Mostly useful for testing a dist.ini without risking a real release.
+        Note that this can also be achieved by setting the FAKE_RELEASE environment variable (which will have precedence over this option).
+        "),
+    );
 
 has has_xs => (
     isa     => 'Bool',
     default => sub { glob('*.xs') ? 1 : 0 }, # @ETHER
+    -doc    => docstr("
+        Signifies that the distribution contains XS code.
+        "),
     );
 
 has hub => (
     isa     => 'Maybe[Str]',
     default => 'github',
-    -doc    =>
-      "The repository 'hub' provider. Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'. Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future.",
-      );
+    -doc    => docstr("
+        The repository 'hub' provider.
+        Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'.
+        Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future.
+        "),
+    );
 
 has git_remotes => (
     isa     => 'ArrayRef',
@@ -214,7 +228,7 @@ has installer => (
 has is_task => ( #DEPRECATED
     isa     => 'Bool',
     default => sub { ( $_[0]->dist_genre // '' ) =~ m/^task/i },
-    -doc    => <<~"__EOT__"
+    -doc    => docstr("
         DEPRECATED. Prefer setting instead, like so:
 
         [\@Author::TABULO]
@@ -223,11 +237,11 @@ has is_task => ( #DEPRECATED
         Identifies this distro as a 'task'.
 
         Currently, the only distinction is that, for a task, we use [TaskWeaver] instead of [SurgicalPodWeaver].
-        __EOT__
+        "),
     );
 
-has manage_versions => (
-    isa     => 'Bool',                                                                                                               # adopted from @Starter (also dropping the 'd' in the name)
+has manage_versions => (    # adopted from @Starter (also dropping the 'd' in the name)
+    isa     => 'Bool',
     default => 1,
     -doc    => "Whether or not to manage versioning, which means: providing, rewriting, bumping, munging \$VERSION in sources, ....",
     );
@@ -285,18 +299,19 @@ has no_git_push => (
 has no_git_impact => (
     isa     => 'Bool',
     default => 0,
-    -doc    => <<~"_EOT_"
+    -doc    => docstr("
         Omit any [Git:*] plugins that may modify the vcs repository state, such as : [Git::Commit], [Git::CommitBuild], [Git::Tag], [Git::Push] and the like.
         Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option.
-        _EOT_
+        "),
     );
 
 has no_github => (
     isa     => 'Bool',
     default => sub { ( $_[0]->hub // '' ) !~ m/^github$/ },
-    -doc    =>
-      "Do not assume that the repository is backed by 'github', which currently means abstaining from using [GithubMeta] and feeding fake values to [MetaResources] and [Bugtracker] -- which you may separately override, by the way, thanks to our[\@Config::Slicer] role.",
-      );
+    -doc    =>  docstr("
+      Do not assume that the repository is backed by 'github', which currently means abstaining from using [GithubMeta] and feeding fake values to [MetaResources] and [Bugtracker] -- which you may separately override, by the way, thanks to our[\@Config::Slicer] role.
+      "),
+    );
 
 has no_minimum_perl => (
     isa     => 'Bool',
@@ -357,45 +372,49 @@ has pod_coverage_also_private => (
 has tag_format => (
     isa     => 'Str',
     default => 'repo-release-v%V%t',
-    -doc    => <<~"__EOT__"
+    -doc    => docstr("
         The tag format passed to [Git::Tag] after committing sources.
         The default is 'repo-release-v%V%t', which may be prefixed by some other string.
         The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
-        __EOT__
+        "),
     );
 
 has tag_format_dist => (
     isa     => 'Str',
     default => 'dist-release-v%V%t',
-    -doc    => <<~"__EOT__"
+    -doc    => docstr("
         The tag format passed to [Git::Tag] after committing the build.
         The default is 'dist-release-v%V%t', which may be prefixed by some other string.
         The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
-        __EOT__
+        "),
     );
 
 has stopwords => ( ## ALIAS: stopword
     isa     => 'ArrayRef',
     default => sub { [] },
-    -doc    =>
-      "Additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopword_files' and 'wordlists' for alternative mechanisms of adding stopwords.",
-      );
+    -doc    => docstr("
+        Additional stopword(s) for Pod::Spell tests. [May be repeated].
+        See also: 'stopword_files' and 'wordlists' for alternative mechanisms of adding stopwords.
+        "),
+    );
 
 has stopwords_files => ( ## ALIAS: stopwords_file
     isa     => 'ArrayRef',
     default => sub { [ grep -e, qw(stopwords) ] },
-    -doc    =>
-      "File(s) that describe additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.",
-      );
+    -doc    => docstr("
+        File(s) that describe additional stopword(s) for Pod::Spell tests. [May be repeated].
+        See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
+        "),
+    );
 
 has stopwords_providers => ( ## ALIAS: wordlist
     isa     => 'ArrayRef',
     default => sub { [q/Pod::Wordlist::Author::TABULO/] },
-    -doc    => <<~"__EOT__"
+    -doc    => docstr("
         Perl module(s) for contributing additional stopword(s) for spelling tests. [May be repeated].
         Note that given module(s) would need to expose the same API as L<Pod::Wordlist>.
         See also: 'stopwords' and 'stopword_files' for alternative mechanisms of adding stopwords.
-        __EOT__
+        "),
     );
 
 has version_regexp => (
@@ -442,18 +461,22 @@ has _harvested_files => (
         _clear_harvested_files => 'clear',
       },
     -access => 'private',
-    -doc    =>
-      "List of files that are effectively 'harvested', i.e. default candidates to be copied from the build/release. This list is dynamically built during bundle configuration.",
-      );
+    -doc    => docstr("
+        List of files that are effectively 'harvested', i.e. default candidates to be copied from the build/release.
+        This list is dynamically built during bundle configuration.
+        "),
+    );
 
 has _installer_files => (
     traits  => ['Array'],
     isa     => 'ArrayRef',
     default => sub { [ $_[0]->installer =~ /MakeMaker/ ? 'Makefile.PL' : 'Build.PL' ] },
     -access => 'private',
-    -doc    =>
-      "List of files that are expected to be generated for the given installer. (e.g. : Makefile.PL, Build.PL, ...).  TODO: handle 'ppport.h' and equivalent.",
-      );
+    -doc    => docstr("
+        List of files that are expected to be generated for the given installer. (e.g. : Makefile.PL, Build.PL, ...).
+        TODO: handle 'ppport.h' and equivalent.
+        "),
+    );
 
 has _plugins => (
     traits  => ['Array'],
@@ -473,9 +496,8 @@ has _target_branches => (
         _clear_target_branches => 'clear',
       },
     -access => 'private',
-    -doc    =>
-      "List of branches that will become targets for [Git::Push]",
-      );
+    -doc    => "List of branches that will become targets for [Git::Push]",
+    );
 
 #region: BUILDARGS and co: copied/adapted from: @DROLSKY
 
@@ -952,7 +974,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =head1 SYNOPSIS
 
@@ -1254,8 +1276,7 @@ Additional documentation: Passed as the 'directory' option, to [ArchiveRelease] 
 
 * The 'directory' [name] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
 * If the directory doesn't exist, it will be created during the BeforeRelease phase.
-* All files inside this directory will be pruned from the distribution.
- Default: 'releases'
+* All files inside this directory will be pruned from the distribution. Default: 'releases'
 
 =head2 authority
 
@@ -1295,7 +1316,7 @@ Reader: copy_mode
 
 Type: Maybe[Str]
 
-Additional documentation: Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  [Regenerate, Release, Build, Build::Filtered, None]. dzil 'regenerate' command will still work.  Default: 'Release'
+Additional documentation: Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  [Regenerate, Release, Build, Build::Filtered, None]. dzil 'regenerate' command will still work. Default: 'Release'
 
 =head2 copy_not
 
@@ -1324,8 +1345,7 @@ Additional documentation: Specifies the 'genre' of the distro. Currently allowed
 This may be used in the future to associate a set behaviours/settings to given genres.
 
 Currently, the only distinction made is for the 'task' genre, which will result in [TaskWeaver] being used
-instead of [SurgicalPodWeaver].
- Default: 'standard'
+instead of [SurgicalPodWeaver]. Default: 'standard'
 
 =head2 exclude_filenames
 
@@ -1349,7 +1369,8 @@ Reader: exec_dir
 
 Type: Maybe[Str]
 
-Additional documentation: If defined, passed to [ExecDir] as its 'dir' option.  Defaults to 'script' when the installer is [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default will be in effect, and that is 'bin' as of this writing.
+Additional documentation: If defined, passed to [ExecDir] as its 'dir' option.
+Defaults to 'script' when the installer is [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default will be in effect, and that is 'bin' as of this writing.,
 
 =head2 fake_release
 
@@ -1357,7 +1378,8 @@ Reader: fake_release
 
 Type: Bool
 
-Additional documentation: Swaps [FakeRelease] for [UploadToCPAN]. Mostly useful for testing a dist.ini without risking a real release. Note that this can also be achieved by setting the FAKE_RELEASE environment variable (which will have precedence over this option). Default: '0'
+Additional documentation: Swaps [FakeRelease] for [UploadToCPAN]. Mostly useful for testing a dist.ini without risking a real release.
+Note that this can also be achieved by setting the FAKE_RELEASE environment variable (which will have precedence over this option). Default: '0'
 
 =head2 git_remotes
 
@@ -1381,13 +1403,17 @@ Reader: has_xs
 
 Type: Bool
 
+Additional documentation: Signifies that the distribution contains XS code.
+
 =head2 hub
 
 Reader: hub
 
 Type: Maybe[Str]
 
-Additional documentation: The repository 'hub' provider. Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'. Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future. Default: 'github'
+Additional documentation: The repository 'hub' provider.
+Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'.
+Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future. Default: 'github'
 
 =head2 installer
 
@@ -1489,8 +1515,7 @@ Reader: no_git_impact
 Type: Bool
 
 Additional documentation: Omit any [Git:*] plugins that may modify the vcs repository state, such as : [Git::Commit], [Git::CommitBuild], [Git::Tag], [Git::Push] and the like.
-Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option.
- Default: '0'
+Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option. Default: '0'
 
 =head2 no_git_push
 
@@ -1608,7 +1633,8 @@ Reader: stopwords
 
 Type: ArrayRef
 
-Additional documentation: Additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopword_files' and 'wordlists' for alternative mechanisms of adding stopwords.
+Additional documentation: Additional stopword(s) for Pod::Spell tests. [May be repeated].
+See also: 'stopword_files' and 'wordlists' for alternative mechanisms of adding stopwords.
 
 =head2 stopwords_files
 
@@ -1616,7 +1642,8 @@ Reader: stopwords_files
 
 Type: ArrayRef
 
-Additional documentation: File(s) that describe additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
+Additional documentation: File(s) that describe additional stopword(s) for Pod::Spell tests. [May be repeated].
+See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
 
 =head2 stopwords_providers
 
@@ -1636,8 +1663,7 @@ Type: Str
 
 Additional documentation: The tag format passed to [Git::Tag] after committing sources.
 The default is 'repo-release-v%V%t', which may be prefixed by some other string.
-The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
- Default: 'repo-release-v%V%t'
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex. Default: 'repo-release-v%V%t'
 
 =head2 tag_format_dist
 
@@ -1647,8 +1673,7 @@ Type: Str
 
 Additional documentation: The tag format passed to [Git::Tag] after committing the build.
 The default is 'dist-release-v%V%t', which may be prefixed by some other string.
-The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
- Default: 'dist-release-v%V%t'
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex. Default: 'dist-release-v%V%t'
 
 =head2 version_regexp
 

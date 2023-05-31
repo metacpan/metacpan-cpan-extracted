@@ -26,7 +26,7 @@ local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin'
     : q[]
   );
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 my $binary  = 'firefox';
 my $ident   = 'ssh-auth-cmd-marionette';
@@ -344,7 +344,7 @@ sub _filesystem_regexes {
                 push @allowed_binary_paths, $os_allowed_binary_paths{$OSNAME};
             }
             my %os_allowed_binary_directories = (
-                freebsd   => '/usr/local/lib',
+                freebsd   => '/usr/local/lib/firefox',
                 dragonfly => '/usr/local/lib/firefox',
                 netbsd    => '/usr/pkg/bin',
                 openbsd   => '/usr/local/lib/firefox',
@@ -401,7 +401,7 @@ ssh-auth-cmd-marionette - ssh ~/.ssh/authorized_keys command for Firefox::Marion
 
 =head1 VERSION
 
-Version 1.37
+Version 1.38
 
 =head1 USAGE
 

@@ -1,2 +1,8 @@
+0.02 2023-05-27T11:07:17+02:00
+ - Add doc for Utils.
+ - Add example to doc.
+ - Add README file.
+ - Fix dependencies (missing URI).
+
 0.01 2023-05-26T14:14:18+02:00
  - First version.

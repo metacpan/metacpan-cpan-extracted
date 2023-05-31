@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "csvgrep",
   "PREREQ_PM" => {
+    "File::Basename" => 0,
     "Getopt::Long" => 0,
     "Text::CSV_XS" => 0,
     "Text::Table::Tiny" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
+  "File::Basename" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,

@@ -3,9 +3,9 @@ package Data::Section::Seekable;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2023-03-24'; # DATE
 our $DIST = 'Data-Section-Seekable'; # DIST
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 1;
 # ABSTRACT: Read and write parts from data section
@@ -22,7 +22,7 @@ Data::Section::Seekable - Read and write parts from data section
 
 =head1 VERSION
 
-This document describes version 0.091 of Data::Section::Seekable (from Perl distribution Data-Section-Seekable), released on 2023-01-20.
+This document describes version 0.092 of Data::Section::Seekable (from Perl distribution Data-Section-Seekable), released on 2023-03-24.
 
 =head1 DESCRIPTION
 
@@ -44,8 +44,8 @@ First line of data section is the header line and must be:
 
  Data::Section::Seekable v1
 
-Actually, the header line need not be the first line of data. Previous lines not
-matching the header line will be ignored (so you can put other stuffs here).
+Actually, the header line needs not be the first line of data. Previous lines
+not matching the header line will be ignored (so you can put other stuffs here).
 
 After the header line, comes zero or more TOC ("table of content") lines. Each
 TOC line must match this Perl regex:

@@ -21,7 +21,7 @@ ss2ss - (NOT YET IMPLEMENTED) Convert spreadsheet from one format (e.g. LibreOff
 
 =head1 VERSION
 
-This document describes version 0.003 of ss2ss (from Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+This document describes version 0.004 of ss2ss (from Perl distribution App-SpreadsheetUtils), released on 2023-03-19.
 
 =head1 SYNOPSIS
 

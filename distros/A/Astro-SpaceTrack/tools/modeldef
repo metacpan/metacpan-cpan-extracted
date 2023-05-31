@@ -13,7 +13,7 @@ use JSON;
 use Pod::Usage;
 use POSIX qw{ strftime };
 
-our $VERSION = '0.161';
+our $VERSION = '0.162';
 
 my %opt;
 

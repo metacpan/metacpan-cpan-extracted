@@ -134,6 +134,10 @@ sub showlayout {
 }
 
 sub setup_fonts {
+    $^O =~ /mswin/i ? setup_fonts_windows() : setup_fonts_linux();
+}
+
+sub setup_fonts_linux {
     my $fd = Text::Layout::FontConfig->new;
 
     # Add font dir and register fonts.
@@ -142,11 +146,17 @@ sub setup_fonts {
 	$fd->register_font( "FreeSerif$_.ttf", "freeserif", $_,
 			  { shaping => 0 } );
     }
-    for ( "Roman", qw( Bold Italic BoldItalic ) ) {
-	$fd->register_font( "Times-$_", "freeserixf",
-			    $_ eq "Roman" ? "" : $_,
-			  { shaping => 0 } );
-    }
+}
+
+sub setup_fonts_windows {
+    my $fd = Text::Layout::FontConfig->new;
+
+    # Add font dir and register fonts.
+    $fd->add_fontdirs( "C:\\Windows\\Fonts" );
+    $fd->register_font( "georgia.ttf",  "freeserif", "" );
+    $fd->register_font( "georgiab.ttf", "freeserif", "bold" );
+    $fd->register_font( "georgiai.ttf", "freeserif", "italic" );
+    $fd->register_font( "georgiaz.ttf", "freeserif", "bolditalic" );
 }
 
 ################ Main entry point ################

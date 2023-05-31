@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000636';
+our $VERSION='1.0000641';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1157,16 +1157,13 @@ END
    unless (-1<index $yins,'zlib-devel') {
       fa_system("sudo yum -y install 'zlib-devel'");
    }
-   if ((exists $amazon{'amazon_linux'}) ||
-         (exists $amazon{'rhel'}) ||
-         (exists $amazon{'centos'})) {
-      unless (-1<index $yins,'wget') {
-         fa_system("sudo yum -y install 'wget'");
-      }
-      fa_system('echo y | sudo amazon-linux-extras install epel');
+   unless (-1<index $yins,'wget') {
+      fa_system("sudo yum -y install 'wget'");
    }
-   unless (-1<index $yins,'figlet') {
-      fa_system("sudo yum -y install 'figlet'");
+   unless (-e '/usr/local/bin/figlet') {
+      my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
+             '/unix/figlet-2.2.5.tar.gz';
+      fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
    }
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
@@ -1190,22 +1187,10 @@ END
    unless (-1<index $yins,'wget') {
       fa_system("sudo yum -y install 'wget'");
    }
-   unless (-1<index $yins,'figlet') {
-      fa_system('echo y | sudo amazon-linux-extras install epel')
-         if exists $amazon{'centos'};
-      fa_system("sudo yum -y install 'figlet'");
-      my $yins=`yum list installed`;
-      unless (-1<index $yins,'figlet') {
-         fa_system("sudo wget http://dl.fedoraproject.org/pub/epel/7/x86_64/".
-                   "Packages/e/epel-release-7-14.noarch.rpm");
-         fa_system("sudo rpm -Uvh epel-release*rpm");
-         fa_system("sudo yum -y install 'figlet'");
-         unless (-e '/usr/local/bin/figlet') {
-            my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
-                   '/unix/figlet-2.2.5.tar.gz';
-            fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
-         }
-      }
+   unless (-e '/usr/local/bin/figlet') {
+      my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
+             '/unix/figlet-2.2.5.tar.gz';
+      fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
    }
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
@@ -1734,6 +1719,7 @@ sub fa_install_module {
        &fa_err_exit($stderr_capture,$_[0])
           if $stderr_capture;
     }
+    return '';
 }
    
 sub menu {
@@ -2065,6 +2051,7 @@ END
    &fa_install_module('MooX::Types::MooseLike::Base','install','Makefile');
    &fa_install_module('Devel::StackTrace','install','Makefile');
    &fa_install_module('Throwable','install','Makefile');
+   &fa_install_module('Time::Local','install','Makefile');
    &fa_install_module('Email::Date::Format','install','Makefile');
    &fa_install_module('Net::SMTP','install','Makefile','','','','PERL_CORE=1');
    &fa_install_module('Email::Simple','install','Makefile');
@@ -2506,18 +2493,20 @@ require Mozilla::CA;
 require Term::Menus;
 require Term::ReadKey;
 require Term::RawInput;
+
 my $last_known_good_location=
-#      "http://download.oracle.com/berkeley-db/db-5.2.28.tar.gz";
-      "http://download.oracle.com/berkeley-db/db-6.2.32.tar.gz";
+      "https://download.oracle.com/berkeley-db/db-6.2.32.tar.gz";
 
 my $process_id='';my $PREFIX='';
 $process_id=pop @ARGV if $ARGV[$#ARGV-1]=~/^\d+$/;
 my $install_cygwin_without_asking=0;
 our $cygwin_berkeley_db_mode=777;
+
 if (exists $ENV{FA_BERKELEY} &&
       (-1<index $ENV{FA_BERKELEY},'Owner Group')) {
    $cygwin_berkeley_db_mode=770;
 }
+
 our $install_webapi=(exists $ENV{FA_WEBAPI})?$ENV{FA_WEBAPI}:'';
 
 if (exists $Config{prefix} &&
@@ -4017,6 +4006,7 @@ if (-e "/bin/grep") {
 } elsif (-e "/usr/local/bin/grep") {
    $greppath="/usr/local/bin/";
 }
+
 my $get_BerkeleyDB=0;
 eval {
    local $SIG{__DIE__}; # No sigdie handler

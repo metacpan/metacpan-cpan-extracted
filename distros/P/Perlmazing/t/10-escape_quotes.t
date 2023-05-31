@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 16;
-use Perlmazing;
+use Perlmazing qw(escape_quotes);
 
 my @cases = (
 	[q[Hello world!], 'Hello world!', 'simple string'],

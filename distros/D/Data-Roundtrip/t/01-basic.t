@@ -1,4 +1,5 @@
 #!perl -T
+
 use 5.008;
 use strict;
 use warnings;
@@ -9,7 +10,7 @@ my $verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.14';
+our $VERSION='0.16';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';

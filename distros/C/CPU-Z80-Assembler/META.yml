@@ -33,8 +33,7 @@ requires:
   Text::Tabs: '2006.1117'
   perl: '5.012'
 resources:
+  bugtracker: https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues
   repository: https://github.com/pauloscustodio/perl-CPU-Z80-Assembler.git
-version: '2.22'
-x_bugtracker:
-  web: https://github.com/pauloscustodio/perl-CPU-Z80-Assembler/issues
+version: '2.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

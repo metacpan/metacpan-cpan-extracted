@@ -4,10 +4,13 @@ use Devel::CheckLib;
 check_lib_or_exit( lib => 'rados', header => 'rados/librados.h' );
 
 use ExtUtils::MakeMaker;
+use File::Copy;
+use File::Spec;
 use File::Which;
 use C::Scan::Constants;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+my $gnulike_p = which('gcc') && -e '/dev/null';
 WriteMakefile(
     NAME              => 'Ceph::Rados',
     VERSION_FROM      => 'lib/Ceph/Rados.pm', # finds $VERSION
@@ -15,7 +18,10 @@ WriteMakefile(
         'Devel::CheckLib'       => 0,
         'ExtUtils::MakeMaker'   => 0,
         'File::Which'           => 0,
-        'C::Scan::Constants'    => 0,
+        ($gnulike_p ?
+       ('C::Scan::Constants'    => 0) :
+       ('ExtUtils::Constant'    => 0)
+        ),
     }, # e.g., Module::Name => 1.1
     TEST_REQUIRES     => {
         'Test::More'        => 0,
@@ -31,10 +37,12 @@ WriteMakefile(
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
 );
-if (which('gcc') and -e '/dev/null') {
+if ($gnulike_p) {
     # looks like we're on something Gnu-like, attempt to find rados header file
     # and generate constants from it
     my $output = `echo '#include <rados/librados.h>' | cpp -H -o /dev/null 2>&1 | head -n1`;
+    # drop out to fallback if we get an error
+    goto FALLBACK if $output =~ m/clang: error/;
     my ($path) = ($output =~ m!^\. (.*)$!);
     my @constants = extract_constants_from( $path );
     @constants = grep { $_ ne 'CEPH_LIBRADOS_H' and
@@ -80,10 +88,11 @@ elsif (eval {require ExtUtils::Constant; 1}) {
       XS_FILE      => 'const-xs.inc',
   );
 }
-else {
-    use File::Copy;
-    use File::Spec;
-    foreach my $file ('const-c.inc', 'const-xs.inc') {
+
+# we don't want to blow up on missing const files, ever
+FALLBACK:
+foreach my $file ('const-c.inc', 'const-xs.inc') {
+    if (!-e $file) {
         my $fallback = File::Spec->catfile('fallback', $file);
         copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
     }

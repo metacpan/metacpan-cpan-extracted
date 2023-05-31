@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Job;
-$POE::Component::SmokeBox::Job::VERSION = '0.56';
+$POE::Component::SmokeBox::Job::VERSION = '0.58';
 #ABSTRACT: Object defining a SmokeBox job.
 
 use strict;
@@ -65,7 +65,7 @@ POE::Component::SmokeBox::Job - Object defining a SmokeBox job.
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

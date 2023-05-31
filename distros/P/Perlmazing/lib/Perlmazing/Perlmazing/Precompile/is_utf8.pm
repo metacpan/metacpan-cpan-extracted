@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(is_empty);
 use Encode;
 
 sub main ($) {

@@ -64,7 +64,7 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 new
 
-  static method new : IO::Socket ($options = undef : object[]);
+  static method new : IO::Socket ($options : object[] = undef);
 
 =head3 new Options
 
@@ -88,7 +88,7 @@ See also L<SPVM::Sys::Socket::Constant>.
 
 =head2 new_instance
 
-  method new_instance : IO::Socket ($options = undef : object[]);
+  method new_instance : IO::Socket ($options : object[] = undef);
 
 =head2 DESTROY
 
@@ -96,7 +96,7 @@ See also L<SPVM::Sys::Socket::Constant>.
 
 =head2 init
 
-  protected method init : void ($options = undef : object[]);
+  protected method init : void ($options : object[] = undef);
 
 =head2 connect
 
@@ -106,11 +106,11 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 recv
 
-  method recv : int ($buffer : mutable string, $length = -1 : int, $flags = 0 : int);
+  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0);
 
 =head2 send
 
-  method send : int ($buffer : string, $flags = 0 : int, $to = undef : Sys::Socket::Sockaddr);
+  method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef);
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
@@ -128,7 +128,7 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 listen
 
-  method listen : int ($queue = 5 : int);
+  method listen : int ($queue : int = 5);
 
 =head2 bind
 
@@ -166,7 +166,7 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 socket
 
-  method socket : int ($domain : int, $type : int, $protocol = 0 : int);
+  method socket : int ($domain : int, $type : int, $protocol : int = 0);
 
 =head2 socketpair
 
@@ -174,7 +174,7 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 accept
 
-  method accept : IO::Socket ($io_socket_builder = undef : IO::Socket::Builder, $peer_ref = undef : Sys::Socket::Sockaddr[]);
+  method accept : IO::Socket ($io_socket_builder : IO::Socket::Builder = undef, $peer_ref : Sys::Socket::Sockaddr[] = undef);
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 

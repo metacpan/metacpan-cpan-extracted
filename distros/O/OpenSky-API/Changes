@@ -1,0 +1,15 @@
+Revision history for OpenSky-API
+
+0.004     2023-05-29 11:25:32 CEST
+          - Fixed iterator bug and wrote tests for it (thanks, toreau)
+
+0.003     2023-05-29 07:27:16 CEST
+          - Doc fixes and remove an unused class.
+
+0.002     2023-05-28 16:18:26 CEST
+          - Doc fixes.
+
+0.001     2023-05-28 15:34:58 CEST
+
+          - First version of OpenSKY::API for Perl
+

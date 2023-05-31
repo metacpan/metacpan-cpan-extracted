@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 5;
-use Perlmazing;
+use Perlmazing qw(eval_string);
 
 {
 	my $r = eval_string 'hello world';

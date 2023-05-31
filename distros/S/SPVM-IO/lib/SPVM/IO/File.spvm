@@ -14,7 +14,7 @@ class IO::File extends IO::Handle {
   
   # Class methods
 
-  static method new : IO::File ($file_name = undef : string, $open_mode = undef : string) {
+  static method new : IO::File ($file_name : string = undef, $open_mode : string = undef) {
     my $self = new IO::File;
     
     $self->init;
@@ -26,7 +26,7 @@ class IO::File extends IO::Handle {
     return $self;
   }
 
-  static method new_from_fd : IO::Handle ($fd : int, $open_mode = undef : string) {
+  static method new_from_fd : IO::Handle ($fd : int, $open_mode : string = undef) {
     my $self = new IO::File;
     
     $self->init;
@@ -116,7 +116,7 @@ class IO::File extends IO::Handle {
     $self->{stream} = $stream;
   }
 
-  protected method init : void ($options = undef : object[]) {
+  protected method init : void ($options : object[] = undef) {
     $self->SUPER::init;
   }
   
@@ -214,13 +214,13 @@ class IO::File extends IO::Handle {
     return Sys::IO->ungetc($c, $stream);
   }
 
-  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int) {
+  method syswrite : int ($buffer : string, $length : int, $offset : int = 0) {
     my $stream = $self->{stream};
     
     return Sys::IO->fwrite($buffer, 1, $length, $stream);
   }
   
-  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int) {
+  method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0) {
     my $stream = $self->{stream};
     
     return Sys::IO->fread($buffer, 1, $length, $stream);

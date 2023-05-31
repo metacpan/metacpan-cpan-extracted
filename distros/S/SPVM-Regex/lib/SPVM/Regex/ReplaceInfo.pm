@@ -14,8 +14,11 @@ The Regex::ReplaceInfo class of L<SPVM> has methods to manipulate a regex replac
 
   use Regex::ReplaceInfo;
   
-  my $match = Regex::ReplaceInfo->new({replaced_count => 3});
+  my $replace_info = Regex::ReplaceInfo->new({replaced_count => 3, match => $match});
   
+  my $replaced_count = $replace_info->replaced_count;
+  
+  my $match = $replace_info->match;
   my $cap1 = $match->cap1;
   my $cap2 = $match->cap2;
   my $cpa3 = $match->cap3;
@@ -28,13 +31,21 @@ The Regex::ReplaceInfo class of L<SPVM> has methods to manipulate a regex replac
 
 Gets the C<replaced_count> field.
 
-The replacement count.
+This field is set to the number of strings replaced the L<replace|SPVM::Regex/"replace"> and L<replace_g|SPVM::Regex/"replace_g"> method in the L<Regex|SPVM::Regex> class.
+
+=head2 match
+
+  has match : ro Regex::Match;
+
+Gets the C<match> field. The type is L<Regex::Match|SPVM::Regex::Match>.
+
+This field is set to the result of the pattern match performed by the the L<replace|SPVM::Regex/"replace"> and L<replace_g|SPVM::Regex/"replace_g"> method in the L<Regex|SPVM::Regex> class.
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Regex::ReplaceInfo ($options = undef : object[]);
+  static method new : Regex::ReplaceInfo ($options : object[] = undef);
 
 Creates a new L<Regex::ReplaceInfo> object.
 
@@ -48,15 +59,25 @@ If an unsupported option is specified, an exception is thrown.
 
 =item * C<replaced_count>
 
-Sets the C<replaced_count> field.
+Sets the L</"replaced_count"> field.
 
-This option must be cast to a L<Int|SPVM::Int> object. Otherwise an exception is thrown.
+The value must be cast to the C<int> type. Otherwise an exception is thrown.
+
+Default:
+
+0
+
+=item * C<match>
+
+Sets the L</"match"> field.
+
+The value must be a L<Regex::Match|SPVM::Regex::Match> object or C<undef>. Otherwise an exception is thrown.
+
+Default:
+
+undef
 
 =back
-
-Examples:
-
-  my $match = Regex::ReplaceInfo->new({replaced_count => 3});
 
 =head1 Copyright & License
 

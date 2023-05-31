@@ -8,7 +8,7 @@ use t_TestCommon ':silent',
                     show_white show_empty_string
                     fmt_codestring 
                     timed_run
-                    checkeq_literal check _check_end
+                    mycheckeq_literal mycheck _mycheck_end
                   /;
 
 use Mydump qw/mydump/;
@@ -58,12 +58,12 @@ sub _check_nomatch($$) {
 sub check_match($$$;$) {
   my (undef, $test_label, undef, $ok_only_if_failed) = @_;
   @_ = ( &_check_match, $test_label, $ok_only_if_failed );
-  goto &_check_end;
+  goto &_mycheck_end;
 }
 sub check_nomatch($$;$) {
   my (undef, $test_label, $ok_only_if_failed) = @_;
   @_ = ( &_check_nomatch, $test_label, $ok_only_if_failed );
-  goto &_check_end;
+  goto &_mycheck_end;
 }
 
 

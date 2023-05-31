@@ -58,15 +58,15 @@
    "provides" : {
       "Travel::Status::DE::IRIS" : {
          "file" : "lib/Travel/Status/DE/IRIS.pm",
-         "version" : "1.84"
+         "version" : "1.85"
       },
       "Travel::Status::DE::IRIS::Result" : {
          "file" : "lib/Travel/Status/DE/IRIS/Result.pm",
-         "version" : "1.84"
+         "version" : "1.85"
       },
       "Travel::Status::DE::IRIS::Stations" : {
          "file" : "lib/Travel/Status/DE/IRIS/Stations.pm",
-         "version" : "1.84"
+         "version" : "1.85"
       }
    },
    "release_status" : "stable",
@@ -78,6 +78,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-IRIS"
       }
    },
-   "version" : "1.84",
+   "version" : "1.85",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

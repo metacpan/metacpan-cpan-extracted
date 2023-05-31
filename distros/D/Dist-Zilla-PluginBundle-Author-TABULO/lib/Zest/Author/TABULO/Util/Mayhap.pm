@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::Mayhap;
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use PerlX::Maybe qw(maybe);
 use Exporter::Shiny qw(mayhap);
@@ -42,7 +42,7 @@ Zest::Author::TABULO::Util::Mayhap - Utility functions used by TABULO's authorin
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =for Pod::Coverage mayhap
 

@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::el_polyton - Locale data examples for the Greek (el-polyton) locale
+DateTime::Locale::el_polyton - Locale data examples for the Greek Polytonic (el-polyton) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Greek locale.
+Greek Polytonic locale.
 
 =head2 Days
 

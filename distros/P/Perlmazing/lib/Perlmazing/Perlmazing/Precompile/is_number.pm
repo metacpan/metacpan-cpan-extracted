@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(define not_empty);
 use Scalar::Util qw(looks_like_number);
 
 sub main ($) {

@@ -23,5 +23,5 @@ requires:
   perl: '5.026000'
 resources:
   repository: https://alexschroeder.ch/cgit/news
-version: 1.02
+version: 1.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

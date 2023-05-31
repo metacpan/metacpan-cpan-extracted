@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 package Pod::Weaver::PluginBundle::Author::TABULO;
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use Pod::Weaver 4;
 use Pod::Weaver::Config::Assembler;
@@ -163,7 +163,7 @@ Pod::Weaver::PluginBundle::Author::TABULO - TABULO's bundle for Pod::Weaver (pro
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =head1 FOREWORD
 

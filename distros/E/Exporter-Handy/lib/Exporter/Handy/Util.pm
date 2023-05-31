@@ -1,24 +1,29 @@
 package Exporter::Handy::Util;
 
 # ABSTRACT: Routines useful when exporting symbols thru Exporter and friends
-our $VERSION = '0.200000';
+our $VERSION = '1.000004';
 
-use v5.14;
+use utf8;
 use strict;
 use warnings;
 
-use Data::Printer;
-
-use List::Util qw( pairs unpairs uniq );
+# Automatically fall back to pure perl for older versions of List::Util (circa Perl version < 5.20)
+use List::Util::MaybeXS qw( pairs unpairs uniq );
 use Exporter::Extensible -exporter_setup => 1;
 
 export(qw(
+    =cxtags
     =xtags
     =expand_xtags
 ));
 
 
 # Generators for exported functions
+sub _generate_cxtags {
+  my ($exporter, $symbol, $opts) = @_;
+  sub {; xtags({+ sig => ':',  %{; $opts // {} }}, @_ ) } # curried
+}
+
 sub _generate_xtags {
   my ($exporter, $symbol, $opts) = @_;
   sub {; xtags($opts // {}, @_ ) } # curried
@@ -28,8 +33,6 @@ sub _generate_expand_xtags {
   my ($exporter, $symbol, $opts) = @_;
   sub {; expand_xtags(@_, $opts // { }) } # curried
 }
-
-
 
 
 sub xtags { # useful for building export tags
@@ -51,6 +54,47 @@ sub xtags { # useful for building export tags
   wantarray ? @res : \@res; ## no critic
 }
 
+
+sub expand_xtags {
+  local $_;
+  my %tags;  %tags = ( %tags, %{; shift } ) while _is_plain_hashref($_[0]);   # tags at start
+
+  # Handle special requests given via options
+  unshift @_,  _flat( delete $tags{-key} // (), delete $tags{-keys} // () );
+  # unshift @_, \'*' unless @_; # no arguments => ALL keys.
+
+  @_ = uniq(@_);
+
+  my %seen;
+  my @res;
+
+  while (@_) {
+    $_ = shift;
+    next unless defined;
+    ref($_) eq 'ARRAY' and do { unshift @_, @$_; next };
+
+    ref($_) eq 'SCALAR' && ($$_ =~  /[*]|ALL/i ) and do {
+      # A scalar ref indicates special handling!
+      # If it deferences to '*' (or 'ALL'), it means "ALL KEYS".
+      unshift @_, values %tags;
+      next
+    };
+
+    next if ref($_);
+    next if exists $seen{$_} && ( $seen{$_} // 0 );
+    $seen{$_} = 1;
+
+    m/^([:](.*))$/ and do {
+      unshift @_, delete $tags{$1} // (), delete $tags{$2} // ();
+      next;
+    };
+
+    push @res, $_;
+  }
+  @res
+}
+
+# PRIVATE routines
 sub _xtag_group {
   # say STDERR '_xtag_group ARGS: ' . np(@_);
 
@@ -99,48 +143,7 @@ sub _xtag_group {
   wantarray ? @tags : \@tags; ## no critic
 }
 
-
-
-sub expand_xtags {
-  local $_;
-  my %tags;  %tags = ( %tags, %{; shift } ) while _is_plain_hashref($_[0]);   # tags at start
-  my %opt;   %opt  = ( %opt,  %{; pop   } ) while _is_plain_hashref($_[-1]);  # options at the end.
-
-  # Handle special requests given via options
-  my @keys = _flat( delete $opt{key} // (), delete $opt{keys} // () );
-  for (@keys) {
-    if (_is_plain_scalarref($_) and ($$_ =~  /[*]|ALL/i ) ) {
-      # A scalar ref indicates special handling!
-      # If it deferences to '*' (or 'ALL'), it means "ALL KEYS".
-      push @_, values %tags;
-      next
-    }
-    push @_, $tags{$_};
-  }
-  @_ = uniq(@_);
-
-  my %seen;
-  my @res;
-
-  while (@_) {
-    $_ = shift;
-    next unless defined;
-    ref($_) eq 'ARRAY' and do { unshift @_, @$_; next };
-
-    next if exists $seen{$_} && ( $seen{$_} // 0 );
-    $seen{$_} = 1;
-
-    m/^([:](.*))$/ and do {
-      unshift @_, delete $tags{$1} // (), delete $tags{$2} // ();
-      next;
-    };
-    push @res, $_;
-  }
-  @res
-}
-
-
-# PRIVATE routines
+# PRIVATE utilities
 # ref
 sub _is_plain_arrayref  { ref( $_[0] ) eq 'ARRAY'  }
 sub _is_plain_hashref   { ref( $_[0] ) eq 'HASH'   }
@@ -174,7 +177,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Tabulo[n]
+=for :stopwords Tabulo[n] cxtags sig
 
 =head1 NAME
 
@@ -182,7 +185,7 @@ Exporter::Handy::Util - Routines useful when exporting symbols thru Exporter and
 
 =head1 VERSION
 
-version 0.200000
+version 1.000004
 
 =head1 SYNOPSIS
 
@@ -220,20 +223,75 @@ You have been warned.
 
 =head1 FUNCTIONS
 
+=head2 cxtags
+
+Same as C<xtags()> described below, except that this one assumes {sig => ':'} as part of the options.
+
+Hence, this one is more suitable to be used in conjunction with L<Exporter::Extensible> and descendants,
+such as L<Exporter::Handy>, like below:
+
+    use Exporter::Handy::Util qw(cxtags);
+    use Exporter::Handy -exporter_setup => 1
+
+    export(
+        foo
+        goo
+        cxtags (
+          bar => [qw( $bozo @baza boom )],
+          util => {
+            io   => [qw(slurp)],
+            text => [qw(ltrim rtrim trim)],
+          },
+        )
+    );
+
+which is the same as:
+
+    use Exporter::Handy -exporter_setup => 1
+
+    export(
+        foo
+        goo
+        ':bar'       => [qw( $bozo @baza boom )],
+        ':util_io'   => [qw(slurp)],
+        ':util_text' => [qw(ltrim rtrim trim)],
+    );
+
 =head2 xtags
 
 Build one or more B<export tags> suitable for L<Exporter> and friends, such as:
 L<Exporter::Extensible>, L<Exporter::Handy>, L<Exporter::Tiny>, L<Exporter::Shiny>, L<Exporter::Almighty>, ...
 
-    use Exporter::Handy::Util qw(xtags);
-    use Exporter::Handy -exporter_setup => 1
+Compared to C<cxtags()> described above, this one does not prefix tag keys by a colon (':').
 
-    export(
-        foo
-        baz
-        xtags( ':' => {
-          bar => [qw( $bozo @baza boom )]
-        }),
+Hence it's quite suitable for populating C<%EXPORT_TAGS>, recognized by
+L<Exporter> and many others, such as: L<Exporter::Tiny>, L<Exporter::Shiny>, L<Exporter::Almighty>, ...
+
+Note that although L<Exporter::Extensible> and L<Exporter::Handy> do recognize C<%EXPORT_TAGS>, their preferred API
+involves a call to the C<export()> function, which requires a colon (:) prefix for tag names... See C<cxtags()> that does
+just that.
+
+    use Exporter::Handy::Util qw(xtags);
+    use parent Exporter;
+
+    our %EXPORT_TAGS = (
+      xtags (
+        bar => [qw( $bozo @baza boom )],
+        util => {
+          io   => [qw(slurp)],
+          text => [qw(ltrim rtrim trim)],
+        },
+      )
+    );
+
+is the same as:
+
+    use parent Exporter;
+
+    our %EXPORT_TAGS = (
+        bar => [qw( $bozo @baza boom )],
+        util_io   => [qw(slurp)],
+        util_text => [qw(ltrim rtrim trim)],
     );
 
 =head2 expand_xtags

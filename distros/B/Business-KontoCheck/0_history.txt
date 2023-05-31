@@ -3,10 +3,64 @@
 #                  C-/AWK/Perl/PHP/Ruby-Bibliothek                               #
 ##################################################################################
 #                                                                                #
-# Autor             : Michael Plugge <m.plugge@hs-mannheim.de>                   #
-# Version           : 6.13                                                       #
-# Datum             : 21.12.2020                                                 #
+# Autor             : Michael Plugge <konto_check@yahoo.com>                     #
+# Version           : 6.15                                                       #
+# Datum             : 13.04.2023                                                 #
 ##################################################################################
+
+##################################################################################
+###                      13.04.23 Version 6.15                                 ###
+##################################################################################
+   diese Version enthält nur einige kleinere Änderungen und Bugfixes:   
+
+   - neue Email-Adresse konto_check@yahoo.com - da ich in Rente gegangen bin,
+     ist die alte Email-Adresse nicht mehr gültig
+
+   - Tests für Perl sowie LUT-Datei für Perl aktualisiert
+
+   - noch einmal eine Korrektur zu den bic* Routinen:
+     bei einer Reihe Banken gibt es einen 8-stelligen BIC (Default-BIC), sowie noch
+     einige 11-stellige BICs, bei denen *weniger* Flags als beim Default-Eintrag
+     auf 1 gesetzt sind. Bei diesen Banken ist dann der Eintrag des Default-BIC zu
+     nehmen, nicht der des 11-stelligen BICs. Einige Beispiele dazu sind (zuerst die
+     Flags des 11-stelligen BICs, dann die des Default-BICs):
+
+         ABNABE2AIDJ 11000 statt 11010
+         DEUTDEDBPAL 10000 statt 11011
+         DEUTDEFFVAC 10000 statt 11011
+         RAISDEFFXXX 00001 statt 11011
+         WELADEDLLEV 10000 statt 11011
+
+     Es sind insgesamt (Stand April 2023) 68 Banken davon betroffen, davon 8 deutsche.
+
+     Die LUT-Datei Generierung wurde so abgeändert, daß in den Fällen die richtigen
+     Flags in die Datei eingetragen sind, so daß auch ältere Versionen der Bibliothek
+     die richtigen Flags ausgeben. Außerdem gibt es einen neuen Block "SCL Flags orig"
+     der die originalen Flags enthält. Wird dem BIC ein ! vorangestellt, werden die
+     originalen Flags zurückgegeben:
+
+        WELADEDLLEV  -> 11011
+        !WELADEDLLEV -> 10000
+
+##################################################################################
+###                      18.02.22 Version 6.14                                 ###
+##################################################################################
+   diese Version enthält nur einige kleinere Änderungen und Bugfixes:   
+
+   - Patch für lut_write_scl_blocks() aus 6.13a
+   - Bei der comdirect Bank wurde ein falscher BIC zurückgegeben; dies ist jetzt berichtigt
+   - Die PHP-Version läßt sich jetzt unter PHP 8.0 und 8.1 kompilieren
+   - Tests für Perl sowie LUT-Datei für Perl aktualisiert
+
+##################################################################################
+###                      18.02.22 Version 6.13a                                ###
+##################################################################################
+
+   - Das Format der SCL-Datei der Deutschen Bundesbank wurde etwas verändert;
+     die alte Routine lut_write_scl_blocks() erkennt diese Dateien nicht mehr.
+     Es ist nur eine kleine Änderung und wohl nur für Wenige interessant, daher
+     wird aktuell eine Diff-Datei (konto_check-6.13a.diff) mit der geänderten
+     Routine zur Verfügung gestellt.
 
 ##################################################################################
 ###                      21.12.20 Version 6.13                                 ###
@@ -1552,7 +1606,7 @@ auch mehr) getestet.
 #                           C-/Perl-Bibliothek                               #
 ##############################################################################
 #                                                                            #
-# Autor             : Michael Plugge <m.plugge@fh-mannheim.de>               #
+# Autor             : Michael Plugge <konto_check@yahoo.com>                 #
 # Version           : 1.3                                                    #
 # Datum             : 16.01.2008                                             #
 ##############################################################################

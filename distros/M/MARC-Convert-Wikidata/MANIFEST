@@ -1,4 +1,8 @@
 Changes
+examples/clean_cover.pl
+examples/clean_date.pl
+examples/clean_edition_number.pl
+examples/marc_to_wikidata_print.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

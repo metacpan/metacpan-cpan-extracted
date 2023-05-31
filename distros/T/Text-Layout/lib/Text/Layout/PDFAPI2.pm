@@ -119,7 +119,7 @@ sub render {
 
 	    if ( $fragment->{bgcolor} ) {
 		my $y = $y0;
-		my $h = -$sz*($font->ascender-$font->descender)/$upem;
+		my $h = -$sz*($f->get_ascender-$f->get_descender)/$upem;
 		my $x = $x0;
 		$text->add(PDF::API2::Content::_save());
 
@@ -170,8 +170,11 @@ sub render {
 		my $w = $font->width($t) * $sz;
 
 		if ( $fragment->{bgcolor} ) {
+		    my ( $d0, $a0 );
+		    $d0 = $f->get_descender * $sz / $upem;
+		    $a0 = $f->get_ascender * $sz / $upem;
 		    my $y = $y0;
-		    my $h = -$sz*($font->ascender-$font->descender)/$upem;
+		    my $h = -($a0-$d0);
 		    my $x = $x0;
 		    $text->add(PDF::API2::Content::_save());
 
@@ -355,20 +358,8 @@ sub bbox {
 
 	# We have width. Now the rest of the layoutbox.
 	my ( $d0, $a0 );
-	if ( !$f->get_interline ) {
-	    # Use descender/ascender.
-	    # Quite accurate, although there are some fonts that do
-	    # not include accents on capitals in the ascender.
-	    $d0 = $font->descender * $size / $upem - $base;
-	    $a0 = $font->ascender * $size / $upem - $base;
-	}
-	else {
-	    # Use bounding box.
-	    # Some (modern) fonts include spacing in the bb.
-	    my @bb = map { $_ * $size / $upem } $font->fontbbox;
-	    $d0 = $bb[1] - $base;
-	    $a0 = $bb[3] - $base;
-	}
+	$d0 = $f->get_descender * $size / $upem - $base;
+	$a0 = $f->get_ascender * $size / $upem - $base;
 	# Keep track of biggest decender/ascender.
 	$d = $d0 if $d0 < $d;
 	$a = $a0 if $a0 > $a;
@@ -412,9 +403,11 @@ sub bbox {
 sub load_font {
     my ( $self, $font, $fd ) = @_;
 
-    if ( $fc->{$font} ) {
+    if ( my $f = $fc->{$font} ) {
 	# warn("Loaded font $font (cached)\n");
-	return $fc->{$font};
+	$fd->{ascender}  //= $f->ascender;
+	$fd->{descender} //= $f->descender;
+	return $f;
     }
     my $ff;
     if ( $font =~ /\.[ot]tf$/ ) {
@@ -436,6 +429,8 @@ sub load_font {
     croak( "Cannot load font: ", $font, "\n", $@ ) unless $ff;
     # warn("Loaded font: $font\n");
     $self->{font} = $ff;
+    $fd->{ascender}  //= $ff->ascender;
+    $fd->{descender} //= $ff->descender;
     $fc->{$font} = $ff;
     return $ff;
 }

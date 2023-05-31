@@ -1,0 +1,84 @@
+Wed May 31 02:25:00 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.03 - CPAN distribution]:
+	* README.md.in: CPAN installation
+	* cpan/Makefile: new
+	* Markdown/Render.pm: bump version, pod updates
+	* README.md: generated
+	* .gitignore: cpan/bin, cpan/lib
+
+Tue Nov 15 08:30:33 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.02]: make rpm
+	* Makefile: make rpm
+	* perl-Markdown.spec: new
+	* .gitignore: rpm/**, *.rpm
+	* README.md.in: added note on rpm building
+	* README.md: generated
+
+Mon Nov 14 17:06:34 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.02]:
+	* .gitignore: new
+	* README.md.in: updated docs
+	* README.md: generated
+	* Markdown/Render.pm
+	- more pod
+	- bump version
+	(new)
+	- new options css, mode, engine, raw, body
+	(_render_with_text_markdown): use Text::Markdown
+	(_render_with_github): refactored render_markdown()
+	(render_markdown): invoke selected engine
+	(fix_header): new
+	(_fix_header): new
+	(fix_anchors): new
+	(fix_github_hml): new
+	* md-utils.pl:
+	- support new options
+	- implement git user vars
+	(back_to_toc): || not //
+	(finalize_markdown)
+	- don't interpolate inside code blocks
+	- allow empty parens () or no parens for @DATE@, @TOC_BACK@
+	(create_toc)
+	- remove \@
+	- remove & after removing HTML entities
+
+Sun Nov 13 18:07:31 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[Markdown::Render]:
+	* Markdown/Render.pm: new
+	* md-utils.pl: refactored to use above
+	* README.md: tweaks
+	* Makefile: md-utils is a dependency
+
+Wed Nov 17 08:34:27 2021  Rob Lauer  <rlauer6@comast.net>
+
+	[date format]:
+	* md-utils.pl
+	- make default date format %Y-%m-%d
+	- usage tip
+	* Makefile: create md-utils
+	* README.md.in: update date format docs
+	* README.md: generated
+
+Sun Mar 21 08:15:39 2021  Rob Lauer  <rlauer6@comcast.net>
+
+	* md-utils.pl
+	- remove '/' in links
+	- remove '{}' in links
+
+Tue Jan 29 09:33:52 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.5]:
+	* md-utils: pl
+	- remove backticks from toc
+
+Sun Jan 27 16:11:25 2019  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.4]:
+	* md-utils.pl
+	- remove backticks from links in rendered HTML
+	- remove ',' from headings for TOC
+

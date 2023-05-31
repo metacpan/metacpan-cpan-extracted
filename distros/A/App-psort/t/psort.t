@@ -460,6 +460,10 @@ my @erroneous_test_defs =
 my @warning_test_defs =
     (
      [["-n", "--rx", '/\d+/'], ("xxx 3\nzzz 2\nyyy 1\n") x 2, qr{\QNo regexp match. Maybe you want to omit the slashes, i.e. use --rx '\d+'?}],
+     [["--rx", '\d+'], ("xxx\n") x 2, qr{^\QUninitialized value returned in psort eval or regexp at standard input line 1\E$}], # custom warning
+     [["--rx", '\d+'], ("xxx\n") x 2, qr{^\QUninitialized value returned in psort eval or regexp at \E.*\.dat\Q line 1\E$}, indata_in_file=>1], # custom warning, with file name
+     [["-X", "--rx", '\d+'], ("xxx\n") x 2, qr{^$}], # custom warning suppressed
+     [["--no-warnings", "--rx", '\d+'], ("xxx\n") x 2, qr{^$}], # custom warning suppressed
     );
 
 my $ok_test_count    = 4;
@@ -569,13 +573,28 @@ sub run_psort_erroneous_testcase {
 }
 
 sub run_psort_warning_testcase {
-    my($args, $indata, $expected, $expected_warning) = @_;
+    my($args, $indata, $expected, $expected_warning, %opts) = @_;
+    my $indata_in_file = delete $opts{indata_in_file};
+    die "Unhandled options: " . join(" ", %opts) if %opts;
 
-    my($result) = _run_psort([@full_script, @$args], 1, \$indata);
+    my @run_psort_args;
+    if ($indata_in_file) {
+	my($tmpfh,$tmpfile) = tempfile(UNLINK => 1, SUFFIX => ".dat")
+	    or die $!;
+	print $tmpfh $indata;
+	close $tmpfh
+	    or die $!;
+	@run_psort_args = ([@full_script, @$args, $tmpfile], 1, undef);
+    } else {
+	@run_psort_args = ([@full_script, @$args          ], 1, \$indata);
+    }
+
+    my($result) = _run_psort(@run_psort_args);
  SKIP: {
 	skip $result->{error}, $warning_test_count
 	    if $result->{error};
 	my $testlabel = !defined $args ? '<no args>' : "args: <@$args>";
+	$testlabel .= " (with option indata_in_file)" if $indata_in_file;
 	ok $result->{cmdres}, "Expected success for $testlabel";
 	eq_or_diff $result->{stdout}, $expected, "Expected output for $testlabel";
 	like $result->{stderr}, $expected_warning, "Expected warning for $testlabel";

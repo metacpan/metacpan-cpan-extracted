@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend;
-$POE::Component::SmokeBox::Backend::VERSION = '0.56';
+$POE::Component::SmokeBox::Backend::VERSION = '0.58';
 #ABSTRACT: smoker backend to POE::Component::SmokeBox
 
 use strict;
@@ -17,7 +17,7 @@ use Regexp::Assemble;
 use Env::Sanctify;
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 
-use constant ON_FREEBSD => $^O =~ m!^(free|midnight|dragonfly)(bsd)?$! ? 1 : 0;
+use constant ON_BSD => $^O =~ m!^(free|midnight|dragonfly|open)(bsd)?$! ? 1 : 0;
 
 my $GOT_KILLFAM;
 my $GOT_PTY;
@@ -393,7 +393,7 @@ sub _detect_loop {
   my $digest = sha256_hex( $input );
 
   my $weighting;
-  if ( ON_FREEBSD and $handle eq 'stderr' and _fbsd_compiler_warnings($input) ) {
+  if ( ON_BSD and $handle eq 'stderr' and _bsd_compiler_warnings($input) ) {
     $weighting = 0.01;
   }
   elsif ( $self->{check_warnings} and length( $input ) <= 5000 ) {
@@ -429,7 +429,7 @@ sub _detect_loop {
               ->add('^')
               ->add('~')
               ->re;
-  sub _fbsd_compiler_warnings {
+  sub _bsd_compiler_warnings {
     my $line = shift;
     return 1 if $line =~ m!$re!;
     return;
@@ -495,7 +495,7 @@ POE::Component::SmokeBox::Backend - smoker backend to POE::Component::SmokeBox
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

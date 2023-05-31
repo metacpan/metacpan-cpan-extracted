@@ -21,7 +21,7 @@ ss-info - (NOT YET IMPLEMENTED) Show information about a spreadsheet file
 
 =head1 VERSION
 
-This document describes version 0.003 of ss-info (from Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+This document describes version 0.004 of ss-info (from Perl distribution App-SpreadsheetUtils), released on 2023-03-19.
 
 =head1 SYNOPSIS
 

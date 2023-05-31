@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke;
-$POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke::VERSION = '0.56';
+$POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke::VERSION = '0.58';
 #ABSTRACT: a backend for CPANPLUS::YACSmoke smokers.
 
 use strict;
@@ -32,7 +32,7 @@ POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke - a backend for CPANPLUS::
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 DESCRIPTION
 

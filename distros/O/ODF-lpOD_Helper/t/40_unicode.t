@@ -9,7 +9,7 @@ use t_TestCommon ':silent',
                     show_white show_empty_string
                     fmt_codestring 
                     timed_run
-                    checkeq_literal check _check_end
+                    mycheckeq_literal mycheck _mycheck_end
                   /;
 
 use Data::Dumper::Interp qw/visnew ivis dvis vis hvis avis u/;

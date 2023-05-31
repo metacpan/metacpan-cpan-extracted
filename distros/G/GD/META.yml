@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl interface to the gd2 graphics library'
+abstract: 'Perl interface to the libgd graphics library'
 author:
   - 'Lincoln Stein <lincoln.stein@gmail.com>'
 build_requires:
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::Constant: '0.22'
   ExtUtils::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,16 +20,10 @@ no_index:
   directory:
     - t
     - inc
-recommends:
-  ExtUtils::Constant: '0.23'
-  ExtUtils::PkgConfig: '0'
-  Math::Trig: '0'
-  Test::Fork: '0.02'
-  Test::More: '0.88'
 requires:
   Math::Trig: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/lstein/Perl-GD
-version: '2.76'
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/lstein/Perl-GD.git
+version: '2.77'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

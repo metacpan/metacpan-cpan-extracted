@@ -1,6 +1,6 @@
 package SPVM::Regex;
 
-our $VERSION = "0.241002";
+our $VERSION = "0.242001";
 
 1;
 
@@ -160,7 +160,7 @@ This field is deprecated and will be removed.
 
 =head2 new
 
-  static method new : Regex ($pattern : string, $flags = undef : string)
+  static method new : Regex ($pattern : string, $flags : string = undef)
 
 Creates a new L<Regex|SPVM::Regex> object and compiles the regex pattern $pattern with the flags $flags, and retruns the created object.
 
@@ -171,7 +171,7 @@ Creates a new L<Regex|SPVM::Regex> object and compiles the regex pattern $patter
 
 =head2 match
 
-  method match : Regex::Match ($string : string, $offset = 0 : int, $length = -1 : int);
+  method match : Regex::Match ($string : string, $offset : int = 0, $length : int = -1);
 
 The alias for the following L<match_forward|/"match_forward"> method.
 
@@ -179,7 +179,7 @@ The alias for the following L<match_forward|/"match_forward"> method.
 
 =head2 match_forward
 
-  method match_forward : Regex::Match ($string : string, $offset : int*, $length = -1 : int);
+  method match_forward : Regex::Match ($string : string, $offset : int*, $length : int = -1);
 
 Performs pattern matching on the substring from the offset $offset to the length $length of the string $string.
 
@@ -197,7 +197,7 @@ If the regex is not compiled, an exception is thrown.
 
 =head2 replace
 
-  method replace  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[])
+  method replace  : string ($string : string, $replace : object of string|Regex::Replacer, $offset : int = 0, $length : int = -1, $options : object[] = undef)
 
 The alias for the following L<replace_common|/"replace_common"> method.
 
@@ -205,7 +205,7 @@ The alias for the following L<replace_common|/"replace_common"> method.
 
 =head2 replace_g
 
-  method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[])
+  method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer, $offset : int = 0, $length : int = -1, $options : object[] = undef)
 
 The alias for the following L<replace_common|/"replace_common"> method.
 
@@ -218,7 +218,7 @@ The alias for the following L<replace_common|/"replace_common"> method.
 =head2 replace_common
 
   method replace_common : string ($string : string, $replace : object of string|Regex::Replacer,
-    $offset_ref : int*, $length = -1 : int, $options = undef : object[]);
+    $offset_ref : int*, $length : int = -1, $options : object[] = undef);
 
 Replaces the substring from the offset $$offset_ref to the length $length of the string $string with the replacement string or callback $replace with the options $options.
 
@@ -256,7 +256,7 @@ Exceptions of the L<match_forward|/"match_forward"> method can be thrown.
 
 =head2 split
 
-  method split : string[] ($string : string, $limit = 0 : int);
+  method split : string[] ($string : string, $limit : int = 0);
 
 The same as the L<split||SPVM::Fn/"split"> method in the L<Fn|SPVM::Fn> class, but the regular expression is used as the separator.
 

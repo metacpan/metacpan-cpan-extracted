@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 2;
-use Perlmazing;
+use Perlmazing qw(md5 aes_encrypt aes_decrypt);
 
 my $author = 'Francisco Zarabozo';
 my $password = md5 $author;

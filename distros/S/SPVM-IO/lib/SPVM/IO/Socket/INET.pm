@@ -75,7 +75,7 @@ L<IO::Socket|SPVM::IO::Socket>
 
 =head2 new
 
-  static method new : IO::Socket::INET ($options = undef : object[]);
+  static method new : IO::Socket::INET ($options : object[] = undef);
 
 =head3 new Options
 
@@ -113,7 +113,7 @@ L<IO::Socket|SPVM::IO::Socket>
 
 =head2 init
 
-  protected method init : void ($options = undef : object[]);
+  protected method init : void ($options : object[] = undef);
 
 =head2 sockaddr
 

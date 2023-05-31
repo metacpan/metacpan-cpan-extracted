@@ -30,7 +30,7 @@ rename-add-prefix - Add prefix to filenames
 
 =head1 VERSION
 
-This document describes version 0.009 of rename-add-prefix (from Perl distribution App-FileRenameUtils), released on 2023-03-02.
+This document describes version 0.010 of rename-add-prefix (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,8 @@ will rename them as follow:
 
  foo -> new-foo
  bar.txt -> new-bar.txt
+
+F<new-baz.mp4> is not renamed because it already has the C<new-> prefix.
 
 =head1 DESCRIPTION
 

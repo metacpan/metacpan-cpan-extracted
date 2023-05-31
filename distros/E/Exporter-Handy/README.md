@@ -4,7 +4,7 @@ Exporter::Handy - An EXPERIMENTAL subclass of <Exporter::Extensible>, which help
 
 # VERSION
 
-version 0.200000
+version 1.000004
 
 # SYNOPSIS
 

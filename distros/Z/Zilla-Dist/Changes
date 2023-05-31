@@ -1,3 +1,6 @@
+0.1.16 Fri May 26 09:57:53 PM PDT 2023
+ - Make Meta merge be RIGHT_PRECEDENT
+
 0.1.15 Wed Jan 25 09:51:39 PM EST 2023
  - Allow explicit modules name in {doc-head: <name>}
 

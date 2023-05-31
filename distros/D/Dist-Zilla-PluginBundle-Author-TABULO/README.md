@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 # VERSION
 
-version 1.000013
+version 1.000014
 
 # SYNOPSIS
 
@@ -306,8 +306,7 @@ Additional documentation: Passed as the 'directory' option, to \[ArchiveRelease\
 
 \* The 'directory' \[name\] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
 \* If the directory doesn't exist, it will be created during the BeforeRelease phase.
-\* All files inside this directory will be pruned from the distribution.
- Default: 'releases'
+\* All files inside this directory will be pruned from the distribution. Default: 'releases'
 
 ## authority
 
@@ -347,7 +346,7 @@ Reader: copy\_mode
 
 Type: Maybe\[Str\]
 
-Additional documentation: Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  \[Regenerate, Release, Build, Build::Filtered, None\]. dzil 'regenerate' command will still work.  Default: 'Release'
+Additional documentation: Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  \[Regenerate, Release, Build, Build::Filtered, None\]. dzil 'regenerate' command will still work. Default: 'Release'
 
 ## copy\_not
 
@@ -376,8 +375,7 @@ Additional documentation: Specifies the 'genre' of the distro. Currently allowed
 This may be used in the future to associate a set behaviours/settings to given genres.
 
 Currently, the only distinction made is for the 'task' genre, which will result in \[TaskWeaver\] being used
-instead of \[SurgicalPodWeaver\].
- Default: 'standard'
+instead of \[SurgicalPodWeaver\]. Default: 'standard'
 
 ## exclude\_filenames
 
@@ -401,7 +399,8 @@ Reader: exec\_dir
 
 Type: Maybe\[Str\]
 
-Additional documentation: If defined, passed to \[ExecDir\] as its 'dir' option.  Defaults to 'script' when the installer is \[Module::Build::Tiny\],undef otherwise, which means the \[ExecDir\] default will be in effect, and that is 'bin' as of this writing.
+Additional documentation: If defined, passed to \[ExecDir\] as its 'dir' option.
+Defaults to 'script' when the installer is \[Module::Build::Tiny\],undef otherwise, which means the \[ExecDir\] default will be in effect, and that is 'bin' as of this writing.,
 
 ## fake\_release
 
@@ -409,7 +408,8 @@ Reader: fake\_release
 
 Type: Bool
 
-Additional documentation: Swaps \[FakeRelease\] for \[UploadToCPAN\]. Mostly useful for testing a dist.ini without risking a real release. Note that this can also be achieved by setting the FAKE\_RELEASE environment variable (which will have precedence over this option). Default: '0'
+Additional documentation: Swaps \[FakeRelease\] for \[UploadToCPAN\]. Mostly useful for testing a dist.ini without risking a real release.
+Note that this can also be achieved by setting the FAKE\_RELEASE environment variable (which will have precedence over this option). Default: '0'
 
 ## git\_remotes
 
@@ -433,13 +433,17 @@ Reader: has\_xs
 
 Type: Bool
 
+Additional documentation: Signifies that the distribution contains XS code.
+
 ## hub
 
 Reader: hub
 
 Type: Maybe\[Str\]
 
-Additional documentation: The repository 'hub' provider. Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'. Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future. Default: 'github'
+Additional documentation: The repository 'hub' provider.
+Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'.
+Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future. Default: 'github'
 
 ## installer
 
@@ -541,8 +545,7 @@ Reader: no\_git\_impact
 Type: Bool
 
 Additional documentation: Omit any \[Git:\*\] plugins that may modify the vcs repository state, such as : \[Git::Commit\], \[Git::CommitBuild\], \[Git::Tag\], \[Git::Push\] and the like.
-Git plugins that are read-only, such as \[Git::GatherDir\] or \[Git::Check\] shouldn't be effected by this option.
- Default: '0'
+Git plugins that are read-only, such as \[Git::GatherDir\] or \[Git::Check\] shouldn't be effected by this option. Default: '0'
 
 ## no\_git\_push
 
@@ -660,7 +663,8 @@ Reader: stopwords
 
 Type: ArrayRef
 
-Additional documentation: Additional stopword(s) for Pod::Spell tests. \[May be repeated\]. See also: 'stopword\_files' and 'wordlists' for alternative mechanisms of adding stopwords.
+Additional documentation: Additional stopword(s) for Pod::Spell tests. \[May be repeated\].
+See also: 'stopword\_files' and 'wordlists' for alternative mechanisms of adding stopwords.
 
 ## stopwords\_files
 
@@ -668,7 +672,8 @@ Reader: stopwords\_files
 
 Type: ArrayRef
 
-Additional documentation: File(s) that describe additional stopword(s) for Pod::Spell tests. \[May be repeated\]. See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
+Additional documentation: File(s) that describe additional stopword(s) for Pod::Spell tests. \[May be repeated\].
+See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
 
 ## stopwords\_providers
 
@@ -688,8 +693,7 @@ Type: Str
 
 Additional documentation: The tag format passed to \[Git::Tag\] after committing sources.
 The default is 'repo-release-v%V%t', which may be prefixed by some other string.
-The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
- Default: 'repo-release-v%V%t'
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex. Default: 'repo-release-v%V%t'
 
 ## tag\_format\_dist
 
@@ -699,8 +703,7 @@ Type: Str
 
 Additional documentation: The tag format passed to \[Git::Tag\] after committing the build.
 The default is 'dist-release-v%V%t', which may be prefixed by some other string.
-The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
- Default: 'dist-release-v%V%t'
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex. Default: 'dist-release-v%V%t'
 
 ## version\_regexp
 

@@ -5,14 +5,16 @@ use warnings;
 
 use Text::CSV_XS;
 use Text::Table::Tiny qw/ generate_table /;
+use File::Basename    qw/ basename /;
 use Getopt::Long;
 
 binmode(STDOUT, ":encoding(UTF-8)");
 
+my $PROGRAM              = basename($0);
 my $SHOW_COUNT_THRESHOLD = 7;
-my $usage_string         = "usage: $0 [-h] [-d <dir>] [-i] <pattern> <file>\n";
+my $usage_string         = "usage: $PROGRAM [-h] [-c <cols>] [-d <dir>] [-i] [-mc <col>] <pattern> <file>\n";
 my $case_insensitive     = 0;
-my $match_column         = "";
+my $match_column;
 my $column_spec;
 
 
@@ -35,27 +37,51 @@ sub show_matching_rows
     open(my $fh, '<:encoding(utf8)', $filename)
         || die "can't read $filename: $!\n";
 
-    my $parser  = Text::CSV_XS->new({ sep_char => $sep_char });
-    my @headers = @{ $parser->getline($fh) };
+    my $parser     = Text::CSV_XS->new({ sep_char => $sep_char });
+    my @headers    = @{ $parser->getline($fh) };
+    my %header_map = map { (lc($headers[$_]), $_) } 0 .. int(@headers) - 1;
 
     if ($column_spec) {
-        @col_indices = split(/,/, $column_spec);
+        foreach my $index (split(/,/, $column_spec)) {
+            if ($index =~ /^[0-9]+$/) {
+                push(@col_indices, $index);
+            }
+            elsif (exists $header_map{ lc($index) }) {
+                push(@col_indices, $header_map{ lc($index) });
+            }
+            else {
+                die "Error: header \"$index\" not found\n";
+            }
+        }
         @headers    = @headers[@col_indices];
     }
 
     push(@rows, \@headers);
 
+    my $match_column_index;
+    if (defined $match_column) {
+        if ($match_column =~ /^[0-9]+$/) {
+            $match_column_index = $match_column;
+        }
+        elsif (exists $header_map{ lc($match_column) }) {
+            $match_column_index = $header_map{ lc($match_column) };
+        }
+        else {
+            die "Error: head \"$match_column\" not found (for -mc)\n";
+        }
+    }
+
     while (<$fh>) {
         $total_rows++;
-        next unless $match_column =~ (/^\d+$/)
+        next unless defined($match_column)
                  || ($case_insensitive && /$pattern/io)
                  || (!$case_insensitive && /$pattern/o);
         my $status = $parser->parse($_);
         my @columns = $parser->fields;
 
-        next if $match_column =~ (/^\d+$/)
-             && (   ($case_insensitive  && $columns[$match_column] !~ /$pattern/io)
-                 || (!$case_insensitive && $columns[$match_column] !~ /$pattern/o)
+        next if defined($match_column)
+             && (   ($case_insensitive  && $columns[$match_column_index] !~ /$pattern/io)
+                 || (!$case_insensitive && $columns[$match_column_index] !~ /$pattern/o)
                 );
 
         if ($column_spec) {
@@ -85,7 +111,7 @@ sub process_command_line
         'help|h'            => \$help,
         'columns|c=s'       => \$column_spec,
         'directory|d=s'     => \$dirpath,
-        'match-column|mc=i' => \$match_column,
+        'match-column|mc=s' => \$match_column,
     ) || die $usage_string;
 
     die $usage_string if ($help);
@@ -170,6 +196,16 @@ which takes a comma-separated list of column numbers:
  | Frankenstein | Mary Shelley | 1818 |
  +--------------+--------------+------+
 
+You can also use the title of columns with the B<-c> option:
+
+ % csvgrep -c book,date -i mary books.csv
+ +--------------+------+
+ | Book         | Date |
+ +--------------+------+
+ | Mary Poppins | 1934 |
+ | Frankenstein | 1818 |
+ +--------------+------+
+
 By default the pattern will be matched against the whole line,
 but you can use B<--match-column> or B<-mc> to specify that the pattern
 should only be matched against a specific column:
@@ -185,6 +221,15 @@ The number of the match column refers to the numbering of the full set
 of columns, regardless of whether you've used the B<-c> option.
 This means you can match against a column that you're not displaying.
 
+You can also use the column header with the B<-mc> option:
+
+ % csvgrep -mc author -i mary books.csv
+ +--------------+--------------+-------+------+
+ | Book         | Author       | Pages | Date |
+ +--------------+--------------+-------+------+
+ | Frankenstein | Mary Shelley | 280   | 1818 |
+ +--------------+--------------+-------+------+
+
 The pattern can be a Perl regexp,
 but you'll probably need to quote it from your shell:
 
@@ -196,10 +241,12 @@ but you'll probably need to quote it from your shell:
  | Death Walks the Woods | Cyril Hare  | 222   | 1954 |
  +-----------------------+-------------+-------+------+
 
-At work we have a number of situations where we have a directory that contains multiple versions
+At work we have a number of situations where
+we have a directory that contains multiple versions
 of a particular CSV file, for example with a feed from a customer.
-With the B<-d> option, csvgrep will look at the most recent file in the specified directory,
-only considering files with a .csv extension:
+With the B<-d> option,
+csvgrep will look at the most recent file in the specified directory,
+only considering files with a C<.csv> or C<.tsv> extension:
 
  % csvgrep -d /usr/local/feeds/users -i smith
 
@@ -229,6 +276,37 @@ we'll set the field separator to be a tab character:
  +----------------+-----------------+-------+------+
 
 This also applies to the B<-d> option.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c E<lt>column-specE<gt>
+
+A comma-separated list of the columns you want displayed,
+with the first column being 0.
+
+=item -d E<lt>directory-pathE<gt>
+
+Search the most recently modified C<.csv> or C<.tsv> file in
+the specified directory,
+and grep thar.
+
+=item -h
+
+Display short help message.
+
+=item -i
+
+Case-insensitive grep.
+
+=item -mc E<lt>column-numberE<gt>
+
+Only search the specified column,
+which can be specified with the column's name or index
+(starting at 0).
+
+=back
 
 =head1 REPOSITORY
 

@@ -1,3 +1,26 @@
+1.03
+
+- Error page for missing server.
+
+- Group articles by day in the group view.
+
+- Show group description, if available.
+
+- Allow customising of the time window of messages shown via the
+  environment variable NEWS_DAYS.
+
+- Fix links if more than one references is given.
+
+- Use XOVER for the list overview.
+
+- Add pagination.
+
+- Add posting ability from the web, including replies.
+
+- Add caching.
+
+- Add dark mode CSS.
+
 1.02
 
 - No user-visible changes. All changes are CPAN related.

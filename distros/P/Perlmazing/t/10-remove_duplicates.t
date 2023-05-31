@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 4;
-use Perlmazing;
+use Perlmazing qw(remove_duplicates);
 
 my @array = (
 	1, 2, 3, 4, 5,

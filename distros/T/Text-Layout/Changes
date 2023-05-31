@@ -1,5 +1,12 @@
 Revision history for Text::Layout
 
+0.031	2023-05-29
+
+	Improve bounding box and line spacing determination by using the
+	font ascender and descender values only.
+	Allow ascender and decender to be overruled in the font config.
+	Adapt some of the example programs to run on Microsoft Windows.
+
 0.030	2022-09-03
 
 	Enable xx-small, medium, large, x-large and xx-large.

@@ -1,13 +1,25 @@
 package TOML::Tiny::Tokenizer;
 # ABSTRACT: tokenizer used by TOML::Tiny
-$TOML::Tiny::Tokenizer::VERSION = '0.15';
+$TOML::Tiny::Tokenizer::VERSION = '0.16';
 use strict;
 use warnings;
 no warnings qw(experimental);
 use charnames qw(:full);
 use v5.18;
 
-use TOML::Tiny::Grammar;
+use TOML::Tiny::Grammar qw(
+    $Comment
+    $CRLF
+    $DateTime
+    $EOL
+    $Escape
+    $Float
+    $Integer
+    $Key
+    $SimpleKey
+    $String
+    $WS
+);
 
 sub new {
   my ($class, %param) = @_;
@@ -70,59 +82,66 @@ sub next_token {
       /\G$WS+/gc;                # ignore whitespace
       /\G$Comment$/mgc && next;  # ignore comments
 
-      last when /\G$/gc;
+      last if /\G$/gc;
 
-      when (/\G$EOL/gc) {
+      if (/\G$EOL/gc) {
         ++$self->{line};
         $type = 'EOL';
+        last;
       }
 
       if ($newline) {
-        when (/$table/gc) {
+        if (/$table/gc) {
           $type = 'table';
           $value = $self->tokenize_key($1);
+          last;
         }
 
-        when (/$array_table/gc) {
+        if (/$array_table/gc) {
           $type = 'array_table';
           $value = $self->tokenize_key($1);
+          last;
         }
       }
 
-      when (/$key_set/gc) {
+      if (/$key_set/gc) {
         $type = 'key';
         $value = $1;
+        last;
       }
 
-      when (/\G ( [\[\]{}=,] | true | false )/xgc) {
+      if (/\G ( [\[\]{}=,] | true | false )/xgc) {
         $value = $1;
         $type = $simple->{$value};
+        last;
       }
 
-      when (/\G($String)/gc) {
+      if (/\G($String)/gc) {
         $type = 'string';
         $value = $1;
+        last;
       }
 
-      when (/\G($DateTime)/gc) {
+      if (/\G($DateTime)/gc) {
         $type = 'datetime';
         $value = $1;
+        last;
       }
 
-      when (/\G($Float)/gc) {
+      if (/\G($Float)/gc) {
         $type = 'float';
         $value = $1;
+        last;
       }
 
-      when (/\G($Integer)/gc) {
+      if (/\G($Integer)/gc) {
         $type = 'integer';
         $value = $1;
+        last;
       }
 
-      default{
-        my $substr = substr($self->{source}, $self->{position}, 30) // 'undef';
-        die "toml syntax error on line $self->{line}\n\t-->|$substr|\n";
-      }
+      my $substr = substr($self->{source}, $self->{position}, 30) // 'undef';
+      die "toml syntax error on line $self->{line}\n\t-->|$substr|\n";
     }
 
     if ($type) {
@@ -266,7 +285,7 @@ TOML::Tiny::Tokenizer - tokenizer used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 AUTHOR
 
@@ -274,7 +293,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Jeff Ober.
+This software is copyright (c) 2023 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

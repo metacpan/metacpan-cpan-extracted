@@ -2,11 +2,8 @@ Changes
 MANIFEST
 META.json
 META.yml
-MYMETA.json
-MYMETA.yml
 Makefile.PL
 README
-pm_to_blib
 test_copy.txt
 test_file.txt
 lib/Perlmazing/Engine/Exporter.pm
@@ -108,6 +105,7 @@ lib/Perlmazing/Perlmazing/shuffle.pm
 lib/Perlmazing/Perlmazing/slurp.pm
 lib/Perlmazing/Perlmazing/splitdir.pm
 lib/Perlmazing/Perlmazing/splitpath.pm
+lib/Perlmazing/Perlmazing/stat.pm
 lib/Perlmazing/Perlmazing/taint.pm
 lib/Perlmazing/Perlmazing/tainted.pm
 lib/Perlmazing/Perlmazing/to_number.pm
@@ -186,6 +184,7 @@ t/10-scalar_context.t
 t/10-slurp.t
 t/10-sort_by_key.t
 t/10-sort_by_value.t
+t/10-stat.t
 t/10-to_utf8.t
 t/10-trim.t
 t/10-truncate_text.t

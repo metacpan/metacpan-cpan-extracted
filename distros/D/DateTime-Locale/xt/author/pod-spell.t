@@ -414,6 +414,7 @@ PayPal
 Pazartesi
 Pijin
 Pisin
+Polytonic
 Pona
 Ponedjeljak
 Príncipe

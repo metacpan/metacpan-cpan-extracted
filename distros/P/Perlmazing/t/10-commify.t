@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 36;
-use Perlmazing;
+use Perlmazing qw(commify);
 
 my @numbers = qw(
 	123

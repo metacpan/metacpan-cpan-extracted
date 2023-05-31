@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::Base;
-$POE::Component::SmokeBox::Backend::Base::VERSION = '0.56';
+$POE::Component::SmokeBox::Backend::Base::VERSION = '0.58';
 #ABSTRACT: Base class for Backend smokers.
 
 use strict;
@@ -60,7 +60,7 @@ POE::Component::SmokeBox::Backend::Base - Base class for Backend smokers.
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

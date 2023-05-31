@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.012000;
+use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -20,19 +20,28 @@ my %WriteMakefileArgs = (
     "bin/lingy"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012000",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingy",
   "PREREQ_PM" => {
     "Capture::Tiny" => "0.48",
+    "File::Path" => "2.18",
+    "File::Spec" => "3.75",
+    "File::Temp" => "0.2311",
+    "File::Which" => "1.27",
+    "Getopt::Long" => "2.54",
+    "IO::Select" => "1.51",
+    "Scalar::Util" => "1.63",
     "Sub::Identify" => "0.14",
     "Sub::Name" => "0.27",
     "Term::ReadLine" => "1.17",
     "Term::ReadLine::Gnu" => "1.45",
+    "Test::Simple" => "1.302195",
     "Tie::IxHash" => "1.23",
+    "Time::HiRes" => "1.9764",
     "XXX" => "0.38",
     "YAML::PP" => "0.036"
   },
-  "VERSION" => "0.1.7",
+  "VERSION" => "0.1.8",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,11 +49,20 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => "0.48",
+  "File::Path" => "2.18",
+  "File::Spec" => "3.75",
+  "File::Temp" => "0.2311",
+  "File::Which" => "1.27",
+  "Getopt::Long" => "2.54",
+  "IO::Select" => "1.51",
+  "Scalar::Util" => "1.63",
   "Sub::Identify" => "0.14",
   "Sub::Name" => "0.27",
   "Term::ReadLine" => "1.17",
   "Term::ReadLine::Gnu" => "1.45",
+  "Test::Simple" => "1.302195",
   "Tie::IxHash" => "1.23",
+  "Time::HiRes" => "1.9764",
   "XXX" => "0.38",
   "YAML::PP" => "0.036"
 );

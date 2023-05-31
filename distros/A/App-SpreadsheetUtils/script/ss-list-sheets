@@ -67,7 +67,7 @@ ss-list-sheets - List worksheets in a spreadsheet (workbook) file
 
 =head1 VERSION
 
-This document describes version 0.003 of ss-list-sheets (from Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+This document describes version 0.004 of ss-list-sheets (from Perl distribution App-SpreadsheetUtils), released on 2023-03-19.
 
 =head1 SYNOPSIS
 

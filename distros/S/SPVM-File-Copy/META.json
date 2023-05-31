@@ -4,9 +4,9 @@
       "USER_NAME<USER_MAIL>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9689"
+            "SPVM" : "0.986"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9689",
+            "SPVM" : "0.986",
             "SPVM::IO" : "0.16",
             "SPVM::Sys" : "0.38"
          }
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Copy"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.021",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

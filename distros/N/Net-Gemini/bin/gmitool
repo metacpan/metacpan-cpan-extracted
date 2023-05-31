@@ -10,7 +10,7 @@ use File::Path            qw(make_path);
 use File::Slurper         qw(read_text write_text);
 use File::Spec::Functions qw(catdir catfile);
 use Getopt::Long          qw(GetOptionsFromArray);
-use Net::Gemini 0.05;
+use Net::Gemini 0.06;
 use Parse::MIME 'parse_mime_type';
 use URI ();
 
@@ -218,17 +218,17 @@ sub show_links {
 }
 
 sub verify_ssl {
-    my ( $host, $port, $digest, $expire_date, $okay ) = @_;
+    my ( $host, $port, $digest, $not_before, $not_after, $okay ) = @_;
     return 1 if $Allow_Verified and $okay;
     my $key = join( '|', $host, $port );
     if ( $Force_Update or !exists $Known_Hosts->{$key} ) {
-        $Known_Hosts->{$key} = { digest => $digest, expire => $expire_date };
+        $Known_Hosts->{$key} = { digest => $digest, expire => $not_after };
         $Hosts_Dirty = 1;
     } else {
         if ( $Known_Hosts->{$key}{digest} ne $digest ) {
             warn qq(gmitool: digest mismatch "$host|$port"\n),
               "  notAfter (old): $Known_Hosts->{$key}{expire}\n",
-              "  notAfter (new): $expire_date\n";
+              "  notAfter (new): $not_after\n";
             exit 1;
         }
     }

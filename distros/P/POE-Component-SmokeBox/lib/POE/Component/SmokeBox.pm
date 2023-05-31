@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox;
-$POE::Component::SmokeBox::VERSION = '0.56';
+$POE::Component::SmokeBox::VERSION = '0.58';
 #ABSTRACT: POE enabled CPAN smoke testing with added value.
 
 use strict;
@@ -212,7 +212,7 @@ POE::Component::SmokeBox - POE enabled CPAN smoke testing with added value.
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

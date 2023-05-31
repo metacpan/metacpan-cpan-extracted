@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Smoker;
-$POE::Component::SmokeBox::Smoker::VERSION = '0.56';
+$POE::Component::SmokeBox::Smoker::VERSION = '0.58';
 #ABSTRACT: encapsulates a smoker object.
 
 use strict;
@@ -54,7 +54,7 @@ POE::Component::SmokeBox::Smoker - encapsulates a smoker object.
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

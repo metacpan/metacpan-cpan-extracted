@@ -17,7 +17,7 @@ $SPEC{ss2csv} = {
 
 Convert first worksheet of `foo.xlsx` to `foo.csv`:
 
-    % ss2csv foo.xlsx foo.csv
+    % ss2csv foo.xlsx -o foo.csv
 
 Convert worksheet named `Sheet2` in `foo.xlsx` to CSV, output to stdout:
 
@@ -75,7 +75,7 @@ ss2csv - Convert spreadsheet to CSV
 
 =head1 VERSION
 
-This document describes version 0.003 of ss2csv (from Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+This document describes version 0.004 of ss2csv (from Perl distribution App-SpreadsheetUtils), released on 2023-03-19.
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ B<Some examples>
 
 Convert first worksheet of C<foo.xlsx> to C<foo.csv>:
 
- % ss2csv foo.xlsx foo.csv
+ % ss2csv foo.xlsx -o foo.csv
 
 Convert worksheet named C<Sheet2> in C<foo.xlsx> to CSV, output to stdout:
 

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.030";
+our $VERSION = "0.031";
 
 use Text::Layout::FontDescriptor;
 
@@ -140,8 +140,13 @@ Text shaping requires module L<HarfBuzz::Shaper>.
 
 =item *
 
-C<interline> - If set to a true value, an alternative way to determine
-glyph height is used. This may improve results for some fonts.
+C<ascender> - If set overrides the font ascender.
+This may be necessary to improve results for some fonts.
+The value is expressed in 1/1000th of an em.
+
+C<descender> - If set overrides the font descender.
+This may be necessary to improve results for some fonts.
+The value is expressed in 1/1000th of an em.
 
 =item *
 
@@ -371,7 +376,7 @@ sub find_font {
 		return;
 	    }
 
-	    for ( qw( shaping interline nosubset direction language
+	    for ( qw( shaping ascender descender nosubset direction language
 		      underline_thickness underline_position
 		      strikeline_thickness strikeline_position
 		      overline_thickness overline_position

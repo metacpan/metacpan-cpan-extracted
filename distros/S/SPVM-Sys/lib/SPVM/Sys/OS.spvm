@@ -2,7 +2,7 @@
 # MIT License
 
 class Sys::OS {
-  native static method defined : int ($macro_name : string, $value_ref = undef : object of int[]|long[]|double[]);
+  native static method defined : int ($macro_name : string, $value_ref : object of int[]|long[]|double[] = undef);
   
   native static method is_windows : int ();
 }

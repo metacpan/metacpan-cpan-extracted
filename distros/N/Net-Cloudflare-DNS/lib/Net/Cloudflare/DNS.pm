@@ -124,18 +124,18 @@ Net::Cloudflare::DNS - DNS API for Cloudflare API v4
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 =head1 SYNOPSIS
 
 This perl module is working for Cloudflare DNS API v4.
 
-If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
+If you find any issues in using the module, please don't hesitate to email me: wesley@mxcloud.app
 
 My system is Ubuntu, to use the module, I have the following perl modules pre-installed in the system.
 
@@ -174,8 +174,10 @@ After then, you can run "cpanm Net::Cloudflare::DNS" to install this module.
     # delete record
     $dns->delete_record($rid);
 
-    # If it succeeds, cloudflare's response is resturned as a reference to you.
-    # Otherwise the method just dies, you could catch the error in the code.
+If the instance method succeeds, cloudflare's response is resturned as a reference to you.
+Otherwise it just dies, you could catch the error in the code.
+
+    $res = $dns->create_record(...);
     print Dumper $res;
 
 

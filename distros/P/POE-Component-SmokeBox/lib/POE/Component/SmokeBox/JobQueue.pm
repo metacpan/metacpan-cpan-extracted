@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::JobQueue;
-$POE::Component::SmokeBox::JobQueue::VERSION = '0.56';
+$POE::Component::SmokeBox::JobQueue::VERSION = '0.58';
 #ABSTRACT: An array based queue for SmokeBox
 
 use strict;
@@ -351,7 +351,7 @@ POE::Component::SmokeBox::JobQueue - An array based queue for SmokeBox
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

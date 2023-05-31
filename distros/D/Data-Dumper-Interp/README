@@ -1,5 +1,5 @@
 This archive contains the distribution Data-Dumper-Interp,
-version 5.021:
+version 5.023:
 
   interpolate Data::Dumper output into strings for human consumption
 

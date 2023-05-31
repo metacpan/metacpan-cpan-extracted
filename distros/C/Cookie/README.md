@@ -1,1118 +1,938 @@
-SYNOPSIS
-========
+# NAME
 
-        use Cookie::Jar;
-        my $jar = Cookie::Jar->new( request => $r ) ||
-        return( $self->error( "An error occurred while trying to get the cookie jar." ) );
-        # set the default host
-        $jar->host( 'www.example.com' );
-        $jar->fetch;
-        # or using a HTTP::Request object
-        # Retrieve cookies from Cookie header sent from client
-        $jar->fetch( request => $http_request );
-        if( $jar->exists( 'my-cookie' ) )
-        {
-            # do something
-        }
-        # get the cookie
-        my $sid = $jar->get( 'my-cookie' );
-        # get all cookies
-        my @all = $jar->get( 'my-cookie', 'example.com', '/' );
-        # set a new Set-Cookie header
-        $jar->set( 'my-cookie' => $cookie_object );
-        # Remove cookie from jar
-        $jar->delete( 'my-cookie' );
-        # or using the object itself:
-        $jar->delete( $cookie_object );
+Cookie::Jar - Cookie Jar Class for Server & Client
 
-        # Create and add cookie to jar
-        $jar->add(
-            name => 'session',
-            value => 'lang=en-GB',
-            path => '/',
-            secure => 1,
-            same_site => 'Lax',
-        ) || die( $jar->error );
-        # or add an existing cookie
-        $jar->add( $some_cookie_object );
+# SYNOPSIS
 
-        my $c = $jar->make({
-            name => 'my-cookie',
-            domain => 'example.com',
-            value => 'sid1234567',
-            path => '/',
-            expires => '+10D',
-            # or alternatively
-            maxage => 864000
-            # to make it exclusively accessible by regular http request and not ajax
-            http_only => 1,
-            # should it be used under ssl only?
-            secure => 1,
-        });
+    use Cookie::Jar;
+    my $jar = Cookie::Jar->new( request => $r ) ||
+        die( "An error occurred while trying to get the cookie jar:", Cookie::Jar->error );
+    # set the default host
+    $jar->host( 'www.example.com' );
+    $jar->fetch;
+    # or using a HTTP::Request object
+    # Retrieve cookies from Cookie header sent from client
+    $jar->fetch( request => $http_request );
+    if( $jar->exists( 'my-cookie' ) )
+    {
+        # do something
+    }
+    # get the cookie
+    my $sid = $jar->get( 'my-cookie' );
+    # get all cookies
+    my @all = $jar->get( 'my-cookie', 'example.com', '/' );
+    # set a new Set-Cookie header
+    $jar->set( 'my-cookie' => $cookie_object );
+    # Remove cookie from jar
+    $jar->delete( 'my-cookie' );
+    # or using the object itself:
+    $jar->delete( $cookie_object );
 
-        # Add the Set-Cookie headers
-        $jar->add_response_header;
-        # Alternatively, using a HTTP::Response object or equivalent
-        $jar->add_response_header( $http_response );
-        $jar->delete( 'some_cookie' );
-        $jar->do(sub
-        {
-            # cookie object is available as $_ or as first argument in @_
-        });
+    # Create and add cookie to jar
+    $jar->add(
+        name => 'session',
+        value => 'lang=en-GB',
+        path => '/',
+        secure => 1,
+        same_site => 'Lax',
+    ) || die( $jar->error );
+    # or add an existing cookie
+    $jar->add( $some_cookie_object );
 
-        # For client side
-        # Takes a HTTP::Response object or equivalent
-        # Extract cookies from Set-Cookie headers received from server
-        $jar->extract( $http_response );
-        # get by domain; by default sort it
-        my $all = $jar->get_by_domain( 'example.com' );
-        # Reverse sort
-        $all = $jar->get_by_domain( 'example.com', sort => 0 );
+    my $c = $jar->make({
+        name => 'my-cookie',
+        domain => 'example.com',
+        value => 'sid1234567',
+        path => '/',
+        expires => '+10D',
+        # or alternatively
+        maxage => 864000
+        # to make it exclusively accessible by regular http request and not ajax
+        http_only => 1,
+        # should it be used under ssl only?
+        secure => 1,
+    });
 
-        # Save cookies repository as json
-        $jar->save( '/some/where/mycookies.json' ) || die( $jar->error );
-        # Load cookies into jar
-        $jar->load( '/some/where/mycookies.json' ) || die( $jar->error );
+    # Add the Set-Cookie headers
+    $jar->add_response_header;
+    # Alternatively, using a HTTP::Response object or equivalent
+    $jar->add_response_header( $http_response );
+    $jar->delete( 'some_cookie' );
+    $jar->do(sub
+    {
+        # cookie object is available as $_ or as first argument in @_
+    });
 
-        # Save encrypted
-        $jar->save( '/some/where/mycookies.json',
-        {
-            encrypt => 1,
-            key => $key,
-            iv => $iv,
-            algo => 'AES',
-        }) || die( $jar->error );
-        # Load cookies from encrypted file
-        $jar->load( '/some/where/mycookies.json',
-        {
-            decrypt => 1,
-            key => $key,
-            iv  => $iv,
-            algo => 'AES'
-        }) || die( $jar->error );
+    # For client side
+    # Takes a HTTP::Response object or equivalent
+    # Extract cookies from Set-Cookie headers received from server
+    $jar->extract( $http_response );
+    # get by domain; by default sort it
+    my $all = $jar->get_by_domain( 'example.com' );
+    # Reverse sort
+    $all = $jar->get_by_domain( 'example.com', sort => 0 );
 
-        # Merge repository
-        $jar->merge( $jar2 ) || die( $jar->error );
+    # Save cookies repository as json
+    $jar->save( '/some/where/mycookies.json' ) || die( $jar->error );
+    # Load cookies into jar
+    $jar->load( '/some/where/mycookies.json' ) || die( $jar->error );
 
-VERSION
-=======
+    # Save encrypted
+    $jar->save( '/some/where/mycookies.json',
+    {
+        encrypt => 1,
+        key => $key,
+        iv => $iv,
+        algo => 'AES',
+    }) || die( $jar->error );
+    # Load cookies from encrypted file
+    $jar->load( '/some/where/mycookies.json',
+    {
+        decrypt => 1,
+        key => $key,
+        iv  => $iv,
+        algo => 'AES'
+    }) || die( $jar->error );
 
-        v0.1.1
+    # Merge repository
+    $jar->merge( $jar2 ) || die( $jar->error );
+    
+    # For autosave
+    my $jar = Cookie::Jar->new(
+        file => '/some/where/cookies.json',
+        # True by default
+        autosave => 1,
+        encrypt => 1,
+        secret => 'My big secret',
+        algo => 'AES',
+    ) || die( Cookie::Jar->error );
 
-DESCRIPTION
-===========
+    say "There are ", $jar->length, " cookies in the repository.";
+    
+    # Take a string from a Set-Cookie header and get a Cookie object
+    my $c = $jar->extract_one( $cookie_string );
 
-This is a module to handle
-[cookies](https://metacpan.org/pod/Cookie){.perl-module}, according to
-the latest standard as set by
-[rfc6265](https://datatracker.ietf.org/doc/html/rfc6265){.perl-module},
-both by the http server and the client. Most modules out there are
-either antiquated, i.e. they do not support latest cookie
-[rfc6265](https://datatracker.ietf.org/doc/html/rfc6265){.perl-module},
-or they focus only on http client side.
+# VERSION
 
-For example, Apache2::Cookie does not work well in decoding cookies, and
-[Cookie::Baker](https://metacpan.org/pod/Cookie::Baker){.perl-module}
-`Set-Cookie` timestamp format is wrong. They use Mon-09-Jan 2020
-12:17:30 GMT where it should be, as per rfc 6265 Mon, 09 Jan 2020
-12:17:30 GMT
+    v0.3.0
 
-Also
-[APR::Request::Cookie](https://metacpan.org/pod/APR::Request::Cookie){.perl-module}
-and
-[Apache2::Cookie](https://metacpan.org/pod/Apache2::Cookie){.perl-module}
-which is a wrapper around
-[APR::Request::Cookie](https://metacpan.org/pod/APR::Request::Cookie){.perl-module}
-return a cookie object that returns the value of the cookie upon
-stringification instead of the full `Set-Cookie` parameters. Clearly
-they designed it with a bias leaned toward collecting cookies from the
-browser.
+# DESCRIPTION
 
-This module supports modperl and uses a
-[Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
-if provided, or can use package objects that implement similar interface
-as [HTTP::Request](https://metacpan.org/pod/HTTP::Request){.perl-module}
-and
-[HTTP::Response](https://metacpan.org/pod/HTTP::Response){.perl-module},
-or if none of those above are available or provided, this module returns
-its results as a string.
+This is a module to handle [cookies](https://metacpan.org/pod/Cookie), according to the latest standard as set by [rfc6265](https://datatracker.ietf.org/doc/html/rfc6265), both by the http server and the client. Most modules out there are either antiquated, i.e. they do not support latest cookie [rfc6265](https://datatracker.ietf.org/doc/html/rfc6265), or they focus only on http client side.
 
-This module is also compatible with
-[LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent){.perl-module},
-so you can use like this:
+For example, Apache2::Cookie does not work well in decoding cookies, and [Cookie::Baker](https://metacpan.org/pod/Cookie%3A%3ABaker) `Set-Cookie` timestamp format is wrong. They use Mon-09-Jan 2020 12:17:30 GMT where it should be, as per rfc 6265 Mon, 09 Jan 2020 12:17:30 GMT
 
-        use LWP::UserAgent;
-        use Cookie::Jar;
-     
-        my $ua = LWP::UserAgent->new(
-            cookie_jar => Cookie::Jar->new
-        );
+Also [APR::Request::Cookie](https://metacpan.org/pod/APR%3A%3ARequest%3A%3ACookie) and [Apache2::Cookie](https://metacpan.org/pod/Apache2%3A%3ACookie) which is a wrapper around [APR::Request::Cookie](https://metacpan.org/pod/APR%3A%3ARequest%3A%3ACookie) return a cookie object that returns the value of the cookie upon stringification instead of the full `Set-Cookie` parameters. Clearly they designed it with a bias leaned toward collecting cookies from the browser.
 
-This module does not die upon error, but instead returns `undef` and
-sets an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module},
-so you should always check the return value of a method.
+This module supports modperl and uses a [Apache2::RequestRec](https://metacpan.org/pod/Apache2%3A%3ARequestRec) if provided, or can use package objects that implement similar interface as [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) and [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse), or if none of those above are available or provided, this module returns its results as a string.
 
-METHODS
-=======
+This module is also compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent), so you can use like this:
 
-new
----
+       use LWP::UserAgent;
+       use Cookie::Jar;
+    
+       my $ua = LWP::UserAgent->new(
+           cookie_jar => Cookie::Jar->new
+       );
+
+It is also compatible with [HTTP::Promise](https://metacpan.org/pod/HTTP%3A%3APromise), such as:
+
+    use HTTP::Promise;
+    my $ua = HTTP::Promise->new( cookie_jar => Cookie::Jar->new );
+
+This module does not die upon error, but instead returns `undef` and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error), so you should always check the return value of a method.
+
+# METHODS
+
+## new
 
 This initiates the package and takes the following parameters:
 
-*request*
+- `request`
 
-:   This is an optional parameter to provide a
-    [Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
-    object. When provided, it will be used in various methods to get or
-    set cookies from or onto http headers.
+    This is an optional parameter to provide a [Apache2::RequestRec](https://metacpan.org/pod/Apache2%3A%3ARequestRec) object. When provided, it will be used in various methods to get or set cookies from or onto http headers.
 
-            package MyApacheHandler;
-            use Apache2::Request ();
-            use Cookie::Jar;
-            
-            sub handler : method
+        package MyApacheHandler;
+        use Apache2::Request ();
+        use Cookie::Jar;
+        
+        sub handler : method
+        {
+            my( $class, $r ) = @_;
+            my $jar = Cookie::Jar->new( $r );
+            # Load cookies;
+            $jar->fetch;
+            $r->log_error( "$class: Found ", $jar->repo->length, " cookies." );
+            $jar->add(
+                name => 'session',
+                value => 'lang=en-GB',
+                path => '/',
+                secure => 1,
+                same_site => 'Lax',
+            );
+            # Will use Apache2::RequestRec object to set the Set-Cookie headers
+            $jar->add_response_header || do
             {
-                my( $class, $r ) = @_;
-                my $jar = Cookie::Jar->new( $r );
-                # Load cookies;
-                $jar->fetch;
-                $r->log_error( "$class: Found ", $jar->repo->length, " cookies." );
-                $jar->add(
-                    name => 'session',
-                    value => 'lang=en-GB',
-                    path => '/',
-                    secure => 1,
-                    same_site => 'Lax',
-                );
-                # Will use Apache2::RequestRec object to set the Set-Cookie headers
-                $jar->add_response_header || do
-                {
-                    $r->log_reason( "Unable to add Set-Cookie to response header: ", $jar->error );
-                    return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-                };
-                # Do some more computing
-                return( Apache2::Const::OK );
-            }
+                $r->log_reason( "Unable to add Set-Cookie to response header: ", $jar->error );
+                return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+            };
+            # Do some more computing
+            return( Apache2::Const::OK );
+        }
 
-*debug*
+- `debug`
 
-:   Optional. If set with a positive integer, this will activate verbose
-    debugging message
+    Optional. If set with a positive integer, this will activate verbose debugging message
 
-add
----
+## add
 
-Provided with an hash or hash reference of cookie parameters (see
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module}) and this will
-create a new [cookie](https://metacpan.org/pod/Cookie){.perl-module} and
-add it to the cookie repository.
+Provided with an hash or hash reference of cookie parameters (see [Cookie](https://metacpan.org/pod/Cookie)) and this will create a new [cookie](https://metacpan.org/pod/Cookie) and add it to the cookie repository.
 
-Alternatively, you can also provide directly an existing [cookie
-object](https://metacpan.org/pod/Cookie){.perl-module}
+Alternatively, you can also provide directly an existing [cookie object](https://metacpan.org/pod/Cookie)
 
-        my $c = $jar->add( $cookie_object ) || die( $jar->error );
+    my $c = $jar->add( $cookie_object ) || die( $jar->error );
 
-add\_cookie\_header
--------------------
+## add\_cookie\_header
 
-This is an alias for
-[\"add\_request\_header\"](#add_request_header){.perl-module} for
-backward compatibility with
-[HTTP::Cookies](https://metacpan.org/pod/HTTP::Cookies){.perl-module}
+This is an alias for ["add\_request\_header"](#add_request_header) for backward compatibility with [HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies)
 
-add\_request\_header
---------------------
+## add\_request\_header
 
-Provided with a request object, such as, but not limited to
-[HTTP::Request](https://metacpan.org/pod/HTTP::Request){.perl-module}
-and this will add all relevant cookies in the repository into the
-`Cookie` http request header.
+Provided with a request object, such as, but not limited to [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) and this will add all relevant cookies in the repository into the `Cookie` http request header. The object method needs to have the `header` method in order to get, or set the `Cookie` or `Set-Cookie` headers and the `uri` method.
 
-As long as the object provided supports the `uri` and `header` method,
-you can provide any class of object you want.
+As long as the object provided supports the `uri` and `header` method, you can provide any class of object you want.
 
-Please refer to the
-[rfc6265](https://datatracker.ietf.org/doc/html/rfc6265){.perl-module}
-for more information on the applicable rule when adding cookies to the
-outgoing request header.
+Please refer to the [rfc6265](https://datatracker.ietf.org/doc/html/rfc6265) for more information on the applicable rule when adding cookies to the outgoing request header.
 
-Basically, it will add, for a given domain, first all cookies whose path
-is longest and at path equivalent, the cookie creation date is used,
-with the earliest first. Cookies who have expired are not sent, and
-there can be cookies bearing the same name for the same domain in
-different paths.
+Basically, it will add, for a given domain, first all cookies whose path is longest and at path equivalent, the cookie creation date is used, with the earliest first. Cookies who have expired are not sent, and there can be cookies bearing the same name for the same domain in different paths.
 
-add\_response\_header
----------------------
+## add\_response\_header
 
-        # Adding cookie to the repository
-        $jar->add(
-            name => 'session',
-            value => 'lang=en-GB',
-            path => '/',
-            secure => 1,
-            same_site => 'Lax',
-        ) || die( $jar->error );
-        # then placing it onto the response header
-        $jar->add_response_header;
+    # Adding cookie to the repository
+    $jar->add(
+        name => 'session',
+        value => 'lang=en-GB',
+        path => '/',
+        secure => 1,
+        same_site => 'Lax',
+    ) || die( $jar->error );
+    # then placing it onto the response header
+    $jar->add_response_header;
 
-This is the alter ego to
-[\"add\_request\_header\"](#add_request_header){.perl-module}, in that
-it performs the equivalent function, but for the server side.
+This is the alter ego to ["add\_request\_header"](#add_request_header), in that it performs the equivalent function, but for the server side.
 
-You can optionally provide, as unique argument, an object, such as but
-not limited to,
-[HTTP::Response](https://metacpan.org/pod/HTTP::Response){.perl-module},
-as long as that class supports the `header` method
+You can optionally provide, as unique argument, an object, such as but not limited to, [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse), as long as that class supports the `header` method
 
-Alternatively, if an [Apache
-object](https://metacpan.org/pod/Apache2::RequestRec){.perl-module} has
-been set upon object instantiation or later using the
-[\"request\"](#request){.perl-module} method, then it will be used to
-set the outgoing `Set-Cookie` headers (there is one for every cookie
-sent).
+Alternatively, if an [Apache object](https://metacpan.org/pod/Apache2%3A%3ARequestRec) has been set upon object instantiation or later using the ["request"](#request) method, then it will be used to set the outgoing `Set-Cookie` headers (there is one for every cookie sent).
 
-If no response, nor Apache2 object were set, then this will simply
-return a list of `Set-Cookie` in list context, or a string of possibly
-multiline `Set-Cookie` headers, or an empty string if there is no cookie
-found to be sent.
+If no response, nor Apache2 object were set, then this will simply return a list of `Set-Cookie` in list context, or a string of possibly multiline `Set-Cookie` headers, or an empty string if there is no cookie found to be sent.
 
 Be careful not to do the following:
 
-        # get cookies sent by the http client
-        $jar->fetch || die( $jar->error );
-        # set the response headers with the cookies from our repository
-        $jar->add_response_header;
+    # get cookies sent by the http client
+    $jar->fetch || die( $jar->error );
+    # set the response headers with the cookies from our repository
+    $jar->add_response_header;
 
-Why? Well, because [\"fetch\"](#fetch){.perl-module} retrieves the
-cookies sent by the http client and store them into the repository.
-However, cookies sent by the http client only contain the cookie name
-and value, such as:
+Why? Well, because ["fetch"](#fetch) retrieves the cookies sent by the http client and store them into the repository. However, cookies sent by the http client only contain the cookie name and value, such as:
 
-        GET /my/path/ HTTP/1.1
-        Host: www.example.org
-        Cookie: session_token=eyJleHAiOjE2MzYwNzEwMzksImFsZyI6IkhTMjU2In0.eyJqdGkiOiJkMDg2Zjk0OS1mYWJmLTRiMzgtOTE1ZC1hMDJkNzM0Y2ZmNzAiLCJmaXJzdF9uYW1lIjoiSm9obiIsImlhdCI6MTYzNTk4NDYzOSwiYXpwIjoiNGQ0YWFiYWQtYmJiMy00ODgwLThlM2ItNTA0OWMwZTczNjBlIiwiaXNzIjoiaHR0cHM6Ly9hcGkuZXhhbXBsZS5jb20iLCJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwibGFzdF9uYW1lIjoiRG9lIiwic3ViIjoiYXV0aHxlNzg5OTgyMi0wYzlkLTQyODctYjc4Ni02NTE3MjkyYTVlODIiLCJjbGllbnRfaWQiOiJiZTI3N2VkYi01MDgzLTRjMWEtYTM4MC03Y2ZhMTc5YzA2ZWQiLCJleHAiOjE2MzYwNzEwMzksImF1ZCI6IjRkNGFhYmFkLWJiYjMtNDg4MC04ZTNiLTUwNDljMGU3MzYwZSJ9.VSiSkGIh41xXIVKn9B6qGjfzcLlnJAZ9jGOPVgXASp0; csrf_token=9849724969dbcffd48c074b894c8fbda14610dc0ae62fac0f78b2aa091216e0b.1635825594; site_prefs=lang%3Den-GB
+    GET /my/path/ HTTP/1.1
+    Host: www.example.org
+    Cookie: session_token=eyJleHAiOjE2MzYwNzEwMzksImFsZyI6IkhTMjU2In0.eyJqdGkiOiJkMDg2Zjk0OS1mYWJmLTRiMzgtOTE1ZC1hMDJkNzM0Y2ZmNzAiLCJmaXJzdF9uYW1lIjoiSm9obiIsImlhdCI6MTYzNTk4NDYzOSwiYXpwIjoiNGQ0YWFiYWQtYmJiMy00ODgwLThlM2ItNTA0OWMwZTczNjBlIiwiaXNzIjoiaHR0cHM6Ly9hcGkuZXhhbXBsZS5jb20iLCJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwibGFzdF9uYW1lIjoiRG9lIiwic3ViIjoiYXV0aHxlNzg5OTgyMi0wYzlkLTQyODctYjc4Ni02NTE3MjkyYTVlODIiLCJjbGllbnRfaWQiOiJiZTI3N2VkYi01MDgzLTRjMWEtYTM4MC03Y2ZhMTc5YzA2ZWQiLCJleHAiOjE2MzYwNzEwMzksImF1ZCI6IjRkNGFhYmFkLWJiYjMtNDg4MC04ZTNiLTUwNDljMGU3MzYwZSJ9.VSiSkGIh41xXIVKn9B6qGjfzcLlnJAZ9jGOPVgXASp0; csrf_token=9849724969dbcffd48c074b894c8fbda14610dc0ae62fac0f78b2aa091216e0b.1635825594; site_prefs=lang%3Den-GB
 
-As you can see, 3 cookies were sent: `session_token`, `csrf_token` and
-`site_prefs`
+As you can see, 3 cookies were sent: `session_token`, `csrf_token` and `site_prefs`
 
-So, when [\"fetch\"](#fetch){.perl-module} creates an object for each
-one and store them, those cookies have no `path` value and no other
-attribute, and when
-[\"add\_response\_header\"](#add_response_header){.perl-module} is then
-called, it stringifies the cookies and create a `Set-Cookie` header for
-each one, but only with their value and no other attribute.
+So, when ["fetch"](#fetch) creates an object for each one and store them, those cookies have no `path` value and no other attribute, and when ["add\_response\_header"](#add_response_header) is then called, it stringifies the cookies and create a `Set-Cookie` header for each one, but only with their value and no other attribute.
 
-The http client, when receiving those cookies will derive the missing
-cookie path to be `/my/path`, i.e. the current uri path, and will create
-a duplicate cookie from the previously stored cookie with the same name
-for that host, but that had the path set to `/`
+The http client, when receiving those cookies will derive the  missing cookie path to be `/my/path`, i.e. the current uri path, and will create a duplicate cookie from the previously stored cookie with the same name for that host, but that had the path set to `/`
 
-So you can create a repository and use it to store the cookies sent by
-the http client using [\"fetch\"](#fetch){.perl-module}, but in
-preparation of the server response, either use a separate repository
-with, for example, `my $jar_out = Cookie::Jar-`new\> or use
-[\"set\"](#set){.perl-module} which will not add the cookie to the
-repository, but rather only set the `Set-Cookie` header for that cookie.
+So you can create a repository and use it to store the cookies sent by the http client using ["fetch"](#fetch), but in preparation of the server response, either use a separate repository with, for example, `my $jar_out = Cookie::Jar->new` or use ["set"](#set) which will not add the cookie to the repository, but rather only set the `Set-Cookie` header for that cookie.
 
-        # Add Set-Cookie header for that cookie, but do not add cookie to repository
-        $jar->set( $cookie_object );
+    # Add Set-Cookie header for that cookie, but do not add cookie to repository
+    $jar->set( $cookie_object );
 
-delete
-------
+## algo
 
-Given a cookie name, an optional host and optional path or a
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module} object, and this
-will remove it from the cookie repository.
+String. Sets or gets the algorithm to use when loading or saving the cookie jar.
 
-It returns an [array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-upon success, or [\"undef\" in
-perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} and
-sets an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}.
-Note that the array object may be empty.
+## autosave
 
-However, this will NOT remove it from the web browser by sending a
-Set-Cookie header. For that, you might want to look at the [\"elapse\"
-in Cookie](https://metacpan.org/pod/Cookie#elapse){.perl-module} method.
+Boolean. Sets or gets the boolean value for automatically saving the cookie jar to the given file specified with ["file"](#file)
 
-It returns an [array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-of cookie objects removed.
+## delete
 
-        my $arr = $jar->delete( 'my-cookie' );
-        # alternatively
-        my $arr = $jar->delete( 'my-cookie' => 'www.example.org' );
-        # or
-        my $arr = $jar->delete( $my_cookie_object );
-        printf( "%d cookie(s) removed.\n", $arr->length );
-        print( "Cookie value removed was: ", $arr->first->value, "\n" );
+Given a cookie name, an optional host and optional path or a [Cookie](https://metacpan.org/pod/Cookie) object, and this will remove it from the cookie repository.
 
-If you are interested in telling the http client to remove all your
-cookies, you can set the `Clear-Site-Data` header:
+It returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) upon success, or ["undef" in perlfunc](https://metacpan.org/pod/perlfunc#undef) and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error). Note that the array object may be empty.
 
-        Clear-Site-Data: "cookies"
+However, this will NOT remove it from the web browser by sending a Set-Cookie header. For that, you might want to look at the ["elapse" in Cookie](https://metacpan.org/pod/Cookie#elapse) method.
 
-You can instruct the http client to remove other data like local
-storage:
+It returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) of cookie objects removed.
 
-        Clear-Site-Data: "cookies", "cache", "storage", "executionContexts"
+    my $arr = $jar->delete( 'my-cookie' );
+    # alternatively
+    my $arr = $jar->delete( 'my-cookie' => 'www.example.org' );
+    # or
+    my $arr = $jar->delete( $my_cookie_object );
+    printf( "%d cookie(s) removed.\n", $arr->length );
+    print( "Cookie value removed was: ", $arr->first->value, "\n" );
 
-Although this is widely supported, there is no guarantee the http client
-will actually comply with this request.
+If you are interested in telling the http client to remove all your cookies, you can set the `Clear-Site-Data` header:
 
-See [Mozilla
-documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data){.perl-module}
-for more information.
+    Clear-Site-Data: "cookies"
 
-do
---
+You can instruct the http client to remove other data like local storage:
 
-Provided with an anonymous code or reference to a subroutine, and this
-will call that code for every cookie in the repository, passing it the
-cookie object as the sole argument. Also, that cookie object is
-accessible using `$_`.
+    Clear-Site-Data: "cookies", "cache", "storage", "executionContexts"
 
-If the code return `undef`, it will end the loop, and it the code
-returns true, this will have the current cookie object added to an
-[array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-returned upon completion of the loop.
+Although this is widely supported, there is no guarantee the http client will actually comply with this request.
 
-        my $found = $jar->do(sub
+See [Mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data) for more information.
+
+## do
+
+Provided with an anonymous code or reference to a subroutine, and this will call that code for every cookie in the repository, passing it the cookie object as the sole argument. Also, that cookie object is accessible using `$_`.
+
+If the code return `undef`, it will end the loop, and if the code returns true, this will have the current cookie object added to an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) returned upon completion of the loop.
+
+    my $found = $jar->do(sub
+    {
+        # Part of the path
+        if( index( $path, $_->path ) == 0 )
         {
-            # Part of the path
-            if( index( $path, $_->path ) == 0 )
-            {
-                return(1);
-            }
-            return(0);
-        });
-        print( "Found cookies: ", $found->map(sub{$_->name})->join( ',' ), "\n" );
+            return(1);
+        }
+        return(0);
+    });
+    print( "Found cookies: ", $found->map(sub{$_->name})->join( ',' ), "\n" );
 
-exists
-------
+## encrypt
+
+Boolean. Sets or gets the boolean value for whether to encrypt or not the cookie jar when saving it, or whether to decrypt it when loading cookies from it.
+
+This defaults to false.
+
+## exists
 
 Given a cookie name, this will check if it exists.
 
 It returns 1 if it does, or 0 if it does not.
 
-extract
--------
+## extract
 
-Provided with a response object, such as, but not limited to
-[HTTP::Response](https://metacpan.org/pod/HTTP::Response){.perl-module},
-and this will retrieve any cookie sent from the remote server, parse
-them and add their respective to the repository.
+Provided with a response object, such as, but not limited to [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse), and this will retrieve any cookie sent from the remote server, parse them and add their respective to the repository.
 
-As per the [rfc6265, section 5.3.11
-specifications](https://datatracker.ietf.org/doc/html/rfc6265#section-5.3){.perl-module}
-if there are duplicate cookies for the same domain and path, only the
-last one will be retained.
+As per the [rfc6265, section 5.3.11 specifications](https://datatracker.ietf.org/doc/html/rfc6265#section-5.3) if there are duplicate cookies for the same domain and path, only the last one will be retained.
 
-If the cookie received does not contain any `Domain` specification,
-then, in line with rfc6265 specifications, it will take the root of the
-current domain as the default domain value. Since finding out what is
-the root for a domain name is a non-trivial exercise, this method relies
-on
-[Cookie::Domain](https://metacpan.org/pod/Cookie::Domain){.perl-module}.
+If the cookie received does not contain any `Domain` specification, then, in line with rfc6265 specifications, it will take the root of the current domain as the default domain value. Since finding out what is the root for a domain name is a non-trivial exercise, this method relies on [Cookie::Domain](https://metacpan.org/pod/Cookie%3A%3ADomain).
 
-extract\_cookies
-----------------
+## extract\_cookies
 
-This is an alias for [\"extract\"](#extract){.perl-module} for backward
-compatibility with
-[HTTP::Cookies](https://metacpan.org/pod/HTTP::Cookies){.perl-module}
+This is an alias for ["extract"](#extract) for backward compatibility with [HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies)
 
-fetch
------
+## extract\_one
 
-This method does the equivalent of
-[\"extract\"](#extract){.perl-module}, but for the server.
+This method takes a cookie string, which can be found in the `Set-Cookie` header, parse it, and returns a [Cookie](https://metacpan.org/pod/Cookie) object if successful, or sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) and return `undef` or an empty list depending on the context.
 
-It retrieves all possible cookies from the http request received from
-the web browser.
+It also takes an hash or hash reference of options.
 
-It takes an optional hash or hash reference of parameters, such as
-`host`. If it is not provided, the value set with
-[\"host\"](#host){.perl-module} is used instead.
+The following options are supported:
 
-If the parameter `request` containing an http request object, such as,
-but not limited to
-[HTTP::Request](https://metacpan.org/pod/HTTP::Request){.perl-module},
-is provided, it will use it to get the `Cookie` header value.
+- `host`
 
-Alternatively, if a value for [\"request\"](#request){.perl-module} has
-been set, it will use it to get the `Cookie` header value from Apache
-modperl.
+    If provided, it will be used to find out the host's root domain, and to set the cookie object `domain` property if none is specified in the cookie string.
 
-You can also provide the `Cookie` string to parse by providing the
-`string` option to this method.
+- `path`
 
-        $jar->fetch( string => q{foo=bar; site_prefs=lang%3Den-GB} ) ||
-            die( $jar->error );
+    If provided, it will be used to set the cookie object `path` property.
 
-Ultimately, if none of those are available, it will use the environment
-variable `HTTP_COOKIE`
+- `port`
 
-If the option *store* is true, this method will add the fetched cookies
-to the [repository](#repo){.perl-module}.
+    If provided, it will be used to set the cookie object `port` property.
 
-It returns an hash reference of cookie key =\> [cookie
-object](https://metacpan.org/pod/Cookie){.perl-module}
+## fetch
 
-A cookie key is made of the host (possibly empty), the path and the
-cookie name separated by `;`
+This method does the equivalent of ["extract"](#extract), but for the server.
 
-        # Cookies added to the repository
-        $jar->fetch || die( $jar->error );
-        # Cookies returned, but NOT added to the repository
-        my $cookies = $jar->fetch || die( $jar->error );
+It retrieves all possible cookies from the http request received from the web browser.
 
-get
----
+It takes an optional hash or hash reference of parameters, such as `host`. If it is not provided, the value set with ["host"](#host) is used instead.
 
-Given a cookie name, an optional host and an optional path, this will
-retrieve its value and return it.
+If the parameter `request` containing an http request object, such as, but not limited to [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest), is provided, it will use it to get the `Cookie` header value. The object method needs to have the `header` method in order to get, or set the `Cookie` or `Set-Cookie` headers.
+
+Alternatively, if a value for ["request"](#request) has been set, it will use it to get the `Cookie` header value from Apache modperl.
+
+You can also provide the `Cookie` string to parse by providing the `string` option to this method.
+
+    $jar->fetch( string => q{foo=bar; site_prefs=lang%3Den-GB} ) ||
+        die( $jar->error );
+
+Ultimately, if none of those are available, it will use the environment variable `HTTP_COOKIE`
+
+If the option `store` is true (by default it is true), this method will add the fetched cookies to the [repository](#repo).
+
+It returns an hash reference of cookie key => [cookie object](https://metacpan.org/pod/Cookie)
+
+A cookie key is made of the host (possibly empty), the path and the cookie name separated by `;`
+
+    # Cookies added to the repository
+    $jar->fetch || die( $jar->error );
+    # Cookies returned, but NOT added to the repository
+    my $cookies = $jar->fetch || die( $jar->error );
+
+## file
+
+Sets or gets the file path to the cookie jar file.
+
+If provided upon instantiation, and if the file exists on the filesystem and is not empty, `Cookie::Jar` will load all the cookies from it.
+
+If ["autosave"](#autosave) is set to a true, `Cookie::Jar` will automatically save all cookies to the specified cookie jar file, possibly encrypting it if ["algo"](#algo) and ["secret"](#secret) are set.
+
+## get
+
+Given a cookie name, an optional host and an optional path, this will retrieve its corresponding [cookie object](https://metacpan.org/pod/Cookie) and return it.
 
 If not found, it will try to return a value with just the cookie name.
 
-If nothing is found, this will return and empty list in list context or
-`undef` in scalar context.
+If nothing is found, this will return and empty list in list context or `undef` in scalar context.
 
-You can `get` multiple cookies and this method will return a list in
-list context and the first cookie found in scalar context.
+You can `get` multiple cookie object and this method will return a list in list context and the first cookie object found in scalar context.
 
-        # Wrong, an undefined returned value here only means there is no such cookie
-        my $c = $jar->get( 'my-cookie' );
-        die( $jar->error ) if( !defined( $c ) );
-        # Correct
-        my $c = $jar->get( 'my-cookie' ) || die( "No cookie my-cookie found\n" );
-        # Possibly get multiple cookie object for the same name
-        my @cookies = $jar->get( 'my_same_name' ) || die( "No cookies my_same_name found\n" );
-        # or
-        my @cookies = $jar->get( 'my_same_name' => 'www.example.org', '/private' ) || die( "No cookies my_same_name found\n" );
+    # Wrong, an undefined returned value here only means there is no such cookie
+    my $c = $jar->get( 'my-cookie' );
+    die( $jar->error ) if( !defined( $c ) );
+    # Correct
+    my $c = $jar->get( 'my-cookie' ) || die( "No cookie my-cookie found\n" );
+    # Possibly get multiple cookie object for the same name
+    my @cookies = $jar->get( 'my_same_name' ) || die( "No cookies my_same_name found\n" );
+    # or
+    my @cookies = $jar->get( 'my_same_name' => 'www.example.org', '/private' ) || die( "No cookies my_same_name found\n" );
 
-get\_by\_domain
----------------
+## get\_by\_domain
 
-Provided with a host and an optional hash or hash reference of
-parameters, and this returns an [array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-of [cookie objects](https://metacpan.org/pod/Cookie){.perl-module}
-matching the domain specified.
+Provided with a host and an optional hash or hash reference of parameters, and this returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) of [cookie objects](https://metacpan.org/pod/Cookie) matching the domain specified.
 
-If a `sort` parameter has been provided and its value is true, this will
-sort the cookies by path alphabetically. If the sort value exists, but
-is false, this will sort the cookies by path but in a reverse
-alphabetical order.
+If a `sort` parameter has been provided and its value is true, this will sort the cookies by path alphabetically. If the sort value exists, but is false, this will sort the cookies by path but in a reverse alphabetical order.
 
 By default, the cookies are sorted.
 
-host
-----
+## host
 
-Sets or gets the default host. This is especially useful for cookies
-repository used on the server side.
+Sets or gets the default host. This is especially useful for cookies repository used on the server side.
 
-key
----
+## key
 
-Provided with a cookie name and an optional host and this returns a key
-used to add an entry in the hash repository.
+Provided with a cookie name and an optional host and this returns a key used to add an entry in the hash repository.
 
-If no host is provided, the key is just the cookie, otherwise the
-resulting key is the cookie name and host separated just by `;`
+If no host is provided, the key is just the cookie, otherwise the resulting key is the cookie name and host separated just by `;`
 
 You should not need to use this method as it is used internally only.
 
-load
-----
+## load
 
-        $jar->load( '/home/joe/cookies.json' ) || die( $jar->error );
+    $jar->load( '/home/joe/cookies.json' ) || die( $jar->error );
 
-        # or loading cookies from encrypted file
-        $jar->load( '/home/joe/cookies_encrypted.json',
-        {
-            decrypt => 1,
-            key => $key,
-            iv  => $iv,
-            algo => 'AES'
-        }) || die( $jar->error );
+    # or loading cookies from encrypted file
+    $jar->load( '/home/joe/cookies_encrypted.json',
+    {
+        decrypt => 1,
+        key => $key,
+        iv  => $iv,
+        algo => 'AES'
+    }) || die( $jar->error );
 
-Give a json cookie file, and an hash or hash reference of options, and
-this will load its data into the repository. If there are duplicates
-(same cookie name and host), the latest one added takes precedence, as
-per the rfc6265 specifications.
+Give a json cookie file, and an hash or hash reference of options, and this will load its data into the repository. If there are duplicates (same cookie name and host), the latest one added takes precedence, as per the rfc6265 specifications.
 
 Supported options are:
 
-*algo* string
+- _algo_ string
 
-:   Algorithm to use to decrypt the cookie file.
+    Algorithm to use to decrypt the cookie file.
 
-    It can be any of
-    [AES](https://metacpan.org/pod/Crypt::Cipher::AES){.perl-module},
-    [Anubis](https://metacpan.org/pod/Crypt::Cipher::Anubis){.perl-module},
-    [Blowfish](https://metacpan.org/pod/Crypt::Cipher::Blowfish){.perl-module},
-    [CAST5](https://metacpan.org/pod/Crypt::Cipher::CAST5){.perl-module},
-    [Camellia](https://metacpan.org/pod/Crypt::Cipher::Camellia){.perl-module},
-    [DES](https://metacpan.org/pod/Crypt::Cipher::DES){.perl-module},
-    [DES\_EDE](https://metacpan.org/pod/Crypt::Cipher::DES_EDE){.perl-module},
-    [KASUMI](https://metacpan.org/pod/Crypt::Cipher::KASUMI){.perl-module},
-    [Khazad](https://metacpan.org/pod/Crypt::Cipher::Khazad){.perl-module},
-    [MULTI2](https://metacpan.org/pod/Crypt::Cipher::MULTI2){.perl-module},
-    [Noekeon](https://metacpan.org/pod/Crypt::Cipher::Noekeon){.perl-module},
-    [RC2](https://metacpan.org/pod/Crypt::Cipher::RC2){.perl-module},
-    [RC5](https://metacpan.org/pod/Crypt::Cipher::RC5){.perl-module},
-    [RC6](https://metacpan.org/pod/Crypt::Cipher::RC6){.perl-module},
-    [SAFERP](https://metacpan.org/pod/Crypt::Cipher::SAFERP){.perl-module},
-    [SAFER\_K128](https://metacpan.org/pod/Crypt::Cipher::SAFER_K128){.perl-module},
-    [SAFER\_K64](https://metacpan.org/pod/Crypt::Cipher::SAFER_K64){.perl-module},
-    [SAFER\_SK128](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK128){.perl-module},
-    [SAFER\_SK64](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK64){.perl-module},
-    [SEED](https://metacpan.org/pod/Crypt::Cipher::SEED){.perl-module},
-    [Skipjack](https://metacpan.org/pod/Crypt::Cipher::Skipjack){.perl-module},
-    [Twofish](https://metacpan.org/pod/Crypt::Cipher::Twofish){.perl-module},
-    [XTEA](https://metacpan.org/pod/Crypt::Cipher::XTEA){.perl-module},
-    [IDEA](https://metacpan.org/pod/Crypt::Cipher::IDEA){.perl-module},
-    [Serpent](https://metacpan.org/pod/Crypt::Cipher::Serpent){.perl-module}
-    or simply any \<NAME\> for which there exists
-    Crypt::Cipher::\<NAME\>
+    It can be any of [AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Anubis](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAnubis), [Blowfish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ABlowfish), [CAST5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACAST5), [Camellia](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACamellia), [DES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES), [DES\_EDE](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES_EDE), [KASUMI](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKASUMI), [Khazad](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKhazad), [MULTI2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AMULTI2), [Noekeon](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ANoekeon), [RC2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC2), [RC5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC5), [RC6](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC6), [SAFERP](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFERP), [SAFER\_K128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K128), [SAFER\_K64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K64), [SAFER\_SK128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK128), [SAFER\_SK64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK64), [SEED](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASEED), [Skipjack](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASkipjack), [Twofish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ATwofish), [XTEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AXTEA), [IDEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AIDEA), [Serpent](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASerpent) or simply any <NAME> for which there exists Crypt::Cipher::<NAME>
 
-*decrypt* boolean
+- _decrypt_ boolean
 
-:   Must be set to true to enable decryption.
+    Must be set to true to enable decryption.
 
-*iv* string
+- _iv_ string
 
-:   Set the [Initialisation
-    Vector](https://en.wikipedia.org/wiki/Initialization_vector){.perl-module}
-    used for file encryption and decryption. This must be the same value
-    used for encryption. See [\"save\"](#save){.perl-module}
+    Set the [Initialisation Vector](https://en.wikipedia.org/wiki/Initialization_vector) used for file encryption and decryption. This must be the same value used for encryption. See ["save"](#save)
 
-*key* string
+- _key_ string
 
-:   Set the encryption key used to decrypt the cookies file.
+    Set the encryption key used to decrypt the cookies file.
 
-    The key must be the same one used to encrypt the file. See
-    [\"save\"](#save){.perl-module}
+    The key must be the same one used to encrypt the file. See ["save"](#save)
 
-[\"load\"](#load){.perl-module} returns the current object upon success
-and `undef` and sets an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
-upon error.
+["load"](#load) returns the current object upon success and `undef` and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) upon error.
 
-load\_as\_lwp
--------------
+## load\_as\_lwp
 
-        $jar->load_as_lwp( '/home/joe/cookies_lwp.txt' ) ||
-            die( "Unable to load cookies from file: ", $jar->error );
+    $jar->load_as_lwp( '/home/joe/cookies_lwp.txt' ) ||
+        die( "Unable to load cookies from file: ", $jar->error );
 
-        # or loading an encrypted file
-        $jar->load_as_lwp( '/home/joe/cookies_encrypted_lwp.txt',
-        {
-            encrypt => 1,
-            key => $key,
-            iv => $iv,
-            algo => 'AES',
-        }) || die( $jar->error );
+    # or loading an encrypted file
+    $jar->load_as_lwp( '/home/joe/cookies_encrypted_lwp.txt',
+    {
+        encrypt => 1,
+        key => $key,
+        iv => $iv,
+        algo => 'AES',
+    }) || die( $jar->error );
 
-Given a file path to an LWP-style cookie file (see below a snapshot of
-what it looks like), and an hash or hash reference of options, and this
-method will read the cookies from the file and add them to our
-repository, possibly overwriting previous cookies with the same name and
-domain name.
+Given a file path to an LWP-style cookie file (see below a snapshot of what it looks like), and an hash or hash reference of options, and this method will read the cookies from the file and add them to our repository, possibly overwriting previous cookies with the same name and domain name.
 
-The supported options are the same as for
-[\"load\"](#load){.perl-module}
+The supported options are the same as for ["load"](#load)
 
-LWP-style cookie files are ancient, and barely used anymore, but no
-matter; if you need to load cookies from such file, it looks like this:
+LWP-style cookie files are ancient, and barely used anymore, but no matter; if you need to load cookies from such file, it looks like this:
 
-        #LWP-Cookies-1.0
-        Set-Cookie3: cookie1=value1; domain=example.com; path=; path_spec; secure; version=2
-        Set-Cookie3: cookie2=value2; domain=api.example.com; path=; path_spec; secure; version=2
-        Set-Cookie3: cookie3=value3; domain=img.example.com; path=; path_spec; secure; version=2
+    #LWP-Cookies-1.0
+    Set-Cookie3: cookie1=value1; domain=example.com; path=; path_spec; secure; version=2
+    Set-Cookie3: cookie2=value2; domain=api.example.com; path=; path_spec; secure; version=2
+    Set-Cookie3: cookie3=value3; domain=img.example.com; path=; path_spec; secure; version=2
 
-It returns the current object upon success, or `undef` and sets an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
-upon error.
+It returns the current object upon success, or `undef` and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) upon error.
 
-load\_as\_netscape
-------------------
+## load\_as\_mozilla
 
-        $jar->save_as_netscape( '/home/joe/cookies_netscape.txt' ) ||
-            die( "Unable to save cookies file: ", $jar->error );
+    $jar->load_as_mozilla( '/home/joe/cookies.sqlite' ) ||
+        die( "Unable to load cookies from mozilla cookies.sqlite file: ", $jar->error );
 
-        # or saving as an encrypted file
-        $jar->save_as_netscape( '/home/joe/cookies_encrypted_netscape.txt',
-        {
-            encrypt => 1,
-            key => $key,
-            iv => $iv,
-            algo => 'AES',
-        }) || die( $jar->error );
+Given a file path to a mozilla SQLite database file, and an hash or hash reference of options, and this method will attempt to read the cookies from the SQLite database file and add them to our repository, possibly overwriting previous cookies with the same name and domain name.
 
-Given a file path to a Netscape-style cookie file, and this method will
-read cookies from the file and add them to our repository, possibly
-overwriting previous cookies with the same name and domain name.
+To read the SQLite database file, this will try first to load [DBI](https://metacpan.org/pod/DBI) and [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite) and use them if they are available, otherwise it will resort to using the `sqlite3` binary if it can find it, using ["which" in File::Which](https://metacpan.org/pod/File%3A%3AWhich#which)
 
-It returns the current object upon success, or `undef` and sets an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
-upon error.
+If none of those 2 methods succeeded, it will return `undef` with an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error)
 
-make
-----
+Note that contrary to other loading method, this method does not support encryption.
 
-Provided with some parameters and this will instantiate a new
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module} object with
-those parameters and return the new object.
+It returns the current object upon success, or `undef` and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) upon error.
 
-This does not add the newly created cookie object to the cookies
-repository.
+Supported options are:
 
-For a list of supported parameters, refer to the [Cookie
-documentation](https://metacpan.org/pod/Cookie){.perl-module}
+- `use_dbi`
 
-        # Make an encrypted cookie
-        use Bytes::Random::Secure ();
-        my $c = $jar->make(
-            name      => 'session',
-            value     => $secret_value,
-            path      => '/',
-            secure    => 1,
-            http_only => 1,
-            same_site => 'Lax',
-            key       => Bytes::Random::Secure::random_bytes(32),
-            algo      => $algo,
-            encrypt   => 1,
-        ) || die( $jar->error );
-        # or as an hash reference of parameters
-        my $c = $jar->make({
-            name      => 'session',
-            value     => $secret_value,
-            path      => '/',
-            secure    => 1,
-            http_only => 1,
-            same_site => 'Lax',
-            key       => Bytes::Random::Secure::random_bytes(32),
-            algo      => $algo,
-            encrypt   => 1,
-        }) || die( $jar->error );
+    Boolean. If true, this will require the use of [DBI](https://metacpan.org/pod/DBI) and [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite) and if it cannot load them, it will return an error without trying to alternatively use the `sqlite3` binary. Default to false.
 
-merge
------
+- `sqlite`
 
-Provided with another
-[Cookie::Jar](https://metacpan.org/pod/Cookie::Jar){.perl-module}
-object, or at least an object that supports the
-[\"do\"](#do){.perl-module} method, which takes an anonymous code as
-argument, and that calls that code passing it each cookie object found
-in the alternate repository, and this method will add all those cookies
-in the alternate repository into the current repository.
+    String. The file path to a `sqlite3` binary. If the file path does not exist, or is lacking sufficient permission, this will return an error.
 
-        $jar->merge( $other_jar ) || die( $jar->error );
+    If it is not provided, and using [DBI](https://metacpan.org/pod/DBI) and [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite) failed, it will try to find the `sqlite3` using ["which" in File::Which](https://metacpan.org/pod/File%3A%3AWhich#which)
 
-If the cookie objects passed to the anonymous code in this method, are
-not [Cookie](https://metacpan.org/pod/Cookie){.perl-module} object, then
-at least they must support the methods `name`, `value`, `domain`,
-`path`, `port`, `secure`, `max_age`, `secure`, `same_site` and ,
-`http_only`
+## load\_as\_netscape
+
+    $jar->save_as_netscape( '/home/joe/cookies_netscape.txt' ) ||
+        die( "Unable to save cookies file: ", $jar->error );
+
+    # or saving as an encrypted file
+    $jar->save_as_netscape( '/home/joe/cookies_encrypted_netscape.txt',
+    {
+        encrypt => 1,
+        key => $key,
+        iv => $iv,
+        algo => 'AES',
+    }) || die( $jar->error );
+
+Given a file path to a Netscape-style cookie file, and this method will read cookies from the file and add them to our repository, possibly overwriting previous cookies with the same name and domain name.
+
+It returns the current object upon success, or `undef` and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) upon error.
+
+## make
+
+Provided with some parameters and this will instantiate a new [Cookie](https://metacpan.org/pod/Cookie) object with those parameters and return the new object.
+
+This does not add the newly created cookie object to the cookies repository.
+
+For a list of supported parameters, refer to the [Cookie documentation](https://metacpan.org/pod/Cookie)
+
+    # Make an encrypted cookie
+    use Bytes::Random::Secure ();
+    my $c = $jar->make(
+        name      => 'session',
+        value     => $secret_value,
+        path      => '/',
+        secure    => 1,
+        http_only => 1,
+        same_site => 'Lax',
+        key       => Bytes::Random::Secure::random_bytes(32),
+        algo      => $algo,
+        encrypt   => 1,
+    ) || die( $jar->error );
+    # or as an hash reference of parameters
+    my $c = $jar->make({
+        name      => 'session',
+        value     => $secret_value,
+        path      => '/',
+        secure    => 1,
+        http_only => 1,
+        same_site => 'Lax',
+        key       => Bytes::Random::Secure::random_bytes(32),
+        algo      => $algo,
+        encrypt   => 1,
+    }) || die( $jar->error );
+
+## merge
+
+Provided with another [Cookie::Jar](https://metacpan.org/pod/Cookie%3A%3AJar) object, or at least an object that supports the ["do"](#do) method, which takes an anonymous code as argument, and that calls that code passing it each cookie object found in the alternate repository, and this method will add all those cookies in the alternate repository into the current repository.
+
+    $jar->merge( $other_jar ) || die( $jar->error );
+
+If the cookie objects passed to the anonymous code in this method, are not [Cookie](https://metacpan.org/pod/Cookie) object, then at least they must support the methods `name`, `value`, `domain`, `path`, `port`, `secure`, `max_age`, `secure`, `same_site` and , `http_only`
 
 This method also takes an hash or hash reference of options:
 
-*die* boolean
+- _die_ boolean
 
-:   If true, the anonymous code passed to the `do` method called, will
-    die upon error. Default to false.
+    If true, the anonymous code passed to the `do` method called, will die upon error. Default to false.
 
-    By default, if an error occurs, `undef` is returned and the
-    [error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
-    is set.
+    By default, if an error occurs, `undef` is returned and the [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) is set.
 
-*overwrite* boolean
+- _overwrite_ boolean
 
-:   If true, when an existing cookie is found it will be overwritten by
-    the new one. Default to false.
+    If true, when an existing cookie is found it will be overwritten by the new one. Default to false.
 
-<!-- -->
+    use Nice::Try;
+    try
+    {
+        $jar->merge( $other_jar, die => 1, overwrite => 1 );
+    }
+    catch( $e )
+    {
+        die( "Failed to merge cookies repository: $e\n" );
+    }
 
-        use Nice::Try;
-        try
-        {
-            $jar->merge( $other_jar, die => 1, overwrite => 1 );
-        }
-        catch( $e )
-        {
-            die( "Failed to merge cookies repository: $e\n" );
-        }
+Upon success this will return the current object, and if there was an error, this returns ["undef" in perlfunc](https://metacpan.org/pod/perlfunc#undef) and sets an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error)
 
-Upon success this will return the current object, and if there was an
-error, this returns [\"undef\" in
-perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} and
-sets an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+## parse
 
-parse
------
+This method is used by ["fetch"](#fetch) to parse cookies sent by http client. Parsing is much simpler than for http client receiving cookies from server.
 
-This method is used by [\"fetch\"](#fetch){.perl-module} to parse
-cookies sent by http client. Parsing is much simpler than for http
-client receiving cookies from server.
+It takes the raw `Cookie` string sent by the http client, and returns an hash reference (possibly empty) of cookie name to cookie value pairs.
 
-It takes the raw `Cookie` string sent by the http client, and returns an
-hash reference (possibly empty) of cookie name to cookie value pairs.
+    my $cookies = $jar->parse( 'foo=bar; site_prefs=lang%3Den-GB' );
+    # You can safely do as well:
+    my $cookies = $jar->parse( '' );
 
-        my $cookies = $jar->parse( 'foo=bar; site_prefs=lang%3Den-GB' );
-        # You can safely do as well:
-        my $cookies = $jar->parse( '' );
+## purge
 
-purge
------
+Thise takes no argument and will remove from the repository all cookies that have expired. A cookie that has expired is a [Cookie](https://metacpan.org/pod/Cookie) that has its `expires` property set and whose value is in the past.
 
-Thise takes no argument and will remove from the repository all cookies
-that have expired. A cookie that has expired is a
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module} that has its
-`expires` property set and whose value is in the past.
+This returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) of all the cookies thus removed.
 
-This returns an [array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-of all the cookies thus removed.
+    my $all = $jar->purge;
+    printf( "Cookie(s) removed were: %s\n", $all->map(sub{ $_->name })->join( ',' ) );
+    # or
+    printf( "%d cookie(s) removed from our repository.\n", $jar->purge->length );
 
-        my $all = $jar->purge;
-        printf( "Cookie(s) removed were: %s\n", $all->map(sub{ $_->name })->join( ',' ) );
-        # or
-        printf( "%d cookie(s) removed from our repository.\n", $jar->purge->length );
+## replace
 
-replace
--------
+Provided with a [Cookie](https://metacpan.org/pod/Cookie) object, and an optional other [Cookie](https://metacpan.org/pod/Cookie) object, and this method will replace the former cookie provided in the second parameter with the new one provided in the first parameter.
 
-Provided with a [Cookie](https://metacpan.org/pod/Cookie){.perl-module}
-object, and an optional other
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module} object, and this
-method will replace the former cookie provided in the second parameter
-with the new one provided in the first parameter.
+If only one parameter is provided, the cookies to be replaced will be derived from the replacement cookie's properties, namely: `name`, `domain` and `path`
 
-If only one parameter is provided, the cookies to be replaced will be
-derived from the replacement cookie\'s properties, namely: `name`,
-`domain` and `path`
+It returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) of cookie objects replaced upon success, or `undef` and set an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) upon error.
 
-It returns an [array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-of cookie objects replaced upon success, or `undef` and set an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
-upon error.
+## repo
 
-repo
-----
+Set or get the [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) used as the cookie jar repository.
 
-Set or get the [array
-object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
-used as the cookie jar repository.
+    printf( "%d cookies found\n", $jar->repo->length );
 
-        printf( "%d cookies found\n", $jar->repo->length );
+## request
 
-request
--------
+Set or get the [Apache2::RequestRec](https://metacpan.org/pod/Apache2%3A%3ARequestRec) object. This object is used to set the `Set-Cookie` header within modperl.
 
-Set or get the
-[Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
-object. This object is used to set the `Set-Cookie` header within
-modperl.
+## save
 
-save
-----
+    $jar->save( '/home/joe/cookies.json' ) || 
+        die( "Failed to save cookies: ", $jar->error );
 
-        $jar->save( '/home/joe/cookies.json' ) || 
-            die( "Failed to save cookies: ", $jar->error );
+    # or saving the cookies file encrypted
+    $jar->save( '/home/joe/cookies_encrypted.json',
+    {
+        encrypt => 1,
+        key => $key,
+        iv => $iv,
+        algo => 'AES',
+    }) || die( $jar->error );
 
-        # or saving the cookies file encrypted
-        $jar->save( '/home/joe/cookies_encrypted.json',
-        {
-            encrypt => 1,
-            key => $key,
-            iv => $iv,
-            algo => 'AES',
-        }) || die( $jar->error );
+Provided with a file, and an hash or hash reference of options, and this will save the repository of cookies as json data.
 
-Provided with a file, and an hash or hash reference of options, and this
-will save the repository of cookies as json data.
+The hash saved to file contains 2 top properties: `updated_on` containing the last update date and `cookies` containing an hash of cookie name to cookie properties pairs.
 
-The hash saved to file contains 2 top properties: `updated_on`
-containing the last update date and `cookies` containing an hash of
-cookie name to cookie properties pairs.
-
-It returns the current object. If an error occurred, it will return
-`undef` and set an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+It returns the current object. If an error occurred, it will return `undef` and set an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error)
 
 Supported options are:
 
-*algo* string
+- _algo_ string
 
-:   Algorithm to use to encrypt the cookie file.
+    Algorithm to use to encrypt the cookie file.
 
-    It can be any of
-    [AES](https://metacpan.org/pod/Crypt::Cipher::AES){.perl-module},
-    [Anubis](https://metacpan.org/pod/Crypt::Cipher::Anubis){.perl-module},
-    [Blowfish](https://metacpan.org/pod/Crypt::Cipher::Blowfish){.perl-module},
-    [CAST5](https://metacpan.org/pod/Crypt::Cipher::CAST5){.perl-module},
-    [Camellia](https://metacpan.org/pod/Crypt::Cipher::Camellia){.perl-module},
-    [DES](https://metacpan.org/pod/Crypt::Cipher::DES){.perl-module},
-    [DES\_EDE](https://metacpan.org/pod/Crypt::Cipher::DES_EDE){.perl-module},
-    [KASUMI](https://metacpan.org/pod/Crypt::Cipher::KASUMI){.perl-module},
-    [Khazad](https://metacpan.org/pod/Crypt::Cipher::Khazad){.perl-module},
-    [MULTI2](https://metacpan.org/pod/Crypt::Cipher::MULTI2){.perl-module},
-    [Noekeon](https://metacpan.org/pod/Crypt::Cipher::Noekeon){.perl-module},
-    [RC2](https://metacpan.org/pod/Crypt::Cipher::RC2){.perl-module},
-    [RC5](https://metacpan.org/pod/Crypt::Cipher::RC5){.perl-module},
-    [RC6](https://metacpan.org/pod/Crypt::Cipher::RC6){.perl-module},
-    [SAFERP](https://metacpan.org/pod/Crypt::Cipher::SAFERP){.perl-module},
-    [SAFER\_K128](https://metacpan.org/pod/Crypt::Cipher::SAFER_K128){.perl-module},
-    [SAFER\_K64](https://metacpan.org/pod/Crypt::Cipher::SAFER_K64){.perl-module},
-    [SAFER\_SK128](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK128){.perl-module},
-    [SAFER\_SK64](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK64){.perl-module},
-    [SEED](https://metacpan.org/pod/Crypt::Cipher::SEED){.perl-module},
-    [Skipjack](https://metacpan.org/pod/Crypt::Cipher::Skipjack){.perl-module},
-    [Twofish](https://metacpan.org/pod/Crypt::Cipher::Twofish){.perl-module},
-    [XTEA](https://metacpan.org/pod/Crypt::Cipher::XTEA){.perl-module},
-    [IDEA](https://metacpan.org/pod/Crypt::Cipher::IDEA){.perl-module},
-    [Serpent](https://metacpan.org/pod/Crypt::Cipher::Serpent){.perl-module}
-    or simply any \<NAME\> for which there exists
-    Crypt::Cipher::\<NAME\>
+    It can be any of [AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Anubis](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAnubis), [Blowfish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ABlowfish), [CAST5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACAST5), [Camellia](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACamellia), [DES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES), [DES\_EDE](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES_EDE), [KASUMI](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKASUMI), [Khazad](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKhazad), [MULTI2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AMULTI2), [Noekeon](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ANoekeon), [RC2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC2), [RC5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC5), [RC6](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC6), [SAFERP](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFERP), [SAFER\_K128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K128), [SAFER\_K64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K64), [SAFER\_SK128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK128), [SAFER\_SK64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK64), [SEED](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASEED), [Skipjack](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASkipjack), [Twofish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ATwofish), [XTEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AXTEA), [IDEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AIDEA), [Serpent](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASerpent) or simply any <NAME> for which there exists Crypt::Cipher::<NAME>
 
-*encrypt* boolean
+- _encrypt_ boolean
 
-:   Must be set to true to enable decryption.
+    Must be set to true to enable encryption.
 
-*iv* string
+- _iv_ string
 
-:   Set the [Initialisation
-    Vector](https://en.wikipedia.org/wiki/Initialization_vector){.perl-module}
-    used for file encryption. If you do not provide one, it will be
-    automatically generated. If you want to provide your own, make sure
-    the size meets the encryption algorithm size requirement. You also
-    need to keep this to decrypt the cookies file.
+    Set the [Initialisation Vector](https://en.wikipedia.org/wiki/Initialization_vector) used for file encryption. If you do not provide one, it will be automatically generated. If you want to provide your own, make sure the size meets the encryption algorithm size requirement. You also need to keep this to decrypt the cookies file.
 
-    To find the right size for the Initialisation Vector, for example
-    for algorithm `AES`, you could do:
+    To find the right size for the Initialisation Vector, for example for algorithm `AES`, you could do:
 
-            perl -MCrypt::Cipher::AES -lE 'say Crypt::Cipher::AES->blocksize'
+        perl -MCrypt::Cipher::AES -lE 'say Crypt::Cipher::AES->blocksize'
 
     which would yield `16`
 
-*key* string
+- _key_ string
 
-:   Set the encryption key used to encrypt the cookies file.
+    Set the encryption key used to encrypt the cookies file.
 
-    The key must be the same one used to decrypt the file and must have
-    a size big enough to satisfy the encryption algorithm requirement,
-    which you can check with, say for `AES`:
+    The key must be the same one used to decrypt the file and must have a size big enough to satisfy the encryption algorithm requirement, which you can check with, say for `AES`:
 
-            perl -MCrypt::Cipher::AES -lE 'say Crypt::Cipher::AES->keysize'
+        perl -MCrypt::Cipher::AES -lE 'say Crypt::Cipher::AES->keysize'
 
-    In this case, it will yield `32`. Replace above `AES`, byt whatever
-    algorithm you have chosen.
+    In this case, it will yield `32`. Replace above `AES`, by whatever algorithm you have chosen.
 
-            perl -MCrypt::Cipher::Blowfish -lE 'say Crypt::Cipher::Blowfish->keysize'
+        perl -MCrypt::Cipher::Blowfish -lE 'say Crypt::Cipher::Blowfish->keysize'
 
     would yield `56` for `Blowfish`
 
-    You can use [\"random\_bytes\" in
-    Bytes::Random::Secure](https://metacpan.org/pod/Bytes::Random::Secure#random_bytes){.perl-module}
-    to generate a random key:
+    You can use ["random\_bytes" in Bytes::Random::Secure](https://metacpan.org/pod/Bytes%3A%3ARandom%3A%3ASecure#random_bytes) to generate a random key:
 
-            # will generate a 32 bytes-long key
-            my $key = Bytes::Random::Secure::random_bytes(32);
+        # will generate a 32 bytes-long key
+        my $key = Bytes::Random::Secure::random_bytes(32);
 
-When encrypting the cookies file, this method will encode the encrypted
-data in base64 before saving it to file.
+When encrypting the cookies file, this method will encode the encrypted data in base64 before saving it to file.
 
-save\_as\_lwp
--------------
+## save\_as\_lwp
 
-        $jar->save_as_lwp( '/home/joe/cookies_lwp.txt' ) ||
-            die( "Unable to save cookies file: ", $jar->error );
+    $jar->save_as_lwp( '/home/joe/cookies_lwp.txt' ) ||
+        die( "Unable to save cookies file: ", $jar->error );
 
-        # or saving as an encrypted file
-        $jar->save_as_lwp( '/home/joe/cookies_encrypted_lwp.txt',
-        {
-            encrypt => 1,
-            key => $key,
-            iv => $iv,
-            algo => 'AES',
-        }) || die( $jar->error );
+    # or saving as an encrypted file
+    $jar->save_as_lwp( '/home/joe/cookies_encrypted_lwp.txt',
+    {
+        encrypt => 1,
+        key => $key,
+        iv => $iv,
+        algo => 'AES',
+    }) || die( $jar->error );
 
-Provided with a file, and an hash or hash reference of options, and this
-save the cookies repository as a LWP-style data.
+Provided with a file, and an hash or hash reference of options, and this save the cookies repository as a LWP-style data.
 
-The supported options are the same as for
-[\"save\"](#save){.perl-module}
+The supported options are the same as for ["save"](#save)
 
-It returns the current object. If an error occurred, it will return
-`undef` and set an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+It returns the current object. If an error occurred, it will return `undef` and set an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error)
 
-save\_as\_netscape
-------------------
+## save\_as\_mozilla
 
-Provided with a file and this save the cookies repository as a
-Netscape-style data.
+    $jar->save_as_mozilla( '/home/joe/cookies.sqlite' ) ||
+        die( "Unable to save cookies as mozilla SQLite database: ", $jar->error );
 
-It returns the current object. If an error occurred, it will return
-`undef` and set an
-[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+    # or
+    $jar->save_as_mozilla( '/home/joe/cookies.sqlite',
+    {
+        # force use of DBI/DBD::SQLite
+        use_dbi => 1,
+        # or specify the path of the sqlite3 binary
+        # sqlite => '/some/where/sqlite3',
+        # Enable logging of SQL queries maybe?
+        # log_sql => '/some/where/sql.log',
+        # Overwrite previous data
+        overwrite => 1,
+        # abort if an error occurred
+        rollback => 1,
+    }) || die( "Unable to save cookies as mozilla SQLite database: ", $jar->error );
 
-scan
-----
+Provided with a file path to a SQLite database and this saves the cookies repository as a mozilla SQLite database.
 
-This is an alias for [\"do\"](#do){.perl-module}
+The structure of the [mozilla SQLite database](http://kb.mozillazine.org/Cookies) is:
 
-set
----
+    CREATE TABLE moz_cookies(
+      id INTEGER PRIMARY KEY,
+      originAttributes TEXT NOT NULL DEFAULT '',
+      name TEXT,
+      value TEXT,
+      host TEXT,
+      path TEXT,
+      expiry INTEGER,
+      lastAccessed INTEGER,
+      creationTime INTEGER,
+      isSecure INTEGER,
+      isHttpOnly INTEGER,
+      inBrowserElement INTEGER DEFAULT 0,
+      sameSite INTEGER DEFAULT 0,
+      rawSameSite INTEGER DEFAULT 0,
+      schemeMap INTEGER DEFAULT 0,
+      CONSTRAINT moz_uniqueid UNIQUE(name, host, path, originAttributes)
+    );
 
-Given a cookie object, and an optional hash or hash reference of
-parameters, and this will add the cookie to the outgoing http headers
-using the `Set-Cookie` http header. To do so, it uses the
-[Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
-value set in [\"request\"](#request){.perl-module}, if any, or a
-[HTTP::Response](https://metacpan.org/pod/HTTP::Response){.perl-module}
-compatible response object provided with the `response` parameter.
+This method will attempt loading [DBI](https://metacpan.org/pod/DBI) and [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite), and if it fails, it will alternatively try to use the `sqlite3` binary.
 
-        $jar->set( $c, response => $http_response_object ) ||
-            die( $jar->error );
+Note that, contrary to other save methods, this method does not allow encrypting the SQLite database.
 
-Ultimately if none of those two are provided it returns the `Set-Cookie`
-header as a string.
+It returns the current object. If an error occurred, it will return `undef` and set an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error)
 
-        # Returns something like:
-        # Set-Cookie: my-cookie=somevalue
-        print( STDOUT $jar->set( $c ), "\015\012" );
+Supported options are:
+
+- `log_sql`
+
+    String. This specifies a file name that will be opened in append mode and to which the SQL statements issued will be logged.
+
+- `overwrite`
+
+    Boolean. If true, this will overwrite any existing data if the specified SQLite database file already exists.
+
+    And if false, this will issue sql queries to perform [upsert](https://www.sqlite.org/lang_UPSERT.html) if the SQLite version is greater or equal to `3.24.0` (2018-06-04), or otherwise it will issue [INSERT OR REPLACE](https://www.sqlite.org/lang_insert.html) queries.
+
+    Default false.
+
+- `rollback`
+
+    Boolean. If true, this will cancel, i.e. rollback, any change mad to the SQLite database upon error, otherwise, any change made will be kept up to the point of when the error occurred. Default to false.
+
+- `skip_discard`
+
+    Boolean. If true, this will not save cookies that have been marked as being discarded, such as session cookies. Default false.
+
+- `skip_expired`
+
+    Boolean. If true, this will not save the cookies that have already expired. Default false.
+
+- `sqlite`
+
+    String. The file path to a `sqlite3` binary. If the file path does not exist, or is lacking sufficient permission, this will return an error.
+
+    If it is not provided, and using [DBI](https://metacpan.org/pod/DBI) and [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite) failed, it will try to find the `sqlite3` using ["which" in File::Which](https://metacpan.org/pod/File%3A%3AWhich#which)
+
+- `use_dbi`
+
+    Boolean. Requires the use of [DBI](https://metacpan.org/pod/DBI) and [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite) and it will return an error if those are not installed.
+
+    If you want to let this method try also to use `sqlite3` binary if necessary, then do not set this option.
+
+## save\_as\_netscape
+
+Provided with a file and this saves the cookies repository as a Netscape-style data.
+
+It returns the current object. If an error occurred, it will return `undef` and set an [error](https://metacpan.org/pod/Module%3A%3AGeneric#error)
+
+## scan
+
+This is an alias for ["do"](#do)
+
+## secret
+
+String. Sets or gets the secret string to use for decrypting or encrypting the cookie jar. This is used in conjonction with ["file"](#file), ["encrypt"](#encrypt) and ["algo"](#algo)
+
+## set
+
+Given a cookie object, and an optional hash or hash reference of parameters, and this will add the cookie to the outgoing http headers using the `Set-Cookie` http header. To do so, it uses the [Apache2::RequestRec](https://metacpan.org/pod/Apache2%3A%3ARequestRec) value set in ["request"](#request), if any, or a [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) compatible response object provided with the `response` parameter.
+
+    $jar->set( $c, response => $http_response_object ) ||
+        die( $jar->error );
+
+Ultimately if none of those two are provided it returns the `Set-Cookie` header as a string.
+
+    # Returns something like:
+    # Set-Cookie: my-cookie=somevalue
+    print( STDOUT $jar->set( $c ), "\015\012" );
 
 Unless the latter, this method returns the current object.
 
-IMPORTING COOKIES
-=================
+## type
 
-To import cookies, you can either use the methods
-[scan](https://metacpan.org/pod/HTTP::Cookies#scan){.perl-module} from
-[HTTP::Cookies](https://metacpan.org/pod/HTTP::Cookies){.perl-module},
-such as:
+String. Sets or gets the cookie jar file format type. The supported formats are: `json`, `lwp` and `netscape`
 
-        use Cookie::Jar;
-        use HTTP::Cookies;
-        my $jar = Cookie::Jar->new;
-        my $old = HTTP::Cookies;
-        $old->load( '/home/joe/old_cookies_file.txt' );
-        my @keys = qw( version key val path domain port path_spec secure expires discard hash );
-        $old->scan(sub
-        {
-            my @values = @_;
-            my $ref = {};
-            @$ref{ @keys } = @values;
-            my $c = Cookie->new;
-            $c->apply( $ref ) || die( $c->error );
-            $jar->add( $c );
-        });
-        printf( "%d cookies now in our repository.\n", $jar->repo->length );
+# IMPORTING COOKIES
 
-or you could also load a cookie file.
-[Cookie::Jar](https://metacpan.org/pod/Cookie::Jar){.perl-module}
-supports [LWP](https://metacpan.org/pod/LWP){.perl-module} format and
-old Netscape format:
+To import cookies, you can either use the methods [scan](https://metacpan.org/pod/HTTP%3A%3ACookies#scan) from [HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies), such as:
 
-        $jar->load_as_lwp( '/home/joe/lwp_cookies.txt' );
-        $jar->load_as_netscape( '/home/joe/netscape_cookies.txt' );
+    use Cookie::Jar;
+    use HTTP::Cookies;
+    my $jar = Cookie::Jar->new;
+    my $old = HTTP::Cookies->new;
+    $old->load( '/home/joe/old_cookies_file.txt' );
+    my @keys = qw( version key val path domain port path_spec secure expires discard hash );
+    $old->scan(sub
+    {
+        my @values = @_;
+        my $ref = {};
+        @$ref{ @keys } = @values;
+        my $c = Cookie->new;
+        $c->apply( $ref ) || die( $c->error );
+        $jar->add( $c );
+    });
+    printf( "%d cookies now in our repository.\n", $jar->repo->length );
 
-And of course, if you are using
-[Cookie::Jar](https://metacpan.org/pod/Cookie::Jar){.perl-module} json
-cookies file, you can import them with:
+or you could also load a cookie file. [Cookie::Jar](https://metacpan.org/pod/Cookie%3A%3AJar) supports [LWP](https://metacpan.org/pod/LWP) format and old Netscape format:
 
-        $jar->load( '/home/joe/cookies.json' );
+    $jar->load_as_lwp( '/home/joe/lwp_cookies.txt' );
+    $jar->load_as_netscape( '/home/joe/netscape_cookies.txt' );
 
-ENCRYPTION
-==========
+And of course, if you are using [Cookie::Jar](https://metacpan.org/pod/Cookie%3A%3AJar) json cookies file, you can import them with:
 
-This package supports encryption and decryption of cookies file, and
-also the cookies values themselve.
+    $jar->load( '/home/joe/cookies.json' );
 
-See methods [\"save\"](#save){.perl-module} and
-[\"load\"](#load){.perl-module} for encryption options and the
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module} package for
-options to encrypt or sign cookies value.
+# ENCRYPTION
 
-INSTALLATION
-============
+This package supports encryption and decryption of cookies file, and also the cookies values themselve.
+
+See methods ["save"](#save) and ["load"](#load) for encryption options and the [Cookie](https://metacpan.org/pod/Cookie) package for options to encrypt or sign cookies value.
+
+# INSTALLATION
 
 As usual, to install this module, you can do:
 
-        perl Makefile.PL
-        make
-        make test
-        sudo make install
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
 
-If you have Apache/modperl2 installed, this will also prepare the
-Makefile and run test under modperl.
+If you have Apache/modperl2 installed, this will also prepare the Makefile and run test under modperl.
 
-The Makefile.PL tries hard to find your Apache configuration, but you
-can give it a hand by specifying some command line parameters. See
-[Apache::TestMM](https://metacpan.org/pod/Apache::TestMM){.perl-module}
-for available parameters or you can type on the command line:
+The Makefile.PL tries hard to find your Apache configuration, but you can give it a hand by specifying some command line parameters. See [Apache::TestMM](https://metacpan.org/pod/Apache%3A%3ATestMM) for available parameters or you can type on the command line:
 
-        perl -MApache::TestConfig -le 'Apache::TestConfig::usage()'
+    perl -MApache::TestConfig -le 'Apache::TestConfig::usage()'
 
 For example:
 
-        perl Makefile.PL -apxs /usr/bin/apxs -port 1234
-        # which will also set the path to httpd_conf, otherwise
-        perl Makefile.PL -httpd_conf /etc/apache2/apache2.conf
+    perl Makefile.PL -apxs /usr/bin/apxs -port 1234
+    # which will also set the path to httpd_conf, otherwise
+    perl Makefile.PL -httpd_conf /etc/apache2/apache2.conf
 
-        # then
-        make
-        make test
-        sudo make install
+    # then
+    make
+    make test
+    sudo make install
 
-See also [modperl testing
-documentation](https://perl.apache.org/docs/general/testing/testing.html){.perl-module}
+See also [modperl testing documentation](https://perl.apache.org/docs/general/testing/testing.html)
 
-But, if for some reason, you do not want to perform the mod\_perl tests,
-you can call use `NO_MOD_PERL=1` when calling `perl Makefile.PL`, such
-as:
+But, if for some reason, you do not want to perform the mod\_perl tests, you can use `NO_MOD_PERL=1` when calling `perl Makefile.PL`, such as:
 
-        NO_MOD_PERL=1 perl Makefile.PL
-        make
-        make test
-        sudo make install
+    NO_MOD_PERL=1 perl Makefile.PL
+    make
+    make test
+    sudo make install
 
-AUTHOR
-======
+# AUTHOR
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5577dce5f858)"}\>
+Jacques Deguest <`jack@deguest.jp`>
 
-SEE ALSO
-========
+# SEE ALSO
 
-[Cookie](https://metacpan.org/pod/Cookie){.perl-module},
-[Cookie::Domain](https://metacpan.org/pod/Cookie::Domain){.perl-module},
-[Apache2::Cookies](https://metacpan.org/pod/Apache2::Cookies){.perl-module},
-[APR::Request::Cookie](https://metacpan.org/pod/APR::Request::Cookie){.perl-module},
-[Cookie::Baker](https://metacpan.org/pod/Cookie::Baker){.perl-module}
+[Cookie](https://metacpan.org/pod/Cookie), [Cookie::Domain](https://metacpan.org/pod/Cookie%3A%3ADomain), [Apache2::Cookies](https://metacpan.org/pod/Apache2%3A%3ACookies), [APR::Request::Cookie](https://metacpan.org/pod/APR%3A%3ARequest%3A%3ACookie), [Cookie::Baker](https://metacpan.org/pod/Cookie%3A%3ABaker)
 
-[Latest tentative version of the cookie
-standard](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09){.perl-module}
+[Latest tentative version of the cookie standard](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09)
 
-[Mozilla documentation on
-Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie){.perl-module}
+[Mozilla documentation on Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
 
-[Information on double submit
-cookies](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie){.perl-module}
+[Information on double submit cookies](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie)
 
-COPYRIGHT & LICENSE
-===================
+# COPYRIGHT & LICENSE
 
 Copyright (c) 2019-2019 DEGUEST Pte. Ltd.
 

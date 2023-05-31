@@ -1,4 +1,9 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class File::Path {
+  version "0.011";
+  
   use Hash;
   use StringBuffer;
   use StringList;
@@ -7,7 +12,7 @@ class File::Path {
   use Cwd;
   use File::Basename;
   
-  static method mkpath : int ($path : string, $options = undef : object[]) {
+  static method mkpath : int ($path : string, $options : object[] = undef) {
     
     unless ($path) {
       die "The \$path must be defined";
@@ -45,7 +50,7 @@ class File::Path {
     }
   }
   
-  static method make_path : int ($path : string, $options = undef : object[]) {
+  static method make_path : int ($path : string, $options : object[] = undef) {
     return &mkpath($path, $options);
   }
 

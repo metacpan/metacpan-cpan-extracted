@@ -6,7 +6,33 @@ NAME
 
 VERSION
 
-    version 1.0.0
+    version 1.0.1
+
+DESCRIPTION
+
+    Ticketsystem addons can define dependencies in the .opm files, e.g.
+
+        <PackageRequired Version="6.0.0">FAQ</PackageRequired>
+        <ModuleRequired Version="8.0">Geo::IP2Location</ModuleRequired>
+        <ModuleRequired Version="0.02">HTTP::AcceptLanguage</ModuleRequired>
+
+    In this case, the addon requires an other addon - FAQ with minimum
+    version 6.0.0 - and two CPAN modules.
+
+    This OPM::Maker command checks for a given .sopm or .opm file if the
+    dependencies are already installed.
+
+HOW IT WORKS
+
+    For the other addons, this command tries to find the ticketsystem
+    installation (it searches for /opt/otrs, /opt/otobo or /opt/znuny) and
+    searches the database for installed addons.
+
+    If it doesn't find the addons in the database, it looks for a
+    /opt/{otrs,otobo,znuny}/$addonname.sopm file. If that file exists the
+    addon is marked as installed.
+
+    For the CPAN dependencies, this command tries to use the module.
 
 AUTHOR
 

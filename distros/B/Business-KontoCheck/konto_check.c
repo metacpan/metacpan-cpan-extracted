@@ -13,7 +13,7 @@
  * #  wurden aus der aktuellen BLZ-Datei der Deutschen Bundesbank           #
  * #  übernommen.                                                           #
  * #                                                                        #
- * #  Copyright (C) 2002-2020 Michael Plugge <m.plugge@hs-mannheim.de>      #
+ * #  Copyright (C) 2002-2023 Michael Plugge <konto_check@yahoo.com>        #
  * #                                                                        #
  * #  Dieses Programm ist freie Software; Sie dürfen es unter den           #
  * #  Bedingungen der GNU Lesser General Public License, wie von der Free   #
@@ -45,15 +45,15 @@
  * # im Internet herunterladen.                                             #
  * ##########################################################################
  */
-#line 332 "perl/Business-KontoCheck/konto_check.lxx"
+#line 332 "konto_check.lxx"
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.13 (final)"
+#define VERSION "6.15 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 13
+#define VERSION_MINOR 15
 #endif
-#define VERSION_DATE "2020-12-16"
+#define VERSION_DATE "2023-04-13"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -93,6 +93,7 @@ static lzo_align_t __LZO_MMODEL wrkmem[LZO1X_1_MEM_COMPRESS];
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #if COMPRESS>0
 #include <zlib.h>
 #endif
@@ -207,8 +208,8 @@ static char **sortc_buf;
 static int *sorti_buf;
 
    /* Variablen für das SCL-Verzeichnis */
-static char *scl_info_block,*scl_bic_block,*scl_name_block,*scl_flags_block,
-            **scl_bic_array,**scl_name_array,**scl_flags_array,
+static char *scl_info_block,*scl_bic_block,*scl_name_block,*scl_flags_block,*scl_flags_block_orig,
+            **scl_bic_array,**scl_name_array,**scl_flags_array,**scl_flags_array_o,
             scl_gueltigkeit[16],scl_gueltigkeit_iso[16];
 static int scl_cnt;
 long scl_ts;
@@ -217,6 +218,7 @@ long scl_ts;
 DLL_EXPORT const char *(*retval_enc)(int)=NULL;
 
 static int convert_encoding(char **data,UINT4 *len);
+static int scl_idx(const char *bic,int *retval,int *raw);
 
 
 /* das Makro RETURN(r) gibt Debug-Meldungen zu Fehler-Rückgabewerten (zur Fehlersuche) */
@@ -249,7 +251,7 @@ static int convert_encoding(char **data,UINT4 *len);
 #define free(ptr) efree(ptr)
 #endif
 
-#line 777 "perl/Business-KontoCheck/konto_check.lxx"
+#line 779 "konto_check.lxx"
 
    /* Testwert zur Markierung ungültiger Ziffern im BLZ-String (>8 Stellen) */
 #define BLZ_FEHLER 100000000
@@ -385,7 +387,7 @@ static int convert_encoding(char **data,UINT4 *len);
     */
 #define CHECK_RETVAL(fkt) do{if((retval=fkt)!=OK)goto fini;}while(0)     /* es muß noch aufgeräumt werden, daher goto */
 #define CHECK_RETURN(fkt) do{if((retval=fkt)!=OK)return retval;}while(0)
-#line 918 "perl/Business-KontoCheck/konto_check.lxx"
+#line 920 "konto_check.lxx"
 
    /* einige Makros zur Umwandlung zwischen unsigned int und char */
 #define UCP  (unsigned char*)
@@ -505,7 +507,7 @@ int pz=-777;
 
 #define E_START(x)
 #define E_END(x)
-#line 1043 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1045 "konto_check.lxx"
 
    /* Variable für die Methoden 27, 29 und 69 */
 static const int m10h_digits[4][10]={
@@ -812,7 +814,7 @@ static UINT4 adler32a(UINT4 adler,const char *buf,unsigned int len)
  * # was einen Sortierlauf vor der Generierung der Tabelle bedingt.          #
  * # Die Funktion wird von qsort() (aus der libc) aufgerufen.                #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -839,7 +841,7 @@ static int sort_cmp(const void *ap,const void *bp)
  * # Diese Funktion dient als Vergleichsfunktion für zwei Integerwerte für   #
  * # die Quicksort-Bibliotheksfunktion.                                      #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -892,7 +894,7 @@ DLL_EXPORT int set_default_compression(int mode)
  * # Funktion create_lutfile_int() (ohne den FILE-Pointer). Die generierte   #
  * # Datei wird nach dem Aufruf geschlossen.                                 #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -913,7 +915,7 @@ DLL_EXPORT int create_lutfile(char *filename, char *prolog, int slots)
  * # des Inhaltsverzeichnisses mit 0-Bytes. Diese Datei kann dann mit der    #
  * # Funktion write_lut_block() (bzw. write_lut_block_int()) gefüllt werden. #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -950,11 +952,11 @@ static int create_lutfile_int(char *name, char *prolog, int slots,FILE **lut)
  * # einige grundlegende Tests gemacht, um sicherzustellen, daß es sich auch #
  * # um eine LUT2-Datei handelt (hier und später in write_block_int()).      #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 1492 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1494 "konto_check.lxx"
 DLL_EXPORT int write_lut_block(char *lutname,UINT4 typ,UINT4 len,char *data)
 {
    char buffer[SLOT_BUFFER],*ptr;
@@ -988,11 +990,11 @@ DLL_EXPORT int write_lut_block(char *lutname,UINT4 typ,UINT4 len,char *data)
  * # meldung LUT2_NO_SLOT_FREE zurückgegeben, aber nichts geschrieben.         #
  * # Vor dem Schreiben wird der Block mittels der ZLIB komprimiert.            #
  * #                                                                           #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>               #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>                 #
  * #############################################################################
  */
 
-#line 1530 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1532 "konto_check.lxx"
 static int write_lut_block_int(FILE *lut,UINT4 typ,UINT4 len,char *data)
 {
    char buffer[SLOT_BUFFER],*ptr,*cptr;
@@ -1124,11 +1126,11 @@ static int write_lut_block_int(FILE *lut,UINT4 typ,UINT4 len,char *data)
  * # mehrere Blocks des angegebenen Typs enthalten sind, wird der letze      #
  * # zurückgeliefert.                                                        #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 1666 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1668 "konto_check.lxx"
 DLL_EXPORT int read_lut_block(char *lutname, UINT4 typ,UINT4 *blocklen,char **data)
 {
    int retval;
@@ -1147,11 +1149,11 @@ DLL_EXPORT int read_lut_block(char *lutname, UINT4 typ,UINT4 *blocklen,char **da
  * # Blocks eines bestimmeten Typs enthalten sind, auch alte Blocks gelesen  #
  * # werden.                                                                 #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 1690 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1692 "konto_check.lxx"
 DLL_EXPORT int read_lut_slot(char *lutname,int slot,UINT4 *blocklen,char **data)
 {
    int retval;
@@ -1169,11 +1171,11 @@ DLL_EXPORT int read_lut_slot(char *lutname,int slot,UINT4 *blocklen,char **data)
  * # lesen; sie wird von vielen internen Funktionen benutzt. Die LUT-Datei   #
  * # wird als FILE-Pointer übergeben und nicht geschlossen.                  #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 1713 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1715 "konto_check.lxx"
 static int read_lut_block_int(FILE *lut,int slot,int typ,UINT4 *blocklen,char **data)
 {
    char buffer[SLOT_BUFFER],*ptr,*sbuffer,*dbuffer;
@@ -1263,7 +1265,7 @@ static int read_lut_block_int(FILE *lut,int slot,int typ,UINT4 *blocklen,char **
             FREE(sbuffer);
             RETURN(ERROR_MALLOC);
          }
-#line 1818 "perl/Business-KontoCheck/konto_check.lxx"
+#line 1820 "konto_check.lxx"
 
          if(fread(sbuffer,1,compressed_len,lut)<compressed_len){
             FREE(sbuffer);
@@ -1428,7 +1430,7 @@ static int read_lut_block_int(FILE *lut,int slot,int typ,UINT4 *blocklen,char **
  * # gegeben. Falls eine Variable nicht benötigt wird, kann für sie auch       #
  * # NULL übergeben werden; die entsprechende Variable wird dann ignoriert.    #
  * #                                                                           #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>               #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>                 #
  * #############################################################################
  */
 
@@ -1597,7 +1599,7 @@ static int lut_dir(FILE *lut,int id,UINT4 *slot_cnt,UINT4 *typ,UINT4 *len,
  * # dieser Buffer wird dann mittels der Funktion write_lut_block_int()      #
  * # komprimiert und in die LUT-Datei geschrieben.                           #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -2169,7 +2171,7 @@ static int write_lutfile_entry_de(UINT4 typ,int auch_filialen,int bank_cnt,char 
  * # generate_lut2(), aber die Funktionalität reicht in der Praxis normaler- #
  * # weise gut aus.                                                          #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -2221,7 +2223,7 @@ DLL_EXPORT int generate_lut2_p(char *inputname,char *outputname,char *user_info,
  * # für einige Prüfziffermethoden (52, 53, B6) benötigt werden (sie sind in #
  * # den Beispielen enthalten, haben aber keine reale Entsprechung).         #
  * #                                                                         #
- * # Copyright (C) 2007, 2013 Michael Plugge <m.plugge@hs-mannheim.de>       #
+ * # Copyright (C) 2007, 2013 Michael Plugge <konto_check@yahoo.com>         #
  * ###########################################################################
  */
 
@@ -2601,7 +2603,7 @@ fini:
  * # Die Funktion lut_dir_dump_str() allokiert für die Ausgabe Speicher;     #
  * # dieser muß von dre aufrufenden Funktion wieder freigegeben werden.      #
  * #                                                                         #
- * # Copyright (C) 2007-2010 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2007-2010 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -2711,7 +2713,7 @@ DLL_EXPORT int lut_dir_dump_str(char *lutname,char **dptr)
  * #    LUT2_NO_VALID_DATE:     Der Datenblock enthält kein Gültigkeitsdatum #
  * #    LUT2_NOT_INITIALIZED:   die library wurde noch nicht initialisiert   #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_valid(void)
@@ -2783,7 +2785,7 @@ DLL_EXPORT int lut_valid_date(char *lut_name,int *v11,int *v12,int *v21,int *v22
  * # und info2; danach wird der Speicher der von lut_info() allokiert wurde, #
  * # wieder freigegeben.                                                     #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -2816,7 +2818,7 @@ DLL_EXPORT int lut_info_b(char *lut_name,char **info1,char **info2,int *valid1,i
  * # mittels der Funktion kc_id2ptr() in einen String umgewandelt, sowie mit #
  * # der Funktion kc_id_free() wieder freigegeben werden kann.               #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -2884,11 +2886,11 @@ DLL_EXPORT int lut_info_id(char *lut_name,int *info1,int *info2,int *valid1,int 
  * #    LUT2_NO_VALID_DATE:     Der Datenblock enthält kein Gültigkeitsdatum #
  * #    LUT2_BLOCK_NOT_IN_FILE: Die LUT-Datei enthält den Infoblock nicht    #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 3443 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3445 "konto_check.lxx"
 DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int *valid2)
 {
    char *ptr,*ptr1,buffer[128];
@@ -2976,7 +2978,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
 
       /* Infoblocks lesen: 1. Infoblock */
    if((ret=read_lut_block_int(in,0,LUT2_INFO,&cnt,&ptr))==OK){
-#line 3532 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3534 "konto_check.lxx"
       *(ptr+cnt)=0;
       if(valid1){
          for(ptr1=ptr,v1=v2=0;*ptr1 && *ptr1!='\n' && !isdigit(*ptr1);ptr1++);
@@ -3024,7 +3026,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
 
       /* Infoblocks lesen: 2. Infoblock */
    if((ret=read_lut_block_int(in,0,LUT2_2_INFO,&cnt,&ptr))==OK){
-#line 3581 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3583 "konto_check.lxx"
       *(ptr+cnt)=0;
       if(valid2){
          for(ptr1=ptr,v1=v2=0;*ptr1 && *ptr1!='\n' && !isdigit(*ptr1);ptr1++);
@@ -3102,7 +3104,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
  * #    info_p:    Variablenpointer für Rückgabe des Info-Strings            #
  * #    user_info_p: Variablenpointer für Rückgabe des User-Info-Strings     #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3213,7 +3215,7 @@ DLL_EXPORT int get_lut_info2(char *lut_name,int *version_p,char **prolog_p,char 
  * # Außerdem kann die Anzahl Slots verändert (vergrößert oder verkleinert)  #
  * # werden.                                                                 #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3243,7 +3245,7 @@ DLL_EXPORT int copy_lutfile(char *old_name,char *new_name,int new_slots)
    qsort(slotdir,slot_cnt,sizeof(int),cmp_int);
    for(last_slot=-1,i=0;i<(int)slot_cnt;i++)if((typ=slotdir[i]) && typ!=(UINT4)last_slot){
       read_lut_block_int(lut1,0,typ,&len,&data);
-#line 3801 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3803 "konto_check.lxx"
       write_lut_block_int(lut2,typ,len,data);
       FREE(data);
       last_slot=typ;
@@ -3261,7 +3263,7 @@ DLL_EXPORT int copy_lutfile(char *old_name,char *new_name,int new_slots)
  * # Sets geladen. Der Rückgabewert ist daher oft -38 (nicht alle Blocks     #
  * # geladen), da die LUT-Datei nicht unbedingt alle Blocks enthält :-).     #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3279,7 +3281,7 @@ DLL_EXPORT int kto_check_init2(char *lut_name)
  * # unterschiedlichen Blocks definiert (lut_set_0 ... lut_set_9), die über  #
  * # einen skalaren Parameter ausgewählt werden können.                      #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3319,7 +3321,7 @@ DLL_EXPORT int kto_check_init_p(char *lut_name,int required,int set,int incremen
  * # testen, ob ein bestimmter Block initialisiert wurde, und welcher        #
  * # Rückgabewert dabei auftrat.                                             #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3341,7 +3343,7 @@ DLL_EXPORT int *lut2_status(void)
  * # Der Parameter id sollte auf einen Speicherbereich von mindestens 33 Byte#
  * # zeigen. Die Datei-ID wird in diesen Speicher geschrieben.               #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3439,7 +3441,7 @@ DLL_EXPORT int get_lut_id(char *lut_name,int set,char *id)
  * # inkrementelle Initialisierung, um noch benötigte Blocks nachzuladen.    #
  * # Falls schon alle gewünschten Blocks geladen sind, wird nichts gemacht.  #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -3470,10 +3472,10 @@ DLL_EXPORT int lut_init(char *lut_name,int required,int set)
  * # Probleme; daher gibt es noch einige andere Initialisierungsfunktionen   #
  * # mit einfacherem Aufrufinterface, wie lut_init() oder kto_check_init_p().#
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
-#line 4031 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4033 "konto_check.lxx"
 DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,int incremental)
 {
    char *ptr,*dptr,*data,*eptr,*prolog,*info,*user_info,*hs=NULL,*info1,*info2,*ci=NULL,name_buffer[LUT_PATH_LEN];
@@ -3701,7 +3703,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
          typ1=typ;
       if(lut2_block_status[typ]==OK)continue;   /* jeden Block nur einmal einlesen */
       retval=read_lut_block_int(lut,0,typ,&len,&data);
-#line 4260 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4262 "konto_check.lxx"
 
       switch(retval){
          case LUT_CRC_ERROR:
@@ -3789,7 +3791,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
             if(typ==LUT2_2_NAME || typ==LUT2_2_NAME_KURZ){
                FREE(data);
                i=read_lut_block_int(lut,0,LUT2_2_NAME_NAME_KURZ,&len,&data);
-#line 4352 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4354 "konto_check.lxx"
                if(i==OK){  /* was gefunden; Typ ändern, dann weiter wie bei OK */
                   typ=LUT2_2_NAME_NAME_KURZ;
                   typ1=LUT2_NAME_NAME_KURZ;
@@ -4286,7 +4288,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
  * #   LUT2_BLOCKS_MISSING   bei einigen Blocks traten Fehler auf             #
  * #   OK                    alle Blocks erfolgreich geladen                  #
  * #                                                                          #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>              #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>                #
  * ############################################################################
  */
 DLL_EXPORT int lut_blocks(int mode,char **lut_filename,char **lut_blocks_ok,char **lut_blocks_fehler)
@@ -4360,7 +4362,7 @@ DLL_EXPORT int lut_blocks(int mode,char **lut_filename,char **lut_blocks_ok,char
  * # Variablen lut_filename, lut_blocks_ok und lut_blocks_fehler müssen immer #
  * # angegeben werden; eine Übergabe von NULL führt zu einer access violation.#
  * #                                                                          #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>              #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                #
  * ############################################################################
  */
 DLL_EXPORT int lut_blocks_id(int mode,int *lut_filename,int *lut_blocks_ok,int *lut_blocks_fehler)
@@ -4391,11 +4393,11 @@ DLL_EXPORT int lut_blocks_id(int mode,int *lut_filename,int *lut_blocks_ok,int *
  * # benutzt, ist aber auch als Info interessant, falls für die LUT-Datei    # 
  * # die Default-Werte benutzt wurden (Pfad und Dateiname).                  #
  * #                                                                         #
- * # Copyright (C) 2011 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2011 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 4958 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4960 "konto_check.lxx"
 DLL_EXPORT const char *current_lutfile_name(int *set,int *level,int *retval)
 {
    if(init_status<7 || !current_lutfile){
@@ -4414,7 +4416,7 @@ DLL_EXPORT const char *current_lutfile_name(int *set,int *level,int *retval)
 /* ###########################################################################
  * # lut_index(): Index einer BLZ in den internen Arrays bestimmen           #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4463,7 +4465,7 @@ static int lut_index(char *b)
  * #                Diese Funktion ist nicht so optimiert wie lut_index(),   #
  * #                da sie nicht in zeitkritischen Routinen benutzt wird.    #
  * #                                                                         #
- * # Copyright (C) 2009 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2009 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4532,7 +4534,7 @@ static int lut_index_i(int b)
  * #               wird. Falls für retval NULL übergeben wird, wird der      #
  * #               Rückgabewert verworfen.                                   #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4543,7 +4545,7 @@ static int lut_index_i(int b)
  * # Diese Funktion testet, ob eine BLZ (und Zweigstelle, falls gewünscht)   #
  * # existiert und gültig ist.                                               #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4574,7 +4576,7 @@ DLL_EXPORT int lut_blz_i(int b,int zweigstelle)
  * # lut_filialen(): Anzahl der Filialen zu einer gegebenen Bankleitzahl     #
  * # bestimmen.                                                              #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4602,7 +4604,7 @@ DLL_EXPORT int lut_filialen_i(int b,int *retval)
 /* ###########################################################################
  * # lut_name(): Banknamen (lange Form) bestimmen                            #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4637,7 +4639,7 @@ DLL_EXPORT const char *lut_name_i(int b,int zweigstelle,int *retval)
  * # der deutschen Kreditwirtschaft ist die Länge der Angaben für die        #
  * # Bezeichnung des Kreditinstituts begrenzt.                               #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4665,7 +4667,7 @@ DLL_EXPORT const char *lut_name_kurz_i(int b,int zweigstelle,int *retval)
 /* ###########################################################################
  * # lut_plz(): Postleitzahl bestimmen                                       #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4693,7 +4695,7 @@ DLL_EXPORT int lut_plz_i(int b,int zweigstelle,int *retval)
 /* ###########################################################################
  * # lut_ort(): Sitz einer Bank bestimmen                                    #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4733,7 +4735,7 @@ DLL_EXPORT const char *lut_ort_i(int b,int zweigstelle,int *retval)
  * # den Stellen der Deutschen Bundesbank stets die Institutsgruppennummer   #
  * # 2 zugewiesen worden.                                                    #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4789,7 +4791,7 @@ DLL_EXPORT int lut_pan_i(int b,int zweigstelle,int *retval)
  * # korrekte Wert läßt sich in diesem Fall durch die Funktion iban_bic_gen()#
  * # ermitteln.                                                              #
  * #                                                                         #
- * # Copyright (C) 2007,2013 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2007,2013 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -4901,7 +4903,7 @@ DLL_EXPORT const char *lut_bic_hi(int b,int zweigstelle,int *retval)
  * # automatisiert eine eindeutige Nummer vergeben. Eine einmal verwendete   #
  * # Nummer wird nicht noch einmal vergeben.                                 #
  * #                                                                         #
- * # Copyright (C) 2009 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2009 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4930,7 +4932,7 @@ DLL_EXPORT int lut_nr_i(int b,int zweigstelle,int *retval)
  * # lut_pz(): Prüfzifferverfahren für eine Bankleitzahl. Das Verfahren wird #
  * # numerisch zurückgegeben, also z.B. 108 für die Methode A8.              #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -4963,7 +4965,7 @@ DLL_EXPORT int lut_pz_i(int b,int zweigstelle,int *retval)
  * # Gültigkeitstermin der Bankleitzahlendatei im Zahlungsverkehr nicht mehr #
  * # zu verwenden.                                                           #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -5003,7 +5005,7 @@ DLL_EXPORT int lut_aenderung_i(int b,int zweigstelle,int *retval)
  * # Das Feld enthält das Merkmal 0 (keine Angabe) oder 1 (BLZ im Feld 1     #
  * # ist zur Löschung vorgesehen). Die Rückgabe erfolgt als ASCII '0' '1'.   #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -5036,7 +5038,7 @@ DLL_EXPORT int lut_loeschung_i(int b,int zweigstelle,int *retval)
  * # wurde (lut_loeschung()==1) oder die Bankleitzahl zum aktuellen Gültig-  #
  * # keitstermin gelöscht wird (lut_aenderung()=='D').                       #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -5070,7 +5072,7 @@ DLL_EXPORT int lut_nachfolge_blz_i(int b,int zweigstelle,int *retval)
  * # aus einer vierstelligen Nummer und einer zweistelligen Versionszahl;    #
  * # sie wird in konto_check als eine sechsstellige Nummer dargestellt.      #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -5105,7 +5107,7 @@ DLL_EXPORT int lut_iban_regel_i(int b,int zweigstelle,int *retval)
  * # Berechnung notwendig sind, schon geladen wurden; falls nicht, werden    #
  * # die fehlenden Daten (per inkrementeller Initialisierung) nachgeladen.   #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -5146,11 +5148,11 @@ static int iban_init(void)
  * # Der Rückgabewert gibt nähere Aufschlüsse über die Anwendung der Regeln  #
  * # und ob eine IBAN berechnet werden darf.                                 #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
-#line 5713 "perl/Business-KontoCheck/konto_check.lxx"
+#line 5715 "konto_check.lxx"
 static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_version,RETVAL *retvals)
 {
    char tmp_buffer[16];
@@ -5251,7 +5253,8 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
              * IBAN-Regel 5 auf S. 14); alle anderen BLZs der Commerzbank
              * bekommen COBADEFFXXX.
              */
-         if(blz[3]=='4' && strcasecmp(lut_name(blz,0,NULL),"comdirect bank"))*bicp="COBADEFFXXX";
+//         if(blz[3]=='4' && strcasecmp(lut_name(blz,0,NULL),"comdirect bank"))*bicp="COBADEFFXXX";
+         if(blz[3]=='4' && blz[4]!='1')*bicp="COBADEFFXXX"; /* comdirect Bank */
 
             /* BLZs ohne Prüfzifferberechnung */
          if(pz_methode==9)return OK_NO_CHK;
@@ -8319,7 +8322,7 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
    }
 }
 
-#line 8882 "perl/Business-KontoCheck/konto_check.lxx"
+#line 8885 "konto_check.lxx"
 /* Funktion lut_multiple() +§§§2 */
 /* ###########################################################################
  * # lut_multiple(): Universalfunktion, um zu einer gegebenen Bankleitzahl   #
@@ -8336,7 +8339,7 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
  * # mit den Indizes der Hauptstellen wird in der letzten Variable zurück-   #
  * # gegeben (start_idx).                                                    #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -8547,7 +8550,7 @@ static int lut_multiple_int(int idx,int *cnt,int **p_blz,char  ***p_name,char **
  * # Die Funktion lut_cleanup() gibt allen belegten Speicher frei und setzt  #
  * # die entsprechenden Variablen auf NULL.                                  #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -8587,7 +8590,7 @@ DLL_EXPORT int lut_cleanup(void)
    FREE(sort_pz_f);
    FREE(sort_plz);
    FREE(sort_iban_regel);
-#line 9144 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9147 "konto_check.lxx"
    if(name_raw && name_data!=name_raw)
       FREE(name_raw);
    else
@@ -8664,7 +8667,7 @@ DLL_EXPORT int lut_cleanup(void)
       lut_cleanup(); /* neuer Versuch, aufzuräumen */
       RETURN(INIT_FATAL_ERROR);
    }
-#line 9226 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9229 "konto_check.lxx"
    init_status&=1;
    init_in_progress=0;
    return OK;
@@ -8688,7 +8691,7 @@ DLL_EXPORT int lut_cleanup(void)
  * #      Prüfziffermethoden; das Problem wird mit dem neuen Dateiformat     #
  * #      noch einmal angegangen.                                            #
  * #                                                                         #
- * # Copyright (C) 2002-2005 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2002-2005 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -8710,7 +8713,7 @@ DLL_EXPORT int generate_lut(char *inputname,char *outputname,char *user_info,int
  * #                                                                         #
  * # Bugs: für eine BLZ wird nur eine Prüfziffermethode unterstützt (s.o.).  #
  * #                                                                         #
- * # Copyright (C) 2002-2005 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2002-2005 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -8828,7 +8831,7 @@ static int read_lut(char *filename,int *cnt_blz)
  * # zurückführen, was wesentlich schneller ist, als die sonst nötigen acht  #
  * # Multiplikationen mit dem jeweiligen Stellenwert.                        #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -8972,6 +8975,8 @@ static void init_atoi_table(void)
    lut2_feld_namen[LUT2_2_SCL_NAME]="LUT2_2_SCL_NAME";
    lut2_feld_namen[LUT2_SCL_FLAGS]="LUT2_SCL_FLAGS";
    lut2_feld_namen[LUT2_2_SCL_FLAGS]="LUT2_2_SCL_FLAGS";
+   lut2_feld_namen[LUT2_SCL_FLAGS_ORIG]="LUT2_SCL_FLAGS_ORIG";
+   lut2_feld_namen[LUT2_2_SCL_FLAGS_ORIG]="LUT2_2_SCL_FLAGS_ORIG";
 
    lut_block_idx[1]=0;
    lut_block_idx[2]=0;
@@ -9004,6 +9009,7 @@ static void init_atoi_table(void)
    lut_block_idx[29]=-1;
    lut_block_idx[30]=-1;
    lut_block_idx[31]=-1;
+   lut_block_idx[32]=-1;
 
    lut_block_name1[1]="BLZ";
    lut_block_name1[2]="FILIALEN";
@@ -9036,6 +9042,7 @@ static void init_atoi_table(void)
    lut_block_name1[29]="SCL_BIC";
    lut_block_name1[30]="SCL_NAME";
    lut_block_name1[31]="SCL_FLAGS";
+   lut_block_name1[32]="SCL_FLAGS_ORIG";
    lut_block_name1[101]="BLZ (2)";
    lut_block_name1[102]="FILIALEN (2)";
    lut_block_name1[103]="NAME (2)";
@@ -9067,6 +9074,7 @@ static void init_atoi_table(void)
    lut_block_name1[129]="SCL_BIC (2)";
    lut_block_name1[130]="SCL_NAME (2)";
    lut_block_name1[131]="SCL_FLAGS (2)";
+   lut_block_name1[132]="SCL_FLAGS_ORIG (2)";
 
    lut_block_name2[1]="1. BLZ";
    lut_block_name2[2]="1. Anzahl Fil.";
@@ -9099,6 +9107,7 @@ static void init_atoi_table(void)
    lut_block_name2[29]="1. SCL BIC";
    lut_block_name2[30]="1. SCL Banknamen";
    lut_block_name2[31]="1. SCL Flags";
+   lut_block_name2[32]="1. SCL Flags orig";
    lut_block_name2[101]="2. BLZ";
    lut_block_name2[102]="2. Anzahl Fil.";
    lut_block_name2[103]="2. Name";
@@ -9130,8 +9139,9 @@ static void init_atoi_table(void)
    lut_block_name2[129]="2. SCL BIC";
    lut_block_name2[130]="2. SCL Banknamen";
    lut_block_name2[131]="2. SCL Flags";
-   lut_blocklen_max=521;
-#line 9466 "perl/Business-KontoCheck/konto_check.lxx"
+   lut_block_name2[132]="2. SCL Flags orig";
+   lut_blocklen_max=544;
+#line 9469 "konto_check.lxx"
    init_status|=1;
 }
 
@@ -9155,7 +9165,7 @@ static void init_atoi_table(void)
  * #    retvals:      Struktur, um Prüfziffermethode und Prüfziffer in einer #
  * #                  threadfesten Version zurückzugeben                     #
  * #                                                                         #
- * # Copyright (C) 2002-2009 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2002-2009 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -9191,7 +9201,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 
    switch(pz_methode){
 
-#line 9529 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9532 "konto_check.lxx"
 /* Berechnungsmethoden 00 bis 09 +§§§3
    Berechnung nach der Methode 00 +§§§4 */
 /*
@@ -11530,7 +11540,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * ######################################################################
  */
 
-#line 11544 "perl/Business-KontoCheck/konto_check.lxx"
+#line 11547 "konto_check.lxx"
       case 51:
          if(*(kto+2)=='9'){   /* Ausnahme */
 
@@ -11792,8 +11802,8 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          else
             return FALSE;
 
-#line 11758 "perl/Business-KontoCheck/konto_check.lxx"
-#line 11760 "perl/Business-KontoCheck/konto_check.lxx"
+#line 11761 "konto_check.lxx"
+#line 11763 "konto_check.lxx"
 /*  Berechnung nach der Methode 53 +§§§4 */
 /*
  * ######################################################################
@@ -12092,7 +12102,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # bewerten.                                                          #
  * ######################################################################
  */
-#line 12029 "perl/Business-KontoCheck/konto_check.lxx"
+#line 12032 "konto_check.lxx"
       case 57:
 #if DEBUG>0
          if(retvals){
@@ -12738,7 +12748,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # Prüfzifferberechnung)                                              #
  * ######################################################################
  */
-#line 12609 "perl/Business-KontoCheck/konto_check.lxx"
+#line 12612 "konto_check.lxx"
       case 66:
 #if DEBUG>0
       case 2066:
@@ -20147,7 +20157,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          return NOT_IMPLEMENTED;
    }
 }
-#line 18821 "perl/Business-KontoCheck/konto_check.lxx"
+#line 18824 "konto_check.lxx"
 
 /*
  * ######################################################################
@@ -20173,7 +20183,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * #    blz:        Bankleitzahl (immer 8-stellig)                           #
  * #    kto:        Kontonummer                                              #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20238,14 +20248,14 @@ DLL_EXPORT int kto_check_blz(char *blz,char *kto)
  * #    retvals:    Struktur, in der die benutzte Prüfziffermethode und die  #
  * #                berechnete Prüfziffer zurückgegeben werden               #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
 #if DEBUG>0    /* es werden einige Funktionen benutzt, die nur in der Debug-Variante enthalten sind */
 DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,const char **bic,int *regel,RETVAL *retvals)
 {
-#line 18919 "perl/Business-KontoCheck/konto_check.lxx"
+#line 18922 "konto_check.lxx"
    char *blz_o,buffer[32],kto_o[16],*blz_n,*kto_n,*ptr,*dptr;
    const char *bicp;
    int ret,ret_regel,r,i;
@@ -20294,7 +20304,7 @@ DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,con
    }
    else  /* BLZ und Kto gleich */
       return ret;
-#line 18968 "perl/Business-KontoCheck/konto_check.lxx"
+#line 18971 "konto_check.lxx"
 }
 
 #else   /* !DEBUG */
@@ -20347,7 +20357,7 @@ DLL_EXPORT int kto_check_regel(char *blz,char *kto)
  * #    kto:        Kontonummer                                              #
  * #    blz:        Bankleitzahl (immer 8-stellig)                           #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20389,7 +20399,7 @@ DLL_EXPORT int kto_check_pz(char *pz,char *kto,char *blz)
  * #    retvals:    Struktur, in der die benutzte Prüfziffermethode und die  #
  * #                berechnete Prüfziffer zurückgegeben werden               #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20442,10 +20452,10 @@ DLL_EXPORT int kto_check_blz_dbg(char *blz,char *kto,RETVAL *retvals)
  * #    retvals:    Struktur, in der die benutzte Prüfziffermethode und die  #
  * #                berechnete Prüfziffer zurückgegeben werden               #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
-#line 19119 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19122 "konto_check.lxx"
 DLL_EXPORT int kto_check_pz_dbg(char *pz,char *kto,char *blz,RETVAL *retvals)
 {
    int untermethode,pz_methode;
@@ -20481,7 +20491,7 @@ DLL_EXPORT int kto_check_pz_dbg(char *pz,char *kto,char *blz,RETVAL *retvals){re
  * # statt eines numerischen Wertes. Die Funktion wurde zunächst für die     #
  * # Perl-Variante eingeführt.                                               #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20533,7 +20543,7 @@ DLL_EXPORT const char *kto_check_str(char *x_blz,char *kto,char *lut_name)
  * #    kto:        Kontonummer                                              #
  * #    lut_name:   Name der Lookup-Datei oder NULL (für DEFAULT_LUT_NAME)   #
  * #                                                                         #
- * # Copyright (C) 2002-2007 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2002-2007 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -20615,7 +20625,7 @@ DLL_EXPORT int kto_check(char *pz_or_blz,char *kto,char *lut_name)
  * # die Anzahl der Banken die zu dem BIC gehören, in der Variablen cnt      #
  * # zurückgegeben (optional).                                               #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20681,7 +20691,7 @@ DLL_EXPORT int get_lut_info2_b(char *lutname,int *version,char **prolog_p,char *
    }
    else
       **user_info_p=0;
-#line 19340 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19343 "konto_check.lxx"
    FREE(prolog);
    return OK;
 }
@@ -20707,7 +20717,7 @@ DLL_EXPORT int get_lut_info2_b(char *lutname,int *version,char **prolog_p,char *
  * #    INVALID_LUT_FILE   Fehler in der LUT-Datei (Format, CRC...)     #
  * #    OK                 Erfolg                                       #
  * #                                                                    #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>          #
  * ######################################################################
  */
 
@@ -20746,7 +20756,7 @@ DLL_EXPORT int get_lut_info(char **info,char *lut_name)
  * # keinen Speicher freigeben kann, der von C aus allokiert wurde.     #
  * # Auch in C# ist die Speicherverwaltung nicht einfach möglich.       #
  * #                                                                    #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>          #
  * ######################################################################
  */
 
@@ -20772,7 +20782,7 @@ DLL_EXPORT void *kc_alloc(int size,int *retval)
  * # Diese Funktion ist Teil des alten Interfaces und wurde als Wrapper      #
  * # zu den neuen Routinen umgestellt.                                       #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20791,7 +20801,7 @@ DLL_EXPORT int cleanup_kto(void)
  * #  Diese Funktion gibt die Version und das Datum der Kompilierung der     #
  * #  konto_check library als String zurück.                                .#
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20823,13 +20833,13 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
       case 5:
         return "09.09.2019";
       case 6:
-        return "16. Dezember 2020";            /* Klartext-Datum der Bibliotheksversion */
+        return "13. April 2023";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "13";             /* Unterversionszahl */
+        return "15";             /* Unterversionszahl */
    }
 }
 
@@ -20844,7 +20854,7 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
  * # Variante vor allem für Perl gedacht ist; in der Umgebung ist es         #
  * # etwas komplizierter, ein Array zu übergeben.                            #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20875,7 +20885,7 @@ DLL_EXPORT int dump_lutfile_p(char *outputname,UINT4 felder)
  * # dem Array required spezifiziert. Es werden nur Felder der Deutschen     #
  * # Bundesbank berücksichtigt; andere Felder werden ignoriert.              #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -20975,7 +20985,7 @@ DLL_EXPORT int dump_lutfile(char *outputname,UINT4 *required)
       default:
          break;
    }
-#line 19573 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19576 "konto_check.lxx"
    fputc('\n',out);
    while(--i)fputc('=',out);
    fputc('\n',out);
@@ -21071,7 +21081,7 @@ DLL_EXPORT int dump_lutfile(char *outputname,UINT4 *required)
  * #                                                                         #
  * # Update 2014: die IBAN-Regeln werden jetzt auch ausgegeben.              #
  * #                                                                         #
- * # Copyright (C) 2007,2009 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2007,2009 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -21182,7 +21192,7 @@ DLL_EXPORT int rebuild_blzfile(char *inputname,char *outputname,UINT4 set)
  * #                                                                         #
  * # Rückgabe:      der zu der übergebenen IBAN gehörende BIC                #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -21285,7 +21295,7 @@ DLL_EXPORT const char *iban2bic(char *iban,int *retval,char *blz,char *kto)
  * # die Parameter blz und kto wird allerdings Speicher allokiert und per    #
  * # Handle wieder zurückgegeben.                                            #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -21300,7 +21310,7 @@ DLL_EXPORT const char *iban2bic_id(char *iban,int *retval,int *blz,int *kto)
    return iban2bic(iban,retval,b,k);
 }
 
-#line 19898 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19901 "konto_check.lxx"
 /* Funktion iban_gen(), iban_bic_gen() und iban_bic_gen1 +§§§1 */
 /* ###########################################################################
  * # Die Funktion iban_gen generiert aus Bankleitzahl und Kontonummer eine   #
@@ -21372,7 +21382,7 @@ DLL_EXPORT const char *iban2bic_id(char *iban,int *retval,int *blz,int *kto)
  * #                fehlschlägt, wird der entsprechende Fehlercode in die    #
  * #                Variable retval geschrieben und NULL zurückgegeben.      #
  * #                                                                         #
- * # Copyright (C) 2008,2013 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2008,2013 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
 
@@ -21624,7 +21634,7 @@ DLL_EXPORT char *iban_bic_gen(char *blz,char *kto,const char **bicp,char *blz2,c
  * # Parameter:                                                              #
  * #    ci:         Creditor Identifiers der getestet werden soll            #
  * #                                                                         #
- * # Copyright (C) 2013 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2013 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -21710,7 +21720,7 @@ DLL_EXPORT int ci_check(char *ci)
  * #    retval:     NULL oder Adresse einer Variablen, in die der Rückgabe-  #
  * #                wert der Kontoprüfung geschrieben wird                   #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -21981,7 +21991,7 @@ DLL_EXPORT int iban_check(char *iban,int *retval)
  * #                zeichen nach jeweils 5 Zeichen) geschrieben wird, oder   #
  * #                NULL (falls nicht benötigt)                              #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -22047,7 +22057,7 @@ DLL_EXPORT int ipi_gen(char *zweck,char *dst,char *papier)
  * # kc_id2ptr() kann das Handle in einen String umgewandelt werden, sowie   #
  * # mittels der Funktion kc_id_free() wieder freigegeben werden.            #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -22076,7 +22086,7 @@ DLL_EXPORT int ipi_gen_id(char *zweck,int *dst,int *papier)
  * # Parameter:                                                              #
  * #    zweck: der Strukturierte Verwendungszweck, der getestet werden soll  #
  * #                                                                         #
- * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2008 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -22130,10 +22140,10 @@ DLL_EXPORT int ipi_check(char *zweck)
  * # Felder der LUT-Datei, z.B. Banken in einem bestimmten Ort oder mit      #
  * # einem bestimmten Namen etc.                                             #
  * #                                                                         #
- * # Copyright (C) 2009,2011 Michael Plugge <m.plugge@hs-mannheim.de>        #
+ * # Copyright (C) 2009,2011 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
-#line 20731 "perl/Business-KontoCheck/konto_check.lxx"
+#line 20734 "konto_check.lxx"
 
 /* Funktion volltext_zeichen() +§§§2 */
 /* Diese Funktion gibt für Zeichen die bei der Volltextsuche gültig sind
@@ -22980,7 +22990,7 @@ static int qcmp_bic_h(const void *ap,const void *bp)
       return a-b;
 }
 
-#line 21578 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21581 "konto_check.lxx"
 
 /* Funktion qcmp_bic() +§§§3 */
 static int qcmp_bic(const void *ap,const void *bp)
@@ -23085,7 +23095,7 @@ static int qcmp_iban_regel(const void *ap,const void *bp)
    else 
       return a-b;
 }
-#line 21593 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21596 "konto_check.lxx"
 
 /* Funktion init_blzf() +§§§2
  * Diese Funktion initialisiert das Array mit den Bankleitzahlen für alle
@@ -23153,7 +23163,7 @@ DLL_EXPORT int konto_check_idx2blz(int idx,int *zweigstelle,int *retval)
 }
 
 /* Funktion suche_int1() +§§§2 */
-#line 21661 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21664 "konto_check.lxx"
 static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int cnt,int such_idx)
 {
@@ -23204,7 +23214,7 @@ static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstell
 }
 
 /* Funktion suche_int2() +§§§2 */
-#line 21712 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21715 "konto_check.lxx"
 static int suche_int2(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int such_idx,int pz_suche)
 {
@@ -23819,7 +23829,7 @@ static int cmp_suche_sort(const void *ap,const void *bp)
 DLL_EXPORT int lut_suche_sort1(int anzahl,int *blz_base,int *zweigstellen_base,int *idx,int *anzahl_o,int **idx_op,int **cnt_op,int uniq)
 {
    int i,j,last_idx,*idx_a,*cnt_o;
-#line 22328 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22331 "konto_check.lxx"
 
    if(idx_op)*idx_op=NULL;
    if(cnt_op)*cnt_op=NULL;
@@ -23901,7 +23911,7 @@ DLL_EXPORT int lut_suche_sort2(int anzahl,int *blz,int *zweigstellen,int *anzahl
    return OK;
 }
 
-#line 22411 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22414 "konto_check.lxx"
 /* Funktion lut_suche_volltext() +§§§2 */
 DLL_EXPORT int lut_suche_volltext(char *such_wort,int *anzahl,int *base_name_idx,char ***base_name,
       int *zweigstellen_anzahl,int **start_idx,int **zweigstellen_base,int **blz_base)
@@ -24031,7 +24041,7 @@ DLL_EXPORT int lut_suche_blz(int such1,int such2,int *anzahl,int **start_idx,int
    return suche_int1(such1,such2,anzahl,start_idx,zweigstellen_base,blz_base,&blz_f,&sort_blz,qcmp_blz,cnt,0);
 }
 
-#line 22561 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22564 "konto_check.lxx"
 /* Funktion lut_suche_bic() +§§§2 */
 DLL_EXPORT int lut_suche_bic(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
       char ***base_name,int **blz_base)
@@ -24122,7 +24132,7 @@ DLL_EXPORT int lut_suche_regel(int such1,int such2,int *anzahl,int **start_idx,i
    return suche_int2(such1*100,such2*100+99,anzahl,start_idx,zweigstellen_base,blz_base,&iban_regel,&sort_iban_regel,qcmp_iban_regel,LUT2_IBAN_REGEL_SORT,0);
 }
 
-#line 22594 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22597 "konto_check.lxx"
 
 /* Funktion lut_suche_bic_h() +§§§2 */
 DLL_EXPORT int lut_suche_bic_h(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
@@ -24214,7 +24224,7 @@ DLL_EXPORT int bic_info(char *bic1,int mode,int *anzahl,int *start_idx)
 /* ###############################################################################
  * # Diese Funktionen bestimmen das Änderungsflag zu einem BIC bzw. einer IBAN   #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24237,7 +24247,7 @@ DLL_EXPORT int iban_aenderung(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen das Löschflag zu einem BIC bzw. einer IBAN       #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24260,7 +24270,7 @@ DLL_EXPORT int iban_loeschung(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen die IBAN-Regel zu einem BIC bzw. einer IBAN      #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24283,7 +24293,7 @@ DLL_EXPORT int iban_iban_regel(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen die Nachfolge-BLZ zu einem BIC bzw. einer IBAN   #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24306,7 +24316,7 @@ DLL_EXPORT int iban_nachfolge_blz(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen die Laufende Nr. zu einem BIC bzw. einer IBAN    #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24329,7 +24339,7 @@ DLL_EXPORT int iban_nr(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen den PAN zu einem BIC bzw. einer IBAN             #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24352,7 +24362,7 @@ DLL_EXPORT int iban_pan(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen die PLZ der Bank zu einem BIC bzw. einer IBAN    #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24375,7 +24385,7 @@ DLL_EXPORT int iban_plz(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen die Prüfziffer zu einem BIC bzw. einer IBAN      #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24398,7 +24408,7 @@ DLL_EXPORT int iban_pz(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen den BIC zu einem BIC bzw. einer IBAN             #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24421,7 +24431,7 @@ DLL_EXPORT const char *iban_bic(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen den BIC der Hauptstelle zu einem BIC bzw. einer IBAN#
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24444,7 +24454,7 @@ DLL_EXPORT const char *iban_bic_h(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen den Name der Bank zu einem BIC bzw. einer IBAN   #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24467,7 +24477,7 @@ DLL_EXPORT const char *iban_name(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen den Kurzname der Bank zu einem BIC bzw. einer IBAN#
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24490,7 +24500,7 @@ DLL_EXPORT const char *iban_name_kurz(char *iban,int filiale,int*retval)
 /* ###############################################################################
  * # Diese Funktionen bestimmen den Ort einer Bank zu einem BIC bzw. einer IBAN  #
  * #                                                                             #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>                 #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>                   #
  * ###############################################################################
  */
 
@@ -24508,7 +24518,7 @@ DLL_EXPORT const char *iban_ort(char *iban,int filiale,int*retval)
 {
    return iban_fkt_s(iban,filiale,retval,lut_ort);
 }
-#line 22683 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22686 "konto_check.lxx"
 
 static int bic_fkt_c(char *bic1,int mode,int filiale,int *retval,char *base,int error)
 {
@@ -24817,7 +24827,7 @@ static const char *iban_fkt_s(char *iban,int filiale,int *retval,const char*(*fk
  * #    val:        Daten                                                    #
  * #    size:   Größe des Datenblocks (nur bei set_default_bin() )           #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -24873,7 +24883,7 @@ DLL_EXPORT int kto_check_set_default_bin(char *key,char *val,int size)
  * # Diese Funktion initialisiert die Variablen für den Default-Block und    #
  * # löscht evl. vorhandene Werte.                                           #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -24909,7 +24919,7 @@ static int kto_check_clear_default(void)
  * #    lut_name:   Name der LUT-Datei                                       #
  * #    block_id:   ID in der LUT-Datei für den Block                        #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -24988,7 +24998,7 @@ DLL_EXPORT int kto_check_init_default(char *lut_name,int block_id)
  * #    val:        Wert (Rückgabe per Referenz)                             #
  * #    size:       Größe des Datenblocks (per Referenz)                     #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25020,7 +25030,7 @@ DLL_EXPORT int kto_check_get_default(char *key,char **val,int *size)
  * #    keys:       Array mit den Schlüsseln (Rückgabe per Referenz)         #
  * #    cnt:        Anzahl (Rückgabe per Referenz)                           #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25048,7 +25058,7 @@ DLL_EXPORT int kto_check_default_keys(char ***keys,int *cnt)
  * #    lutfile:    LUT-Datei in die der Block geschrieben werden soll       #
  * #    block_id:   ID in der LUT-Datei für den Block                        #
  * #                                                                         #
- * # Copyright (C) 2010 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2010 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25093,7 +25103,7 @@ DLL_EXPORT int kto_check_write_default(char *lutfile,int block_id)
  * # Funktion mit dem Parameter 0 aufgerufen wird, wird nur die aktuelle     #
  * # Kodierung zurückgegeben.                                                #
  * #                                                                         #
- * # Copyright (C) 2011 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2011 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25244,7 +25254,7 @@ DLL_EXPORT int kto_check_encoding(int mode)
  * # Diese Funktion entspricht der Funktion kto_check_encoding(); allerdings #
  * # ist der Rückgabewert nicht numerisch, sondern ein String.               #
  * #                                                                         #
- * # Copyright (C) 2011 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2011 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25302,7 +25312,7 @@ DLL_EXPORT const char *kto_check_encoding_str(int mode)
  * #    0: Flag abfragen, nicht verändern                                    #
  * #   -1: Flag löschen, Speicher der raw-Daten freigeben                    #
  * #                                                                         #
- * # Copyright (C) 2011 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2011 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25339,7 +25349,7 @@ DLL_EXPORT int keep_raw_data(int mode)
  * # Diese Funktion konvertiert einen gelesenen LUT-Block in die gewünschte  #
  * # Kodierung. Der ursprünglich allokierte Speicher wird wieder freigegeben.#
  * #                                                                         #
- * # Copyright (C) 2011 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2011 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25797,7 +25807,7 @@ DLL_EXPORT const char *pz2str(int pz,int *ret)
       default:   return "???";
    }
 }
-#line 23638 "perl/Business-KontoCheck/konto_check.lxx"
+#line 23641 "konto_check.lxx"
 
 /* Funktion lut_keine_iban_berechnung() +§§§1 */
 /*
@@ -25922,7 +25932,7 @@ DLL_EXPORT int lut_keine_iban_berechnung(char *iban_blacklist,char *lutfile,int 
  * #                anderer Wert: nur Abfrage des Status                     #
  * # Rückgabe:      aktueller Status des Flags                               #                                                               #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25946,7 +25956,7 @@ DLL_EXPORT int pz_aenderungen_enable(int set)
  * #    txt:        Textvariable                                             #
  * #    i:          Integervariable (4 Byte)                                 #
  * #                                                                         #
- * # Copyright (C) 2006 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2006 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -25961,7 +25971,7 @@ DLL_EXPORT char *kto_check_test_vars(char *txt,UINT4 i)
 #endif
 
 
-#line 23802 "perl/Business-KontoCheck/konto_check.lxx"
+#line 23805 "konto_check.lxx"
 /* Funktionen *_id() +§§§1 */
 /* ###########################################################################
  * # Die folgenden Funktionen sind die id-Varianten von Funktionen, die      #
@@ -25975,7 +25985,7 @@ DLL_EXPORT char *kto_check_test_vars(char *txt,UINT4 i)
  * # Da der Aufruf für jede Funktionsgruppe gleich ist, wird er per Makro    #
  * # gemacht.                                                                #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
    /* numerische Rückgabewerte in eine id umwandeln */
@@ -26118,7 +26128,7 @@ DLL_EXPORT int current_lutfile_name_id(int *set,int *level,int *retval)
  * # den etwas eigenwilligen (Schleich-)Weg über IntPtr nehmen, damit der    #
  * # Speicher wieder freigegeben werden kann...                              #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -26136,7 +26146,7 @@ DLL_EXPORT int current_lutfile_name_id(int *set,int *level,int *retval)
  * # von kc_id_free() wird es auch nicht gelöscht, der Funktionsaufruf gibt  #
  * # nur OK zurück, ohne etwas zu tun.                                       #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -26180,7 +26190,7 @@ static int kc_ptr2id(char *ptr,int *handle,int release_mem)
  * # Diese Funktion gibt den Pointer zu einem Handle zurück. Dieser Wert     #
  * # kann dann als String-Pointer in den DLL-Routinen verwendet werden.      #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -26201,7 +26211,7 @@ DLL_EXPORT char *kc_id2ptr(int handle,int *retval)
  * # Diese Funktion gibt den Speicher, der zu einem Handle gehört, wieder    #
  * # frei und setzt den entsprechenden Slot-Eintrag auf NULL.                #
  * #                                                                         #
- * # Copyright (C) 2014 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2014 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -26225,7 +26235,7 @@ DLL_EXPORT int kc_id_free(int handle)
  * # cmp_bic() ist die Vergleichsfunktion für bic_binsearch() und            #
  * # lut_write_scl_blocks() (zum Sortieren der BICs).                        #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 static int cmp_bic(const void *ap,const void *bp)
@@ -26245,7 +26255,7 @@ static int cmp_bic(const void *ap,const void *bp)
  * # Die Funktion bic_binsearch() implementiert eine binäre Suche im         #
  * # BIC-Array (rekursiv)                                                    #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 static int bic_binsearch(int links,int rechts,char *bic)
@@ -26270,10 +26280,18 @@ static int bic_binsearch(int links,int rechts,char *bic)
  * # letzten Stellen existiert (Extension BIC); falls dieser auch nicht      #
  * # existiert, wird als Letztes ein 8-stelliger BIC gesucht (Wildcard-BIC). #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Der zusätzliche Parameter raw wurde eingeführt, da bei den Flags        #
+ * # öfters bei 11-stelligen BICs nicht die richtigen Flags angegeben sind   #
+ * # (bei den zugehörigen Wildcard-BICs (8-stellig) sind mehr Optionen       #
+ * # gesetzt), wie z.B. bei WELADEDLLEV oder DEUTDEDBPAL. Falls als erstes   #
+ * # Zeichen der BIC ein ! übergeben wird, werden die originalen Flags       #
+ * # zurückgegeben, andernfalls die "richtigen". So ist die Rückgabe von     #
+ * # DEUTDEDBPAL z.B. 11011, von !DEUTDEDBPAL jedoch 10000.                  #
+ * #                                                                         #
+ * # Copyright (C) 2018, 2023 Michael Plugge <konto_check@yahoo.com>         #
  * ###########################################################################
  */
-static int scl_idx(const char *bic,int *retval)
+static int scl_idx(const char *bic,int *retval,int *raw)
 {
    char such_bic[12];
    int i,idx;
@@ -26282,7 +26300,14 @@ static int scl_idx(const char *bic,int *retval)
       if(retval)*retval=NO_SCL_BLOCKS_LOADED;
       return -1;
    }
-   strcpy(such_bic,bic);
+   if(*bic=='!'){
+      *raw=1;
+      strcpy(such_bic,bic+1);
+   }
+   else{
+      *raw=0;
+      strcpy(such_bic,bic);
+   }
    for(i=0;i<11 && such_bic[i];i++)such_bic[i]=toupper(such_bic[i]);
 
    /*
@@ -26305,6 +26330,9 @@ static int scl_idx(const char *bic,int *retval)
     *
     * Punkt 2 hat eine höhere Priorität als Punkt 1, denn eine 8-stellige BIC ist mit selbiger
     * um 'XXX' erweiterten BIC identisch.
+    *
+    * (Update April 23: das gilt wohl doch nicht so ganz, zumindest nicht bei den Flags...
+    * - die Flags werden jetzt vom Eintrag und dem Wildcard kombiniert)
     *
     */
 
@@ -26357,21 +26385,22 @@ static int scl_idx(const char *bic,int *retval)
  * # direkter Download-Link:                                                 #
  * #    https://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/SEPA/verzeichnis_der_erreichbaren_zahlungsdienstleister.csv?__blob=publicationFile
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
 {
-   char c,*ptr,buffer[512],*scl_name_block_s,*scl_bic_block_s,*scl_flags_block_s,*ptr1,*ptr2,*ptr3;
+   char c,*ptr,buffer[512],buffer2[128],*scl_name_block_s,*scl_bic_block_s,
+        *scl_flags_block_s,*scl_flags_block_o,*ptr1,*ptr2,*ptr3,*ptr4,*base_ptr="";
    char scl_gueltigkeit[16],scl_gueltigkeit_iso[16];
-   int cnt,i,rv,j,*iptr,jahr,monat,tag;
+   int cnt,i,j,rv,*iptr,jahr,monat,tag,f1,f2,f3,f4,f5;
    FILE *in,*lut;
    struct stat stat_buffer;
    struct tm z;
    time_t ts;
 
    if(!(in=fopen(inputfile,"r")))RETURN(FILE_READ_ERROR);
-   fgets(buffer,512,in);
+   if(!fgets(buffer,512,in))RETURN(SCL_INPUT_FORMAT_ERROR);
    if(strncmp(buffer,"Gueltig ab / valid from ",24))return SCL_INPUT_FORMAT_ERROR;
    for(ptr=buffer;!isdigit(*ptr);ptr++);
    strncpy(scl_gueltigkeit,ptr,16);
@@ -26385,26 +26414,31 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    z.tm_mon=monat;
    z.tm_year=jahr-1900;
    ts=mktime(&z);
-   snprintf(scl_gueltigkeit_iso,16,"%4d-%02d-%02d",jahr,monat,tag);
-   fgets(buffer,512,in);
-   if(strncmp(buffer,"BIC;Name;Service SCT;Service SDD;Service COR1;Service B2B;Service SCC",69))RETURN(SCL_INPUT_FORMAT_ERROR);
-
+   snprintf(scl_gueltigkeit_iso,16,"%4d-%02d-%02d",jahr%10000,monat%100,tag%100);
+   if(!fgets(buffer,512,in))RETURN(SCL_INPUT_FORMAT_ERROR);
+      /* Leerzeichen aus dem Überschrift-String entfernen */
+   for(ptr=buffer,ptr2=buffer2;*ptr;ptr++)if(!isspace(*ptr))*ptr2++=*ptr;
+   if(strncmp(buffer2,"BIC;Name;SERVICESCT;SERVICECOR;SERVICECOR1;SERVICEB2B;SERVICESCC",64))RETURN(SCL_INPUT_FORMAT_ERROR);
    stat(inputfile,&stat_buffer);
-   cnt=stat_buffer.st_size/163+100;    /* etwas großzügig die Anzahl rechnen */
+
+   cnt=stat_buffer.st_size/163+300;    /* etwas großzügig die Anzahl rechnen; jede Zeile hat 163 Bytes und ist am Ende mit Leerzeichen aufgefüllt */
 
    scl_bic_array=(char **)calloc(sizeof(char*),cnt);
    scl_name_array=(char **)calloc(sizeof(char*),cnt);
    scl_flags_array=(char **)calloc(sizeof(char*),cnt);
+   scl_flags_array_o=(char **)calloc(sizeof(char*),cnt);
 
    scl_bic_block=ptr1=(char *)calloc(12,cnt);
    scl_name_block=ptr2=(char *)calloc(150,cnt);
    scl_flags_block=ptr3=(char *)calloc(6,cnt);
+   scl_flags_block_orig=ptr4=(char *)calloc(6,cnt);
 
    /* SCL-Datei einlesen */
    for(cnt=0;fgets(buffer,512,in);){
       scl_bic_array[cnt]=ptr1;
       scl_name_array[cnt]=ptr2;
       scl_flags_array[cnt]=ptr3;
+      scl_flags_array_o[cnt]=ptr4;
       cnt++;
       for(ptr=buffer;*ptr!=';' && !isspace(*ptr);*ptr1++=*ptr++);
       c=*ptr;
@@ -26419,12 +26453,12 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
       ptr2++;
 
       /* ptr steht nun auf den Flags */
-      *ptr3++=*ptr;
-      *ptr3++=*(ptr+2);
-      *ptr3++=*(ptr+4);
-      *ptr3++=*(ptr+6);
-      *ptr3++=*(ptr+8);
-      *ptr3++=0;
+      *ptr4++=*ptr3++=*ptr;
+      *ptr4++=*ptr3++=*(ptr+2);
+      *ptr4++=*ptr3++=*(ptr+4);
+      *ptr4++=*ptr3++=*(ptr+6);
+      *ptr4++=*ptr3++=*(ptr+8);
+      *ptr4++=*ptr3++=0;
    }
    fclose(in);
 
@@ -26435,34 +26469,89 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    /* vor dem Abspeichern der Blocks nach BICs sortieren */
    qsort(iptr,cnt,sizeof(int),cmp_bic);
 
+      /* Auszug aus dem SCL-Merkblatt:
+       * Das SCL-Directory enthält elfstellige und achtstellige BICs. Dabei gilt:
+       *
+       * - Ein achtstelliger BIC ist eine sog. Wildcard und repräsentiert die Erreichbarkeit eines
+       *   jeden elfstelligen BICs mit identischen ersten acht Stellen sowie die Erreichbarkeit
+       *   des achtstelligen BICs selbst.
+       *
+       * - Ein elfstelliger BIC mit der Branch Code Extension XXX repräsentiert sich selbst
+       *   sowie die Erreichbarkeit des zugehörigen achtstelligen BICs. Er stellt jedoch keine
+       *   Wildcard dar.
+       *
+       * - Alle übrigen elfstelligen BICs repräsentieren ausschließlich die Erreichbarkeit des
+       *   jeweiligen einzelnen elfstelligen BICs.
+       *
+       * Ein Zahlungsdienstleister, der mit einer Wildcard im SCL-Directory ausgewiesen wird, muss
+       * Zahlungen für alle denkbaren elfstelligen BICs, die durch die Wildcard repräsentiert werden,
+       * aufnehmen.
+       *
+       * D.h., bei 11-stelligen BICs, zu denen eine 8-stellige Wildcard-BIC existiert, sind die Flags
+       * aus beiden Varianten zu kombinieren. Beispiel:
+       *
+       * WELADEDL;SPARKASSE LEVERKUSEN;1;1;0;1;1                                                                                                                                                                 
+       * WELADEDLLEV;SPARKASSE LEVERKUSEN;1;0;0;0;0                                                                                                                                                              
+       *
+       * Die resultierenden Flags für WELADEDLLEV werden aus den beiden BICs zusammengesetzt zu 1;1;0;1;1
+       *
+       * Um das Verhalten auch für ältere Installationen von konto_check zu implementieren, wird in die LUT-Datei
+       * ein Block mit den resultierenden Flags als SCL Flags (ID 31) geschrieben; die Original-Version findet sich
+       * als ID 32 mit der Bezeichnung SCL Flags orig, und wird von äteren Installationen ignoriert.
+       *
+       * Von der Problematik betroffen sind in der aktuellen Datei (Stand April 2023) 68 BICs, davon 8 deutsche.
+       */
+
+   f1=f2=f3=f4=f5=0;
    ptr1=scl_bic_block_s=(char *)calloc(1,ptr1-scl_bic_block+16);
    ptr2=scl_name_block_s=(char *)calloc(1,ptr2-scl_name_block+16);
    ptr3=scl_flags_block_s=(char *)calloc(1,ptr3-scl_flags_block+16);
+   ptr4=scl_flags_block_o=(char *)calloc(1,ptr4-scl_flags_block_orig+16);
    for(i=0;i<cnt;i++){
       j=iptr[i];
       for(ptr=scl_bic_array[j];(*ptr1++=*ptr++););
       for(ptr=scl_name_array[j];(*ptr2++=*ptr++););
       for(ptr=scl_flags_array[j];(*ptr3++=*ptr++););
+      if(strlen(scl_bic_array[j])==8){
+         base_ptr=scl_bic_array[j];   /* 8-stelliger BIC, Flags merken */
+         f1=*(scl_flags_array[j]+0)-'0';
+         f2=*(scl_flags_array[j]+1)-'0';
+         f3=*(scl_flags_array[j]+2)-'0';
+         f4=*(scl_flags_array[j]+3)-'0';
+         f5=*(scl_flags_array[j]+4)-'0';
+      }
+      if(!strncmp(scl_bic_array[j],base_ptr,8)){
+         ptr=scl_flags_array_o[j];
+         if(*ptr++=='1' || f1)*ptr4++='1'; else *ptr4++='0';
+         if(*ptr++=='1' || f2)*ptr4++='1'; else *ptr4++='0';
+         if(*ptr++=='1' || f3)*ptr4++='1'; else *ptr4++='0';
+         if(*ptr++=='1' || f4)*ptr4++='1'; else *ptr4++='0';
+         if(*ptr++=='1' || f5)*ptr4++='1'; else *ptr4++='0';
+         *ptr4++=0;
+      }
+      else
+         for(ptr=scl_flags_array_o[j];(*ptr4++=*ptr++););
    }
    free(iptr);
 
    if(!(lut=fopen(lutfile,"rb+")))RETURN(FILE_WRITE_ERROR);
 
       /* zunächst mal testen ob es auch eine LUT2 Datei ist */
-   if(!(ptr=fgets(buffer,SLOT_BUFFER,lut)))RETURN(FILE_READ_ERROR);
+   if(!(ptr=fgets(buffer,512,lut)))RETURN(FILE_READ_ERROR);
    while(*ptr && *ptr!='\n')ptr++;
    *--ptr=0;
    if(!strcmp(buffer,"BLZ Lookup Table/Format 1."))RETURN(LUT1_FILE_USED); /* alte LUT-Datei */
    if(strcmp(buffer,"BLZ Lookup Table/Format 2."))RETURN(INVALID_LUT_FILE); /* keine LUT-Datei */
 
       /* nun die Blocks schreiben */
-   rewind(lut);
-   sprintf(buffer,"cnt: %d, TS: %ld, Gueltigkeit: %s %s",cnt,(long)ts,scl_gueltigkeit,scl_gueltigkeit_iso);
+   rewind(lut);   /* Info schreiben daß korrigierte Flags */
+   sprintf(buffer,"cnt: %d, TS: %ld, Gueltigkeit: %s %s korrigiert",cnt,(long)ts,scl_gueltigkeit,scl_gueltigkeit_iso);
    if((rv=write_lut_block_int(lut,LUT2_SCL_INFO,strlen(buffer)+1,buffer))!=OK){
       fclose(lut);
       FREE(scl_bic_block_s);
       FREE(scl_name_block_s);
       FREE(scl_flags_block_s);
+      FREE(scl_flags_block_o);
       RETURN(rv);
    }
    if((rv=write_lut_block_int(lut,LUT2_SCL_BIC,(UINT4)(ptr1-scl_bic_block_s+1),scl_bic_block_s))!=OK){
@@ -26470,6 +26559,7 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
       FREE(scl_bic_block_s);
       FREE(scl_name_block_s);
       FREE(scl_flags_block_s);
+      FREE(scl_flags_block_o);
       RETURN(rv);
    }
    if((rv=write_lut_block_int(lut,LUT2_SCL_NAME,(UINT4)(ptr2-scl_name_block_s+1),scl_name_block_s))!=OK){
@@ -26477,13 +26567,23 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
       FREE(scl_bic_block_s);
       FREE(scl_name_block_s);
       FREE(scl_flags_block_s);
+      FREE(scl_flags_block_o);
       RETURN(rv);
    }
-   if((rv=write_lut_block_int(lut,LUT2_SCL_FLAGS,(UINT4)(ptr3-scl_flags_block_s+1),scl_flags_block_s))!=OK){
+   if((rv=write_lut_block_int(lut,LUT2_SCL_FLAGS,(UINT4)(ptr4-scl_flags_block_o+1),scl_flags_block_o))!=OK){
       fclose(lut);
       FREE(scl_bic_block_s);
       FREE(scl_name_block_s);
       FREE(scl_flags_block_s);
+      FREE(scl_flags_block_o);
+      RETURN(rv);
+   }
+   if((rv=write_lut_block_int(lut,LUT2_SCL_FLAGS_ORIG,(UINT4)(ptr3-scl_flags_block_s+1),scl_flags_block_s))!=OK){
+      fclose(lut);
+      FREE(scl_bic_block_s);
+      FREE(scl_name_block_s);
+      FREE(scl_flags_block_s);
+      FREE(scl_flags_block_o);
       RETURN(rv);
    }
 
@@ -26491,26 +26591,27 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    FREE(scl_bic_block_s);
    FREE(scl_name_block_s);
    FREE(scl_flags_block_s);
+   FREE(scl_flags_block_o);
    RETURN(OK);
 }
 
-#line 24335 "perl/Business-KontoCheck/konto_check.lxx"
+#line 24429 "konto_check.lxx"
 /* Funktion lut_scl_init() +§§§3 */
 /* ###########################################################################
  * # Die Funktion lut_scl_init() liest die SCL-Blocks aus einer LUT-Datei    #
  * # und initialisiert die zugehörigen internen Datenstrukturen.             #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_init(char *lut_name)
 {
    char *ptr,*end;
    int i,cnt,rv;
-   static UINT4 block_size_0,block_size_1,block_size_2,block_size_3;
+   static UINT4 block_size_0,block_size_1,block_size_2,block_size_3,block_size_4;
    FILE *lut;
 
-   if(scl_bic_array && scl_name_array && scl_flags_array)return OK;  /* schon initialisiert */
+   if(scl_bic_array && scl_name_array && scl_flags_array && scl_flags_array_o)return OK;  /* schon initialisiert */
 
    if(!(lut=fopen(lut_name,"rb")))RETURN(FILE_READ_ERROR);
    if((rv=read_lut_block_int(lut,0,LUT2_SCL_INFO,&block_size_0,&scl_info_block))<0){
@@ -26541,6 +26642,15 @@ DLL_EXPORT int lut_scl_init(char *lut_name)
       else
          return rv;
    }
+   if((rv=read_lut_block_int(lut,0,LUT2_SCL_FLAGS_ORIG,&block_size_4,&scl_flags_block_orig))<0){
+         /* hier retval<0 ignorieren, denn bei alten LUT_Dateien ist der Block nicht enthalten.
+          * In dem Fall kann der Block durch den Block LUT2_SCL_FLAGS ersetzt werden. Die BIC Flags
+          * sind in dem Fall dann nicht korrigiert. Lohnt sich nicht, das hier zu machen, da die
+          * LUT-Dateien die mit dieser Version erzeugt werden, den Block enthalten.
+          */
+      scl_flags_block_orig=scl_flags_block;
+      block_size_4=block_size_3;
+   }
    fclose(lut);
    if((i=sscanf(scl_info_block,"cnt: %d, TS: %ld, Gueltigkeit: %15s %15s",
                &cnt,&scl_ts,(char *)&scl_gueltigkeit,(char *)&scl_gueltigkeit_iso))!=4)RETURN(INVALID_SCL_INFO_BLOCK);
@@ -26548,6 +26658,7 @@ DLL_EXPORT int lut_scl_init(char *lut_name)
    scl_bic_array=(char **)calloc(sizeof(char*),cnt);
    scl_name_array=(char **)calloc(sizeof(char*),cnt);
    scl_flags_array=(char **)calloc(sizeof(char*),cnt);
+   scl_flags_array_o=(char **)calloc(sizeof(char*),cnt);
 
    for(i=0,ptr=scl_bic_block,end=scl_bic_block+block_size_1;i<cnt && ptr<end;i++){
       scl_bic_array[i]=ptr;
@@ -26563,6 +26674,11 @@ DLL_EXPORT int lut_scl_init(char *lut_name)
       scl_flags_array[i++]=ptr;
       while(*ptr++ && ptr<end);
    }
+
+   for(i=0,ptr=scl_flags_block_orig,end=scl_flags_block_orig+block_size_4;i<cnt && ptr<end;){
+      scl_flags_array_o[i++]=ptr;
+      while(*ptr++ && ptr<end);
+   }
    scl_cnt=cnt;
    RETURN(OK);
 }
@@ -26572,7 +26688,7 @@ DLL_EXPORT int lut_scl_init(char *lut_name)
  * # Die Funktion lut_scl_info() gibt Infos über die Anzahl der Einträge im  #
  * # SCL-Verzeichnis sowie das Datum, ab wann die Datei gültig ist.          #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_info(char *lutfile,int *cnt,const char **gueltigkeit,const char **gueltigkeit_iso)
@@ -26608,16 +26724,16 @@ DLL_EXPORT int lut_scl_info(char *lutfile,int *cnt,const char **gueltigkeit,cons
  * # Die Funktion lut_scl_multi() gibt alle Einträge des SCL-Verzeichnisses  #
  * # zu einem gegebenen BIC zurück.                                          #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_multi(char *bic,const char **scl_flags,const char **used_bic,const char **scl_name)
 {
-   int i,rv;
+   int i,rv,raw;
 
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0)return rv;
-   if(scl_flags)*scl_flags=scl_flags_array[i];
+   if(scl_flags)*scl_flags=raw?scl_flags_array_o[i]:scl_flags_array[i];
    if(used_bic)*used_bic=scl_bic_array[i];
    if(scl_name)*scl_name=scl_name_array[i];
    return rv;
@@ -26630,15 +26746,15 @@ DLL_EXPORT int lut_scl_multi(char *bic,const char **scl_flags,const char **used_
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_sct(char *bic,int *retval)
 {
    char *flags;
-   int i,rv;
+   int i,rv,raw;
 
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26656,15 +26772,15 @@ DLL_EXPORT int lut_scl_sct(char *bic,int *retval)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_sdd(char *bic,int *retval)
 {
    char *flags;
-   int i,rv;
+   int i,rv,raw;
 
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26683,15 +26799,15 @@ DLL_EXPORT int lut_scl_sdd(char *bic,int *retval)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_cor1(char *bic,int *retval)
 {
    char *flags;
-   int i,rv;
+   int i,rv,raw;
 
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26709,15 +26825,15 @@ DLL_EXPORT int lut_scl_cor1(char *bic,int *retval)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_b2b(char *bic,int *retval)
 {
    char *flags;
-   int i,rv;
+   int i,rv,raw;
 
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26735,15 +26851,15 @@ DLL_EXPORT int lut_scl_b2b(char *bic,int *retval)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_scc(char *bic,int *retval)
 {
    char *flags;
-   int i,rv;
+   int i,rv,raw;
 
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26761,17 +26877,17 @@ DLL_EXPORT int lut_scl_scc(char *bic,int *retval)
  * # einen BIC umgewandelt werden muß, müssen auch die Blocks BLZ und BIC    #
  * # der LUT-Datei initialisiert sein, sonst wird ein Fehler zurückgegeben.  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_multi_blz(char *blz,const char **scl_flags,const char **used_bic,const char **scl_name)
 {
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic(blz,0,&rv);
    if(rv<0)return rv;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0)return rv;
    if(scl_flags)*scl_flags=scl_flags_array[i];
    if(used_bic)*used_bic=scl_bic_array[i];
@@ -26786,14 +26902,14 @@ DLL_EXPORT int lut_scl_multi_blz(char *blz,const char **scl_flags,const char **u
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_sct_blz(char *blz,int *retval,const char **used_bic)
 {
    char *flags;
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic(blz,0,&rv);
    if(rv<0){
@@ -26802,7 +26918,7 @@ DLL_EXPORT int lut_scl_sct_blz(char *blz,int *retval,const char **used_bic)
    }
    else
       if(retval)*retval=OK;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26821,14 +26937,14 @@ DLL_EXPORT int lut_scl_sct_blz(char *blz,int *retval,const char **used_bic)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_sdd_blz(char *blz,int *retval,const char **used_bic)
 {
    char *flags;
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic(blz,0,&rv);
    if(rv<0){
@@ -26837,7 +26953,7 @@ DLL_EXPORT int lut_scl_sdd_blz(char *blz,int *retval,const char **used_bic)
    }
    else
       if(retval)*retval=OK;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26857,14 +26973,14 @@ DLL_EXPORT int lut_scl_sdd_blz(char *blz,int *retval,const char **used_bic)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_cor1_blz(char *blz,int *retval,const char **used_bic)
 {
    char *flags;
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic(blz,0,&rv);
    if(rv<0){
@@ -26873,7 +26989,7 @@ DLL_EXPORT int lut_scl_cor1_blz(char *blz,int *retval,const char **used_bic)
    }
    else
       if(retval)*retval=OK;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26892,14 +27008,14 @@ DLL_EXPORT int lut_scl_cor1_blz(char *blz,int *retval,const char **used_bic)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_b2b_blz(char *blz,int *retval,const char **used_bic)
 {
    char *flags;
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic(blz,0,&rv);
    if(rv<0){
@@ -26908,7 +27024,7 @@ DLL_EXPORT int lut_scl_b2b_blz(char *blz,int *retval,const char **used_bic)
    }
    else
       if(retval)*retval=OK;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26927,14 +27043,14 @@ DLL_EXPORT int lut_scl_b2b_blz(char *blz,int *retval,const char **used_bic)
  * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
  * # entsprechende Fehlercode (<0) gesetzt.                                  #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_scc_blz(char *blz,int *retval,const char **used_bic)
 {
    char *flags;
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic(blz,0,&rv);
    if(rv<0){
@@ -26943,7 +27059,7 @@ DLL_EXPORT int lut_scl_scc_blz(char *blz,int *retval,const char **used_bic)
    }
    else
       if(retval)*retval=OK;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0){
       if(retval)*retval=rv;
       return -1;
@@ -26960,17 +27076,17 @@ DLL_EXPORT int lut_scl_scc_blz(char *blz,int *retval,const char **used_bic)
  * # Diese Funktion entspricht der Funktion lut_scl_multi_blz(), nur wird    #
  * # die BLZ als Integer-Wert statt als String übergeben.                    #
  * #                                                                         #
- * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2018 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 DLL_EXPORT int lut_scl_multi_blz_i(int blz,const char **scl_flags,const char **used_bic,const char **scl_name)
 {
    const char *bic;
-   int i,rv;
+   int i,rv,raw;
 
    bic=lut_bic_i(blz,0,&rv);
    if(rv<0)return rv;
-   i=scl_idx(bic,&rv);
+   i=scl_idx(bic,&rv,&raw);
    if(rv<0)return rv;
    if(scl_flags)*scl_flags=scl_flags_array[i];
    if(used_bic)*used_bic=scl_bic_array[i];

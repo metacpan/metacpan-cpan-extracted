@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.018;
+use 5.022000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Diff spreadsheets (or CSVs) showing changed cells",
+  "ABSTRACT" => "Diff spreadsheets or CSVs showing changed cells",
   "AUTHOR" => "Jim Avera",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,12 +17,12 @@ my %WriteMakefileArgs = (
     "bin/diff_spreadsheets"
   ],
   "LICENSE" => "unrestricted",
-  "MIN_PERL_VERSION" => "5.018",
+  "MIN_PERL_VERSION" => "5.022000",
   "NAME" => "App::diff_spreadsheets",
   "PREREQ_PM" => {
     "Algorithm::Diff" => 0,
     "Carp" => 0,
-    "Data::Dumper::Interp" => "5.010",
+    "Data::Dumper::Interp" => "5.022",
     "Encode" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
@@ -37,11 +37,12 @@ my %WriteMakefileArgs = (
     "PerlIO" => 0,
     "Pod::Find" => 0,
     "Pod::Usage" => 0,
-    "Spreadsheet::Edit" => "3.005",
+    "Scalar::Util" => 0,
+    "Spreadsheet::Edit" => "3.010",
     "Spreadsheet::Edit::IO" => 0,
     "Term::ReadKey" => 0,
+    "constant" => 0,
     "feature" => 0,
-    "lib" => 0,
     "open" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -55,16 +56,20 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "File::Spec" => 0,
     "File::Temp" => "0.23",
+    "File::Which" => 0,
     "Import::Into" => 0,
-    "Scalar::Util" => 0,
-    "Test::More" => "0.98",
+    "POSIX" => 0,
+    "Path::Tiny" => 0,
+    "Test2::Plugin::BailOnFail" => 0,
+    "Test2::V0" => 0,
     "Time::HiRes" => 0,
     "autovivification" => 0,
     "indirect" => 0,
+    "lib" => 0,
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,7 +82,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
-  "Data::Dumper::Interp" => "5.010",
+  "Data::Dumper::Interp" => "5.022",
   "Encode" => 0,
   "English" => 0,
   "Exporter" => 0,
@@ -87,22 +92,27 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "File::Temp" => "0.23",
+  "File::Which" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
   "Guard" => 0,
   "Import::Into" => 0,
   "List::MoreUtils" => 0,
   "List::Util" => 0,
+  "POSIX" => 0,
+  "Path::Tiny" => 0,
   "PerlIO" => 0,
   "Pod::Find" => 0,
   "Pod::Usage" => 0,
   "Scalar::Util" => 0,
-  "Spreadsheet::Edit" => "3.005",
+  "Spreadsheet::Edit" => "3.010",
   "Spreadsheet::Edit::IO" => 0,
   "Term::ReadKey" => 0,
-  "Test::More" => "0.98",
+  "Test2::Plugin::BailOnFail" => 0,
+  "Test2::V0" => 0,
   "Time::HiRes" => 0,
   "autovivification" => 0,
+  "constant" => 0,
   "feature" => 0,
   "indirect" => 0,
   "lib" => 0,

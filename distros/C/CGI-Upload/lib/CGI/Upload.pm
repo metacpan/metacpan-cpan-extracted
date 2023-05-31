@@ -15,7 +15,7 @@ require Exporter;
 @ISA = qw/ Exporter /;
 @EXPORT_OK = qw/ file_handle file_name file_type mime_magic mime_type query /;
 
-$VERSION = '1.11';
+$VERSION = '1.13';
 
 
 sub AUTOLOAD {
@@ -66,7 +66,7 @@ sub _handle_file {
     $client_os = 'MSWin32' if $browser->windows;
     $client_os = 'MacOS' if $browser->mac;
     fileparse_set_fstype($client_os);
-    my @file = fileparse( $cgi->param( $param ), '\.[^.]*' );
+    my @file = fileparse( scalar($cgi->param( $param )), '\.[^.]*' );
 
     #   Return an undefined value if the file name cannot be parsed from the 
     #   file field form parameter.

@@ -46,16 +46,26 @@ if (open my $fh, ">", $tf) {
     is   ($d->{status}, -2,			"Status");
     like ($d->{reason}, qr{malformed JSON},	"Error");
 
-    my $is_linux = $^O eq "linux";
-    chmod 006, $tf;
-    $r->get ($tf);
-    ok   ($r->get ($tf),			"Get unreadable");
-    ok   ($d = $r->diag,			"Get diagnostics");
-    is   ($d->{action}, "get",			"Action get");
-    is   ($d->{source}, $tf,			"Source");
-    is   ($d->{status}, 13,			"Status")	if $is_linux;
-    like ($d->{reason}, qr{denied},		"Error")	if $is_linux;
+    if ($> && $^O eq "linux") {	# Useless test for root
+	chmod 006, $tf;
+	$r->get ($tf);
+	ok   ($r->get ($tf),			"Get unreadable");
+	ok   ($d = $r->diag,			"Get diagnostics");
+	is   ($d->{action}, "get",		"Action get");
+	is   ($d->{source}, $tf,		"Source");
+	is   ($d->{status}, 13,			"Status");
+	like ($d->{reason}, qr{denied},		"Error");
+	}
     }
 unlink $tf;
+
+# Force a bad URL
+$r->{url} = "https://foo.bar.cve.google.org/wibletrog/ipa$$/cve";
+$r->get ("2021-12232"); # Number doesn't matter
+ok   ($d = $r->diag,				"Diag on a bad URL");
+is   ($d->{action}, "get",					"Action get");
+is   ($d->{source}, "$r->{url}/CVE-2021-12232",			"Source");
+is   ($d->{status}, 599,					"Status");
+like ($d->{reason}, qr{^Internal Exception: Could not connect},	"Error");
 
 done_testing;

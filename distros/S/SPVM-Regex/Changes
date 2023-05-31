@@ -1,3 +1,9 @@
+0.242001 2023-05-29
+  [Prerequirement Changes]
+    * SPVM 0.986+ is required.
+0.242 2023-05-26
+  [New Features]
+    * The match field is added to the Regex::ReplaceInfo class.
 0.241002 2023-05-08
   [Prerequirement Changes]
     * SPVM 0.973+ is required.

@@ -3,7 +3,7 @@ package OpenAIGPT4;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 # ABSTRACT: Interact with the OpenAI GPT-4 API
 
@@ -14,11 +14,11 @@ use JSON;
 
 =head1 NAME
 
-OpenAIGPT4 - Interact with the OpenAI GPT-4 API
+OpenAIGPT4 - Interact with the OpenAI GPT-3,4 API
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ Version 0.11
 
 =head1 DESCRIPTION
 
-This module provides a Perl interface to the OpenAI GPT-4 API. It currently supports generating text given a prompt.
+OpenAIGPT4 is a Perl module that enables developers to interface with the OpenAI GPT-3,4 API. With this module, you can easily generate natural language text.
 
 =head1 METHODS
 
@@ -42,9 +42,9 @@ This constructor returns a new OpenAIGPT4 object. You must pass your OpenAI API 
 
 =head2 generate_text
 
-    my $response = $gpt->generate_text('Hello, how are you?');
+    my $response = $gpt->generate_text('Hello, how are you?', 'gpt-4');
 
-This method generates text given a prompt. The argument should be a string containing the prompt. It returns the generated text.
+This method generates text given a prompt. The first argument should be a string containing the prompt. The second argument is optional and can be used to specify the model to be used for the generation. If no model is specified, it defaults to 'gpt-3.5-turbo'. It returns the generated text.
 
 =head1 AUTHOR
 
@@ -61,12 +61,6 @@ This program is free software; you can redistribute it and/or modify it under th
     use OpenAIGPT4;
 
     my $gpt = OpenAIGPT4->new('<your_api_key>');
-    my $response = $gpt->generate_text('Hello, how are you?');
-    print $response;
-
-    # Or for a more interactive example:
-
-    my $gpt4 = OpenAIGPT4->new('<your_api_key>');
     print "ChatGPT: Hello! Let's start a conversation.\n";
 
     while (1) {
@@ -75,7 +69,7 @@ This program is free software; you can redistribute it and/or modify it under th
         chomp $user_input;
 
         # Send the user's input to the API and receive a response
-        my $response = $gpt4->generate_text($user_input);
+        my $response = $gpt->generate_text($user_input);
 
         # Display the response
         print "ChatGPT: $response\n";

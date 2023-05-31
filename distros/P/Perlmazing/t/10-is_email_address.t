@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 33;
-use Perlmazing;
+use Perlmazing qw(numeric is_email_address);
 
 my $cases = {
 	'!def!xyz%abc@example.com'										=> 1,

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
+use DateTime ();
 use Test2::V0;
-use TOML::Tiny;
-use DateTime::Format::RFC3339;
-use DateTime::Format::ISO8601;
+use TOML::Tiny qw(from_toml to_toml);
+use TOML::Tiny::Writer ();
 
 my $src = do{ local $/; <DATA> };
 
@@ -52,6 +52,12 @@ subtest 'oddballs and regressions' => sub{
     is to_toml({a => 'no inf here'}), 'a="no inf here"', '"inf" present in string is string';
     is to_toml({a => 'no nan here'}), 'a="no nan here"', '"nan" present in string is string';
   };
+};
+
+subtest 'to_toml_array' => sub{
+    my @to_toml = [1,2,3];
+    my $toml = TOML::Tiny::Writer::to_toml_array(\@to_toml, {strict => 1});
+    ok($toml, 'no exception in strict mode');
 };
 
 done_testing;

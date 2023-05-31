@@ -44,9 +44,9 @@ class Sys::Socket {
 
   native static method shutdown : int ($sockfd : int, $how : int);
 
-  native static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset = 0 : int);
+  native static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0);
 
-  native static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset = 0 : int);
+  native static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset : int = 0);
 
   native static method getpeername : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen_ref : int*);
 

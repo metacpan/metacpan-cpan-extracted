@@ -30,7 +30,7 @@ class IO::Handle {
   }
   
   # Instance Methods
-  method init : void ($options = undef : object[]) {
+  method init : void ($options : object[] = undef) {
     my $options_h = Hash->new($options);
     
     # Blocking option
@@ -95,7 +95,7 @@ class IO::Handle {
     return Sys::IO->ftruncate($fileno, $legnth);
   }
   
-  method ioctl : int ($request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object) {
+  method ioctl : int ($request : int, $request_arg : object of Byte|Short|Int|Long|Float|Double|object = undef) {
     my $fileno = $self->fileno;
     
     return Sys::Ioctl->ioctl($fileno, $request, $request_arg);
@@ -117,7 +117,7 @@ class IO::Handle {
 
   method getlines : string () { die "Not implemented"; }
 
-  method fcntl : int ($command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object) {
+  method fcntl : int ($command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef) {
     my $fileno = $self->fileno;
     
     return Sys::IO->fcntl($fileno, $command, $command_arg);
@@ -148,15 +148,15 @@ class IO::Handle {
     }
   }
 
-  method write : int ($buffer : string, $length : int, $offset = 0 : int) {
+  method write : int ($buffer : string, $length : int, $offset : int = 0) {
     return $self->syswrite($buffer, $length, $offset);
   }
   
-  method read : int ($buffer : mutable string, $length : int, $offset = 0 : int) {
+  method read : int ($buffer : mutable string, $length : int, $offset : int = 0) {
     return $self->sysread($buffer, $length, $offset);
   }
   
-  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int) { die "Not implemented"; }
+  method syswrite : int ($buffer : string, $length : int, $offset : int = 0) { die "Not implemented"; }
   
-  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int) { die "Not implemented"; }
+  method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0) { die "Not implemented"; }
 }

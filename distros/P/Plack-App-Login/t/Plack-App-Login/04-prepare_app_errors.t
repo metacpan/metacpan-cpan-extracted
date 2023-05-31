@@ -13,8 +13,8 @@ eval {
 		'css' => 'bad',
 	)->to_app;
 };
-is($EVAL_ERROR, "Bad 'CSS::Struct::Output' object.\n",
-	"Bad 'CSS::Struct::Output' object.");
+is($EVAL_ERROR, "Accessor 'css' must be a 'CSS::Struct::Output' object.\n",
+	"Accessor 'css' must be a 'CSS::Struct::Output' object.");
 clean();
 
 # Test.
@@ -23,6 +23,6 @@ eval {
 		'tags' => 'bad',
 	)->to_app;
 };
-is($EVAL_ERROR, "Bad 'Tags::Output' object.\n",
-	"Bad 'Tags::Output' object.");
+is($EVAL_ERROR, "Accessor 'tags' must be a 'Tags::Output' object.\n",
+	"Accessor 'tags' must be a 'Tags::Output' object.");
 clean();

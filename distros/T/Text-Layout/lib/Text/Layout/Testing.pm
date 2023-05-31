@@ -50,6 +50,8 @@ sub _debug_text {
 	       $f->{font}->{weight},
 	       $f->{font}->{size} // $f->{size}) . ")";
 	for ( keys %$f ) {
+	    $f->{$_} = sprintf("%.3f",$f->{$_})
+	      if $_ eq "size" && defined($f->{$_}) && int($f->{$_}) != $f->{$_};
 	    next if defined($f->{$_})
 	      && ! ( !$f->{$_} || /col/ && $f->{$_} eq 'black' );
 	    delete $f->{$_};

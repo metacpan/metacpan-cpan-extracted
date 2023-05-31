@@ -15,18 +15,19 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.2.0
+Version 2.3.0
 
 =cut
 
 BEGIN {
-    $VERSION = '2.2.0';
+    $VERSION = '2.3.0';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
         assert_aoh
         assert_arrayref
         assert_arrayref_nonempty
+        assert_arrayref_of
         assert_cmp
         assert_coderef
         assert_context_nonvoid
@@ -100,7 +101,10 @@ have no excuse to not use them.
 
 =head2 assert_is( $string, $match [,$name] )
 
-Asserts that I<$string> matches I<$match>.
+Asserts that I<$string> is the same string value as I<$match>.
+
+C<undef> is not converted to an empty string. If both strings are
+C<undef>, they match. If only one string is C<undef>, they don't match.
 
 =cut
 
@@ -123,7 +127,9 @@ sub assert_is($$;$) {
 
 =head2 assert_isnt( $string, $unmatch [,$name] )
 
-Asserts that I<$string> does NOT match I<$unmatch>.
+Asserts that I<$string> does NOT have the same string value as I<$unmatch>.
+
+C<undef> is not converted to an empty string.
 
 =cut
 
@@ -144,15 +150,25 @@ sub assert_isnt($$;$) {
 
 =head2 assert_cmp( $x, $op, $y [,$name] )
 
-Asserts that the relation C<$x $op $y> is true. For example:
+Asserts that the relation C<$x $op $y> is true. It lets you know why
+the comparsison failed, rather than simply that it did fail, by giving
+better diagnostics than a plain C<assert()>, as well as showing the
+operands in the stacktrace.
 
-    assert_cmp( $divisor, '!=', 0, 'Divisor must not be zero' );
+Plain C<assert()>:
 
-is the same as:
+    assert( $nitems <= 10, 'Ten items or fewer in the express lane' );
 
-    assert( $divisor != 0, 'Divisor must not be zero' );
+    Assertion (Ten items or fewer in the express lane) failed!
+    Carp::Assert::assert("", "Ten items or fewer in the express lane") called at foo.pl line 12
 
-but with better error reporting.
+With C<assert_cmp()>:
+
+    assert_cmp( $nitems, '<=', 10, 'Ten items or fewer in the express lane' );
+
+    Assertion (Ten items or fewer in the express lane) failed!
+    Failed: 14 <= 10
+    Carp::Assert::More::assert_cmp(14, "<=", 10, "Ten items or fewer in the express lane") called at foo.pl line 11
 
 The following operators are supported:
 
@@ -847,6 +863,51 @@ sub assert_arrayref_nonempty($;$) {
 
     require Carp;
     &Carp::confess( _failure_msg($name) );
+}
+
+
+=head2 assert_arrayref_of( $ref, $type [, $name] )
+
+Asserts that I<$ref> is reference to an array that has at least one
+element in it, and every one of those elements is of type I<$type>.
+
+For example:
+
+    my @users = get_users();
+    assert_arrayref_of( \@users, 'My::User' );
+
+=cut
+
+sub assert_arrayref_of($$;$) {
+    my $ref  = shift;
+    my $type = shift;
+    my $name = shift;
+
+    my $ok;
+    my @why;
+
+    if ( ref($ref) eq 'ARRAY' || (Scalar::Util::blessed( $ref ) && $ref->isa( 'ARRAY' )) ) {
+        if ( scalar @{$ref} > 0 ) {
+            my $n = 0;
+            for my $i ( @{$ref} ) {
+                if ( !( ( Scalar::Util::blessed( $i ) && $i->isa( $type ) ) || (ref($i) eq $type) ) ) {
+                    push @why, "Element #$n is not of type $type";
+                }
+                ++$n;
+            }
+            $ok = !@why;
+        }
+        else {
+            push @why, 'Array contains no elements';
+        }
+    }
+
+    if ( !$ok ) {
+        require Carp;
+        &Carp::confess( _failure_msg($name), @why );
+    }
+
+    return;
 }
 
 

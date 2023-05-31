@@ -10,7 +10,7 @@ String::License - detect source code license statements in a text string
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.5
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ and serializes them in a normalized format.
 
 =cut
 
-package String::License v0.0.4;
+package String::License v0.0.5;
 
 use Carp            qw(croak);
 use Log::Any        ();

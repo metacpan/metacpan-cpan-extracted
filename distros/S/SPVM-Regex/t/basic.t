@@ -22,8 +22,9 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
 # SPVM::Regex
 {
 
-  ok(SPVM::TestCase::Regex->replace_g);
   ok(SPVM::TestCase::Regex->replace);
+  ok(SPVM::TestCase::Regex->replace_g);
+  ok(SPVM::TestCase::Regex->replace_common);
   ok(SPVM::TestCase::Regex->match_start_and_end);
   ok(SPVM::TestCase::Regex->match_capture);
   ok(SPVM::TestCase::Regex->match_char_class_range);

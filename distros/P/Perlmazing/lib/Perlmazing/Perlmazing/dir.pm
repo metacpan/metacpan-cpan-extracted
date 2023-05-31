@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(croak carp isa_code numeric);
 use File::Spec;
 
 sub main {

@@ -5,7 +5,7 @@ vim:tw=80:ft=text:ai
 #                        C-/Perl-Bibliothek                            #
 ########################################################################
 #                                                                      #
-# Autor             : Michael Plugge <m.plugge@hs-mannheim.de>         #
+# Autor             : Michael Plugge <konto_check@yahoo.com>           #
 # Version           : 6.03                                             #
 # Datum             : 13.12.2016                                       #
 #                                                                      #

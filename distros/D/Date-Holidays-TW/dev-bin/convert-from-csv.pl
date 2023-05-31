@@ -11,7 +11,7 @@ Download the one named: 111年中華民國政府行政機關辦公日曆表
 
 After converting that from Big5 to UTF-8, feed it to this program.
 
-    perl ./dev-bin/convert-from-csv.pl  <( piconf -f big5 -t utf8 ~/Downloads/111年 中華民國政府行政機關辦公日曆表.csv )
+    perl ./dev-bin/convert-from-csv.pl  <( piconv -f big5 -t utf8 ~/Downloads/111年 中華民國政府行政機關辦公日曆表.csv )
 
 =cut
 

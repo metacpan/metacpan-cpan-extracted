@@ -169,7 +169,7 @@ EOF
 # Recursive structures
 { my $debug = 0 || $debug;
   my %hash;
-  my @orig_a = (100, \%hash, 900);
+  my @orig_a = (100, \%hash, [1..4]);
   my $x = \@orig_a;
   $hash{aaa} = \$x;
   $hash{bbb} = \$orig_a[2];
@@ -188,12 +188,12 @@ EOF
     note '$aref->[2] = ',Data::Dumper::Interp::_dbrvis($aref->[2]);
     note '$aref->[3] = ',Data::Dumper::Interp::_dbrvis($aref->[3]);
   }
-  is( visnew->Foldwidth(20)->Debug($debug)->vis($aref), do{chomp(local $_=<<'EOF'); $_}, "big recursive structure" );
+  is( visnew->Foldwidth(30)->Debug($debug)->vis($aref), do{chomp(local $_=<<'EOF'); $_}, "big recursive structure" );
 [
   100,
   {
     aaa => \$VAR1,
-    bbb => \900
+    bbb => \[1,2,3,4]
   },
   ${$VAR1->[1]{bbb}},
   \$VAR1->[1],

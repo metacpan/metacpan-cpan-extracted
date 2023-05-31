@@ -1,6 +1,6 @@
 package SPVM::File::Find;
 
-our $VERSION = "0.021";
+our $VERSION = "0.021001";
 
 1;
 
@@ -52,7 +52,7 @@ Gets file names:
 
 =head1 Class Methods
 
-  static method find : void ($cb : File::Find::Handler, $top_dir : string, $options = undef : object[]);
+  static method find : void ($cb : File::Find::Handler, $top_dir : string, $options : object[] = undef);
 
 Iterates each file recursively under the $top_dir and calls the $cb by the file.
 

@@ -25,9 +25,12 @@ WriteMakefile(
 		resources => {
 			repository => {
 				type => 'git',
-				url  => 'http://github.com/szabgab/Web-Feed.git',
-				web  => 'http://github.com/szabgab/Web-Feed',
-			}
+				url  => 'https://github.com/szabgab/Web-Feed.git',
+				web  => 'https://github.com/szabgab/Web-Feed',
+			},
+            bugtracker => {
+                web => 'https://github.com/szabgab/Web-Feed/issues'
+            },
 		}})
 		: ()
 	),

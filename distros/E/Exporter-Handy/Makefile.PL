@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,24 +14,25 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Exporter-Handy",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Exporter::Handy",
   "PREREQ_PM" => {
-    "Data::Printer" => 0,
     "Exporter::Extensible" => 0,
-    "List::Util" => 0,
+    "List::Util::MaybeXS" => 0,
     "feature" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Printer" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "List::Util" => 0,
     "Scalar::Util" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.200000",
+  "VERSION" => "1.000004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "List::Util" => 0,
+  "List::Util::MaybeXS" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "feature" => 0,

@@ -19,7 +19,7 @@ NOP
 END
 
 my($stdout, $stderr, $exit) = capture {
-	system("perl", "blib/script/z80masm", "foo.asm", "foo.bin");
+	system($^X, "-Iblib/lib", "blib/script/z80masm", "foo.asm", "foo.bin");
 };
 
 is norm($stdout), norm(<<'END');

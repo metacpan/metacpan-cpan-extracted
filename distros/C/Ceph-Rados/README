@@ -1,4 +1,4 @@
-Ceph-Rados version 0.04
+Ceph-Rados version 0.18
 =======================
 
 This module provides a very limited subset of the librados API,
@@ -18,11 +18,11 @@ DEPENDENCIES
 This module requires that you have the librados installed, available
 as either librados-dev under Ubuntu or from:
 
-  http://ceph.com/resources/downloads/
+  http://ceph.io/
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014-2015 by Alex Bowley.
+Copyright (C) 2014-2023 by Alex Bowley.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

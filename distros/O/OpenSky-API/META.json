@@ -1,0 +1,131 @@
+{
+   "abstract" : "Perl interface to the OpenSky Network API",
+   "author" : [
+      "Curtis \"Ovid\" Poe <curtis.poe@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenSky-API",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::INI::Reader" : "0",
+            "Mojo::JSON" : "0",
+            "Mojo::URL" : "0",
+            "Mojo::UserAgent" : "0",
+            "Moose" : "0",
+            "PerlX::Maybe" : "0",
+            "Type::Library" : "0",
+            "Type::Params" : "0",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Common::String" : "0",
+            "Types::Standard" : "0",
+            "experimental" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::PerlTidy" : "0",
+            "lib" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "OpenSky::API" : {
+         "file" : "lib/OpenSky/API.pm",
+         "version" : "0.004"
+      },
+      "OpenSky::API::Core::Flight" : {
+         "file" : "lib/OpenSky/API/Core/Flight.pm",
+         "version" : "0.004"
+      },
+      "OpenSky::API::Core::StateVector" : {
+         "file" : "lib/OpenSky/API/Core/StateVector.pm",
+         "version" : "0.004"
+      },
+      "OpenSky::API::Flights" : {
+         "file" : "lib/OpenSky/API/Flights.pm",
+         "version" : "0.004"
+      },
+      "OpenSky::API::States" : {
+         "file" : "lib/OpenSky/API/States.pm",
+         "version" : "0.004"
+      },
+      "OpenSky::API::Types" : {
+         "file" : "lib/OpenSky/API/Types.pm",
+         "version" : "0.004"
+      },
+      "OpenSky::API::Utils::Iterator" : {
+         "file" : "lib/OpenSky/API/Utils/Iterator.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Ovid/opensky-api/issues"
+      },
+      "homepage" : "https://github.com/Ovid/opensky-api",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Ovid/opensky-api.git",
+         "web" : "https://github.com/Ovid/opensky-api"
+      }
+   },
+   "version" : "0.004",
+   "x_contributors" : [
+      "Ovid <ovid@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

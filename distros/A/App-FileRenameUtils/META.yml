@@ -21,10 +21,10 @@ name: App-FileRenameUtils
 provides:
   App::FileMoveUtils:
     file: lib/App/FileMoveUtils.pm
-    version: '0.009'
+    version: '0.010'
   App::FileRenameUtils:
     file: lib/App/FileRenameUtils.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   App::perlmv: '0.604'
   App::perlmv::scriptlet::add_prefix: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils
   homepage: https://metacpan.org/release/App-FileRenameUtils
   repository: git://github.com/perlancar/perl-App-FileRenameUtils.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -220,7 +220,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'

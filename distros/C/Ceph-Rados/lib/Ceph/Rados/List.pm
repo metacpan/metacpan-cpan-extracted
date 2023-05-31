@@ -7,6 +7,9 @@ use Carp;
 
 our @ISA = qw();
 
+# stupid, pointless version mandated by cpan
+our $VERSION = $Ceph::Rados::Version;
+
 # Preloaded methods go here.
 
 sub new {

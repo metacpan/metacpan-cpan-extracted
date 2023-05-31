@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-04-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our @EXPORT_OK = qw(list_org_todos);
 
@@ -37,7 +37,7 @@ gen_modified_sub(
 
         $args{done} //= 0;
 
-        App::ListOrgHeadlines::list_org_headlines(%args, todo=>1);
+        App::ListOrgHeadlines::list_org_headlines(%args, todo=>1, _raw=>0);
     },
 );
 
@@ -56,7 +56,7 @@ App::ListOrgTodos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.484 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2023-01-19.
+This document describes version 0.485 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2023-04-06.
 
 =head1 SYNOPSIS
 

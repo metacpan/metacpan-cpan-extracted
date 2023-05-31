@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.2.3
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/11/11
+## Modified 2023/05/30
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.3.0';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -837,7 +837,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.2.3
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -876,39 +876,99 @@ Provided with an hash or hash reference of parameters, and this initiates a new 
 
 =over 4
 
-=item I<debug>
+=item * C<debug>
 
 Optional. If set with a positive integer, this will activate verbose debugging message
 
-=item I<name> string
+=item * C<name>
 
-=item I<value> string
+String.
 
-=item I<comment> string
+See also L</name>
 
-=item I<commentURL> URI string or object
+=item * C<value>
 
-=item I<discard> boolean
+String.
 
-=item I<domain> string
+See also L</value>
 
-=item I<expires> datetime str | DateTime object | integer
+=item * C<comment>
 
-=item I<http_only> boolean
+String.
 
-=item I<implicit> boolean
+See also L</comment>
 
-=item I<max_age> integer
+=item * C<commentURL>
 
-=item I<path> string
+URI string or object.
 
-=item I<port> integer
+See also L</commentURL>
 
-=item I<same_site> string
+=item * C<discard>
 
-=item I<secure> boolean
+Boolean.
 
-=item I<version> integer
+See also L</discard>
+
+=item * C<domain>
+
+String.
+
+See also L</domain>
+
+=item * C<expires>
+
+Datetime str | DateTime object | integer
+
+See also L</expires>
+
+=item * C<http_only>
+
+Boolean,
+
+See also L</http_only>
+
+=item * C<implicit>
+
+Boolean.
+
+See also L</implicit>
+
+=item * C<max_age>
+
+Integer.
+
+See also L</max_age>
+
+=item * C<path>
+
+String.
+
+See also L</path>
+
+=item * C<port>
+
+Integer.
+
+See also L</port>
+
+=item * C<same_site>
+
+String.
+
+See also L</same_site>
+
+=item * C<secure>
+
+Boolean.
+
+See also L</secure>
+
+=item * C<version>
+
+Integer.
+
+See also L</version>
 
 =back
 
@@ -916,17 +976,41 @@ Other extra parameters not directly related to the cookie standard:
 
 =over 4
 
-=item I<accessed_on> datetime
+=item * C<accessed_on>
 
-=item I<algo> string
+Datetime.
 
-=item I<created_on> datetime
+See also L</accessed_on>
 
-=item I<encrypt> boolean
+=item * C<algo>
 
-=item I<key> string
+String.
 
-=item I<sign> boolean
+See also L</algo>
+
+=item * C<created_on>
+
+Datetime.
+
+See also L</created_on>
+
+=item * C<encrypt>
+
+Boolean.
+
+See also L</encrypt>
+
+=item * C<key>
+
+String.
+
+See also L</key>
+
+=item * C<sign>
+
+Boolean.
+
+See also L</sign>
 
 =back
 

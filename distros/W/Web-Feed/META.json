@@ -4,13 +4,13 @@
       "Gabor Szabo <szabgab@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Web-Feed",
    "no_index" : {
@@ -42,12 +42,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/Web-Feed/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/szabgab/Web-Feed.git",
-         "web" : "http://github.com/szabgab/Web-Feed"
+         "url" : "https://github.com/szabgab/Web-Feed.git",
+         "web" : "https://github.com/szabgab/Web-Feed"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

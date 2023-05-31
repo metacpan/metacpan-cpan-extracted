@@ -22,7 +22,7 @@ use CPU::Z80::Disassembler::Labels;
 
 use Path::Tiny;
 
-our $VERSION = '0.09';
+our $VERSION = '1.02';
 
 #------------------------------------------------------------------------------
 

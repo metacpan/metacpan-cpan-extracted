@@ -1,4 +1,9 @@
 Revision history for Perl extension Socket::More.
+v0.4.2 2023-05-27
+  [tests]
+  - Disabled failing 'localhost' test. Incorrectly assumed a host with IPv6
+    had a loopback interface with IPv6 addressing enabled
+
 v0.4.1 2023-05-24
   [tests]
   - Fixed bud in test script. Incorrect label for skipping IPV6 tests when no

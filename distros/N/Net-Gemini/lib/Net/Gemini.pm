@@ -5,7 +5,7 @@
 #   "The conjunction of Jupiter with one of the stars of Gemini, which
 #   'we ourselves have seen' (1.6.343b30) has been dated in recent years
 #   to December 337 BC."
-#    -- Malcolm Wilson. Structure and Method in Aristotle's Meteorologica
+#    -- Malcolm Wilson. Structure and Method in Aristotle's Meteorologica.
 
 # NOTE this silently accepts URI with userinfo; those probably
 # should be failed?
@@ -37,7 +37,7 @@ package URI::gemini {
 }
 
 package Net::Gemini;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use strict;
 use warnings;
 use Encode ();
@@ -83,12 +83,14 @@ sub get {
         goto BLESSING;
     }
 
-    # VERIFICATION is based on the following link though much remains up
-    # to the caller to manage
+    # VERIFICATION is based on the following though much remains up to
+    # the caller to manage
     # gemini://makeworld.space/gemlog/2020-07-03-tofu-rec.gmi
+    # gemini://alexschroeder.ch/page/2020-07-20%20Does%20a%20Gemini%20certificate%20need%20a%20Common%20Name%20matching%20the%20domain%3F
     eval {
         $obj{_socket} = IO::Socket::SSL->new(
             SSL_hostname        => $obj{_host},    # SNI
+			( $param{tofu} ? ( SSL_verifycn_scheme => 'none' ) : () ),
             SSL_verify_callback => sub {
                 my ( $ok, $ctx_store, $certname, $error, $cert, $depth ) = @_;
                 if ( $depth != 0 ) {
@@ -98,6 +100,7 @@ sub get {
                 ( $param{verify_ssl} || \&_verify_ssl )->(
                     @obj{qw(_host _port)},
                     Net::SSLeay::X509_get_fingerprint( $cert, 'sha256' ),
+                    Net::SSLeay::P_ASN1_TIME_get_isotime( Net::SSLeay::X509_get_notBefore($cert) ),
                     Net::SSLeay::P_ASN1_TIME_get_isotime( Net::SSLeay::X509_get_notAfter($cert) ),
                     $ok,
                     $cert
@@ -311,6 +314,10 @@ If true, only the leaf certificate will be checked. Otherwise, the full
 certificate chain will be verified by default, which is probably not
 what you want when trusting the very first leaf certificate seen.
 
+Also with this flag set hostname verification is turned off; the caller
+can manage C<SSL_verifycn_scheme> and possibly C<SSL_verifycn_name> via
+the B<ssl> param if this needs to be customized.
+
 =item B<verify_ssl> => code-reference
 
 Custom callback function to handle SSL verification. The default is to
@@ -321,7 +328,7 @@ L<DateTime::Format::RFC3339>) and should return a C<1> to verify the
 connection, or C<0> to not.
 
   ...->get( $url, ..., verify_ssl => sub {
-    my ($host, $port, $digest, $expire_date, $ok, $raw_cert) = @_;
+    my ($host, $port, $digest, $not_before, $not_after, $ok, $raw_cert) = @_;
     return 1 if int rand 2; # certificate is OK
     return 0;
   } );
@@ -330,6 +337,11 @@ The "okay?" boolean and raw certificate is also passed; these could be
 used to allow certificates that other code was able to verify, or to
 perform custom checks on the certificate using probably various routines
 from L<Net::SSLeay>.
+
+Note that some have argued that under TOFU one should not verify the
+hostname nor the dates (notBefore, notAfter) of the certificate, only to
+accept the first certificate presented as-is, like SSH does, and to use
+that certificate thereafter. This has plusses and minuses.
 
 =back
 

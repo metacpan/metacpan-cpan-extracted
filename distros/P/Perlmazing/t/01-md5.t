@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 5;
-use Perlmazing;
+use Perlmazing qw(md5);
 
 my @values = ('0123456789', 'abcdefghijklmnopqrstuvwxyz', '0123456789abcdef');
 is scalar md5(@values), '781e5e245d69b566979b86e28d23f2c7', 'scalar';

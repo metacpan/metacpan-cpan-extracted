@@ -15,7 +15,7 @@
  * #  meinen, sie müssten aus jeder .c-Datei auch eine Objekt-Datei         #
  * #  generieren, wurde sie umgetauft auf retvals.h                         #
  * #                                                                        #
- * #  Copyright (C) 2002-2014 Michael Plugge <m.plugge@hs-mannheim.de>      #
+ * #  Copyright (C) 2002-2014 Michael Plugge <konto_check@yahoo.com>        #
  * #                                                                        #
  * ##########################################################################
  */
@@ -26,7 +26,7 @@
  * # werte in Klartext um. Die Funktion kto_check_retval2txt_short macht     #
  * # dasselbe, nur mit mehr symbolischen Klartexten (kurz).                  #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -41,7 +41,7 @@ DLL_EXPORT const char *kto_check_retval2txt(int retval)
  * # Die Funktion kto_check_retval2iso() wandelt die numerischen Rückgabe-   #
  * # werte in Klartext mit den Umlauten in der Kodierung ISO-8859-1 um.      #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -219,7 +219,7 @@ DLL_EXPORT const char *kto_check_retval2iso(int retval)
  * # Die Funktion kto_check_retval2dos() wandelt die numerischen Rückgabe-   #
  * # werte in Klartext mit den Umlauten in DOS-Kodierung (CP850) um.         #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -397,7 +397,7 @@ DLL_EXPORT const char *kto_check_retval2dos(int retval)
  * # Die Funktion kto_check_retval2html() wandelt die numerischen Rückgabe-  #
  * # werte in Klartext mit den Umlauten in HTML-Kodierung um.                #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -575,7 +575,7 @@ DLL_EXPORT const char *kto_check_retval2html(int retval)
  * # Die Funktion kto_check_retval2utf8() wandelt die numerischen Rückgabe-  #
  * # werte in Klartext mit den Umlauten in UTF-8-Kodierung um.               #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 
@@ -753,7 +753,7 @@ DLL_EXPORT const char *kto_check_retval2utf8(int retval)
  * # Die Funktion kto_check_retval2txt_short() wandelt die numerischen       #
  * # Rückgabwerte in kurze Klartexte (symbolische Konstanten) um.            #
  * #                                                                         #
- * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
 

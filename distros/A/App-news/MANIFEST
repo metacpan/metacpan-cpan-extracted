@@ -5,5 +5,9 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 script/news
+t/00-basic.t
+t/01-quit.t
+t/10-groups.t
+t/test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

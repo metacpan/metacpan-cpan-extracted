@@ -64,7 +64,7 @@ The length of the matched string.
 
 =head2 new
 
-  static method new : Regex::Match ($options = undef : object[]);
+  static method new : Regex::Match ($options : object[] = undef);
 
 Creates a new L<Regex::Match> object.
 

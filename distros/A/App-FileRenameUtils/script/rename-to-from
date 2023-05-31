@@ -39,7 +39,7 @@ rename-to-from - Rename a file, with reversed order of arguments
 
 =head1 VERSION
 
-This document describes version 0.009 of rename-to-from (from Perl distribution App-FileRenameUtils), released on 2023-03-02.
+This document describes version 0.010 of rename-to-from (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
 
 =head1 SYNOPSIS
 

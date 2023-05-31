@@ -8,6 +8,9 @@ use Scalar::Util qw/blessed openhandle/;
 
 use Ceph::Rados::List;
 
+# stupid, pointless version mandated by cpan
+our $VERSION = $Ceph::Rados::Version;
+
 our @ISA = qw();
 
 my $CHUNK_SIZE = 1024 * 1024;

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2023-03-24'; # DATE
 our $DIST = 'Data-Section-Seekable'; # DIST
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 sub new {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -104,7 +104,7 @@ Data::Section::Seekable::Reader - Read parts from data section
 
 =head1 VERSION
 
-This document describes version 0.091 of Data::Section::Seekable::Reader (from Perl distribution Data-Section-Seekable), released on 2023-01-20.
+This document describes version 0.092 of Data::Section::Seekable::Reader (from Perl distribution Data-Section-Seekable), released on 2023-03-24.
 
 =head1 SYNOPSIS
 

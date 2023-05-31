@@ -2,7 +2,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -16,27 +16,12 @@ unless(   -f File::HomeDir->my_home . '/.config/spread-revolutionary-date/spread
        || -f File::HomeDir->my_home . '/.spread-revolutionary-date.conf') {
   plan skip_all => 'No user config file found';
 } else {
-  plan tests => 3;
+  plan tests => 2;
 }
 
 use App::SpreadRevolutionaryDate;
-use App::SpreadRevolutionaryDate::Target::Freenode::Bot;
 
-{
-    no strict 'refs';
-    no warnings 'redefine';
-
-    *App::SpreadRevolutionaryDate::Target::Freenode::Bot::tick = undef;
-    *App::SpreadRevolutionaryDate::Target::Freenode::Bot::said = sub {
-        my ($self, $message) = @_;
-
-        return if $message->{who} eq 'freenode-connect';
-        ok($message->{who} eq 'NickServ' && $message->{body} =~ /^You are now identified for/, 'Freenode connection with actual credentials in user conf');
-        $self->shutdown('Shutdown overridden said');
-    };
-}
-
-@ARGV = ('--test');
+@ARGV = ('--test', '--twitter_api=1');
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new;
 
 eval { $spread_revolutionary_date->targets->{twitter}->obj->verify_credentials };
@@ -44,5 +29,3 @@ ok(!$@, 'Twitter connection with actual credentials in user conf');
 
 eval { $spread_revolutionary_date->targets->{mastodon}->obj->get_account };
 ok(!$@, 'Mastodon connection with actual credentials in user conf');
-
-$spread_revolutionary_date->targets->{freenode}->spread('Test authentication');

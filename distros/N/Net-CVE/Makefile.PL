@@ -30,14 +30,17 @@ my %wm = (
     PREREQ_FATAL => 0,
     PREREQ_PM    => {
 	# Core modules
-	"Carp"				=> 0,
-	"HTTP::Tiny"			=> 0.009,
-	"JSON::MaybeXS"			=> 1.004005,
-	"List::Util"			=> 0,
+	"Carp"			=> 0,
+	"HTTP::Tiny"		=> 0.009,
+	"JSON::MaybeXS"		=> 1.004005,
+	"List::Util"		=> 0,
+
+	# For https
+	"IO::Socket::SSL"	=> 1.42,
 
 	# For testing
-	"Test::More"			=> 0.90,
-	"Test::Warnings"		=> 0,
+	"Test::More"		=> 0.90,
+	"Test::Warnings"	=> 0,
 	},
     macro        => { TARFLAGS   => "--format=ustar -c -v -f", },
     );

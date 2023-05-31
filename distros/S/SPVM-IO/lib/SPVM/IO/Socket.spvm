@@ -24,7 +24,7 @@ class IO::Socket extends IO::Handle {
   has listen_backlog : protected ro int;
   
   # Class Methods
-  static method new : IO::Socket ($options = undef : object[]) {
+  static method new : IO::Socket ($options : object[] = undef) {
     
     my $self = new IO::Socket;
     
@@ -34,7 +34,7 @@ class IO::Socket extends IO::Handle {
   }
   
   # Instance Methods
-  method new_instance : IO::Socket ($options = undef : object[]) {
+  method new_instance : IO::Socket ($options : object[] = undef) {
     {
       my $self = IO::Socket->new($options);
       
@@ -42,7 +42,7 @@ class IO::Socket extends IO::Handle {
     }
   }
   
-  method init : void ($options = undef : object[]) {
+  method init : void ($options : object[] = undef) {
 
     $self->set_autoflush(1);
     
@@ -131,7 +131,7 @@ class IO::Socket extends IO::Handle {
     return $connect_status;
   }
 
-  method recv : int ($buffer : mutable string, $length = -1 : int, $flags = 0 : int) {
+  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0) {
     my $fd = $self->{fd};
     
     if ($length < 0) {
@@ -143,7 +143,7 @@ class IO::Socket extends IO::Handle {
     return $recv_length;
   }
   
-  method send : int ($buffer : string, $flags = 0 : int, $to = undef : Sys::Socket::Sockaddr) {
+  method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef) {
     my $fd = $self->{fd};
     
     my $peername = (Sys::Socket::Sockaddr)undef;
@@ -203,7 +203,7 @@ class IO::Socket extends IO::Handle {
     $self->close;
   }
   
-  method listen : int ($queue = 5 : int) {
+  method listen : int ($queue : int = 5) {
     my $fd = $self->{fd};
     my $status = Sys::Socket->listen($fd, $queue);
     return $status;
@@ -278,7 +278,7 @@ class IO::Socket extends IO::Handle {
     return $addr;
   }
 
-  method socket : int ($domain : int, $type : int, $protocol = 0 : int) {
+  method socket : int ($domain : int, $type : int, $protocol : int = 0) {
     my $fd = Sys::Socket->socket($domain, $type, $protocol);
     
     $self->{fd} = $fd;
@@ -305,7 +305,7 @@ class IO::Socket extends IO::Handle {
     return $pair;
   }
 
-  method accept : IO::Socket ($peer_ref = undef : Sys::Socket::Sockaddr[]) {
+  method accept : IO::Socket ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
     my $fd = $self->fd;
     my $timeout = $self->timeout;
     

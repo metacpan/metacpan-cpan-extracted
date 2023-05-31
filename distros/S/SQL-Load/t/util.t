@@ -86,6 +86,23 @@ LIMIT
 my %parse_3 = (parse($sql_3));
 is($parse_3{1}, trim($sql_3), 'Test if default is same sql');
 
+my $sql_4 = q{
+SELECT * FROM foo;
+
+SELECT * FROM bar;
+
+SELECT * FROM baz;
+};
+
+my %parse_4 = (parse($sql_4, "\n"));
+
+for my $number (keys %parse_4) {
+    my $value = $parse_4{$number};
+    
+    like($number, qr/(1|2|3)/, 'Test name ' . $number . ' from parse');
+    like($value, qr/SELECT \* FROM (foo|bar|baz)\n/, 'Test value ' . $number . ' from parse');
+}
+
 my $remove_extension_1 = remove_extension('path/users.sql');
 is($remove_extension_1, 'path/users', 'Test removed extension from file name (path/users.sql)');
 

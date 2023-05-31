@@ -57,11 +57,6 @@ xt/author/pod-coverage.t
 xt/author/pod-linkcheck.t
 xt/author/pod-syntax.t
 xt/author/portability.t
-xt/freenode.t
-xt/freenode_fake_credentials.t
-xt/liberachat.t
-xt/liberachat_authentication.t
-xt/liberachat_fake_credentials.t
 xt/release/distmeta.t
 xt/release/kwalitee.t
 xt/release/unused-vars.t

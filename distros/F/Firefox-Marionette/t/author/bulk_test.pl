@@ -40,6 +40,19 @@ $ENV{DEVEL_COVER_DB_FORMAT} = $devel_cover_db_format;
 system { 'cover' } 'cover', '-delete' and die "Failed to 'cover' for " . ($ENV{FIREFOX_BINARY} || 'firefox');
 MAIN: {
 	my $cwd = Cwd::cwd();
+	my $test_directory = File::Spec->catdir($cwd, 't');
+	my $test_directory_handle = DirHandle->new($test_directory);
+	my @syscall_entries;
+	if ($test_directory_handle) {
+		while(my $entry = $test_directory_handle->read()) {
+			next if ($entry eq File::Spec->updir());
+			next if ($entry eq File::Spec->curdir());
+			next if ($entry !~ /03\-/smx);
+			push @syscall_entries, File::Spec->catfile($test_directory, $entry);
+		}
+	} else {
+		die "Failed to open test directory:$!";
+	}
 	my @servers;
         my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
 	my $servers_path = $cwd . '/servers.csv';
@@ -73,10 +86,10 @@ MAIN: {
 			$background_pids->{$pid} = $server;
 		} elsif (defined $pid) {
 			eval {
-				my $win32_local_alarm = 600;
+				my $win32_local_alarm = 900;
 				my $cygwin_local_alarm = 2700;
 				my $cygwin_remote_alarm = 7200;
-				my $physical_local_alarm = 600;
+				my $physical_local_alarm = 900;
 				$ENV{FIREFOX_ALARM} = $win32_remote_alarm;
 				$ENV{FIREFOX_NO_RECONNECT} = 1;
 				if ((lc $server->{type}) eq 'virsh') {
@@ -509,6 +522,9 @@ MAIN: {
 		}
 		_check_for_background_processes($background_pids, @servers);
 	}
+	foreach my $syscall_entry (@syscall_entries) {
+		_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $syscall_entry ], {});
+	}
 	while (_check_for_background_processes($background_pids, @servers)) {
 		sleep 10;
 	}
@@ -516,13 +532,14 @@ MAIN: {
 		if ((lc $server->{type}) eq 'virsh') {
 			if (_virsh_node_running($server)) {
 				_virsh_shutdown($server);
+				_sleep_until_shutdown($server);
 			}
 		}
 	}
 	chdir $cwd or die "Failed to chdir to '$cwd':$EXTENDED_OS_ERROR";
 	if (-d "$cwd/$cover_db_name") {
 		$ENV{DEVEL_COVER_DB_FORMAT} = $devel_cover_db_format;
-		system { 'cover' } 'cover', '-ignore', $test_marionette_file and die "Failed to 'cover'";
+		system { 'cover' } 'cover', '-ignore_re', '^t/*' and die "Failed to 'cover'";
 	} else {
 		warn "No coverage generated\n";
 	}
@@ -644,6 +661,7 @@ sub _check_for_background_processes {
 		foreach my $server (@{$servers}) {
 			if ((lc $server->{type}) eq 'virsh') {
 				_virsh_shutdown($server);
+				_sleep_until_shutdown($server);
 			}
 		}
 	}

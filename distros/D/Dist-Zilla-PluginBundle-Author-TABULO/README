@@ -3,7 +3,7 @@ NAME
     à la TABULO
 
 VERSION
-    version 1.000013
+    version 1.000014
 
 SYNOPSIS
     In your dist.ini:
@@ -413,7 +413,7 @@ ATTRIBUTES
     Additional documentation: If defined, passed to [ExecDir] as its 'dir'
     option. Defaults to 'script' when the installer is
     [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default
-    will be in effect, and that is 'bin' as of this writing.
+    will be in effect, and that is 'bin' as of this writing.,
 
   fake_release
     Reader: fake_release
@@ -444,6 +444,9 @@ ATTRIBUTES
     Reader: has_xs
 
     Type: Bool
+
+    Additional documentation: Signifies that the distribution contains XS
+    code.
 
   hub
     Reader: hub

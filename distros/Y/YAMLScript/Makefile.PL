@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "XXX" => "0.38",
     "YAML::PP" => "0.036"
   },
-  "VERSION" => "0.1.2",
+  "VERSION" => "0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,5 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-package MY;
-use lib 't/lib';
-use DistTestFixer;
-sub postamble { $_[0]->SUPER::postamble . DistTestFixer->fix('yamlscript', 'ys-yamlscript.pl') }
+package MY; use lib 't/lib'; use DistTestFixer;
+sub postamble { $_[0]->SUPER::postamble . DistTestFixer->fix('yamlscript') }

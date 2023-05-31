@@ -1,0 +1,23 @@
+{
+  "head": {
+    "vars": [
+      "item",
+      "itemLabel"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q27954834"
+        },
+        "itemLabel": {
+          "xml:lang": "cs",
+          "type": "literal",
+          "value": "Michal Josef Špaček"
+        }
+      }
+    ]
+  }
+}

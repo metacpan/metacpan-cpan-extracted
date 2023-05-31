@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use File::Temp;
 use FindBin qw($RealBin);
@@ -46,6 +46,21 @@ EOD
 }
 
 {
+    my $stdout = do_csvgrep("-mc book k");
+    my $expected_output =<<'EOD';
++-----------------------+--------------+-------+------+
+| Book                  | Author       | Pages | Date |
++-----------------------+--------------+-------+------+
+| A Walk in the Woods   | Bill Bryson  | 276   | 1997 |
+| Death Walks the Woods | Cyril Hare   | 222   | 1954 |
+| Frankenstein          | Mary Shelley | 280   | 1818 |
++-----------------------+--------------+-------+------+
+EOD
+
+    is($stdout, $expected_output, "Match column specified with column header");
+}
+
+{
     my $stdout = do_csvgrep("-c 0,1,3 -i mary");
     my $expected_output =<<'EOD';
 +--------------+--------------+------+
@@ -59,15 +74,28 @@ EOD
     is($stdout, $expected_output, "Display a subset of columns");
 }
 
-SKIP: {
-    skip "Can't match first column with -mc 0: https://github.com/neilb/csvgrep/issues/14", 1 if 1;
+{
+    my $stdout = do_csvgrep("-c book,date -i mary");
+    my $expected_output =<<'EOD';
++--------------+------+
+| Book         | Date |
++--------------+------+
+| Mary Poppins | 1934 |
+| Frankenstein | 1818 |
++--------------+------+
+EOD
+
+    is($stdout, $expected_output, "Display a subset of columns by label");
+}
+
+{
     my $stdout = do_csvgrep("-mc 0 -c 0,1,3 -i mary");
     my $expected_output =<<'EOD';
-+--------------+--------------+------+
-| Book         | Author       | Date |
-+--------------+--------------+------+
-| Mary Poppins | PL Travers   | 1934 |
-+--------------+--------------+------+
++--------------+------------+------+
+| Book         | Author     | Date |
++--------------+------------+------+
+| Mary Poppins | PL Travers | 1934 |
++--------------+------------+------+
 EOD
 
     is($stdout, $expected_output, "Match on first column");
@@ -91,7 +119,7 @@ sub do_csvgrep {
     my $grep_args = shift;
     my $filename = $fh->filename;
     my $stdout = capture_stdout {
-        system("perl $RealBin/../bin/csvgrep $grep_args $filename")
+        system("$^X $RealBin/../bin/csvgrep $grep_args $filename")
     };
 
     return $stdout;

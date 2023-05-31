@@ -1,0 +1,17 @@
+{
+  "head": {
+    "vars": [
+      "item"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "item": {
+          "type": "bad",
+          "value": "foo"
+        }
+      }
+    ]
+  }
+}

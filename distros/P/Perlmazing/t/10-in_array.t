@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 40;
-use Perlmazing;
+use Perlmazing qw(in_array);
 
 my @arr = (0..9);
 

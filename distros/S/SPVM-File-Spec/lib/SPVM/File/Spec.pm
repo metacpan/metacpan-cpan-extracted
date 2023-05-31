@@ -1,6 +1,6 @@
 package SPVM::File::Spec;
 
-our $VERSION = "0.080001";
+our $VERSION = "0.081001";
 
 1;
 
@@ -74,7 +74,7 @@ The File::Spec class of L<SPVM> has methods to perform operations on file names 
 
 =head2 splitpath
 
-  static method splitpath : string[] ($path : string, $no_file = 0 : int);
+  static method splitpath : string[] ($path : string, $no_file : int = 0);
 
 =head2 splitdir
 
@@ -86,11 +86,11 @@ The File::Spec class of L<SPVM> has methods to perform operations on file names 
 
 =head2 abs2rel
 
-  static method abs2rel : string ($path : string, $base = undef : string);
+  static method abs2rel : string ($path : string, $base : string = undef);
 
 =head2 rel2abs
 
-  static method rel2abs : string ($path : string, $base = undef : string);
+  static method rel2abs : string ($path : string, $base : string = undef);
 
 =head1 Object Oriented Classes
 

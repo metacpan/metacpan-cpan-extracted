@@ -4,7 +4,7 @@ DateTime::Format::Text - Find a Date in Text
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -47,8 +47,6 @@ Here's the author information from that:
     version  0.2.0
 
 # BUGS
-
-In array mode, it would be good to find more than one date in the string
 
 # SEE ALSO
 

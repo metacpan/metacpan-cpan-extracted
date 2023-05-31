@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 2;
-use Perlmazing;
+use Perlmazing qw(md5_file);
 use File::Spec;
 
 my $path = 'test_file.txt';

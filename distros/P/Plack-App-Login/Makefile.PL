@@ -18,15 +18,9 @@ name 'Plack-App-Login';
 perl_version 5.008;
 readme_from 'Login.pm';
 recursive_author_tests('xt');
-requires 'CSS::Struct::Output::Raw' => 0;
-requires 'Error::Pure' => 0;
+requires 'Plack::Component::Tags::HTML' => 0.13;
 requires 'Plack::Util::Accessor' => 0;
-requires 'Scalar::Util' => 0;
 requires 'Tags::HTML::Login::Button' => 0.02;
-requires 'Tags::HTML::Page::Begin' => 0.16;
-requires 'Tags::HTML::Page::End' => 0.04;
-requires 'Tags::Output::Raw' => 0;
-requires 'Unicode::UTF8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Plack-App-Login/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Plack-App-Login';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Plack-App-Login';
@@ -39,7 +33,7 @@ test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

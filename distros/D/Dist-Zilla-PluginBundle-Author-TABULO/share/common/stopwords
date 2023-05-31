@@ -9,6 +9,9 @@ dir
 distro
 distros
 dzil dist zilla
+evalbytes
+fc
+Raku
 README
 Readme
 repo
@@ -18,25 +21,17 @@ vcs
 wikidoc
 
 ## stopwords -- technical / POD
-attr      # attributes
-cattr     # class attributes
-pattr     # private attributes
-
-cmethod   # class method
-omethod   # object method
-
-cmd       # command
-opt       # option
-singleton # singleton
-tag       # tag
-var       # variable
-
+attr    # attributes
+cattr   # class attributes
+pattr   # private attributes
 
 ## stopwords -- technical / Odd
 MAXWORDLENGTH
 mayhap
+xtags   # export tags
 
 # stopwords -- English words that are somehow not recognized
+casefolding
 merchantability
 optimizations
 unsetting

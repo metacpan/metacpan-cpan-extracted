@@ -3,5 +3,5 @@
 
 class Sys::Ioctl {
 
-  native static method ioctl : int ($fd : int, $request : int, $request_arg_ref = undef : object of byte[]|short[]|int[]|long[]|float[]|double[]|object);
+  native static method ioctl : int ($fd : int, $request : int, $request_arg_ref : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef);
 }

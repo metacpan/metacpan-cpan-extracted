@@ -44,8 +44,6 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
   our $RE_catpath6 : Regex;
   
   INIT {
-    Regex->INIT;
-    
     $DRIVE_RX_STRING = "[a-zA-Z]:";
     $UNC_RX_STRING = "(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+";
     $VOL_RX_STRING = "(?:$DRIVE_RX_STRING|$UNC_RX_STRING)";
@@ -200,7 +198,7 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
     return $pathes;
   }
   
-  method splitpath : string[] ($path : string, $nofile = 0 : int) {
+  method splitpath : string[] ($path : string, $nofile : int = 0) {
     
     my $volume = "";
     my $directory = "";
@@ -403,7 +401,7 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
     return $file;
   }
 
-  method rel2abs : string ($path : string, $base = undef : string) {
+  method rel2abs : string ($path : string, $base : string = undef) {
     
     my $is_abs = $self->file_name_is_absolute($path);
     

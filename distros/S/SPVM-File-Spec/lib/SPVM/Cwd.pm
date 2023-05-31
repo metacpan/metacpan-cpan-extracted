@@ -46,7 +46,7 @@ On Windows, the path separaters C<\> of the return value are replaced with C</>.
 
 =head2 getdcwd
 
-  static method getdcwd : string ($drive = undef : string) {
+  static method getdcwd : string ($drive : string = undef) {
 
 The C<$drive> is a drive letter such as C<C:>, C<D:>. It is converted to the drive id.
 

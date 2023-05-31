@@ -11,6 +11,7 @@ lib/Travel/Status/DE/IRIS/Stations.pm
 lib/Travel/Status/DE/IRIS/Stations.pm.PL
 MANIFEST			This list of files
 META.json
+META.yml
 README.md
 scripts/debug
 scripts/makedeb-docker
@@ -64,5 +65,4 @@ t/in/station/KK
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/02-compile-pod.t
-META.yml
 SIGNATURE    Added here by Module::Build

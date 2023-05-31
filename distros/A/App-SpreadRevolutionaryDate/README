@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.32
+    version 0.33
 
 DESCRIPTION
 
@@ -556,8 +556,7 @@ EXTENDING TO NEW TARGETS
 
     Should you extend spread-revolutionary-date to a new target, we advise
     you to have a look on how default targets are implemented:
-    App::SpreadRevolutionaryDate::Target::Twitter with
-    Net::Twitter::Lite::WithAPIv1_1 worker,
+    App::SpreadRevolutionaryDate::Target::Twitter with Twitter::API worker,
     App::SpreadRevolutionaryDate::Target::Mastodon with Mastodon::Client
     worker. Both are using OAuth2 protocol <https://oauth.net/2/> to
     perform authentication. The third and fourth default targets,
@@ -763,7 +762,7 @@ SEE ALSO
 
     AppConfig
 
-    Net::Twitter::Lite::WithAPIv1_1
+    Twitter::API
 
     Mastodon::Client
 
@@ -775,7 +774,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019-2022 by Gérald Sédrati.
+    This software is Copyright (c) 2019-2023 by Gérald Sédrati.
 
     This is free software, licensed under:
 

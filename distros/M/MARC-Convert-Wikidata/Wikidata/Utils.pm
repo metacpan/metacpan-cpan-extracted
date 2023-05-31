@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -469,3 +469,220 @@ sub _remove_square_brackets {
 1;
 
 __END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+MARC::Convert::Wikidata::Utils - Utilities for MARC::Convert::Wikidata.
+
+=head1 SYNOPSIS
+
+ use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_number clean_number_of_pages clean_oclc clean_publication_date clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal clean_subtitle clean_title);
+
+ my $cleaned_cover = clean_cover($cover);
+ my $cleaned_date = clean_date($date);
+ my $cleaned_edition_number = clean_edition_number($edition_number);
+ my $cleaned_number_of_pages = clean_number_of_pages($number_of_pages);
+ my $cleaned_oclc = clean_oclc($oclc);
+ my ($cleaned_publication_date, $option) = clean_publication_date($publication_date);
+ my $cleaned_publisher_name = clean_publisher_name($publisher);
+ my $cleaned_publisher_place = clean_publisher_place($publisher_place);
+ my $cleaned_series_name = clean_series_name($series_name);
+ my $cleaned_series_ordinal = clean_series_ordinal($series_ordinal);
+ my $cleaned_subtitle = clean_subitle($subtitle);
+ my $cleaned_title = clean_title($title);
+
+=head1 SUBROUTINES
+
+=head2 C<clean_cover>
+
+ my $cleaned_cover = clean_cover($cover);
+
+Clean book cover in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_date>
+
+ my $cleaned_date = clean_date($date);
+
+Clean date in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_edition_number>
+
+ my $cleaned_edition_number = clean_edition_number($edition_number);
+
+Clean edition number in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_number_of_pages>
+
+ my $cleaned_number_of_pages = clean_number_of_pages($number_of_pages);
+
+Clean number of pages in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_oclc>
+
+ my $cleaned_oclc = clean_oclc($oclc);
+
+Clean OCLC number.
+
+Returns string or undef.
+
+=head2 C<clean_publication_date>
+
+ my ($cleaned_publication_date, $option) = clean_publication_date($publication_date);
+
+Clean publication date. Returned options could be 'circa' string in case that
+publication date is not precise.
+
+Returns array with string or undef and string.
+
+=head2 C<clean_publisher_name>
+
+ my $cleaned_publisher_name = clean_publisher_name($publisher);
+
+Clean publishing house.
+
+Returns string or undef.
+
+=head2 C<clean_publisher_place>
+
+ my $cleaned_publisher_place = clean_publisher_place($publisher_place);
+
+Clean place of publication in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_series_name>
+
+ my $cleaned_series_name = clean_series_name($series_name);
+
+Clean series name.
+
+Returns string or undef.
+
+=head2 C<clean_series_ordinal>
+
+ my $cleaned_series_ordinal = clean_series_ordinal($series_ordinal);
+
+Clean series ordinal in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_subtitle>
+
+ my $cleaned_subtitle = clean_subtitle($subtitle);
+
+Clean subtitle.
+
+Returns string or undef.
+
+=head2 C<clean_title>
+
+ my $cleaned_title = clean_title($title);
+
+Clean title.
+
+Returns string or undef.
+
+=head1 EXAMPLE1
+
+=for comment filename=clean_cover.pl
+
+ use strict;
+ use warnings;
+
+ use MARC::Convert::Wikidata::Utils qw(clean_cover);
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+ my $cover = decode_utf8('(Vázáno) :');;
+ my $cleaned_cover = clean_cover($cover);
+
+ # Print out.
+ print encode_utf8("Cover: $cover\n");
+ print "Cleaned cover: $cleaned_cover\n";
+
+ # Output:
+ # Cover: (Vázáno) :
+ # Cleaned cover: hardback
+
+=head1 EXAMPLE2
+
+=for comment filename=clean_date.pl
+
+ use strict;
+ use warnings;
+
+ use MARC::Convert::Wikidata::Utils qw(clean_date);
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+ my $date = decode_utf8('2020 březen 03.');
+ my $cleaned_date = clean_date($date);
+
+ # Print out.
+ print encode_utf8("Date: $date\n");
+ print "Cleaned date: $cleaned_date\n";
+
+ # Output:
+ # Date: 2020 březen 03.
+ # Cleaned date: 2020-03-03
+
+=head1 EXAMPLE3
+
+=for comment filename=clean_edition_number.pl
+
+ use strict;
+ use warnings;
+
+ use MARC::Convert::Wikidata::Utils qw(clean_edition_number);
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+ my $edition_number = decode_utf8('Druhé vydání');
+ my $cleaned_edition_number = clean_edition_number($edition_number);
+
+ # Print out.
+ print encode_utf8("Edition number: $edition_number\n");
+ print "Cleaned edition number: $cleaned_edition_number\n";
+
+ # Output:
+ # Edition number: Druhé vydání
+ # Cleaned edition number: 2
+
+=head1 DEPENDENCIES
+
+L<Exporter>,
+L<List::Util>,
+L<Readonly>,
+L<Roman>,
+L<Unicode::UTF8>.
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/MARC-Convert-Wikidata>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021-2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

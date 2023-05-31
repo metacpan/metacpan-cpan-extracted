@@ -1,3 +1,10 @@
+0.08 2023-05-29T23:53:55+02:00
+ - Add SEE ALSO section to doc.
+ - Improve example in doc.
+ - Remove module version from example.
+ - Rewrite to Plack::Component::Tags::HTML.
+ - Update Module::Install to 1.21 version.
+
 0.07 2023-02-10T22:24:02+01:00
  - Rewrite to new Tags::HTML::Page::Begin@0.16 with css init section.
  - Update copyright years.

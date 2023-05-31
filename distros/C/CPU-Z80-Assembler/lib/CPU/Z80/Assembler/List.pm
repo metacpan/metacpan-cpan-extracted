@@ -18,7 +18,7 @@ use warnings;
 use Text::Tabs;
 use Iterator::Simple::Lookahead;
 
-our $VERSION = '2.22';
+our $VERSION = '2.25';
 
 use Class::Struct (
 		output			=> '$',		# output file handle for the list

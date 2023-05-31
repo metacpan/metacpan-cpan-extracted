@@ -20,7 +20,6 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   our $RE_splitpath1 : Regex;
   
   INIT {
-    Regex->INIT;
     $RE_canonpath1 = Regex->new("/{2,}");
     $RE_canonpath2 = Regex->new("(?:/\.)+(?:/|\z)");
     $RE_canonpath3 = Regex->new("^(?:\./)+", "s");
@@ -193,7 +192,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return $directory;
   }
 
-  method splitpath : string[] ($path : string, $no_file = 0 : int) {
+  method splitpath : string[] ($path : string, $no_file : int = 0) {
     
     my $volume = "";
     my $directory = "";
@@ -212,7 +211,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return [$volume, $directory, $file];
   }
 
-  method rel2abs : string ($path : string, $base = undef : string) {
+  method rel2abs : string ($path : string, $base : string = undef) {
     
     # Clean up $path
     if (!$self->file_name_is_absolute($path)) {
@@ -235,7 +234,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return $rel2abs;
   }
   
-  private static method re_split : string[] ($re_separator : Regex, $string : string, $limit = -1 : int) {
+  private static method re_split : string[] ($re_separator : Regex, $string : string, $limit : int = -1) {
     unless ($re_separator) {
       die "The \$separator must be defined";
     }
@@ -289,7 +288,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return $dirs;
   }
 
-  method abs2rel : string ($path : string, $base = undef : string) {
+  method abs2rel : string ($path : string, $base : string = undef) {
     
     unless ($base && length $base) {
       $base = Cwd->getcwd();
@@ -393,7 +392,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return undef;
   }
   
-  static method compatible_split : string[] ($separator : string, $string : string, $limit = 0 : int) {
+  static method compatible_split : string[] ($separator : string, $string : string, $limit : int = 0) {
     unless ($separator) {
       die "The \$separator must be defined";
     }

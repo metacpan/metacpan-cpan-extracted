@@ -64,6 +64,6 @@
          "web" : "https://github.com/nigelhorne/DateTime-Format-Text"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

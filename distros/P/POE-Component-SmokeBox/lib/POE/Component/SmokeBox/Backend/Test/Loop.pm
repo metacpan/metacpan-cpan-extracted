@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::Test::Loop;
-$POE::Component::SmokeBox::Backend::Test::Loop::VERSION = '0.56';
+$POE::Component::SmokeBox::Backend::Test::Loop::VERSION = '0.58';
 #ABSTRACT: a backend to test looping output kills.
 
 use strict;
@@ -31,7 +31,7 @@ POE::Component::SmokeBox::Backend::Test::Loop - a backend to test looping output
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 DESCRIPTION
 

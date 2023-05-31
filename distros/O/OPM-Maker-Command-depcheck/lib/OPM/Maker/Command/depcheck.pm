@@ -7,6 +7,8 @@ use v5.10;
 use strict;
 use warnings;
 
+our $VERSION = '1.0.1'; # VERSION
+
 use version;
 
 use Carp qw(croak);
@@ -189,7 +191,33 @@ OPM::Maker::Command::depcheck - Check if ticketsystem addon dependencies are ins
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
+
+=head1 DESCRIPTION
+
+Ticketsystem addons can define dependencies in the I<.opm> files, e.g.
+
+    <PackageRequired Version="6.0.0">FAQ</PackageRequired>
+    <ModuleRequired Version="8.0">Geo::IP2Location</ModuleRequired>
+    <ModuleRequired Version="0.02">HTTP::AcceptLanguage</ModuleRequired>
+
+In this case, the addon requires an other addon - FAQ with minimum version 6.0.0 -
+and two CPAN modules.
+
+This L<OPM::Maker> command checks for a given I<.sopm> or I<.opm> file
+if the dependencies are already installed.
+
+=head1 HOW IT WORKS
+
+For the other addons, this command tries to find the ticketsystem installation
+(it searches for I</opt/otrs>, I</opt/otobo> or I</opt/znuny>) and searches the database for
+installed addons.
+
+If it doesn't find the addons in the database, it looks for a
+I</opt/{otrs,otobo,znuny}/$addonname.sopm> file. If that file exists
+the addon is marked as I<installed>.
+
+For the CPAN dependencies, this command tries to I<use> the module.
 
 =head1 AUTHOR
 

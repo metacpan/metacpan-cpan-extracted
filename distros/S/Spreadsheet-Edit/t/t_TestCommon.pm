@@ -9,9 +9,13 @@
 #   Everything not specifically test-related is in the separate
 #   module t_Common (which is not necessairly just for tests).
 #
-#   Sets default encode/decode to UTF-8 for all file handles.
-#   (this must be done before Test::More is loaded to avoid problems).
-#   Then loads Test::More into your module.
+#   Loads Test2::V0, which sets UTF-8 encoding/decoding for test-harnes
+#   streasm (but *not* STD* or new filehandles).  And imports 'utf8'.
+#
+#   Makes STDIN, STDOUT & STDERR UTF-8 auto de/encode
+#
+#   warnings are *not* imported, to avoid clobbering 'no warnings ...'
+#   settings done beforehand (e.g. via t_Common).
 #
 #   If @ARGV contains -d etc. those options are removed from @ARGV
 #   and the corresponding globals are set: $debug, $verbose, $silent
@@ -34,20 +38,19 @@ use v5.16; # must have PerlIO for in-memory files for ':silent';
 
 use Carp;
 BEGIN{
-  # Unicode support
-  # This must be done before loading Test::More to be effective
   confess "Test::More already loaded!" if defined( &Test::More::ok );
   confess "Test2::V0 already loaded!" if defined( &Test2::V0::import );
 
-  # Maybe we should just call binmode(encoding...) on STDOUT & STDERR?
-  use open IO => ':encoding(UTF-8)', ':std';
+  binmode(STDIN, ":encoding(UTF-8)");
+  binmode(STDOUT, ":encoding(UTF-8)");
+  binmode(STDERR, ":encoding(UTF-8)");
 
   # Disable buffering
   STDERR->autoflush(1);
   STDOUT->autoflush(1);
 }
-#use Test::More 0.98; # see UNIVERSAL
 use Test2::V0 (); # a huge collection of tools
+require Test2::Plugin::BailOnFail; 
 use POSIX ();
 
 require Exporter;
@@ -92,7 +95,7 @@ GetOptions(
 Getopt::Long::Configure("default");
 
 if ($nonrandom) {
-  # This must run before Test::More is loaded!!
+  # This must run before Test::More or Test2::V0 is loaded!!
   # Normally this is the case because our package body is executed before
   # import() is called.
   if (open my $fh, "<", "/proc/sys/kernel/randomize_va_space") {
@@ -119,15 +122,18 @@ sub import {
   # (prevents corrupting $!/ERRNO in subsequent tests)
   eval '$[' // die;
 
-  #Test::More->import::into($target);
+  # Test2::V0
+  #  Do not import warnings, to avoid un-doing prior settings.
   #  Do not inport 1- and 2- or 3- character upper-case names, which are 
   #  likely to clash with user variables and/or spreadsheet column letters
-  #  (when using Spreadsheet::Edit).  Test2::Tools::Compare documents some 
-  #  of these ("QUICK CHECKS") as not be exported by default, but they are 
-  #  by default re-exported by Test2::V0 anyway.
+  #  (when using Spreadsheet::Edit).
   Test2::V0->import::into($target,
-    (map{ "!$_" } "A".."AAZ", "a".."z")
+    -no_warnings => 1,
+    (map{ "!$_" } "A".."AAZ")
   );
+
+  # Stop on the first error
+  Test2::Plugin::BailOnFail->import::into($target);
 
   if (grep{ $_ eq ':silent' } @_) {
     @_ = grep{ $_ ne ':silent' } @_;
@@ -138,10 +144,6 @@ sub import {
   goto &Exporter::import
 }
 
-#sub dprint(@)   { Test::More::note(@_)               if $debug };
-#sub dprintf($@) { Test::More::note($_[0],@_[1..$#_]) if $debug };
-#sub dprint(@)   { Test2::V0::note(@_)               if $debug };
-#sub dprintf($@) { Test2::V0::note($_[0],@_[1..$#_]) if $debug };
 # Avoid turning on Test2 if not otherwise used...
 sub dprint(@)   { print(@_)                if $debug };
 sub dprintf($@) { printf($_[0],@_[1..$#_]) if $debug };
@@ -177,40 +179,26 @@ sub string_to_tempfile($@) {
 # Run a Perl script in a sub-process.
 # Plain 'system  path/to/script.pl' does not work in a test environment
 # where the correct Perl executable is not at the front of PATH,
-# and also where -I options might supply library paths.
-# This is usually enclosed in Capture { ... }
+# and also where -I options might have supplied library paths.
+#
+# This is usually enclosed in Tiny::Capture::capture { ... }
+#    ==> IMPORTANT: Be sure STDOUT/ERR has :encoding(...) set beforehand
+#        because Tiny::Capture will decode captured output the same way.
+#        Otherwise wide chars will be corrupted
+#
 sub run_perlscript(@) {
-  my @script_and_args = @_;
-  oops unless defined($script_and_args[0]);
-  VERIF:
-  { open my $fh, "<", $script_and_args[0] or die "$script_and_args[0] : $!";
-    while (<$fh>) { last VERIF if /^#!.*perl|^\s*use\s+(?:warnings|\w+::)/; }
-    confess "$script_and_args[0] does not appear to be a Perl script";
-  }
-  my $pid = fork();
-  if ($pid==0) {
-    #CHILD
-    
-    # Try to erase connections to the parent's test harness
-    # **DOES NOT WORK**
-    local %ENV = (PATH => $ENV{PATH}, PERL5LIB => $ENV{PERL5LIB});
-    local $ENV{PERL5LIB} = join(":", @INC);
-    for my $fd (3..127) { POSIX::close($fd) }
-
-    exec $^X, @script_and_args;
-    die "exec failed";
-  }
-  waitpid($pid,0);
-  return $?;
+  my @perlargs = @_;  # might be ('-e', 'perlcode...')
+  unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
+  local $ENV{PERL5LIB} = join(":", @INC);
+  system $^X, @perlargs;
 }
 
 #--------------- :silent support ---------------------------
-# N.B. It appears, experimentally, that with Test::More output from ok(), 
-# like() and friends is not written to the test process's STDOUT or STDERR, 
-# so we do not need to worry about ignoring those normal outputs (somehow 
-# everything is merged at the right spots, presumably by a supervisory 
-# process).
-# [Note May23: This may not be true with Test2::V0]
+# N.B. It appears, experimentally, that output from ok(), like() and friends
+# is not written to the test process's STDOUT or STDERR, so we do not need
+# to worry about ignoring those normal outputs (somehow everything is
+# merged at the right spots, presumably by a supervisory process).
+# [Note May23: This was with Test::More may *NOT* be true with Test2::V0 !!]
 #
 # Therefore tests can be simply wrapped in silent{...} or the entire
 # program via the ':silent' tag; however any "Silence expected..." diagnostics
@@ -280,7 +268,6 @@ sub silent(&) {
   };
   my $errmsg = _finish_silent();
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  #Test::More::ok(! defined($errmsg), $errmsg);
   Test2::V0::ok(! defined($errmsg), $errmsg);
   wantarray ? @result : $result[0]
 }
@@ -315,6 +302,9 @@ sub verif_no_internals_mentioned($) { # croaks if references found
   
   # Ignore object refs like Some::Package=THING(hexaddr)
   s/(?<!\w)\w[\w:\$]*=(?:REF|ARRAY|HASH|SCALAR|CODE|GLOB)\(0x[0-9a-f]+\)//g;
+  
+  # Ignore Data::Dumper::addrvis output like Some::Package<dec:hex>
+  s/(?<!\w)\w[\w:\$]*<\d+:[\da-f]+>//g;
   
   # Mask references to our test library files named t_something.pm
   s#\b(\bt_\w+).pm(\W|$)#<$1 .pm>$2#gs;
@@ -357,7 +347,7 @@ our @quotes = ("«", "»");
 sub rawstr(_) { # just the characters in French Quotes (truncated)
   # Show spaces visibly
   my $text = $_[0];
-  $text =~ s/ /\N{MIDDLE DOT}/gs;
+  ##$text =~ s/ /\N{MIDDLE DOT}/gs;
   $quotes[0].(length($text)>$showstr_maxlen ? substr($text,0,$showstr_maxlen-3)."..." : $text).$quotes[1]
 }
 
@@ -381,20 +371,23 @@ sub showstr(_) {
   }
 }
 
-# Show both the raw string in French Quotes, and with hex escapes
+# Show the raw string in French Quotes.
+# If STDOUT is not UTF-8 encoded, also show D::D hex escapes 
 # so we can still see something useful in output from non-Unicode platforms.
 sub displaystr($) {
   my ($input) = @_;
   return "undef" if ! defined($input);
-  # Data::Dumper will show 'wide' characters as hex escapes
-  my $dd = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump;
-  chomp $dd;
-  if ($dd eq $input || $dd eq "\"$input\"") {
-    # No special characters, so omit the hex-escaped form
-    return rawstr($input)
-  } else {
-    return rawstr($input)."($dd)"
+  local $_;
+  state $utf8_output = grep /utf.?8/i, PerlIO::get_layers(*STDOUT, output=>1);
+  my $r = rawstr($input);
+  if (! $utf8_output && $input =~ /[^[:print:]]/a) {
+    # Data::Dumper will show 'wide' characters as hex escapes
+    my $dd = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump;
+    if ($dd ne $input && $dd ne "\"$input\"") {
+      $r .= "\nD::D->$dd";
+    }
   }
+  $r
 }
 
 sub fmt_codestring($;$) { # returns list of lines
@@ -408,8 +401,7 @@ sub t_ok($;$) {
   my $lno = (caller)[2];
   $test_label = ($test_label//"") . " (line $lno)";
   @_ = ( $isok, $test_label );
-  #goto &Test::More::ok;  # show caller's line number
-  goto &Test2::V0::ok; # show caller's line number
+  goto &Test2::V0::ok;  # show caller's line number
 }
 sub ok_with_lineno($;$) { goto &t_ok };
 
@@ -418,8 +410,7 @@ sub t_is($$;$) {
   my $lno = (caller)[2];
   $test_label = ($test_label//$exp//"undef") . " (line $lno)";
   @_ = ( $got, $exp, $test_label );
-  #goto &Test::More::is;  # show caller's line number
-  goto &Test2::V0::ok; # show caller's line number
+  goto &Test2::V0::is;  # show caller's line number
 }
 sub is_with_lineno($$;$) { goto &t_is }
 
@@ -428,8 +419,7 @@ sub t_like($$;$) {
   my $lno = (caller)[2];
   $test_label = ($test_label//$exp) . " (line $lno)";
   @_ = ( $got, $exp, $test_label );
-  #goto &Test::More::like;  # show caller's line number
-  goto &Test2::V0::ok; # show caller's line number
+  goto &Test2::V0::like;  # show caller's line number
 }
 sub like_with_lineno($$;$) { goto &t_like }
 
@@ -483,12 +473,9 @@ sub expect1($$) {
 # into a regex which works with all versions.
 # As of 1/1/23 the input string is expected to be what Perl v5.34 produces.
 our $bs = '\\';  # a single backslash
-sub expstr2re($) {
+sub _expstr2restr($) {
   local $_ = shift;
   confess "bug" if ref($_);
-  unless (m#qr/|"::#) {
-    return $_; # doesn't contain variable-representation items
-  }
   # In \Q *string* \E the *string* may not end in a backslash because
   # it would be parsed as (\\)(E) instead of (\)(\E).
   # So change them to a unique token and later replace problematic
@@ -503,7 +490,7 @@ sub expstr2re($) {
     # Alternate: qr/(?^MODIFIERS:STUFF)/
     # Alternate: qr/(?^uMODIFIERS:STUFF)/
 #say "#XX qr BEFORE: $_";
-    s#qr/([^\/]+)/([msixpodualngcer]*)
+    s#qr/((?:\\.|[^\/])+)/([msixpodualngcer]*)
      #\\E\(\\Qqr/$1/\\Eu?\\Q$2\\E|\\Qqr/(?^\\Eu?\\Q$2:$1)/\\E\)\\Q#xg
       or confess "Problem with qr/.../ in input string: $_";
 #say "#XX qr AFTER : $_";
@@ -527,13 +514,29 @@ sub expstr2re($) {
   s/<BS>/\\/g;
 #say "#XX    FINAL : $_";
 
-  my $saved_dollarat = $@;
-  my $re = eval "qr{${_}}"; die "$@ " if $@;
-  $@ = $saved_dollarat;
-  $re
+  $_
+}
+sub expstr2re($) { 
+  my $input = shift;
+  my $xdesc; # extra debug description of intermediates
+  my $output;
+  if ($input !~ m#qr/|"::#) {
+    # doesn't contain variable-representation items
+    $output = $input;
+    $xdesc = ""; 
+  } else {
+    my $s = _expstr2restr($input);
+    my $saved_dollarat = $@;
+    my $re = eval "qr{$s}"; die "$@ " if $@;
+    $@ = $saved_dollarat;
+    $xdesc = "**Orig match str  :".displaystr($input)."\n"
+            ."**Generated re str:".displaystr($s)."\n" ;
+    $output = $re;
+  }
+  wantarray ? ($xdesc, $output) : $output
 }
 
-# mycheck $test_desc, string_or_regex, result
+# check $test_desc, string_or_regex, result
 sub mycheck($$@) {
   my ($desc, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller
@@ -554,15 +557,18 @@ sub mycheck($$@) {
   foreach my $i (0..$#actual) {
     my $actual = $actual[$i];
     my $expected = $expected[$i];
+    my $xdesc = "";
     if (!ref($expected)) {
       # Work around different Perl versions stringifying regexes differently
-      $expected = expstr2re($expected);
+      #$expected = expstr2re($expected);
+      ($xdesc, $expected) = expstr2re($expected);
     }
     if (ref($expected) eq "Regexp") {
       unless ($actual =~ $expected) {
         @_ = ( "\n**************************************\n"
               ."TESTb FAILED: ".$desc."\n"
               ."Expected (Regexp):\n".${expected}."<<end>>\n"
+              .$xdesc
               ."Got:\n".displaystr($actual)."<<end>>\n"
              ) ;
         Carp::confess(@_); #goto &Carp::confess;
@@ -585,17 +591,14 @@ sub verif_eval_err(;$) {  # MUST be called on same line as the 'eval'
   my $fn = $caller[1];
   my $ex = $@;
   confess "expected error did not occur at $fn line $ln\n",
-          fmtsheet(sheet({package => $caller[0]}))
     unless $ex;
 
   if ($ex !~ / at $fn line $ln\.?(?:$|\n)/s) {
     confess "Got UN-expected err (not ' at $fn line $ln'):\n«$ex»\n",
-            fmtsheet(sheet({package => $caller[0]})),
             "\n";
   }
   if ($msg_regex && $ex !~ qr/$msg_regex/) {
     confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$ex»\n",
-            fmtsheet(sheet({package => $caller[0]})),
             "\n";
   }
   verif_no_internals_mentioned($ex);
@@ -612,9 +615,13 @@ sub insert_loc_in_evalstr($) {
 sub timed_run(&$@) {
   my ($code, $maxcpusecs, @codeargs) = @_;
 
-  eval { require Time::HiRes };
-  my $getcpu = defined(eval{ &Time::HiRes::clock() })
-    ? \&Time::HiRes::clock : sub{ my @t = times; $t[0]+$t[1] };
+  my $getcpu = eval {do{ 
+    require Time::HiRes;
+    () = (&Time::HiRes::clock());
+    \&Time::HiRes::clock;
+  }} // sub{ my @t = times; $t[0]+$t[1] };
+  dprint("Note: $@") if $@;
+  $@ = ""; # avoid triggering "Eval error" in mycheck();
 
   my $startclock = &$getcpu();
   my (@result, $result);

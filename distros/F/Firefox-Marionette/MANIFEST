@@ -1,6 +1,7 @@
 Changes
 lib/Firefox/Marionette.pm
 lib/Firefox/Marionette/Buttons.pm
+lib/Firefox/Marionette/Cache.pm
 lib/Firefox/Marionette/Capabilities.pm
 lib/Firefox/Marionette/Certificate.pm
 lib/Firefox/Marionette/Cookie.pm
@@ -54,11 +55,22 @@ t/data/last_pass_example.csv
 t/00.load.t
 t/01-marionette.t
 t/02-taint.t
+t/03-close.t
+t/03-closedir.t
+t/03-fork.t
+t/03-mkdir.t
+t/03-opendir.t
+t/03-read.t
+t/03-seek.t
+t/03-stat.t
+t/03-sysopen.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/addons/test.xpi
 t/addons/discogs-search/manifest.json
 t/addons/discogs-search/README.md
+t/stub.pl
+t/syscall_tests.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

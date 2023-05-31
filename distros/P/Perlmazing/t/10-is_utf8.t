@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 7;
-use Perlmazing;
+use Perlmazing qw(is_utf8);
 use Encode;
 my $string = '¡Hola amigos! Pongan atención, esto es un poco de español';
 my $encoded_string = Encode::encode('utf8', $string);

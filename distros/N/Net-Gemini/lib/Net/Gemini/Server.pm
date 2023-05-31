@@ -9,7 +9,7 @@
 #   trustworthy does not get caught, but the evil cannot pass through."
 
 package Net::Gemini::Server;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use strict;
 use warnings;
 # the below code mostly cargo culted from example/ssl_server.pl

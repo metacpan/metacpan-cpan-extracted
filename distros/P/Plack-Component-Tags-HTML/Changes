@@ -1,3 +1,8 @@
+0.13 2023-05-29T16:49:03+02:00
+ - Move defaults to _prepare_app() directly. Possible to rewrite/place in
+   module, which inherits this.
+ - Update Module::Install to 1.21 version.
+
 0.12 2023-02-10T23:04:51+01:00
  - Fix CSS processing from Tags::HTML::Page::Begin.
 

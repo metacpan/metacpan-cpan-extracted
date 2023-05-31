@@ -91,7 +91,7 @@ sub do_csvgrep {
     my $grep_args = shift;
     my $filename = $fh->filename;
     my $stdout = capture_stdout {
-        system("perl $RealBin/../bin/csvgrep $grep_args $filename");
+        system("$^X $RealBin/../bin/csvgrep $grep_args $filename");
     };
 
     return $stdout;

@@ -1,11 +1,8 @@
-.travis.yml
 Changes
-lib/Web/.Feed.pm.swp
 lib/Web/Feed.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/01-load.t
-tv
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

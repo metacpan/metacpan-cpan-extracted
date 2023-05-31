@@ -5,17 +5,19 @@
 
 # Pod documentation is below (use perldoc to view)
 
+use 5.18.0; # lexical subs with bug we have worked around
 use strict; use warnings FATAL => 'all'; use utf8;
-use feature qw(say state lexical_subs current_sub);
 no warnings qw(experimental::lexical_subs);
+use feature qw(say state lexical_subs current_sub);
 
 package Spreadsheet::Edit;
-our $VERSION = '3.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-05-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-05-31'; # DATE from Dist::Zilla::Plugin::OurDate
+
+# FIXME: cmd_nesting does nothing except prefix >s to log messages.
+#        Shouldn't it skip that many "public" call frames???
 
 # TODO FIXME: Integrate with Spreadsheet::Read and provide a formatting API
-#
-# TODO: Need api to *read* options without changing them
 
 # TODO: Allow & support undef cell values (see Text::CSV_XS), used to
 #       represent "NULL" when interfacing with database systems.
@@ -198,7 +200,9 @@ sub _generateHash_crow {  # %crow indexes cells in the current row during apply
 #
 ########################### End of Exporting stuff ##########################
 
-#use Data::Dumper::Interp 5.000;
+use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall/;
+
+#use Data::Dumper::Interp 5.019;  # no $VERSION in dev sandbox; see dist.ini
 use Data::Dumper::Interp;
 
 use Carp;
@@ -212,6 +216,7 @@ use Scalar::Util qw(looks_like_number openhandle reftype refaddr blessed);
 use List::Util qw(min max sum0 first any all pairs pairgrep);
 use File::Temp qw(tempfile tempdir);
 use File::Basename qw(basename dirname fileparse);
+use File::Find ();
 use Symbol qw(gensym);
 use POSIX qw(INT_MAX);
 use Guard qw(scope_guard);
@@ -226,58 +231,11 @@ use Spreadsheet::Edit::IO qw(
 
 sub oops(@) { unshift @_, "oops - "; goto &Carp::confess; }
 
-my $mypkg = __PACKAGE__;
-
 use constant _CALLER_OVERRIDE_CHECK_OK =>
-     (! defined(&Carp::CALLER_OVERRIDE_CHECK_OK) 
-      || &Carp::CALLER_OVERRIDE_CHECK_OK);
+     (defined(&Carp::CALLER_OVERRIDE_CHECK_OK) 
+      && &Carp::CALLER_OVERRIDE_CHECK_OK);
 
-sub __mytraceback() {
-  my $foldwidth = 80;
-  my $indent = "  ";
-  my $s = "";
-  for (my $lvl=1 ; ; ++$lvl) {
-    # A Perl panic sometimes occurs because element(s) of @DB::args are
-    # freed, due to a refcounting bug somewhere.  It seems, at least for us,
-    # to be related to args-less calls like &__self ;  Avoiding referencing
-    # @DB::args if hasargs is not true seems to circumvent this.
-    # https://github.com/Perl/perl5/issues/11758#issuecomment-1430576569
-    # Carp has some work-arounds like pre-setting DB::args 
-    # to "a sentinel which no-one else has the address of" and using eval;
-    # there are some contentious bugreps about this; see comments in Carp.pm 
-    @DB::args = \$lvl if _CALLER_OVERRIDE_CHECK_OK; # work-around from Carp
-    my ($pkg, $fname, $lno, $called_subr,$hasargs,$wantarray,$evaltext) =
-      do{ package
-            DB; caller($lvl) };
-    last if !defined($pkg);
-    my $calling_subr = (caller($lvl+1))[3];
-    ($fname //= "") =~ s#.*/##;
-    $lno //= "";
-    foreach ($calling_subr, $called_subr) {
-      s/^\Q${mypkg}::\E// if defined;
-    }
-
-    my $line1 = $indent.($lvl-1).": ";
-    if ($called_subr eq '(eval)') {
-      $line1 .= defined($evaltext) ? "eval ".vis($evaltext) : "eval{...}";
-    }
-    elsif (! $hasargs) {
-      $line1 .= '&'.$called_subr;
-    } else {
-      my @args = eval { @DB::args };
-      $line1 .= $called_subr.($@ ? "(sorry: perl bug prevents arg retrieval)"
-                                 : avis(@args));
-    }
-
-    my $line2 = " called".($calling_subr ? " from $calling_subr" : "")
-               ." at ${fname}:${lno}";
-
-    $s .= "\n" if $s ne "";
-    $s .= (length($line1)+length($line2) <= $foldwidth)
-            ? $line1.$line2 : $line1."\n".$indent." ".$line2;
-  }
-  $s .= "\n";
-}
+# sub __mytraceback() { ... } archived in commit 482e09b6009
 
 use constant DEFAULT_WRITE_ENCODING => 'UTF-8';
 #use constant DEFAULT_READ_ENCODINGS => 'UTF-8,windows-1252';
@@ -487,7 +445,10 @@ sub _fmt_colx(;$$) {
       if (ref $_) {
         push @items, $$_; # \"string" means insert "string" literally
       } else {
-        additem($_, $hash{$_}//oops(dvis '$_ $specs\n$hash'));
+        # Work around old Perl lexical sub limitations...
+        my $item=$hash{$_}; 
+          oops(dvis '$_ $specs hash=',hvis(%hash)) unless defined $item;
+        additem($_, $item);
         delete $hash{$_} // oops;
       }
     }
@@ -498,12 +459,17 @@ sub _fmt_colx(;$$) {
   my @ABCs    = subset [ map{ my $A = cx2let($_);
                               u($hash{$A}) eq $_ ? $A : \"  "
                             } 0..$num_cols-1 ];
+
+  # More lexical sub bug work-arounds...
+  my @ss1 = subset [sortbycx grep{ /^(=.*\D)\w+$/ } keys %hash]; # normal titles
+  my @ss2 = subset [sortbycx grep{ /^\d+$/ } keys %hash];        # numeric titles
+  my @ss3 = subset [sortbycx keys %hash];                        # oddities
   __fill [
            @ABCs,
-           subset [sortbycx grep{ /^(=.*\D)\w+$/ } keys %hash], # normal titles
-           subset [sortbycx grep{ /^\d+$/ } keys %hash],        # numeric titles
-           subset [sortbycx keys %hash],                        # oddities
-         ], $indent, $foldwidth
+           @ss1,
+           @ss2,
+           @ss3,
+         ], $indent, $foldwidth;
 }
 
 # Is a title a special symbol or looks like a cx number?
@@ -668,10 +634,13 @@ sub logmsg(@) {
 }
 
 #####################################################################
-# Locate the nearest call to a public method/function in the call stack.
+# Locate the nearest call to a public sub in the call stack.
+# [Now *GENERIC*]
 #
-# Basically we search for a call to any of our subs with a name not starting
-# with underscore, excluding a few public utilities we might call internally.
+# A "public" sub means anything named starting with [a-z], irrespective
+# of package, and not mentioned in $USERCALL_NOT.
+# The assumption is that internal subs are named with an initial
+# underscore or are ALLCAPS (e.g. for constants).
 #
 # RETURNS
 #   ([frame], [called args]) in array context
@@ -681,22 +650,19 @@ sub logmsg(@) {
 #   0       1        2       3
 #   package filename linenum subname ...
 #
-sub __usercall_info() {
+sub __usercall_info(;$) {
   for (my $lvl=1 ; ; ++$lvl) {
     @DB::args = \$lvl if _CALLER_OVERRIDE_CHECK_OK; # see mytraceback()
     my @frame = do{ package
                       DB; caller($lvl) };
     oops dvis('$lvl @frame') unless defined($frame[0]);
-    if ($frame[3] =~ /^\Q${mypkg}::\E([a-z][^:]*)/
-         # && $1 ne "internal_utility_1" ...
-         # && $1 ne "internal_utility_2" ...
-       ) {
+    if ( $frame[3] =~ /::([a-z][^:]*)/ ) {
       return \@frame unless wantarray;
       my @args;
       my $hasargs = $frame[4];
       if ($hasargs) {
         eval{ @args = @DB::args }; 
-        @args=() if $@; # perl bug?
+        @args=("<perl bug(?) prevented getting args>") if $@;
       }
       return (\@frame, \@args)
     }
@@ -725,7 +691,7 @@ sub __find_userpkg() {
 # checks that it is not an internal call, which should never happen
 sub __callerpkg() {
   my $pkg = (caller(1))[0];
-  oops if $pkg =~ /^$mypkg/;
+  oops if index($pkg,__PACKAGE__) == 0;
   $pkg
 }
 
@@ -1195,34 +1161,48 @@ sub _tie_col_vars {
         no strict 'refs';
         if (exists ${$p.'::'}{$ident}) {
           my $msg = <<EOF ;
-'$ident' clashes with an existing variable in package '$p' .
+COLSPEC '$ident' clashes with an existing object in package '$p' .
     This is dis-allowed when tie_column_vars was called with option :safe,
     in this case at ${file}:${lno} .  In this situation you can not
     explicitly declare the tied variables, and they must be tied and
     imported before the compiler sees them.
 
-    Note: The clash may not be with a scalar, but something else 
+    Note: The clash might not be with a scalar \$$ident, but something else 
     named '${ident}' in the same package (array, hash, sub, filehandle, 
     etc.) Unfortunately it is not possible to distinguish a non-existent
     scalar from a declared scalar containing an undef value
-    (see *foo{SCALAR} in 'man perlref').  
-    Therefore, to be safe, nothing with the name '${ident}' may pre-exist.
+    (see *foo{SCALAR} in 'man perlref').  Therefore, to be safe, 
+    nothing is allowed to pre-exist with the name '${ident}'.
 EOF
-          if (defined(my $val = ${"${p}::${ident}"})) {
-            $msg .= "\n  Found existing non-undef scalar \$${p}::${ident} = ".vis($val)."\n";
+          # We can detect anything other than an undef scalar
+          local $Data::Dumper::Maxdepth = 2;
+          local $Data::Dumper::Interp::Maxdepth = 2;
+          my $fqname = $p."::".$ident;
+          no strict 'refs';
+          if (my $r = *$fqname{SCALAR}) {
+            if (defined($$r)) {
+              $msg .= "\nExisting *Defined* Scalar \$$ident = ".vis($$r)."\n";
+            }
           }
-          if (defined(my $code = \&{"${p}::${ident}"})) {
-            $msg .= "\n  Found existing sub ${p}::${ident} = ".Data::Dumper->new([$code])->Terse(1)->Indent(0)->Deparse(1)->Dump()."\n";
+          if (my $r = *$fqname{ARRAY}) {
+            $msg .= "\nExisting Array \@$fqname = ".avis(@$r)."\n";
           }
-          if ($debug && eval{ require Devel::Symdump; }) {
+          if (my $r = *$fqname{HASH}) {
+            $msg .= "\nExisting Hash \%$fqname = ".hvis(%$r)."\n";
+          }
+          if (my $r = *$fqname{CODE}) {
+            $msg .= "\nExisting $fqname = ".Data::Dumper->new([$r])->Terse(1)->Indent(0)->Deparse(1)->Dump()."\n";
+          }
+          if (my $r = *$fqname{IO}) {
+            $msg .= "\nExisting IO object $fqname (file/dir handle, etc.)\n";
+          }
+          if (eval{ require Devel::Symdump; }) {
             my $obj = Devel::Symdump->new($p);
-            $msg .= "\nPackage $p contains:\n";
-            for my $things (qw/scalars arrays hashes functions 
-                               filehandles dirhandles ios unknowns
-                              packages/) {
-              my @names = sort grep{$_ ne ""} 
-                               map{ s/^${p}::(?:.*::)*//r } $obj->$things();
-              $msg .= "   $things :".avis(@names)."\n" if @names;
+            foreach (qw/FILEHANDLE.s DIRHANDLE.s UNKNOWN.s PACKAGE.s/) {
+              /^(.+)\.(.*)$/ or die; my $kind = lc $1; my $methname = lc $1.$2;
+              if (grep{$_ eq $ident} $obj->$methname()) {
+                $msg .= "\n  Found existing $kind object $fqname\n";
+              }
             }
           }
           croak "\n$msg\n";
@@ -1417,7 +1397,7 @@ sub _log {
 # Object refs in the top two levels are not visualized.
 #
 # If the arguments are recognized as a sequence then they are formatted as
-# Arg0..ArgN instead of Arg1,Arg2,...,ArgN.
+# Arg1..ArgN instead of Arg1,Arg2,...,ArgN.
 #
 sub _is_annotation($) { ref($_[0]) eq 'SCALAR' }
 sub fmt_list(@) {
@@ -1435,7 +1415,8 @@ sub fmt_list(@) {
   # Join vis() results with commas except for \"..." annotations
   join "", map{
      _is_annotation($_[$_]) ? ${ $_[$_] } :
-     vis($_[$_]) . (($_ < $#_ && !_is_annotation($_[$_+1])) ? "," : "")
+     visnew->Pad("  ")->vis($_[$_]) 
+     . (($_ < $#_ && !_is_annotation($_[$_+1])) ? "," : "")
               } (0..$#_)
 }
 ## test
@@ -1470,59 +1451,7 @@ sub fmt_sheet($) {
   $r
 }
 
-# __calldesc([ITEMS...], undef,        optOBJECT)  # no return value
-# __calldesc([ITEMS...], [RETVALS...], optOBJECT)
-#
-# Compose a message string about the current function or method call:
-#
-#   ">[callers_file:callers_lno] <OBJaddr> calledsubname ITEMS\n"
-# or
-#   ">[callers_file:callers_lno] <OBJaddr> calledsubname ITEMS -> RETVALS\n"
-#
-# <OBJaddr> is shown only once in a sequence of calls with the same value.
-#
-# ITEMS and RETURNVALS are formatted by fmt_list, so may contain embedded
-# \"annotations" etc.   \n is unconditionally appended to the overall result.
-#
-# ITEMS Special case: The first ITEM is ignored if it is a ref to an empty 
-#   hash; this assumes it came from __opthash and prevents showing {}
-#   when the user actually did not pass any {OPTARGS} argument.  
-#
-sub __calldesc($;$$) {
-  my ($items_arg, $retvals, $object) = @_;
-  oops unless ref($items_arg) eq "ARRAY";
-
-  my $items =
-    (ref($items_arg->[0]) eq "HASH" && !(keys %{$items_arg->[0]}))
-      ? [@$items_arg[1..$#$items_arg]] : $items_arg;
-
-  my ($fn, $lno, $subname) = __fn_ln_methname();
-  my $msg = ">[$fn:$lno] $subname";
-
-  state $prev_objaddr = 0;
-  if (defined $object) {
-    if (refaddr($object) != $prev_objaddr) {
-      #$msg .= " <".addrvis(refaddr($object)).">";
-      $msg .= " <".fmt_sheet($object).">";
-      $prev_objaddr = refaddr($object);
-    }
-  } else {
-    $prev_objaddr = 0;
-  }
-
-  $msg .= " ".fmt_list(@$items) if @$items;
-  if (defined $retvals) {
-    oops unless ref($retvals) eq "ARRAY";
-    oops "terminal newline in last item" if $msg =~ /\n"?\z/s;
-    $msg .= "()" if @$items == 0;
-    $msg .= " -> ";
-    $msg .= fmt_list(@$retvals);
-  }
-  oops "terminal newline should not be included" if $msg =~ /\n"?\z/s;
-  $msg."\n"
-}
-
-sub _methretmsg {
+sub _methretmsg { #METHOD
   oops if @_ > 3; # (self, items, retvals)
   my $self = shift;
   my ($items, $retvals) = @_;
@@ -1530,22 +1459,23 @@ sub _methretmsg {
   # Prepend additional ">"s according to {cmd_nesting}
   my $pfx = ">" x ($$self->{cmd_nesting});
 
-  $pfx . &__calldesc($items, $retvals, $self);
+  $pfx . fmt_methcall($self,$items,$retvals);
 }
 
-sub _logmethret {
+sub _logmethret { #METHOD
   print STDERR &_methretmsg;
-  $_[0]  # return self for chaining
+  oops if defined(wantarray);
 }
-sub _logmethretifv {
+sub _logmethretifv { #METHOD
   oops if @_ > 3; # (self, items, retvals)
   return unless ${$_[0]}->{verbose};
   goto &_logmethret;
 }
 
-sub __logmethret($$) {
+sub __logmethret($$) { #FUNCTION
+  my ($items, $retvals) = @_;
   # FIXME: Should this prefix with ">" also?
-  print STDERR &__calldesc
+  print STDERR fmt_call($items,$retvals);
 }
 
 #-----------------------------------------------
@@ -1840,7 +1770,7 @@ sub _colspec2cx {
 
 # The user-callable API
 # THROWS if a spec does not indicate any existing column.
-# Can return multiple results, either from multple args or Regexp multimatch
+# Can return multiple results due to multple args and/or Regexp multimatch
 # In scalar context returns the first result.
 sub spectocx(@) { # the user-callable API
   my $self = &__selfmust;
@@ -2007,6 +1937,10 @@ sub _autodetect_title_rx {
 
   my ($title_rx, $rows, $colx, $num_cols, $verbose, $debug) =
      @$$self{qw(title_rx rows colx num_cols verbose debug)};
+
+  if ($#$rows == -1) {
+    return undef; # completely empty
+  }
 
   # Filter out titles which can not be used as a COLSPEC
   my @required_specs = $opthash->{required}
@@ -2704,7 +2638,7 @@ sub read_spreadsheet($;@) {
                       [
       qw/title_rx/,
       qw/iolayers encoding verbose silent debug/,
-      qw/tempdir use_gnumeric sheetname/, # for OpenAsCsv
+      qw/tempdir use_gnumeric raw_values sheetname/, # for OpenAsCsv
       qw/required min_rx max_rx first_cx last_cx/, # for title_rx
                       ],
       desc => "read_spreadsheet option",
@@ -3045,7 +2979,7 @@ sub _refval_tiehelper { # access a sheet variable which is a ref of some kind
 sub sheet(;$$) {
   my $opthash = &__opthash;
   my $pkg = $opthash->{package} // caller();
-   oops if $pkg =~ /$mypkg/;
+  oops if index($pkg,__PACKAGE__) >= 0; # not us or sub-pkg
   my $pkgmsg = $opthash->{package} ? " [for pkg $pkg]" : "";
   my $curr = $pkg2currsheet{$pkg};
   my $verbose = ($curr && $$curr->{verbose});

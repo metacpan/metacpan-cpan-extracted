@@ -3,7 +3,7 @@ NAME
     which helps create easy-to-extend modules that export symbols
 
 VERSION
-    version 0.200000
+    version 1.000004
 
 SYNOPSIS
     Define a module with exports

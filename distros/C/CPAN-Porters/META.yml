@@ -1,19 +1,26 @@
 ---
-name: CPAN-Porters
-version: 0.03
+abstract: 'Description on how to created binary packages from CPAN distributions'
 author:
-  - 'This document is maintained by Gabor Szabo <gabor@pti.co.il>'
-abstract: Description on how to created binary packages from CPAN distributions
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
+  - 'Gabor Szabo <szabgab@cpan.org>'
 build_requires:
-  Test::More: 0.47
-provides:
-  CPAN::Porters:
-    file: lib/CPAN/Porters.pm
-    version: 0.03
-generated_by: Module::Build version 0.2808
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Porters
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/szabgab/CPAN-Porters/issues
+  repository: https://github.com/szabgab/CPAN-Porters.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

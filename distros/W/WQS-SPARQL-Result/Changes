@@ -1,2 +1,13 @@
+0.03 2023-05-28T15:11:10+02:00
+ - Add error for unsupported result types.
+ - Add example to doc.
+ - Add tests.
+ - Fix doc in result() method.
+ - Support result literal.
+
+0.02 2023-05-28T10:38:39+02:00
+ - Add verbose parameter, which dumps result JSON structure.
+ - Skip result variables, which doesn't exist.
+
 0.01 2023-05-26T10:21:33+02:00
  - First version.

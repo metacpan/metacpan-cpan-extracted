@@ -2,5 +2,5 @@
 # MIT License
 
 class IO {
-  version "0.202";
+  version "0.202001";
 }

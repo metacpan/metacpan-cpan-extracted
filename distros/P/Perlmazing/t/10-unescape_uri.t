@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 3;
-use Perlmazing;
+use Perlmazing qw(escape_uri unescape_uri);
 
 my @uris = (
 	qw(

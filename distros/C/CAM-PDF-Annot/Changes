@@ -1,5 +1,8 @@
 Revision history for Perl extension CAM::PDF::Annot.
 
+0.10 2023.05.29
+    - Replace Travis-CI by GitHub Actions
+
 0.09 2014.09.08
     - Add YAML::Tiny to test requirements.
 

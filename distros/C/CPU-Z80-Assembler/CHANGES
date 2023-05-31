@@ -1,3 +1,18 @@
+2.25	2023-05-27
+
+	Bug Fixes
+	* #4: Makefile out-of-date with respect to lib/CPU/Z80/Assembler.pm
+
+2.24	2023-05-27
+
+	Other
+	* Add bugtracker URL
+
+2.23	2023-05-27
+
+	Bug Fixes
+	* #3: Can't locate Asm/Preproc.pm in @INC
+
 2.22	2023-05-24
 
 	Bug Fixes
